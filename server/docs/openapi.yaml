@@ -1,0 +1,77 @@
+openapi: 3.0.3
+
+info:
+  title: SINGGAH API
+  version: 1.0.0
+  description: REST API SINGGAH
+
+servers:
+  - url: http://localhost:5000/api
+
+paths:
+  /auth/login:
+    $ref: './paths/auth.yaml#/login'
+
+  /auth/register:
+    $ref: './paths/auth.yaml#/register'
+
+  /auth/verify-email:
+    $ref: './paths/auth.yaml#/verifyEmail'
+
+  /auth/resend-verification:
+    $ref: './paths/auth.yaml#/resendVerification'
+
+  /auth/forgot-password:
+    $ref: './paths/auth.yaml#/forgotPassword'
+
+  /auth/verify-reset-code:
+    $ref: './paths/auth.yaml#/verifyResetCode'
+
+  /auth/reset-password:
+    $ref: './paths/auth.yaml#/resetPassword'
+
+  /auth/change-password:
+    $ref: './paths/auth.yaml#/changePassword'
+
+  /users:
+    $ref: './paths/users.yaml#/collection'
+
+  /users/{id}:
+    $ref: './paths/users.yaml#/single'
+
+  /categories:
+    $ref: './paths/categories.yaml#/collection'
+
+  /categories/{id}:
+    $ref: './paths/categories.yaml#/single'
+
+  /projects:
+    $ref: './paths/projects.yaml#/collection'
+
+  /projects/{id}:
+    $ref: './paths/projects.yaml#/single'
+
+  /news:
+    $ref: './paths/news.yaml#/collection'
+
+  /news/{id}:
+    $ref: './paths/news.yaml#/single'
+
+  /dashboard:
+    $ref: './paths/dashboard.yaml#/summary'
+
+  /notifications:
+    $ref: './paths/notifications.yaml#/collection'
+
+  /notifications/read-all:
+    $ref: './paths/notifications.yaml#/markAllRead'
+    
+  /notifications/{id}/read:
+    $ref: './paths/notifications.yaml#/markOneRead'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

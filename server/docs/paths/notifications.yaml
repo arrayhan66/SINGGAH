@@ -1,0 +1,172 @@
+collection:
+  get:
+    tags:
+      - Notifications
+
+    summary: Ambil daftar notifikasi milik user yang login
+
+    description: |
+      Mengambil daftar notifikasi milik user yang sedang login, dengan pagination.
+
+    security:
+      - BearerAuth: []
+
+    parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 10
+
+    responses:
+
+      "200":
+        description: Berhasil mengambil notifikasi
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil mengambil notifikasi
+                data:
+                  type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          type:
+                            type: string
+                            example: project_approved
+                          title:
+                            type: string
+                            example: Project Disetujui
+                          message:
+                            type: string
+                            example: Project "SINGGAH" Anda telah disetujui admin.
+                          reference_type:
+                            type: string
+                            nullable: true
+                            example: project
+                          reference_id:
+                            type: integer
+                            nullable: true
+                            example: 5
+                          is_read:
+                            type: boolean
+                            example: false
+                    pagination:
+                      type: object
+                      properties:
+                        page:
+                          type: integer
+                          example: 1
+                        limit:
+                          type: integer
+                          example: 10
+                        total:
+                          type: integer
+                          example: 12
+                        totalPages:
+                          type: integer
+                          example: 2
+
+markAllRead:
+  patch:
+    tags:
+      - Notifications
+
+    summary: Tandai semua notifikasi sebagai sudah dibaca
+
+    security:
+      - BearerAuth: []
+
+    responses:
+
+      "200":
+        description: Semua notifikasi berhasil ditandai sudah dibaca
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Semua notifikasi ditandai sudah dibaca
+                data:
+                  type: object
+                  nullable: true
+                  example: null
+
+markOneRead:
+  patch:
+    tags:
+      - Notifications
+
+    summary: Tandai satu notifikasi sebagai sudah dibaca
+
+    security:
+      - BearerAuth: []
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+
+    responses:
+
+      "200":
+        description: Notifikasi berhasil ditandai sudah dibaca
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Notifikasi ditandai sudah dibaca
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    type:
+                      type: string
+                      example: project_approved
+                    title:
+                      type: string
+                      example: Project Disetujui
+                    message:
+                      type: string
+                      example: Project "SINGGAH" Anda telah disetujui admin.
+                    is_read:
+                      type: boolean
+                      example: true
+
+      "404":
+        description: Notifikasi tidak ditemukan

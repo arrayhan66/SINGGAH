@@ -1,0 +1,394 @@
+collection:
+  get:
+    tags:
+      - Projects
+
+    summary: Ambil daftar project
+
+    description: |
+      Mengambil daftar project dengan filter pencarian, kategori, status, tahun,
+      dan pagination.
+
+    parameters:
+      - name: search
+        in: query
+        schema:
+          type: string
+        description: Mencari berdasarkan judul, deskripsi, atau nama pembuat
+        example: sistem informasi
+
+      - name: category_id
+        in: query
+        schema:
+          type: integer
+        example: 1
+
+      - name: status
+        in: query
+        schema:
+          type: string
+        example: published
+
+      - name: year
+        in: query
+        schema:
+          type: integer
+        example: 2025
+
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 10
+
+    responses:
+
+      "200":
+        description: Berhasil mengambil daftar project
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          title:
+                            type: string
+                            example: SINGGAH - Sistem Informasi Gelar Gagasan
+                          slug:
+                            type: string
+                            example: singgah-sistem-informasi
+                          description:
+                            type: string
+                            example: Platform untuk memamerkan hasil karya akademik.
+                          thumbnail:
+                            type: string
+                            example: https://res.cloudinary.com/demo/image/upload/thumbnail.jpg
+                          year:
+                            type: integer
+                            example: 2025
+                          status:
+                            type: string
+                            example: published
+                          Category:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              name:
+                                type: string
+                                example: Teknologi Informasi
+                              slug:
+                                type: string
+                                example: teknologi-informasi
+                          User:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              name:
+                                type: string
+                                example: Ilham Baihaqi
+                              username:
+                                type: string
+                                example: ilhambb
+                          images:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                image_url:
+                                  type: string
+                                  example: https://res.cloudinary.com/demo/image/upload/img1.jpg
+                    pagination:
+                      type: object
+                      properties:
+                        page:
+                          type: integer
+                          example: 1
+                        limit:
+                          type: integer
+                          example: 10
+                        total:
+                          type: integer
+                          example: 25
+                        totalPages:
+                          type: integer
+                          example: 3
+
+  post:
+    tags:
+      - Projects
+
+    summary: Buat project baru
+
+    description: |
+      Membuat project baru. Thumbnail wajib diupload, gambar tambahan (images) opsional.
+      Menggunakan multipart/form-data karena melibatkan upload file ke Cloudinary.
+
+    security:
+      - BearerAuth: []
+
+    requestBody:
+      required: true
+
+      content:
+        multipart/form-data:
+
+          schema:
+            type: object
+
+            required:
+              - title
+              - slug
+              - description
+              - year
+              - category_id
+              - thumbnail
+
+            properties:
+
+              title:
+                type: string
+                example: SINGGAH - Sistem Informasi Gelar Gagasan
+
+              slug:
+                type: string
+                example: singgah-sistem-informasi
+
+              description:
+                type: string
+                example: Platform untuk memamerkan hasil karya akademik.
+
+              year:
+                type: integer
+                example: 2025
+
+              category_id:
+                type: integer
+                example: 1
+
+              thumbnail:
+                type: string
+                format: binary
+                description: File gambar thumbnail (wajib)
+
+              images:
+                type: array
+                items:
+                  type: string
+                  format: binary
+                description: File gambar tambahan (opsional, bisa lebih dari satu)
+
+    responses:
+
+      "201":
+        description: Project berhasil dibuat
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Project berhasil dibuat
+                data:
+                  type: object
+                  description: Struktur sama seperti item pada daftar project
+
+      "400":
+        description: Field wajib kosong, thumbnail tidak diupload, atau slug sudah digunakan
+
+      "404":
+        description: Kategori tidak ditemukan
+
+single:
+  get:
+    tags:
+      - Projects
+
+    summary: Ambil detail project berdasarkan ID
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+
+    responses:
+
+      "200":
+        description: Berhasil mengambil detail project
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  description: Struktur sama seperti item pada daftar project
+
+      "404":
+        description: Project tidak ditemukan
+
+  put:
+    tags:
+      - Projects
+
+    summary: Ubah data project
+
+    description: |
+      Mengubah data project. Semua field bersifat opsional.
+
+    security:
+      - BearerAuth: []
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+
+    requestBody:
+      required: false
+
+      content:
+        multipart/form-data:
+
+          schema:
+            type: object
+
+            properties:
+
+              title:
+                type: string
+                example: SINGGAH - Sistem Informasi Gelar Gagasan
+
+              slug:
+                type: string
+                example: singgah-sistem-informasi
+
+              description:
+                type: string
+                example: Platform untuk memamerkan hasil karya akademik.
+
+              thumbnail:
+                type: string
+                format: binary
+                description: File gambar thumbnail baru (opsional, menggantikan yang lama)
+
+              year:
+                type: integer
+                example: 2025
+
+              category_id:
+                type: integer
+                example: 1
+
+              status:
+                type: string
+                example: published
+
+    responses:
+
+      "200":
+        description: Project berhasil diubah
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  description: Struktur sama seperti item pada daftar project
+
+      "400":
+        description: Slug sudah digunakan
+
+      "404":
+        description: Project atau kategori tidak ditemukan
+
+  delete:
+    tags:
+      - Projects
+
+    summary: Hapus project
+
+    security:
+      - BearerAuth: []
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+
+    responses:
+
+      "200":
+        description: Project berhasil dihapus
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  nullable: true
+                  example: null
+
+      "404":
+        description: Project tidak ditemukan

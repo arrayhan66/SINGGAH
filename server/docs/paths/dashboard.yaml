@@ -1,0 +1,76 @@
+summary:
+  get:
+    tags:
+      - Dashboard
+
+    summary: Ambil ringkasan statistik dashboard
+
+    description: |
+      Mengambil statistik jumlah project (total, pending, published, rejected),
+      total berita, total user, dan 5 project dengan status pending terbaru.
+
+    security:
+      - BearerAuth: []
+
+    responses:
+
+      "200":
+        description: Berhasil mengambil data dashboard
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  properties:
+                    stats:
+                      type: object
+                      properties:
+                        totalProject:
+                          type: integer
+                          example: 42
+                        pendingProject:
+                          type: integer
+                          example: 5
+                        publishedProject:
+                          type: integer
+                          example: 35
+                        rejectedProject:
+                          type: integer
+                          example: 2
+                        totalNews:
+                          type: integer
+                          example: 10
+                        totalUser:
+                          type: integer
+                          example: 120
+                    pendingProjects:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          title:
+                            type: string
+                            example: SINGGAH - Sistem Informasi Gelar Gagasan
+                          status:
+                            type: string
+                            example: pending
+                          User:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              name:
+                                type: string
+                                example: Ilham Baihaqi

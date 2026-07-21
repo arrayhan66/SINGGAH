@@ -1,0 +1,482 @@
+login:
+  post:
+    tags:
+      - Authentication
+
+    summary: Login pengguna
+
+    description: |
+      Login menggunakan email dan password.
+
+    requestBody:
+      required: true
+
+      content:
+        application/json:
+
+          schema:
+            type: object
+
+            required:
+              - email
+              - password
+
+            properties:
+
+              email:
+                type: string
+                example: ilhambb666@gmail.com
+
+              password:
+                type: string
+                example: password123
+
+    responses:
+
+      "200":
+        description: Login berhasil
+
+      "401":
+        description: Email atau password salah
+
+      "403":
+        description: Email belum diverifikasi
+        
+register:
+  post:
+    tags:
+      - Authentication
+
+    summary: Registrasi pengguna baru
+
+    description: |
+      Mendaftarkan pengguna baru. Setelah berhasil, kode verifikasi
+      akan dikirim ke email yang didaftarkan.
+
+    requestBody:
+      required: true
+
+      content:
+        application/json:
+
+          schema:
+            type: object
+
+            required:
+              - name
+              - username
+              - email
+              - password
+
+            properties:
+
+              name:
+                type: string
+                example: Ilham Baihaqi
+
+              username:
+                type: string
+                example: ilhambb
+
+              email:
+                type: string
+                example: ilhambb666@gmail.com
+
+              password:
+                type: string
+                example: password123
+
+    responses:
+
+      "201":
+        description: Registrasi berhasil
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Registrasi berhasil, silakan cek email untuk kode verifikasi
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: Ilham Baihaqi
+                    username:
+                      type: string
+                      example: ilhambb
+                    email:
+                      type: string
+                      example: ilhambb666@gmail.com
+                    role:
+                      type: string
+                      example: user
+                    is_verified:
+                      type: boolean
+                      example: false
+
+      "400":
+        description: Semua field wajib diisi, atau email/username sudah digunakan
+
+verifyEmail:
+  post:
+    tags:
+      - Authentication
+
+    summary: Verifikasi email
+
+    description: |
+      Memverifikasi email pengguna menggunakan kode yang dikirim saat registrasi.
+
+    requestBody:
+      required: true
+
+      content:
+        application/json:
+
+          schema:
+            type: object
+
+            required:
+              - email
+              - code
+
+            properties:
+
+              email:
+                type: string
+                example: ilhambb666@gmail.com
+
+              code:
+                type: string
+                example: "123456"
+
+    responses:
+
+      "200":
+        description: Email berhasil diverifikasi
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Email berhasil diverifikasi, silakan login
+                data:
+                  type: object
+                  nullable: true
+                  example: null
+
+      "400":
+        description: Email/kode kosong, kode salah, kode kadaluarsa, atau email sudah terverifikasi
+
+      "404":
+        description: Email tidak terdaftar
+
+resendVerification:
+  post:
+    tags:
+      - Authentication
+
+    summary: Kirim ulang kode verifikasi email
+
+    description: |
+      Mengirim ulang kode verifikasi ke email pengguna yang belum terverifikasi.
+
+    requestBody:
+      required: true
+
+      content:
+        application/json:
+
+          schema:
+            type: object
+
+            required:
+              - email
+
+            properties:
+
+              email:
+                type: string
+                example: ilhambb666@gmail.com
+
+    responses:
+
+      "200":
+        description: Kode verifikasi baru berhasil dikirim
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Kode verifikasi baru telah dikirim ke email Anda
+                data:
+                  type: object
+                  nullable: true
+                  example: null
+
+      "400":
+        description: Email kosong, atau email sudah terverifikasi
+
+      "404":
+        description: Email tidak terdaftar
+
+forgotPassword:
+  post:
+    tags:
+      - Authentication
+
+    summary: Lupa password
+
+    description: |
+      Mengirim kode reset password ke email pengguna.
+
+    requestBody:
+      required: true
+
+      content:
+        application/json:
+
+          schema:
+            type: object
+
+            required:
+              - email
+
+            properties:
+
+              email:
+                type: string
+                example: ilhambb666@gmail.com
+
+    responses:
+
+      "200":
+        description: Kode reset password berhasil dikirim
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Kode reset password telah dikirim ke email Anda
+                data:
+                  type: object
+                  nullable: true
+                  example: null
+
+      "400":
+        description: Email kosong
+
+      "404":
+        description: Email tidak terdaftar
+
+verifyResetCode:
+  post:
+    tags:
+      - Authentication
+
+    summary: Verifikasi kode reset password
+
+    description: |
+      Memverifikasi kode reset password sebelum pengguna membuat password baru.
+
+    requestBody:
+      required: true
+
+      content:
+        application/json:
+
+          schema:
+            type: object
+
+            required:
+              - email
+              - code
+
+            properties:
+
+              email:
+                type: string
+                example: ilhambb666@gmail.com
+
+              code:
+                type: string
+                example: "123456"
+
+    responses:
+
+      "200":
+        description: Kode valid
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Kode valid, silakan buat password baru
+                data:
+                  type: object
+                  nullable: true
+                  example: null
+
+      "400":
+        description: Email/kode kosong, kode salah, atau kode kadaluarsa
+
+      "404":
+        description: Email tidak terdaftar
+
+resetPassword:
+  post:
+    tags:
+      - Authentication
+
+    summary: Reset password
+
+    description: |
+      Mengganti password pengguna menggunakan kode reset yang sudah diverifikasi.
+
+    requestBody:
+      required: true
+
+      content:
+        application/json:
+
+          schema:
+            type: object
+
+            required:
+              - email
+              - code
+              - newPassword
+
+            properties:
+
+              email:
+                type: string
+                example: ilhambb666@gmail.com
+
+              code:
+                type: string
+                example: "123456"
+
+              newPassword:
+                type: string
+                example: passwordBaru123
+
+    responses:
+
+      "200":
+        description: Password berhasil direset
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Password berhasil direset, silakan login dengan password baru
+                data:
+                  type: object
+                  nullable: true
+                  example: null
+
+      "400":
+        description: Field kosong, kode salah, atau kode kadaluarsa
+
+      "404":
+        description: Email tidak terdaftar
+
+changePassword:
+  post:
+    tags:
+      - Authentication
+
+    summary: Ubah password
+
+    description: |
+      Mengubah password pengguna yang sedang login. Membutuhkan Bearer Token.
+
+    security:
+      - BearerAuth: []
+
+    requestBody:
+      required: true
+
+      content:
+        application/json:
+
+          schema:
+            type: object
+
+            required:
+              - oldPassword
+              - newPassword
+
+            properties:
+
+              oldPassword:
+                type: string
+                example: password123
+
+              newPassword:
+                type: string
+                example: passwordBaru123
+
+    responses:
+
+      "200":
+        description: Password berhasil diubah
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Password berhasil diubah
+                data:
+                  type: object
+                  nullable: true
+                  example: null
+
+      "400":
+        description: Field kosong, atau password lama salah
+
+      "401":
+        description: Token tidak valid atau tidak ada
+
+      "404":
+        description: User tidak ditemukan

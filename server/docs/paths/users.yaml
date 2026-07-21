@@ -1,0 +1,402 @@
+collection:
+  get:
+    tags:
+      - Users
+
+    summary: Ambil daftar user
+
+    description: |
+      Mengambil daftar user dengan pagination. Password tidak disertakan dalam response.
+
+    security:
+      - BearerAuth: []
+
+    parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+        example: 1
+
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 10
+        example: 10
+
+    responses:
+
+      "200":
+        description: Berhasil mengambil daftar user
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: Ilham Baihaqi
+                          username:
+                            type: string
+                            example: ilhambb
+                          email:
+                            type: string
+                            example: ilhambb666@gmail.com
+                          avatar:
+                            type: string
+                            nullable: true
+                            example: null
+                          role:
+                            type: string
+                            example: user
+                          status:
+                            type: string
+                            example: active
+                    pagination:
+                      type: object
+                      properties:
+                        page:
+                          type: integer
+                          example: 1
+                        limit:
+                          type: integer
+                          example: 10
+                        total:
+                          type: integer
+                          example: 25
+                        totalPages:
+                          type: integer
+                          example: 3
+
+  post:
+    tags:
+      - Users
+
+    summary: Buat user baru
+
+    description: |
+      Membuat user baru secara langsung (biasanya oleh admin), tanpa proses verifikasi email.
+
+    security:
+      - BearerAuth: []
+
+    requestBody:
+      required: true
+
+      content:
+        application/json:
+
+          schema:
+            type: object
+
+            required:
+              - name
+              - username
+              - email
+              - password
+
+            properties:
+
+              name:
+                type: string
+                example: Ilham Baihaqi
+
+              username:
+                type: string
+                example: ilhambb
+
+              email:
+                type: string
+                example: ilhambb666@gmail.com
+
+              password:
+                type: string
+                example: password123
+
+              role:
+                type: string
+                enum: [admin, user]
+                example: user
+
+              status:
+                type: string
+                example: active
+
+              avatar:
+                type: string
+                nullable: true
+                example: null
+
+    responses:
+
+      "201":
+        description: User berhasil dibuat
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: Ilham Baihaqi
+                    username:
+                      type: string
+                      example: ilhambb
+                    email:
+                      type: string
+                      example: ilhambb666@gmail.com
+                    avatar:
+                      type: string
+                      nullable: true
+                      example: null
+                    role:
+                      type: string
+                      example: user
+                    status:
+                      type: string
+                      example: active
+
+      "400":
+        description: Field wajib kosong, atau email/username sudah digunakan
+
+single:
+  get:
+    tags:
+      - Users
+
+    summary: Ambil detail user berdasarkan ID
+
+    security:
+      - BearerAuth: []
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+
+    responses:
+
+      "200":
+        description: Berhasil mengambil detail user
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: Ilham Baihaqi
+                    username:
+                      type: string
+                      example: ilhambb
+                    email:
+                      type: string
+                      example: ilhambb666@gmail.com
+                    avatar:
+                      type: string
+                      nullable: true
+                      example: null
+                    role:
+                      type: string
+                      example: user
+                    status:
+                      type: string
+                      example: active
+
+      "404":
+        description: User tidak ditemukan
+
+  put:
+    tags:
+      - Users
+
+    summary: Ubah data user
+
+    description: |
+      Mengubah data user. Semua field bersifat opsional, hanya field
+      yang dikirim yang akan diubah.
+
+    security:
+      - BearerAuth: []
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+
+    requestBody:
+      required: false
+
+      content:
+        application/json:
+
+          schema:
+            type: object
+
+            properties:
+
+              name:
+                type: string
+                example: Ilham Baihaqi
+
+              username:
+                type: string
+                example: ilhambb
+
+              email:
+                type: string
+                example: ilhambb666@gmail.com
+
+              password:
+                type: string
+                example: passwordBaru123
+
+              role:
+                type: string
+                enum: [admin, user]
+                example: user
+
+              status:
+                type: string
+                example: active
+
+              avatar:
+                type: string
+                nullable: true
+                example: null
+
+    responses:
+
+      "200":
+        description: User berhasil diubah
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: Ilham Baihaqi
+                    username:
+                      type: string
+                      example: ilhambb
+                    email:
+                      type: string
+                      example: ilhambb666@gmail.com
+                    avatar:
+                      type: string
+                      nullable: true
+                      example: null
+                    role:
+                      type: string
+                      example: user
+                    status:
+                      type: string
+                      example: active
+
+      "400":
+        description: Email atau username sudah digunakan
+
+      "404":
+        description: User tidak ditemukan
+
+  delete:
+    tags:
+      - Users
+
+    summary: Hapus user
+
+    security:
+      - BearerAuth: []
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+
+    responses:
+
+      "200":
+        description: User berhasil dihapus
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  nullable: true
+                  example: null
+
+      "404":
+        description: User tidak ditemukan

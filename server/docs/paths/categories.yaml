@@ -1,0 +1,264 @@
+collection:
+  get:
+    tags:
+      - Categories
+
+    summary: Ambil daftar kategori
+
+    description: |
+      Mengambil seluruh kategori, diurutkan berdasarkan nama.
+
+    responses:
+
+      "200":
+        description: Berhasil mengambil daftar kategori
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: string
+                        example: Teknologi Informasi
+                      slug:
+                        type: string
+                        example: teknologi-informasi
+
+  post:
+    tags:
+      - Categories
+
+    summary: Buat kategori baru
+
+    security:
+      - BearerAuth: []
+
+    requestBody:
+      required: true
+
+      content:
+        application/json:
+
+          schema:
+            type: object
+
+            required:
+              - name
+              - slug
+
+            properties:
+
+              name:
+                type: string
+                example: Teknologi Informasi
+
+              slug:
+                type: string
+                example: teknologi-informasi
+
+    responses:
+
+      "201":
+        description: Kategori berhasil dibuat
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: Teknologi Informasi
+                    slug:
+                      type: string
+                      example: teknologi-informasi
+
+      "400":
+        description: Nama/slug kosong, atau nama/slug sudah digunakan
+
+single:
+  get:
+    tags:
+      - Categories
+
+    summary: Ambil detail kategori berdasarkan ID
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+
+    responses:
+
+      "200":
+        description: Berhasil mengambil detail kategori
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: Teknologi Informasi
+                    slug:
+                      type: string
+                      example: teknologi-informasi
+
+      "404":
+        description: Kategori tidak ditemukan
+
+  put:
+    tags:
+      - Categories
+
+    summary: Ubah kategori
+
+    security:
+      - BearerAuth: []
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+
+    requestBody:
+      required: false
+
+      content:
+        application/json:
+
+          schema:
+            type: object
+
+            properties:
+
+              name:
+                type: string
+                example: Teknologi Informasi
+
+              slug:
+                type: string
+                example: teknologi-informasi
+
+    responses:
+
+      "200":
+        description: Kategori berhasil diubah
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: Teknologi Informasi
+                    slug:
+                      type: string
+                      example: teknologi-informasi
+
+      "400":
+        description: Nama/slug sudah digunakan
+
+      "404":
+        description: Kategori tidak ditemukan
+
+  delete:
+    tags:
+      - Categories
+
+    summary: Hapus kategori
+
+    description: |
+      Menghapus kategori. Akan gagal jika kategori masih digunakan oleh project lain.
+
+    security:
+      - BearerAuth: []
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+
+    responses:
+
+      "200":
+        description: Kategori berhasil dihapus
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  nullable: true
+                  example: null
+
+      "400":
+        description: Kategori masih digunakan oleh project
+
+      "404":
+        description: Kategori tidak ditemukan

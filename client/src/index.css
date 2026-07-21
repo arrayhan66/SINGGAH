@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-dark: #041d38;
+  --color-brand-navy: #06294d;
+  --color-brand-blue: #497eae;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  background: #041d38;
+  overflow-x: hidden;
+}

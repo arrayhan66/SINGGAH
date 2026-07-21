@@ -1,0 +1,357 @@
+collection:
+  get:
+    tags:
+      - News
+
+    summary: Ambil daftar berita
+
+    description: |
+      Mengambil daftar berita dengan filter pencarian, status, rentang tanggal,
+      dan pagination.
+
+    parameters:
+      - name: search
+        in: query
+        schema:
+          type: string
+        description: Mencari berdasarkan judul, konten, atau nama penulis
+        example: wisuda
+
+      - name: status
+        in: query
+        schema:
+          type: string
+        example: published
+
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Tanggal mulai (created_at)
+        example: "2025-01-01"
+
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Tanggal akhir (created_at)
+        example: "2025-12-31"
+
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 10
+
+    responses:
+
+      "200":
+        description: Berhasil mengambil daftar berita
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          title:
+                            type: string
+                            example: Wisuda Angkatan 2025
+                          slug:
+                            type: string
+                            example: wisuda-angkatan-2025
+                          headline_image:
+                            type: string
+                            example: https://res.cloudinary.com/demo/image/upload/news1.jpg
+                          content:
+                            type: string
+                            example: Universitas menggelar wisuda untuk 500 mahasiswa.
+                          status:
+                            type: string
+                            example: published
+                          published_at:
+                            type: string
+                            format: date-time
+                            nullable: true
+                            example: "2025-07-01T08:00:00.000Z"
+                          User:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              name:
+                                type: string
+                                example: Ilham Baihaqi
+                              username:
+                                type: string
+                                example: ilhambb
+                    pagination:
+                      type: object
+                      properties:
+                        page:
+                          type: integer
+                          example: 1
+                        limit:
+                          type: integer
+                          example: 10
+                        total:
+                          type: integer
+                          example: 25
+                        totalPages:
+                          type: integer
+                          example: 3
+
+  post:
+    tags:
+      - News
+
+    summary: Buat berita baru
+
+    description: |
+      Membuat berita baru. Headline image wajib diupload.
+      Menggunakan multipart/form-data karena melibatkan upload file ke Cloudinary.
+      Jika status "published", published_at otomatis terisi waktu sekarang.
+
+    security:
+      - BearerAuth: []
+
+    requestBody:
+      required: true
+
+      content:
+        multipart/form-data:
+
+          schema:
+            type: object
+
+            required:
+              - title
+              - slug
+              - content
+              - headline_image
+
+            properties:
+
+              title:
+                type: string
+                example: Wisuda Angkatan 2025
+
+              slug:
+                type: string
+                example: wisuda-angkatan-2025
+
+              content:
+                type: string
+                example: Universitas menggelar wisuda untuk 500 mahasiswa.
+
+              status:
+                type: string
+                enum: [draft, published]
+                default: draft
+                example: draft
+
+              headline_image:
+                type: string
+                format: binary
+                description: File gambar headline (wajib)
+
+    responses:
+
+      "201":
+        description: Berita berhasil dibuat
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: News berhasil dibuat
+                data:
+                  type: object
+                  description: Struktur sama seperti item pada daftar berita
+
+      "400":
+        description: Field wajib kosong, headline image tidak diupload, atau slug sudah digunakan
+
+single:
+  get:
+    tags:
+      - News
+
+    summary: Ambil detail berita berdasarkan ID
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+
+    responses:
+
+      "200":
+        description: Berhasil mengambil detail berita
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  description: Struktur sama seperti item pada daftar berita
+
+      "404":
+        description: Berita tidak ditemukan
+
+  put:
+    tags:
+      - News
+
+    summary: Ubah data berita
+
+    description: |
+      Mengubah data berita. Semua field bersifat opsional.
+
+    security:
+      - BearerAuth: []
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+
+    requestBody:
+      required: false
+
+      content:
+        multipart/form-data:
+
+          schema:
+            type: object
+
+            properties:
+
+              title:
+                type: string
+                example: Wisuda Angkatan 2025
+
+              slug:
+                type: string
+                example: wisuda-angkatan-2025
+
+              content:
+                type: string
+                example: Universitas menggelar wisuda untuk 500 mahasiswa.
+
+              status:
+                type: string
+                enum: [draft, published]
+                example: published
+
+              headline_image:
+                type: string
+                format: binary
+                description: File gambar headline baru (opsional, menggantikan yang lama)
+
+    responses:
+
+      "200":
+        description: Berita berhasil diubah
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  description: Struktur sama seperti item pada daftar berita
+
+      "400":
+        description: Slug sudah digunakan
+
+      "404":
+        description: Berita tidak ditemukan
+
+  delete:
+    tags:
+      - News
+
+    summary: Hapus berita
+
+    security:
+      - BearerAuth: []
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+
+    responses:
+
+      "200":
+        description: Berita berhasil dihapus
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  nullable: true
+                  example: null
+
+      "404":
+        description: Berita tidak ditemukan

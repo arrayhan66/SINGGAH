@@ -5,7 +5,7 @@ import {
   Brain,
   Database,
   ShieldCheck,
-} from "lucide-react"
+} from "lucide-react";
 
 export const karyaCategories = [
   {
@@ -50,7 +50,7 @@ export const karyaCategories = [
     slug: "ui-ux-design",
     desc: "Desain antarmuka dan pengalaman pengguna yang fungsional dan estetis.",
   },
-]
+];
 
 export const karyaProjects = [
   // ===== WEBSITE =====
@@ -62,6 +62,20 @@ export const karyaProjects = [
     author: "Ahmad Fauzan",
     year: 2024,
     desc: "Platform manajemen akademik kampus berbasis web menggunakan Laravel.",
+    techStack: ["Laravel", "Tailwind CSS", "MySQL"],
+    liveUrl: "https://siakad.poliban.ac.id",
+    repoUrl: "https://github.com/example/siakad-poliban",
+    contributors: [
+      { name: "Ahmad Fauzan", role: "Backend Developer" },
+      { name: "Karen Jauhari", role: "UI/UX Designer" },
+    ],
+    comments: [
+      {
+        id: 1,
+        author: "Budi Santoso",
+        text: "Tampilan antarmukanya sangat rapi dan informatif!",
+      },
+    ],
   },
   {
     id: 2,
@@ -71,6 +85,11 @@ export const karyaProjects = [
     author: "Siti Nurhaliza",
     year: 2025,
     desc: "Landing page company profile jurusan berbasis React dan Tailwind.",
+    techStack: ["React", "Tailwind CSS", "Vite"],
+    liveUrl: "https://pamerit.example.com",
+    repoUrl: "https://github.com/example/pamerit-landing",
+    contributors: [{ name: "Siti Nurhaliza", role: "Frontend Developer" }],
+    comments: [],
   },
   {
     id: 3,
@@ -127,6 +146,12 @@ export const karyaProjects = [
     author: "Rizky Ramadhan",
     year: 2024,
     desc: "Aplikasi absensi berbasis Flutter dengan fitur face recognition.",
+    techStack: ["Flutter", "Dart", "Firebase"],
+    liveUrl:
+      "https://play.google.com/store/apps/details?id=com.example.absensi",
+    repoUrl: "https://github.com/example/flutter-absensi",
+    contributors: [{ name: "Rizky Ramadhan", role: "Mobile Developer" }],
+    comments: [],
   },
   {
     id: 9,
@@ -507,4 +532,4 @@ export const karyaProjects = [
     year: 2025,
     desc: "Redesign UI/UX website portofolio mahasiswa dengan tema modern minimalis.",
   },
-]
+];

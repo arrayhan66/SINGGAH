@@ -1,27 +1,25 @@
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
-import DustBackground from "../../ui/DustBackground";
-import GlowBackground from "../../ui/GlowBackground";
-import useSearchAndExpand from "../../../hooks/useSearchAndExpand";
-import SearchBar from "../../ui/SearchBar";
-import OutlineButton from "../../ui/OutlineButton";
-import KaryaProjectCard from "./KaryaProjectCard";
-import { karyaCategories, karyaProjects } from "../../../data/karyaData";
+import { useParams, useNavigate, Link } from "react-router-dom"
+import { ArrowLeft } from "lucide-react"
+import DustBackground from "../../ui/DustBackground"
+import GlowBackground from "../../ui/GlowBackground"
+import useSearchAndExpand from "../../../hooks/useSearchAndExpand"
+import SearchBar from "../../ui/SearchBar"
+import OutlineButton from "../../ui/OutlineButton"
+import KaryaProjectCard from "./KaryaProjectCard"
+import { karyaCategories, karyaProjects } from "../../../data/karyaData"
 
-// Set limit awal 6 (karena kita pakai 3 kolom, jadinya pas 2 baris)
-const INITIAL_COUNT = 6;
+const INITIAL_COUNT = 6
 
 function KaryaProjectSection() {
-  const { slug } = useParams();
-  const navigate = useNavigate();
+  const { slug } = useParams()
+  const navigate = useNavigate()
 
-  const category = karyaCategories.find((item) => item.slug === slug);
+  const category = karyaCategories.find((item) => item.slug === slug)
 
-  // FILTER STATUS: Sesuai skema database, hanya ambil project yang "published".
   const categoryProjects = karyaProjects.filter(
     (item) =>
       item.category === slug && (item.status === "published" || !item.status),
-  );
+  )
 
   const {
     search,
@@ -30,9 +28,8 @@ function KaryaProjectSection() {
     filteredData: filteredProjects,
     showAll,
     setShowAll,
-  } = useSearchAndExpand(categoryProjects, INITIAL_COUNT);
+  } = useSearchAndExpand(categoryProjects, INITIAL_COUNT)
 
-  // Jika URL kategori tidak valid
   if (!category) {
     return (
       <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-brand-navy py-20 text-center 2xl:py-32">
@@ -48,24 +45,23 @@ function KaryaProjectSection() {
           </button>
         </div>
       </section>
-    );
+    )
   }
 
   return (
     <section
       id="karya-detail"
-      className="relative min-h-screen overflow-hidden bg-brand-navy pt-20 pb-6 sm:pt-24 sm:pb-10 lg:pt-28 lg:pb-12 2xl:pt-32 2xl:pb-20"
+      className="relative min-h-screen overflow-hidden bg-brand-navy pt-25 pb-10 sm:pt-30 sm:pb-12 lg:pt-35 lg:pb-16 2xl:pt-40 2xl:pb-20"
     >
       <GlowBackground />
       <DustBackground />
 
-      {/* Menggunakan max-w-360 sesuai saran Tailwind Intellisense */}
       <div className="mx-auto max-w-7xl px-5 sm:px-8 relative 2xl:max-w-360 2xl:px-12">
-        {/* Tombol Kembali */}
-        <div className="mb-6 flex sm:mb-8 2xl:mb-10">
+        <div className="mb-2 flex sm:-mb-2 2xl:-mb-8">
           <Link
             to="/karya"
-            className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 py-2 pl-3 pr-4 text-sm text-slate-300 backdrop-blur-sm transition-colors duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 2xl:py-3 2xl:pl-4 2xl:pr-5 2xl:text-base"
+            aria-label="Kembali"
+            className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 p-2.5 sm:py-2 sm:pl-3 sm:pr-4 text-sm text-slate-300 backdrop-blur-sm transition-colors duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 2xl:py-3 2xl:pl-4 2xl:pr-5 2xl:text-base"
           >
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 transition-colors duration-300 group-hover:bg-cyan-400/20 2xl:h-8 2xl:w-8">
               <ArrowLeft
@@ -73,17 +69,16 @@ function KaryaProjectSection() {
                 className="transition-transform duration-300 group-hover:-translate-x-0.5 2xl:size-5"
               />
             </span>
-            Kembali
+            <span className="hidden sm:inline">Kembali</span>
           </Link>
         </div>
 
-        {/* Judul Kategori */}
         <div className="text-center">
           <h2 className="text-3xl font-black text-white sm:text-4xl lg:text-5xl 2xl:text-6xl">
             {category.title}
           </h2>
 
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8 2xl:mt-6 2xl:max-w-4xl 2xl:text-xl 2xl:leading-9">
+          <p className="mx-auto mt-3 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8 2xl:mt-5 2xl:max-w-4xl 2xl:text-xl 2xl:leading-9">
             {category.desc}
           </p>
         </div>
@@ -96,7 +91,7 @@ function KaryaProjectSection() {
           />
         </div>
 
-        <div className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3 2xl:mt-16 2xl:gap-10">
+        <div className="mt-8 grid gap-8 md:grid-cols-2 lg:grid-cols-3 sm:mt-10 2xl:mt-16 2xl:gap-10">
           {visibleProjects.length > 0 ? (
             visibleProjects.map((project) => (
               <KaryaProjectCard key={project.id} project={project} />
@@ -139,7 +134,7 @@ function KaryaProjectSection() {
         )}
       </div>
     </section>
-  );
+  )
 }
 
-export default KaryaProjectSection;
+export default KaryaProjectSection

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import React, { useState } from "react"
+import { useParams, useNavigate, Link } from "react-router-dom"
 import {
   ArrowLeft,
   Calendar,
@@ -16,25 +16,26 @@ import {
   Globe,
   Users,
   UserCheck,
-} from "lucide-react";
-import DustBackground from "../../ui/DustBackground";
-import GlowBackground from "../../ui/GlowBackground";
-import GlassCard from "../../ui/GlassCard";
-import { karyaCategories, karyaProjects } from "../../../data/karyaData";
+  CheckCircle2,
+  Clock,
+} from "lucide-react"
+import DustBackground from "../../ui/DustBackground"
+import GlowBackground from "../../ui/GlowBackground"
+import GlassCard from "../../ui/GlassCard"
+import { karyaCategories, karyaProjects } from "../../../data/karyaData"
 
 function KaryaProjectDetailSection() {
-  const { slug, id } = useParams();
-  const navigate = useNavigate();
+  const { slug, projectSlug } = useParams()
+  const navigate = useNavigate()
 
-  const category = karyaCategories.find((item) => item.slug === slug);
+  const category = karyaCategories.find((item) => item.slug === slug)
   const project = karyaProjects.find(
-    (item) => item.category === slug && String(item.id) === id,
-  );
+    (item) => item.category === slug && item.slug === projectSlug,
+  )
 
-  const [activeImage, setActiveImage] = useState(0);
-
-  const [isLoggedIn] = useState(false);
-  const [newComment, setNewComment] = useState("");
+  const [activeImage, setActiveImage] = useState(0)
+  const [isLoggedIn] = useState(false)
+  const [newComment, setNewComment] = useState("")
 
   if (!category || !project) {
     return (
@@ -47,38 +48,49 @@ function KaryaProjectDetailSection() {
           Kembali ke Karya
         </button>
       </section>
-    );
+    )
   }
 
   const gallery =
     Array.isArray(project.images) && project.images.length > 0
       ? project.images
-      : [project.image];
+      : [project.image]
 
   const authors = Array.isArray(project.author)
     ? project.author
     : project.author
       ? [project.author]
-      : [];
+      : []
 
-  const links = Array.isArray(project.links) ? project.links : [];
-  const documents = Array.isArray(project.documents) ? project.documents : [];
-  const comments = Array.isArray(project.comments) ? project.comments : [];
-  const techStack = Array.isArray(project.techStack) ? project.techStack : [];
+  const links = Array.isArray(project.links) ? project.links : []
+  const documents = Array.isArray(project.documents) ? project.documents : []
+  const comments = Array.isArray(project.comments) ? project.comments : []
+  const techStack = Array.isArray(project.techStack) ? project.techStack : []
   const contributors = Array.isArray(project.contributors)
     ? project.contributors
-    : [];
+    : []
+
+  // Helper untuk format tanggal dari ISO string ke format lokal yang rapi
+  const formatDate = (dateString) => {
+    if (!dateString) return ""
+    try {
+      const options = { year: "numeric", month: "long", day: "numeric" }
+      return new Date(dateString).toLocaleDateString("id-ID", options)
+    } catch {
+      return dateString
+    }
+  }
 
   function handleAuthRedirect(e) {
-    e.preventDefault();
-    navigate("/login");
+    e.preventDefault()
+    navigate("/login")
   }
 
   function handleAddComment(e) {
-    e.preventDefault();
-    if (!newComment.trim()) return;
-    console.log("Komentar dikirim:", newComment);
-    setNewComment("");
+    e.preventDefault()
+    if (!newComment.trim()) return
+    console.log("Komentar dikirim:", newComment)
+    setNewComment("")
   }
 
   function renderLinkItem(link) {
@@ -89,14 +101,14 @@ function KaryaProjectDetailSection() {
       rel: "noopener noreferrer",
       className:
         "flex items-center gap-2 rounded-xl border border-cyan-400/30 px-4 py-2.5 text-sm font-medium text-cyan-300 transition hover:bg-cyan-400 hover:text-black cursor-pointer 2xl:px-5 2xl:py-3 2xl:text-base",
-    };
+    }
 
     return React.createElement(
       "a",
       anchorProps,
       React.createElement(ExternalLink, { size: 14, className: "2xl:size-4" }),
       link.label,
-    );
+    )
   }
 
   function renderDocumentItem(doc) {
@@ -107,14 +119,14 @@ function KaryaProjectDetailSection() {
       rel: "noopener noreferrer",
       className:
         "flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-300 transition hover:border-cyan-400/40 hover:text-cyan-300 cursor-pointer 2xl:px-5 2xl:py-3 2xl:text-base",
-    };
+    }
 
     return React.createElement(
       "a",
       anchorProps,
       React.createElement(FileText, { size: 14, className: "2xl:size-4" }),
       doc.name,
-    );
+    )
   }
 
   return (
@@ -172,10 +184,19 @@ function KaryaProjectDetailSection() {
 
           <div className="p-6 sm:p-10 2xl:p-12">
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-400/30 px-3 py-1 text-xs font-medium text-cyan-300 2xl:px-4 2xl:py-1.5 2xl:text-sm">
-                <Layers size={12} className="2xl:size-3.5" />
-                {category.title}
-              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-400/30 px-3 py-1 text-xs font-medium text-cyan-300 2xl:px-4 2xl:py-1.5 2xl:text-sm">
+                  <Layers size={12} className="2xl:size-3.5" />
+                  {category.title}
+                </span>
+
+                {project.status && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-300 capitalize">
+                    <CheckCircle2 size={12} />
+                    {project.status}
+                  </span>
+                )}
+              </div>
 
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1.5 text-sm text-slate-400 2xl:text-base">
@@ -243,6 +264,12 @@ function KaryaProjectDetailSection() {
                 <span className="flex items-center gap-1.5 text-slate-400">
                   <Calendar size={14} />
                   {project.year}
+                </span>
+              )}
+              {project.createdAt && (
+                <span className="flex items-center gap-1.5 text-slate-400">
+                  <Clock size={14} />
+                  {formatDate(project.createdAt)}
                 </span>
               )}
             </div>
@@ -316,7 +343,7 @@ function KaryaProjectDetailSection() {
           </div>
         </GlassCard>
 
-        {/* Bagian Komentar dengan Background Putih Solid (bg-white) & Teks Gelap */}
+        {/* Bagian Komentar */}
         <GlassCard className="mt-8 p-6 sm:p-10 2xl:mt-10 2xl:p-12">
           <h3 className="flex items-center gap-2 text-lg font-bold text-white sm:text-xl 2xl:text-2xl">
             <MessageCircle size={20} className="2xl:size-6" />
@@ -368,10 +395,17 @@ function KaryaProjectDetailSection() {
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-100 border border-cyan-200 text-cyan-700 2xl:h-10 2xl:w-10">
                     <UserCheck size={18} />
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900 2xl:text-base">
-                      {item.author}
-                    </p>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold text-slate-900 2xl:text-base">
+                        {item.author}
+                      </p>
+                      {item.createdAt && (
+                        <span className="text-xs text-slate-400">
+                          {formatDate(item.createdAt)}
+                        </span>
+                      )}
+                    </div>
                     <p className="mt-1 text-sm leading-6 text-slate-700 2xl:text-base 2xl:leading-7">
                       {item.text}
                     </p>
@@ -387,7 +421,7 @@ function KaryaProjectDetailSection() {
         </GlassCard>
       </div>
     </section>
-  );
+  )
 }
 
-export default KaryaProjectDetailSection;
+export default KaryaProjectDetailSection

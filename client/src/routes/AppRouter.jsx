@@ -42,7 +42,10 @@ function AppRouter() {
         <Route path="/" element={<Home />} />
         <Route path="/karya" element={<Karya />} />
         <Route path="/karya/:slug" element={<KaryaDetail />} />
-        <Route path="/karya/:slug/:id" element={<KaryaProjectDetail />} />
+        <Route
+          path="/karya/:slug/:projectSlug"
+          element={<KaryaProjectDetail />}
+        />
         <Route path="/about" element={<About />} />
         <Route path="/hall" element={<Hall />} />
         <Route path="/berita" element={<News />} />
@@ -81,7 +84,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/user/karya/:slug/:id"
+          path="/user/karya/:slug/:projectSlug"
           element={
             <ProtectedRoute allowedRoles={["user", "admin"]}>
               <KaryaProjectDetail />

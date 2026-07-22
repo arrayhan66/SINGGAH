@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"
 import {
   ArrowRight,
   User,
@@ -7,27 +7,27 @@ import {
   Eye,
   Bookmark,
   MessageSquare,
-} from "lucide-react";
-import GlassCard from "../../ui/GlassCard";
-import { karyaCategories } from "../../../data/karyaData";
+} from "lucide-react"
+import GlassCard from "../../ui/GlassCard"
+import { karyaCategories } from "../../../data/karyaData"
 
 function KaryaProjectCard({ project }) {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const category = karyaCategories.find(
     (item) => item.slug === project.category,
-  );
+  )
 
   const coverImage =
     Array.isArray(project.images) && project.images.length > 0
       ? project.images[0]
-      : project.image;
+      : project.image
 
   const authorLabel = Array.isArray(project.author)
     ? project.author.length > 1
       ? `${project.author[0]} +${project.author.length - 1}`
       : project.author[0]
-    : project.author;
+    : project.author
 
   return (
     <GlassCard
@@ -51,9 +51,9 @@ function KaryaProjectCard({ project }) {
 
         <button
           onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            navigate("/login");
+            e.preventDefault()
+            e.stopPropagation()
+            navigate("/login")
           }}
           aria-label="Bookmark"
           className="absolute right-4 top-4 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-brand-navy/80 text-slate-200 backdrop-blur-sm transition hover:scale-110 hover:text-cyan-300 2xl:right-5 2xl:top-5 2xl:h-10 2xl:w-10"
@@ -94,9 +94,9 @@ function KaryaProjectCard({ project }) {
         <div className="mt-4 flex items-center gap-5 border-t border-slate-700/50 pt-4 text-sm text-slate-400 2xl:mt-5 2xl:gap-6 2xl:pt-5 2xl:text-base">
           <button
             onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              navigate("/login");
+              e.preventDefault()
+              e.stopPropagation()
+              navigate("/login")
             }}
             className="group/action flex cursor-pointer items-center gap-1.5 transition-colors hover:text-pink-400"
           >
@@ -111,9 +111,9 @@ function KaryaProjectCard({ project }) {
 
           <button
             onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              navigate("/login");
+              e.preventDefault()
+              e.stopPropagation()
+              navigate("/login")
             }}
             className="group/action flex cursor-pointer items-center gap-1.5 transition-colors hover:text-cyan-300"
           >
@@ -132,7 +132,7 @@ function KaryaProjectCard({ project }) {
 
         <div className="mt-auto pt-6 2xl:pt-8">
           <Link
-            to={`/karya/${project.category}/${project.id}`}
+            to={`/karya/${project.category}/${project.slug}`}
             className="group/btn flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-white py-3 text-sm font-semibold text-slate-900 transition-colors duration-300 hover:bg-slate-200 2xl:py-4 2xl:text-base"
           >
             Lihat Detail
@@ -144,7 +144,7 @@ function KaryaProjectCard({ project }) {
         </div>
       </div>
     </GlassCard>
-  );
+  )
 }
 
-export default KaryaProjectCard;
+export default KaryaProjectCard

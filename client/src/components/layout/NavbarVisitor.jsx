@@ -1,44 +1,44 @@
-import { useState, useRef, useEffect } from "react"
-import { User } from "lucide-react"
-import { NavLink } from "react-router-dom"
-import logo from "../../assets/icons/logo.png"
-import { visitorMenu } from "../../constants/navigation"
+import { useState, useRef, useEffect } from "react";
+import { User } from "lucide-react";
+import { NavLink } from "react-router-dom";
+import logo from "../../assets/icons/logo.png";
+import { visitorMenu } from "../../constants/navigation";
 
 function NavbarVisitor() {
-  const [isOpen, setIsOpen] = useState(false)
-  const navRef = useRef(null)
+  const [isOpen, setIsOpen] = useState(false);
+  const navRef = useRef(null);
 
   const navLinkClass = ({ isActive }) =>
     `relative rounded-full px-5 py-2 text-sm font-medium transition-all duration-300 ${
       isActive
         ? "bg-cyan-400/10 text-cyan-300 shadow-[0_0_18px_rgba(34,211,238,.15)]"
         : "text-slate-300 hover:bg-white/5 hover:text-cyan-300 hover:-translate-y-0.5"
-    }`
+    }`;
 
-  const closeMenu = () => setIsOpen(false)
+  const closeMenu = () => setIsOpen(false);
 
   useEffect(() => {
     function handleClickOutside(event) {
       if (navRef.current && !navRef.current.contains(event.target)) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
     }
 
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside)
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [isOpen])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
 
   return (
     <header
       ref={navRef}
-      className="fixed top-0 left-0 z-50 w-full px-4 sm:px-6 md:px-8"
+      className="fixed top-0 left-0 z-50 w-full px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16"
     >
-      <div className="mx-auto mt-3 sm:mt-4 md:mt-5 flex max-w-7xl items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:px-6 sm:py-4 md:px-8 backdrop-blur-xl">
+      <div className="mx-auto mt-5 sm:mt-6 md:mt-7 2xl:mt-8 flex w-full max-w-[1700px] items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:px-6 sm:py-4 md:px-8 2xl:px-10 backdrop-blur-xl">
         {/* LOGO */}
         <NavLink
           to="/"
@@ -61,7 +61,7 @@ function NavbarVisitor() {
         </NavLink>
 
         {/* Menu - Desktop */}
-        <nav className="hidden gap-6 font-medium lg:mr-10 lg:flex lg:gap-10">
+        <nav className="hidden flex-1 items-center justify-center font-medium lg:flex lg:gap-12 xl:gap-14 2xl:gap-16">
           {visitorMenu.map((item) => (
             <NavLink key={item.to} to={item.to} className={navLinkClass}>
               {item.label}
@@ -154,7 +154,7 @@ function NavbarVisitor() {
         </div>
       </div>
     </header>
-  )
+  );
 }
 
-export default NavbarVisitor
+export default NavbarVisitor;

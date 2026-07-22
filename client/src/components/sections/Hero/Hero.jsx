@@ -1,14 +1,14 @@
-import { ArrowRight } from "lucide-react"
-import DustBackground from "../../ui/DustBackground"
-import GlowBackground from "../../ui/GlowBackground"
-import PCBBackground from "../../ui/PCBBackground"
-import HeroModel3D from "./HeroModel3D"
-import logoPoliban from "../../../assets/icons/Logo_Poliban.png"
-import { useNavigate } from "react-router-dom"
-import HeroStats, { statsData } from "./HeroStats"
+import { ArrowRight } from "lucide-react";
+import DustBackground from "../../ui/DustBackground";
+import GlowBackground from "../../ui/GlowBackground";
+import PCBBackground from "../../ui/PCBBackground";
+import HeroModel3D from "./HeroModel3D";
+import logoPoliban from "../../../assets/icons/Logo_Poliban.png";
+import { useNavigate } from "react-router-dom";
+import HeroStats, { statsData } from "./HeroStats";
 
 function Hero() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <section
@@ -24,48 +24,43 @@ function Hero() {
       {/* DustBackground */}
       <DustBackground />
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col lg:flex-row items-center justify-between px-4 min-[350px]:px-6 md:px-12 lg:px-8 pt-28 pb-12 lg:pt-12">
-        {/* LEFT - DESKTOP */}
-        <div className="flex w-full flex-col items-center text-center md:max-w-2xl md:mx-auto lg:max-w-xl lg:mx-0 lg:items-start lg:text-left">
-          {/* Logo */}
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-[1700px] flex-col lg:flex-row items-center lg:items-start justify-between px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-32 md:pt-40 lg:pt-44 pb-12">
+        <div className="flex w-full flex-col items-center text-center md:max-w-2xl md:mx-auto lg:max-w-xl 2xl:max-w-2xl lg:mx-0 lg:items-start lg:text-left">
           <div className="inline-flex items-center gap-2 min-[350px]:gap-3 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 min-[350px]:px-4 py-2 backdrop-blur-md">
             <img
               src={logoPoliban}
               alt="Logo Poliban"
-              className="h-4 w-4 min-[350px]:h-5 min-[350px]:w-5 md:h-6 md:w-6 object-contain"
+              className="h-4 w-4 min-[350px]:h-5 min-[350px]:w-5 md:h-6 md:w-6 2xl:h-8 2xl:w-8 object-contain"
             />
-            <span className="text-[10px] min-[350px]:text-xs md:text-sm font-medium text-cyan-300">
+            <span className="text-[10px] min-[350px]:text-xs md:text-sm 2xl:text-lg font-medium text-cyan-300">
               Politeknik Negeri Banjarmasin
             </span>
           </div>
 
           {/* JUDUL */}
-          <h1 className="mt-6 text-3xl min-[350px]:text-4xl md:text-5xl lg:text-6xl font-black leading-tight text-white">
+          <h1 className="mt-4 text-3xl min-[350px]:text-4xl md:text-5xl lg:text-6xl 2xl:text-7xl font-black leading-tight text-white">
             SINGGAH
-            <br className="hidden md:block" />{" "}
-            <span className="md:hidden"> </span> SEJENAK{" "}
-            <span className="text-cyan-300">DISINI</span>
+            <br />
+            SEJENAK <span className="text-cyan-300">DISINI</span>
           </h1>
 
           {/* Deskripsi */}
           <div className="mt-5 flex flex-col md:flex-row items-center lg:items-start gap-3">
             <div className="hidden lg:block mt-2 h-13 w-[3px] shrink-0 rounded-full bg-gradient-to-b from-cyan-400 to-blue-600" />
-            <p className="text-xs min-[350px]:text-sm md:text-base lg:text-lg leading-relaxed text-slate-300 max-w-md md:max-w-xl lg:max-w-full">
+            <p className="text-xs min-[350px]:text-sm md:text-base lg:text-lg 2xl:text-xl leading-relaxed text-slate-300 max-w-md md:max-w-xl 2xl:max-w-2xl">
               Sebuah Karya Ciptaan Civitas Akademika{" "}
               <span className="font-semibold text-cyan-300">
                 #ElektroPoliban
-              </span>
-              <br className="hidden md:block" />
-              <span className="md:hidden"> </span>
+              </span>{" "}
               tertarik untuk kolaborasi riset?
             </p>
           </div>
 
           {/* Tombol Eksplorasi - Desktop*/}
-          <div className="hidden lg:block mt-10 w-full max-w-md">
+          <div className="hidden lg:block mt-10 w-full">
             <button
               onClick={() => navigate("/hall")}
-              className="group relative w-full cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-12 py-6 font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/50"
+              className="group relative w-full cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-12 py-6 2xl:px-14 2xl:py-7 font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/50"
             >
               <span className="relative flex items-center justify-between gap-4">
                 <span className="text-lg tracking-wide">Mulai Eksplorasi</span>
@@ -78,13 +73,13 @@ function Hero() {
           </div>
 
           {/* Stats Desktop - Desktop */}
-          <div className="hidden lg:block">
+          <div className="hidden lg:block mt-10 w-full">
             <HeroStats />
           </div>
         </div>
 
         {/* Model 3D */}
-        <div className="mt-2 lg:mt-0 flex w-full flex-1 items-center justify-center">
+        <div className="mt-2 lg:-mt-30 flex w-full lg:w-[45%] xl:w-1/2 items-center justify-center shrink-0">
           <div className="w-full max-w-xs md:max-w-lg lg:max-w-full">
             <HeroModel3D />
           </div>
@@ -113,7 +108,7 @@ function Hero() {
           <div className="w-full">
             <div className="flex flex-col min-[400px]:flex-row items-center justify-between gap-6 min-[400px]:gap-0 rounded-2xl border border-white/10 bg-white/5 px-4 md:px-6 py-5 min-[400px]:py-4 backdrop-blur-xl">
               {statsData.map((stat, index) => {
-                const Icon = stat.icon
+                const Icon = stat.icon;
                 return (
                   <div
                     key={stat.label}
@@ -142,7 +137,7 @@ function Hero() {
                       <div className="block min-[400px]:hidden absolute -bottom-3 left-1/2 h-px w-[90%] -translate-x-1/2 bg-white/10" />
                     )}
                   </div>
-                )
+                );
               })}
             </div>
           </div>
@@ -158,7 +153,7 @@ function Hero() {
         }}
       />
     </section>
-  )
+  );
 }
 
-export default Hero
+export default Hero;

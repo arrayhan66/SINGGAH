@@ -15,3 +15,7 @@ body {
   background: #041d38;
   overflow-x: hidden;
 }
+
+:root {
+  color-scheme: dark;
+}

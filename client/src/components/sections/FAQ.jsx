@@ -1,7 +1,7 @@
-import { useState } from "react"
-import { ChevronDown } from "lucide-react"
-import DustBackground from "../ui/DustBackground"
-import PCBBackground from "../ui/PCBBackground"
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+import DustBackground from "../ui/DustBackground";
+import PCBBackground from "../ui/PCBBackground";
 
 const faq = [
   {
@@ -31,14 +31,14 @@ const faq = [
     answer:
       "Tergantung pemiliknya. Beberapa project menyediakan source code atau dokumentasi lengkap untuk diunduh, sementara yang lain hanya menampilkan demo atau preview saja.",
   },
-]
+];
 
 function FAQ() {
-  const [openIndex, setOpenIndex] = useState(null)
+  const [openIndex, setOpenIndex] = useState(null);
 
   const toggleFAQ = (index) => {
-    setOpenIndex(openIndex === index ? null : index)
-  }
+    setOpenIndex(openIndex === index ? null : index);
+  };
 
   return (
     <section
@@ -51,14 +51,14 @@ function FAQ() {
       {/* Dust Particles */}
       <DustBackground />
 
-      <div className="mx-auto max-w-5xl px-5 sm:px-8">
-        <h2 className="text-center text-2xl font-black text-white sm:text-3xl">
+      <div className="mx-auto max-w-5xl 2xl:max-w-6xl px-5 sm:px-8">
+        <h2 className="text-center text-2xl font-black text-white sm:text-3xl 2xl:text-4xl">
           Pertanyaan yang <span className="text-cyan-300">Sering Diajukan</span>
         </h2>
 
-        <div className="mt-10 space-y-6 sm:mt-16">
+        <div className="mt-10 space-y-6 sm:mt-16 2xl:space-y-8">
           {faq.map((item, index) => {
-            const isOpen = openIndex === index
+            const isOpen = openIndex === index;
 
             return (
               <div
@@ -67,14 +67,15 @@ function FAQ() {
               >
                 <button
                   onClick={() => toggleFAQ(index)}
-                  className="flex w-full cursor-pointer items-center justify-between gap-3 p-4 text-left sm:p-6"
+                  className="flex w-full cursor-pointer items-center justify-between gap-3 p-4 text-left sm:p-6 2xl:p-8"
                 >
-                  <span className="text-base font-semibold text-white sm:text-lg">
+                  <span className="text-base font-semibold text-white sm:text-lg 2xl:text-xl">
                     {item.question}
                   </span>
 
                   <ChevronDown
-                    className={`shrink-0 text-cyan-300 transition-transform duration-300 ${
+                    size={20}
+                    className={`shrink-0 text-cyan-300 transition-transform duration-300 2xl:w-6 2xl:h-6 ${
                       isOpen ? "rotate-180" : ""
                     }`}
                   />
@@ -88,18 +89,18 @@ function FAQ() {
                   }`}
                 >
                   <div className="overflow-hidden">
-                    <p className="px-4 pb-4 text-justify leading-7 text-slate-300 sm:px-6 sm:pb-6 sm:leading-8">
+                    <p className="px-4 pb-4 text-justify leading-7 text-slate-300 sm:px-6 sm:pb-6 sm:leading-8 2xl:px-8 2xl:pb-8 2xl:text-lg 2xl:leading-9">
                       {item.answer}
                     </p>
                   </div>
                 </div>
               </div>
-            )
+            );
           })}
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-export default FAQ
+export default FAQ;

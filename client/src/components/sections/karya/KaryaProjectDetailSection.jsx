@@ -1,41 +1,38 @@
-import React, { useState } from "react"
-import { useParams, useNavigate, Link } from "react-router-dom"
-import {
-  ArrowLeft,
-  Calendar,
-  Layers,
-  Heart,
-  Bookmark,
-  Eye,
-  ExternalLink,
-  FileText,
-  MessageCircle,
-  Send,
-  Code2,
-  GitBranch,
-  Globe,
-  Users,
-  UserCheck,
-  CheckCircle2,
-  Clock,
-} from "lucide-react"
-import DustBackground from "../../ui/DustBackground"
-import GlowBackground from "../../ui/GlowBackground"
-import GlassCard from "../../ui/GlassCard"
-import { karyaCategories, karyaProjects } from "../../../data/karyaData"
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import DustBackground from "../../ui/DustBackground";
+import GlowBackground from "../../ui/GlowBackground";
+import GlassCard from "../../ui/GlassCard";
+// Facebook & Twitter dihapus dari import Lucide
+import { X, MessageCircle, Copy, Check, Send } from "lucide-react";
+import { karyaCategories, karyaProjects } from "../../../data/karyaData";
+
+import KaryaProjectGallery from "./detail/KaryaProjectGallery";
+import KaryaProjectHeader from "./detail/KaryaProjectHeader";
+import KaryaProjectContent from "./detail/KaryaProjectContent";
+import KaryaProjectComments from "./detail/KaryaProjectComments";
 
 function KaryaProjectDetailSection() {
-  const { slug, projectSlug } = useParams()
-  const navigate = useNavigate()
+  const { slug, projectSlug } = useParams();
+  const navigate = useNavigate();
 
-  const category = karyaCategories.find((item) => item.slug === slug)
+  const category = karyaCategories.find((item) => item.slug === slug);
   const project = karyaProjects.find(
     (item) => item.category === slug && item.slug === projectSlug,
-  )
+  );
 
-  const [activeImage, setActiveImage] = useState(0)
-  const [isLoggedIn] = useState(false)
-  const [newComment, setNewComment] = useState("")
+  const [activeImage, setActiveImage] = useState(0);
+  const [newComment, setNewComment] = useState("");
+  const [currentUser] = useState(null);
+  const isLoggedIn = currentUser !== null;
+  const [isLiked, setIsLiked] = useState(project?.isLiked || false);
+  const [likeCount, setLikeCount] = useState(project?.likesCount || 0);
+  const [isBookmarked, setIsBookmarked] = useState(
+    project?.isBookmarked || false,
+  );
+
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   if (!category || !project) {
     return (
@@ -43,385 +40,269 @@ function KaryaProjectDetailSection() {
         <p className="text-slate-300">Karya tidak ditemukan.</p>
         <button
           onClick={() => navigate("/karya")}
-          className="mt-6 rounded-xl border border-cyan-400/30 px-5 py-3 text-cyan-300 transition hover:bg-cyan-400 hover:text-black cursor-pointer"
+          className="mt-6 cursor-pointer rounded-xl border border-cyan-400/30 px-5 py-3 text-cyan-300 transition hover:bg-cyan-400 hover:text-black"
         >
           Kembali ke Karya
         </button>
       </section>
-    )
+    );
   }
 
   const gallery =
     Array.isArray(project.images) && project.images.length > 0
       ? project.images
-      : [project.image]
+      : [project.image];
 
-  const authors = Array.isArray(project.author)
-    ? project.author
-    : project.author
-      ? [project.author]
-      : []
+  const comments = Array.isArray(project.comments) ? project.comments : [];
 
-  const links = Array.isArray(project.links) ? project.links : []
-  const documents = Array.isArray(project.documents) ? project.documents : []
-  const comments = Array.isArray(project.comments) ? project.comments : []
-  const techStack = Array.isArray(project.techStack) ? project.techStack : []
-  const contributors = Array.isArray(project.contributors)
-    ? project.contributors
-    : []
-
-  // Helper untuk format tanggal dari ISO string ke format lokal yang rapi
   const formatDate = (dateString) => {
-    if (!dateString) return ""
+    if (!dateString) return "";
     try {
-      const options = { year: "numeric", month: "long", day: "numeric" }
-      return new Date(dateString).toLocaleDateString("id-ID", options)
+      const options = { year: "numeric", month: "long", day: "numeric" };
+      return new Date(dateString).toLocaleDateString("id-ID", options);
     } catch {
-      return dateString
+      return dateString;
     }
-  }
+  };
 
   function handleAuthRedirect(e) {
-    e.preventDefault()
-    navigate("/login")
+    if (e) e.preventDefault();
+    navigate("/login");
   }
+
+  function handleLike() {
+    if (!currentUser) {
+      navigate("/login");
+      return;
+    }
+
+    const allowedRoles = ["user", "mahasiswa", "dosen", "admin"];
+    if (allowedRoles.includes(currentUser.role)) {
+      setIsLiked(!isLiked);
+      setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+    }
+  }
+
+  function handleBookmark() {
+    if (!currentUser) {
+      navigate("/login");
+      return;
+    }
+
+    const allowedRoles = ["user", "mahasiswa", "dosen", "admin"];
+    if (allowedRoles.includes(currentUser.role)) {
+      setIsBookmarked(!isBookmarked);
+    }
+  }
+
+  async function handleShare() {
+    setShowShareModal(true);
+  }
+
+  const shareToWhatsApp = () => {
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent("Lihat karya ini: " + window.location.href)}`;
+    window.open(waUrl, "_blank");
+    setShowShareModal(false);
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setIsCopied(true);
+      setTimeout(() => {
+        setIsCopied(false);
+        setShowShareModal(false);
+      }, 2000);
+    } catch (err) {
+      console.error("Gagal menyalin", err);
+    }
+  };
 
   function handleAddComment(e) {
-    e.preventDefault()
-    if (!newComment.trim()) return
-    console.log("Komentar dikirim:", newComment)
-    setNewComment("")
-  }
-
-  function renderLinkItem(link) {
-    const anchorProps = {
-      key: link.url,
-      href: link.url,
-      target: "_blank",
-      rel: "noopener noreferrer",
-      className:
-        "flex items-center gap-2 rounded-xl border border-cyan-400/30 px-4 py-2.5 text-sm font-medium text-cyan-300 transition hover:bg-cyan-400 hover:text-black cursor-pointer 2xl:px-5 2xl:py-3 2xl:text-base",
+    e.preventDefault();
+    if (!currentUser) {
+      navigate("/login");
+      return;
     }
 
-    return React.createElement(
-      "a",
-      anchorProps,
-      React.createElement(ExternalLink, { size: 14, className: "2xl:size-4" }),
-      link.label,
-    )
-  }
-
-  function renderDocumentItem(doc) {
-    const anchorProps = {
-      key: doc.url,
-      href: doc.url,
-      target: "_blank",
-      rel: "noopener noreferrer",
-      className:
-        "flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-300 transition hover:border-cyan-400/40 hover:text-cyan-300 cursor-pointer 2xl:px-5 2xl:py-3 2xl:text-base",
-    }
-
-    return React.createElement(
-      "a",
-      anchorProps,
-      React.createElement(FileText, { size: 14, className: "2xl:size-4" }),
-      doc.name,
-    )
+    if (!newComment.trim()) return;
+    console.log("Komentar dikirim:", newComment);
+    setNewComment("");
   }
 
   return (
     <section
       id="karya-project-detail"
-      className="relative overflow-hidden bg-brand-navy pt-28 pb-16 sm:pt-32 lg:pt-36 2xl:pt-40 2xl:pb-24"
+      className="relative overflow-hidden bg-brand-navy pb-16 pt-28 sm:pt-32 lg:pt-36 2xl:pb-24 2xl:pt-40"
     >
       <GlowBackground />
       <DustBackground />
 
       <div className="relative mx-auto max-w-5xl px-5 sm:px-8 2xl:max-w-6xl">
-        <Link
-          to={`/karya/${slug}`}
-          className="group absolute left-5 top-0 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 py-2 pl-3 pr-4 text-sm text-slate-300 backdrop-blur-sm transition-colors duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 sm:left-8 cursor-pointer"
-        >
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 transition-colors duration-300 group-hover:bg-cyan-400/20">
-            <ArrowLeft
-              size={14}
-              className="transition-transform duration-300 group-hover:-translate-x-0.5"
-            />
-          </span>
-          Kembali
-        </Link>
-
         <GlassCard className="overflow-hidden p-0">
-          <div>
-            <img
-              src={gallery[activeImage]}
-              alt={project.title}
-              className="h-64 w-full object-cover sm:h-80 lg:h-96 2xl:h-128"
+          <KaryaProjectGallery
+            slug={slug}
+            gallery={gallery}
+            activeImage={activeImage}
+            setActiveImage={setActiveImage}
+            projectTitle={project.title}
+          />
+
+          <div className="p-4 sm:p-8 lg:p-10 2xl:p-12">
+            <KaryaProjectHeader
+              project={project}
+              category={category}
+              formatDate={formatDate}
+              isLiked={isLiked}
+              likeCount={likeCount}
+              handleLike={handleLike}
+              handleShare={handleShare}
+              isBookmarked={isBookmarked}
+              handleBookmark={handleBookmark}
             />
-
-            {gallery.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto p-4 sm:p-6 2xl:p-8">
-                {gallery.map((img, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setActiveImage(index)}
-                    className={`h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 transition cursor-pointer sm:h-20 sm:w-28 2xl:h-24 2xl:w-32 ${
-                      activeImage === index
-                        ? "border-cyan-400"
-                        : "border-white/10 opacity-60 hover:opacity-100"
-                    }`}
-                  >
-                    <img
-                      src={img}
-                      alt={`${project.title} ${index + 1}`}
-                      className="h-full w-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="p-6 sm:p-10 2xl:p-12">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-400/30 px-3 py-1 text-xs font-medium text-cyan-300 2xl:px-4 2xl:py-1.5 2xl:text-sm">
-                  <Layers size={12} className="2xl:size-3.5" />
-                  {category.title}
-                </span>
-
-                {project.status && (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-300 capitalize">
-                    <CheckCircle2 size={12} />
-                    {project.status}
-                  </span>
-                )}
-              </div>
-
-              <div className="flex items-center gap-3">
-                <span className="flex items-center gap-1.5 text-sm text-slate-400 2xl:text-base">
-                  <Eye size={16} className="2xl:size-4.5" />
-                  {project.viewsCount || 0}
-                </span>
-
-                <button
-                  onClick={handleAuthRedirect}
-                  className="flex cursor-pointer items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-sm text-slate-300 transition hover:border-pink-400/40 hover:text-pink-400 2xl:px-4 2xl:py-2 2xl:text-base"
-                >
-                  <Heart
-                    size={16}
-                    className={
-                      project.isLiked
-                        ? "fill-pink-500 text-pink-500 2xl:size-4.5"
-                        : "2xl:size-4.5"
-                    }
-                  />
-                  {project.likesCount || 0}
-                </button>
-
-                <button
-                  onClick={handleAuthRedirect}
-                  aria-label="Bookmark"
-                  className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/10 text-slate-300 transition hover:border-cyan-400/40 hover:text-cyan-300 2xl:h-11 2xl:w-11"
-                >
-                  <Bookmark
-                    size={16}
-                    className={
-                      project.isBookmarked
-                        ? "fill-cyan-300 text-cyan-300 2xl:size-4.5"
-                        : "2xl:size-4.5"
-                    }
-                  />
-                </button>
-              </div>
-            </div>
-
-            <h1 className="mt-4 text-2xl font-black text-white sm:text-3xl lg:text-4xl 2xl:text-5xl">
-              {project.title}
-            </h1>
-
-            {techStack.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {techStack.map((tech, idx) => (
-                  <span
-                    key={idx}
-                    className="inline-flex items-center gap-1 rounded-md bg-white/5 border border-white/10 px-2.5 py-1 text-xs font-medium text-cyan-300/90 2xl:text-sm"
-                  >
-                    <Code2 size={11} className="text-cyan-400" />
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-400 2xl:text-base">
-              {authors.length > 0 && (
-                <span className="font-medium text-slate-300">
-                  {authors.join(", ")}
-                </span>
-              )}
-              {project.year && (
-                <span className="flex items-center gap-1.5 text-slate-400">
-                  <Calendar size={14} />
-                  {project.year}
-                </span>
-              )}
-              {project.createdAt && (
-                <span className="flex items-center gap-1.5 text-slate-400">
-                  <Clock size={14} />
-                  {formatDate(project.createdAt)}
-                </span>
-              )}
-            </div>
-
-            {contributors.length > 0 && (
-              <div className="mt-2.5 flex items-center gap-2 text-xs text-slate-400 2xl:text-sm">
-                <Users size={13} className="text-slate-500" />
-                <div className="flex flex-wrap gap-1.5">
-                  {contributors.map((c, i) => (
-                    <span key={i} className="text-slate-400">
-                      {c.name}{" "}
-                      <span className="text-slate-500">({c.role})</span>
-                      {i < contributors.length - 1 ? "," : ""}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <p className="mt-6 leading-8 text-slate-300 2xl:text-lg 2xl:leading-9">
-              {project.desc}
-            </p>
-
-            <div className="mt-8 flex flex-wrap gap-3 2xl:mt-10 2xl:gap-4">
-              {project.liveUrl && (
-                <a
-                  href={project.liveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-xl bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 cursor-pointer 2xl:px-5 2xl:py-3 2xl:text-base"
-                >
-                  <Globe size={16} />
-                  Live Demo
-                </a>
-              )}
-              {project.repoUrl && (
-                <a
-                  href={project.repoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-slate-200 transition hover:border-cyan-400/40 hover:text-cyan-300 cursor-pointer 2xl:px-5 2xl:py-3 2xl:text-base"
-                >
-                  <GitBranch size={16} />
-                  Repository
-                </a>
-              )}
-              {links.map(renderLinkItem)}
-            </div>
-
-            {project.videoUrl && (
-              <div className="mt-8 aspect-video w-full overflow-hidden rounded-xl 2xl:mt-10">
-                <iframe
-                  src={project.videoUrl}
-                  title="Video Demo"
-                  className="h-full w-full"
-                  allowFullScreen
-                />
-              </div>
-            )}
-
-            {documents.length > 0 && (
-              <div className="mt-8 2xl:mt-10">
-                <h3 className="text-sm font-semibold text-slate-300 2xl:text-base">
-                  Dokumen Pendukung
-                </h3>
-                <div className="mt-3 flex flex-col gap-2 2xl:gap-3">
-                  {documents.map(renderDocumentItem)}
-                </div>
-              </div>
-            )}
+            <KaryaProjectContent project={project} />
           </div>
         </GlassCard>
 
-        {/* Bagian Komentar */}
-        <GlassCard className="mt-8 p-6 sm:p-10 2xl:mt-10 2xl:p-12">
-          <h3 className="flex items-center gap-2 text-lg font-bold text-white sm:text-xl 2xl:text-2xl">
-            <MessageCircle size={20} className="2xl:size-6" />
-            Komentar ({comments.length})
-          </h3>
+        <KaryaProjectComments
+          comments={comments}
+          isLoggedIn={isLoggedIn}
+          newComment={newComment}
+          setNewComment={setNewComment}
+          handleAuthRedirect={handleAuthRedirect}
+          handleAddComment={handleAddComment}
+          formatDate={formatDate}
+        />
+      </div>
 
-          {!isLoggedIn ? (
-            <div className="mt-6 flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white shadow-md py-8 text-center 2xl:py-10">
-              <p className="text-sm text-slate-600 font-medium 2xl:text-base">
-                Silakan login terlebih dahulu untuk bergabung dalam diskusi.
-              </p>
+      {showShareModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-0">
+          <div
+            className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+            onClick={() => setShowShareModal(false)}
+          ></div>
+
+          <div className="relative w-full max-w-md transform overflow-hidden rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl shadow-cyan-900/20 transition-all sm:p-8">
+            <div className="mb-6 flex items-center justify-between">
+              <h3 className="text-xl font-bold text-white">Bagikan ke...</h3>
               <button
-                onClick={handleAuthRedirect}
-                className="mt-4 rounded-xl bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-800 cursor-pointer 2xl:px-8 2xl:py-3 2xl:text-base"
+                onClick={() => setShowShareModal(false)}
+                className="cursor-pointer rounded-full bg-white/5 p-2 text-slate-400 transition hover:bg-white/10 hover:text-white"
               >
-                Login untuk Komentar
+                <X size={20} />
               </button>
             </div>
-          ) : (
-            <form onSubmit={handleAddComment} className="mt-6">
-              <div className="flex flex-col gap-3">
-                <textarea
-                  rows={3}
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Tulis tanggapan atau diskusimu di sini..."
-                  className="w-full rounded-xl border border-slate-300 bg-white p-4 text-sm text-slate-900 placeholder-slate-400 focus:border-cyan-500 focus:outline-none shadow-sm 2xl:text-base"
-                />
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400 cursor-pointer 2xl:px-6 2xl:py-3 2xl:text-base"
-                  >
-                    <Send size={16} />
-                    Kirim Komentar
-                  </button>
-                </div>
-              </div>
-            </form>
-          )}
 
-          <div className="mt-8 flex flex-col gap-4 2xl:gap-5">
-            {comments.length > 0 ? (
-              comments.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-start gap-3.5 rounded-xl border border-slate-200 bg-white p-4 shadow-sm 2xl:p-5"
-                >
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-100 border border-cyan-200 text-cyan-700 2xl:h-10 2xl:w-10">
-                    <UserCheck size={18} />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold text-slate-900 2xl:text-base">
-                        {item.author}
-                      </p>
-                      {item.createdAt && (
-                        <span className="text-xs text-slate-400">
-                          {formatDate(item.createdAt)}
-                        </span>
-                      )}
-                    </div>
-                    <p className="mt-1 text-sm leading-6 text-slate-700 2xl:text-base 2xl:leading-7">
-                      {item.text}
-                    </p>
-                  </div>
+            <div className="mb-8 grid grid-cols-4 gap-4">
+              {/* WhatsApp */}
+              <button
+                onClick={shareToWhatsApp}
+                className="group flex flex-col items-center gap-2"
+              >
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-[#25D366]/10 text-[#25D366] transition group-hover:bg-[#25D366] group-hover:text-white">
+                  <MessageCircle size={24} />
                 </div>
-              ))
-            ) : (
-              <p className="text-center text-sm text-slate-500 2xl:text-base">
-                Belum ada komentar.
-              </p>
-            )}
+                <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">
+                  WhatsApp
+                </span>
+              </button>
+
+              {/* Twitter */}
+              <button
+                onClick={() =>
+                  window.open(
+                    `https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=Lihat%20karya%20menarik%20ini!`,
+                    "_blank",
+                  )
+                }
+                className="group flex flex-col items-center gap-2"
+              >
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-white/5 text-slate-300 transition group-hover:bg-slate-800 group-hover:text-white">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+                  </svg>
+                </div>
+                <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">
+                  Twitter
+                </span>
+              </button>
+
+              {/* Facebook */}
+              <button
+                onClick={() =>
+                  window.open(
+                    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`,
+                    "_blank",
+                  )
+                }
+                className="group flex flex-col items-center gap-2"
+              >
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-[#1877F2]/10 text-[#1877F2] transition group-hover:bg-[#1877F2] group-hover:text-white">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                  </svg>
+                </div>
+                <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">
+                  Facebook
+                </span>
+              </button>
+
+              {/* Telegram */}
+              <button
+                onClick={() =>
+                  window.open(
+                    `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=Lihat%20karya%20menarik%20ini!`,
+                    "_blank",
+                  )
+                }
+                className="group flex flex-col items-center gap-2"
+              >
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-[#0088cc]/10 text-[#0088cc] transition group-hover:bg-[#0088cc] group-hover:text-white">
+                  <Send size={24} />
+                </div>
+                <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">
+                  Telegram
+                </span>
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between rounded-xl border border-white/10 bg-black/30 p-1.5 pl-4">
+              <div className="mr-4 overflow-hidden text-ellipsis whitespace-nowrap text-sm text-slate-400">
+                {window.location.href}
+              </div>
+              <button
+                onClick={copyToClipboard}
+                className="flex shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-500"
+              >
+                {isCopied ? <Check size={16} /> : <Copy size={16} />}
+                {isCopied ? "Tersalin!" : "Salin"}
+              </button>
+            </div>
           </div>
-        </GlassCard>
-      </div>
+        </div>
+      )}
     </section>
-  )
+  );
 }
 
-export default KaryaProjectDetailSection
+export default KaryaProjectDetailSection;

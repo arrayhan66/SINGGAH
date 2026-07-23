@@ -37,7 +37,7 @@ function BeritaDetail() {
 
   if (!item) {
     return (
-      <section className="relative min-h-screen bg-brand-navy pt-28 pb-16 px-5">
+      <section className="relative min-h-screen bg-brand-navy pt-36 pb-16 px-5">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-2xl font-bold text-white">
             Berita tidak ditemukan
@@ -58,14 +58,15 @@ function BeritaDetail() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-brand-navy min-h-screen pt-28 sm:pt-32 lg:pt-36 pb-20 px-5 sm:px-8">
+    // Padding top diperbesar agar kontainer putih berhenti di bawah navbar
+    <section className="relative overflow-hidden bg-brand-navy min-h-screen pt-36 sm:pt-40 lg:pt-44 pb-20 px-5 sm:px-8">
       <DustBackground />
 
       <div className="relative z-10 mx-auto max-w-4xl 2xl:max-w-5xl">
-        <div className="overflow-hidden border border-slate-700/60 shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-3xl">
+        <div className="overflow-hidden border border-slate-700/60 shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-3xl bg-brand-navy">
           {/* HEADER ARTIKEL */}
-          <div className="p-5 sm:p-8 lg:p-10 bg-brand-navy/80 border-b border-slate-800/80">
-            {/* Navigasi & Tombol Share (Tanpa border-b dan padding bawah diminimalkan) */}
+          <div className="p-5 sm:p-8 lg:p-10 bg-brand-navy border-b border-slate-800/80">
+            {/* Navigasi & Tombol Share */}
             <div className="flex items-center justify-between pb-0">
               <Link
                 to="/berita"
@@ -78,7 +79,9 @@ function BeritaDetail() {
                     className="transition-transform duration-300 group-hover:-translate-x-0.5"
                   />
                 </span>
-                <span className="hidden sm:inline font-semibold">Kembali</span>
+                <span className="hidden sm:inline font-semibold">
+                  Kembali ke Indeks Berita
+                </span>
               </Link>
 
               <button
@@ -91,9 +94,8 @@ function BeritaDetail() {
               </button>
             </div>
 
-            {/* Container Konten Header Bawah (Tags, Judul, Metadata) dengan jarak atas yang pas */}
+            {/* Container Konten Header Bawah */}
             <div className="mt-5 sm:mt-6 space-y-4">
-              {/* Kategori & Tag Utama */}
               {item.tags?.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {item.tags.map((tag) => (
@@ -107,7 +109,6 @@ function BeritaDetail() {
                 </div>
               )}
 
-              {/* Judul Artikel Utama */}
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-[1.15] tracking-tight">
                 {item.title}
               </h1>
@@ -310,7 +311,6 @@ function BeritaDetail() {
       {isShareModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md transition-all">
           <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
-            {/* Header Modal */}
             <div className="flex items-center justify-between border-b border-slate-800 pb-4">
               <div className="flex items-center gap-2.5">
                 <div className="h-9 w-9 rounded-xl bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center text-cyan-400">
@@ -328,7 +328,6 @@ function BeritaDetail() {
               </button>
             </div>
 
-            {/* Opsi Media Sosial */}
             <div className="grid grid-cols-3 gap-3">
               <a
                 href={`https://api.whatsapp.com/send?text=${shareTitle}%20-%20${currentUrl}`}
@@ -367,7 +366,6 @@ function BeritaDetail() {
               </a>
             </div>
 
-            {/* Salin Tautan Otomatis */}
             <div className="space-y-2">
               <label className="text-xs font-semibold text-slate-400">
                 Atau salin tautan artikel

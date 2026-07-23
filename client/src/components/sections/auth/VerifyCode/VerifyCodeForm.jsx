@@ -1,120 +1,166 @@
-import { useRef, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { ArrowLeft } from "lucide-react"
-import logo from "../../../../assets/icons/logo.png"
+import { useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import logo from "../../../../assets/icons/logo.png";
 
 function VerifyCodeForm() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const [otp, setOtp] = useState(["", "", "", "", "", ""])
-  const [loading, setLoading] = useState(false)
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [loading, setLoading] = useState(false);
 
-  const inputs = useRef([])
+  const inputs = useRef([]);
 
-  const handleChange = (value, index) => {
-    if (!/^\d?$/.test(value)) return
+  const handleChange = (e, index) => {
+    const value = e.target.value;
 
-    const newOtp = [...otp]
-    newOtp[index] = value
-    setOtp(newOtp)
-
-    if (value && index < 5) {
-      inputs.current[index + 1]?.focus()
+    // 1. Jika kotak dikosongkan (hapus)
+    if (value === "") {
+      const newOtp = [...otp];
+      newOtp[index] = "";
+      setOtp(newOtp);
+      return;
     }
-  }
+
+    // 2. Handle Paste / Autofill (kalau user masukin lebih dari 1 angka sekaligus)
+    if (value.length > 1 && /^\d+$/.test(value)) {
+      const pasted = value.slice(0, 6).split("");
+      const newOtp = [...otp];
+
+      pasted.forEach((num, i) => {
+        if (index + i < 6) newOtp[index + i] = num;
+      });
+
+      setOtp(newOtp);
+
+      const nextIndex = Math.min(index + pasted.length, 5);
+      inputs.current[nextIndex]?.focus();
+      return;
+    }
+
+    // 3. Normal typing: Ambil 1 digit terakhir biar ngetik mulus di laptop & HP
+    const lastChar = value.slice(-1);
+    if (!/^\d$/.test(lastChar)) return;
+
+    const newOtp = [...otp];
+    newOtp[index] = lastChar;
+    setOtp(newOtp);
+
+    // Otomatis pindah ke kotak kanan
+    if (index < 5) {
+      inputs.current[index + 1]?.focus();
+    }
+  };
 
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace") {
-      if (otp[index]) {
-        const newOtp = [...otp]
-        newOtp[index] = ""
-        setOtp(newOtp)
-      } else if (index > 0) {
-        inputs.current[index - 1]?.focus()
+      // Hapus & mundur ke kiri otomatis kalau kotak saat ini kosong
+      if (!otp[index] && index > 0) {
+        e.preventDefault();
+        const newOtp = [...otp];
+        newOtp[index - 1] = "";
+        setOtp(newOtp);
+        inputs.current[index - 1]?.focus();
       }
+    } else if (e.key === "ArrowLeft" && index > 0) {
+      e.preventDefault();
+      inputs.current[index - 1]?.focus();
+    } else if (e.key === "ArrowRight" && index < 5) {
+      e.preventDefault();
+      inputs.current[index + 1]?.focus();
     }
-  }
+  };
+
+  const handleFocus = (index) => {
+    const firstEmptyIndex = otp.findIndex((val) => val === "");
+
+    // Cegah user melompati kotak yang masih kosong
+    if (firstEmptyIndex !== -1 && index > firstEmptyIndex) {
+      inputs.current[firstEmptyIndex]?.focus();
+    }
+    // Udah nggak ada e.target.select() di sini, jadi nggak bakal nge-drag biru lagi!
+  };
 
   const handlePaste = (e) => {
-    e.preventDefault()
-
+    e.preventDefault();
     const pasted = e.clipboardData
       .getData("text")
       .replace(/\D/g, "")
-      .slice(0, 6)
+      .slice(0, 6);
+    if (!pasted) return;
 
-    if (!pasted) return
-
-    const newOtp = [...otp]
-
+    const newOtp = [...otp];
     pasted.split("").forEach((num, i) => {
-      newOtp[i] = num
-    })
+      newOtp[i] = num;
+    });
+    setOtp(newOtp);
 
-    setOtp(newOtp)
-
-    inputs.current[Math.min(pasted.length - 1, 5)]?.focus()
-  }
+    const nextIndex = Math.min(pasted.length, 5);
+    if (pasted.length < 6) {
+      inputs.current[nextIndex]?.focus();
+    } else {
+      inputs.current[5]?.focus();
+    }
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (otp.some((item) => item === "")) {
-      alert("Masukkan kode verifikasi terlebih dahulu.")
-      return
+      alert("Masukkan kode verifikasi terlebih dahulu.");
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
 
     setTimeout(() => {
-      setLoading(false)
-      navigate("/reset-password")
-    }, 1500)
-  }
+      setLoading(false);
+      navigate("/reset-password");
+    }, 1500);
+  };
 
   return (
-    <div className="flex w-full flex-col justify-center overflow-y-auto p-4 min-[350px]:p-8 sm:p-12 lg:w-1/2 lg:px-16 lg:py-10">
-      {/* Header Mobile */}
-      <div className="mb-5 flex items-center justify-between min-[350px]:mb-8 lg:hidden">
+    <div className="flex w-full flex-col justify-center overflow-y-auto p-4 min-[300px]:p-5 min-[350px]:p-8 sm:p-12 lg:w-1/2 lg:px-16 lg:py-10">
+      <div className="mb-4 flex items-center justify-between min-[300px]:mb-6 lg:hidden">
         <Link
           to="/"
-          className="flex items-center gap-2 min-[350px]:gap-3 transition-opacity hover:opacity-90"
+          className="flex items-center gap-1.5 min-[300px]:gap-2 min-[350px]:gap-3 transition-opacity hover:opacity-90"
         >
           <img
             src={logo}
             alt="Logo SINGGAH"
-            className="h-8 w-8 min-[350px]:h-10 min-[350px]:w-10"
+            className="h-6 w-6 min-[300px]:h-8 min-[300px]:w-8 min-[350px]:h-10 min-[350px]:w-10"
           />
-
-          <span className="text-xl font-black tracking-wide text-white min-[350px]:text-2xl">
+          <span className="text-base font-black tracking-wide text-white min-[300px]:text-lg min-[350px]:text-2xl">
             SINGGAH
           </span>
         </Link>
 
         <Link
           to="/forgot-password"
-          className="flex items-center gap-2 text-[11px] text-slate-400 transition hover:text-cyan-300 min-[350px]:text-sm"
+          className="flex items-center gap-1 text-[10px] text-slate-400 transition hover:text-cyan-300 min-[300px]:gap-2 min-[300px]:text-xs min-[350px]:text-sm"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={14} className="min-[350px]:h-4 min-[350px]:w-4" />
           <span className="hidden min-[400px]:inline">Kembali</span>
         </Link>
       </div>
 
-      {/* Title */}
       <div className="text-center">
         <h2 className="text-lg font-bold leading-tight text-white min-[300px]:text-2xl min-[350px]:text-3xl sm:text-4xl">
           Verifikasi <span className="text-cyan-300">Kode</span>
         </h2>
 
-        <p className="mt-2 text-xs text-slate-400 min-[300px]:text-sm min-[350px]:text-base">
+        <p className="mt-1.5 text-[10px] text-slate-400 min-[300px]:mt-2 min-[300px]:text-xs min-[350px]:text-sm sm:text-base">
           Masukkan 6 digit kode yang telah dikirim ke email Anda.
         </p>
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="mt-6 min-[350px]:mt-8">
+      <form
+        onSubmit={handleSubmit}
+        className="mt-5 min-[300px]:mt-6 min-[350px]:mt-8"
+      >
         <div
-          className="flex justify-center gap-2 min-[350px]:gap-3"
+          className="mx-auto flex w-full max-w-[380px] justify-center gap-1 min-[280px]:gap-1.5 min-[320px]:gap-2 min-[400px]:gap-3"
           onPaste={handlePaste}
         >
           {otp.map((digit, index) => (
@@ -123,11 +169,12 @@ function VerifyCodeForm() {
               ref={(el) => (inputs.current[index] = el)}
               type="text"
               inputMode="numeric"
-              maxLength={1}
               value={digit}
-              onChange={(e) => handleChange(e.target.value, index)}
+              onChange={(e) => handleChange(e, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
-              className="h-10 w-10 rounded-xl border border-slate-200 bg-slate-50 text-center text-base font-bold text-slate-900 shadow-sm transition-all focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-cyan-500/20 min-[300px]:h-11 min-[300px]:w-11 min-[350px]:h-14 min-[350px]:w-14 min-[350px]:text-xl"
+              onClick={() => handleFocus(index)}
+              onFocus={() => handleFocus(index)}
+              className="h-9 w-7 min-[280px]:h-10 min-[280px]:w-8 min-[320px]:h-11 min-[320px]:w-9 min-[350px]:h-12 min-[350px]:w-10 min-[400px]:h-14 min-[400px]:w-12 sm:h-14 sm:w-14 rounded-lg border border-slate-200 bg-slate-50 text-center text-sm font-bold text-slate-900 shadow-sm transition-all focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-cyan-500/20 min-[300px]:text-base min-[350px]:rounded-xl min-[350px]:text-xl"
             />
           ))}
         </div>
@@ -135,13 +182,13 @@ function VerifyCodeForm() {
         <button
           type="submit"
           disabled={loading}
-          className="group relative mt-8 w-full cursor-pointer overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] py-2 font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 disabled:cursor-not-allowed disabled:opacity-70 min-[350px]:py-4"
+          className="group relative mx-auto mt-6 block w-full max-w-[380px] cursor-pointer overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] py-2.5 font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 disabled:cursor-not-allowed disabled:opacity-70 min-[350px]:mt-8 min-[350px]:py-4"
         >
           <span className="flex items-center justify-center gap-2">
             {loading ? (
-              <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white min-[350px]:h-5 min-[350px]:w-5" />
             ) : (
-              <span className="text-sm tracking-wide min-[350px]:text-base">
+              <span className="text-xs tracking-wide min-[300px]:text-sm min-[350px]:text-base">
                 Verifikasi
               </span>
             )}
@@ -149,17 +196,17 @@ function VerifyCodeForm() {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-xs text-slate-400 min-[350px]:mt-10 min-[350px]:text-sm lg:mt-8">
+      <p className="mt-5 text-center text-[10px] text-slate-400 min-[300px]:mt-6 min-[300px]:text-xs min-[350px]:mt-10 min-[350px]:text-sm lg:mt-8">
         Belum menerima kode?
         <button
           type="button"
-          className="ml-2 font-bold text-cyan-400 transition-colors hover:text-cyan-300"
+          className="ml-1.5 font-bold text-cyan-400 transition-colors hover:text-cyan-300 min-[300px]:ml-2"
         >
           Kirim ulang
         </button>
       </p>
     </div>
-  )
+  );
 }
 
-export default VerifyCodeForm
+export default VerifyCodeForm;

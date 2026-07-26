@@ -1,66 +1,84 @@
-import { useState, useRef, useEffect } from "react";
-import { User } from "lucide-react";
-import { NavLink } from "react-router-dom";
-import logo from "../../assets/icons/logo.png";
-import { visitorMenu } from "../../constants/navigation";
+import { useState, useRef, useEffect } from "react"
+import { NavLink } from "react-router-dom"
+import logo from "../../assets/icons/logo.png"
+import { visitorMenu } from "../../constants/navigation"
 
 function NavbarVisitor() {
-  const [isOpen, setIsOpen] = useState(false);
-  const navRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false)
+  const navRef = useRef(null)
+  const headerRef = useRef(null)
 
   const navLinkClass = ({ isActive }) =>
     `relative rounded-full px-5 py-2 text-sm font-medium transition-all duration-300 ${
       isActive
         ? "bg-cyan-400/10 text-cyan-300 shadow-[0_0_18px_rgba(34,211,238,.15)]"
         : "text-slate-300 hover:bg-white/5 hover:text-cyan-300 hover:-translate-y-0.5"
-    }`;
+    }`
 
-  const closeMenu = () => setIsOpen(false);
+  const closeMenu = () => setIsOpen(false)
 
   useEffect(() => {
     function handleClickOutside(event) {
       if (navRef.current && !navRef.current.contains(event.target)) {
-        setIsOpen(false);
+        setIsOpen(false)
       }
     }
 
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside)
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [isOpen])
+
+  useEffect(() => {
+    const el = headerRef.current
+    if (!el) return
+
+    const setVar = () => {
+      document.documentElement.style.setProperty(
+        "--navbar-h",
+        `${el.offsetHeight}px`,
+      )
+    }
+
+    setVar()
+    const observer = new ResizeObserver(setVar)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <header
-      ref={navRef}
-      className="fixed top-0 left-0 z-50 w-full px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16"
+      ref={(node) => {
+        navRef.current = node
+        headerRef.current = node
+      }}
+      className="fixed left-0 top-0 z-50 w-full px-3 min-[350px]:px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16"
     >
-      <div className="mx-auto mt-5 sm:mt-6 md:mt-7 2xl:mt-8 flex w-full max-w-[1700px] items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:px-6 sm:py-4 md:px-8 2xl:px-10 backdrop-blur-xl">
-        {/* LOGO */}
+      <div className="mx-auto mt-3 flex w-full max-w-[1700px] items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-2.5 py-2.5 backdrop-blur-xl min-[350px]:mt-5 min-[350px]:px-4 min-[350px]:py-3 sm:mt-6 sm:px-6 sm:py-4 md:mt-7 md:px-8 2xl:mt-8 2xl:px-10">
         <NavLink
           to="/"
           onClick={closeMenu}
-          className="flex items-center gap-2 sm:gap-3"
+          className="flex items-center gap-1.5 min-[350px]:gap-2 sm:gap-3"
         >
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-11 md:w-11 items-center justify-center overflow-hidden rounded-xl shrink-0">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-xl min-[350px]:h-9 min-[350px]:w-9 sm:h-10 sm:w-10 md:h-11 md:w-11">
             <img
               src={logo}
               alt="PamerIT Logo"
-              className="h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12 object-contain"
+              className="h-full w-full object-contain"
             />
           </div>
 
           <div>
-            <h1 className="text-base sm:text-lg font-bold text-white">
+            <h1 className="text-sm font-bold text-white min-[350px]:text-base sm:text-lg">
               SINGGAH
             </h1>
           </div>
         </NavLink>
 
-        {/* Menu - Desktop */}
         <nav className="hidden flex-1 items-center justify-center font-medium lg:flex lg:gap-12 xl:gap-14 2xl:gap-16">
           {visitorMenu.map((item) => (
             <NavLink key={item.to} to={item.to} className={navLinkClass}>
@@ -69,51 +87,51 @@ function NavbarVisitor() {
           ))}
         </nav>
 
-        {/* RIGHT */}
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-1.5 min-[350px]:gap-2 sm:gap-4">
           <NavLink
             to="/login"
             onClick={closeMenu}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-blue text-white transition-all duration-300 hover:bg-[#5b8dbc] sm:h-8 sm:w-8 md:h-9 md:w-9 lg:h-11 lg:w-11"
-            aria-label="Login"
+            className="group relative flex shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-2.5 py-1.5 text-[10px] font-bold tracking-wide text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 active:scale-95 min-[350px]:px-3 sm:px-4 sm:py-2 sm:text-xs md:px-5 md:py-2.5 md:text-sm lg:px-6 lg:py-2.5 lg:text-base 2xl:px-8 2xl:py-3 2xl:text-lg min-[2000px]:px-10 min-[2000px]:py-4 min-[2000px]:text-xl"
           >
-            <User size={13} className="sm:hidden" />
-            <User size={14} className="hidden sm:block md:hidden" />
-            <User size={16} className="hidden md:block lg:hidden" />
-            <User size={20} className="hidden lg:block" />
+            LOGIN
           </NavLink>
 
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="group relative flex h-9 w-9 cursor-pointer items-center justify-center lg:hidden"
+            className="group relative flex h-7 w-7 cursor-pointer items-center justify-center min-[350px]:h-9 min-[350px]:w-9 lg:hidden"
             aria-label="Toggle menu"
           >
             <span
-              className={`absolute h-[2px] w-6 rounded-full bg-white transition-all duration-300 ${
-                isOpen ? "rotate-45" : "-translate-y-2"
+              className={`absolute h-[2px] w-5 rounded-full bg-white transition-all duration-300 min-[350px]:w-6 ${
+                isOpen
+                  ? "rotate-45"
+                  : "-translate-y-1.5 min-[350px]:-translate-y-2"
               }`}
             />
             <span
-              className={`absolute h-[2px] w-6 rounded-full bg-cyan-300 transition-all duration-300 ${
+              className={`absolute h-[2px] w-5 rounded-full bg-cyan-300 transition-all duration-300 min-[350px]:w-6 ${
                 isOpen ? "opacity-0" : "opacity-100"
               }`}
             />
             <span
-              className={`absolute h-[2px] w-6 rounded-full bg-white transition-all duration-300 ${
-                isOpen ? "-rotate-45" : "translate-y-2"
+              className={`absolute h-[2px] w-5 rounded-full bg-white transition-all duration-300 min-[350px]:w-6 ${
+                isOpen
+                  ? "-rotate-45"
+                  : "translate-y-1.5 min-[350px]:translate-y-2"
               }`}
             />
           </button>
         </div>
       </div>
 
-      {/* Menu - Mobile / Tablet */}
       <div
-        className={`mx-auto max-w-7xl overflow-hidden transition-all duration-500 ease-in-out lg:hidden ${
-          isOpen ? "mt-2 max-h-[500px] opacity-100" : "mt-0 max-h-0 opacity-0"
+        className={`absolute left-0 top-full z-50 w-full px-3 min-[350px]:px-5 md:px-8 lg:hidden transition-all duration-300 ${
+          isOpen
+            ? "mt-2 opacity-100 visible translate-y-0"
+            : "opacity-0 invisible -translate-y-2"
         }`}
       >
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-brand-dark/95 backdrop-blur-xl">
+        <div className="mx-auto max-w-[1700px] overflow-hidden rounded-2xl border border-white/10 bg-brand-dark/95 backdrop-blur-xl">
           <div
             className="pointer-events-none absolute inset-0 opacity-10"
             style={{
@@ -154,7 +172,7 @@ function NavbarVisitor() {
         </div>
       </div>
     </header>
-  );
+  )
 }
 
-export default NavbarVisitor;
+export default NavbarVisitor

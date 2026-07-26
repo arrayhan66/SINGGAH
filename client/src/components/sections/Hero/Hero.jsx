@@ -1,30 +1,25 @@
-import { ArrowRight } from "lucide-react";
-import DustBackground from "../../ui/DustBackground";
-import GlowBackground from "../../ui/GlowBackground";
-import PCBBackground from "../../ui/PCBBackground";
-import HeroModel3D from "./HeroModel3D";
-import logoPoliban from "../../../assets/icons/Logo_Poliban.png";
-import { useNavigate } from "react-router-dom";
-import HeroStats, { statsData } from "./HeroStats";
+import { ArrowRight } from "lucide-react"
+import DustBackground from "../../ui/DustBackground"
+import GlowBackground from "../../ui/GlowBackground"
+import PCBBackground from "../../ui/PCBBackground"
+import HeroModel3D from "./HeroModel3D"
+import logoPoliban from "../../../assets/icons/Logo_Poliban.png"
+import { useNavigate } from "react-router-dom"
+import HeroStats, { statsData } from "./HeroStats"
 
 function Hero() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   return (
     <section
       id="hero"
       className="relative min-h-[100dvh] overflow-hidden bg-brand-dark"
     >
-      {/* GlowBackground */}
       <GlowBackground />
-
-      {/* PCBBackground */}
       <PCBBackground />
-
-      {/* DustBackground */}
       <DustBackground />
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-[1700px] flex-col lg:flex-row items-center lg:items-start justify-between px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-32 md:pt-40 lg:pt-44 pb-12">
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-[1700px] flex-col lg:flex-row items-center lg:items-start justify-between px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-[calc(var(--navbar-h)+24px)] pb-12">
         <div className="flex w-full flex-col items-center text-center md:max-w-2xl md:mx-auto lg:max-w-xl 2xl:max-w-2xl lg:mx-0 lg:items-start lg:text-left">
           <div className="inline-flex items-center gap-2 min-[350px]:gap-3 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 min-[350px]:px-4 py-2 backdrop-blur-md">
             <img
@@ -37,14 +32,12 @@ function Hero() {
             </span>
           </div>
 
-          {/* JUDUL */}
           <h1 className="mt-4 text-3xl min-[350px]:text-4xl md:text-5xl lg:text-6xl 2xl:text-7xl font-black leading-tight text-white">
             SINGGAH
             <br />
             SEJENAK <span className="text-cyan-300">DISINI</span>
           </h1>
 
-          {/* Deskripsi */}
           <div className="mt-5 flex flex-col md:flex-row items-center lg:items-start gap-3">
             <div className="hidden lg:block mt-2 h-13 w-[3px] shrink-0 rounded-full bg-gradient-to-b from-cyan-400 to-blue-600" />
             <p className="text-xs min-[350px]:text-sm md:text-base lg:text-lg 2xl:text-xl leading-relaxed text-slate-300 max-w-md md:max-w-xl 2xl:max-w-2xl">
@@ -56,7 +49,6 @@ function Hero() {
             </p>
           </div>
 
-          {/* Tombol Eksplorasi - Desktop*/}
           <div className="hidden lg:block mt-10 w-full">
             <button
               onClick={() => navigate("/hall")}
@@ -72,22 +64,18 @@ function Hero() {
             </button>
           </div>
 
-          {/* Stats Desktop - Desktop */}
           <div className="hidden lg:block mt-10 w-full">
             <HeroStats />
           </div>
         </div>
 
-        {/* Model 3D */}
         <div className="mt-2 lg:-mt-30 flex w-full lg:w-[45%] xl:w-1/2 items-center justify-center shrink-0">
           <div className="w-full max-w-xs md:max-w-lg lg:max-w-full">
             <HeroModel3D />
           </div>
         </div>
 
-        {/* Area Bawah - Mobile */}
         <div className="mt-8 flex w-full max-w-lg md:max-w-2xl flex-col items-center gap-8 lg:hidden">
-          {/* Tombol Eksplorasi - Mobile / Tablet */}
           <div className="w-full max-w-sm md:max-w-md">
             <button
               onClick={() => navigate("/hall")}
@@ -104,22 +92,19 @@ function Hero() {
             </button>
           </div>
 
-          {/* Stats Mobile */}
           <div className="w-full">
             <div className="flex flex-col min-[400px]:flex-row items-center justify-between gap-6 min-[400px]:gap-0 rounded-2xl border border-white/10 bg-white/5 px-4 md:px-6 py-5 min-[400px]:py-4 backdrop-blur-xl">
               {statsData.map((stat, index) => {
-                const Icon = stat.icon;
+                const Icon = stat.icon
                 return (
                   <div
                     key={stat.label}
                     className="relative flex w-full min-[400px]:w-auto flex-1 items-center justify-start min-[400px]:justify-center gap-4"
                   >
-                    {/* Ikon */}
                     <div className="flex h-10 w-10 md:h-12 md:w-12 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10">
                       <Icon className="h-5 w-5 md:h-6 md:w-6 text-cyan-300" />
                     </div>
 
-                    {/* Teks */}
                     <div className="text-left">
                       <p className="text-base min-[400px]:text-sm md:text-lg font-bold text-white leading-none">
                         {stat.value}
@@ -137,14 +122,13 @@ function Hero() {
                       <div className="block min-[400px]:hidden absolute -bottom-3 left-1/2 h-px w-[90%] -translate-x-1/2 bg-white/10" />
                     )}
                   </div>
-                );
+                )
               })}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Vignette Gelap */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
@@ -153,7 +137,7 @@ function Hero() {
         }}
       />
     </section>
-  );
+  )
 }
 
-export default Hero;
+export default Hero

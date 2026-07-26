@@ -51,7 +51,7 @@ function KaryaProjectSection() {
   return (
     <section
       id="karya-detail"
-      className="relative min-h-screen overflow-hidden bg-brand-navy pt-25 pb-10 sm:pt-30 sm:pb-12 lg:pt-35 lg:pb-16 2xl:pt-40 2xl:pb-20"
+      className="relative min-h-screen overflow-hidden bg-brand-navy pt-[calc(var(--navbar-h)+18px)] pb-10 sm:pb-12 lg:pb-16 2xl:pb-20"
     >
       <GlowBackground />
       <DustBackground />

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { ProtectedRoute } from "./ProtectedRoute"
+import { ResetFlowRoute } from "./ResetFlowRoute"
 
 import Hall from "../pages/Hall/Hall"
 import Home from "../pages/Home/Home"
@@ -49,14 +50,31 @@ function AppRouter() {
         <Route path="/about" element={<About />} />
         <Route path="/hall" element={<Hall />} />
         <Route path="/berita" element={<News />} />
-        <Route path="/berita/:id" element={<NewsDetail />} />
+        <Route path="/berita/:slug" element={<NewsDetail />} />
 
         {/* === AUTH ROUTES === */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/verify-code" element={<VerifyCode />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+        {/* DIKUNCI: Hanya bisa masuk kalau ada resetEmail */}
+        <Route
+          path="/verify-code"
+          element={
+            <ResetFlowRoute step="verify">
+              <VerifyCode />
+            </ResetFlowRoute>
+          }
+        />
+
+        {/* DIKUNCI: Hanya bisa masuk kalau OTP sudah diverifikasi */}
+        <Route
+          path="/reset-password"
+          element={
+            <ResetFlowRoute step="reset">
+              <ResetPassword />
+            </ResetFlowRoute>
+          }
+        />
 
         {/* === USER ROUTES === */}
         <Route

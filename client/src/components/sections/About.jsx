@@ -6,28 +6,23 @@ import {
   Mail,
   Phone,
   MapPin,
-} from "lucide-react";
-import DustBackground from "../ui/DustBackground";
-import GlowBackground from "../ui/GlowBackground";
-import GlassCard from "../ui/GlassCard";
+} from "lucide-react"
+import DustBackground from "../ui/DustBackground"
+import GlowBackground from "../ui/GlowBackground"
+import GlassCard from "../ui/GlassCard"
 
 function About() {
   return (
     <section
       id="about"
-      className="relative overflow-hidden bg-brand-dark pb-12 pt-25 lg:pb-16 lg:pt-30 2xl:pb-32 2xl:pt-35"
+      className="relative overflow-hidden bg-brand-dark pt-[calc(var(--navbar-h)+24px)] pb-12 lg:pb-16 2xl:pb-32"
     >
-      {/* Glow */}
       <GlowBackground />
-
-      {/* Dust Particles */}
       <DustBackground />
 
-      {/* Container Utama */}
-      <div className="mx-auto w-full max-w-7xl px-8 sm:px-12 lg:px-16 2xl:max-w-7xl">
-        {/* 1. BAGIAN HEADER */}
+      <div className="mx-auto w-full max-w-7xl px-4 min-[280px]:px-5 min-[350px]:px-6 sm:px-8 lg:px-12 2xl:max-w-7xl 2xl:px-16">
         <div>
-          <h2 className="mt-6 text-3xl font-black leading-tight text-white sm:text-4xl lg:text-5xl 2xl:text-7xl">
+          <h2 className="text-3xl font-black leading-tight text-white sm:text-4xl lg:text-5xl 2xl:text-7xl">
             Wadah <span className="text-cyan-300">Inovasi</span>
             <br />
             Mahasiswa
@@ -118,7 +113,7 @@ function About() {
               desc: "Mengapresiasi project terbaik setiap tahunnya.",
             },
           ].map((item, idx) => {
-            const IconEl = item.icon;
+            const IconEl = item.icon
             return (
               <GlassCard
                 key={idx}
@@ -134,7 +129,7 @@ function About() {
                   {item.desc}
                 </p>
               </GlassCard>
-            );
+            )
           })}
         </div>
 
@@ -159,7 +154,7 @@ function About() {
         </div>
       </div>
     </section>
-  );
+  )
 }
 
-export default About;
+export default About

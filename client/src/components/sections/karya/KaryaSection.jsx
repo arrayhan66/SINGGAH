@@ -1,30 +1,30 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import DustBackground from "../../ui/DustBackground";
-import GlowBackground from "../../ui/GlowBackground";
-import useSearchAndExpand from "../../../hooks/useSearchAndExpand";
-import SearchBar from "../../ui/SearchBar";
-import OutlineButton from "../../ui/OutlineButton";
-import KaryaCategoryCard from "./KaryaCategoryCard";
-import { karyaCategories } from "../../../data/karyaData";
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import DustBackground from "../../ui/DustBackground"
+import GlowBackground from "../../ui/GlowBackground"
+import useSearchAndExpand from "../../../hooks/useSearchAndExpand"
+import SearchBar from "../../ui/SearchBar"
+import OutlineButton from "../../ui/OutlineButton"
+import KaryaCategoryCard from "./KaryaCategoryCard"
+import { karyaCategories } from "../../../data/karyaData"
 
 function KaryaSection() {
-  const navigate = useNavigate();
-  const [initialCount, setInitialCount] = useState(6);
+  const navigate = useNavigate()
+  const [initialCount, setInitialCount] = useState(6)
 
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1536) {
-        setInitialCount(8);
+        setInitialCount(8)
       } else {
-        setInitialCount(6);
+        setInitialCount(6)
       }
-    };
+    }
 
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    handleResize()
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
 
   // Catatan: Nanti saat integrasi API, data karyaCategories idealnya
   // sudah membawa field `projectCount` dari database (hasil COUNT project berstatus published).
@@ -35,16 +35,16 @@ function KaryaSection() {
     filteredData: filteredCategories,
     showAll,
     setShowAll,
-  } = useSearchAndExpand(karyaCategories, initialCount);
+  } = useSearchAndExpand(karyaCategories, initialCount)
 
   function handleCategoryClick(slug) {
-    navigate(`/karya/${slug}`);
+    navigate(`/karya/${slug}`)
   }
 
   return (
     <section
       id="karya"
-      className="relative overflow-hidden bg-brand-navy min-h-screen pt-20 pb-6 sm:pt-24 sm:pb-10 lg:pt-28 lg:pb-12 2xl:pt-32 2xl:pb-20"
+      className="relative overflow-hidden bg-brand-navy min-h-screen pt-[calc(var(--navbar-h)-8px)] pb-6 sm:pb-10 lg:pb-12 2xl:pb-20"
     >
       <GlowBackground />
       <DustBackground />
@@ -119,7 +119,7 @@ function KaryaSection() {
         )}
       </div>
     </section>
-  );
+  )
 }
 
-export default KaryaSection;
+export default KaryaSection

@@ -1,166 +1,265 @@
-import { useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
-import logo from "../../../../assets/icons/logo.png";
+import { useEffect, useRef, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { ArrowLeft, Clock } from "lucide-react"
+import logo from "../../../../assets/icons/logo.png"
+import FormAlert from "../../../ui/FormAlert"
+import api from "../../../../services/api"
 
 function VerifyCodeForm() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const [otp, setOtp] = useState(["", "", "", "", "", ""])
+  const [loading, setLoading] = useState(false)
+  const [alert, setAlert] = useState({ message: "", type: "" })
+  const [countdown, setCountdown] = useState(60)
+  const [isResending, setIsResending] = useState(false)
+  const inputs = useRef([])
 
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    let timer
+    if (countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1)
+      }, 1000)
+    }
+    return () => clearInterval(timer)
+  }, [countdown])
 
-  const inputs = useRef([]);
+  useEffect(() => {
+    if (alert.message) {
+      const timer = setTimeout(() => {
+        setAlert({ message: "", type: "" })
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [alert.message])
 
   const handleChange = (e, index) => {
-    const value = e.target.value;
+    setAlert({ message: "", type: "" })
+    const value = e.target.value
 
-    // 1. Jika kotak dikosongkan (hapus)
     if (value === "") {
-      const newOtp = [...otp];
-      newOtp[index] = "";
-      setOtp(newOtp);
-      return;
+      const newOtp = [...otp]
+      newOtp[index] = ""
+      setOtp(newOtp)
+      return
     }
 
-    // 2. Handle Paste / Autofill (kalau user masukin lebih dari 1 angka sekaligus)
     if (value.length > 1 && /^\d+$/.test(value)) {
-      const pasted = value.slice(0, 6).split("");
-      const newOtp = [...otp];
-
+      const pasted = value.slice(0, 6).split("")
+      const newOtp = [...otp]
       pasted.forEach((num, i) => {
-        if (index + i < 6) newOtp[index + i] = num;
-      });
-
-      setOtp(newOtp);
-
-      const nextIndex = Math.min(index + pasted.length, 5);
-      inputs.current[nextIndex]?.focus();
-      return;
+        if (index + i < 6) newOtp[index + i] = num
+      })
+      setOtp(newOtp)
+      const nextIndex = Math.min(index + pasted.length, 5)
+      inputs.current[nextIndex]?.focus()
+      return
     }
 
-    // 3. Normal typing: Ambil 1 digit terakhir biar ngetik mulus di laptop & HP
-    const lastChar = value.slice(-1);
-    if (!/^\d$/.test(lastChar)) return;
+    const lastChar = value.slice(-1)
+    if (!/^\d$/.test(lastChar)) return
 
-    const newOtp = [...otp];
-    newOtp[index] = lastChar;
-    setOtp(newOtp);
+    const newOtp = [...otp]
+    newOtp[index] = lastChar
+    setOtp(newOtp)
 
-    // Otomatis pindah ke kotak kanan
     if (index < 5) {
-      inputs.current[index + 1]?.focus();
+      inputs.current[index + 1]?.focus()
     }
-  };
+  }
 
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace") {
-      // Hapus & mundur ke kiri otomatis kalau kotak saat ini kosong
       if (!otp[index] && index > 0) {
-        e.preventDefault();
-        const newOtp = [...otp];
-        newOtp[index - 1] = "";
-        setOtp(newOtp);
-        inputs.current[index - 1]?.focus();
+        e.preventDefault()
+        const newOtp = [...otp]
+        newOtp[index - 1] = ""
+        setOtp(newOtp)
+        inputs.current[index - 1]?.focus()
       }
     } else if (e.key === "ArrowLeft" && index > 0) {
-      e.preventDefault();
-      inputs.current[index - 1]?.focus();
+      e.preventDefault()
+      inputs.current[index - 1]?.focus()
     } else if (e.key === "ArrowRight" && index < 5) {
-      e.preventDefault();
-      inputs.current[index + 1]?.focus();
+      e.preventDefault()
+      inputs.current[index + 1]?.focus()
     }
-  };
+  }
 
   const handleFocus = (index) => {
-    const firstEmptyIndex = otp.findIndex((val) => val === "");
-
-    // Cegah user melompati kotak yang masih kosong
+    const firstEmptyIndex = otp.findIndex((val) => val === "")
     if (firstEmptyIndex !== -1 && index > firstEmptyIndex) {
-      inputs.current[firstEmptyIndex]?.focus();
+      inputs.current[firstEmptyIndex]?.focus()
     }
-    // Udah nggak ada e.target.select() di sini, jadi nggak bakal nge-drag biru lagi!
-  };
+  }
 
   const handlePaste = (e) => {
-    e.preventDefault();
+    e.preventDefault()
+    setAlert({ message: "", type: "" })
+
     const pasted = e.clipboardData
       .getData("text")
       .replace(/\D/g, "")
-      .slice(0, 6);
-    if (!pasted) return;
+      .slice(0, 6)
+    if (!pasted) return
 
-    const newOtp = [...otp];
+    const newOtp = [...otp]
     pasted.split("").forEach((num, i) => {
-      newOtp[i] = num;
-    });
-    setOtp(newOtp);
+      newOtp[i] = num
+    })
+    setOtp(newOtp)
 
-    const nextIndex = Math.min(pasted.length, 5);
+    const nextIndex = Math.min(pasted.length, 5)
     if (pasted.length < 6) {
-      inputs.current[nextIndex]?.focus();
+      inputs.current[nextIndex]?.focus()
     } else {
-      inputs.current[5]?.focus();
+      inputs.current[5]?.focus()
     }
-  };
+  }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const verifyType = localStorage.getItem("verifyType") || "reset"
+  const currentEmail =
+    verifyType === "register"
+      ? localStorage.getItem("registerEmail")
+      : localStorage.getItem("resetEmail")
 
-    if (otp.some((item) => item === "")) {
-      alert("Masukkan kode verifikasi terlebih dahulu.");
-      return;
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setAlert({ message: "", type: "" })
+
+    const otpString = otp.join("")
+
+    if (otp.some((digit) => digit === "")) {
+      setAlert({
+        message: "Masukkan 6 digit kode verifikasi dengan lengkap.",
+        type: "error",
+      })
+      return
     }
 
-    setLoading(true);
+    if (!currentEmail) {
+      setAlert({
+        message: "Sesi hilang. Silakan ulangi proses.",
+        type: "error",
+      })
+      return
+    }
 
-    setTimeout(() => {
-      setLoading(false);
-      navigate("/reset-password");
-    }, 1500);
-  };
+    setLoading(true)
+
+    try {
+      if (verifyType === "register") {
+        await api.post("GANTI_DENGAN_URL_VERIFIKASI_REGISTER_LU", {
+          code: otpString,
+          email: currentEmail,
+        })
+        localStorage.removeItem("registerEmail")
+        localStorage.removeItem("verifyType")
+        setLoading(false)
+        navigate("/login")
+      } else {
+        await api.post("/verify-reset-code", {
+          code: otpString,
+          email: currentEmail,
+        })
+        localStorage.setItem("otpVerified", "true")
+        setLoading(false)
+        navigate("/reset-password")
+      }
+    } catch (error) {
+      setLoading(false)
+      setAlert({
+        message:
+          error.response?.data?.message ||
+          "Kode verifikasi salah atau kedaluwarsa.",
+        type: "error",
+      })
+    }
+  }
+
+  const handleResend = async () => {
+    if (countdown > 0 || isResending) return
+
+    if (!currentEmail) {
+      setAlert({
+        message: "Sesi hilang. Silakan ulangi proses.",
+        type: "error",
+      })
+      return
+    }
+
+    setIsResending(true)
+    setAlert({ message: "", type: "" })
+
+    try {
+      if (verifyType === "register") {
+        await api.post("GANTI_DENGAN_URL_KIRIM_ULANG_REGISTER_LU", {
+          email: currentEmail,
+        })
+      } else {
+        await api.post("/forgot-password", { email: currentEmail })
+      }
+
+      setIsResending(false)
+      setCountdown(60)
+      setAlert({ message: "Kode baru berhasil dikirim!", type: "success" })
+    } catch (error) {
+      setIsResending(false)
+      setAlert({
+        message:
+          error.response?.data?.message ||
+          "Gagal mengirim ulang kode. Silakan coba lagi.",
+        type: "error",
+      })
+    }
+  }
 
   return (
-    <div className="flex w-full flex-col justify-center overflow-y-auto p-4 min-[300px]:p-5 min-[350px]:p-8 sm:p-12 lg:w-1/2 lg:px-16 lg:py-10">
-      <div className="mb-4 flex items-center justify-between min-[300px]:mb-6 lg:hidden">
-        <Link
-          to="/"
-          className="flex items-center gap-1.5 min-[300px]:gap-2 min-[350px]:gap-3 transition-opacity hover:opacity-90"
-        >
-          <img
-            src={logo}
-            alt="Logo SINGGAH"
-            className="h-6 w-6 min-[300px]:h-8 min-[300px]:w-8 min-[350px]:h-10 min-[350px]:w-10"
-          />
-          <span className="text-base font-black tracking-wide text-white min-[300px]:text-lg min-[350px]:text-2xl">
+    <div className="flex w-full flex-col justify-center overflow-y-auto px-4 py-5 sm:p-10 lg:w-1/2 lg:px-16 lg:py-12 2xl:px-20">
+      <div className="mb-8 flex items-center justify-between sm:mb-12 lg:hidden">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-100/30 bg-white/10 p-3 shadow-md backdrop-blur-md sm:h-16 sm:w-16 sm:p-3.5">
+            <img
+              src={logo}
+              alt="Logo SINGGAH"
+              className="h-full w-full object-contain"
+            />
+          </div>
+          <span className="text-xl font-black tracking-wider text-white sm:text-2xl">
             SINGGAH
           </span>
-        </Link>
+        </div>
 
         <Link
           to="/forgot-password"
-          className="flex items-center gap-1 text-[10px] text-slate-400 transition hover:text-cyan-300 min-[300px]:gap-2 min-[300px]:text-xs min-[350px]:text-sm"
+          aria-label="Kembali"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-300 shadow-sm backdrop-blur-md transition hover:text-cyan-300 sm:h-10 sm:w-10"
         >
-          <ArrowLeft size={14} className="min-[350px]:h-4 min-[350px]:w-4" />
-          <span className="hidden min-[400px]:inline">Kembali</span>
+          <ArrowLeft className="h-5 w-5" />
         </Link>
       </div>
 
       <div className="text-center">
-        <h2 className="text-lg font-bold leading-tight text-white min-[300px]:text-2xl min-[350px]:text-3xl sm:text-4xl">
+        <h2 className="text-2xl font-bold leading-tight text-white sm:text-4xl">
           Verifikasi <span className="text-cyan-300">Kode</span>
         </h2>
-
-        <p className="mt-1.5 text-[10px] text-slate-400 min-[300px]:mt-2 min-[300px]:text-xs min-[350px]:text-sm sm:text-base">
-          Masukkan 6 digit kode yang telah dikirim ke email Anda.
+        <p className="mt-1.5 text-xs text-slate-400 min-[350px]:text-sm sm:mt-2 sm:text-base">
+          Masukkan 6 digit kode dari email Anda.
         </p>
+
+        <div className="mx-auto mt-3 flex w-fit items-center gap-1.5 rounded-md border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-xs text-amber-400/90 shadow-sm sm:px-3 sm:py-1.5 sm:text-sm">
+          <Clock className="h-3.5 w-3.5 min-[350px]:h-4 min-[350px]:w-4" />
+          <span>Kode ini hanya berlaku selama 15 menit.</span>
+        </div>
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="mt-5 min-[300px]:mt-6 min-[350px]:mt-8"
-      >
+      <form onSubmit={handleSubmit} className="my-10 sm:my-14" noValidate>
+        {alert.message && (
+          <FormAlert message={alert.message} type={alert.type} />
+        )}
+
         <div
-          className="mx-auto flex w-full max-w-[380px] justify-center gap-1 min-[280px]:gap-1.5 min-[320px]:gap-2 min-[400px]:gap-3"
+          className="mx-auto mt-4 flex w-full max-w-[380px] justify-center gap-1 min-[280px]:gap-1.5 min-[320px]:gap-2"
           onPaste={handlePaste}
         >
           {otp.map((digit, index) => (
@@ -174,7 +273,13 @@ function VerifyCodeForm() {
               onKeyDown={(e) => handleKeyDown(e, index)}
               onClick={() => handleFocus(index)}
               onFocus={() => handleFocus(index)}
-              className="h-9 w-7 min-[280px]:h-10 min-[280px]:w-8 min-[320px]:h-11 min-[320px]:w-9 min-[350px]:h-12 min-[350px]:w-10 min-[400px]:h-14 min-[400px]:w-12 sm:h-14 sm:w-14 rounded-lg border border-slate-200 bg-slate-50 text-center text-sm font-bold text-slate-900 shadow-sm transition-all focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-cyan-500/20 min-[300px]:text-base min-[350px]:rounded-xl min-[350px]:text-xl"
+              className={`h-10 w-8 shrink-0 rounded-lg bg-slate-50 text-center text-base font-bold text-slate-900 shadow-sm transition-all focus:bg-white focus:outline-none min-[320px]:h-11 min-[320px]:w-9 min-[350px]:h-12 min-[350px]:w-10 min-[350px]:rounded-xl min-[350px]:text-xl min-[400px]:h-12 min-[400px]:w-12 sm:h-14 sm:w-14
+                ${
+                  alert.type === "error"
+                    ? "border-2 border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/20"
+                    : "border border-slate-200 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/20"
+                }
+              `}
             />
           ))}
         </div>
@@ -182,13 +287,13 @@ function VerifyCodeForm() {
         <button
           type="submit"
           disabled={loading}
-          className="group relative mx-auto mt-6 block w-full max-w-[380px] cursor-pointer overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] py-2.5 font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 disabled:cursor-not-allowed disabled:opacity-70 min-[350px]:mt-8 min-[350px]:py-4"
+          className="group relative mx-auto mt-6 block w-full max-w-[380px] cursor-pointer overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] py-3 font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 disabled:cursor-not-allowed disabled:opacity-70 min-[350px]:mt-8 min-[350px]:py-3.5 sm:py-4"
         >
           <span className="flex items-center justify-center gap-2">
             {loading ? (
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white min-[350px]:h-5 min-[350px]:w-5" />
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white min-[350px]:h-5 min-[350px]:w-5 sm:h-5 sm:w-5" />
             ) : (
-              <span className="text-xs tracking-wide min-[300px]:text-sm min-[350px]:text-base">
+              <span className="text-sm tracking-wide sm:text-base">
                 Verifikasi
               </span>
             )}
@@ -196,17 +301,32 @@ function VerifyCodeForm() {
         </button>
       </form>
 
-      <p className="mt-5 text-center text-[10px] text-slate-400 min-[300px]:mt-6 min-[300px]:text-xs min-[350px]:mt-10 min-[350px]:text-sm lg:mt-8">
-        Belum menerima kode?
+      <div className="mt-5 flex items-center justify-center gap-1.5 text-xs text-slate-400 min-[350px]:text-sm sm:mt-8">
+        <span>Belum menerima kode?</span>
         <button
           type="button"
-          className="ml-1.5 font-bold text-cyan-400 transition-colors hover:text-cyan-300 min-[300px]:ml-2"
+          onClick={handleResend}
+          disabled={countdown > 0 || isResending}
+          className={`inline-flex items-center gap-1.5 font-bold transition-all duration-300 ${
+            countdown > 0 || isResending
+              ? "cursor-not-allowed text-slate-500"
+              : "cursor-pointer text-cyan-400 hover:scale-105 hover:text-cyan-300 hover:underline hover:underline-offset-2 active:scale-95"
+          }`}
         >
-          Kirim ulang
+          {isResending ? (
+            <>
+              <span className="h-3 w-3 animate-spin rounded-full border-2 border-slate-500/30 border-t-slate-500" />
+              <span>Mengirim...</span>
+            </>
+          ) : countdown > 0 ? (
+            `Tunggu ${countdown}s`
+          ) : (
+            "Kirim ulang"
+          )}
         </button>
-      </p>
+      </div>
     </div>
-  );
+  )
 }
 
-export default VerifyCodeForm;
+export default VerifyCodeForm

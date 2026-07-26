@@ -1,38 +1,38 @@
-import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import DustBackground from "../../ui/DustBackground";
-import GlowBackground from "../../ui/GlowBackground";
-import GlassCard from "../../ui/GlassCard";
+import { useState } from "react"
+import { useParams, useNavigate } from "react-router-dom"
+import DustBackground from "../../ui/DustBackground"
+import GlowBackground from "../../ui/GlowBackground"
+import GlassCard from "../../ui/GlassCard"
 // Facebook & Twitter dihapus dari import Lucide
-import { X, MessageCircle, Copy, Check, Send } from "lucide-react";
-import { karyaCategories, karyaProjects } from "../../../data/karyaData";
+import { X, MessageCircle, Copy, Check, Send } from "lucide-react"
+import { karyaCategories, karyaProjects } from "../../../data/karyaData"
 
-import KaryaProjectGallery from "./detail/KaryaProjectGallery";
-import KaryaProjectHeader from "./detail/KaryaProjectHeader";
-import KaryaProjectContent from "./detail/KaryaProjectContent";
-import KaryaProjectComments from "./detail/KaryaProjectComments";
+import KaryaProjectGallery from "./detail/KaryaProjectGallery"
+import KaryaProjectHeader from "./detail/KaryaProjectHeader"
+import KaryaProjectContent from "./detail/KaryaProjectContent"
+import KaryaProjectComments from "./detail/KaryaProjectComments"
 
 function KaryaProjectDetailSection() {
-  const { slug, projectSlug } = useParams();
-  const navigate = useNavigate();
+  const { slug, projectSlug } = useParams()
+  const navigate = useNavigate()
 
-  const category = karyaCategories.find((item) => item.slug === slug);
+  const category = karyaCategories.find((item) => item.slug === slug)
   const project = karyaProjects.find(
     (item) => item.category === slug && item.slug === projectSlug,
-  );
+  )
 
-  const [activeImage, setActiveImage] = useState(0);
-  const [newComment, setNewComment] = useState("");
-  const [currentUser] = useState(null);
-  const isLoggedIn = currentUser !== null;
-  const [isLiked, setIsLiked] = useState(project?.isLiked || false);
-  const [likeCount, setLikeCount] = useState(project?.likesCount || 0);
+  const [activeImage, setActiveImage] = useState(0)
+  const [newComment, setNewComment] = useState("")
+  const [currentUser] = useState(null)
+  const isLoggedIn = currentUser !== null
+  const [isLiked, setIsLiked] = useState(project?.isLiked || false)
+  const [likeCount, setLikeCount] = useState(project?.likesCount || 0)
   const [isBookmarked, setIsBookmarked] = useState(
     project?.isBookmarked || false,
-  );
+  )
 
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false)
+  const [isCopied, setIsCopied] = useState(false)
 
   if (!category || !project) {
     return (
@@ -45,100 +45,100 @@ function KaryaProjectDetailSection() {
           Kembali ke Karya
         </button>
       </section>
-    );
+    )
   }
 
   const gallery =
     Array.isArray(project.images) && project.images.length > 0
       ? project.images
-      : [project.image];
+      : [project.image]
 
-  const comments = Array.isArray(project.comments) ? project.comments : [];
+  const comments = Array.isArray(project.comments) ? project.comments : []
 
   const formatDate = (dateString) => {
-    if (!dateString) return "";
+    if (!dateString) return ""
     try {
-      const options = { year: "numeric", month: "long", day: "numeric" };
-      return new Date(dateString).toLocaleDateString("id-ID", options);
+      const options = { year: "numeric", month: "long", day: "numeric" }
+      return new Date(dateString).toLocaleDateString("id-ID", options)
     } catch {
-      return dateString;
+      return dateString
     }
-  };
+  }
 
   function handleAuthRedirect(e) {
-    if (e) e.preventDefault();
-    navigate("/login");
+    if (e) e.preventDefault()
+    navigate("/login")
   }
 
   function handleLike() {
     if (!currentUser) {
-      navigate("/login");
-      return;
+      navigate("/login")
+      return
     }
 
-    const allowedRoles = ["user", "mahasiswa", "dosen", "admin"];
+    const allowedRoles = ["user", "mahasiswa", "dosen", "admin"]
     if (allowedRoles.includes(currentUser.role)) {
-      setIsLiked(!isLiked);
-      setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+      setIsLiked(!isLiked)
+      setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1))
     }
   }
 
   function handleBookmark() {
     if (!currentUser) {
-      navigate("/login");
-      return;
+      navigate("/login")
+      return
     }
 
-    const allowedRoles = ["user", "mahasiswa", "dosen", "admin"];
+    const allowedRoles = ["user", "mahasiswa", "dosen", "admin"]
     if (allowedRoles.includes(currentUser.role)) {
-      setIsBookmarked(!isBookmarked);
+      setIsBookmarked(!isBookmarked)
     }
   }
 
   async function handleShare() {
-    setShowShareModal(true);
+    setShowShareModal(true)
   }
 
   const shareToWhatsApp = () => {
-    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent("Lihat karya ini: " + window.location.href)}`;
-    window.open(waUrl, "_blank");
-    setShowShareModal(false);
-  };
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent("Lihat karya ini: " + window.location.href)}`
+    window.open(waUrl, "_blank")
+    setShowShareModal(false)
+  }
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(window.location.href);
-      setIsCopied(true);
+      await navigator.clipboard.writeText(window.location.href)
+      setIsCopied(true)
       setTimeout(() => {
-        setIsCopied(false);
-        setShowShareModal(false);
-      }, 2000);
+        setIsCopied(false)
+        setShowShareModal(false)
+      }, 2000)
     } catch (err) {
-      console.error("Gagal menyalin", err);
+      console.error("Gagal menyalin", err)
     }
-  };
+  }
 
   function handleAddComment(e) {
-    e.preventDefault();
+    e.preventDefault()
     if (!currentUser) {
-      navigate("/login");
-      return;
+      navigate("/login")
+      return
     }
 
-    if (!newComment.trim()) return;
-    console.log("Komentar dikirim:", newComment);
-    setNewComment("");
+    if (!newComment.trim()) return
+    console.log("Komentar dikirim:", newComment)
+    setNewComment("")
   }
 
   return (
     <section
       id="karya-project-detail"
-      className="relative overflow-hidden bg-brand-navy pb-16 pt-28 sm:pt-32 lg:pt-36 2xl:pb-24 2xl:pt-40"
+      className="relative min-h-screen overflow-hidden bg-brand-navy pb-16 2xl:pb-24"
     >
       <GlowBackground />
       <DustBackground />
 
-      <div className="relative mx-auto max-w-5xl px-5 sm:px-8 2xl:max-w-6xl">
+      <div className="relative mx-auto max-w-5xl px-2 min-[280px]:px-3 sm:px-5 pt-[calc(var(--navbar-h)+28px)]">
         <GlassCard className="overflow-hidden p-0">
           <KaryaProjectGallery
             slug={slug}
@@ -302,7 +302,7 @@ function KaryaProjectDetailSection() {
         </div>
       )}
     </section>
-  );
+  )
 }
 
-export default KaryaProjectDetailSection;
+export default KaryaProjectDetailSection

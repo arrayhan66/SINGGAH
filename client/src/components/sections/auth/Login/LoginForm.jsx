@@ -1,59 +1,90 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { Mail, Lock, EyeOff, Eye, ArrowLeft } from "lucide-react";
-import logo from "../../../../assets/icons/logo.png";
-import api from "../../../../services/api";
-import { useAuth } from "../../../../context/AuthContext";
+import { useState } from "react"
+import { useNavigate, Link } from "react-router-dom"
+import { Mail, Lock, EyeOff, Eye, ArrowLeft } from "lucide-react"
+import logo from "../../../../assets/icons/logo.png"
+import api from "../../../../services/api"
+import { useAuth } from "../../../../context/AuthContext"
+import FormAlert from "../../../ui/FormAlert"
 
 function LoginForm() {
-  const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { login } = useAuth();
+  const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [generalError, setGeneralError] = useState("")
+  const [fieldErrors, setFieldErrors] = useState({ email: "", password: "" })
+
+  const { login } = useAuth()
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
+    setGeneralError("")
+    setFieldErrors({ email: "", password: "" })
+
+    let errors = {}
+    let isValid = true
+
+    if (!email.trim()) {
+      errors.email = "Email tidak boleh kosong."
+      isValid = false
+    } else if (!validateEmail(email)) {
+      errors.email = "Format email tidak valid (contoh: nama@email.com)."
+      isValid = false
+    }
+
+    if (!password) {
+      errors.password = "Kata sandi tidak boleh kosong."
+      isValid = false
+    } else if (password.length < 6) {
+      errors.password = "Kata sandi minimal 6 karakter."
+      isValid = false
+    }
+
+    if (!isValid) {
+      setFieldErrors(errors)
+      return
+    }
 
     try {
-      setIsLoading(true);
+      setIsLoading(true)
+      const res = await api.post("/login", { email, password })
+      const { token, user } = res.data.data
 
-      const res = await api.post("/login", {
-        email,
-        password,
-      });
-
-      const { token, user } = res.data.data;
-
-      login(user, token);
+      login(user, token)
 
       if (user.role === "admin") {
-        navigate("/admin");
+        navigate("/admin")
       } else {
-        navigate("/user");
+        navigate("/user")
       }
     } catch (err) {
-      alert(err.response?.data?.message || "Email atau password salah.");
+      setGeneralError(
+        err.response?.data?.message ||
+          "Terjadi kesalahan sistem. Silakan coba lagi.",
+      )
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
-    // Padding atas-bawah (py) dipangkas habis jadi py-5 di mobile agar card tidak kepanjangan
-    <div className="flex w-full flex-col justify-center overflow-y-auto px-4 py-5 sm:p-10 lg:w-1/2 lg:px-16 2xl:px-20 lg:py-12">
-      {/* HEADER MOBILE */}
-      <div className="mb-4 flex items-center justify-between lg:hidden">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-cyan-100/30 bg-white/10 p-1.5 shadow-md backdrop-blur-md">
+    <div className="flex w-full flex-col justify-center overflow-y-auto px-4 py-5 sm:p-10 lg:w-1/2 lg:px-16 lg:py-12 2xl:px-20">
+      <div className="mb-8 flex items-center justify-between sm:mb-12 lg:hidden">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-100/30 bg-white/10 p-3 shadow-md backdrop-blur-md sm:h-16 sm:w-16 sm:p-3.5">
             <img
               src={logo}
               alt="Logo SINGGAH"
               className="h-full w-full object-contain"
             />
           </div>
-          <span className="text-sm font-black tracking-wider text-white">
+          <span className="text-xl font-black tracking-wider text-white sm:text-2xl">
             SINGGAH
           </span>
         </div>
@@ -61,92 +92,122 @@ function LoginForm() {
         <Link
           to="/"
           aria-label="Kembali"
-          className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-300 backdrop-blur-md transition hover:text-cyan-300"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-300 shadow-sm backdrop-blur-md transition hover:text-cyan-300 sm:h-10 sm:w-10"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft className="h-5 w-5" />
         </Link>
       </div>
 
-      {/* Judul Form */}
       <div className="text-center">
-        <h2 className="text-xl font-bold leading-tight text-white sm:text-4xl">
+        <h2 className="text-2xl font-bold leading-tight text-white sm:text-4xl">
           Selamat <span className="text-cyan-300">Datang</span>
         </h2>
-        <p className="mt-1 text-[11px] text-slate-400 sm:text-base">
+        <p className="mt-1.5 text-xs text-slate-400 min-[350px]:text-sm sm:mt-2 sm:text-base">
           Silakan masuk ke akun Anda.
         </p>
       </div>
 
-      {/* Form Login (Margin atas dipangkas) */}
-      <form onSubmit={handleLogin} className="mt-5 sm:mt-8">
-        {/* Input Email/NIM */}
-        <div className="mb-4 sm:mb-6">
-          <label className="mb-1.5 block text-[11px] font-medium text-slate-300 sm:text-sm">
-            Email atau NIM
-          </label>
+      <form onSubmit={handleLogin} className="my-10 sm:my-14" noValidate>
+        <FormAlert message={generalError} type="error" />
 
-          <div className="relative text-cyan-500 focus-within:text-cyan-400">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 transition-colors">
-              <Mail className="h-4 w-4" />
+        <div className="mb-4 sm:mb-6">
+          <label className="mb-1.5 block text-xs font-medium text-slate-300 min-[350px]:text-sm">
+            Email
+          </label>
+          <div
+            className={`relative ${fieldErrors.email ? "text-red-500" : "text-cyan-500 focus-within:text-cyan-400"}`}
+          >
+            <div className="absolute inset-y-0 left-0 flex items-center pl-4 transition-colors">
+              <Mail className="h-[18px] w-[18px] min-[350px]:h-5 min-[350px]:w-5 sm:h-6 sm:w-6" />
             </div>
             <input
-              type="text"
-              required
+              type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Masukkan Email / NIM"
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-3 text-xs text-slate-900 placeholder:text-slate-600 shadow-sm transition-all focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-cyan-500/20 sm:py-4 sm:text-sm"
+              onChange={(e) => {
+                setEmail(e.target.value)
+                setFieldErrors((prev) => ({ ...prev, email: "" }))
+              }}
+              placeholder="Masukkan Email"
+              className={`w-full rounded-xl bg-slate-50 py-3 pl-11 pr-3 text-xs text-slate-900 shadow-sm placeholder:text-slate-500 transition-all focus:bg-white focus:outline-none min-[350px]:py-3.5 min-[350px]:pl-12 min-[350px]:text-sm sm:py-4 sm:pl-12 sm:text-base [&:-webkit-autofill]:[-webkit-text-fill-color:#0f172a] [&:-webkit-autofill]:shadow-[0_0_0_1000px_#f8fafc_inset] [&:-webkit-autofill]:transition-none focus:[&:-webkit-autofill]:shadow-[0_0_0_1000px_#fff_inset]
+                ${
+                  fieldErrors.email
+                    ? "border-2 border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/20"
+                    : "border border-slate-200 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/20"
+                }
+              `}
             />
           </div>
+          {fieldErrors.email && (
+            <p className="mt-1.5 text-[10px] text-red-400 sm:text-xs">
+              {fieldErrors.email}
+            </p>
+          )}
         </div>
 
-        {/* Input Password */}
         <div className="mb-6 sm:mb-8">
           <div className="mb-1.5 flex items-center justify-between">
-            <label className="text-[11px] font-medium text-slate-300 sm:text-sm">
+            <label className="text-xs font-medium text-slate-300 min-[350px]:text-sm">
               Kata Sandi
             </label>
             <Link
               to="/forgot-password"
-              className="text-[10px] font-bold text-cyan-400 transition-colors hover:text-cyan-300 sm:text-sm"
+              className="text-xs font-bold text-cyan-400 transition-colors hover:text-cyan-300 min-[350px]:text-sm"
             >
               Lupa sandi?
             </Link>
           </div>
 
-          <div className="relative text-cyan-500 focus-within:text-cyan-400">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 transition-colors">
-              <Lock className="h-4 w-4" />
+          <div
+            className={`relative ${fieldErrors.password ? "text-red-500" : "text-cyan-500 focus-within:text-cyan-400"}`}
+          >
+            <div className="absolute inset-y-0 left-0 flex items-center pl-4 transition-colors">
+              <Lock className="h-[18px] w-[18px] min-[350px]:h-5 min-[350px]:w-5 sm:h-6 sm:w-6" />
             </div>
             <input
               type={showPassword ? "text" : "password"}
-              required
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value)
+                setFieldErrors((prev) => ({ ...prev, password: "" }))
+              }}
               placeholder="••••••••"
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-10 text-xs text-slate-900 placeholder:text-slate-600 shadow-sm transition-all focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-cyan-500/20 sm:py-4 sm:text-sm"
+              className={`w-full rounded-xl bg-slate-50 py-3 pl-11 pr-11 text-xs text-slate-900 shadow-sm placeholder:text-slate-500 transition-all focus:bg-white focus:outline-none min-[350px]:py-3.5 min-[350px]:pl-12 min-[350px]:pr-12 min-[350px]:text-sm sm:py-4 sm:pl-12 sm:pr-12 sm:text-base [&:-webkit-autofill]:[-webkit-text-fill-color:#0f172a] [&:-webkit-autofill]:shadow-[0_0_0_1000px_#f8fafc_inset] [&:-webkit-autofill]:transition-none focus:[&:-webkit-autofill]:shadow-[0_0_0_1000px_#fff_inset]
+                ${
+                  fieldErrors.password
+                    ? "border-2 border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/20"
+                    : "border border-slate-200 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/20"
+                }
+              `}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3.5 text-slate-600 transition-colors hover:text-cyan-600"
+              className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-4 text-slate-600 transition-colors hover:text-cyan-600"
             >
-              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              {showPassword ? (
+                <EyeOff className="h-[18px] w-[18px] min-[350px]:h-5 min-[350px]:w-5 sm:h-6 sm:w-6" />
+              ) : (
+                <Eye className="h-[18px] w-[18px] min-[350px]:h-5 min-[350px]:w-5 sm:h-6 sm:w-6" />
+              )}
             </button>
           </div>
+          {fieldErrors.password && (
+            <p className="mt-1.5 text-[10px] text-red-400 sm:text-xs">
+              {fieldErrors.password}
+            </p>
+          )}
         </div>
 
-        {/* Tombol Submit */}
         <button
           type="submit"
           disabled={isLoading}
-          className="group relative w-full cursor-pointer overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] py-2.5 font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 disabled:cursor-not-allowed disabled:opacity-70 sm:py-4"
+          className="group relative w-full cursor-pointer overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] py-3 font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 disabled:cursor-not-allowed disabled:opacity-70 min-[350px]:py-3.5 sm:py-4"
         >
           <span className="flex items-center justify-center gap-2">
             {isLoading ? (
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white sm:h-5 sm:w-5" />
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white min-[350px]:h-5 min-[350px]:w-5 sm:h-5 sm:w-5" />
             ) : (
-              <span className="text-xs tracking-wide sm:text-sm">
+              <span className="text-sm tracking-wide sm:text-base">
                 Masuk Sekarang
               </span>
             )}
@@ -154,18 +215,17 @@ function LoginForm() {
         </button>
       </form>
 
-      {/* Register Link (Margin atas dipangkas) */}
-      <p className="mt-5 text-center text-[10px] text-slate-400 sm:mt-8 sm:text-sm">
+      <p className="text-center text-xs text-slate-400 min-[350px]:text-sm">
         Belum memiliki akun?
         <Link
           to="/register"
-          className="ml-1 font-bold text-cyan-400 transition-colors hover:text-cyan-300"
+          className="ml-1.5 font-bold text-cyan-400 transition-colors hover:text-cyan-300"
         >
           Daftar
         </Link>
       </p>
     </div>
-  );
+  )
 }
 
-export default LoginForm;
+export default LoginForm

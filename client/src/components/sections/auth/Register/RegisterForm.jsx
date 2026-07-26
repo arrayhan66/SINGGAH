@@ -61,9 +61,12 @@ function RegisterForm() {
 
     setIsLoading(true)
 
-    // Simulasi loading register (nantinya ini panggil API backend pakai FormData)
     setTimeout(() => {
       setIsLoading(false)
+
+      localStorage.setItem("registerEmail", formData.email)
+      localStorage.setItem("verifyType", "register")
+
       navigate("/verify-code")
     }, 1500)
   }

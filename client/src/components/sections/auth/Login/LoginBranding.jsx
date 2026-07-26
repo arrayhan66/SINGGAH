@@ -1,9 +1,9 @@
 // File: src/components/auth/LoginBranding.jsx
-import { Link } from "react-router-dom";
-import { ArrowLeft, Sparkles, ShieldCheck, Cpu } from "lucide-react";
-import logo from "../../../../assets/icons/logo.png";
-import bglogin from "../../../../assets/images/bg-login.jpg";
-import logoPoliban from "../../../../assets/icons/Logo_Poliban.png";
+import { Link } from "react-router-dom"
+import { ArrowLeft,  ShieldCheck, Cpu } from "lucide-react"
+import logo from "../../../../assets/icons/logo.png"
+import bglogin from "../../../../assets/images/bg-login.jpg"
+import logoPoliban from "../../../../assets/icons/Logo_Poliban.png"
 
 function LoginBranding({ backTo = "/" }) {
   return (
@@ -65,12 +65,6 @@ function LoginBranding({ backTo = "/" }) {
               />
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold tracking-widest text-cyan-600 uppercase">
-                  Platform Kolaborasi
-                </span>
-                <Sparkles size={13} className="text-cyan-500 animate-pulse" />
-              </div>
               <h2 className="text-2xl font-black tracking-tight text-slate-900">
                 SINGGAH
               </h2>
@@ -134,7 +128,7 @@ function LoginBranding({ backTo = "/" }) {
         </span>
       </div>
     </div>
-  );
+  )
 }
 
-export default LoginBranding;
+export default LoginBranding

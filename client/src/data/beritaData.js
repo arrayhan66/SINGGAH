@@ -1,6 +1,7 @@
 export const beritaData = [
   {
     id: 1,
+    slug: "sosialisasi-platform-singgah-untuk-publikasi-karya-mahasiswa",
     title: "Sosialisasi Platform SINGGAH untuk Publikasi Karya Mahasiswa",
     event: "Workshop Digitalisasi Kampus 2026",
     winner: "Tim Pengembang SINGGAH",
@@ -33,6 +34,7 @@ export const beritaData = [
   },
   {
     id: 2,
+    slug: "pameran-karya-inovasi-iot-smart-agriculture-mahasiswa",
     title: "Pameran Karya Inovasi IoT & Smart Agriculture Mahasiswa",
     event: "Gelar Gagasan Teknologi Tepat Guna",
     winner: "Tim Elektro Innovate",
@@ -63,6 +65,7 @@ export const beritaData = [
   },
   {
     id: 3,
+    slug: "implementasi-artificial-intelligence-untuk-analisis-data-pertanian",
     title: "Implementasi Artificial Intelligence untuk Analisis Data Pertanian",
     event: "Seminar Riset Teknologi & Data Science",
     winner: "Tim DataMind",
@@ -92,6 +95,7 @@ export const beritaData = [
   },
   {
     id: 4,
+    slug: "pengembangan-aplikasi-mobile-layanan-publik-kampus",
     title: "Pengembangan Aplikasi Mobile Layanan Publik Kampus",
     event: "Showcase Mobile App Development",
     winner: "Tim MobiTech",
@@ -121,6 +125,7 @@ export const beritaData = [
   },
   {
     id: 5,
+    slug: "workshop-keamanan-siber-ethical-hacking-untuk-mahasiswa",
     title: "Workshop Keamanan Siber & Ethical Hacking untuk Mahasiswa",
     event: "Cyber Security Community Meetup",
     winner: "Tim SecureNet",
@@ -150,6 +155,7 @@ export const beritaData = [
   },
   {
     id: 6,
+    slug: "pameran-desain-ui-ux-interaktif-untuk-solusi-umkm",
     title: "Pameran Desain UI/UX Interaktif untuk Solusi UMKM",
     event: "UI/UX Design Showcase 2026",
     winner: "Tim PixelCraft",
@@ -179,6 +185,7 @@ export const beritaData = [
   },
   {
     id: 7,
+    slug: "simposium-game-development-interaktif-media-nasional",
     title: "Simposium Game Development & Interaktif Media Nasional",
     event: "Gelar Kreatif Game Tech 2026",
     winner: "Tim GameCraft",
@@ -208,4 +215,4 @@ export const beritaData = [
       "Karya-karya ini membuktikan bahwa bidang pengkodean game engine dan media interaktif kini menjadi salah satu pilar unggulan publikasi di platform SINGGAH.",
     ],
   },
-];
+]

@@ -1,26 +1,32 @@
 import { useState } from "react"
+import { useAuth } from "../../../../context/AuthContext"
 import ProfileAvatar from "./ProfileAvatar"
 import ProfileInformation from "./ProfileInformation"
+import ProfileAccountInfo from "./ProfileAccountInfo"
+import ProfileStats from "./ProfileStats"
 import ProfilePassword from "./ProfilePassword"
+import ProfileDangerZone from "./ProfileDangerZone"
 import ProfileAction from "./ProfileAction"
 
-const initialProfileData = {
-  avatar: null, // File object
-  name: "",
-  email: "",
-  nim: "",
-  jurusan: "",
-}
-
-const initialPasswordData = {
-  currentPassword: "",
-  newPassword: "",
-  confirmPassword: "",
-}
-
 function ProfileForm() {
-  const [profileData, setProfileData] = useState(initialProfileData)
-  const [passwordData, setPasswordData] = useState(initialPasswordData)
+  const { user } = useAuth()
+
+  const [profileData, setProfileData] = useState(() => ({
+    avatar: null,
+    name: user?.name || "",
+    username: user?.username || "",
+    email: user?.email || "",
+  }))
+
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  })
+
+  const [originalAvatarUrl, setOriginalAvatarUrl] = useState(
+    user?.avatar || null,
+  )
 
   function updateProfileField(field, value) {
     setProfileData((prev) => ({ ...prev, [field]: value }))
@@ -30,12 +36,17 @@ function ProfileForm() {
     setPasswordData((prev) => ({ ...prev, [field]: value }))
   }
 
-  function handleSubmit() {
-    // sementara cuma log dulu, belum ada backend
-    console.log("Update profile:", profileData)
-    if (passwordData.newPassword) {
-      console.log("Update password:", passwordData)
-    }
+  function handleAvatarRemoved() {
+    setProfileData((prev) => ({ ...prev, avatar: null }))
+    setOriginalAvatarUrl(null)
+  }
+
+  function resetPasswordData() {
+    setPasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    })
   }
 
   return (
@@ -43,23 +54,32 @@ function ProfileForm() {
       <div className="mx-auto flex max-w-4xl flex-col gap-8">
         <ProfileAvatar
           value={profileData.avatar}
+          existingUrl={originalAvatarUrl}
           onChange={(file) => updateProfileField("avatar", file)}
+          onRemove={handleAvatarRemoved}
         />
 
         <ProfileInformation
           profileData={profileData}
           updateProfileField={updateProfileField}
+          userTipe={user?.tipe}
         />
+
+        <ProfileAccountInfo />
+
+        {user?.tipe !== "umum" && <ProfileStats />}
 
         <ProfilePassword
           passwordData={passwordData}
           updatePasswordField={updatePasswordField}
         />
 
+        <ProfileDangerZone />
+
         <ProfileAction
           profileData={profileData}
           passwordData={passwordData}
-          onSubmit={handleSubmit}
+          onResetPassword={resetPasswordData}
         />
       </div>
     </section>

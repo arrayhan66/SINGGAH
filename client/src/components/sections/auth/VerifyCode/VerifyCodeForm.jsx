@@ -1,218 +1,218 @@
-import { useEffect, useRef, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { ArrowLeft, Clock } from "lucide-react"
-import logo from "../../../../assets/icons/logo.png"
-import FormAlert from "../../../ui/FormAlert"
-import api from "../../../../services/api"
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, Clock } from "lucide-react";
+import logo from "../../../../assets/icons/logo.png";
+import FormAlert from "../../../ui/FormAlert";
+import api from "../../../../services/api";
 
 function VerifyCodeForm() {
-  const navigate = useNavigate()
-  const [otp, setOtp] = useState(["", "", "", "", "", ""])
-  const [loading, setLoading] = useState(false)
-  const [alert, setAlert] = useState({ message: "", type: "" })
-  const [countdown, setCountdown] = useState(60)
-  const [isResending, setIsResending] = useState(false)
-  const inputs = useRef([])
+  const navigate = useNavigate();
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState({ message: "", type: "" });
+  const [countdown, setCountdown] = useState(60);
+  const [isResending, setIsResending] = useState(false);
+  const inputs = useRef([]);
 
   useEffect(() => {
-    let timer
+    let timer;
     if (countdown > 0) {
       timer = setInterval(() => {
-        setCountdown((prev) => prev - 1)
-      }, 1000)
+        setCountdown((prev) => prev - 1);
+      }, 1000);
     }
-    return () => clearInterval(timer)
-  }, [countdown])
+    return () => clearInterval(timer);
+  }, [countdown]);
 
   useEffect(() => {
     if (alert.message) {
       const timer = setTimeout(() => {
-        setAlert({ message: "", type: "" })
-      }, 5000)
-      return () => clearTimeout(timer)
+        setAlert({ message: "", type: "" });
+      }, 5000);
+      return () => clearTimeout(timer);
     }
-  }, [alert.message])
+  }, [alert.message]);
 
   const handleChange = (e, index) => {
-    setAlert({ message: "", type: "" })
-    const value = e.target.value
+    setAlert({ message: "", type: "" });
+    const value = e.target.value;
 
     if (value === "") {
-      const newOtp = [...otp]
-      newOtp[index] = ""
-      setOtp(newOtp)
-      return
+      const newOtp = [...otp];
+      newOtp[index] = "";
+      setOtp(newOtp);
+      return;
     }
 
     if (value.length > 1 && /^\d+$/.test(value)) {
-      const pasted = value.slice(0, 6).split("")
-      const newOtp = [...otp]
+      const pasted = value.slice(0, 6).split("");
+      const newOtp = [...otp];
       pasted.forEach((num, i) => {
-        if (index + i < 6) newOtp[index + i] = num
-      })
-      setOtp(newOtp)
-      const nextIndex = Math.min(index + pasted.length, 5)
-      inputs.current[nextIndex]?.focus()
-      return
+        if (index + i < 6) newOtp[index + i] = num;
+      });
+      setOtp(newOtp);
+      const nextIndex = Math.min(index + pasted.length, 5);
+      inputs.current[nextIndex]?.focus();
+      return;
     }
 
-    const lastChar = value.slice(-1)
-    if (!/^\d$/.test(lastChar)) return
+    const lastChar = value.slice(-1);
+    if (!/^\d$/.test(lastChar)) return;
 
-    const newOtp = [...otp]
-    newOtp[index] = lastChar
-    setOtp(newOtp)
+    const newOtp = [...otp];
+    newOtp[index] = lastChar;
+    setOtp(newOtp);
 
     if (index < 5) {
-      inputs.current[index + 1]?.focus()
+      inputs.current[index + 1]?.focus();
     }
-  }
+  };
 
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace") {
       if (!otp[index] && index > 0) {
-        e.preventDefault()
-        const newOtp = [...otp]
-        newOtp[index - 1] = ""
-        setOtp(newOtp)
-        inputs.current[index - 1]?.focus()
+        e.preventDefault();
+        const newOtp = [...otp];
+        newOtp[index - 1] = "";
+        setOtp(newOtp);
+        inputs.current[index - 1]?.focus();
       }
     } else if (e.key === "ArrowLeft" && index > 0) {
-      e.preventDefault()
-      inputs.current[index - 1]?.focus()
+      e.preventDefault();
+      inputs.current[index - 1]?.focus();
     } else if (e.key === "ArrowRight" && index < 5) {
-      e.preventDefault()
-      inputs.current[index + 1]?.focus()
+      e.preventDefault();
+      inputs.current[index + 1]?.focus();
     }
-  }
+  };
 
   const handleFocus = (index) => {
-    const firstEmptyIndex = otp.findIndex((val) => val === "")
+    const firstEmptyIndex = otp.findIndex((val) => val === "");
     if (firstEmptyIndex !== -1 && index > firstEmptyIndex) {
-      inputs.current[firstEmptyIndex]?.focus()
+      inputs.current[firstEmptyIndex]?.focus();
     }
-  }
+  };
 
   const handlePaste = (e) => {
-    e.preventDefault()
-    setAlert({ message: "", type: "" })
+    e.preventDefault();
+    setAlert({ message: "", type: "" });
 
     const pasted = e.clipboardData
       .getData("text")
       .replace(/\D/g, "")
-      .slice(0, 6)
-    if (!pasted) return
+      .slice(0, 6);
+    if (!pasted) return;
 
-    const newOtp = [...otp]
+    const newOtp = [...otp];
     pasted.split("").forEach((num, i) => {
-      newOtp[i] = num
-    })
-    setOtp(newOtp)
+      newOtp[i] = num;
+    });
+    setOtp(newOtp);
 
-    const nextIndex = Math.min(pasted.length, 5)
+    const nextIndex = Math.min(pasted.length, 5);
     if (pasted.length < 6) {
-      inputs.current[nextIndex]?.focus()
+      inputs.current[nextIndex]?.focus();
     } else {
-      inputs.current[5]?.focus()
+      inputs.current[5]?.focus();
     }
-  }
+  };
 
-  const verifyType = localStorage.getItem("verifyType") || "reset"
+  const verifyType = localStorage.getItem("verifyType") || "reset";
   const currentEmail =
     verifyType === "register"
       ? localStorage.getItem("registerEmail")
-      : localStorage.getItem("resetEmail")
+      : localStorage.getItem("resetEmail");
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setAlert({ message: "", type: "" })
+    e.preventDefault();
+    setAlert({ message: "", type: "" });
 
-    const otpString = otp.join("")
+    const otpString = otp.join("");
 
     if (otp.some((digit) => digit === "")) {
       setAlert({
         message: "Masukkan 6 digit kode verifikasi dengan lengkap.",
         type: "error",
-      })
-      return
+      });
+      return;
     }
 
     if (!currentEmail) {
       setAlert({
         message: "Sesi hilang. Silakan ulangi proses.",
         type: "error",
-      })
-      return
+      });
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
 
     try {
       if (verifyType === "register") {
-        await api.post("GANTI_DENGAN_URL_VERIFIKASI_REGISTER_LU", {
+        await api.post("/verify-email", {
           code: otpString,
           email: currentEmail,
-        })
-        localStorage.removeItem("registerEmail")
-        localStorage.removeItem("verifyType")
-        setLoading(false)
-        navigate("/login")
+        });
+        localStorage.removeItem("registerEmail");
+        localStorage.removeItem("verifyType");
+        setLoading(false);
+        navigate("/login");
       } else {
         await api.post("/verify-reset-code", {
           code: otpString,
           email: currentEmail,
-        })
-        localStorage.setItem("otpVerified", "true")
-        setLoading(false)
-        navigate("/reset-password")
+        });
+        localStorage.setItem("otpVerified", "true");
+        setLoading(false);
+        navigate("/reset-password");
       }
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       setAlert({
         message:
           error.response?.data?.message ||
           "Kode verifikasi salah atau kedaluwarsa.",
         type: "error",
-      })
+      });
     }
-  }
+  };
 
   const handleResend = async () => {
-    if (countdown > 0 || isResending) return
+    if (countdown > 0 || isResending) return;
 
     if (!currentEmail) {
       setAlert({
         message: "Sesi hilang. Silakan ulangi proses.",
         type: "error",
-      })
-      return
+      });
+      return;
     }
 
-    setIsResending(true)
-    setAlert({ message: "", type: "" })
+    setIsResending(true);
+    setAlert({ message: "", type: "" });
 
     try {
       if (verifyType === "register") {
-        await api.post("GANTI_DENGAN_URL_KIRIM_ULANG_REGISTER_LU", {
+        await api.post("/resend-verification", {
           email: currentEmail,
-        })
+        });
       } else {
-        await api.post("/forgot-password", { email: currentEmail })
+        await api.post("/forgot-password", { email: currentEmail });
       }
 
-      setIsResending(false)
-      setCountdown(60)
-      setAlert({ message: "Kode baru berhasil dikirim!", type: "success" })
+      setIsResending(false);
+      setCountdown(60);
+      setAlert({ message: "Kode baru berhasil dikirim!", type: "success" });
     } catch (error) {
-      setIsResending(false)
+      setIsResending(false);
       setAlert({
         message:
           error.response?.data?.message ||
           "Gagal mengirim ulang kode. Silakan coba lagi.",
         type: "error",
-      })
+      });
     }
-  }
+  };
 
   return (
     <div className="flex w-full flex-col justify-center overflow-y-auto px-4 py-5 sm:p-10 lg:w-1/2 lg:px-16 lg:py-12 2xl:px-20">
@@ -301,7 +301,7 @@ function VerifyCodeForm() {
         </button>
       </form>
 
-      <div className="mt-5 flex items-center justify-center gap-1.5 text-xs text-slate-400 min-[350px]:text-sm sm:mt-8">
+      <div className="-mt-6 sm:-mt-8 lg:-mt-10 flex items-center justify-center gap-1.5 text-xs text-slate-400 min-[350px]:text-sm sm:mt-8">
         <span>Belum menerima kode?</span>
         <button
           type="button"
@@ -326,7 +326,7 @@ function VerifyCodeForm() {
         </button>
       </div>
     </div>
-  )
+  );
 }
 
-export default VerifyCodeForm
+export default VerifyCodeForm;

@@ -1,46 +1,46 @@
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { Lock, Eye, EyeOff, ArrowLeft } from "lucide-react"
-import logo from "../../../../assets/icons/logo.png"
-import SuccessPopup from "../../../ui/SuccessPopup"
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import logo from "../../../../assets/icons/logo.png";
+import SuccessPopup from "../../../ui/SuccessPopup";
 
 function ResetPasswordForm() {
-  const navigate = useNavigate()
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
+  const navigate = useNavigate();
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert("Password tidak sama.")
-      return
+      alert("Password tidak sama.");
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
 
     setTimeout(() => {
-      setLoading(false)
-      setShowSuccess(true)
-      localStorage.removeItem("resetEmail")
-      localStorage.removeItem("otpVerified")
-      localStorage.removeItem("verifyType")
+      setLoading(false);
+      setShowSuccess(true);
+      localStorage.removeItem("resetEmail");
+      localStorage.removeItem("otpVerified");
+      localStorage.removeItem("verifyType");
 
       setTimeout(() => {
-        navigate("/login")
-      }, 2500)
-    }, 1500)
-  }
+        navigate("/login");
+      }, 2500);
+    }, 1500);
+  };
 
   return (
     <>
       <SuccessPopup isOpen={showSuccess} />
 
-      <div className="flex w-full flex-col justify-center overflow-y-auto px-4 py-5 sm:p-10 lg:w-1/2 lg:px-16 lg:py-12 2xl:px-20">
+      <div className="flex w-full flex-col justify-center px-4 py-5 sm:p-10 lg:w-1/2 lg:px-16 lg:py-12 2xl:px-20">
         <div className="mb-8 flex items-center justify-between sm:mb-12 lg:hidden">
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-100/30 bg-white/10 p-3 shadow-md backdrop-blur-md sm:h-16 sm:w-16 sm:p-3.5">
@@ -157,7 +157,7 @@ function ResetPasswordForm() {
           </button>
         </form>
 
-        <p className="text-center text-xs text-slate-400 min-[350px]:text-sm">
+        <p className="-mt-6 sm:-mt-8 lg:-mt-10 text-center text-xs text-slate-400 min-[350px]:text-sm">
           Kembali ke halaman
           <Link
             to="/login"
@@ -168,7 +168,7 @@ function ResetPasswordForm() {
         </p>
       </div>
     </>
-  )
+  );
 }
 
-export default ResetPasswordForm
+export default ResetPasswordForm;

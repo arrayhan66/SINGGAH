@@ -1,14 +1,14 @@
-import { ArrowRight } from "lucide-react"
-import DustBackground from "../../ui/DustBackground"
-import GlowBackground from "../../ui/GlowBackground"
-import PCBBackground from "../../ui/PCBBackground"
-import HeroModel3D from "./HeroModel3D"
-import logoPoliban from "../../../assets/icons/Logo_Poliban.png"
-import { useNavigate } from "react-router-dom"
-import HeroStats, { statsData } from "./HeroStats"
+import { ArrowRight } from "lucide-react";
+import DustBackground from "../../ui/DustBackground";
+import GlowBackground from "../../ui/GlowBackground";
+import PCBBackground from "../../ui/PCBBackground";
+import HeroModel3D from "./HeroModel3D";
+import logoPoliban from "../../../assets/icons/Logo_Poliban.png";
+import { useNavigate } from "react-router-dom";
+import HeroStats, { statsData } from "./HeroStats";
 
 function Hero() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <section
@@ -19,8 +19,9 @@ function Hero() {
       <PCBBackground />
       <DustBackground />
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-[1700px] flex-col lg:flex-row items-center lg:items-start justify-between px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-[calc(var(--navbar-h)+24px)] pb-12">
-        <div className="flex w-full flex-col items-center text-center md:max-w-2xl md:mx-auto lg:max-w-xl 2xl:max-w-2xl lg:mx-0 lg:items-start lg:text-left">
+      {/* Class lg:items-start dihapus, jadi items-center berlaku untuk desktop juga biar sejajar */}
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-[1700px] flex-col lg:flex-row items-center justify-between px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-[calc(var(--navbar-h)+24px)] pb-12">
+        <div className="flex w-full flex-col items-center text-center md:max-w-2xl md:mx-auto lg:max-w-xl 2xl:max-w-2xl lg:mx-0 lg:items-start lg:text-left lg:-mt-20">
           <div className="inline-flex items-center gap-2 min-[350px]:gap-3 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 min-[350px]:px-4 py-2 backdrop-blur-md">
             <img
               src={logoPoliban}
@@ -69,7 +70,8 @@ function Hero() {
           </div>
         </div>
 
-        <div className="mt-2 lg:-mt-30 flex w-full lg:w-[45%] xl:w-1/2 items-center justify-center shrink-0">
+        {/* Di desktop margin dibikin normal lg:mt-0 biar sejajar persis di tengah sama teks kiri */}
+        <div className="mt-8 flex w-full lg:w-[45%] xl:w-1/2 items-center justify-center shrink-0 lg:-mt-20">
           <div className="w-full max-w-xs md:max-w-lg lg:max-w-full">
             <HeroModel3D />
           </div>
@@ -95,7 +97,7 @@ function Hero() {
           <div className="w-full">
             <div className="flex flex-col min-[400px]:flex-row items-center justify-between gap-6 min-[400px]:gap-0 rounded-2xl border border-white/10 bg-white/5 px-4 md:px-6 py-5 min-[400px]:py-4 backdrop-blur-xl">
               {statsData.map((stat, index) => {
-                const Icon = stat.icon
+                const Icon = stat.icon;
                 return (
                   <div
                     key={stat.label}
@@ -122,7 +124,7 @@ function Hero() {
                       <div className="block min-[400px]:hidden absolute -bottom-3 left-1/2 h-px w-[90%] -translate-x-1/2 bg-white/10" />
                     )}
                   </div>
-                )
+                );
               })}
             </div>
           </div>
@@ -137,7 +139,7 @@ function Hero() {
         }}
       />
     </section>
-  )
+  );
 }
 
-export default Hero
+export default Hero;

@@ -1,8 +1,8 @@
 // File: src/components/auth/VerifyCode/VerifyCodeSection.jsx
-import DustBackground from "../../../ui/DustBackground"
-import GlowBackground from "../../../ui/GlowBackground"
-import LoginBranding from "../Login/LoginBranding"
-import VerifyCodeForm from "./VerifyCodeForm"
+import DustBackground from "../../../ui/DustBackground";
+import GlowBackground from "../../../ui/GlowBackground";
+import AuthBranding from "../shared/AuthBranding";
+import VerifyCodeForm from "./VerifyCodeForm";
 
 function VerifyCodeSection() {
   return (
@@ -13,11 +13,11 @@ function VerifyCodeSection() {
 
       {/* Main Kontainer */}
       <div className="relative z-10 flex w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-cyan-400/40 bg-white/5 shadow-2xl shadow-cyan-900/40 backdrop-blur-xl lg:min-h-[680px] lg:flex-row 2xl:max-w-7xl 2xl:min-h-[740px]">
-        <LoginBranding backTo="/forgot-password" />
+        <AuthBranding backTo="/forgot-password" />
         <VerifyCodeForm />
       </div>
     </section>
-  )
+  );
 }
 
-export default VerifyCodeSection
+export default VerifyCodeSection;

@@ -1,11 +1,11 @@
-import { useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { useParams, useNavigate, useLocation } from "react-router-dom"
 import DustBackground from "../../ui/DustBackground"
 import GlowBackground from "../../ui/GlowBackground"
 import GlassCard from "../../ui/GlassCard"
-// Facebook & Twitter dihapus dari import Lucide
 import { X, MessageCircle, Copy, Check, Send } from "lucide-react"
 import { karyaCategories, karyaProjects } from "../../../data/karyaData"
+import { useAuth } from "../../../context/AuthContext"
 
 import KaryaProjectGallery from "./detail/KaryaProjectGallery"
 import KaryaProjectHeader from "./detail/KaryaProjectHeader"
@@ -15,6 +15,33 @@ import KaryaProjectComments from "./detail/KaryaProjectComments"
 function KaryaProjectDetailSection() {
   const { slug, projectSlug } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
+  const { user: contextUser } = useAuth()
+
+  const [localUser, setLocalUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user")) || null
+    } catch {
+      return null
+    }
+  })
+
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === "user") {
+        try {
+          setLocalUser(e.newValue ? JSON.parse(e.newValue) : null)
+        } catch {
+          setLocalUser(null)
+        }
+      }
+    }
+    window.addEventListener("storage", onStorage)
+    return () => window.removeEventListener("storage", onStorage)
+  }, [])
+
+  const currentUser = contextUser || localUser
+  const isLoggedIn = currentUser !== null
 
   const category = karyaCategories.find((item) => item.slug === slug)
   const project = karyaProjects.find(
@@ -23,14 +50,11 @@ function KaryaProjectDetailSection() {
 
   const [activeImage, setActiveImage] = useState(0)
   const [newComment, setNewComment] = useState("")
-  const [currentUser] = useState(null)
-  const isLoggedIn = currentUser !== null
   const [isLiked, setIsLiked] = useState(project?.isLiked || false)
   const [likeCount, setLikeCount] = useState(project?.likesCount || 0)
   const [isBookmarked, setIsBookmarked] = useState(
     project?.isBookmarked || false,
   )
-
   const [showShareModal, setShowShareModal] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
 
@@ -39,7 +63,7 @@ function KaryaProjectDetailSection() {
       <section className="relative overflow-hidden bg-brand-navy py-32 text-center">
         <p className="text-slate-300">Karya tidak ditemukan.</p>
         <button
-          onClick={() => navigate("/karya")}
+          onClick={() => navigate(location.pathname.startsWith("/user") ? "/user/karya" : "/karya")}
           className="mt-6 cursor-pointer rounded-xl border border-cyan-400/30 px-5 py-3 text-cyan-300 transition hover:bg-cyan-400 hover:text-black"
         >
           Kembali ke Karya
@@ -76,11 +100,8 @@ function KaryaProjectDetailSection() {
       return
     }
 
-    const allowedRoles = ["user", "mahasiswa", "dosen", "admin"]
-    if (allowedRoles.includes(currentUser.role)) {
-      setIsLiked(!isLiked)
-      setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1))
-    }
+    setIsLiked(!isLiked)
+    setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1))
   }
 
   function handleBookmark() {
@@ -89,10 +110,7 @@ function KaryaProjectDetailSection() {
       return
     }
 
-    const allowedRoles = ["user", "mahasiswa", "dosen", "admin"]
-    if (allowedRoles.includes(currentUser.role)) {
-      setIsBookmarked(!isBookmarked)
-    }
+    setIsBookmarked(!isBookmarked)
   }
 
   async function handleShare() {
@@ -146,6 +164,7 @@ function KaryaProjectDetailSection() {
             activeImage={activeImage}
             setActiveImage={setActiveImage}
             projectTitle={project.title}
+            isUserRoute={location.pathname.startsWith("/user") || isLoggedIn}
           />
 
           <div className="p-4 sm:p-8 lg:p-10 2xl:p-12">

@@ -7,9 +7,12 @@ import SearchBar from "../../ui/SearchBar"
 import OutlineButton from "../../ui/OutlineButton"
 import KaryaCategoryCard from "./KaryaCategoryCard"
 import { karyaCategories } from "../../../data/karyaData"
+import { useAuth } from "../../../context/AuthContext"
 
 function KaryaSection() {
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const isLoggedIn = user !== null
   const [initialCount, setInitialCount] = useState(6)
 
   useEffect(() => {
@@ -38,7 +41,7 @@ function KaryaSection() {
   } = useSearchAndExpand(karyaCategories, initialCount)
 
   function handleCategoryClick(slug) {
-    navigate(`/karya/${slug}`)
+    navigate(isLoggedIn ? `/user/karya/${slug}` : `/karya/${slug}`)
   }
 
   return (

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
@@ -10,9 +11,12 @@ import {
 } from "lucide-react";
 import GlassCard from "../../ui/GlassCard";
 import { karyaCategories } from "../../../data/karyaData";
+import { useAuth } from "../../../context/AuthContext";
 
 function KaryaProjectCard({ project }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isLoggedIn = user !== null;
 
   const {
     category: categorySlug,
@@ -23,12 +27,16 @@ function KaryaProjectCard({ project }) {
     author,
     year,
     slug,
-    isBookmarked,
-    isLiked,
-    likesCount,
+    isBookmarked: initialBookmarked,
+    isLiked: initialLiked,
+    likesCount: initialLikes,
     commentsCount,
     viewsCount,
   } = project;
+
+  const [isBookmarked, setIsBookmarked] = useState(initialBookmarked || false);
+  const [isLiked, setIsLiked] = useState(initialLiked || false);
+  const [likesCount, setLikesCount] = useState(initialLikes || 0);
 
   const category = karyaCategories.find((item) => item.slug === categorySlug);
 
@@ -40,6 +48,37 @@ function KaryaProjectCard({ project }) {
       ? `${author[0]} +${author.length - 1}`
       : author[0]
     : author;
+
+  function handleBookmark(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+    setIsBookmarked((prev) => !prev);
+  }
+
+  function handleLike(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+    setIsLiked((prev) => !prev);
+    setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1));
+  }
+
+  function handleComment(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+    navigate(`/user/karya/${categorySlug}/${slug}`);
+  }
 
   return (
     <GlassCard
@@ -63,11 +102,7 @@ function KaryaProjectCard({ project }) {
         )}
 
         <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            navigate("/login");
-          }}
+          onClick={handleBookmark}
           aria-label="Bookmark"
           className="absolute right-4 top-4 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-brand-navy/80 text-slate-200 backdrop-blur-sm transition hover:scale-110 hover:text-cyan-300 2xl:right-5 2xl:top-5 2xl:h-10 2xl:w-10"
         >
@@ -109,11 +144,7 @@ function KaryaProjectCard({ project }) {
         {/* Statistik */}
         <div className="mt-4 flex items-center gap-5 border-t border-slate-700/50 pt-4 text-sm text-slate-400 2xl:mt-5 2xl:gap-6 2xl:pt-5 2xl:text-base">
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              navigate("/login");
-            }}
+            onClick={handleLike}
             className="group/action flex cursor-pointer items-center gap-1.5 transition-colors hover:text-pink-400"
           >
             <Heart
@@ -122,15 +153,11 @@ function KaryaProjectCard({ project }) {
                 isLiked ? "fill-pink-500 text-pink-500" : ""
               }`}
             />
-            <span>{likesCount || 0}</span>
+            <span>{likesCount}</span>
           </button>
 
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              navigate("/login");
-            }}
+            onClick={handleComment}
             className="group/action flex cursor-pointer items-center gap-1.5 transition-colors hover:text-cyan-300"
           >
             <MessageSquare
@@ -149,7 +176,11 @@ function KaryaProjectCard({ project }) {
         {/* Button Lihat Detail */}
         <div className="mt-auto pt-6 2xl:pt-8">
           <Link
-            to={`/karya/${categorySlug}/${slug}`}
+            to={
+              isLoggedIn
+                ? `/user/karya/${categorySlug}/${slug}`
+                : `/karya/${categorySlug}/${slug}`
+            }
             className="group/btn flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-white py-3 text-sm font-semibold text-slate-900 transition-colors duration-300 hover:bg-slate-200 2xl:py-4 2xl:text-base"
           >
             Lihat Detail

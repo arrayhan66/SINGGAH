@@ -1,54 +1,55 @@
-import { useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
-import { Mail, ArrowLeft } from "lucide-react"
-import api from "../../../../services/api"
-import logo from "../../../../assets/icons/logo.png"
-import FormAlert from "../../../ui/FormAlert"
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { Mail, ArrowLeft } from "lucide-react";
+import api from "../../../../services/api";
+import logo from "../../../../assets/icons/logo.png";
+import FormAlert from "../../../ui/FormAlert";
 
 function ForgotPasswordForm() {
-  const navigate = useNavigate()
-  const [email, setEmail] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [generalError, setGeneralError] = useState("")
-  const [emailError, setEmailError] = useState("")
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [generalError, setGeneralError] = useState("");
+  const [emailError, setEmailError] = useState("");
 
   const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setGeneralError("")
-    setEmailError("")
+    e.preventDefault();
+    setGeneralError("");
+    setEmailError("");
 
     if (!email.trim()) {
-      setEmailError("Email tidak boleh kosong.")
-      return
+      setEmailError("Email tidak boleh kosong.");
+      return;
     }
 
     if (!validateEmail(email)) {
-      setEmailError("Format email tidak valid (contoh: nama@email.com).")
-      return
+      setEmailError("Format email tidak valid (contoh: nama@email.com).");
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
 
     try {
-      await api.post("/forgot-password", { email })
-      localStorage.setItem("resetEmail", email)
-      navigate("/verify-code")
+      await api.post("/forgot-password", { email });
+      localStorage.setItem("resetEmail", email);
+      localStorage.setItem("verifyType", "reset");
+      navigate("/verify-code");
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       setGeneralError(
         error.response?.data?.message ||
           "Gagal mengirim email verifikasi. Silakan coba lagi.",
-      )
+      );
     }
-  }
+  };
 
   return (
-    <div className="flex w-full flex-col justify-center overflow-y-auto px-4 py-5 sm:p-10 lg:w-1/2 lg:px-16 lg:py-12 2xl:px-20">
+    <div className="flex w-full flex-col justify-center px-4 py-5 sm:p-10 lg:w-1/2 lg:px-16 lg:py-12 2xl:px-20">
       <div className="mb-8 flex items-center justify-between sm:mb-12 lg:hidden">
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-100/30 bg-white/10 p-3 shadow-md backdrop-blur-md sm:h-16 sm:w-16 sm:p-3.5">
@@ -100,8 +101,8 @@ function ForgotPasswordForm() {
               type="email"
               value={email}
               onChange={(e) => {
-                setEmail(e.target.value)
-                setEmailError("")
+                setEmail(e.target.value);
+                setEmailError("");
               }}
               placeholder="Masukkan Email"
               className={`w-full rounded-xl bg-slate-50 py-3 pl-11 pr-3 text-xs text-slate-900 shadow-sm placeholder:text-slate-500 transition-all focus:bg-white focus:outline-none min-[350px]:py-3.5 min-[350px]:pl-12 min-[350px]:text-sm sm:py-4 sm:pl-12 sm:text-base [&:-webkit-autofill]:[-webkit-text-fill-color:#0f172a] [&:-webkit-autofill]:shadow-[0_0_0_1000px_#f8fafc_inset] [&:-webkit-autofill]:transition-none focus:[&:-webkit-autofill]:shadow-[0_0_0_1000px_#fff_inset] ${
@@ -136,7 +137,7 @@ function ForgotPasswordForm() {
         </button>
       </form>
 
-      <p className="text-center text-xs text-slate-400 min-[350px]:text-sm">
+      <p className="-mt-6 sm:-mt-8 lg:-mt-10 text-center text-xs text-slate-400 min-[350px]:text-sm">
         Ingat password?
         <Link
           to="/login"
@@ -146,7 +147,7 @@ function ForgotPasswordForm() {
         </Link>
       </p>
     </div>
-  )
+  );
 }
 
-export default ForgotPasswordForm
+export default ForgotPasswordForm;

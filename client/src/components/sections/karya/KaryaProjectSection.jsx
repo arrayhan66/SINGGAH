@@ -7,12 +7,15 @@ import SearchBar from "../../ui/SearchBar"
 import OutlineButton from "../../ui/OutlineButton"
 import KaryaProjectCard from "./KaryaProjectCard"
 import { karyaCategories, karyaProjects } from "../../../data/karyaData"
+import { useAuth } from "../../../context/AuthContext"
 
 const INITIAL_COUNT = 6
 
 function KaryaProjectSection() {
   const { slug } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const isLoggedIn = user !== null
 
   const category = karyaCategories.find((item) => item.slug === slug)
 
@@ -38,7 +41,7 @@ function KaryaProjectSection() {
             Kategori tidak ditemukan.
           </p>
           <button
-            onClick={() => navigate("/karya")}
+            onClick={() => navigate(isLoggedIn ? "/user/karya" : "/karya")}
             className="mt-6 rounded-xl border border-cyan-400/30 px-5 py-3 text-cyan-300 transition hover:bg-cyan-400 hover:text-black 2xl:mt-8 2xl:px-8 2xl:py-4 2xl:text-lg"
           >
             Kembali ke Daftar Kategori
@@ -59,7 +62,7 @@ function KaryaProjectSection() {
       <div className="mx-auto max-w-7xl px-5 sm:px-8 relative 2xl:max-w-360 2xl:px-12">
         <div className="mb-2 flex sm:-mb-2 2xl:-mb-8">
           <Link
-            to="/karya"
+            to={isLoggedIn ? "/user/karya" : "/karya"}
             aria-label="Kembali"
             className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 p-2.5 sm:py-2 sm:pl-3 sm:pr-4 text-sm text-slate-300 backdrop-blur-sm transition-colors duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 2xl:py-3 2xl:pl-4 2xl:pr-5 2xl:text-base"
           >

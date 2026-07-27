@@ -1,15 +1,22 @@
 import { useRef } from "react"
-import { Camera } from "lucide-react"
+import { Camera, X } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
 
-function ProfileAvatar({ value, onChange }) {
+function ProfileAvatar({ value, existingUrl, onChange, onRemove }) {
   const inputRef = useRef(null)
 
   const previewUrl = value ? URL.createObjectURL(value) : null
+  const displayUrl = previewUrl || existingUrl
 
   function handleFileChange(e) {
     const file = e.target.files?.[0]
     if (file) onChange(file)
+  }
+
+  function handleRemove(e) {
+    e.stopPropagation()
+    onRemove()
+    if (inputRef.current) inputRef.current.value = ""
   }
 
   return (
@@ -24,9 +31,9 @@ function ProfileAvatar({ value, onChange }) {
       <div className="mt-4 flex items-center gap-5">
         <div className="relative">
           <div className="flex h-20 w-20 md:h-24 md:w-24 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-gradient-to-br from-cyan-500 to-blue-700">
-            {previewUrl ? (
+            {displayUrl ? (
               <img
-                src={previewUrl}
+                src={displayUrl}
                 alt="Preview avatar"
                 className="h-full w-full object-cover"
               />
@@ -40,10 +47,20 @@ function ProfileAvatar({ value, onChange }) {
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-cyan-500 text-white shadow-lg hover:bg-cyan-400 transition-colors"
+            className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-cyan-500 text-white shadow-lg hover:bg-cyan-400 transition-colors cursor-pointer"
           >
             <Camera size={14} />
           </button>
+
+          {displayUrl && (
+            <button
+              type="button"
+              onClick={handleRemove}
+              className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500/80 text-white shadow-lg hover:bg-red-500 transition-colors cursor-pointer"
+            >
+              <X size={12} />
+            </button>
+          )}
 
           <input
             ref={inputRef}

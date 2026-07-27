@@ -1,7 +1,13 @@
-import RegisterSection from "../../../components/sections/auth/Register/RegisterSection"
+import RegisterSection from "../../../components/sections/auth/Register/RegisterSection";
+import Footer from "../../../components/layout/Footer";
 
 function Register() {
-  return <RegisterSection />
+  return (
+    <main>
+      <RegisterSection />
+      <Footer />
+    </main>
+  );
 }
 
-export default Register
+export default Register;

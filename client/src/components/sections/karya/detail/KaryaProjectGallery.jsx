@@ -7,12 +7,13 @@ function KaryaProjectGallery({
   activeImage,
   setActiveImage,
   projectTitle,
+  isUserRoute,
 }) {
   return (
     <div className="relative overflow-hidden bg-slate-950/40">
       {/* Tombol Kembali di Pojok Kiri Atas */}
       <Link
-        to={`/karya/${slug}`}
+        to={isUserRoute ? `/user/karya/${slug}` : `/karya/${slug}`}
         className="group absolute left-4 top-4 z-10 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 p-2 sm:py-2 sm:pl-3 sm:pr-4 text-sm text-slate-300 backdrop-blur-md transition-colors duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 cursor-pointer"
       >
         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 transition-colors duration-300 group-hover:bg-cyan-400/20">

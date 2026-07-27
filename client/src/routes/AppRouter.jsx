@@ -24,6 +24,7 @@ import ResetPassword from "../pages/auth/ResetPassword/ResetPassword"
 import UserUpload from "../pages/user/Upload/Upload"
 import UserMyProject from "../pages/user/MyProject/MyProject"
 import UserProfile from "../pages/user/Profile/Profile"
+import UserKaryaTersimpan from "../pages/user/KaryaTersimpan/KaryaTersimpan"
 
 /* === ADMIN IMPORT === */
 import AdminHome from "../pages/admin/Home/Home"
@@ -157,6 +158,14 @@ function AppRouter() {
           element={
             <ProtectedRoute allowedRoles={["user", "admin"]}>
               <UserProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user/karya-tersimpan"
+          element={
+            <ProtectedRoute allowedRoles={["user", "admin"]}>
+              <UserKaryaTersimpan />
             </ProtectedRoute>
           }
         />

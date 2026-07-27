@@ -1,80 +1,80 @@
-import { useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
-import { Mail, Lock, EyeOff, Eye, ArrowLeft } from "lucide-react"
-import logo from "../../../../assets/icons/logo.png"
-import api from "../../../../services/api"
-import { useAuth } from "../../../../context/AuthContext"
-import FormAlert from "../../../ui/FormAlert"
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { Mail, Lock, EyeOff, Eye, ArrowLeft } from "lucide-react";
+import logo from "../../../../assets/icons/logo.png";
+import api from "../../../../services/api";
+import { useAuth } from "../../../../context/AuthContext";
+import FormAlert from "../../../ui/FormAlert";
 
 function LoginForm() {
-  const navigate = useNavigate()
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [generalError, setGeneralError] = useState("")
-  const [fieldErrors, setFieldErrors] = useState({ email: "", password: "" })
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [generalError, setGeneralError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({ email: "", password: "" });
 
-  const { login } = useAuth()
+  const { login } = useAuth();
 
   const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleLogin = async (e) => {
-    e.preventDefault()
-    setGeneralError("")
-    setFieldErrors({ email: "", password: "" })
+    e.preventDefault();
+    setGeneralError("");
+    setFieldErrors({ email: "", password: "" });
 
-    let errors = {}
-    let isValid = true
+    let errors = {};
+    let isValid = true;
 
     if (!email.trim()) {
-      errors.email = "Email tidak boleh kosong."
-      isValid = false
+      errors.email = "Email tidak boleh kosong.";
+      isValid = false;
     } else if (!validateEmail(email)) {
-      errors.email = "Format email tidak valid (contoh: nama@email.com)."
-      isValid = false
+      errors.email = "Format email tidak valid (contoh: nama@email.com).";
+      isValid = false;
     }
 
     if (!password) {
-      errors.password = "Kata sandi tidak boleh kosong."
-      isValid = false
+      errors.password = "Kata sandi tidak boleh kosong.";
+      isValid = false;
     } else if (password.length < 6) {
-      errors.password = "Kata sandi minimal 6 karakter."
-      isValid = false
+      errors.password = "Kata sandi minimal 6 karakter.";
+      isValid = false;
     }
 
     if (!isValid) {
-      setFieldErrors(errors)
-      return
+      setFieldErrors(errors);
+      return;
     }
 
     try {
-      setIsLoading(true)
-      const res = await api.post("/login", { email, password })
-      const { token, user } = res.data.data
+      setIsLoading(true);
+      const res = await api.post("/login", { email, password });
+      const { token, user } = res.data.data;
 
-      login(user, token)
+      login(user, token);
 
       if (user.role === "admin") {
-        navigate("/admin")
+        navigate("/admin");
       } else {
-        navigate("/user")
+        navigate("/user");
       }
     } catch (err) {
       setGeneralError(
         err.response?.data?.message ||
           "Terjadi kesalahan sistem. Silakan coba lagi.",
-      )
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="flex w-full flex-col justify-center overflow-y-auto px-4 py-5 sm:p-10 lg:w-1/2 lg:px-16 lg:py-12 2xl:px-20">
+    <div className="flex w-full flex-col justify-center px-4 py-5 sm:p-10 lg:w-1/2 lg:px-16 lg:py-12 2xl:px-20">
       <div className="mb-8 flex items-center justify-between sm:mb-12 lg:hidden">
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-100/30 bg-white/10 p-3 shadow-md backdrop-blur-md sm:h-16 sm:w-16 sm:p-3.5">
@@ -124,8 +124,8 @@ function LoginForm() {
               type="email"
               value={email}
               onChange={(e) => {
-                setEmail(e.target.value)
-                setFieldErrors((prev) => ({ ...prev, email: "" }))
+                setEmail(e.target.value);
+                setFieldErrors((prev) => ({ ...prev, email: "" }));
               }}
               placeholder="Masukkan Email"
               className={`w-full rounded-xl bg-slate-50 py-3 pl-11 pr-3 text-xs text-slate-900 shadow-sm placeholder:text-slate-500 transition-all focus:bg-white focus:outline-none min-[350px]:py-3.5 min-[350px]:pl-12 min-[350px]:text-sm sm:py-4 sm:pl-12 sm:text-base [&:-webkit-autofill]:[-webkit-text-fill-color:#0f172a] [&:-webkit-autofill]:shadow-[0_0_0_1000px_#f8fafc_inset] [&:-webkit-autofill]:transition-none focus:[&:-webkit-autofill]:shadow-[0_0_0_1000px_#fff_inset]
@@ -167,8 +167,8 @@ function LoginForm() {
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => {
-                setPassword(e.target.value)
-                setFieldErrors((prev) => ({ ...prev, password: "" }))
+                setPassword(e.target.value);
+                setFieldErrors((prev) => ({ ...prev, password: "" }));
               }}
               placeholder="••••••••"
               className={`w-full rounded-xl bg-slate-50 py-3 pl-11 pr-11 text-xs text-slate-900 shadow-sm placeholder:text-slate-500 transition-all focus:bg-white focus:outline-none min-[350px]:py-3.5 min-[350px]:pl-12 min-[350px]:pr-12 min-[350px]:text-sm sm:py-4 sm:pl-12 sm:pr-12 sm:text-base [&:-webkit-autofill]:[-webkit-text-fill-color:#0f172a] [&:-webkit-autofill]:shadow-[0_0_0_1000px_#f8fafc_inset] [&:-webkit-autofill]:transition-none focus:[&:-webkit-autofill]:shadow-[0_0_0_1000px_#fff_inset]
@@ -215,7 +215,7 @@ function LoginForm() {
         </button>
       </form>
 
-      <p className="text-center text-xs text-slate-400 min-[350px]:text-sm">
+      <p className="-mt-6 sm:-mt-8 lg:-mt-10 text-center text-xs text-slate-400 min-[350px]:text-sm">
         Belum memiliki akun?
         <Link
           to="/register"
@@ -225,7 +225,7 @@ function LoginForm() {
         </Link>
       </p>
     </div>
-  )
+  );
 }
 
-export default LoginForm
+export default LoginForm;

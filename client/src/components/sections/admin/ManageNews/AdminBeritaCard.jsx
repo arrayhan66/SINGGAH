@@ -37,7 +37,7 @@ function AdminBeritaCard({ berita, onEdit, onDeleteClick }) {
           <button
             type="button"
             onClick={() => onEdit(berita)}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-white/10 transition-colors"
+            className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-white/10 transition-colors"
           >
             <Pencil size={13} />
             Edit
@@ -46,7 +46,7 @@ function AdminBeritaCard({ berita, onEdit, onDeleteClick }) {
           <button
             type="button"
             onClick={() => onDeleteClick(berita)}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/5 px-3 py-2 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors"
+            className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/5 px-3 py-2 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors"
           >
             <Trash2 size={13} />
             Hapus

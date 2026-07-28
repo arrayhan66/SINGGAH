@@ -1,5 +1,5 @@
 import MainLayout from "../../layouts/MainLayout"
-import KaryaProjectDetailSection from "../../components/sections/Karya/KaryaProjectDetailSection"
+import KaryaProjectDetailSection from "../../components/sections/karya/KaryaProjectDetailSection"
 
 function KaryaProjectDetail() {
   return (

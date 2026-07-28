@@ -35,7 +35,7 @@ function ForgotPasswordForm() {
     setLoading(true);
 
     try {
-      await api.post("/forgot-password", { email });
+      await api.post("/auth/forgot-password", { email });
       localStorage.setItem("resetEmail", email);
       localStorage.setItem("verifyType", "reset");
       navigate("/verify-code");

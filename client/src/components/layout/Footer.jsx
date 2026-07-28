@@ -3,27 +3,25 @@ import logo from "../../assets/icons/logo.png";
 
 function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-[#02111f]">
-      <div className="mx-auto flex max-w-7xl 2xl:max-w-[1700px] flex-col items-center justify-between gap-6 px-5 py-8 sm:px-8 lg:flex-row lg:py-10 2xl:py-14">
+    <footer className="mt-auto border-t border-white/10 bg-[#02111f]">
+      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-5 px-4 py-6 sm:px-5 sm:gap-6 sm:py-8 md:px-8 lg:max-w-[1280px] lg:flex-row lg:py-10 xl:max-w-[1400px] 3xl:max-w-[1700px] 3xl:gap-8 3xl:px-12 3xl:py-12 4xl:py-14">
         {/* LOGO */}
-        <NavLink to="/" className="flex items-center gap-3">
-          <div className="flex h-11 w-11 2xl:h-14 2xl:w-14 items-center justify-center overflow-hidden rounded-xl">
+        <NavLink to="/" className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:h-10 sm:w-10 md:h-11 md:w-11 2xl:h-14 2xl:w-14">
             <img
               src={logo}
-              alt="PamerIT Logo"
-              className="h-12 w-12 2xl:h-16 2xl:w-16 object-contain"
+              alt="SINGGAH Logo"
+              className="h-10 w-10 object-contain sm:h-12 sm:w-12 2xl:h-16 2xl:w-16"
             />
           </div>
 
-          <div>
-            <h2 className="text-lg font-bold text-white 2xl:text-2xl">
-              SINGGAH
-            </h2>
-          </div>
+          <h2 className="text-base font-bold text-white sm:text-lg md:text-xl 2xl:text-2xl">
+            SINGGAH
+          </h2>
         </NavLink>
 
         {/* MENU */}
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-slate-300 sm:gap-x-8 sm:text-base 2xl:gap-x-16 2xl:text-lg">
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-xs text-slate-300 sm:gap-x-6 sm:text-sm md:gap-x-8 md:text-base lg:gap-x-10 xl:gap-x-12 2xl:gap-x-16 2xl:text-lg">
           <NavLink to="/" className="transition hover:text-cyan-300">
             Beranda
           </NavLink>
@@ -42,7 +40,7 @@ function Footer() {
         </div>
 
         {/* COPYRIGHT */}
-        <p className="text-center text-xs text-slate-500 sm:text-sm 2xl:text-base">
+        <p className="text-center text-[10px] text-slate-500 sm:text-xs md:text-sm 2xl:text-base">
           Copyright © 2026 SINGGAH — Dibuat ElektroPoliban
         </p>
       </div>

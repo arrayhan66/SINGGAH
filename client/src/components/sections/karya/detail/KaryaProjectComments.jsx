@@ -65,11 +65,11 @@ function KaryaProjectComments({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-xs sm:text-sm font-semibold text-white truncate">
-                    {item.author}
+                    {item.User?.name || "Anonim"}
                   </p>
-                  {item.createdAt && (
+                  {item.created_at && (
                     <span className="shrink-0 text-[10px] sm:text-xs text-slate-400">
-                      {formatDate(item.createdAt)}
+                      {formatDate(item.created_at)}
                     </span>
                   )}
                 </div>

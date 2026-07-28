@@ -10,7 +10,7 @@ function DashboardPendingProjects() {
 
   return (
     <div className="px-6 py-8 md:px-10">
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6 backdrop-blur-xl">
+      <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6 backdrop-blur-xl">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-amber-300" />
@@ -21,7 +21,7 @@ function DashboardPendingProjects() {
 
           <button
             onClick={() => navigate("/admin/projects")}
-            className="flex items-center gap-1.5 text-xs md:text-sm text-cyan-300 hover:text-cyan-200 transition-colors"
+            className="flex cursor-pointer items-center gap-1.5 text-xs md:text-sm text-cyan-300 hover:text-cyan-200 transition-colors"
           >
             Lihat Semua
             <ArrowRight size={14} />
@@ -40,7 +40,7 @@ function DashboardPendingProjects() {
             {pendingProjects.map((project) => (
               <div
                 key={project.id}
-                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 min-w-0"
+                className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.03] p-3 min-w-0 transition-all duration-200 hover:bg-white/[0.06] hover:border-white/[0.12]"
               >
                 <img
                   src={project.thumbnail}

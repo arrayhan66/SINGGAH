@@ -1,15 +1,19 @@
-import { ExternalLink, FileText, Globe, GitBranch } from "lucide-react";
+import { ExternalLink, FileText } from "lucide-react";
 
 function KaryaProjectContent({ project }) {
-  const descriptionText = project.desc || project.description;
-  const techStack = project.techStack || project.technologies || [];
+  const descriptionText = project.description || "";
+  const techStack = Array.isArray(project.technologies)
+    ? project.technologies
+    : [];
   const links = Array.isArray(project.links) ? project.links : [];
   const documents = Array.isArray(project.documents) ? project.documents : [];
+  const videos = Array.isArray(project.videos) ? project.videos : [];
+  const members = Array.isArray(project.members) ? project.members : [];
 
   function renderLinkItem(link) {
     return (
       <a
-        key={link.url}
+        key={link.id || link.url}
         href={link.url}
         target="_blank"
         rel="noopener noreferrer"
@@ -24,8 +28,8 @@ function KaryaProjectContent({ project }) {
   function renderDocumentItem(doc) {
     return (
       <a
-        key={doc.url}
-        href={doc.url}
+        key={doc.id || doc.file_url}
+        href={doc.file_url}
         target="_blank"
         rel="noopener noreferrer"
         className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-300 transition hover:border-cyan-400/40 hover:text-cyan-300 sm:w-auto sm:justify-start 2xl:px-5 2xl:py-3 2xl:text-base"
@@ -38,61 +42,63 @@ function KaryaProjectContent({ project }) {
 
   return (
     <div className="space-y-6 text-slate-300">
-      {/* Deskripsi Singkat */}
       {descriptionText && (
         <p className="text-sm font-medium leading-relaxed text-slate-200 sm:text-base lg:text-lg">
           {descriptionText}
         </p>
       )}
 
-      {/* Konten HTML */}
-      {project.content && (
-        <div
-          className="prose prose-invert max-w-none space-y-4 pt-2 text-sm leading-relaxed text-slate-300 sm:text-base"
-          dangerouslySetInnerHTML={{ __html: project.content }}
-        />
+      {/* Team Members */}
+      {members.length > 0 && (
+        <div className="border-t border-white/10 pt-6">
+          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-white sm:text-sm">
+            Tim Pengembang
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {members.map((m) => (
+              <span
+                key={m.id}
+                className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-slate-300"
+              >
+                {m.name}
+                {m.role && (
+                  <span className="ml-2 text-xs text-slate-500">
+                    ({m.role})
+                  </span>
+                )}
+              </span>
+            ))}
+          </div>
+        </div>
       )}
 
-      {/* Area Tombol Eksternal */}
-      {(project.liveUrl || project.repoUrl || links.length > 0) && (
+      {/* Links */}
+      {links.length > 0 && (
         <div className="flex flex-col items-stretch gap-2.5 pt-2 sm:flex-row sm:flex-wrap 2xl:gap-4">
-          {project.liveUrl && (
-            <a
-              href={project.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 sm:w-auto 2xl:px-5 2xl:py-3 2xl:text-base"
-            >
-              <Globe size={16} /> Live Demo
-            </a>
-          )}
-          {project.repoUrl && (
-            <a
-              href={project.repoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-slate-200 transition hover:border-cyan-400/40 hover:text-cyan-300 sm:w-auto 2xl:px-5 2xl:py-3 2xl:text-base"
-            >
-              <GitBranch size={16} /> Repository
-            </a>
-          )}
           {links.map(renderLinkItem)}
         </div>
       )}
 
       {/* Video */}
-      {project.videoUrl && (
-        <div className="mt-8 aspect-video w-full overflow-hidden rounded-xl 2xl:mt-10">
-          <iframe
-            src={project.videoUrl}
-            title="Video Demo"
-            className="h-full w-full border-0"
-            allowFullScreen
-          />
+      {videos.length > 0 && (
+        <div className="mt-8 space-y-6 2xl:mt-10">
+          {videos.map((vid) => (
+            <div
+              key={vid.id}
+              className="aspect-video w-full overflow-hidden rounded-xl"
+            >
+              <iframe
+                src={vid.video_url}
+                title="Video Demo"
+                className="h-full w-full border-0"
+                allowFullScreen
+              />
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Dokumen */}
+      {/* Documents */}
       {documents.length > 0 && (
         <div className="mt-8 2xl:mt-10">
           <h3 className="mb-3 text-sm font-semibold text-slate-300 2xl:text-base">
@@ -104,7 +110,7 @@ function KaryaProjectContent({ project }) {
         </div>
       )}
 
-      {/* Stack Teknologi */}
+      {/* Technologies */}
       {techStack.length > 0 && (
         <div className="border-t border-white/10 pt-6">
           <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-white sm:text-sm">
@@ -116,7 +122,7 @@ function KaryaProjectContent({ project }) {
                 key={index}
                 className="rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-300 sm:px-3"
               >
-                {typeof tech === "string" ? tech : tech.name}
+                {tech}
               </span>
             ))}
           </div>

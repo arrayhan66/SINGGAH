@@ -1,15 +1,11 @@
-import UserLayout from "../../../layouts/UserLayout"
-import MyProjectHero from "../../../components/sections/user/MyProject/MyProjectHero"
-import MyProjectStats from "../../../components/sections/user/MyProject/MyProjectStats"
-import MyProjectList from "../../../components/sections/user/MyProject/MyProjectList"
+import MainLayout from "../../../layouts/MainLayout"
+import MyProjectSection from "../../../components/sections/user/MyProject/MyProjectSection"
 
 function MyProject() {
   return (
-    <UserLayout>
-      <MyProjectHero />
-      <MyProjectStats />
-      <MyProjectList />
-    </UserLayout>
+    <MainLayout>
+      <MyProjectSection />
+    </MainLayout>
   )
 }
 

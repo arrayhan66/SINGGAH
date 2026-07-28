@@ -351,7 +351,7 @@ function RegisterForm() {
               <button
                 type="button"
                 onClick={prevStep}
-                className="w-full sm:w-auto flex items-center justify-center rounded-xl bg-slate-800 px-4 py-2.5 sm:py-3 text-xs sm:text-sm"
+                className="w-full sm:w-auto flex items-center justify-center cursor-pointer rounded-xl bg-slate-800 px-4 py-2.5 sm:py-3 text-xs sm:text-sm"
               >
                 Kembali
               </button>
@@ -361,7 +361,7 @@ function RegisterForm() {
               <button
                 type="button"
                 onClick={nextStep}
-                className="group flex w-full sm:flex-1 items-center justify-center gap-2 rounded-xl bg-cyan-600 px-4 py-2.5 sm:py-3 text-xs sm:text-sm"
+                className="group flex w-full sm:flex-1 items-center justify-center gap-2 rounded-xl bg-cyan-600 px-4 py-2.5 sm:py-3 text-xs sm:text-sm cursor-pointer"
               >
                 Selanjutnya
                 <ChevronRight
@@ -373,7 +373,7 @@ function RegisterForm() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative flex-1 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] py-3 sm:py-3.5 font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 disabled:opacity-70"
+                className="group relative flex-1 overflow-hidden cursor-pointer rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] py-3 sm:py-3.5 font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 disabled:opacity-70"
               >
                 <span className="flex items-center justify-center gap-2">
                   {isLoading ? (

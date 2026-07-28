@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { ProtectedRoute } from "./ProtectedRoute"
+import { GuestRoute } from "./GuestRoute"
 import { ResetFlowRoute } from "./ResetFlowRoute"
 
 import Hall from "../pages/Hall/Hall"
@@ -45,7 +46,7 @@ function AppRouter() {
         <Route path="/karya" element={<Karya />} />
         <Route path="/karya/:slug" element={<KaryaDetail />} />
         <Route
-          path="/karya/:slug/:projectSlug"
+          path="/karya/:slug/:projectId"
           element={<KaryaProjectDetail />}
         />
         <Route path="/about" element={<About />} />
@@ -54,9 +55,9 @@ function AppRouter() {
         <Route path="/berita/:slug" element={<NewsDetail />} />
 
         {/* === AUTH ROUTES === */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+        <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
+        <Route path="/forgot-password" element={<GuestRoute><ForgotPassword /></GuestRoute>} />
         {/* DIKUNCI: Hanya bisa masuk kalau ada resetEmail */}
         <Route
           path="/verify-code"
@@ -77,65 +78,9 @@ function AppRouter() {
           }
         />
 
-        {/* === USER ROUTES === */}
+        {/* === USER-ONLY ROUTES === */}
         <Route
-          path="/user"
-          element={
-            <ProtectedRoute allowedRoles={["user", "admin"]}>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/user/karya"
-          element={
-            <ProtectedRoute allowedRoles={["user", "admin"]}>
-              <Karya />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/user/karya/:slug"
-          element={
-            <ProtectedRoute allowedRoles={["user", "admin"]}>
-              <KaryaDetail />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/user/karya/:slug/:projectSlug"
-          element={
-            <ProtectedRoute allowedRoles={["user", "admin"]}>
-              <KaryaProjectDetail />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/user/about"
-          element={
-            <ProtectedRoute allowedRoles={["user", "admin"]}>
-              <About />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/user/hall"
-          element={
-            <ProtectedRoute allowedRoles={["user", "admin"]}>
-              <Hall />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/user/berita"
-          element={
-            <ProtectedRoute allowedRoles={["user", "admin"]}>
-              <News />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/user/upload"
+          path="/upload"
           element={
             <ProtectedRoute
               allowedRoles={["user", "admin"]}
@@ -146,7 +91,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/user/my-project"
+          path="/my-project"
           element={
             <ProtectedRoute allowedRoles={["user", "admin"]}>
               <UserMyProject />
@@ -154,7 +99,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/user/profile"
+          path="/profile"
           element={
             <ProtectedRoute allowedRoles={["user", "admin"]}>
               <UserProfile />
@@ -162,7 +107,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/user/karya-tersimpan"
+          path="/karya-tersimpan"
           element={
             <ProtectedRoute allowedRoles={["user", "admin"]}>
               <UserKaryaTersimpan />

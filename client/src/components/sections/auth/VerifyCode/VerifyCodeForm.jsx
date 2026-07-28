@@ -149,7 +149,7 @@ function VerifyCodeForm() {
 
     try {
       if (verifyType === "register") {
-        await api.post("/verify-email", {
+        await api.post("/auth/verify-email", {
           code: otpString,
           email: currentEmail,
         });
@@ -158,7 +158,7 @@ function VerifyCodeForm() {
         setLoading(false);
         navigate("/login");
       } else {
-        await api.post("/verify-reset-code", {
+        await api.post("/auth/verify-reset-code", {
           code: otpString,
           email: currentEmail,
         });
@@ -193,11 +193,11 @@ function VerifyCodeForm() {
 
     try {
       if (verifyType === "register") {
-        await api.post("/resend-verification", {
+        await api.post("/auth/resend-verification", {
           email: currentEmail,
         });
       } else {
-        await api.post("/forgot-password", { email: currentEmail });
+        await api.post("/auth/forgot-password", { email: currentEmail });
       }
 
       setIsResending(false);

@@ -13,7 +13,7 @@ function AdminBeritaDeleteModal({ berita, onConfirm, onCancel }) {
           <button
             type="button"
             onClick={onCancel}
-            className="text-slate-400 hover:text-white transition-colors"
+            className="text-slate-400 cursor-pointer hover:text-white transition-colors"
           >
             <X size={18} />
           </button>
@@ -32,14 +32,14 @@ function AdminBeritaDeleteModal({ berita, onConfirm, onCancel }) {
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/10 transition-colors"
+            className="flex-1 cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/10 transition-colors"
           >
             Batal
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className="flex-1 rounded-xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-600 transition-colors"
+            className="flex-1 cursor-pointer rounded-xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-600 transition-colors"
           >
             Ya, Hapus
           </button>

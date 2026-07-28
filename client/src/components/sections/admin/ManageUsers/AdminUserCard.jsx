@@ -44,7 +44,7 @@ function AdminUserCard({ user, onEdit, onDelete, onDetail }) {
             e.stopPropagation()
             onEdit(user)
           }}
-          className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 py-2 text-sm text-slate-300 hover:bg-white/10"
+          className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 py-2 text-sm text-slate-300 hover:bg-white/10"
         >
           <Pencil size={14} />
           Edit
@@ -55,7 +55,7 @@ function AdminUserCard({ user, onEdit, onDelete, onDetail }) {
             e.stopPropagation()
             onDelete(user)
           }}
-          className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-red-500/20 bg-red-500/5 py-2 text-sm text-red-400 hover:bg-red-500/10"
+          className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-red-500/20 bg-red-500/5 py-2 text-sm text-red-400 hover:bg-red-500/10"
         >
           <Trash2 size={14} />
           Hapus

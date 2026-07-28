@@ -26,7 +26,7 @@ function AdminUserFormSidebar({
         <button
           type="button"
           onClick={onPublish}
-          className="w-full rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
+          className="w-full cursor-pointer rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
         >
           {isEditMode ? "Simpan Perubahan" : "Tambah User"}
         </button>
@@ -53,7 +53,7 @@ function AdminUserFormSidebar({
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-cyan-500 text-white shadow-lg hover:bg-cyan-400 transition-colors"
+              className="absolute -bottom-1 -right-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-cyan-500 text-white shadow-lg hover:bg-cyan-400 transition-colors"
             >
               <Camera size={11} />
             </button>
@@ -83,7 +83,7 @@ function AdminUserFormSidebar({
             <select
               value={formData.role}
               onChange={(e) => updateField("role", e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white focus:border-cyan-400/50 focus:outline-none"
+              className="w-full cursor-pointer rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white focus:border-cyan-400/50 focus:outline-none"
             >
               {roleOptions.map((role) => (
                 <option key={role} value={role} className="bg-brand-navy">
@@ -98,7 +98,7 @@ function AdminUserFormSidebar({
             <select
               value={formData.status}
               onChange={(e) => updateField("status", e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white focus:border-cyan-400/50 focus:outline-none"
+              className="w-full cursor-pointer rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white focus:border-cyan-400/50 focus:outline-none"
             >
               {statusOptions.map((status) => (
                 <option key={status} value={status} className="bg-brand-navy">

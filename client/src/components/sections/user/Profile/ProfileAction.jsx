@@ -17,6 +17,15 @@ function ProfileAction({ profileData, passwordData, onResetPassword }) {
     return () => clearTimeout(t)
   }, [showSuccess])
 
+  useEffect(() => {
+    if (showSuccess) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
+    }
+    return () => { document.body.style.overflow = "" }
+  }, [showSuccess])
+
   const isChangingPassword =
     passwordData.currentPassword ||
     passwordData.newPassword ||
@@ -66,7 +75,7 @@ function ProfileAction({ profileData, passwordData, onResetPassword }) {
         formData.append("avatar", profileData.avatar)
       }
 
-      const res = await api.put("/profile", formData, {
+      const res = await api.put("/auth/profile", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -78,7 +87,7 @@ function ProfileAction({ profileData, passwordData, onResetPassword }) {
 
       if (isChangingPassword) {
         await api.put(
-          "/change-password",
+          "/auth/change-password",
           {
             oldPassword: passwordData.currentPassword,
             newPassword: passwordData.newPassword,
@@ -99,21 +108,21 @@ function ProfileAction({ profileData, passwordData, onResetPassword }) {
   }
 
   function handleCancel() {
-    navigate("/user")
+    navigate("/")
   }
 
   return (
     <div className="relative flex flex-col gap-3">
       {/* Success Modal */}
       <div
-        className={`fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all duration-500 ease-out ${
+        className={`fixed inset-0 z-[100] flex items-center justify-center overflow-hidden p-4 transition-all duration-500 ease-out ${
           showSuccess
             ? "visible bg-black/60 opacity-100 backdrop-blur-sm"
             : "invisible bg-black/0 opacity-0 backdrop-blur-none"
         }`}
       >
         <div
-          className={`relative flex w-full max-w-sm transform flex-col items-center rounded-3xl border border-cyan-400/30 bg-slate-900 p-8 text-center shadow-2xl shadow-cyan-900/50 transition-all duration-500 ease-out ${
+          className={`relative flex w-full max-w-sm transform flex-col items-center overflow-hidden rounded-3xl border border-cyan-400/30 bg-slate-900 p-8 text-center shadow-2xl shadow-cyan-900/50 transition-all duration-500 ease-out ${
             showSuccess
               ? "translate-y-0 scale-100 opacity-100 delay-100"
               : "translate-y-10 scale-90 opacity-0"

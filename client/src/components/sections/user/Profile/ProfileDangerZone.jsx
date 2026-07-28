@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { Trash2, AlertTriangle, Eye, EyeOff, X } from "lucide-react"
 import api from "../../../../services/api"
@@ -17,6 +17,15 @@ function ProfileDangerZone() {
 
   const isConfirmValid = confirmText === "SAYA MENGERTI"
   const canSubmit = password.length > 0 && isConfirmValid
+
+  useEffect(() => {
+    if (showModal) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
+    }
+    return () => { document.body.style.overflow = "" }
+  }, [showModal])
 
   function handleOpen() {
     setShowModal(true)
@@ -39,7 +48,7 @@ function ProfileDangerZone() {
     setError("")
 
     try {
-      await api.delete("/account", {
+      await api.delete("/auth/account", {
         headers: { Authorization: `Bearer ${token}` },
         data: { password },
       })
@@ -83,7 +92,7 @@ function ProfileDangerZone() {
       </GlassCard>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden p-4">
           <div
             className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
             onClick={handleClose}

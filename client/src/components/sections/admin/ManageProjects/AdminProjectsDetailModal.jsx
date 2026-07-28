@@ -30,7 +30,7 @@ function AdminProjectsDetailModal({ project, onApprove, onReject, onClose }) {
           <button
             type="button"
             onClick={handleClose}
-            className="text-slate-400 hover:text-white transition-colors"
+            className="text-slate-400 cursor-pointer hover:text-white transition-colors"
           >
             <X size={18} />
           </button>
@@ -52,15 +52,15 @@ function AdminProjectsDetailModal({ project, onApprove, onReject, onClose }) {
           <div className="mt-3 flex flex-col gap-2 text-sm text-slate-300">
             <div className="flex items-center gap-2 min-w-0">
               <User size={15} className="shrink-0 text-cyan-400" />
-              <span className="truncate">{project.studentName}</span>
+              <span className="truncate">{project.User?.name || ""}</span>
             </div>
             <div className="flex items-center gap-2">
               <Tag size={15} className="shrink-0 text-cyan-400" />
-              <span className="capitalize">{project.category}</span>
+              <span className="capitalize">{project.Category?.name || ""}</span>
             </div>
             <div className="flex items-center gap-2">
               <Calendar size={15} className="shrink-0 text-cyan-400" />
-              <span>{project.createdAt}</span>
+              <span>{project.created_at || ""}</span>
             </div>
           </div>
 
@@ -71,7 +71,7 @@ function AdminProjectsDetailModal({ project, onApprove, onReject, onClose }) {
                   <button
                     type="button"
                     onClick={() => setShowRejectForm(true)}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-400 hover:bg-red-500/20 transition-colors"
+                    className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-400 hover:bg-red-500/20 transition-colors"
                   >
                     <XCircle size={16} />
                     Tolak
@@ -79,7 +79,7 @@ function AdminProjectsDetailModal({ project, onApprove, onReject, onClose }) {
                   <button
                     type="button"
                     onClick={() => onApprove(project.id)}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-600 transition-colors"
+                    className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-600 transition-colors"
                   >
                     <CheckCircle2 size={16} />
                     Setujui
@@ -98,7 +98,7 @@ function AdminProjectsDetailModal({ project, onApprove, onReject, onClose }) {
                     <button
                       type="button"
                       onClick={() => setShowRejectForm(false)}
-                      className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/10 transition-colors"
+                      className="flex-1 cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/10 transition-colors"
                     >
                       Batal
                     </button>
@@ -106,7 +106,7 @@ function AdminProjectsDetailModal({ project, onApprove, onReject, onClose }) {
                       type="button"
                       onClick={handleRejectSubmit}
                       disabled={!rejectionReason.trim()}
-                      className="flex-1 rounded-xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-600 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex-1 cursor-pointer rounded-xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-600 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Kirim Penolakan
                     </button>

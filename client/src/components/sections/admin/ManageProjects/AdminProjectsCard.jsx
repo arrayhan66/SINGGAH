@@ -44,12 +44,12 @@ function AdminProjectsCard({ project, onViewDetail }) {
           {project.title}
         </h3>
 
-        <p className="truncate text-xs text-slate-400">{project.studentName}</p>
+        <p className="truncate text-xs text-slate-400">{project.User?.name || ""}</p>
 
         <button
           type="button"
           onClick={() => onViewDetail(project)}
-          className="mt-2 flex items-center justify-center gap-1.5 rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-3 py-2 text-xs font-medium text-cyan-300 hover:bg-cyan-400/20 transition-colors"
+          className="mt-2 flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-3 py-2 text-xs font-medium text-cyan-300 hover:bg-cyan-400/20 transition-colors"
         >
           <Eye size={13} />
           Lihat Detail

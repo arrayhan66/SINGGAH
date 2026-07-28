@@ -41,7 +41,7 @@ function AdminBeritaEditorSidebar({
         <button
           type="button"
           onClick={onPublish}
-          className="w-full rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
+          className="w-full cursor-pointer rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
         >
           {isEditMode ? "Simpan Perubahan" : "Publikasikan"}
         </button>
@@ -88,7 +88,7 @@ function AdminBeritaEditorSidebar({
           <button
             type="button"
             onClick={handleRemoveHeadline}
-            className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-400 transition hover:bg-red-500/20"
+            className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-400 transition hover:bg-red-500/20"
           >
             <Trash size={16} />
             Hapus Foto
@@ -160,7 +160,7 @@ function AdminBeritaEditorSidebar({
                 <button
                   type="button"
                   onClick={() => handleTagRemove(tag)}
-                  className="text-cyan-300 hover:text-white transition-colors"
+                  className="cursor-pointer text-cyan-300 hover:text-white transition-colors"
                 >
                   <X size={11} />
                 </button>

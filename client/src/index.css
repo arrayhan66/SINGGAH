@@ -4,6 +4,9 @@
   --color-brand-dark: #041d38;
   --color-brand-navy: #06294d;
   --color-brand-blue: #497eae;
+
+  --breakpoint-3xl: 1920px;
+  --breakpoint-4xl: 2560px;
 }
 
 html {

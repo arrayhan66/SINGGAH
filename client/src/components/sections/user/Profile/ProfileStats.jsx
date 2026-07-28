@@ -18,7 +18,7 @@ function ProfileStats() {
     let cancelled = false
     async function fetchStats() {
       try {
-        const res = await api.get("/profile-stats", {
+        const res = await api.get("/auth/profile-stats", {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (!cancelled) setStats(res.data.data)

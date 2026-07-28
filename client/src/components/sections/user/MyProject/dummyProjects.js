@@ -7,7 +7,7 @@ export const dummyProjects = [
     category: "iot",
     thumbnail:
       "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400",
-    status: "approved", // "pending" | "approved" | "rejected"
+    status: "published",
     createdAt: "2025-03-12",
     rejectionReason: null,
   },
@@ -44,7 +44,7 @@ export const dummyProjects = [
     category: "otomasi",
     thumbnail:
       "https://images.unsplash.com/photo-1558002038-1055907df827?w=400",
-    status: "approved",
+    status: "published",
     createdAt: "2025-02-08",
     rejectionReason: null,
   },

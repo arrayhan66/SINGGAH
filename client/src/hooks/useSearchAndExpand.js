@@ -5,7 +5,7 @@ function useSearchAndExpand(data, initialCount = 6) {
   const [showAll, setShowAll] = useState(false)
 
   const filteredData = data.filter((item) =>
-    item.title.toLowerCase().includes(search.toLowerCase()),
+    (item.name || item.title || "").toLowerCase().includes(search.toLowerCase()),
   )
 
   const visibleData = showAll

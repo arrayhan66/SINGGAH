@@ -1,11 +1,11 @@
-import { forwardRef } from "react"
-import { Bell, CheckCheck, BellOff } from "lucide-react"
+import { forwardRef } from "react";
+import { Bell, CheckCheck, BellOff } from "lucide-react";
 import {
   formatRelativeTime,
   notifIcon,
   notifBg,
   notifText,
-} from "../../utils/notificationHelpers"
+} from "../../utils/notificationHelpers";
 
 const NotificationBell = forwardRef(function NotificationBell(
   {
@@ -19,10 +19,10 @@ const NotificationBell = forwardRef(function NotificationBell(
     onLoadMore,
     onClickNotif,
   },
-  ref
+  ref,
 ) {
   return (
-    <div ref={ref} className="relative hidden lg:block">
+    <div ref={ref} className="relative">
       <button
         onClick={onToggle}
         className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition-all duration-300 hover:border-cyan-400/30 hover:bg-cyan-400/10 hover:text-cyan-300"
@@ -37,7 +37,7 @@ const NotificationBell = forwardRef(function NotificationBell(
       </button>
 
       <div
-        className={`absolute left-1/2 -translate-x-1/2 top-full mt-3 w-80 overflow-hidden rounded-2xl border border-white/10 bg-brand-dark/95 shadow-2xl backdrop-blur-xl transition-all duration-200 sm:w-96 max-w-[calc(100vw-1.5rem)] ${
+        className={`hidden lg:block absolute left-1/2 -translate-x-1/2 top-full mt-3 w-80 overflow-hidden rounded-2xl border border-white/10 bg-brand-dark/95 shadow-2xl backdrop-blur-xl transition-all duration-200 sm:w-96 max-w-[calc(100vw-1.5rem)] ${
           isOpen
             ? "translate-y-0 opacity-100"
             : "pointer-events-none -translate-y-2 opacity-0"
@@ -116,7 +116,7 @@ const NotificationBell = forwardRef(function NotificationBell(
         )}
       </div>
     </div>
-  )
-})
+  );
+});
 
-export default NotificationBell
+export default NotificationBell;

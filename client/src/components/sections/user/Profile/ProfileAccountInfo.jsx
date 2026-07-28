@@ -91,7 +91,7 @@ function ProfileAccountInfo() {
                   {item.label}
                 </span>
               </div>
-              <span className="text-xs md:text-sm font-medium text-white">
+              <span className="text-xs md:text-sm font-medium text-white text-end min-w-0">
                 {item.value}
               </span>
             </div>

@@ -17,7 +17,7 @@ function AdminProjectsList() {
       const keyword = search.toLowerCase()
       const matchSearch =
         p.title.toLowerCase().includes(keyword) ||
-        p.studentName.toLowerCase().includes(keyword)
+        (p.User?.name || "").toLowerCase().includes(keyword)
       return matchStatus && matchSearch
     })
   }, [projects, statusFilter, search])

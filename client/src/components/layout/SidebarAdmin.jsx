@@ -9,6 +9,7 @@ import {
   ChevronRight,
 } from "lucide-react"
 import logo from "../../assets/icons/logo.png"
+import { useAuth } from "../../context/AuthContext"
 
 const menuItems = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
@@ -19,10 +20,11 @@ const menuItems = [
 
 function SidebarAdmin({ collapsed, onToggle }) {
   const navigate = useNavigate()
+  const { logout, user } = useAuth()
 
   function handleLogout() {
-    // TODO: sambungkan ke logic auth beneran (clear token, dsb)
-    navigate("/login")
+    logout()
+    navigate("/login", { replace: true })
   }
 
   return (
@@ -31,20 +33,20 @@ function SidebarAdmin({ collapsed, onToggle }) {
         collapsed ? "w-20" : "w-64"
       }`}
     >
-      {/* LOGO + TOGGLE */}
-      <div className="flex items-center justify-between border-b border-white/10 px-4 py-5">
-        <div className="flex items-center gap-2.5 min-w-0">
+      {/* LOGO */}
+      <div className={`flex items-center gap-2.5 border-b border-white/10 px-4 py-5 ${collapsed ? "justify-center" : ""}`}>
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl">
           <img
             src={logo}
             alt="SINGGAH Logo"
-            className="h-9 w-9 shrink-0 object-contain"
+            className="h-full w-full object-contain"
           />
-          {!collapsed && (
-            <span className="truncate text-base font-bold text-white">
-              SINGGAH
-            </span>
-          )}
         </div>
+        {!collapsed && (
+          <span className="truncate text-base font-bold text-white">
+            SINGGAH
+          </span>
+        )}
       </div>
 
       {/* MENU */}
@@ -57,42 +59,45 @@ function SidebarAdmin({ collapsed, onToggle }) {
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all duration-300 ${
+                `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150 cursor-pointer ${
                   isActive
-                    ? "bg-cyan-400/10 text-cyan-300 shadow-[0_0_18px_rgba(34,211,238,.15)]"
-                    : "text-slate-300 hover:bg-white/5 hover:text-cyan-300"
+                    ? "bg-white/5 text-white"
+                    : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
                 } ${collapsed ? "justify-center" : ""}`
               }
               title={collapsed ? item.label : undefined}
             >
-              <Icon size={19} className="shrink-0" />
+              <Icon size={18} className="shrink-0" />
               {!collapsed && <span className="truncate">{item.label}</span>}
             </NavLink>
           )
         })}
       </nav>
 
-      {/* TOGGLE COLLAPSE */}
-      <button
-        onClick={onToggle}
-        className="flex items-center justify-center gap-2 border-t border-white/10 px-3.5 py-3.5 text-slate-400 transition-colors hover:text-cyan-300"
-        aria-label="Toggle sidebar"
-      >
-        {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-        {!collapsed && <span className="text-xs">Ciutkan</span>}
-      </button>
+      {/* BOTTOM */}
+      <div className="border-t border-white/10 p-3">
+        {/* TOGGLE - desktop only */}
+        <button
+          onClick={onToggle}
+          className="hidden lg:flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2 text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
+          aria-label="Toggle sidebar"
+        >
+          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+          {!collapsed && <span className="text-xs">Ciutkan</span>}
+        </button>
 
-      {/* LOGOUT */}
-      <button
-        onClick={handleLogout}
-        className={`flex items-center gap-3 border-t border-white/10 px-3.5 py-4 text-sm font-medium text-slate-300 transition-colors hover:bg-red-500/10 hover:text-red-400 ${
-          collapsed ? "justify-center" : ""
-        }`}
-        title={collapsed ? "Keluar" : undefined}
-      >
-        <LogOut size={19} className="shrink-0" />
-        {!collapsed && "Keluar"}
-      </button>
+        {/* LOGOUT */}
+        <button
+          onClick={handleLogout}
+          className={`flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200 ${
+            collapsed ? "justify-center" : ""
+          }`}
+          title={collapsed ? "Keluar" : undefined}
+        >
+          <LogOut size={18} className="shrink-0" />
+          {!collapsed && "Keluar"}
+        </button>
+      </div>
     </aside>
   )
 }

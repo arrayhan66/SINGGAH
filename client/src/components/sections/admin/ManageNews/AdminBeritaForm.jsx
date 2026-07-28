@@ -90,7 +90,7 @@ function AdminBeritaForm() {
       <div className="px-6 py-8 md:px-10 md:py-10">
         <button
           onClick={() => navigate("/admin/berita")}
-          className="flex items-center gap-2 text-sm text-slate-300 hover:text-cyan-300 transition-colors"
+          className="flex cursor-pointer items-center gap-2 text-sm text-slate-300 hover:text-cyan-300 transition-colors"
         >
           <ArrowLeft size={16} />
           Kembali ke Kelola Berita

@@ -53,7 +53,7 @@ function LoginForm() {
 
     try {
       setIsLoading(true);
-      const res = await api.post("/login", { email, password });
+      const res = await api.post("/auth/login", { email, password });
       const { token, user } = res.data.data;
 
       login(user, token);
@@ -61,7 +61,7 @@ function LoginForm() {
       if (user.role === "admin") {
         navigate("/admin");
       } else {
-        navigate("/user");
+        navigate("/");
       }
     } catch (err) {
       setGeneralError(

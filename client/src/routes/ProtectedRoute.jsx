@@ -20,7 +20,7 @@ export function ProtectedRoute({ children, allowedRoles, allowedTypes }) {
   }
 
   if (allowedTypes && !allowedTypes.includes(user.tipe)) {
-    return <Navigate to="/user" replace />
+    return <Navigate to="/" replace />
   }
 
   return children

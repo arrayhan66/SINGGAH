@@ -5,10 +5,10 @@ function MyProjectDeleteModal({ project, onConfirm, onCancel }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
-      <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-brand-navy p-6 shadow-2xl">
+      <div className="w-full max-w-[calc(100vw-2rem)] sm:max-w-sm rounded-2xl border border-white/10 bg-brand-navy p-4 sm:p-6 shadow-2xl">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-500/10 border border-red-500/30">
-            <AlertTriangle className="h-5 w-5 text-red-400" />
+            <div className="flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-red-500/10 border border-red-500/30">
+              <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-red-400" />
           </div>
           <button
             type="button"
@@ -19,10 +19,10 @@ function MyProjectDeleteModal({ project, onConfirm, onCancel }) {
           </button>
         </div>
 
-        <h3 className="mt-4 text-base md:text-lg font-semibold text-white">
+        <h3 className="mt-3 text-sm sm:text-base md:text-lg font-semibold text-white sm:mt-4">
           Hapus Project?
         </h3>
-        <p className="mt-2 text-xs md:text-sm text-slate-400 min-w-0 break-words">
+        <p className="mt-1.5 text-xs sm:text-sm text-slate-400 min-w-0 break-words sm:mt-2">
           Kamu akan menghapus{" "}
           <span className="font-medium text-slate-200">"{project.title}"</span>.
           Tindakan ini tidak bisa dibatalkan.

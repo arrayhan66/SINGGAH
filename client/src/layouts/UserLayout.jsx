@@ -3,11 +3,11 @@ import Footer from "../components/layout/Footer"
 
 function UserLayout({ children }) {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <NavbarUser />
-      {children}
+      <main className="flex-1">{children}</main>
       <Footer />
-    </>
+    </div>
   )
 }
 

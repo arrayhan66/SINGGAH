@@ -26,7 +26,7 @@ function AdminProjectsFilter({
       <select
         value={statusFilter}
         onChange={(e) => onStatusChange(e.target.value)}
-        className="w-full min-[500px]:w-auto rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-cyan-400/50 focus:outline-none"
+        className="w-full min-[500px]:w-auto cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-cyan-400/50 focus:outline-none"
       >
         {statusOptions.map((opt) => (
           <option key={opt.value} value={opt.value} className="bg-brand-navy">

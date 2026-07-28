@@ -1306,3 +1306,46 @@ export const karyaProjects = [
     comments: [],
   },
 ]
+
+export function normalizeProject(project) {
+  const categoryLabel = project.category
+    ? project.category.charAt(0).toUpperCase() +
+      project.category.slice(1).replace(/-/g, " ")
+    : ""
+
+  return {
+    ...project,
+    description: project.description || project.desc,
+    thumbnail: project.thumbnail || project.image,
+    Category: project.Category || { id: 1, name: categoryLabel, slug: project.category },
+    User: project.User || { name: project.author?.[0] || "" },
+    members:
+      project.members ||
+      (project.contributors || []).map((c, i) => ({
+        id: c.id || i + 1,
+        name: c.name,
+        role: c.role,
+      })),
+    technologies: project.technologies || project.techStack || [],
+    links:
+      project.links?.length > 0
+        ? project.links
+        : [
+            ...(project.liveUrl
+              ? [{ id: 1, url: project.liveUrl, label: "Live Demo" }]
+              : []),
+            ...(project.repoUrl
+              ? [{ id: 2, url: project.repoUrl, label: "GitHub" }]
+              : []),
+          ],
+    images:
+      project.images?.length > 0 && typeof project.images[0] === "object"
+        ? project.images
+        : (project.images || []).map((url, i) => ({ id: i, image_url: url })),
+    comments: (project.comments || []).map((c) => ({
+      ...c,
+      User: c.User || { name: c.author || "Anonim" },
+      created_at: c.created_at || c.createdAt,
+    })),
+  }
+}

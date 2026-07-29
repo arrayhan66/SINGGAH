@@ -7,12 +7,18 @@ const tipeIcon = {
   umum: Users,
 }
 
-function ProfileHero() {
+function ProfileHero({ isAdmin = false }) {
   const { user } = useAuth()
   const TipeIcon = tipeIcon[user?.tipe] || Users
 
   return (
-    <section className="relative overflow-hidden bg-brand-dark px-4 pt-28 pb-6 md:px-12 md:pt-32 md:pb-8 lg:px-16 lg:pb-10 2xl:px-20 2xl:pt-36 2xl:pb-12">
+    <section
+      className={
+        isAdmin
+          ? "relative overflow-hidden bg-brand-dark px-6 pt-6 pb-6 md:px-10 md:pt-8 md:pb-8"
+          : "relative overflow-hidden bg-brand-dark px-4 pt-28 pb-6 md:px-12 md:pt-32 md:pb-8 lg:px-16 lg:pb-10 2xl:px-20 2xl:pt-36 2xl:pb-12"
+      }
+    >
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center text-center lg:max-w-6xl 2xl:max-w-7xl">
         <div className="relative">
           {user?.avatar ? (

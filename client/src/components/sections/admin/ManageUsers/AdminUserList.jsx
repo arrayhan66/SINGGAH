@@ -52,10 +52,10 @@ function AdminUserList() {
   }
 
   return (
-    <div className="px-6 pb-10 md:px-10">
+    <div className="px-6 pt-2 pb-10 md:px-10 md:pt-4">
       <div className="flex flex-col gap-5">
         <div className="flex flex-col min-[500px]:flex-row gap-3">
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 [&>div]:mt-0">
             <SearchBar
               value={search}
               onChange={handleSearchChange}
@@ -74,24 +74,36 @@ function AdminUserList() {
         </div>
 
         {filteredUsers.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 rounded-2xl border border-white/10 bg-white/5 py-16 text-center">
-            <UserSearch className="h-10 w-10 text-slate-500" />
-            <p className="text-sm md:text-base text-slate-400">
-              Tidak ada user yang cocok.
-            </p>
+          <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.04] to-white/[0.01] py-20 text-center backdrop-blur-xl">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-slate-500/20 bg-slate-500/10">
+              <UserSearch className="h-7 w-7 text-slate-400" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-300">
+                Tidak ada user yang cocok
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                Coba ubah kata kunci pencarian kamu.
+              </p>
+            </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 min-[500px]:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
-            {filteredUsers.map((user) => (
-              <AdminUserCard
-                key={user.id}
-                user={user}
-                onEdit={handleEditClick}
-                onDelete={handleDeleteClick}
-                onDetail={handleDetailClick}
-              />
-            ))}
-          </div>
+          <>
+            <p className="text-xs text-slate-500">
+              Menampilkan {filteredUsers.length} dari {userList.length} user
+            </p>
+            <div className="grid grid-cols-1 min-[500px]:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+              {filteredUsers.map((user) => (
+                <AdminUserCard
+                  key={user.id}
+                  user={user}
+                  onEdit={handleEditClick}
+                  onDelete={handleDeleteClick}
+                  onDetail={handleDetailClick}
+                />
+              ))}
+            </div>
+          </>
         )}
       </div>
 

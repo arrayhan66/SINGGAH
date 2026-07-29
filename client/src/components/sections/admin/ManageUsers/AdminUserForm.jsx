@@ -69,7 +69,7 @@ function AdminUserForm() {
 
   return (
     <AdminLayout>
-      <div className="px-6 py-8 md:px-10 md:py-10">
+      <div className="px-6 pt-6 pb-10 md:px-10 md:pt-8">
         <button
           onClick={() => navigate("/admin/users")}
           className="flex cursor-pointer items-center gap-2 text-sm text-slate-300 hover:text-cyan-300 transition-colors"

@@ -31,8 +31,11 @@ import UserKaryaTersimpan from "../pages/user/KaryaTersimpan/KaryaTersimpan"
 /* === ADMIN IMPORT === */
 import AdminHome from "../pages/admin/Home/Home"
 import AdminProjects from "../pages/admin/ManageProjects/Projects"
+import ProjectForm from "../pages/admin/ManageProjects/ProjectForm"
 import ManageNews from "../pages/admin/ManageNews/Berita"
 import BeritaForm from "../pages/admin/ManageNews/BeritaForm"
+import BeritaPreview from "../pages/admin/ManageNews/BeritaPreview"
+import AdminProfile from "../pages/admin/Profile/Profile"
 import ManageUsers from "../pages/admin/ManageUsers/Users"
 import UserForm from "../pages/admin/ManageUsers/UserForm"
 import UserDetail from "../pages/admin/ManageUsers/UserDetail"
@@ -142,6 +145,22 @@ function AppRouter() {
           }
         />
         <Route
+          path="/admin/projects/tambah"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <ProjectForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/projects/edit/:id"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <ProjectForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/admin/berita"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
@@ -162,6 +181,14 @@ function AppRouter() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <BeritaForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/berita/preview/:id"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <BeritaPreview />
             </ProtectedRoute>
           }
         />
@@ -194,6 +221,14 @@ function AppRouter() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <UserDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/profile"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminProfile />
             </ProtectedRoute>
           }
         />

@@ -1,13 +1,16 @@
 import AppRoutes from "./routes/AppRouter"
 import { BeritaProvider } from "./context/BeritaContext"
 import { UserProvider } from "./context/UserContext"
+import { ProjectProvider } from "./context/ProjectContext"
 
 function App() {
   return (
     <UserProvider>
-      <BeritaProvider>
-        <AppRoutes />
-      </BeritaProvider>
+      <ProjectProvider>
+        <BeritaProvider>
+          <AppRoutes />
+        </BeritaProvider>
+      </ProjectProvider>
     </UserProvider>
   )
 }

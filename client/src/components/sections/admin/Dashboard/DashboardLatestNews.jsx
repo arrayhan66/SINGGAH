@@ -1,30 +1,28 @@
 import { useNavigate } from "react-router-dom"
-import { Clock, ArrowRight, Inbox } from "lucide-react"
-import { dummyAdminProjects } from "../dummyAdminProjects"
+import { Newspaper, ArrowRight, BookOpen } from "lucide-react"
+import { beritaData } from "../../../../data/beritaData"
 import GlowBackground from "../../../ui/GlowBackground"
 import DustBackground from "../../../ui/DustBackground"
 
-function DashboardPendingProjects() {
+function DashboardLatestNews() {
   const navigate = useNavigate()
-  const pendingProjects = dummyAdminProjects
-    .filter((p) => p.status === "pending")
-    .slice(0, 5)
+  const latestNews = beritaData.slice(0, 4)
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6 backdrop-blur-xl h-full">
+    <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6 backdrop-blur-xl">
       <GlowBackground />
       <DustBackground />
       <div className="relative z-10">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-amber-300" />
+            <Newspaper className="h-4 w-4 text-blue-300" />
             <h2 className="text-sm md:text-base font-semibold text-white">
-              Project Menunggu Review
+              Berita Terbaru
             </h2>
           </div>
 
           <button
-            onClick={() => navigate("/admin/projects")}
+            onClick={() => navigate("/admin/berita")}
             className="flex cursor-pointer items-center gap-1.5 text-xs md:text-sm text-cyan-300 hover:text-cyan-200 transition-colors"
           >
             Lihat Semua
@@ -32,35 +30,35 @@ function DashboardPendingProjects() {
           </button>
         </div>
 
-        {pendingProjects.length === 0 ? (
+        {latestNews.length === 0 ? (
           <div className="mt-6 flex flex-col items-center gap-2 py-8 text-center">
-            <Inbox className="h-8 w-8 text-slate-500" />
+            <BookOpen className="h-8 w-8 text-slate-500" />
             <p className="text-sm text-slate-400">
-              Tidak ada project yang menunggu review.
+              Belum ada berita.
             </p>
           </div>
         ) : (
           <div className="mt-4 flex flex-col gap-2">
-            {pendingProjects.map((project) => (
+            {latestNews.map((news) => (
               <div
-                key={project.id}
+                key={news.id}
                 className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.03] p-3 min-w-0 transition-all duration-200 hover:bg-white/[0.06] hover:border-white/[0.12]"
               >
                 <img
-                  src={project.thumbnail}
-                  alt={project.title}
+                  src={news.image}
+                  alt={news.title}
                   className="h-12 w-16 shrink-0 rounded-lg object-cover"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-white">
-                    {project.title}
+                  <p className="line-clamp-1 text-sm font-medium text-white">
+                    {news.title}
                   </p>
                   <p className="truncate text-xs text-slate-400">
-                    {project.studentName}
+                    {news.date}
                   </p>
                 </div>
-                <span className="shrink-0 rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-1 text-[11px] text-amber-300">
-                  Pending
+                <span className="hidden sm:inline shrink-0 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-slate-400">
+                  {news.tags[0]}
                 </span>
               </div>
             ))}
@@ -71,4 +69,4 @@ function DashboardPendingProjects() {
   )
 }
 
-export default DashboardPendingProjects
+export default DashboardLatestNews

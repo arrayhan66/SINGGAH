@@ -1,6 +1,7 @@
 export const beritaData = [
   {
     id: 1,
+    status: "published",
     slug: "sosialisasi-platform-singgah-untuk-publikasi-karya-mahasiswa",
     title: "Sosialisasi Platform SINGGAH untuk Publikasi Karya Mahasiswa",
     event: "Workshop Digitalisasi Kampus 2026",
@@ -34,6 +35,7 @@ export const beritaData = [
   },
   {
     id: 2,
+    status: "published",
     slug: "pameran-karya-inovasi-iot-smart-agriculture-mahasiswa",
     title: "Pameran Karya Inovasi IoT & Smart Agriculture Mahasiswa",
     event: "Gelar Gagasan Teknologi Tepat Guna",
@@ -65,6 +67,7 @@ export const beritaData = [
   },
   {
     id: 3,
+    status: "published",
     slug: "implementasi-artificial-intelligence-untuk-analisis-data-pertanian",
     title: "Implementasi Artificial Intelligence untuk Analisis Data Pertanian",
     event: "Seminar Riset Teknologi & Data Science",
@@ -95,6 +98,7 @@ export const beritaData = [
   },
   {
     id: 4,
+    status: "published",
     slug: "pengembangan-aplikasi-mobile-layanan-publik-kampus",
     title: "Pengembangan Aplikasi Mobile Layanan Publik Kampus",
     event: "Showcase Mobile App Development",
@@ -125,6 +129,7 @@ export const beritaData = [
   },
   {
     id: 5,
+    status: "published",
     slug: "workshop-keamanan-siber-ethical-hacking-untuk-mahasiswa",
     title: "Workshop Keamanan Siber & Ethical Hacking untuk Mahasiswa",
     event: "Cyber Security Community Meetup",
@@ -155,6 +160,7 @@ export const beritaData = [
   },
   {
     id: 6,
+    status: "published",
     slug: "pameran-desain-ui-ux-interaktif-untuk-solusi-umkm",
     title: "Pameran Desain UI/UX Interaktif untuk Solusi UMKM",
     event: "UI/UX Design Showcase 2026",
@@ -185,6 +191,7 @@ export const beritaData = [
   },
   {
     id: 7,
+    status: "published",
     slug: "simposium-game-development-interaktif-media-nasional",
     title: "Simposium Game Development & Interaktif Media Nasional",
     event: "Gelar Kreatif Game Tech 2026",

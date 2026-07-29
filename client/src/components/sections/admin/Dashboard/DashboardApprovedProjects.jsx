@@ -1,14 +1,14 @@
 import { useNavigate } from "react-router-dom"
-import { Clock, ArrowRight, Inbox } from "lucide-react"
+import { CheckCircle2, ArrowRight, FolderOpen } from "lucide-react"
 import { dummyAdminProjects } from "../dummyAdminProjects"
 import GlowBackground from "../../../ui/GlowBackground"
 import DustBackground from "../../../ui/DustBackground"
 
-function DashboardPendingProjects() {
+function DashboardApprovedProjects() {
   const navigate = useNavigate()
-  const pendingProjects = dummyAdminProjects
-    .filter((p) => p.status === "pending")
-    .slice(0, 5)
+  const approvedProjects = dummyAdminProjects
+    .filter((p) => p.status === "approved")
+    .slice(0, 4)
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6 backdrop-blur-xl h-full">
@@ -17,9 +17,9 @@ function DashboardPendingProjects() {
       <div className="relative z-10">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-amber-300" />
+            <CheckCircle2 className="h-4 w-4 text-emerald-300" />
             <h2 className="text-sm md:text-base font-semibold text-white">
-              Project Menunggu Review
+              Project Disetujui
             </h2>
           </div>
 
@@ -32,16 +32,16 @@ function DashboardPendingProjects() {
           </button>
         </div>
 
-        {pendingProjects.length === 0 ? (
+        {approvedProjects.length === 0 ? (
           <div className="mt-6 flex flex-col items-center gap-2 py-8 text-center">
-            <Inbox className="h-8 w-8 text-slate-500" />
+            <FolderOpen className="h-8 w-8 text-slate-500" />
             <p className="text-sm text-slate-400">
-              Tidak ada project yang menunggu review.
+              Belum ada project yang disetujui.
             </p>
           </div>
         ) : (
           <div className="mt-4 flex flex-col gap-2">
-            {pendingProjects.map((project) => (
+            {approvedProjects.map((project) => (
               <div
                 key={project.id}
                 className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.03] p-3 min-w-0 transition-all duration-200 hover:bg-white/[0.06] hover:border-white/[0.12]"
@@ -59,8 +59,8 @@ function DashboardPendingProjects() {
                     {project.studentName}
                   </p>
                 </div>
-                <span className="shrink-0 rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-1 text-[11px] text-amber-300">
-                  Pending
+                <span className="shrink-0 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-[11px] text-emerald-300">
+                  Approved
                 </span>
               </div>
             ))}
@@ -71,4 +71,4 @@ function DashboardPendingProjects() {
   )
 }
 
-export default DashboardPendingProjects
+export default DashboardApprovedProjects

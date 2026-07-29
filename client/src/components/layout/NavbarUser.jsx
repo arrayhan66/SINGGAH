@@ -26,7 +26,7 @@ function NavbarUser() {
   ];
 
   const profileMenuItems = [
-    { to: "/profile", icon: User, label: "Profil Saya" },
+    { to: role === "admin" ? "/admin/profile" : "/profile", icon: User, label: "Profil Saya" },
     { to: "/karya-tersimpan", icon: Bookmark, label: "Karya Tersimpan" },
     ...(tipe !== "umum"
       ? [{ to: "/my-karya", icon: UploadCloud, label: "Karya Saya" }]

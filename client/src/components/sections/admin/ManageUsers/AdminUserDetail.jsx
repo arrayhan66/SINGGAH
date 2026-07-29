@@ -43,7 +43,7 @@ function AdminUserDetail() {
 
   return (
     <AdminLayout>
-      <div className="px-6 py-8 md:px-10 md:py-10">
+      <div className="px-6 pt-2 pb-10 md:px-10 md:pt-3">
         <button
           onClick={() => navigate("/admin/users")}
           className="flex cursor-pointer items-center gap-2 text-sm text-slate-300 hover:text-cyan-300 transition-colors"
@@ -56,7 +56,7 @@ function AdminUserDetail() {
           Detail User
         </h1>
 
-        <div className="mt-6 max-w-2xl">
+        <div className="mt-6 w-full">
           <AdminUserProfileCard
             user={user}
             onEdit={handleEdit}

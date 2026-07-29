@@ -1,42 +1,46 @@
 import { useState, useMemo } from "react"
 import GlowBackground from "../../../ui/GlowBackground"
 import DustBackground from "../../../ui/DustBackground"
-import MyProjectHero from "./MyProjectHero"
-import MyProjectStats from "./MyProjectStats"
-import MyProjectFilter from "./MyProjectFilter"
-import MyProjectCard from "./MyProjectCard"
-import MyProjectDeleteModal from "./MyProjectDeleteModal"
-import { dummyProjects } from "./dummyProjects"
+import MyKaryaHero from "./MyKaryaHero"
+import MyKaryaStats from "./MyKaryaStats"
+import MyKaryaFilter from "./MyKaryaFilter"
+import MyKaryaCard from "./MyKaryaCard"
+import MyKaryaDeleteModal from "./MyKaryaDeleteModal"
+import { dummyKarya } from "./dummyKarya"
 import { FolderX } from "lucide-react"
 import OutlineButton from "../../../ui/OutlineButton"
+import { useAuth } from "../../../../context/AuthContext"
 
 const INITIAL_VISIBLE_COUNT = 6
 
-function MyProjectSection() {
-  const [projects, setProjects] = useState(dummyProjects)
+function MyKaryaSection() {
+  const { user } = useAuth()
+  const isDosen = user?.tipe === "dosen"
+
+  const [karya, setKarya] = useState(dummyKarya)
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [showAll, setShowAll] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState(null)
 
   const filteredData = useMemo(() => {
-    return projects.filter((p) => {
-      const matchStatus = statusFilter === "all" || p.status === statusFilter
-      const matchSearch = p.title.toLowerCase().includes(search.toLowerCase())
+    return karya.filter((k) => {
+      const matchStatus = statusFilter === "all" || k.status === statusFilter
+      const matchSearch = k.title.toLowerCase().includes(search.toLowerCase())
       return matchStatus && matchSearch
     })
-  }, [projects, statusFilter, search])
+  }, [karya, statusFilter, search])
 
   const visibleData = showAll
     ? filteredData
     : filteredData.slice(0, INITIAL_VISIBLE_COUNT)
 
   const stats = useMemo(() => ({
-    total: projects.length,
-    pending: projects.filter((p) => p.status === "pending").length,
-    published: projects.filter((p) => p.status === "published").length,
-    rejected: projects.filter((p) => p.status === "rejected").length,
-  }), [projects])
+    total: karya.length,
+    pending: isDosen ? 0 : karya.filter((k) => k.status === "pending").length,
+    published: karya.filter((k) => k.status === "published").length,
+    rejected: isDosen ? 0 : karya.filter((k) => k.status === "rejected").length,
+  }), [karya, isDosen])
 
   function handleSearchChange(e) {
     setSearch(e.target.value)
@@ -48,12 +52,12 @@ function MyProjectSection() {
     setShowAll(false)
   }
 
-  function handleDeleteClick(project) {
-    setDeleteTarget(project)
+  function handleDeleteClick(karyaItem) {
+    setDeleteTarget(karyaItem)
   }
 
   function handleConfirmDelete() {
-    setProjects((prev) => prev.filter((p) => p.id !== deleteTarget.id))
+    setKarya((prev) => prev.filter((k) => k.id !== deleteTarget.id))
     setDeleteTarget(null)
   }
 
@@ -63,23 +67,24 @@ function MyProjectSection() {
 
   return (
     <section
-      id="my-project"
-      className="relative overflow-hidden bg-brand-navy min-h-screen pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-6 sm:pb-10 lg:pb-12 3xl:pb-16 4xl:pb-20"
+      id="my-karya"
+      className="relative overflow-hidden bg-brand-navy min-h-screen pt-[calc(var(--navbar-h)+24px)] sm:pt-[calc(var(--navbar-h)+32px)] pb-6 sm:pb-10 lg:pb-12 3xl:pb-16 4xl:pb-20"
     >
       <GlowBackground />
       <DustBackground />
 
       <div className="mx-auto max-w-7xl px-5 sm:px-8 relative 2xl:max-w-[1440px] 2xl:px-12 3xl:max-w-[1800px] 3xl:px-16 4xl:max-w-[2200px] 4xl:px-20">
-        <MyProjectHero />
+        <MyKaryaHero />
 
-        <MyProjectStats stats={stats} />
+        <MyKaryaStats stats={stats} isDosen={isDosen} />
 
         <div className="mt-8 2xl:mt-12 3xl:mt-14 4xl:mt-16">
-          <MyProjectFilter
+          <MyKaryaFilter
             search={search}
             onSearchChange={handleSearchChange}
             statusFilter={statusFilter}
             onStatusChange={handleStatusChange}
+            isDosen={isDosen}
           />
         </div>
 
@@ -89,19 +94,20 @@ function MyProjectSection() {
               <FolderX className="h-10 w-10 text-slate-400 2xl:h-12 2xl:w-12 3xl:h-14 3xl:w-14 4xl:h-16 4xl:w-16" />
             </div>
             <h3 className="text-xl font-bold text-slate-200 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl">
-              Belum ada project
+              Belum ada karya
             </h3>
             <p className="mt-2 max-w-md text-center text-sm text-slate-400 sm:text-base 2xl:mt-3 2xl:text-lg 3xl:text-xl 4xl:text-2xl">
-              Kamu belum memiliki project. Mulai upload project pertamamu sekarang!
+              Kamu belum memiliki karya. Mulai upload karya pertamamu sekarang!
             </p>
           </div>
         ) : (
           <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-3 2xl:mt-20 2xl:gap-10 3xl:mt-24 3xl:gap-12 4xl:mt-28 4xl:gap-14">
-            {visibleData.map((project) => (
-              <MyProjectCard
-                key={project.id}
-                project={project}
+            {visibleData.map((karyaItem) => (
+              <MyKaryaCard
+                key={karyaItem.id}
+                karya={karyaItem}
                 onDeleteClick={handleDeleteClick}
+                isDosen={isDosen}
               />
             ))}
           </div>
@@ -116,8 +122,8 @@ function MyProjectSection() {
         )}
       </div>
 
-      <MyProjectDeleteModal
-        project={deleteTarget}
+       <MyKaryaDeleteModal
+        karya={deleteTarget}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
       />
@@ -125,4 +131,4 @@ function MyProjectSection() {
   )
 }
 
-export default MyProjectSection
+export default MyKaryaSection

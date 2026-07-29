@@ -23,7 +23,8 @@ import ResetPassword from "../pages/auth/ResetPassword/ResetPassword"
 
 /* === USER IMPORT === */
 import UserUpload from "../pages/user/Upload/Upload"
-import UserMyProject from "../pages/user/MyProject/MyProject"
+import UserEditKarya from "../pages/user/EditKarya/EditKarya"
+import UserMyKarya from "../pages/user/MyKarya/MyKarya"
 import UserProfile from "../pages/user/Profile/Profile"
 import UserKaryaTersimpan from "../pages/user/KaryaTersimpan/KaryaTersimpan"
 
@@ -91,10 +92,18 @@ function AppRouter() {
           }
         />
         <Route
-          path="/my-project"
+          path="/edit-karya/:id"
           element={
             <ProtectedRoute allowedRoles={["user", "admin"]}>
-              <UserMyProject />
+              <UserEditKarya />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-karya"
+          element={
+            <ProtectedRoute allowedRoles={["user", "admin"]}>
+              <UserMyKarya />
             </ProtectedRoute>
           }
         />

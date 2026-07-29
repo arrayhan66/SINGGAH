@@ -1,7 +1,7 @@
 import { AlertTriangle, X } from "lucide-react"
 
-function MyProjectDeleteModal({ project, onConfirm, onCancel }) {
-  if (!project) return null
+function MyKaryaDeleteModal({ karya, onConfirm, onCancel }) {
+  if (!karya) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
@@ -20,11 +20,11 @@ function MyProjectDeleteModal({ project, onConfirm, onCancel }) {
         </div>
 
         <h3 className="mt-3 text-sm sm:text-base md:text-lg font-semibold text-white sm:mt-4">
-          Hapus Project?
+          Hapus Karya?
         </h3>
         <p className="mt-1.5 text-xs sm:text-sm text-slate-400 min-w-0 break-words sm:mt-2">
           Kamu akan menghapus{" "}
-          <span className="font-medium text-slate-200">"{project.title}"</span>.
+           <span className="font-medium text-slate-200">"{karya.title}"</span>.
           Tindakan ini tidak bisa dibatalkan.
         </p>
 
@@ -49,4 +49,4 @@ function MyProjectDeleteModal({ project, onConfirm, onCancel }) {
   )
 }
 
-export default MyProjectDeleteModal
+export default MyKaryaDeleteModal

@@ -147,13 +147,17 @@ function KaryaProjectCard({ project }) {
             <span>{likesCount}</span>
           </button>
 
-          <span className="flex items-center gap-1.5">
+          <Link
+            to={`/karya/${categorySlug}/${id}`}
+            onClick={(e) => e.stopPropagation()}
+            className="flex cursor-pointer items-center gap-1.5 transition-colors hover:text-cyan-400"
+          >
             <MessageSquare
               size={14}
               className="sm:size-[15px] md:size-4 lg:size-[18px] 3xl:size-5 4xl:size-[22px]"
             />
             <span>{Array.isArray(comments) ? comments.length : 0}</span>
-          </span>
+          </Link>
 
           <span className="ml-auto flex items-center gap-1.5 text-slate-500">
             <Eye

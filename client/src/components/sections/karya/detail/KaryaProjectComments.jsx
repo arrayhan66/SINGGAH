@@ -11,7 +11,7 @@ function KaryaProjectComments({
   formatDate,
 }) {
   return (
-    <GlassCard className="mt-8 p-5 sm:p-10 2xl:mt-10 2xl:p-12">
+    <GlassCard id="komentar" className="mt-8 p-5 sm:p-10 2xl:mt-10 2xl:p-12">
       <h3 className="flex items-center gap-2 text-lg font-bold text-white sm:text-xl 2xl:text-2xl">
         <MessageCircle size={20} className="2xl:size-6" />
         Komentar ({comments.length})

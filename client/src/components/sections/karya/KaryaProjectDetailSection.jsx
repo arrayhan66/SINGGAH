@@ -38,7 +38,7 @@ function KaryaProjectDetailSection() {
         <p className="text-slate-300">Project tidak ditemukan.</p>
         <button
           onClick={() => navigate("/karya")}
-          className="mt-6 cursor-pointer rounded-xl border border-cyan-400/30 px-5 py-3 text-cyan-300 transition hover:bg-cyan-400 hover:text-black"
+          className="mt-6 cursor-pointer rounded-xl border border-slate-200 bg-white px-5 py-3 text-slate-700 transition hover:bg-slate-50"
         >
           Kembali ke Karya
         </button>
@@ -165,7 +165,7 @@ function KaryaProjectDetailSection() {
               <h3 className="text-xl font-bold text-white">Bagikan ke...</h3>
               <button
                 onClick={() => setShowShareModal(false)}
-                className="cursor-pointer rounded-full bg-white/5 p-2 text-slate-400 transition hover:bg-white/10 hover:text-white"
+                className="cursor-pointer rounded-full bg-white/80 p-2 text-slate-500 transition hover:bg-white hover:text-slate-800"
               >
                 <X size={20} />
               </button>
@@ -246,7 +246,7 @@ function KaryaProjectDetailSection() {
               </div>
               <button
                 onClick={copyToClipboard}
-                className="flex shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-500"
+                className="flex shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 border border-slate-200"
               >
                 {isCopied ? <Check size={16} /> : <Copy size={16} />}
                 {isCopied ? "Tersalin!" : "Salin"}

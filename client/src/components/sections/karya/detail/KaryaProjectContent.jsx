@@ -17,7 +17,7 @@ function KaryaProjectContent({ project }) {
         href={link.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-cyan-400/30 px-4 py-2.5 text-sm font-medium text-cyan-300 transition hover:bg-cyan-400 hover:text-black sm:w-auto 2xl:px-5 2xl:py-3 2xl:text-base"
+        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-slate-900 sm:w-auto 2xl:px-5 2xl:py-3 2xl:text-base"
       >
         <ExternalLink size={14} className="2xl:size-4" />
         {link.label}
@@ -32,7 +32,7 @@ function KaryaProjectContent({ project }) {
         href={doc.file_url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-300 transition hover:border-cyan-400/40 hover:text-cyan-300 sm:w-auto sm:justify-start 2xl:px-5 2xl:py-3 2xl:text-base"
+        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-600 shadow-sm transition hover:bg-slate-50 hover:text-slate-800 sm:w-auto sm:justify-start 2xl:px-5 2xl:py-3 2xl:text-base"
       >
         <FileText size={14} className="2xl:size-4" />
         {doc.name}

@@ -1,4 +1,4 @@
-export const dummyProjects = [
+export const dummyKarya = [
   {
     id: 1,
     title: "Sistem Monitoring Suhu Berbasis IoT",

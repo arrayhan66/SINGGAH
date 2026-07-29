@@ -36,7 +36,7 @@ function KaryaProjectSection() {
           </p>
           <button
             onClick={() => navigate("/karya")}
-            className="mt-5 rounded-xl border border-cyan-400/30 px-4 py-2.5 text-sm text-cyan-300 transition hover:bg-cyan-400 hover:text-black sm:mt-6 sm:px-5 sm:py-3 sm:text-sm md:text-base lg:mt-8 lg:px-6 lg:py-3.5 3xl:px-8 3xl:py-4 3xl:text-lg 4xl:text-xl"
+            className="mt-5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 sm:mt-6 sm:px-5 sm:py-3 sm:text-sm md:text-base lg:mt-8 lg:px-6 lg:py-3.5 3xl:px-8 3xl:py-4 3xl:text-lg 4xl:text-xl"
           >
             Kembali ke Daftar Kategori
           </button>

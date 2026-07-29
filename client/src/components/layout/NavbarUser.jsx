@@ -7,6 +7,7 @@ import useNotifications from "../../hooks/useNotifications";
 import NotificationBell from "./NotificationBell";
 import NotificationPanel from "./NotificationPanel";
 import MobileMenu from "./MobileMenu";
+import LogoutConfirmModal from "../ui/LogoutConfirmModal";
 
 function NavbarUser() {
   const { user, logout } = useAuth();
@@ -19,7 +20,7 @@ function NavbarUser() {
   const menuItems = [
     { to: "/", label: "BERANDA" },
     { to: "/karya", label: "KARYA" },
-    ...(tipe !== "umum" ? [{ to: "/upload", label: "UPLOAD PROJECT" }] : []),
+    ...(tipe !== "umum" ? [{ to: "/upload", label: "UPLOAD KARYA" }] : []),
     { to: "/about", label: "TENTANG" },
     { to: "/berita", label: "BERITA" },
   ];
@@ -28,12 +29,13 @@ function NavbarUser() {
     { to: "/profile", icon: User, label: "Profil Saya" },
     { to: "/karya-tersimpan", icon: Bookmark, label: "Karya Tersimpan" },
     ...(tipe !== "umum"
-      ? [{ to: "/my-project", icon: UploadCloud, label: "Project Saya" }]
+      ? [{ to: "/my-karya", icon: UploadCloud, label: "Karya Saya" }]
       : []),
   ];
 
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const navRef = useRef(null);
   const headerRef = useRef(null);
   const profileRef = useRef(null);
@@ -100,6 +102,11 @@ function NavbarUser() {
   };
 
   const handleLogout = () => {
+    setIsProfileOpen(false);
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
     logout();
     navigate("/login", { replace: true });
   };
@@ -346,7 +353,7 @@ function NavbarUser() {
         menuItems={menuItems}
         profileMenuItems={profileMenuItems}
         onClose={closeMenu}
-        onLogout={handleLogout}
+        onLogout={() => { closeMenu(); setShowLogoutConfirm(true); }}
       />
 
       <NotificationPanel
@@ -357,6 +364,13 @@ function NavbarUser() {
           closeNotif();
         }}
       />
+
+      {showLogoutConfirm && (
+        <LogoutConfirmModal
+          onConfirm={confirmLogout}
+          onCancel={() => setShowLogoutConfirm(false)}
+        />
+      )}
     </header>
   );
 }

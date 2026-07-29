@@ -5,6 +5,8 @@ import {
   CheckCircle2,
   XCircle,
   AlertTriangle,
+  Eye,
+  Calendar,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import GlassCard from "../../../ui/GlassCard";
@@ -27,21 +29,59 @@ const statusConfig = {
   },
 };
 
-function MyProjectCard({ project, onDeleteClick }) {
+const categoryLabels = {
+  website: "Website",
+  mobile: "Mobile App",
+  iot: "IoT",
+  ai: "AI",
+  data: "Data Science",
+  cybersecurity: "Cyber Security",
+  ux: "UI/UX Design",
+  robotika: "Robotika",
+  energi: "Energi",
+  otomasi: "Otomasi",
+};
+
+function MyKaryaCard({ karya, onDeleteClick, isDosen = false }) {
   const navigate = useNavigate();
-  const status = statusConfig[project.status];
+
+  const showEdit = isDosen || karya.status === "pending" || karya.status === "rejected";
+  const status = statusConfig[isDosen ? "published" : karya.status] || statusConfig.published;
   const StatusIcon = status.icon;
+
+  const year = karya.year || (karya.createdAt ? new Date(karya.createdAt).getFullYear() : "");
+  const categoryLabel = categoryLabels[karya.category] || karya.category;
+  const technologies = karya.technologies || karya.techStack || [];
+  const slug = karya.slug || "";
+
+  function handleDetail(e) {
+    if (e) e.stopPropagation();
+    if (slug) {
+      navigate(`/karya/${slug}/${karya.id}`);
+    }
+  }
+
+  function handleEdit(e) {
+    e.stopPropagation();
+    navigate(`/edit-karya/${karya.id}`);
+  }
+
+  function handleDelete(e) {
+    e.stopPropagation();
+    onDeleteClick(karya);
+  }
 
   return (
     <GlassCard
       hover
-      className="group flex h-full flex-col overflow-hidden p-0 !cursor-default"
+      onClick={slug ? handleDetail : undefined}
+      className="group flex h-full flex-col overflow-hidden p-0"
     >
       {/* Cover */}
       <div className="relative overflow-hidden">
         <img
-          src={project.thumbnail}
-          alt={project.title}
+          src={karya.thumbnail}
+          alt={karya.title}
           className="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-110 sm:h-48 md:h-52 lg:h-56 xl:h-60 3xl:h-72 4xl:h-80"
         />
 
@@ -58,32 +98,67 @@ function MyProjectCard({ project, onDeleteClick }) {
         </span>
       </div>
 
-      {/* Konten */}
+      {/* Content */}
       <div className="flex flex-1 flex-col p-4 sm:p-5 md:p-6 lg:p-7 xl:p-8 3xl:p-9 4xl:p-10">
+        {/* Category + Year */}
+        <div className="mb-2 flex flex-wrap items-center gap-2">
+          {categoryLabel && (
+            <span className="rounded-md bg-cyan-400/10 px-2 py-0.5 text-[10px] font-medium text-cyan-300 sm:text-xs">
+              {categoryLabel}
+            </span>
+          )}
+          {year && (
+            <span className="flex items-center gap-1 text-[10px] text-slate-400 sm:text-xs">
+              <Calendar size={10} className="sm:size-3" />
+              {year}
+            </span>
+          )}
+        </div>
+
         <h3 className="text-base font-bold text-white sm:text-lg md:text-xl lg:text-2xl xl:text-2xl 3xl:text-3xl 4xl:text-4xl">
-          {project.title}
+          {karya.title}
         </h3>
 
         <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-300 sm:mt-2.5 sm:text-sm sm:leading-6 md:mt-3 md:text-base md:leading-7 lg:text-base 3xl:mt-4 3xl:text-lg 3xl:leading-8 4xl:text-xl 4xl:leading-9">
-          {project.description}
+          {karya.description || karya.shortDescription}
         </p>
 
-        {project.status === "rejected" && project.rejectionReason && (
+        {/* Technology tags */}
+        {technologies.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5 sm:mt-4">
+            {technologies.slice(0, 2).map((tech) => (
+              <span
+                key={tech}
+                className="rounded-md border border-slate-700/50 bg-slate-800/50 px-2 py-0.5 text-[10px] text-slate-300 sm:text-xs"
+              >
+                {tech}
+              </span>
+            ))}
+            {technologies.length > 2 && (
+              <span className="text-[10px] text-slate-500 sm:text-xs">
+                +{technologies.length - 2}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Rejection reason */}
+        {!isDosen && karya.status === "rejected" && karya.rejectionReason && (
           <div className="mt-3 flex items-start gap-2 rounded-xl border border-red-400/20 bg-red-400/5 p-3 text-xs sm:mt-4 sm:text-sm md:text-sm text-red-300 3xl:mt-5 3xl:p-4 3xl:text-base 4xl:text-lg">
             <AlertTriangle
               size={16}
               className="mt-0.5 shrink-0 sm:size-[18px] md:size-5 3xl:size-[22px] 4xl:size-6"
             />
-            <span>{project.rejectionReason}</span>
+            <span>{karya.rejectionReason}</span>
           </div>
         )}
 
-        {/* Button */}
+        {/* Buttons */}
         <div className="mt-auto flex items-center gap-3 pt-5 sm:pt-6 md:pt-7 lg:pt-8 3xl:pt-9 4xl:pt-10">
-          {project.status === "pending" && (
+          {showEdit && (
             <button
               type="button"
-              onClick={() => navigate(`/upload?edit=${project.id}`)}
+              onClick={handleEdit}
               className="group/btn flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-white py-2.5 text-xs font-semibold text-slate-900 transition-colors duration-300 hover:bg-slate-200 sm:py-3 sm:text-sm md:text-sm lg:py-3.5 lg:text-base 3xl:py-4 3xl:text-base 4xl:py-5 4xl:text-lg"
             >
               <Pencil
@@ -96,7 +171,7 @@ function MyProjectCard({ project, onDeleteClick }) {
 
           <button
             type="button"
-            onClick={() => onDeleteClick(project)}
+            onClick={handleDelete}
             className="group/btn flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-500 py-2.5 text-xs font-semibold text-white transition-colors duration-300 hover:bg-red-600 sm:py-3 sm:text-sm md:text-sm lg:py-3.5 lg:text-base 3xl:py-4 3xl:text-base 4xl:py-5 4xl:text-lg"
           >
             <Trash2
@@ -111,4 +186,4 @@ function MyProjectCard({ project, onDeleteClick }) {
   );
 }
 
-export default MyProjectCard;
+export default MyKaryaCard;

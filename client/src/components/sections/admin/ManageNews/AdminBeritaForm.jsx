@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { ArrowLeft, CheckCircle, XCircle } from "lucide-react"
 import { useBerita } from "../../../../context/BeritaContext"
+import AdminHeroBackground from "../../../ui/AdminHeroBackground"
 import AdminBeritaEditorMain from "../../../../components/sections/admin/ManageNews/AdminBeritaEditorMain"
 import AdminBeritaEditorSidebar from "../../../../components/sections/admin/ManageNews/AdminBeritaEditorSidebar"
 
@@ -157,6 +158,7 @@ function AdminBeritaForm() {
   }
 
   return (
+    <AdminHeroBackground>
       <div className="px-6 py-8 md:px-10 md:py-10">
         {notification && (
           <div
@@ -207,6 +209,7 @@ function AdminBeritaForm() {
           />
         </div>
       </div>
+    </AdminHeroBackground>
   )
 }
 

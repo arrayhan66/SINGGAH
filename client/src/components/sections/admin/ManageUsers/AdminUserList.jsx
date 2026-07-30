@@ -52,7 +52,7 @@ function AdminUserList() {
   }
 
   return (
-    <div className="px-6 pt-2 pb-10 md:px-10 md:pt-4">
+    <div className="px-4 md:px-6 lg:px-8 pt-4 pb-12">
       <div className="flex flex-col gap-5">
         <div className="flex flex-col min-[500px]:flex-row gap-3">
           <div className="flex-1 min-w-0 [&>div]:mt-0">

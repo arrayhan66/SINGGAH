@@ -107,6 +107,7 @@ function AdminBeritaEditorMain({ formData, updateField }) {
   const [linkPopover, setLinkPopover] = useState(false)
   const [linkUrl, setLinkUrl] = useState("")
   const [selectedImageAttrs, setSelectedImageAttrs] = useState(null)
+  const [selectedImagePos, setSelectedImagePos] = useState(null)
   const [imageCaptionInput, setImageCaptionInput] = useState("")
 
   const editor = useEditor({
@@ -173,9 +174,11 @@ function AdminBeritaEditorMain({ formData, updateField }) {
     if (selection instanceof NodeSelection && selection.node.type.name === "image") {
       const attrs = selection.node.attrs
       setSelectedImageAttrs(attrs)
+      setSelectedImagePos(selection.from)
       setImageCaptionInput(attrs.caption || "")
     } else {
       setSelectedImageAttrs(null)
+      setSelectedImagePos(null)
       setImageCaptionInput("")
     }
   }
@@ -227,24 +230,48 @@ function AdminBeritaEditorMain({ formData, updateField }) {
 
   function setImageSize(widthValue) {
     if (!editor) return
-    editor
-      .chain()
-      .focus()
-      .updateAttributes("image", { width: widthValue })
-      .run()
+    const widthStr = typeof widthValue === "number" ? `${widthValue}%` : widthValue
+    if (selectedImagePos !== null) {
+      editor
+        .chain()
+        .focus()
+        .setNodeSelection(selectedImagePos)
+        .updateAttributes("image", { width: widthStr })
+        .run()
+    } else {
+      editor
+        .chain()
+        .focus()
+        .updateAttributes("image", { width: widthStr })
+        .run()
+    }
     const { selection } = editor.state
     if (selection instanceof NodeSelection && selection.node.type.name === "image") {
       setSelectedImageAttrs(selection.node.attrs)
+    } else if (selectedImagePos !== null) {
+      const node = editor.state.doc.nodeAt(selectedImagePos)
+      if (node && node.type.name === "image") {
+        setSelectedImageAttrs(node.attrs)
+      }
     }
   }
 
   function saveImageCaption() {
     if (!editor) return
-    editor
-      .chain()
-      .focus()
-      .updateAttributes("image", { caption: imageCaptionInput })
-      .run()
+    if (selectedImagePos !== null) {
+      editor
+        .chain()
+        .focus()
+        .setNodeSelection(selectedImagePos)
+        .updateAttributes("image", { caption: imageCaptionInput })
+        .run()
+    } else {
+      editor
+        .chain()
+        .focus()
+        .updateAttributes("image", { caption: imageCaptionInput })
+        .run()
+    }
     const { selection } = editor.state
     if (selection instanceof NodeSelection && selection.node.type.name === "image") {
       setSelectedImageAttrs(selection.node.attrs)
@@ -253,8 +280,13 @@ function AdminBeritaEditorMain({ formData, updateField }) {
 
   function removeSelectedImage() {
     if (!editor) return
-    editor.chain().focus().deleteSelection().run()
+    if (selectedImagePos !== null) {
+      editor.chain().focus().setNodeSelection(selectedImagePos).deleteSelection().run()
+    } else {
+      editor.chain().focus().deleteSelection().run()
+    }
     setSelectedImageAttrs(null)
+    setSelectedImagePos(null)
   }
 
   return (
@@ -313,7 +345,7 @@ function AdminBeritaEditorMain({ formData, updateField }) {
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="font-semibold flex items-center gap-1.5 text-white">
                 <ImageIcon size={14} className="text-cyan-400" />
-                Pengaturan Foto Terpilih (Resize & Caption):
+                Pengaturan Foto Terpilih (Resize & Drag / Slider):
               </span>
               <div className="flex items-center gap-1.5">
                 <button
@@ -323,16 +355,25 @@ function AdminBeritaEditorMain({ formData, updateField }) {
                     selectedImageAttrs.width === "30%" ? "bg-cyan-500 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"
                   }`}
                 >
-                  Kecil (30%)
+                  30%
                 </button>
                 <button
                   type="button"
-                  onClick={() => setImageSize("60%")}
+                  onClick={() => setImageSize("50%")}
                   className={`rounded px-2.5 py-1 text-xs font-medium transition ${
-                    selectedImageAttrs.width === "60%" ? "bg-cyan-500 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                    selectedImageAttrs.width === "50%" ? "bg-cyan-500 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"
                   }`}
                 >
-                  Sedang (60%)
+                  50%
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setImageSize("75%")}
+                  className={`rounded px-2.5 py-1 text-xs font-medium transition ${
+                    selectedImageAttrs.width === "75%" ? "bg-cyan-500 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  }`}
+                >
+                  75%
                 </button>
                 <button
                   type="button"
@@ -341,7 +382,7 @@ function AdminBeritaEditorMain({ formData, updateField }) {
                     !selectedImageAttrs.width || selectedImageAttrs.width === "100%" ? "bg-cyan-500 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"
                   }`}
                 >
-                  Full / Lebar (100%)
+                  100%
                 </button>
                 <button
                   type="button"
@@ -352,6 +393,22 @@ function AdminBeritaEditorMain({ formData, updateField }) {
                   <Trash2 size={14} />
                 </button>
               </div>
+            </div>
+
+            {/* Slider for smooth drag/resize width */}
+            <div className="flex items-center gap-3 pt-1 border-t border-slate-800">
+              <span className="text-[11px] text-slate-400 shrink-0">Geser Ukuran Lebar:</span>
+              <input
+                type="range"
+                min="20"
+                max="100"
+                value={parseInt(selectedImageAttrs.width || "100", 10)}
+                onChange={(e) => setImageSize(Number(e.target.value))}
+                className="w-full accent-cyan-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
+              />
+              <span className="text-[11px] text-cyan-300 font-mono shrink-0 w-10 text-right">
+                {selectedImageAttrs.width || "100%"}
+              </span>
             </div>
 
             {/* Caption / Title Input for Photo */}
@@ -385,15 +442,15 @@ function AdminBeritaEditorMain({ formData, updateField }) {
           <EditorContent editor={editor} />
 
           {linkPopover && (
-            <div className="absolute top-4 left-4 z-50 flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5 shadow-2xl">
-              <div className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-                <LinkIcon size={14} className="text-slate-400 shrink-0" />
+            <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 p-3 shadow-2xl backdrop-blur-md">
+              <div className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2">
+                <LinkIcon size={15} className="text-cyan-400 shrink-0" />
                 <input
                   type="url"
                   value={linkUrl}
                   onChange={(e) => setLinkUrl(e.target.value)}
                   placeholder="https://example.com"
-                  className="w-60 bg-transparent text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none"
+                  className="w-64 bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none"
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === "Enter") applyLink()
@@ -404,18 +461,21 @@ function AdminBeritaEditorMain({ formData, updateField }) {
               <button
                 type="button"
                 onClick={applyLink}
-                className="flex cursor-pointer items-center gap-1 rounded-lg bg-cyan-600 px-3 py-2 text-xs font-semibold text-white hover:bg-cyan-700 transition-colors"
+                className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-cyan-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-cyan-700 transition-colors shadow-md"
               >
                 <Check size={14} />
                 Terapkan
               </button>
+              <button
+                type="button"
+                onClick={() => setLinkPopover(false)}
+                className="rounded-lg px-2 py-2 text-xs text-slate-400 hover:text-white transition"
+              >
+                Batal
+              </button>
             </div>
           )}
         </div>
-      </div>
-
-      <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-xs text-slate-400">
-        💡 <strong className="text-white">Panduan Level Dewa Editor:</strong> Ketik paragraf berita secara natural. Klik ikon gambar <ImageIcon size={13} className="inline text-cyan-400 mx-0.5" /> di toolbar atas untuk menyisipkan foto di antara paragraf. **Klik pada foto** di dalam editor untuk memunculkan panel pengatur ukuran (30%, 60%, 100%) dan menambahkan judul/caption foto secara instan!
       </div>
     </div>
   )

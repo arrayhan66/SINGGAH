@@ -54,18 +54,18 @@ function AdminBeritaList() {
   }
 
   return (
-    <div className="px-6 pb-10 md:px-10">
+    <div className="px-4 md:px-6 lg:px-8 pt-6 md:pt-8 pb-12">
       <div className="flex flex-col gap-5">
         <div className="flex flex-col min-[500px]:flex-row gap-3">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2.5 rounded-xl border border-white/20 bg-white px-3.5 py-2.5">
-              <Search size={16} className="text-slate-500 shrink-0" />
+            <div className="relative">
+              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => handleSearchChange(e.target.value)}
                 placeholder="Cari judul atau event..."
-                className="w-full bg-transparent text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none"
+                className="w-full rounded-xl border border-white/10 bg-slate-800/50 py-2.5 pl-10 pr-4 text-sm text-white placeholder-slate-500 focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/20 focus:outline-none transition-colors"
               />
             </div>
           </div>

@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
-import { FolderX, Plus } from "lucide-react"
+import { FolderX, Plus, Search } from "lucide-react"
 import { useProjects } from "../../../../context/ProjectContext"
 import AdminProjectsFilter from "./AdminProjectsFilter"
 import AdminProjectsCard from "./AdminProjectsCard"
@@ -73,29 +73,34 @@ function AdminProjectsList() {
   }, [rejectProject])
 
   return (
-    <div className="px-6 pb-12 md:px-10">
-      <div className="flex flex-col gap-6 md:gap-7">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex-1">
-            <AdminProjectsFilter
-              search={search}
-              onSearchChange={handleSearchChange}
-              statusFilter={statusFilter}
-              onStatusChange={setStatusFilter}
-              counts={tabCounts}
+    <div className="px-4 md:px-6 lg:px-8 pb-12">
+      <div className="flex flex-col gap-5 md:gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={handleSearchChange}
+              placeholder="Cari judul atau nama mahasiswa..."
+              className="w-full rounded-xl border border-white/10 bg-slate-800/50 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/20 focus:outline-none transition-colors"
             />
           </div>
-          <div className="flex md:items-start shrink-0">
-            <button
-              type="button"
-              onClick={handleAddClick}
-              className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
-            >
-              <Plus size={16} />
-              Tambah Project
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={handleAddClick}
+            className="flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
+          >
+            <Plus size={16} />
+            Tambah Project
+          </button>
         </div>
+
+        <AdminProjectsFilter
+          statusFilter={statusFilter}
+          onStatusChange={setStatusFilter}
+          counts={tabCounts}
+        />
 
         {filteredProjects.length === 0 ? (
           <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 py-16 text-center">

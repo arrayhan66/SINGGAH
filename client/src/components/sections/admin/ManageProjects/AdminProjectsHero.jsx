@@ -1,4 +1,5 @@
 import { FolderKanban, Clock, CheckCircle2, XCircle, LayoutGrid } from "lucide-react"
+import AdminHeroBackground from "../../../ui/AdminHeroBackground"
 
 const statCards = [
   {
@@ -37,22 +38,23 @@ const statCards = [
 
 function AdminProjectsHero({ stats }) {
   return (
-    <div className="px-6 pt-8 pb-6 md:px-10 md:pt-10 md:pb-8">
-      <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-400/10 border border-cyan-400/30">
-          <FolderKanban className="h-6 w-6 text-cyan-300" />
+    <AdminHeroBackground>
+      <div className="px-4 md:px-6 lg:px-8 pt-8 pb-8">
+        <div className="flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-400/10 border border-cyan-400/30">
+            <FolderKanban className="h-6 w-6 text-cyan-300" />
+          </div>
+          <div>
+            <h1 className="text-xl md:text-2xl font-bold text-white">
+              Kelola Project
+            </h1>
+            <p className="text-xs md:text-sm text-slate-400 mt-0.5">
+              Tinjau, setujui, atau tolak project yang diunggah mahasiswa.
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold text-white">
-            Kelola Project
-          </h1>
-          <p className="text-xs md:text-sm text-slate-400 mt-0.5">
-            Tinjau, setujui, atau tolak project yang diunggah mahasiswa.
-          </p>
-        </div>
-      </div>
 
-      <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
         {statCards.map((s) => {
           const Icon = s.icon
           const count = stats?.[s.key] ?? 0
@@ -79,6 +81,7 @@ function AdminProjectsHero({ stats }) {
         })}
       </div>
     </div>
+    </AdminHeroBackground>
   )
 }
 

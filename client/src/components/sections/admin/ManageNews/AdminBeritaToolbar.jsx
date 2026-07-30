@@ -20,16 +20,19 @@ import {
   Eraser,
 } from "lucide-react"
 
-function ToolbarButton({ onClick, active, children, title }) {
+function ToolbarButton({ onClick, active, children, title, disabled }) {
   return (
     <button
       type="button"
       onClick={onClick}
       title={title}
-      className={`flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg transition-all ${
-        active
-          ? "bg-cyan-600 text-white shadow-sm ring-2 ring-cyan-400/40"
-          : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
+      disabled={disabled}
+      className={`flex h-9 w-9 items-center justify-center rounded-lg transition-all ${
+        disabled
+          ? "bg-slate-100 text-slate-300 border border-slate-200 cursor-not-allowed opacity-50"
+          : active
+          ? "bg-cyan-600 text-white shadow-sm ring-2 ring-cyan-400/40 cursor-pointer"
+          : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer"
       }`}
     >
       {children}
@@ -42,11 +45,19 @@ function AdminBeritaToolbar({ editor, insertImage, insertLink }) {
 
   return (
     <div className="flex flex-wrap items-center gap-1.5 border-b border-slate-200 bg-slate-50 p-3">
-      <ToolbarButton onClick={() => editor.chain().focus().undo().run()} title="Undo">
+      <ToolbarButton
+        onClick={() => editor.chain().focus().undo().run()}
+        disabled={!editor.can().undo()}
+        title="Undo"
+      >
         <Undo2 size={17} />
       </ToolbarButton>
 
-      <ToolbarButton onClick={() => editor.chain().focus().redo().run()} title="Redo">
+      <ToolbarButton
+        onClick={() => editor.chain().focus().redo().run()}
+        disabled={!editor.can().redo()}
+        title="Redo"
+      >
         <Redo2 size={17} />
       </ToolbarButton>
 
@@ -124,7 +135,13 @@ function AdminBeritaToolbar({ editor, insertImage, insertLink }) {
 
       <ToolbarButton
         active={editor.isActive({ textAlign: "left" })}
-        onClick={() => editor.chain().focus().setTextAlign("left").run()}
+        onClick={() => {
+          if (editor.isActive({ textAlign: "left" })) {
+            editor.chain().focus().unsetTextAlign().run()
+          } else {
+            editor.chain().focus().setTextAlign("left").run()
+          }
+        }}
         title="Rata Kiri"
       >
         <AlignLeft size={17} />
@@ -132,7 +149,13 @@ function AdminBeritaToolbar({ editor, insertImage, insertLink }) {
 
       <ToolbarButton
         active={editor.isActive({ textAlign: "center" })}
-        onClick={() => editor.chain().focus().setTextAlign("center").run()}
+        onClick={() => {
+          if (editor.isActive({ textAlign: "center" })) {
+            editor.chain().focus().unsetTextAlign().run()
+          } else {
+            editor.chain().focus().setTextAlign("center").run()
+          }
+        }}
         title="Rata Tengah"
       >
         <AlignCenter size={17} />
@@ -140,7 +163,13 @@ function AdminBeritaToolbar({ editor, insertImage, insertLink }) {
 
       <ToolbarButton
         active={editor.isActive({ textAlign: "right" })}
-        onClick={() => editor.chain().focus().setTextAlign("right").run()}
+        onClick={() => {
+          if (editor.isActive({ textAlign: "right" })) {
+            editor.chain().focus().unsetTextAlign().run()
+          } else {
+            editor.chain().focus().setTextAlign("right").run()
+          }
+        }}
         title="Rata Kanan"
       >
         <AlignRight size={17} />
@@ -148,7 +177,13 @@ function AdminBeritaToolbar({ editor, insertImage, insertLink }) {
 
       <ToolbarButton
         active={editor.isActive({ textAlign: "justify" })}
-        onClick={() => editor.chain().focus().setTextAlign("justify").run()}
+        onClick={() => {
+          if (editor.isActive({ textAlign: "justify" })) {
+            editor.chain().focus().unsetTextAlign().run()
+          } else {
+            editor.chain().focus().setTextAlign("justify").run()
+          }
+        }}
         title="Rata Kiri-Kanan (Justify)"
       >
         <AlignJustify size={17} />

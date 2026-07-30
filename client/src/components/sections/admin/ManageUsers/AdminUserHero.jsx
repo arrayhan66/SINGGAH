@@ -1,5 +1,6 @@
 import { Users, UserCheck, UserX, UserPlus } from "lucide-react"
 import { useUsers } from "../../../../context/UserContext"
+import AdminHeroBackground from "../../../ui/AdminHeroBackground"
 
 const statsConfig = [
   { key: "total", label: "Total User", icon: Users, color: "cyan" },
@@ -35,8 +36,8 @@ function AdminUserHero() {
   }
 
   return (
-    <div className="relative overflow-hidden px-6 pt-6 pb-6 md:px-10 md:pt-8 md:pb-8">
-      <div className="relative z-10">
+    <AdminHeroBackground>
+      <div className="px-4 md:px-6 lg:px-8 pt-8 pb-8">
         <div className="flex flex-col gap-6 rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-6 backdrop-blur-xl md:flex-row md:items-center md:justify-between md:p-8">
           <div className="flex items-center gap-4">
             <div className="relative">
@@ -57,7 +58,7 @@ function AdminUserHero() {
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             {statsConfig.map((s) => {
               const Icon = s.icon
               return (
@@ -80,10 +81,7 @@ function AdminUserHero() {
           </div>
         </div>
       </div>
-
-      <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-cyan-500/10 blur-[100px]" />
-      <div className="pointer-events-none absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-blue-500/10 blur-[100px]" />
-    </div>
+    </AdminHeroBackground>
   )
 }
 

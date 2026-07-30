@@ -152,7 +152,6 @@ function AdminBeritaPreview() {
   return (
     <section className="relative overflow-hidden bg-brand-navy min-h-screen pb-16 sm:pb-20 lg:pb-24">
       <DustBackground />
-
       <div className="relative z-10 mx-auto max-w-4xl px-3 sm:px-8 2xl:max-w-5xl pt-10 sm:pt-14 lg:pt-16">
         <div className="overflow-hidden border border-slate-700/60 shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-2xl sm:rounded-3xl bg-brand-navy">
           <div className="p-4 sm:p-8 lg:p-10 bg-brand-navy border-b border-slate-800/80">

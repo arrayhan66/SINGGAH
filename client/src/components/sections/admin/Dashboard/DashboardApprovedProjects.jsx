@@ -1,8 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { CheckCircle2, ArrowRight, FolderOpen } from "lucide-react"
 import { dummyAdminProjects } from "../dummyAdminProjects"
-import GlowBackground from "../../../ui/GlowBackground"
-import DustBackground from "../../../ui/DustBackground"
 
 function DashboardApprovedProjects() {
   const navigate = useNavigate()
@@ -11,62 +9,61 @@ function DashboardApprovedProjects() {
     .slice(0, 4)
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6 backdrop-blur-xl h-full">
-      <GlowBackground />
-      <DustBackground />
-      <div className="relative z-10">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-emerald-300" />
-            <h2 className="text-sm md:text-base font-semibold text-white">
-              Project Disetujui
-            </h2>
+    <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5 shadow-xl backdrop-blur-xl md:p-6">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/15">
+            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
           </div>
-
-          <button
-            onClick={() => navigate("/admin/projects")}
-            className="flex cursor-pointer items-center gap-1.5 text-xs md:text-sm text-cyan-300 hover:text-cyan-200 transition-colors"
-          >
-            Lihat Semua
-            <ArrowRight size={14} />
-          </button>
+          <h2 className="text-[17px] font-semibold text-white md:text-[18px]">
+            Project Disetujui
+          </h2>
         </div>
 
-        {approvedProjects.length === 0 ? (
-          <div className="mt-6 flex flex-col items-center gap-2 py-8 text-center">
-            <FolderOpen className="h-8 w-8 text-slate-500" />
-            <p className="text-sm text-slate-400">
-              Belum ada project yang disetujui.
-            </p>
-          </div>
-        ) : (
-          <div className="mt-4 flex flex-col gap-2">
-            {approvedProjects.map((project) => (
-              <div
-                key={project.id}
-                className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.03] p-3 min-w-0 transition-all duration-200 hover:bg-white/[0.06] hover:border-white/[0.12]"
-              >
-                <img
-                  src={project.thumbnail}
-                  alt={project.title}
-                  className="h-12 w-16 shrink-0 rounded-lg object-cover"
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-white">
-                    {project.title}
-                  </p>
-                  <p className="truncate text-xs text-slate-400">
-                    {project.studentName}
-                  </p>
-                </div>
-                <span className="shrink-0 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-[11px] text-emerald-300">
-                  Approved
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
+        <button
+          onClick={() => navigate("/admin/projects")}
+          className="group flex cursor-pointer items-center gap-1.5 text-xs font-medium text-cyan-400 transition-all duration-200 hover:text-cyan-300"
+        >
+          Lihat Semua
+          <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+        </button>
       </div>
+
+      {approvedProjects.length === 0 ? (
+        <div className="mt-6 flex flex-col items-center gap-2 py-6 text-center">
+          <FolderOpen className="h-8 w-8 text-slate-500" />
+          <p className="text-sm text-slate-400">
+            Belum ada project yang disetujui.
+          </p>
+        </div>
+      ) : (
+        <div className="mt-4 flex flex-col gap-3">
+          {approvedProjects.map((project) => (
+            <div
+              key={project.id}
+              className="group flex flex-col gap-3 rounded-[14px] border border-white/10 bg-white/[0.04] p-3 transition-all duration-250 hover:-translate-y-[2px] hover:bg-white/[0.08] hover:border-white/20 hover:shadow-lg sm:flex-row sm:items-center"
+              style={{ minHeight: 90 }}
+            >
+              <img
+                src={project.thumbnail}
+                alt={project.title}
+                className="h-[72px] w-full shrink-0 rounded-lg object-cover sm:h-[72px] sm:w-[72px]"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-[15px] font-semibold text-white md:text-[17px]">
+                  {project.title}
+                </p>
+                <p className="mt-0.5 text-sm text-slate-400">
+                  {project.User?.name}
+                </p>
+              </div>
+              <span className="shrink-0 self-start rounded-md border border-emerald-400/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-400 sm:self-center">
+                Approved
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

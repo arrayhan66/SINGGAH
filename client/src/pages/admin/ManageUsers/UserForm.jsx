@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { ArrowLeft } from "lucide-react"
 import AdminLayout from "../../../layouts/AdminLayout"
 import { useUsers } from "../../../context/UserContext"
+import AdminHeroBackground from "../../../components/ui/AdminHeroBackground"
 import AdminUserFormMain from "../../../components/sections/admin/ManageUsers/AdminUserFormMain"
 import AdminUserFormSidebar from "../../../components/sections/admin/ManageUsers/AdminUserFormSidebar"
 
@@ -70,19 +71,23 @@ function UserForm() {
 
   return (
     <AdminLayout>
-      <div className="px-6 py-8 md:px-10 md:py-10">
-        <button
-          onClick={() => navigate("/admin/users")}
-          className="flex cursor-pointer items-center gap-2 text-sm text-slate-300 transition-colors hover:text-cyan-300"
-        >
-          <ArrowLeft size={16} />
-          Kembali ke Kelola User
-        </button>
+      <AdminHeroBackground>
+        <div className="px-4 md:px-6 lg:px-8 pt-8 md:pt-10">
+          <button
+            onClick={() => navigate("/admin/users")}
+            className="flex cursor-pointer items-center gap-2 text-sm text-slate-300 transition-colors hover:text-cyan-300"
+          >
+            <ArrowLeft size={16} />
+            Kembali ke Kelola User
+          </button>
 
-        <h1 className="mt-4 text-xl font-bold text-white md:text-2xl">
-          {isEditMode ? "Edit User" : "Tambah User Baru"}
-        </h1>
+          <h1 className="mt-4 text-xl font-bold text-white md:text-2xl">
+            {isEditMode ? "Edit User" : "Tambah User Baru"}
+          </h1>
+        </div>
+      </AdminHeroBackground>
 
+      <div className="px-4 md:px-6 lg:px-8">
         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
           <AdminUserFormMain formData={formData} updateField={updateField} />
           <AdminUserFormSidebar

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { ArrowLeft, FolderKanban, Check, Sparkles } from "lucide-react"
 import AdminLayout from "../../../../layouts/AdminLayout"
 import { useProjects } from "../../../../context/ProjectContext"
+import AdminHeroBackground from "../../../ui/AdminHeroBackground"
 
 const emptyForm = {
   title: "",
@@ -91,39 +92,43 @@ function AdminProjectForm() {
 
   return (
     <AdminLayout>
-      <div className="px-6 py-8 md:px-10 md:py-10 max-w-4xl mx-auto">
-        {notification && (
-          <div className={`mb-6 flex items-center gap-3 rounded-xl p-4 text-sm font-medium shadow-lg backdrop-blur-xl transition-all ${
-            notification.type === "error"
-              ? "bg-red-500/20 border border-red-500/30 text-red-300"
-              : "bg-emerald-500/20 border border-emerald-500/30 text-emerald-300"
-          }`}>
-            <span>{notification.message}</span>
-          </div>
-        )}
+      <AdminHeroBackground>
+        <div className="px-6 py-8 md:px-10 md:py-10 max-w-4xl mx-auto">
+          {notification && (
+            <div className={`mb-6 flex items-center gap-3 rounded-xl p-4 text-sm font-medium shadow-lg backdrop-blur-xl transition-all ${
+              notification.type === "error"
+                ? "bg-red-500/20 border border-red-500/30 text-red-300"
+                : "bg-emerald-500/20 border border-emerald-500/30 text-emerald-300"
+            }`}>
+              <span>{notification.message}</span>
+            </div>
+          )}
 
-        <button
-          onClick={() => navigate("/admin/projects")}
-          className="flex cursor-pointer items-center gap-2 text-sm text-slate-300 hover:text-cyan-300 transition-colors"
-        >
-          <ArrowLeft size={16} />
-          Kembali ke Kelola Project
-        </button>
+          <button
+            onClick={() => navigate("/admin/projects")}
+            className="flex cursor-pointer items-center gap-2 text-sm text-slate-300 hover:text-cyan-300 transition-colors"
+          >
+            <ArrowLeft size={16} />
+            Kembali ke Kelola Project
+          </button>
 
-        <div className="mt-4 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-400/10 border border-cyan-400/30">
-            <FolderKanban className="h-6 w-6 text-cyan-300" />
-          </div>
-          <div>
-            <h1 className="text-xl md:text-2xl font-bold text-white">
-              {isEditMode ? "Edit Project Mahasiswa" : "Tambah Project Baru"}
-            </h1>
-            <p className="text-xs md:text-sm text-slate-400">
-              {isEditMode ? "Perbarui informasi project yang sudah ada." : "Tambahkan project baru ke dalam sistem katalog SINGGAH."}
-            </p>
+          <div className="mt-4 flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-400/10 border border-cyan-400/30">
+              <FolderKanban className="h-6 w-6 text-cyan-300" />
+            </div>
+            <div>
+              <h1 className="text-xl md:text-2xl font-bold text-white">
+                {isEditMode ? "Edit Project Mahasiswa" : "Tambah Project Baru"}
+              </h1>
+              <p className="text-xs md:text-sm text-slate-400">
+                {isEditMode ? "Perbarui informasi project yang sudah ada." : "Tambahkan project baru ke dalam sistem katalog SINGGAH."}
+              </p>
+            </div>
           </div>
         </div>
+      </AdminHeroBackground>
 
+      <div className="px-6 md:px-10 max-w-4xl mx-auto pb-8 md:pb-10">
         <form onSubmit={handleSubmit} className="mt-8 space-y-6 rounded-2xl border border-white/10 bg-slate-900/60 p-6 md:p-8 backdrop-blur-xl shadow-xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2 md:col-span-2">

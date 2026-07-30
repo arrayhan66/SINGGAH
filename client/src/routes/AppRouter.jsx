@@ -39,6 +39,10 @@ import AdminProfile from "../pages/admin/Profile/Profile"
 import ManageUsers from "../pages/admin/ManageUsers/Users"
 import UserForm from "../pages/admin/ManageUsers/UserForm"
 import UserDetail from "../pages/admin/ManageUsers/UserDetail"
+import ManageCategories from "../pages/admin/ManageCategories/ManageCategories"
+import MediaLibrary from "../pages/admin/MediaLibrary/MediaLibrary"
+import Reports from "../pages/admin/Reports/Reports"
+import Settings from "../pages/admin/Settings/Settings"
 
 function AppRouter() {
   return (
@@ -229,6 +233,38 @@ function AppRouter() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AdminProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/kategori"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <ManageCategories />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/media"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <MediaLibrary />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/laporan"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Reports />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/pengaturan"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Settings />
             </ProtectedRoute>
           }
         />

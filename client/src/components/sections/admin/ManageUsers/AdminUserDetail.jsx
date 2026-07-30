@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { ArrowLeft } from "lucide-react"
 import AdminLayout from "../../../../layouts/AdminLayout"
 import { useUsers } from "../../../../context/UserContext"
+import AdminHeroBackground from "../../../ui/AdminHeroBackground"
 import AdminUserProfileCard from "../../../../components/sections/admin/ManageUsers/AdminUserProfileCard"
 import AdminUserDeleteModal from "../../../../components/sections/admin/ManageUsers/AdminUserDeleteModal"
 
@@ -43,19 +44,23 @@ function AdminUserDetail() {
 
   return (
     <AdminLayout>
-      <div className="px-6 pt-2 pb-10 md:px-10 md:pt-3">
-        <button
-          onClick={() => navigate("/admin/users")}
-          className="flex cursor-pointer items-center gap-2 text-sm text-slate-300 hover:text-cyan-300 transition-colors"
-        >
-          <ArrowLeft size={16} />
-          Kembali ke Kelola User
-        </button>
+      <AdminHeroBackground>
+        <div className="px-4 md:px-6 lg:px-8 pt-2 md:pt-3 pb-10">
+          <button
+            onClick={() => navigate("/admin/users")}
+            className="flex cursor-pointer items-center gap-2 text-sm text-slate-300 hover:text-cyan-300 transition-colors"
+          >
+            <ArrowLeft size={16} />
+            Kembali ke Kelola User
+          </button>
 
-        <h1 className="mt-4 text-xl md:text-2xl font-bold text-white">
-          Detail User
-        </h1>
+          <h1 className="mt-4 text-xl md:text-2xl font-bold text-white">
+            Detail User
+          </h1>
+        </div>
+      </AdminHeroBackground>
 
+      <div className="px-4 md:px-6 lg:px-8">
         <div className="mt-6 w-full">
           <AdminUserProfileCard
             user={user}

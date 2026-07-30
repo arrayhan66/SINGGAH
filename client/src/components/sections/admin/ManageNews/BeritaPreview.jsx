@@ -7,7 +7,7 @@ function DashboardLatestNews() {
   const latestNews = beritaData.slice(0, 4)
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5 shadow-xl backdrop-blur-xl md:p-6">
+    <div className="rounded-2xl border border-white/[0.08] bg-slate-800/30 p-5 shadow-xl backdrop-blur-xl md:p-6">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/15">
@@ -29,8 +29,8 @@ function DashboardLatestNews() {
 
       {latestNews.length === 0 ? (
         <div className="mt-6 flex flex-col items-center gap-2 py-6 text-center">
-          <BookOpen className="h-8 w-8 text-slate-500" />
-          <p className="text-sm text-slate-400">
+          <BookOpen className="h-8 w-8 text-slate-400" />
+          <p className="text-sm text-slate-300">
             Belum ada berita.
           </p>
         </div>
@@ -39,7 +39,7 @@ function DashboardLatestNews() {
           {latestNews.map((news) => (
             <div
               key={news.id}
-              className="group flex flex-col gap-3 rounded-[14px] border border-white/10 bg-white/[0.04] p-3 transition-all duration-250 hover:-translate-y-[2px] hover:bg-white/[0.08] hover:border-white/20 hover:shadow-lg sm:flex-row sm:items-center"
+              className="group flex flex-col gap-3 rounded-[14px] border border-slate-200/80 bg-white p-3 transition-all duration-250 hover:-translate-y-[2px] hover:bg-slate-50 hover:shadow-md sm:flex-row sm:items-center"
               style={{ minHeight: 90 }}
             >
               <img
@@ -48,10 +48,10 @@ function DashboardLatestNews() {
                 className="h-[72px] w-full shrink-0 rounded-lg object-cover sm:h-[72px] sm:w-[72px]"
               />
               <div className="min-w-0 flex-1">
-                <p className="line-clamp-1 text-[15px] font-semibold text-white md:text-[17px]">
+                <p className="line-clamp-1 text-[15px] font-semibold text-slate-900 md:text-[17px]">
                   {news.title}
                 </p>
-                <p className="mt-0.5 text-sm text-slate-400">
+                <p className="mt-0.5 text-sm text-slate-500">
                   {news.date}
                 </p>
               </div>

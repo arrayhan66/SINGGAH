@@ -10,13 +10,13 @@ import { useBerita } from "../../../../context/BeritaContext"
 import DustBackground from "../../../ui/DustBackground"
 
 function AdminBeritaPreview() {
-  const { id } = useParams()
+  const { slug } = useParams()
   const navigate = useNavigate()
-  const { beritaList, getBeritaById, tempPreviewData } = useBerita()
+  const { beritaList, getBeritaBySlug, tempPreviewData } = useBerita()
 
-  const isTempPreview = String(id) === "temp"
-  const item = getBeritaById(id)
-  const relatedNews = isTempPreview ? [] : beritaList.filter((b) => b.id !== Number(id)).slice(0, 3)
+  const isTempPreview = String(slug) === "temp"
+  const item = isTempPreview ? tempPreviewData : getBeritaBySlug(slug)
+  const relatedNews = isTempPreview ? [] : beritaList.filter((b) => b.slug !== slug).slice(0, 3)
 
   if (!item) {
     return (
@@ -31,7 +31,7 @@ function AdminBeritaPreview() {
             Artikel yang kamu cari mungkin sudah dihapus atau tidak tersedia.
           </p>
           <Link
-            to="/admin/berita"
+            to="/berita"
             className="mt-6 inline-flex items-center gap-2 text-cyan-300 hover:text-cyan-200 transition-colors"
           >
             <ArrowLeft size={16} />
@@ -157,7 +157,7 @@ function AdminBeritaPreview() {
           <div className="p-4 sm:p-8 lg:p-10 bg-brand-navy border-b border-slate-800/80">
             <div className="flex flex-wrap items-center justify-between gap-3 pb-0">
               <Link
-                to="/admin/berita"
+                to="/berita"
                 className="group inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 sm:py-2 sm:pl-3 sm:pr-4 text-xs sm:text-sm text-slate-300 transition-all duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 shadow-sm"
               >
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 shrink-0">
@@ -287,7 +287,7 @@ function AdminBeritaPreview() {
                 Berita & Kegiatan Terkait
               </h2>
               <Link
-                to="/admin/berita"
+                to="/berita"
                 className="text-xs sm:text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
               >
                 Lihat Semua &rarr;
@@ -298,7 +298,7 @@ function AdminBeritaPreview() {
               {relatedNews.map((news) => (
                 <div
                   key={news.id}
-                  onClick={() => navigate(`/admin/berita/preview/${news.id}`)}
+                  onClick={() => navigate(`/berita/preview/${news.slug}`)}
                   className="group cursor-pointer overflow-hidden border border-slate-700/50 bg-slate-900/40 backdrop-blur-xl rounded-xl sm:rounded-2xl transition-all duration-300 hover:-translate-y-1.5 hover:border-cyan-400/50 shadow-xl"
                 >
                   <div className="h-40 sm:h-44 w-full overflow-hidden bg-slate-950 relative">

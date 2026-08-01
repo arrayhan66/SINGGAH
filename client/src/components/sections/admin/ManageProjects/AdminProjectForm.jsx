@@ -20,17 +20,17 @@ const emptyForm = {
 const categoriesList = ["IoT", "Elektronika", "Energi", "Otomasi", "Robotika", "Multimedia"]
 
 function AdminProjectForm() {
-  const { id } = useParams()
+  const { slug } = useParams()
   const navigate = useNavigate()
-  const { getProjectById, addProject, updateProject } = useProjects()
+  const { getProjectBySlug, addProject, updateProject } = useProjects()
 
-  const isEditMode = Boolean(id)
+  const isEditMode = Boolean(slug)
   const [formData, setFormData] = useState(emptyForm)
   const [notification, setNotification] = useState(null)
 
   useEffect(() => {
     if (isEditMode) {
-      const existing = getProjectById(id)
+      const existing = getProjectBySlug(slug)
       if (existing) {
         setFormData({
           title: existing.title || "",
@@ -45,7 +45,7 @@ function AdminProjectForm() {
         })
       }
     }
-  }, [id, getProjectById])
+  }, [slug, getProjectBySlug])
 
   function showNotification(message, type = "success") {
     setNotification({ message, type })
@@ -78,7 +78,8 @@ function AdminProjectForm() {
     }
 
     if (isEditMode) {
-      updateProject(Number(id), payload)
+      const existing = getProjectBySlug(slug)
+      if (existing) updateProject(existing.id, payload)
       showNotification("Project berhasil diperbarui!", "success")
     } else {
       addProject(payload)
@@ -86,13 +87,13 @@ function AdminProjectForm() {
     }
 
     setTimeout(() => {
-      navigate("/admin/projects")
+      navigate("/projects")
     }, 1000)
   }
 
   return (
     <AdminLayout>
-      <AdminHeroBackground>
+      <AdminHeroBackground fullWidth>
         <div className="px-6 py-8 md:px-10 md:py-10 max-w-4xl mx-auto">
           {notification && (
             <div className={`mb-6 flex items-center gap-3 rounded-xl p-4 text-sm font-medium shadow-lg backdrop-blur-xl transition-all ${
@@ -105,7 +106,7 @@ function AdminProjectForm() {
           )}
 
           <button
-            onClick={() => navigate("/admin/projects")}
+            onClick={() => navigate("/projects")}
             className="flex cursor-pointer items-center gap-2 text-sm text-slate-300 hover:text-cyan-300 transition-colors"
           >
             <ArrowLeft size={16} />
@@ -250,7 +251,7 @@ function AdminProjectForm() {
           <div className="flex items-center justify-end gap-3 pt-6 border-t border-white/10">
             <button
               type="button"
-              onClick={() => navigate("/admin/projects")}
+              onClick={() => navigate("/projects")}
               className="cursor-pointer rounded-xl px-5 py-2.5 text-sm font-semibold text-slate-300 hover:bg-white/5 transition-all"
             >
               Batal

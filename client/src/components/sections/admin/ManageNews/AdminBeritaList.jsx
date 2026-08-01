@@ -1,16 +1,25 @@
-import { useState, useMemo } from "react"
+import { useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Search, Newspaper, Plus } from "lucide-react"
+import { Newspaper } from "lucide-react"
 import { useBerita } from "../../../../context/BeritaContext"
 import AdminBeritaCard from "./AdminBeritaCard"
 import AdminBeritaDeleteModal from "./AdminBeritaDeleteModal"
+import ShowMoreButton from "../../../ui/ShowMoreButton"
 
-function AdminBeritaList() {
+const INITIAL_VISIBLE = 6
+
+function AdminBeritaList({ search, statusFilter }) {
   const navigate = useNavigate()
   const { beritaList, deleteBerita } = useBerita()
-  const [search, setSearch] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [showAll, setShowAll] = useState(false)
+
+  const filterKey = `${search}|${statusFilter}`
+  const [activeFilter, setActiveFilter] = useState(filterKey)
+  if (filterKey !== activeFilter) {
+    setActiveFilter(filterKey)
+    setShowAll(false)
+  }
 
   const filteredBerita = useMemo(() => {
     const keyword = search.toLowerCase()
@@ -24,20 +33,14 @@ function AdminBeritaList() {
     })
   }, [beritaList, search, statusFilter])
 
-  function handleSearchChange(value) {
-    setSearch(value)
-  }
-
-  function handleAddClick() {
-    navigate("/admin/berita/tambah")
-  }
+  const visibleBerita = showAll ? filteredBerita : filteredBerita.slice(0, INITIAL_VISIBLE)
 
   function handlePreviewClick(berita) {
-    navigate(`/admin/berita/preview/${berita.id}`)
+    navigate(`/berita/preview/${berita.slug}`)
   }
 
   function handleEditClick(berita) {
-    navigate(`/admin/berita/edit/${berita.id}`)
+    navigate(`/berita/edit/${berita.slug}`)
   }
 
   function handleDeleteClick(berita) {
@@ -54,70 +57,8 @@ function AdminBeritaList() {
   }
 
   return (
-    <div className="px-4 md:px-6 lg:px-8 pt-6 md:pt-8 pb-12">
+    <div className="px-4 md:px-6 lg:px-8 pt-6 md:pt-8 pb-12 md:pb-16">
       <div className="flex flex-col gap-5">
-        <div className="flex flex-col min-[500px]:flex-row gap-3">
-          <div className="flex-1 min-w-0">
-            <div className="relative">
-              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                placeholder="Cari judul atau event..."
-                className="w-full rounded-xl border border-white/10 bg-slate-800/50 py-2.5 pl-10 pr-4 text-sm text-white placeholder-slate-500 focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/20 focus:outline-none transition-colors"
-              />
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-1">
-              <button
-                type="button"
-                onClick={() => setStatusFilter("all")}
-                className={`cursor-pointer rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-                  statusFilter === "all"
-                    ? "bg-white/10 text-white"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Semua
-              </button>
-              <button
-                type="button"
-                onClick={() => setStatusFilter("published")}
-                className={`cursor-pointer rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-                  statusFilter === "published"
-                    ? "bg-emerald-400/20 text-emerald-300"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Published
-              </button>
-              <button
-                type="button"
-                onClick={() => setStatusFilter("draft")}
-                className={`cursor-pointer rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-                  statusFilter === "draft"
-                    ? "bg-yellow-400/20 text-yellow-300"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Draft
-              </button>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleAddClick}
-              className="flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
-            >
-              <Plus size={16} />
-              Tambah Berita
-            </button>
-          </div>
-        </div>
-
         {filteredBerita.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-2xl border border-white/10 bg-white/5 py-16 text-center">
             <Newspaper className="h-10 w-10 text-slate-500" />
@@ -126,17 +67,31 @@ function AdminBeritaList() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 min-[500px]:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
-            {filteredBerita.map((berita) => (
-              <AdminBeritaCard
-                key={berita.id}
-                berita={berita}
-                onEdit={handleEditClick}
-                onDeleteClick={handleDeleteClick}
-                onPreview={handlePreviewClick}
-              />
-            ))}
-          </div>
+          <>
+            <p className="text-xs text-slate-500">
+              Menampilkan {filteredBerita.length} dari {beritaList.length} berita
+            </p>
+            <div className="grid grid-cols-1 min-[500px]:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+              {visibleBerita.map((berita) => (
+                <AdminBeritaCard
+                  key={berita.id}
+                  berita={berita}
+                  onEdit={handleEditClick}
+                  onDeleteClick={handleDeleteClick}
+                  onPreview={handlePreviewClick}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        {filteredBerita.length > INITIAL_VISIBLE && (
+          <ShowMoreButton
+            label="Lihat Semua Berita"
+            total={filteredBerita.length}
+            showAll={showAll}
+            onToggle={() => setShowAll((prev) => !prev)}
+          />
         )}
       </div>
 

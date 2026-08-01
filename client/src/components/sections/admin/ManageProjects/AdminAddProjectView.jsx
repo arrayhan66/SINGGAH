@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { UploadCloud } from "lucide-react"
 import AdminLayout from "../../../../layouts/AdminLayout"
-import GlowBackground from "../../../ui/GlowBackground"
+import AdminHeroBackground from "../../../ui/AdminHeroBackground"
 import UploadThumbnail from "../../user/Upload/UploadThumbnail"
 import UploadInformation from "../../user/Upload/UploadInformation"
 import UploadTechnology from "../../user/Upload/UploadTechnology"
@@ -111,7 +111,7 @@ function AdminAddProjectView() {
       }
 
       addProject(payload)
-      navigate("/admin/projects")
+      navigate("/projects")
     } catch (err) {
       const msg =
         err.response?.data?.message || "Gagal menambahkan project. Coba lagi."
@@ -123,9 +123,9 @@ function AdminAddProjectView() {
 
   return (
     <AdminLayout>
-      <section className="relative overflow-hidden bg-brand-dark px-4 pt-[calc(var(--navbar-h)+24px)] pb-10 sm:px-6 sm:pt-[calc(var(--navbar-h)+32px)] sm:pb-16 md:px-8 lg:px-12 2xl:px-16 2xl:pb-20 3xl:px-20 3xl:pb-24 4xl:px-24 4xl:pb-28">
-        <GlowBackground />
-        <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center text-center">
+      <AdminHeroBackground fullWidth>
+        <div className="pt-8 pb-10 sm:pt-10 sm:pb-16 2xl:pt-12 2xl:pb-20 3xl:pb-24 4xl:pb-28">
+          <div className="mx-auto flex max-w-5xl flex-col items-center text-center">
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 sm:h-16 sm:w-16 md:h-20 md:w-20 lg:h-24 lg:w-24 3xl:h-28 3xl:w-28 4xl:h-32 4xl:w-32">
             <UploadCloud className="h-8 w-8 text-cyan-300 sm:h-9 sm:w-9 md:h-10 md:w-10 lg:h-12 lg:w-12 3xl:h-14 3xl:w-14 4xl:h-16 4xl:w-16" />
           </div>
@@ -138,10 +138,11 @@ function AdminAddProjectView() {
             Tambahkan project mahasiswa ke SINGGAH. Project akan langsung
             dipublikasikan ke Hall.
           </p>
+          </div>
         </div>
-      </section>
+      </AdminHeroBackground>
 
-      <section className="relative bg-brand-dark px-4 py-10 sm:py-12 md:px-8 lg:px-12 2xl:px-16 3xl:px-20 4xl:px-24">
+      <div className="bg-brand-dark py-10 sm:py-12 2xl:py-14">
         <div className="mx-auto flex max-w-5xl flex-col gap-6 sm:gap-8 2xl:gap-10 3xl:gap-12 4xl:gap-14">
           <StepDivider step={steps[0]} currentIndex={0} />
           <UploadThumbnail
@@ -184,10 +185,10 @@ function AdminAddProjectView() {
             submitting={submitting}
             apiError={error}
             submitLabel="Publikasikan"
-            cancelPath="/admin/projects"
+            cancelPath="/projects"
           />
         </div>
-      </section>
+      </div>
     </AdminLayout>
   )
 }

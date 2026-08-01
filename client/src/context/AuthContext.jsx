@@ -34,6 +34,7 @@ export function AuthProvider({ children }) {
     setToken(null)
     localStorage.removeItem("token")
     localStorage.removeItem("user")
+    localStorage.removeItem("admin-sidebar-collapsed")
   }
 
   return (

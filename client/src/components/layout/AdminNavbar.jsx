@@ -211,7 +211,7 @@ function AdminNavbar() {
             </div>
 
             <NavLink
-              to="/admin/profile"
+              to="/profile"
               onClick={() => setIsProfileOpen(false)}
               className="flex items-center gap-2 min-[360px]:gap-3 5xl:gap-4 px-3 min-[360px]:px-4 5xl:px-5 6xl:px-6 py-2 min-[360px]:py-3 5xl:py-4 text-xs min-[360px]:text-sm 5xl:text-base 6xl:text-lg text-slate-300 transition hover:bg-white/5 hover:text-cyan-300"
             >

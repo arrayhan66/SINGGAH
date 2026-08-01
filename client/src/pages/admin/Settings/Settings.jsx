@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import {
   Settings2, Save, Globe, Mail, Image, MessageSquare, Shield,
-  Check, Upload, Palette, X, Sparkles
+  Check, Upload, Palette, X
 } from "lucide-react"
 import AdminLayout from "../../../layouts/AdminLayout"
 import AdminHeroBackground from "../../../components/ui/AdminHeroBackground"
@@ -34,24 +34,31 @@ const defaults = {
 }
 
 function loadSettings() {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored) {
+  const stored = localStorage.getItem(STORAGE_KEY)
+  if (stored) {
+    try {
       return { ...defaults, ...JSON.parse(stored) }
+    } catch {
+      return { ...defaults }
     }
-  } catch {}
+  }
   return { ...defaults }
 }
 
 function loadLogo() {
-  try {
-    return localStorage.getItem(SETTINGS_LOGO_KEY) || null
-  } catch {
-    return null
-  }
+  return localStorage.getItem(SETTINGS_LOGO_KEY) || null
 }
 
-const inputClass = "w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 outline-none transition-all duration-200 focus:border-indigo-500/70 focus:ring-2 focus:ring-indigo-500/20 focus:bg-slate-950"
+const inputClass =
+  "w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white placeholder-slate-500 outline-none backdrop-blur-md transition-all duration-200 focus:border-cyan-400/50 focus:bg-white/[0.1] focus:ring-2 focus:ring-cyan-400/20"
+
+const toggleClass =
+  "relative inline-flex cursor-pointer items-center"
+const switchClass =
+  "h-6 w-11 rounded-full border border-white/10 bg-white/10 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-slate-300 after:shadow-md after:transition-all peer-checked:border-cyan-400 peer-checked:bg-cyan-500 peer-checked:after:translate-x-full peer-checked:after:bg-white"
+
+const rowClass =
+  "flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.04] p-4 transition-colors hover:border-white/20"
 
 function Settings() {
   const [activeTab, setActiveTab] = useState("general")
@@ -119,6 +126,7 @@ function Settings() {
   }
 
   function switchTab(id) {
+    if (id === activeTab) return
     const oldIdx = tabs.findIndex((t) => t.id === activeTab)
     const newIdx = tabs.findIndex((t) => t.id === id)
     setAnimDir(newIdx > oldIdx ? "right" : "left")
@@ -132,30 +140,30 @@ function Settings() {
     return (
       <div className="space-y-6" key="general">
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Nama Website</label>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-300">Nama Website</label>
           <input type="text" name="siteName" value={form.siteName} onChange={handleChange} className={inputClass} />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Deskripsi Website</label>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-300">Deskripsi Website</label>
           <textarea name="siteDescription" value={form.siteDescription} onChange={handleChange} rows={3} className={`${inputClass} resize-none`} />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Footer Text</label>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-300">Footer Text</label>
           <input type="text" name="footerText" value={form.footerText} onChange={handleChange} className={inputClass} />
         </div>
-        <div className="flex items-center justify-between rounded-xl bg-slate-950/50 p-4 border border-slate-800/80 transition-colors hover:border-slate-700">
+        <div className={rowClass}>
           <div className="flex items-center gap-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <Palette className="h-5 w-5 text-amber-400" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-400/10">
+              <Palette className="h-5 w-5 text-amber-300" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-slate-200">Mode Maintenance</p>
-              <p className="text-xs text-slate-400 mt-0.5">Nonaktifkan akses publik ke website sementara waktu</p>
+              <p className="text-sm font-semibold text-white">Mode Maintenance</p>
+              <p className="mt-0.5 text-xs text-slate-400">Nonaktifkan akses publik ke website sementara waktu</p>
             </div>
           </div>
-          <label className="relative inline-flex cursor-pointer items-center">
+          <label className={toggleClass}>
             <input type="checkbox" name="maintenanceMode" checked={form.maintenanceMode} onChange={handleChange} className="peer sr-only" />
-            <div className="h-6 w-11 rounded-full bg-slate-800 border border-slate-700 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-slate-300 after:shadow-md after:transition-all peer-checked:bg-indigo-600 peer-checked:border-indigo-500 peer-checked:after:translate-x-full peer-checked:after:bg-white" />
+            <div className={switchClass} />
           </label>
         </div>
       </div>
@@ -166,15 +174,15 @@ function Settings() {
     return (
       <div className="space-y-6" key="contact">
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Email Resmi</label>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-300">Email Resmi</label>
           <input type="email" name="email" value={form.email} onChange={handleChange} className={inputClass} />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Nomor Telepon / WhatsApp</label>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-300">Nomor Telepon / WhatsApp</label>
           <input type="text" name="phone" value={form.phone} onChange={handleChange} className={inputClass} />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Alamat Kantor / Studio</label>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-300">Alamat Kantor / Studio</label>
           <textarea name="address" value={form.address} onChange={handleChange} rows={2} className={`${inputClass} resize-none`} />
         </div>
       </div>
@@ -184,33 +192,33 @@ function Settings() {
   function renderLogo() {
     return (
       <div className="space-y-6" key="logo">
-        <div className="group relative overflow-hidden rounded-2xl border border-dashed border-slate-700 bg-slate-950/40 p-8 text-center transition-all duration-300 hover:border-indigo-500/50 hover:bg-slate-950/70">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        <div className="group relative overflow-hidden rounded-2xl border border-dashed border-white/15 bg-white/[0.03] p-8 text-center backdrop-blur-md transition-all duration-300 hover:border-cyan-400/50 hover:bg-white/[0.05]">
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           <div className="relative">
             {logoPreview ? (
-              <div className="relative mx-auto inline-block p-2 rounded-2xl bg-slate-900 border border-slate-800 shadow-lg">
+              <div className="relative mx-auto inline-block rounded-2xl border border-white/10 bg-white/[0.06] p-2 shadow-lg">
                 <img src={logoPreview} alt="Logo preview" className="h-24 max-w-xs rounded-xl object-contain" />
                 <button
                   type="button"
                   onClick={removeLogo}
-                  className="absolute -top-2.5 -right-2.5 cursor-pointer rounded-full bg-red-500 p-1.5 text-white shadow-md hover:bg-red-600 transition-colors"
+                  className="absolute -right-2.5 -top-2.5 cursor-pointer rounded-full bg-red-500 p-1.5 text-white shadow-md transition-colors hover:bg-red-600"
                   title="Hapus Logo"
                 >
                   <X size={14} />
                 </button>
               </div>
             ) : (
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 border border-slate-800 transition-colors group-hover:border-indigo-500/40 group-hover:bg-indigo-500/10">
-                <Upload className="h-7 w-7 text-slate-400 transition-colors group-hover:text-indigo-400" />
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] transition-colors group-hover:border-cyan-400/40 group-hover:bg-cyan-400/10">
+                <Upload className="h-7 w-7 text-slate-400 transition-colors group-hover:text-cyan-300" />
               </div>
             )}
-            <p className="mt-4 text-sm font-medium text-slate-200">{logoPreview ? "Logo Website Aktif" : "Upload logo website utama"}</p>
-            <p className="text-xs text-slate-400 mt-1">Format PNG, SVG, atau JPG (maksimal 2MB)</p>
+            <p className="mt-4 text-sm font-medium text-white">{logoPreview ? "Logo Website Aktif" : "Upload logo website utama"}</p>
+            <p className="mt-1 text-xs text-slate-400">Format PNG, SVG, atau JPG (maksimal 2MB)</p>
             <input ref={logoInputRef} type="file" accept="image/png,image/svg+xml,image/jpeg" onChange={handleLogoSelect} className="hidden" />
             <button
               type="button"
               onClick={() => logoInputRef.current?.click()}
-              className="mt-5 cursor-pointer rounded-xl bg-indigo-500/15 px-6 py-2.5 text-sm font-semibold text-indigo-300 border border-indigo-500/30 transition-all duration-200 hover:bg-indigo-500/25 hover:shadow-lg hover:shadow-indigo-500/10 active:scale-[0.98]"
+              className="mt-5 cursor-pointer rounded-xl border border-cyan-400/30 bg-cyan-400/15 px-6 py-2.5 text-sm font-semibold text-cyan-200 transition-all duration-200 hover:bg-cyan-400/25 hover:shadow-lg hover:shadow-cyan-400/10 active:scale-[0.98]"
             >
               {logoPreview ? "Ganti File Logo" : "Pilih File Logo"}
             </button>
@@ -218,7 +226,7 @@ function Settings() {
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Favicon Browser</label>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-300">Favicon Browser</label>
           <div className="flex items-center gap-3">
             <input
               ref={faviconInputRef}
@@ -232,7 +240,7 @@ function Settings() {
               <button
                 type="button"
                 onClick={() => { setFavicon(""); localStorage.removeItem("singgah_favicon") }}
-                className="cursor-pointer rounded-xl bg-slate-800 p-3 text-slate-400 border border-slate-700 hover:bg-slate-700 hover:text-red-400 transition-colors"
+                className="cursor-pointer rounded-xl border border-white/10 bg-white/5 p-3 text-slate-400 transition-colors hover:bg-white/10 hover:text-red-400"
                 title="Hapus Favicon"
               >
                 <X size={16} />
@@ -240,8 +248,8 @@ function Settings() {
             )}
           </div>
           {favicon && favicon.startsWith("data:") && (
-            <div className="mt-3 flex items-center gap-3 rounded-xl bg-slate-950/60 p-3 border border-slate-800 w-fit">
-              <img src={favicon} alt="favicon preview" className="h-6 w-6 rounded object-contain bg-slate-900 p-0.5" />
+            <div className="mt-3 flex w-fit items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-3">
+              <img src={favicon} alt="favicon preview" className="h-6 w-6 rounded object-contain bg-white/10 p-0.5" />
               <span className="text-xs text-slate-400">Favicon terpasang</span>
             </div>
           )}
@@ -254,15 +262,15 @@ function Settings() {
     return (
       <div className="space-y-6" key="social">
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Instagram Official</label>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-300">Instagram Official</label>
           <input type="text" name="instagram" value={form.instagram} onChange={handleChange} className={inputClass} />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Twitter / X Handle</label>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-300">Twitter / X Handle</label>
           <input type="text" name="twitter" value={form.twitter} onChange={handleChange} className={inputClass} />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">YouTube Channel</label>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-300">YouTube Channel</label>
           <input type="text" name="youtube" value={form.youtube} onChange={handleChange} className={inputClass} />
         </div>
       </div>
@@ -272,28 +280,28 @@ function Settings() {
   function renderSecurity() {
     return (
       <div className="space-y-6" key="security">
-        <div className="flex items-center justify-between rounded-xl bg-slate-950/50 p-4 border border-slate-800/80 transition-all duration-200 hover:border-slate-700">
+        <div className={rowClass}>
           <div>
-            <p className="text-sm font-semibold text-slate-200">Registrasi Pengguna Baru</p>
-            <p className="text-xs text-slate-400 mt-0.5">Izinkan pengunjung mendaftar akun baru secara mandiri</p>
+            <p className="text-sm font-semibold text-white">Registrasi Pengguna Baru</p>
+            <p className="mt-0.5 text-xs text-slate-400">Izinkan pengunjung mendaftar akun baru secara mandiri</p>
           </div>
-          <label className="relative inline-flex cursor-pointer items-center">
+          <label className={toggleClass}>
             <input type="checkbox" name="registrationOpen" checked={form.registrationOpen} onChange={handleChange} className="peer sr-only" />
-            <div className="h-6 w-11 rounded-full bg-slate-800 border border-slate-700 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-slate-300 after:shadow-md after:transition-all peer-checked:bg-indigo-600 peer-checked:border-indigo-500 peer-checked:after:translate-x-full peer-checked:after:bg-white" />
+            <div className={switchClass} />
           </label>
         </div>
-        <div className="flex items-center justify-between rounded-xl bg-slate-950/50 p-4 border border-slate-800/80 transition-all duration-200 hover:border-slate-700">
+        <div className={rowClass}>
           <div>
-            <p className="text-sm font-semibold text-slate-200">Verifikasi Email Wajib</p>
-            <p className="text-xs text-slate-400 mt-0.5">Kirim tautan verifikasi email saat registrasi akun baru</p>
+            <p className="text-sm font-semibold text-white">Verifikasi Email Wajib</p>
+            <p className="mt-0.5 text-xs text-slate-400">Kirim tautan verifikasi email saat registrasi akun baru</p>
           </div>
-          <label className="relative inline-flex cursor-pointer items-center">
+          <label className={toggleClass}>
             <input type="checkbox" name="emailVerification" checked={form.emailVerification} onChange={handleChange} className="peer sr-only" />
-            <div className="h-6 w-11 rounded-full bg-slate-800 border border-slate-700 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-slate-300 after:shadow-md after:transition-all peer-checked:bg-indigo-600 peer-checked:border-indigo-500 peer-checked:after:translate-x-full peer-checked:after:bg-white" />
+            <div className={switchClass} />
           </label>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Maksimal Ukuran Upload File (MB)</label>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-300">Maksimal Ukuran Upload File (MB)</label>
           <input type="number" name="maxUploadSize" value={form.maxUploadSize} onChange={handleChange} className={`${inputClass} max-w-xs`} />
         </div>
       </div>
@@ -312,83 +320,86 @@ function Settings() {
 
   return (
     <AdminLayout>
-      <div className="max-w-5xl mx-auto pb-12">
-        <AdminHeroBackground className="rounded-2xl border border-slate-800/80 shadow-xl overflow-hidden mb-6">
-          <div className="px-6 md:px-8 py-8 md:py-10">
-            <div className="flex items-center gap-4">
-              <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 via-violet-500/20 to-purple-600/20 border border-indigo-500/30 shadow-lg shadow-indigo-500/10">
-                <Settings2 className="h-7 w-7 text-indigo-300" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">Pengaturan Website</h1>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-indigo-500/10 px-2.5 py-0.5 text-xs font-medium text-indigo-300 border border-indigo-500/20">
-                    <Sparkles size={11} /> Admin Panel
-                  </span>
-                </div>
-                <p className="text-xs md:text-sm text-slate-400 mt-1">Kelola konfigurasi, identitas visual, dan sistem platform SINGGAH</p>
-              </div>
+      <AdminHeroBackground fullWidth>
+        <div className="px-4 min-[260px]:px-3 pt-5 min-[260px]:pt-5 md:px-6 md:pt-6">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10 sm:h-16 sm:w-16">
+              <Settings2 className="h-7 w-7 text-cyan-300 sm:h-8 sm:w-8" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-black text-white">
+                Pengaturan <span className="text-cyan-300">Website</span>
+              </h1>
+              <p className="mt-1 max-w-xl text-sm text-slate-400">
+                Kelola konfigurasi, identitas visual, dan sistem platform SINGGAH
+              </p>
             </div>
           </div>
-        </AdminHeroBackground>
-
-        {/* Navigation Tabs */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          {tabs.map((tab) => {
-            const Icon = tab.icon
-            const isActive = activeTab === tab.id
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => switchTab(tab.id)}
-                className={`group relative flex cursor-pointer items-center gap-2.5 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                  isActive
-                    ? "bg-indigo-500/15 text-indigo-300 border border-indigo-500/40 shadow-lg shadow-indigo-500/10"
-                    : "bg-slate-900/60 text-slate-400 border border-slate-800 hover:bg-slate-900 hover:text-slate-200 hover:border-slate-700"
-                }`}
-              >
-                {isActive && (
-                  <span className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500/10 to-violet-600/5 pointer-events-none" />
-                )}
-                <span className="relative">
-                  <Icon size={16} className={isActive ? "text-indigo-400" : "text-slate-500 group-hover:text-slate-300"} />
-                </span>
-                <span className="relative font-semibold">{tab.label}</span>
-              </button>
-            )
-          })}
         </div>
 
-        {/* Form Container */}
-        <form onSubmit={handleSave}>
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/90 backdrop-blur-xl p-6 md:p-8 shadow-2xl">
-            <div className="flex items-center gap-3.5 mb-7 pb-5 border-b border-slate-800/80">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 border border-indigo-500/20">
-                <TabIcon className="h-5 w-5 text-indigo-400" />
+        <div className="px-4 min-[260px]:px-3 pt-8 min-[260px]:pt-8 pb-5 min-[260px]:pb-5 md:px-6 md:pt-10 md:pb-6">
+          <div role="tablist" aria-label="Menu pengaturan" className="flex flex-wrap gap-2">
+            {tabs.map((tab) => {
+              const Icon = tab.icon
+              const isActive = activeTab === tab.id
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-controls={`panel-${tab.id}`}
+                  onClick={() => switchTab(tab.id)}
+                  className={`group relative flex cursor-pointer items-center gap-2 rounded-xl border px-3.5 py-2 text-[13px] font-semibold transition-all duration-200 active:scale-[0.98] ${
+                    isActive
+                      ? "border-cyan-400/40 bg-gradient-to-b from-cyan-500/[0.18] to-cyan-500/[0.04] text-cyan-200 shadow-lg shadow-cyan-500/15"
+                      : "border-white/[0.08] bg-white/[0.04] text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-500/[0.06] hover:text-white"
+                  }`}
+                >
+                  <span className={`flex h-6 w-6 items-center justify-center rounded-md transition-all duration-200 ${
+                    isActive
+                      ? "bg-cyan-400/15 text-cyan-300"
+                      : "text-slate-500 group-hover:text-cyan-300"
+                  }`}>
+                    <Icon size={14} />
+                  </span>
+                  <span className="tracking-tight">{tab.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      </AdminHeroBackground>
+
+      <div className="px-4 min-[260px]:px-3 pb-12 md:px-6 md:pb-16 lg:px-8">
+        <form onSubmit={handleSave} className="mx-auto mt-6 max-w-5xl md:mt-8">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5 shadow-xl backdrop-blur-xl md:p-8">
+            <div className="mb-7 flex items-center gap-3.5 border-b border-white/10 pb-5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-400/10">
+                <TabIcon className="h-5 w-5 text-cyan-300" />
               </div>
               <div>
                 <h3 className="text-base font-semibold text-white">{active.label}</h3>
-                <p className="text-xs text-slate-400 mt-0.5">{active.desc}</p>
+                <p className="mt-0.5 text-xs text-slate-400">{active.desc}</p>
               </div>
             </div>
 
-            <div key={activeTab} className={animClass}>
+            <div key={activeTab} id={`panel-${activeTab}`} role="tabpanel" className={animClass}>
               {tabContent[activeTab]}
             </div>
 
-            <div className="mt-8 flex items-center justify-between gap-4 pt-6 border-t border-slate-800/80">
+            <div className="mt-8 flex items-center justify-between gap-4 border-t border-white/10 pt-6">
               <button
                 type="submit"
-                className="group relative flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-xl bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-600 bg-[length:200%_100%] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-xl hover:shadow-indigo-500/35 active:scale-[0.98]"
+                className="group relative flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-xl hover:shadow-cyan-500/35 active:scale-[0.98]"
               >
                 <Save size={16} className="transition-transform duration-300 group-hover:rotate-12" />
                 Simpan Pengaturan
               </button>
               {saved && (
-                <span className="flex items-center gap-2 text-sm text-emerald-400 font-semibold bg-emerald-500/10 px-3.5 py-1.5 rounded-xl border border-emerald-500/20 animate-fade-in">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20">
-                    <Check size={12} className="text-emerald-400" />
+                <span className="flex animate-fade-in items-center gap-2 rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3.5 py-1.5 text-sm font-semibold text-emerald-300">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400/20">
+                    <Check size={12} className="text-emerald-300" />
                   </span>
                   Pengaturan berhasil disimpan!
                 </span>

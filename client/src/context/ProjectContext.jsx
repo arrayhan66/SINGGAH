@@ -3,13 +3,26 @@ import { dummyAdminProjects } from "../components/sections/admin/dummyAdminProje
 
 const ProjectContext = createContext(null)
 
+function slugify(text) {
+  return String(text || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "")
+}
+
 export function ProjectProvider({ children }) {
-  const [projects, setProjects] = useState(dummyAdminProjects)
+  const [projects, setProjects] = useState(() =>
+    dummyAdminProjects.map((p) => ({ ...p, slug: p.slug || slugify(p.title) })),
+  )
 
   const addProject = useCallback((formData) => {
     const newId = Math.max(...projects.map((p) => p.id), 0) + 1
     const newProject = {
       id: newId,
+      slug: slugify(formData.title) + "-" + newId,
       title: formData.title,
       description: formData.description,
       year: Number(formData.year) || new Date().getFullYear(),
@@ -89,6 +102,10 @@ export function ProjectProvider({ children }) {
     return projects.find((p) => String(p.id) === String(id))
   }, [projects])
 
+  const getProjectBySlug = useCallback((slug) => {
+    return projects.find((p) => String(p.slug) === String(slug))
+  }, [projects])
+
   const value = {
     projects,
     addProject,
@@ -97,6 +114,7 @@ export function ProjectProvider({ children }) {
     approveProject,
     rejectProject,
     getProjectById,
+    getProjectBySlug,
   }
 
   return (

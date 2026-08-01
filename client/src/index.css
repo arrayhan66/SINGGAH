@@ -46,6 +46,125 @@ html {
   animation: slide-down 0.2s ease-out;
 }
 
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-fade-in-up {
+  animation: fade-in-up 0.25s ease-out both;
+}
+
+@keyframes slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@utility animate-slide-right {
+  animation: slide-right 0.28s ease-out;
+}
+
+@utility animate-slide-left {
+  animation: slide-left 0.28s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@utility animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+@keyframes spark-draw {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@utility animate-spark-draw {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: spark-draw 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes spark-fill {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.15;
+  }
+}
+
+@utility animate-spark-fill {
+  opacity: 0;
+  animation: spark-fill 0.7s ease-out 0.4s both;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-fade-up {
+  animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spark-draw {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+
+  .animate-spark-fill {
+    opacity: 0.15;
+    animation: none;
+  }
+
+  .animate-fade-up {
+    animation: none;
+  }
+}
+
 body {
   font-family: "Plus Jakarta Sans", sans-serif;
   background: #041d38;

@@ -6,7 +6,7 @@ const tipeOptions = [
   { value: "umum", label: "Umum", icon: Users },
 ]
 
-function AdminUserFormMain({ formData, updateField }) {
+function AdminUserFormMain({ formData, updateField, onPublish, isEditMode }) {
   return (
     <div className="flex flex-col gap-6 rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-6 backdrop-blur-xl md:p-8">
       <div>
@@ -91,6 +91,16 @@ function AdminUserFormMain({ formData, updateField }) {
             )
           })}
         </div>
+      </div>
+
+      <div className="border-t border-white/[0.06] pt-6">
+        <button
+          type="button"
+          onClick={onPublish}
+          className="w-full cursor-pointer rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
+        >
+          {isEditMode ? "Simpan Perubahan" : "Tambah User"}
+        </button>
       </div>
     </div>
   )

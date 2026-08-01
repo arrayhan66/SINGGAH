@@ -1,6 +1,16 @@
-import { createContext, useContext, useState } from "react"
+git import { createContext, useContext, useState } from "react"
 
 const UserContext = createContext()
+
+function slugify(text) {
+  return String(text || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "")
+}
 
 const initialUsers = [
   {
@@ -78,6 +88,7 @@ export function UserProvider({ children }) {
       ...prev,
       {
         id: Date.now(),
+        username: user.username || slugify(user.name),
         ...user,
       },
     ])
@@ -97,6 +108,12 @@ export function UserProvider({ children }) {
     return userList.find((u) => u.id === Number(id))
   }
 
+  function getUserByUsername(username) {
+    return userList.find(
+      (u) => String(u.username).toLowerCase() === String(username).toLowerCase(),
+    )
+  }
+
   return (
     <UserContext.Provider
       value={{
@@ -105,6 +122,7 @@ export function UserProvider({ children }) {
         updateUser,
         deleteUser,
         getUserById,
+        getUserByUsername,
       }}
     >
       {children}

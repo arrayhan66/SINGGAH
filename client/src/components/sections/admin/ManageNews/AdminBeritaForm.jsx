@@ -46,17 +46,17 @@ function contentArrayToHTML(content) {
 }
 
 function AdminBeritaForm() {
-  const { id } = useParams()
+  const { slug } = useParams()
   const navigate = useNavigate()
-  const { getBeritaById, addBerita, updateBerita, setTempPreviewData } = useBerita()
+  const { getBeritaBySlug, addBerita, updateBerita, setTempPreviewData } = useBerita()
 
-  const isEditMode = Boolean(id)
+  const isEditMode = Boolean(slug)
   const [formData, setFormData] = useState(emptyForm)
   const [notification, setNotification] = useState(null)
 
   useEffect(() => {
     if (isEditMode) {
-      const existing = getBeritaById(id)
+      const existing = getBeritaBySlug(slug)
       if (existing) {
         setFormData({
           title: existing.title || "",
@@ -80,7 +80,7 @@ function AdminBeritaForm() {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id])
+  }, [slug])
 
   function showNotification(message, type) {
     setNotification({ message, type })
@@ -127,7 +127,8 @@ function AdminBeritaForm() {
     }
 
     if (isEditMode) {
-      updateBerita(Number(id), payload)
+      const existing = getBeritaBySlug(slug)
+      if (existing) updateBerita(existing.id, payload)
     } else {
       addBerita(payload)
     }
@@ -137,7 +138,7 @@ function AdminBeritaForm() {
       "success",
     )
 
-    setTimeout(() => navigate("/admin/berita"), 1000)
+    setTimeout(() => navigate("/berita"), 1000)
   }
 
   function handlePreview() {
@@ -148,7 +149,7 @@ function AdminBeritaForm() {
       gallery: (formData.gallery || []).filter((g) => g.url),
     }
     setTempPreviewData(data)
-    navigate(`/admin/berita/preview/temp`)
+    navigate(`/berita/preview/temp`)
   }
 
   function stripHtml(html) {
@@ -158,7 +159,7 @@ function AdminBeritaForm() {
   }
 
   return (
-    <AdminHeroBackground>
+    <AdminHeroBackground fullWidth>
       <div className="px-6 py-8 md:px-10 md:py-10">
         {notification && (
           <div
@@ -178,10 +179,13 @@ function AdminBeritaForm() {
         )}
 
         <button
-          onClick={() => navigate("/admin/berita")}
-          className="flex cursor-pointer items-center gap-2 text-sm text-slate-300 hover:text-cyan-300 transition-colors"
+          onClick={() => navigate("/berita")}
+          className="group inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 backdrop-blur-xl transition-all duration-200 hover:border-cyan-400/40 hover:bg-cyan-500/10 hover:text-cyan-300"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft
+            size={14}
+            className="transition-transform duration-200 group-hover:-translate-x-0.5"
+          />
           Kembali ke Kelola Berita
         </button>
 

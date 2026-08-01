@@ -20,7 +20,7 @@ function DashboardActivityFeed() {
         </h2>
       </div>
       <div className="flex flex-col gap-3">
-        {activities.map((item) => {
+        {activities.slice(0, 5).map((item) => {
           const Icon = item.icon
           return (
             <div key={item.id} className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-3 transition-all hover:bg-white/[0.08]">

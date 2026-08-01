@@ -28,7 +28,7 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
   const categoryName = project.Category?.name || ""
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] transition-all duration-300 hover:border-cyan-400/20 hover:shadow-[0_0_30px_-6px_rgba(34,211,238,0.15)]">
+    <div className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.09] to-white/[0.04] shadow-lg shadow-black/10 backdrop-blur-xl transition-all duration-[250ms] hover:-translate-y-0.5 hover:border-cyan-400/30 hover:shadow-xl hover:shadow-black/20">
       <div
         className="aspect-video w-full overflow-hidden bg-brand-navy relative cursor-pointer"
         onClick={() => onViewDetail(project)}
@@ -58,7 +58,7 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
         </div>
       </div>
 
-      <div className="p-4 md:p-5">
+      <div className="flex flex-1 flex-col p-4 md:p-5">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 text-[11px] font-bold text-white shadow-sm">
             {authorInitial}
@@ -91,7 +91,7 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
           </span>
         </div>
 
-        <div className="mt-4 flex items-center gap-2">
+        <div className="mt-auto flex items-center gap-2 pt-4">
           {project.status === "pending" ? (
             <>
               <button

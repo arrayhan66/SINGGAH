@@ -22,8 +22,8 @@ function ProfileHero({ isAdmin = false }) {
             className="h-20 w-20 min-[350px]:h-24 min-[350px]:w-24 md:h-[120px] md:w-[120px] lg:h-36 lg:w-36 2xl:h-40 2xl:w-40 rounded-full border-2 border-white/10 object-cover"
           />
         ) : (
-          <div className="flex h-16 w-16 min-[350px]:h-20 min-[350px]:w-20 md:h-28 md:w-28 lg:h-32 lg:w-32 2xl:h-36 2xl:w-36 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-blue-700 border border-white/10">
-            <UserCircle className="h-8 w-8 min-[350px]:h-10 min-[350px]:w-10 md:h-14 md:w-14 lg:h-16 lg:w-16 2xl:h-[72px] 2xl:w-[72px] text-white" />
+          <div className="flex h-16 w-16 min-[350px]:h-20 min-[350px]:w-20 md:h-28 md:w-28 lg:h-32 lg:w-32 2xl:h-36 2xl:w-36 items-center justify-center rounded-full bg-cyan-400/10 border border-cyan-400/30">
+            <UserCircle className="h-8 w-8 min-[350px]:h-10 min-[350px]:w-10 md:h-14 md:w-14 lg:h-16 lg:w-16 2xl:h-[72px] 2xl:w-[72px] text-cyan-300" />
           </div>
         )}
       </div>
@@ -49,7 +49,7 @@ function ProfileHero({ isAdmin = false }) {
 
   if (isAdmin) {
     return (
-      <AdminHeroBackground>
+      <AdminHeroBackground fullWidth>
         <div className="px-6 pt-6 pb-6 md:px-10 md:pt-8 md:pb-8">
           <div className="mx-auto flex max-w-5xl flex-col items-center text-center lg:max-w-6xl 2xl:max-w-7xl">
             {content}

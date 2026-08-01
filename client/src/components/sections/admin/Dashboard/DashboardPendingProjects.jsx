@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom"
 import { Clock, ArrowRight, Eye, Inbox } from "lucide-react"
-import { dummyAdminProjects } from "../dummyAdminProjects"
+import { useProjects } from "../../../../context/ProjectContext"
 
 function DashboardPendingProjects() {
   const navigate = useNavigate()
-  const pendingProjects = dummyAdminProjects
+  const { projects } = useProjects()
+  const pendingProjects = projects
     .filter((p) => p.status === "pending")
-    .slice(0, 5)
+    .slice(0, 4)
 
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5 shadow-xl backdrop-blur-xl md:p-6">
@@ -21,7 +22,7 @@ function DashboardPendingProjects() {
         </div>
 
         <button
-          onClick={() => navigate("/admin/projects")}
+          onClick={() => navigate("/projects?status=pending")}
           className="group flex cursor-pointer items-center gap-1.5 text-xs font-medium text-cyan-400 transition-all duration-200 hover:text-cyan-300"
         >
           Lihat Semua
@@ -62,7 +63,7 @@ function DashboardPendingProjects() {
                   Pending
                 </span>
                 <button
-                  onClick={() => navigate(`/admin/projects/${project.id}`)}
+                  onClick={() => navigate(`/projects/${project.slug}`)}
                   className="flex cursor-pointer items-center gap-1 rounded-md bg-cyan-500/15 px-2.5 py-1.5 text-[11px] font-medium text-cyan-400 transition-all duration-200 hover:bg-cyan-500/25 hover:text-cyan-300"
                 >
                   <Eye size={13} />

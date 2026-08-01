@@ -16,16 +16,16 @@ const emptyForm = {
 }
 
 function AdminUserForm() {
-  const { id } = useParams()
+  const { slug } = useParams()
   const navigate = useNavigate()
-  const { getUserById, addUser, updateUser } = useUsers()
+  const { getUserByUsername, addUser, updateUser } = useUsers()
 
-  const isEditMode = Boolean(id)
+  const isEditMode = Boolean(slug)
   const [formData, setFormData] = useState(emptyForm)
 
   useEffect(() => {
     if (isEditMode) {
-      const existing = getUserById(id)
+      const existing = getUserByUsername(slug)
       if (existing) {
         setFormData({
           name: existing.name || "",
@@ -38,7 +38,7 @@ function AdminUserForm() {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id])
+  }, [slug])
 
   function updateField(field, value) {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -51,7 +51,8 @@ function AdminUserForm() {
     }
 
     if (isEditMode) {
-      updateUser(Number(id), formData)
+      const existing = getUserByUsername(slug)
+      if (existing) updateUser(existing.id, formData)
     } else {
       addUser({
         ...formData,
@@ -64,14 +65,14 @@ function AdminUserForm() {
       })
     }
 
-    navigate("/admin/users")
+    navigate("/users")
   }
 
   return (
     <AdminLayout>
       <div className="px-6 pt-6 pb-10 md:px-10 md:pt-8">
         <button
-          onClick={() => navigate("/admin/users")}
+          onClick={() => navigate("/users")}
           className="flex cursor-pointer items-center gap-2 text-sm text-slate-300 hover:text-cyan-300 transition-colors"
         >
           <ArrowLeft size={16} />

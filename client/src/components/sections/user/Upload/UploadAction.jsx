@@ -15,7 +15,7 @@ function validateForm(formData, isEdit = false) {
   return errors
 }
 
-function UploadAction({ formData, onSubmit, submitting, apiError, isEdit = false }) {
+function UploadAction({ formData, onSubmit, submitting, apiError, isEdit = false, cancelPath = "/" }) {
   const navigate = useNavigate()
   const [validationErrors, setValidationErrors] = useState([])
 
@@ -32,7 +32,7 @@ function UploadAction({ formData, onSubmit, submitting, apiError, isEdit = false
   }
 
   function handleCancel() {
-    navigate("/")
+    navigate(cancelPath)
   }
 
   const showValidationErrors = validationErrors.length > 0

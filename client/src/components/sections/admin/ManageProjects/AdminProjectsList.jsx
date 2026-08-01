@@ -1,22 +1,28 @@
 import { useState, useMemo, useCallback } from "react"
-import { useNavigate } from "react-router-dom"
-import { FolderX, Plus, Search } from "lucide-react"
+import { FolderX } from "lucide-react"
 import { useProjects } from "../../../../context/ProjectContext"
-import AdminProjectsFilter from "./AdminProjectsFilter"
 import AdminProjectsCard from "./AdminProjectsCard"
 import AdminProjectsDetailModal from "./AdminProjectsDetailModal"
 import AdminProjectApproveModal from "./AdminProjectApproveModal"
 import AdminProjectRejectModal from "./AdminProjectRejectModal"
+import ShowMoreButton from "../../../ui/ShowMoreButton"
 
-function AdminProjectsList() {
-  const navigate = useNavigate()
+const INITIAL_VISIBLE = 6
+
+function AdminProjectsList({ search, statusFilter }) {
   const { projects, approveProject, rejectProject } = useProjects()
 
-  const [search, setSearch] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
   const [selectedProject, setSelectedProject] = useState(null)
   const [approveModalProject, setApproveModalProject] = useState(null)
   const [rejectModalProject, setRejectModalProject] = useState(null)
+  const [showAll, setShowAll] = useState(false)
+
+  const filterKey = `${search}|${statusFilter}`
+  const [activeFilter, setActiveFilter] = useState(filterKey)
+  if (filterKey !== activeFilter) {
+    setActiveFilter(filterKey)
+    setShowAll(false)
+  }
 
   const filteredProjects = useMemo(() => {
     return projects.filter((p) => {
@@ -29,20 +35,7 @@ function AdminProjectsList() {
     })
   }, [projects, statusFilter, search])
 
-  const tabCounts = useMemo(() => {
-    const pending = projects.filter((p) => p.status === "pending").length
-    const approved = projects.filter((p) => p.status === "approved").length
-    const rejected = projects.filter((p) => p.status === "rejected").length
-    return { all: projects.length, pending, approved, rejected }
-  }, [projects])
-
-  function handleSearchChange(e) {
-    setSearch(e.target.value)
-  }
-
-  function handleAddClick() {
-    navigate("/admin/projects/tambah")
-  }
+  const visibleProjects = showAll ? filteredProjects : filteredProjects.slice(0, INITIAL_VISIBLE)
 
   function handleViewDetail(project) {
     setSelectedProject(project)
@@ -73,37 +66,10 @@ function AdminProjectsList() {
   }, [rejectProject])
 
   return (
-    <div className="px-4 md:px-6 lg:px-8 pb-12">
+    <div className="px-4 md:px-6 lg:px-8 pt-6 md:pt-8 pb-12 md:pb-16">
       <div className="flex flex-col gap-5 md:gap-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={handleSearchChange}
-              placeholder="Cari judul atau nama mahasiswa..."
-              className="w-full rounded-xl border border-white/10 bg-slate-800/50 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/20 focus:outline-none transition-colors"
-            />
-          </div>
-          <button
-            type="button"
-            onClick={handleAddClick}
-            className="flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
-          >
-            <Plus size={16} />
-            Tambah Project
-          </button>
-        </div>
-
-        <AdminProjectsFilter
-          statusFilter={statusFilter}
-          onStatusChange={setStatusFilter}
-          counts={tabCounts}
-        />
-
         {filteredProjects.length === 0 ? (
-          <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 py-16 text-center">
+          <div className="animate-fade-in-up flex flex-col items-center gap-4 rounded-2xl border border-dashed border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] py-16 text-center">
             <div className="rounded-full bg-slate-800/50 p-4 ring-1 ring-slate-700/50">
               <FolderX className="h-8 w-8 text-slate-500" />
             </div>
@@ -120,16 +86,26 @@ function AdminProjectsList() {
           </div>
         ) : (
           <div className="grid grid-cols-1 min-[500px]:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-            {filteredProjects.map((project) => (
-              <AdminProjectsCard
-                key={project.id}
-                project={project}
-                onViewDetail={handleViewDetail}
-                onQuickApprove={handleApproveClick}
-                onQuickReject={handleRejectClick}
-              />
+            {visibleProjects.map((project, i) => (
+              <div key={project.id} className="h-full animate-fade-in-up" style={{ animationDelay: `${i * 30}ms` }}>
+                <AdminProjectsCard
+                  project={project}
+                  onViewDetail={handleViewDetail}
+                  onQuickApprove={handleApproveClick}
+                  onQuickReject={handleRejectClick}
+                />
+              </div>
             ))}
           </div>
+        )}
+
+        {filteredProjects.length > INITIAL_VISIBLE && (
+          <ShowMoreButton
+            label="Lihat Semua Project"
+            total={filteredProjects.length}
+            showAll={showAll}
+            onToggle={() => setShowAll((prev) => !prev)}
+          />
         )}
       </div>
 

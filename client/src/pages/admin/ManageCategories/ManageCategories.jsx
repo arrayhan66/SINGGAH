@@ -14,11 +14,16 @@ import {
   Sparkles, 
   Code, 
   BookOpen, 
-  FolderOpen 
+  FolderOpen,
+  LayoutGrid, 
+  PackageOpen 
 } from "lucide-react"
 import AdminLayout from "../../../layouts/AdminLayout"
 import AdminHeroBackground from "../../../components/ui/AdminHeroBackground"
 import AdminCategoryDeleteModal from "../../../components/sections/admin/ManageCategories/AdminCategoryDeleteModal"
+import ShowMoreButton from "../../../components/ui/ShowMoreButton"
+
+const INITIAL_VISIBLE = 9
 
 const getCategoryIcon = (name) => {
   const lower = name.toLowerCase()
@@ -33,6 +38,12 @@ const getCategoryIcon = (name) => {
   return FolderOpen
 }
 
+const stateTabs = [
+  { value: "all", label: "Semua", icon: LayoutGrid },
+  { value: "used", label: "Berisi Project", icon: FolderOpen },
+  { value: "empty", label: "Kosong", icon: PackageOpen },
+]
+
 const initialCategories = [
   { id: 1, name: "Desain Grafis", slug: "desain-grafis", projectCount: 12 },
   { id: 2, name: "Ilustrasi", slug: "ilustrasi", projectCount: 8 },
@@ -45,15 +56,38 @@ const initialCategories = [
 function ManageCategories() {
   const [categories, setCategories] = useState(initialCategories)
   const [search, setSearch] = useState("")
+  const [stateFilter, setStateFilter] = useState("all")
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState(null)
   const [formName, setFormName] = useState("")
+  const [showAll, setShowAll] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState(null)
+
+  const filterKey = `${search}|${stateFilter}`
+  const [activeFilter, setActiveFilter] = useState(filterKey)
+  if (filterKey !== activeFilter) {
+    setActiveFilter(filterKey)
+    setShowAll(false)
+  }
 
   const filtered = useMemo(() => {
     const s = search.toLowerCase()
-    return categories.filter((c) => c.name.toLowerCase().includes(s))
-  }, [categories, search])
+    return categories.filter((c) => {
+      const matchSearch = c.name.toLowerCase().includes(s)
+      const matchState =
+        stateFilter === "all" ||
+        (stateFilter === "used" ? c.projectCount > 0 : c.projectCount === 0)
+      return matchSearch && matchState
+    })
+  }, [categories, search, stateFilter])
+
+  const stateCounts = {
+    all: categories.length,
+    used: categories.filter((c) => c.projectCount > 0).length,
+    empty: categories.filter((c) => c.projectCount === 0).length,
+  }
+
+  const visibleCategories = showAll ? filtered : filtered.slice(0, INITIAL_VISIBLE)
 
   function handleOpenAdd() {
     setEditing(null)
@@ -101,11 +135,11 @@ function ManageCategories() {
 
   return (
     <AdminLayout>
-      <AdminHeroBackground>
+      <AdminHeroBackground fullWidth>
         <div className="px-4 md:px-6 lg:px-8 pt-8 md:pt-10">
           <div className="flex flex-col items-center text-center sm:flex-row sm:text-left sm:items-start gap-4 sm:gap-5">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 shadow-lg shadow-cyan-500/30 sm:h-16 sm:w-16">
-              <LayoutList className="h-7 w-7 text-white sm:h-8 sm:w-8" />
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 sm:h-16 sm:w-16">
+              <LayoutList className="h-7 w-7 text-cyan-300 sm:h-8 sm:w-8" />
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-black text-white">
@@ -117,34 +151,71 @@ function ManageCategories() {
             </div>
           </div>
         </div>
+
+        <div className="px-4 pt-6 pb-6 md:px-6 md:pt-7 md:pb-7 lg:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Cari kategori..."
+                className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleOpenAdd}
+              className="group flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
+            >
+              <Plus size={16} className="transition-transform duration-300 group-hover:rotate-90" />
+              <span>Tambah Kategori</span>
+            </button>
+          </div>
+
+          <div className="mt-4 flex w-fit flex-wrap items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-1">
+            {stateTabs.map((tab) => {
+              const Icon = tab.icon
+              const isActive = stateFilter === tab.value
+              const count = stateCounts[tab.value]
+              return (
+                <button
+                  key={tab.value}
+                  type="button"
+                  onClick={() => setStateFilter(tab.value)}
+                  className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-cyan-400/40 focus-visible:outline-none ${
+                    isActive
+                      ? "bg-white/10 text-white shadow-sm"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                  aria-pressed={isActive}
+                >
+                  <Icon
+                    className={`h-3.5 w-3.5 transition-colors duration-200 ${isActive ? "text-cyan-300" : "text-slate-500"}`}
+                  />
+                  {tab.label}
+                  {count !== undefined && (
+                    <span
+                      className={`rounded-full px-1.5 py-0.5 text-[10px] tabular-nums ${
+                        isActive
+                          ? "bg-cyan-500/20 text-cyan-300"
+                          : "bg-white/[0.07] text-slate-400"
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        </div>
       </AdminHeroBackground>
 
-      <div className="px-4 md:px-6 lg:px-8 mt-6 md:mt-8">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari kategori..."
-              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-800 placeholder-slate-400 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all"
-            />
-          </div>
-          <button
-            type="button"
-            onClick={handleOpenAdd}
-            className="group flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25 transition-all duration-300 hover:from-cyan-400 hover:to-blue-500 hover:-translate-y-0.5 active:translate-y-0"
-          >
-            <Plus size={16} className="transition-transform duration-300 group-hover:rotate-90" />
-            <span>Tambah Kategori</span>
-          </button>
-        </div>
-      </div>
-
-      <div className="px-4 pb-8 md:px-6 md:pb-10 lg:px-8 lg:pb-12 mt-8 md:mt-10">
+      <div className="relative px-4 pb-8 md:px-6 md:pb-10 lg:px-8 lg:pb-12 mt-6 md:mt-8">
         {showForm && (
-          <div className="animate-slide-down mb-8 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.08] to-white/[0.03] p-6 backdrop-blur-2xl sm:p-8 shadow-xl">
+          <div className="animate-slide-down absolute inset-x-0 top-0 z-20 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-brand-navy/95 via-brand-dark/95 to-slate-900/95 p-6 shadow-2xl shadow-black/50 backdrop-blur-2xl sm:p-8">
             <div className="flex items-center gap-3 mb-5">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600">
                 {editing ? <Pencil size={16} className="text-white" /> : <Plus size={16} className="text-white" />}
@@ -156,11 +227,11 @@ function ManageCategories() {
             <div className="flex flex-col sm:flex-row gap-3">
               <input
                 type="text"
-                placeholder="Masukkan nama kategori..."
+                placeholder="Masukkan kategori"
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSave()}
-                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-400 outline-none transition-all focus:border-cyan-400/50 focus:bg-white/10 focus:ring-2 focus:ring-cyan-400/20"
+                className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
                 autoFocus
               />
               <div className="flex gap-2">
@@ -201,7 +272,7 @@ function ManageCategories() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-            {filtered.map((cat) => {
+            {visibleCategories.map((cat) => {
               const IconComponent = getCategoryIcon(cat.name)
               return (
                 <div
@@ -256,6 +327,16 @@ function ManageCategories() {
               )
             })}
           </div>
+        )}
+
+        {filtered.length > INITIAL_VISIBLE && (
+          <ShowMoreButton
+            label="Lihat Semua Kategori"
+            total={filtered.length}
+            showAll={showAll}
+            onToggle={() => setShowAll((prev) => !prev)}
+            className="mt-4 md:mt-5"
+          />
         )}
       </div>
 

@@ -1,41 +1,46 @@
-import { useState, useMemo } from "react"
+import { useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { UserSearch, Plus } from "lucide-react"
+import { UserSearch } from "lucide-react"
 import { useUsers } from "../../../../context/UserContext"
-import SearchBar from "../../../ui/SearchBar"
 import AdminUserCard from "./AdminUserCard"
 import AdminUserDeleteModal from "./AdminUserDeleteModal"
+import ShowMoreButton from "../../../ui/ShowMoreButton"
 
-function AdminUserList() {
+const INITIAL_VISIBLE = 9
+
+function AdminUserList({ search, statusFilter }) {
   const navigate = useNavigate()
   const { userList, deleteUser } = useUsers()
-  const [search, setSearch] = useState("")
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [showAll, setShowAll] = useState(false)
+
+  const filterKey = search
+  const [activeFilter, setActiveFilter] = useState(filterKey)
+  if (filterKey !== activeFilter) {
+    setActiveFilter(filterKey)
+    setShowAll(false)
+  }
 
   const filteredUsers = useMemo(() => {
     const keyword = search.toLowerCase()
-    return userList.filter(
-      (u) =>
+    return userList.filter((u) => {
+      const matchSearch =
         u.name.toLowerCase().includes(keyword) ||
         u.email.toLowerCase().includes(keyword) ||
-        u.username.toLowerCase().includes(keyword),
-    )
-  }, [userList, search])
+        u.username.toLowerCase().includes(keyword)
+      const matchStatus = statusFilter === "all" || u.status === statusFilter
+      return matchSearch && matchStatus
+    })
+  }, [userList, search, statusFilter])
 
-  function handleSearchChange(e) {
-    setSearch(e.target.value)
-  }
-
-  function handleAddClick() {
-    navigate("/admin/users/tambah")
-  }
+  const visibleUsers = showAll ? filteredUsers : filteredUsers.slice(0, INITIAL_VISIBLE)
 
   function handleEditClick(user) {
-    navigate(`/admin/users/edit/${user.id}`)
+    navigate(`/users/edit/${user.username}`)
   }
 
   function handleDetailClick(user) {
-    navigate(`/admin/users/${user.id}`)
+    navigate(`/users/${user.username}`)
   }
 
   function handleDeleteClick(user) {
@@ -54,25 +59,6 @@ function AdminUserList() {
   return (
     <div className="px-4 md:px-6 lg:px-8 pt-4 pb-12">
       <div className="flex flex-col gap-5">
-        <div className="flex flex-col min-[500px]:flex-row gap-3">
-          <div className="flex-1 min-w-0 [&>div]:mt-0">
-            <SearchBar
-              value={search}
-              onChange={handleSearchChange}
-              placeholder="Cari nama, email, atau username..."
-            />
-          </div>
-
-          <button
-            type="button"
-            onClick={handleAddClick}
-            className="flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
-          >
-            <Plus size={16} />
-            Tambah User
-          </button>
-        </div>
-
         {filteredUsers.length === 0 ? (
           <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.04] to-white/[0.01] py-20 text-center backdrop-blur-xl">
             <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-slate-500/20 bg-slate-500/10">
@@ -93,7 +79,7 @@ function AdminUserList() {
               Menampilkan {filteredUsers.length} dari {userList.length} user
             </p>
             <div className="grid grid-cols-1 min-[500px]:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
-              {filteredUsers.map((user) => (
+              {visibleUsers.map((user) => (
                 <AdminUserCard
                   key={user.id}
                   user={user}
@@ -104,6 +90,15 @@ function AdminUserList() {
               ))}
             </div>
           </>
+        )}
+
+        {filteredUsers.length > INITIAL_VISIBLE && (
+          <ShowMoreButton
+            label="Lihat Semua User"
+            total={filteredUsers.length}
+            showAll={showAll}
+            onToggle={() => setShowAll((prev) => !prev)}
+          />
         )}
       </div>
 

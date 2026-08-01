@@ -1,216 +1,342 @@
-import { useState, useEffect } from "react"
-import { X, CheckCircle2, XCircle, Tag, Calendar, Heart, Eye, Clock, Layers } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import {
+  X, CheckCircle2, XCircle, Clock, Tag, Calendar, Heart, Eye, Layers,
+  FileText, AlertTriangle,
+} from "lucide-react"
+
+const statusConfig = {
+  approved: {
+    label: "Disetujui",
+    icon: CheckCircle2,
+    chip: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
+    softBg: "bg-emerald-500/10",
+    softColor: "text-emerald-400",
+  },
+  rejected: {
+    label: "Ditolak",
+    icon: XCircle,
+    chip: "border-red-400/30 bg-red-400/10 text-red-300",
+    softBg: "bg-red-500/10",
+    softColor: "text-red-400",
+  },
+  pending: {
+    label: "Menunggu Review",
+    icon: Clock,
+    chip: "border-amber-400/30 bg-amber-400/10 text-amber-300",
+    softBg: "bg-amber-500/10",
+    softColor: "text-amber-400",
+  },
+}
 
 function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onClose }) {
   const [visible, setVisible] = useState(false)
+  const [activeImage, setActiveImage] = useState(null)
+  const closeButtonRef = useRef(null)
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), 10)
-    return () => clearTimeout(timer)
-  }, [])
+    if (!project) return undefined
+    document.body.style.overflow = "hidden"
+    closeButtonRef.current?.focus()
+    const timer = setTimeout(() => {
+      setVisible(true)
+      setActiveImage(null)
+    }, 10)
+    return () => {
+      clearTimeout(timer)
+      document.body.style.overflow = "unset"
+    }
+  }, [project])
 
   if (!project) return null
 
-  function handleClose() {
-    setVisible(false)
-    setTimeout(() => {
-      onClose()
-    }, 200)
+  const config = statusConfig[project.status] || statusConfig.pending
+  const StatusIcon = config.icon
+  const techStack = Array.isArray(project.technologies) ? project.technologies : []
+  const allImages = Array.from(
+    new Set([
+      project.thumbnail,
+      ...(Array.isArray(project.images) ? project.images : []).map((img) => img.image_url),
+    ]),
+  ).filter(Boolean)
+  const currentImage = activeImage || project.thumbnail || ""
+
+  function formatDate(value) {
+    if (!value) return "—"
+    const date = new Date(value)
+    if (Number.isNaN(date.getTime())) return value
+    return date.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
   }
 
-  const StatusIcon = project.status === "approved" ? CheckCircle2 : project.status === "rejected" ? XCircle : Clock
-  const statusLabel = project.status === "approved" ? "Disetujui" : project.status === "rejected" ? "Ditolak" : "Menunggu Review"
-  const statusColor = project.status === "approved"
-    ? "text-emerald-300 border-emerald-400/30 bg-emerald-400/10"
-    : project.status === "rejected"
-    ? "text-red-300 border-red-400/30 bg-red-400/10"
-    : "text-amber-300 border-amber-400/30 bg-amber-400/10"
+  function handleClose() {
+    setVisible(false)
+    setTimeout(() => onClose(), 200)
+  }
 
-  const techStack = Array.isArray(project.technologies) ? project.technologies : []
-  const images = Array.isArray(project.images) ? project.images : []
+  function handleBackdropClick(e) {
+    if (e.target === e.currentTarget) handleClose()
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === "Escape") handleClose()
+  }
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 transition-opacity duration-200 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm transition-opacity duration-200 ${
         visible ? "opacity-100" : "opacity-0"
       }`}
+      onKeyDown={handleKeyDown}
+      onClick={handleBackdropClick}
     >
       <div
-        className={`relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-white/10 bg-brand-navy shadow-2xl transition-all duration-200 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent ${
-          visible ? "scale-100" : "scale-95"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="project-detail-title"
+        className={`relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-brand-navy to-brand-dark shadow-2xl backdrop-blur-xl transition-all duration-200 ${
+          visible ? "scale-100 opacity-100" : "scale-95 opacity-0"
         }`}
       >
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 bg-brand-navy/90 backdrop-blur-md px-5 py-4">
-          <div className="flex items-center gap-3">
-            <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium ${statusColor}`}>
+        <header className="flex items-center justify-between gap-3 border-b border-white/10 bg-brand-navy/90 px-5 py-4 backdrop-blur-md">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium ${config.chip}`}>
               <StatusIcon size={12} />
-              {statusLabel}
+              {config.label}
             </span>
             <span className="text-xs text-slate-500">ID: #{project.id}</span>
           </div>
           <button
+            ref={closeButtonRef}
             type="button"
             onClick={handleClose}
-            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+            aria-label="Tutup detail project"
+            className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
           >
             <X size={16} />
           </button>
-        </div>
+        </header>
 
-        <div className="flex flex-col">
-          <div className="aspect-video w-full overflow-hidden bg-brand-dark">
-            <img
-              src={project.thumbnail}
-              alt={project.title}
-              className="h-full w-full object-cover"
-            />
-          </div>
-
-          {images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto px-5 pb-4 -mt-3 relative z-10">
-              {images.map((img, i) => (
-                <img
-                  key={i}
-                  src={img.image_url}
-                  alt={`${project.title} ${i + 1}`}
-                  className="h-14 w-20 shrink-0 rounded-lg object-cover border border-white/10"
-                />
-              ))}
-            </div>
-          )}
-
-          <div className="px-5 pb-5 -mt-1">
-            <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 text-sm font-bold text-white shadow-sm">
-                {project.User?.name?.charAt(0) || "?"}
-              </div>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-white truncate">
-                  {project.User?.name || ""}
-                </p>
-                <p className="text-xs text-slate-500 truncate">
-                  {project.User?.nim || ""}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="px-5 pb-5">
-            <h2 className="text-xl font-bold text-white leading-snug">
-              {project.title}
-            </h2>
-
-            {project.description && (
-              <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                {project.description}
-              </p>
-            )}
-          </div>
-
-          <div className="px-5 pb-5">
-            <div className="flex flex-wrap items-center gap-2">
-              {project.Category?.name && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-400/20 bg-cyan-400/5 px-3 py-1 text-xs font-medium text-cyan-300">
-                  <Tag className="h-3 w-3" />
-                  {project.Category.name}
+        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+          <div className="grid lg:grid-cols-[minmax(0,1fr)_300px]">
+            <main className="min-w-0 p-5 md:p-6">
+              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-brand-dark">
+                <div className="aspect-video w-full">
+                  <img
+                    src={currentImage}
+                    alt={project.title}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand-dark/80 via-transparent to-transparent" />
+                <span className={`absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium backdrop-blur-md ${config.chip}`}>
+                  <StatusIcon size={11} />
+                  {config.label}
                 </span>
-              )}
-              {project.year && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300">
-                  <Calendar className="h-3 w-3 text-slate-400" />
-                  {project.year}
-                </span>
-              )}
-              {project.created_at && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300">
-                  <Clock className="h-3 w-3 text-slate-400" />
-                  {project.created_at}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {techStack.length > 0 && (
-            <div className="border-t border-white/5 px-5 py-4">
-              <h4 className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 mb-3">
-                <Layers className="h-3.5 w-3.5" />
-                Teknologi
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {techStack.map((tech, i) => (
-                  <span
-                    key={i}
-                    className="rounded-full border border-cyan-400/15 bg-cyan-400/5 px-3 py-1 text-xs text-cyan-300/90"
-                  >
-                    {tech}
-                  </span>
-                ))}
               </div>
-            </div>
-          )}
 
-          <div className="border-t border-white/5 px-5 py-4">
-            <div className="flex items-center gap-5 text-sm text-slate-500">
-              <span className="flex items-center gap-1.5">
-                <Heart className="h-4 w-4 text-pink-400/70" />
-                {project.likesCount ?? 0} suka
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Eye className="h-4 w-4 text-slate-400/70" />
-                {project.viewsCount ?? 0} dilihat
-              </span>
-            </div>
-          </div>
+              {allImages.length > 1 && (
+                <div className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                  {allImages.map((img, i) => {
+                    const active = img === currentImage
+                    return (
+                      <button
+                        key={`${img}-${i}`}
+                        type="button"
+                        onClick={() => setActiveImage(img)}
+                        aria-label={`Lihat gambar ${i + 1}`}
+                        aria-pressed={active}
+                        className={`relative h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200 ${
+                          active
+                            ? "border-cyan-400 shadow-[0_0_16px_-4px_rgba(34,211,238,0.6)]"
+                            : "border-white/10 opacity-60 hover:opacity-100"
+                        }`}
+                      >
+                        <img src={img} alt="" loading="lazy" className="h-full w-full object-cover" />
+                        {active && (
+                          <span className="absolute inset-x-0 bottom-0 flex h-6 items-center justify-center bg-cyan-400/20 backdrop-blur-sm">
+                            <CheckCircle2 className="h-3.5 w-3.5 text-cyan-300" />
+                          </span>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
 
-          {project.status === "rejected" && project.rejectionReason && (
-            <div className="border-t border-white/5 px-5 py-4">
-              <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4">
-                <h4 className="flex items-center gap-1.5 text-xs font-semibold text-red-400 mb-2">
-                  <XCircle className="h-3.5 w-3.5" />
-                  Alasan Penolakan
-                </h4>
-                <p className="text-sm leading-relaxed text-red-200/80">
-                  {project.rejectionReason}
+              <h2
+                id="project-detail-title"
+                className="mt-5 text-xl font-bold leading-snug text-white md:text-2xl"
+              >
+                {project.title}
+              </h2>
+
+              {project.description && (
+                <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                  {project.description}
                 </p>
-              </div>
-            </div>
-          )}
+              )}
 
-          {project.status === "approved" && (
-            <div className="border-t border-white/5 px-5 py-4">
-              <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
-                <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" />
-                  <p className="text-sm text-emerald-200/80">
-                    Project ini sudah disetujui dan ditampilkan di halaman Karya.
-                  </p>
+              <div className="mt-5 flex w-fit items-center gap-1 rounded-xl border border-white/10 bg-white/[0.03] p-1.5">
+                <span className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-slate-400">
+                  <Heart className="h-3.5 w-3.5 text-pink-400/80" />
+                  <strong className="font-semibold tabular-nums text-white">{project.likesCount ?? 0}</strong>
+                  Suka
+                </span>
+                <span className="h-4 w-px bg-white/10" />
+                <span className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-slate-400">
+                  <Eye className="h-3.5 w-3.5 text-cyan-400/80" />
+                  <strong className="font-semibold tabular-nums text-white">{project.viewsCount ?? 0}</strong>
+                  Dilihat
+                </span>
+              </div>
+
+              {techStack.length > 0 && (
+                <div className="mt-6">
+                  <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    <Layers className="h-3.5 w-3.5" />
+                    Teknologi
+                  </h4>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {techStack.map((tech, i) => (
+                      <span
+                        key={i}
+                        className="rounded-lg border border-cyan-400/15 bg-cyan-400/5 px-2.5 py-1 text-xs font-medium text-cyan-300/90"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {project.status === "rejected" && project.rejectionReason && (
+                <div className="mt-6 rounded-xl border border-red-500/20 bg-red-500/5 p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-500/10">
+                      <AlertTriangle className="h-4 w-4 text-red-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-semibold text-red-400">Alasan Penolakan</h4>
+                      <p className="mt-1 text-sm leading-relaxed text-red-200/80">
+                        {project.rejectionReason}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {project.status === "approved" && (
+                <div className="mt-6 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-semibold text-emerald-400">Project Disetujui</h4>
+                      <p className="mt-1 text-sm leading-relaxed text-emerald-200/80">
+                        {project.approveNote || "Project ini sudah disetujui dan ditampilkan di halaman Karya."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </main>
+
+            <aside className="flex flex-col gap-4 border-t border-white/10 p-5 md:p-6 lg:border-l lg:border-t-0">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 text-sm font-bold text-white shadow-sm">
+                    {project.User?.name?.charAt(0) || "?"}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-white">
+                      {project.User?.name || "—"}
+                    </p>
+                    <p className="truncate text-xs text-slate-500">
+                      {project.User?.nim || ""}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
 
-          {project.status === "pending" && (
-            <div className="border-t border-white/10 px-5 py-5">
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => onApproveClick(project)}
-                  className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:bg-emerald-600 transition-all"
-                >
-                  <CheckCircle2 size={18} />
-                  Setujui
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onRejectClick(project)}
-                  className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-400 hover:bg-red-500/20 transition-all"
-                >
-                  <XCircle size={18} />
-                  Tolak
-                </button>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+                <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  <FileText className="h-3.5 w-3.5" />
+                  Detail Project
+                </h4>
+                <dl className="mt-3 flex flex-col gap-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <dt className="flex items-center gap-2 text-xs text-slate-500">
+                      <Tag className="h-3.5 w-3.5" />
+                      Kategori
+                    </dt>
+                    <dd className="min-w-0 truncate text-xs font-medium text-slate-200">
+                      {project.Category?.name || "—"}
+                    </dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <dt className="flex items-center gap-2 text-xs text-slate-500">
+                      <Calendar className="h-3.5 w-3.5" />
+                      Tahun
+                    </dt>
+                    <dd className="text-xs font-medium text-slate-200">{project.year || "—"}</dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <dt className="flex items-center gap-2 text-xs text-slate-500">
+                      <Clock className="h-3.5 w-3.5" />
+                      Dikirim
+                    </dt>
+                    <dd className="text-right text-xs font-medium text-slate-200">
+                      {formatDate(project.created_at)}
+                    </dd>
+                  </div>
+                </dl>
               </div>
-            </div>
-          )}
+
+              {project.status === "pending" ? (
+                <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    Keputusan Review
+                  </h4>
+                  <div className="mt-3 flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onApproveClick(project)}
+                      className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-600 active:scale-[0.98]"
+                    >
+                      <CheckCircle2 size={16} />
+                      Setujui
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onRejectClick(project)}
+                      className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-400 transition-all hover:bg-red-500/20 active:scale-[0.98]"
+                    >
+                      <XCircle size={16} />
+                      Tolak
+                    </button>
+                  </div>
+                  <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
+                    Project akan langsung tampil di halaman Karya setelah disetujui.
+                  </p>
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    Status
+                  </h4>
+                  <div className="mt-3 flex items-center gap-3">
+                    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${config.softBg}`}>
+                      <StatusIcon className={`h-5 w-5 ${config.softColor}`} />
+                    </span>
+                    <div>
+                      <p className="text-sm font-semibold text-white">{config.label}</p>
+                      <p className="text-xs text-slate-500">ID: #{project.id}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </aside>
+          </div>
         </div>
       </div>
     </div>

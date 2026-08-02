@@ -6,6 +6,7 @@
   --color-brand-navy: #06294d;
   --color-brand-blue: #497eae;
 
+  --breakpoint-xs: 450px;
   --breakpoint-3xl: 1920px;
   --breakpoint-4xl: 2560px;
   --breakpoint-5xl: 3200px;

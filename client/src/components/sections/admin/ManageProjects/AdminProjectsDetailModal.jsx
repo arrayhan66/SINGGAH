@@ -102,7 +102,7 @@ function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onCl
               <StatusIcon size={12} />
               {config.label}
             </span>
-            <span className="text-xs text-slate-500">ID: #{project.id}</span>
+            <span className="hidden min-[300px]:inline text-xs text-slate-500">ID: #{project.id}</span>
           </div>
           <button
             ref={closeButtonRef}

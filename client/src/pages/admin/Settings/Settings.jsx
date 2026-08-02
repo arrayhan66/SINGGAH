@@ -71,8 +71,44 @@ function Settings() {
   const faviconInputRef = useRef(null)
   const menuButtonRef = useRef(null)
   const menuRef = useRef(null)
+  const rafRef = useRef(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [menuPos, setMenuPos] = useState(null)
+
+  function getNavbarBottom() {
+    const main = document.querySelector("main")
+    if (main) {
+      const pt = parseFloat(window.getComputedStyle(main).paddingTop)
+      if (!Number.isNaN(pt)) return pt
+    }
+    const header = document.querySelector("header")
+    return header ? header.getBoundingClientRect().bottom : 0
+  }
+
+  function applyMenuPosition() {
+    const btn = menuButtonRef.current
+    const panel = menuRef.current
+    if (!btn || !panel) return
+    const rect = btn.getBoundingClientRect()
+    const navbarBottom = getNavbarBottom()
+
+    if (rect.bottom <= navbarBottom) {
+      setMenuOpen(false)
+      return
+    }
+
+    panel.style.top = `${rect.bottom + 6}px`
+    panel.style.left = `${rect.left}px`
+    panel.style.width = `${rect.width}px`
+  }
+
+  function handleScrollReposition() {
+    if (rafRef.current) return
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null
+      applyMenuPosition()
+    })
+  }
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -89,10 +125,10 @@ function Settings() {
     function handleClose() {
       setMenuOpen(false)
     }
-    window.addEventListener("scroll", handleClose, true)
+    window.addEventListener("scroll", handleScrollReposition, { capture: true, passive: true })
     window.addEventListener("resize", handleClose)
     return () => {
-      window.removeEventListener("scroll", handleClose, true)
+      window.removeEventListener("scroll", handleScrollReposition, { capture: true, passive: true })
       window.removeEventListener("resize", handleClose)
     }
   }, [menuOpen])
@@ -161,7 +197,11 @@ function Settings() {
   function toggleMenu() {
     if (!menuOpen && menuButtonRef.current) {
       const rect = menuButtonRef.current.getBoundingClientRect()
-      setMenuPos({ top: rect.bottom + 6, left: rect.left, width: rect.width })
+      setMenuPos({
+        top: rect.bottom + 6,
+        left: rect.left,
+        width: rect.width,
+      })
     }
     setMenuOpen((v) => !v)
   }
@@ -462,8 +502,10 @@ function Settings() {
                           <Icon size={14} />
                         </span>
                         <span className="min-w-0 flex-1 truncate">{tab.label}</span>
-                        <span className="hidden text-xs text-slate-500 min-[400px]:block">{tab.desc}</span>
-                        {isActive && <Check size={16} className="shrink-0 text-cyan-400" />}
+                        <span className="min-w-0 flex-1 truncate text-xs text-slate-400 [@media(max-width:600px)]:hidden">{tab.desc}</span>
+                        <div className="flex w-4 shrink-0 items-center justify-center">
+                          {isActive && <Check size={16} className="shrink-0 text-cyan-400" />}
+                        </div>
                       </button>
                     )
                   })}

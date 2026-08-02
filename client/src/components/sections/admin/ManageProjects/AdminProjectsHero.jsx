@@ -40,15 +40,15 @@ function AdminProjectsHero({ stats, search, onSearchChange, statusFilter, onStat
   return (
     <AdminHeroBackground fullWidth>
       <div className="px-4 md:px-6 lg:px-8 pt-8 md:pt-10">
-        <div className="flex items-center gap-4 md:gap-5">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10 shadow-lg shadow-cyan-500/10 sm:h-16 sm:w-16">
-            <FolderKanban className="h-7 w-7 text-cyan-300 sm:h-8 sm:w-8" />
+        <div className="flex flex-col items-center text-center sm:flex-row sm:text-left gap-[clamp(0.75rem,0.5rem+1vw,1rem)] md:gap-5">
+          <div className="flex h-[clamp(2.75rem,2.25rem+2vw,3.5rem)] w-[clamp(2.75rem,2.25rem+2vw,3.5rem)] shrink-0 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10 shadow-lg shadow-cyan-500/10 sm:h-16 sm:w-16">
+            <FolderKanban className="h-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] w-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] text-cyan-300 sm:h-8 sm:w-8" />
           </div>
-          <div>
-            <h1 className="text-2xl font-black text-white sm:text-3xl">
+          <div className="min-w-0">
+            <h1 className="text-[clamp(1.25rem,0.9375rem+1.5vw,1.5rem)] font-black text-white sm:text-3xl">
               Kelola <span className="text-cyan-300">Project</span>
             </h1>
-            <p className="mt-1.5 max-w-xl text-sm text-slate-300/90">
+            <p className="mt-1.5 max-w-xl text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-300/90">
               Tinjau, setujui, atau tolak project yang diunggah mahasiswa.
             </p>
           </div>
@@ -57,20 +57,23 @@ function AdminProjectsHero({ stats, search, onSearchChange, statusFilter, onStat
 
       <div className="px-4 pt-8 pb-5 md:px-6 md:pt-10 md:pb-6 lg:px-8">
         <div className="animate-fade-in-up rounded-2xl border border-white/10 bg-white/[0.07] px-4 py-4 shadow-lg shadow-black/10 backdrop-blur-xl md:px-6 md:py-5">
-          <div className="grid grid-cols-2 gap-x-4 gap-y-5 min-[500px]:grid-cols-4 min-[500px]:gap-0 min-[500px]:divide-x min-[500px]:divide-white/[0.06]">
+          <div className="grid grid-cols-1 gap-3 min-[600px]:grid-cols-2 min-[1000px]:grid-cols-4 min-[1000px]:gap-0 min-[1000px]:divide-x min-[1000px]:divide-white/[0.06]">
             {statCards.map((stat) => {
               const Icon = stat.icon
               const count = stats?.[stat.key] ?? 0
               return (
-                <div key={stat.key} className="group flex items-center gap-3 min-w-0 min-[500px]:px-5 min-[500px]:first:pl-0">
-                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-transform duration-300 group-hover:scale-105 ${stat.iconBg}`}>
-                    <Icon className={`h-[18px] w-[18px] ${stat.iconColor}`} />
+                <div
+                  key={stat.key}
+                  className="group flex min-w-0 items-center gap-3.5 rounded-xl bg-white/[0.05] px-4 py-3.5 transition-colors duration-300 hover:bg-white/[0.09] min-[1000px]:rounded-none min-[1000px]:bg-transparent min-[1000px]:px-5 min-[1000px]:first:pl-0 min-[1000px]:hover:bg-transparent"
+                >
+                  <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105 min-[1000px]:h-9 min-[1000px]:w-9 min-[1000px]:rounded-lg ${stat.iconBg}`}>
+                    <Icon className={`h-5 w-5 min-[1000px]:h-[18px] min-[1000px]:w-[18px] ${stat.iconColor}`} />
                   </div>
                   <div className="min-w-0">
-                    <p className="truncate text-lg font-bold text-white leading-tight md:text-xl tabular-nums">
+                    <p className="truncate text-xl font-bold text-white leading-tight tabular-nums min-[1000px]:text-lg">
                       {count}
                     </p>
-                    <p className="truncate text-[11px] text-slate-400 leading-tight">
+                    <p className="truncate text-xs text-slate-400 leading-tight min-[1000px]:text-[11px]">
                       {stat.label}
                     </p>
                   </div>

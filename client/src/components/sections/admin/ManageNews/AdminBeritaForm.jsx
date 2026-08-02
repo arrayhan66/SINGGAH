@@ -163,7 +163,7 @@ function AdminBeritaForm() {
       <div className="px-6 py-8 md:px-10 md:py-10">
         {notification && (
           <div
-            className={`fixed top-6 right-6 z-50 flex items-center gap-3 rounded-xl border px-5 py-3.5 text-sm font-semibold shadow-2xl backdrop-blur-md transition-all ${
+            className={`fixed top-6 right-6 z-50 flex max-w-[calc(100vw-3rem)] items-center gap-3 rounded-xl border px-5 py-3.5 text-sm font-semibold shadow-2xl backdrop-blur-md transition-all ${
               notification.type === "success"
                 ? "border-emerald-500/30 bg-emerald-500/20 text-emerald-300"
                 : "border-red-500/30 bg-red-500/20 text-red-300"
@@ -189,11 +189,11 @@ function AdminBeritaForm() {
           Kembali ke Kelola Berita
         </button>
 
-        <h1 className="mt-4 text-xl md:text-2xl font-bold text-white">
+        <h1 className="mt-4 text-[clamp(1.125rem,1rem+0.75vw,1.25rem)] md:text-2xl font-bold text-white">
           {isEditMode ? "Edit Berita" : "Tambah Berita Baru"}
         </h1>
 
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="mt-1 text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400">
           {isEditMode
             ? "Perbarui judul, konten, dan pengaturan berita."
             : "Buat berita baru untuk dipublikasikan di halaman Berita & Kegiatan."}

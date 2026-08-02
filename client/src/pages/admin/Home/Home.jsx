@@ -12,12 +12,12 @@ function HomeAdmin() {
         <AdminHero />
 
         <div className="px-4 md:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-7">
-            <div className="flex flex-col gap-6 lg:col-span-2 lg:gap-7">
+          <div className="grid grid-cols-1 gap-6 min-[1200px]:grid-cols-3 min-[1200px]:gap-7">
+            <div className="flex flex-col gap-6 min-[1200px]:col-span-2 min-[1200px]:gap-7">
               <DashboardPendingProjects />
               <DashboardApprovedProjects />
             </div>
-            <div className="flex flex-col gap-6 lg:gap-7">
+            <div className="flex flex-col gap-6 min-[1200px]:gap-7">
               <DashboardActivityFeed />
               <DashboardLatestNews />
             </div>

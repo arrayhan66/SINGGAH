@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react"
+import { createPortal } from "react-dom"
 import {
   Settings2, Save, Globe, Mail, Image, MessageSquare, Shield,
-  Check, Upload, Palette, X
+  Check, Upload, Palette, X, ChevronDown
 } from "lucide-react"
 import AdminLayout from "../../../layouts/AdminLayout"
 import AdminHeroBackground from "../../../components/ui/AdminHeroBackground"
@@ -57,9 +58,6 @@ const toggleClass =
 const switchClass =
   "h-6 w-11 rounded-full border border-white/10 bg-white/10 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-slate-300 after:shadow-md after:transition-all peer-checked:border-cyan-400 peer-checked:bg-cyan-500 peer-checked:after:translate-x-full peer-checked:after:bg-white"
 
-const rowClass =
-  "flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.04] p-4 transition-colors hover:border-white/20"
-
 function Settings() {
   const [activeTab, setActiveTab] = useState("general")
   const [animDir, setAnimDir] = useState("right")
@@ -71,6 +69,33 @@ function Settings() {
   })
   const logoInputRef = useRef(null)
   const faviconInputRef = useRef(null)
+  const menuButtonRef = useRef(null)
+  const menuRef = useRef(null)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [menuPos, setMenuPos] = useState(null)
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      const inButton = menuButtonRef.current && menuButtonRef.current.contains(e.target)
+      const inMenu = menuRef.current && menuRef.current.contains(e.target)
+      if (!inButton && !inMenu) setMenuOpen(false)
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  useEffect(() => {
+    if (!menuOpen) return
+    function handleClose() {
+      setMenuOpen(false)
+    }
+    window.addEventListener("scroll", handleClose, true)
+    window.addEventListener("resize", handleClose)
+    return () => {
+      window.removeEventListener("scroll", handleClose, true)
+      window.removeEventListener("resize", handleClose)
+    }
+  }, [menuOpen])
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(form))
@@ -133,6 +158,19 @@ function Settings() {
     setActiveTab(id)
   }
 
+  function toggleMenu() {
+    if (!menuOpen && menuButtonRef.current) {
+      const rect = menuButtonRef.current.getBoundingClientRect()
+      setMenuPos({ top: rect.bottom + 6, left: rect.left, width: rect.width })
+    }
+    setMenuOpen((v) => !v)
+  }
+
+  function selectTabFromMenu(id) {
+    switchTab(id)
+    setMenuOpen(false)
+  }
+
   const active = tabs.find((t) => t.id === activeTab)
   const TabIcon = active.icon
 
@@ -151,17 +189,15 @@ function Settings() {
           <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-300">Footer Text</label>
           <input type="text" name="footerText" value={form.footerText} onChange={handleChange} className={inputClass} />
         </div>
-        <div className={rowClass}>
-          <div className="flex items-center gap-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-400/10">
-              <Palette className="h-5 w-5 text-amber-300" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-white">Mode Maintenance</p>
-              <p className="mt-0.5 text-xs text-slate-400">Nonaktifkan akses publik ke website sementara waktu</p>
-            </div>
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-5 text-center transition-colors hover:border-white/20">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-400/10">
+            <Palette className="h-6 w-6 text-amber-300" />
           </div>
-          <label className={toggleClass}>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-white">Mode Maintenance</p>
+            <p className="mt-0.5 text-xs text-slate-400">Nonaktifkan akses publik ke website sementara waktu</p>
+          </div>
+          <label className={`${toggleClass} shrink-0`}>
             <input type="checkbox" name="maintenanceMode" checked={form.maintenanceMode} onChange={handleChange} className="peer sr-only" />
             <div className={switchClass} />
           </label>
@@ -192,12 +228,12 @@ function Settings() {
   function renderLogo() {
     return (
       <div className="space-y-6" key="logo">
-        <div className="group relative overflow-hidden rounded-2xl border border-dashed border-white/15 bg-white/[0.03] p-8 text-center backdrop-blur-md transition-all duration-300 hover:border-cyan-400/50 hover:bg-white/[0.05]">
+        <div className="group relative overflow-hidden rounded-2xl border border-dashed border-white/15 bg-white/[0.03] p-6 text-center backdrop-blur-md transition-all duration-300 hover:border-cyan-400/50 hover:bg-white/[0.05] min-[480px]:p-8">
           <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           <div className="relative">
             {logoPreview ? (
               <div className="relative mx-auto inline-block rounded-2xl border border-white/10 bg-white/[0.06] p-2 shadow-lg">
-                <img src={logoPreview} alt="Logo preview" className="h-24 max-w-xs rounded-xl object-contain" />
+                <img src={logoPreview} alt="Logo preview" className="h-24 w-auto max-w-[220px] rounded-xl object-contain min-[480px]:max-w-xs" />
                 <button
                   type="button"
                   onClick={removeLogo}
@@ -218,7 +254,7 @@ function Settings() {
             <button
               type="button"
               onClick={() => logoInputRef.current?.click()}
-              className="mt-5 cursor-pointer rounded-xl border border-cyan-400/30 bg-cyan-400/15 px-6 py-2.5 text-sm font-semibold text-cyan-200 transition-all duration-200 hover:bg-cyan-400/25 hover:shadow-lg hover:shadow-cyan-400/10 active:scale-[0.98]"
+              className="mt-5 w-full cursor-pointer rounded-xl border border-cyan-400/30 bg-cyan-400/15 px-6 py-2.5 text-sm font-semibold text-cyan-200 transition-all duration-200 hover:bg-cyan-400/25 hover:shadow-lg hover:shadow-cyan-400/10 active:scale-[0.98] min-[480px]:w-auto"
             >
               {logoPreview ? "Ganti File Logo" : "Pilih File Logo"}
             </button>
@@ -235,7 +271,7 @@ function Settings() {
               onChange={handleFaviconSelect}
               className="hidden"
             />
-            <input type="text" placeholder="/favicon.ico" value={favicon} readOnly className={`${inputClass} flex-1 cursor-pointer`} onClick={() => faviconInputRef.current?.click()} />
+            <input type="text" placeholder="/favicon.ico" value={favicon} readOnly className={`${inputClass} min-w-0 flex-1 cursor-pointer`} onClick={() => faviconInputRef.current?.click()} />
             {favicon && (
               <button
                 type="button"
@@ -280,22 +316,22 @@ function Settings() {
   function renderSecurity() {
     return (
       <div className="space-y-6" key="security">
-        <div className={rowClass}>
-          <div>
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-5 text-center transition-colors hover:border-white/20">
+          <div className="min-w-0">
             <p className="text-sm font-semibold text-white">Registrasi Pengguna Baru</p>
             <p className="mt-0.5 text-xs text-slate-400">Izinkan pengunjung mendaftar akun baru secara mandiri</p>
           </div>
-          <label className={toggleClass}>
+          <label className={`${toggleClass} shrink-0`}>
             <input type="checkbox" name="registrationOpen" checked={form.registrationOpen} onChange={handleChange} className="peer sr-only" />
             <div className={switchClass} />
           </label>
         </div>
-        <div className={rowClass}>
-          <div>
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-5 text-center transition-colors hover:border-white/20">
+          <div className="min-w-0">
             <p className="text-sm font-semibold text-white">Verifikasi Email Wajib</p>
             <p className="mt-0.5 text-xs text-slate-400">Kirim tautan verifikasi email saat registrasi akun baru</p>
           </div>
-          <label className={toggleClass}>
+          <label className={`${toggleClass} shrink-0`}>
             <input type="checkbox" name="emailVerification" checked={form.emailVerification} onChange={handleChange} className="peer sr-only" />
             <div className={switchClass} />
           </label>
@@ -322,15 +358,15 @@ function Settings() {
     <AdminLayout>
       <AdminHeroBackground fullWidth>
         <div className="px-4 min-[260px]:px-3 pt-5 min-[260px]:pt-5 md:px-6 md:pt-6">
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10 sm:h-16 sm:w-16">
-              <Settings2 className="h-7 w-7 text-cyan-300 sm:h-8 sm:w-8" />
+          <div className="flex flex-col items-center text-center sm:flex-row sm:text-left gap-[clamp(0.75rem,0.5rem+1vw,1rem)]">
+            <div className="flex h-[clamp(2.75rem,2.25rem+2vw,3.5rem)] w-[clamp(2.75rem,2.25rem+2vw,3.5rem)] shrink-0 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10 sm:h-16 sm:w-16">
+              <Settings2 className="h-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] w-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] text-cyan-300 sm:h-8 sm:w-8" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-black text-white">
+              <h1 className="text-[clamp(1.25rem,0.9375rem+1.5vw,1.5rem)] sm:text-3xl font-black text-white">
                 Pengaturan <span className="text-cyan-300">Website</span>
               </h1>
-              <p className="mt-1 max-w-xl text-sm text-slate-400">
+              <p className="mt-1 max-w-xl text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400">
                 Kelola konfigurasi, identitas visual, dan sistem platform SINGGAH
               </p>
             </div>
@@ -338,7 +374,7 @@ function Settings() {
         </div>
 
         <div className="px-4 min-[260px]:px-3 pt-8 min-[260px]:pt-8 pb-5 min-[260px]:pb-5 md:px-6 md:pt-10 md:pb-6">
-          <div role="tablist" aria-label="Menu pengaturan" className="flex flex-wrap gap-2">
+          <div role="tablist" aria-label="Menu pengaturan" className="hidden flex-wrap gap-2 min-[800px]:flex">
             {tabs.map((tab) => {
               const Icon = tab.icon
               const isActive = activeTab === tab.id
@@ -368,12 +404,79 @@ function Settings() {
               )
             })}
           </div>
+
+          <div className="min-[800px]:hidden">
+            <button
+              ref={menuButtonRef}
+              type="button"
+              aria-haspopup="listbox"
+              aria-expanded={menuOpen}
+              onClick={toggleMenu}
+              className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-200 backdrop-blur-xl transition-all duration-200 hover:bg-white/[0.08]"
+            >
+              <span className="flex min-w-0 items-center gap-2.5">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-cyan-400/30 bg-cyan-400/15 text-cyan-300">
+                  <TabIcon size={15} />
+                </span>
+                <span className="truncate">{active.label}</span>
+              </span>
+              <ChevronDown
+                size={16}
+                className={`shrink-0 text-slate-400 transition-transform duration-200 ${menuOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+
+            {menuOpen &&
+              menuPos &&
+              createPortal(
+                <div
+                  ref={menuRef}
+                  role="listbox"
+                  style={{
+                    position: "fixed",
+                    top: menuPos.top,
+                    left: menuPos.left,
+                    width: menuPos.width,
+                  }}
+                  className="z-50 min-w-[220px] animate-fade-in-up overflow-hidden rounded-xl border border-white/10 bg-slate-900/95 shadow-2xl shadow-black/40 backdrop-blur-xl"
+                >
+                  {tabs.map((tab) => {
+                    const Icon = tab.icon
+                    const isActive = activeTab === tab.id
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        role="option"
+                        aria-selected={isActive}
+                        onClick={() => selectTabFromMenu(tab.id)}
+                        className={`flex w-full cursor-pointer items-center gap-2.5 px-4 py-3 text-left text-sm font-medium transition-colors ${
+                          isActive
+                            ? "bg-cyan-400/10 text-cyan-300"
+                            : "text-slate-300 hover:bg-white/5 hover:text-white"
+                        }`}
+                      >
+                        <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${
+                          isActive ? "bg-cyan-400/15 text-cyan-300" : "text-slate-500"
+                        }`}>
+                          <Icon size={14} />
+                        </span>
+                        <span className="min-w-0 flex-1 truncate">{tab.label}</span>
+                        <span className="hidden text-xs text-slate-500 min-[400px]:block">{tab.desc}</span>
+                        {isActive && <Check size={16} className="shrink-0 text-cyan-400" />}
+                      </button>
+                    )
+                  })}
+                </div>,
+                document.body
+              )}
+          </div>
         </div>
       </AdminHeroBackground>
 
       <div className="px-4 min-[260px]:px-3 pb-12 md:px-6 md:pb-16 lg:px-8">
         <form onSubmit={handleSave} className="mx-auto mt-6 max-w-5xl md:mt-8">
-          <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5 shadow-xl backdrop-blur-xl md:p-8">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-xl backdrop-blur-xl min-[500px]:p-6 md:p-8">
             <div className="mb-7 flex items-center gap-3.5 border-b border-white/10 pb-5">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-400/10">
                 <TabIcon className="h-5 w-5 text-cyan-300" />
@@ -388,7 +491,7 @@ function Settings() {
               {tabContent[activeTab]}
             </div>
 
-            <div className="mt-8 flex items-center justify-between gap-4 border-t border-white/10 pt-6">
+            <div className="mt-8 flex flex-col items-stretch gap-3 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
               <button
                 type="submit"
                 className="group relative flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-xl hover:shadow-cyan-500/35 active:scale-[0.98]"
@@ -397,7 +500,7 @@ function Settings() {
                 Simpan Pengaturan
               </button>
               {saved && (
-                <span className="flex animate-fade-in items-center gap-2 rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3.5 py-1.5 text-sm font-semibold text-emerald-300">
+                <span className="flex min-w-0 animate-fade-in items-center gap-2 rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3.5 py-1.5 text-sm font-semibold text-emerald-300">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400/20">
                     <Check size={12} className="text-emerald-300" />
                   </span>

@@ -1,9 +1,7 @@
 import GlowBackground from "./GlowBackground"
 
-const bleedMargin =
-  "-mx-3 min-[260px]:-mx-4 md:-mx-6 lg:-mx-8 xl:-mx-10 2xl:-mx-12 3xl:-mx-16 4xl:-mx-20 5xl:-mx-24 6xl:-mx-28"
-const restorePadding =
-  "px-3 min-[260px]:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12 3xl:px-16 4xl:px-20 5xl:px-24 6xl:px-28"
+const bleedMargin = "-mx-[clamp(8px,2vw,32px)]"
+const restorePadding = "px-[clamp(8px,2vw,32px)]"
 
 function AdminHeroBackground({ children, className = "", fullWidth = false }) {
   return (

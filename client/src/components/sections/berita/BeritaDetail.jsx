@@ -37,7 +37,7 @@ function BeritaDetail() {
 
   if (!item) {
     return (
-      <section className="relative min-h-screen bg-brand-navy pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-16">
+      <section className="relative min-h-screen bg-brand-dark pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-16">
         <div className="mx-auto max-w-2xl px-4 min-[350px]:px-5 text-center">
           <h2 className="text-xl min-[350px]:text-2xl font-bold text-white">
             Berita tidak ditemukan
@@ -58,7 +58,7 @@ function BeritaDetail() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-brand-navy min-h-screen pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-16 sm:pb-20 lg:pb-24">
+    <section className="relative overflow-hidden bg-brand-dark min-h-screen pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-16 sm:pb-20 lg:pb-24">
       <DustBackground />
 
       <div className="relative z-10 mx-auto max-w-4xl px-3 min-[350px]:px-5 sm:px-8 2xl:max-w-5xl">

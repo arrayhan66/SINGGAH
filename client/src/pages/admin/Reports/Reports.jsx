@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { BarChart3, Users, FolderKanban, Eye, ThumbsUp, TrendingUp, TrendingDown, Calendar } from "lucide-react"
+import { BarChart3, Users, FolderKanban, Eye, ThumbsUp, TrendingUp, TrendingDown, Calendar, UserCheck, Sparkles } from "lucide-react"
 import AdminLayout from "../../../layouts/AdminLayout"
 import AdminHeroBackground from "../../../components/ui/AdminHeroBackground"
 import { useProjects } from "../../../context/ProjectContext"
@@ -56,6 +56,108 @@ function Trend({ value }) {
       {isUp ? "+" : ""}
       {value.toFixed(1)}%
     </span>
+  )
+}
+
+const barTheme = {
+  cyan: {
+    bar: "from-cyan-500 to-cyan-300",
+    top: "text-cyan-400",
+    iconWrap: "border-cyan-400/30 bg-cyan-500/15 shadow-cyan-500/20",
+    iconText: "text-cyan-300",
+    badge: "border-cyan-400/20 bg-cyan-500/10",
+    badgeText: "text-cyan-300",
+    glow: "bg-cyan-500/15",
+    glowShadow: "shadow-cyan-500/30",
+  },
+  emerald: {
+    bar: "from-emerald-500 to-emerald-300",
+    top: "text-emerald-400",
+    iconWrap: "border-emerald-400/30 bg-emerald-500/15 shadow-emerald-500/20",
+    iconText: "text-emerald-300",
+    badge: "border-emerald-400/20 bg-emerald-500/10",
+    badgeText: "text-emerald-300",
+    glow: "bg-emerald-500/15",
+    glowShadow: "shadow-emerald-500/30",
+  },
+}
+
+function MonthlyBarChart({ title, subtitle, data, valueKey, color, Icon, formatter }) {
+  const c = barTheme[color]
+  const total = data.reduce((s, d) => s + (d[valueKey] || 0), 0)
+  const maxValue = Math.max(...data.map((d) => d[valueKey] || 0), 1)
+  const bestIndex = data.findIndex((d) => (d[valueKey] || 0) === maxValue)
+
+  return (
+    <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-5 shadow-xl backdrop-blur-xl transition-all duration-300 hover:border-white/20 md:p-6">
+      <div className={`pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full ${c.glow} blur-3xl opacity-50 transition-opacity duration-300 group-hover:opacity-80`} />
+      <div className="relative mb-6 flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border shadow-lg ${c.iconWrap}`}>
+            <Icon className={`h-5 w-5 ${c.iconText}`} />
+          </div>
+          <div className="min-w-0">
+            <h3 className="truncate text-[17px] font-semibold text-white leading-tight md:text-[18px]">{title}</h3>
+            <p className="text-xs text-slate-400">{subtitle}</p>
+          </div>
+        </div>
+        <div className={`flex shrink-0 flex-col items-center rounded-xl border px-3.5 py-2 ${c.badge}`}>
+          <span className={`text-base font-black leading-none tabular-nums ${c.badgeText}`}>{formatter(total)}</span>
+          <span className="mt-0.5 text-[10px] text-slate-400">Total</span>
+        </div>
+      </div>
+
+      <div className="relative flex h-40 items-end gap-1.5 overflow-x-auto overflow-y-hidden">
+        <div className="flex min-w-[300px] flex-1 items-end gap-1.5">
+          {data.map((d, i) => {
+            const val = d[valueKey] || 0
+            const isBest = val > 0 && i === bestIndex
+            const height = val > 0 ? Math.max((val / maxValue) * 100, 4) : 3
+            return (
+              <div key={d.month} className="flex flex-1 flex-col items-center gap-1.5">
+                <span className={`text-[10px] font-semibold tabular-nums ${val > 0 ? c.top : "text-slate-600"}`}>
+                  {formatter(val)}
+                </span>
+                <div
+                  className={`w-full rounded-t-lg bg-gradient-to-t ${c.bar} transition-all duration-200 ${
+                    isBest ? `${c.glowShadow} shadow-lg opacity-100` : "opacity-60 group-hover:opacity-100"
+                  }`}
+                  style={{ height: `${height}%` }}
+                />
+                <span className={`text-[10px] ${isBest ? `font-semibold ${c.badgeText}` : "text-slate-500"}`}>
+                  {d.month}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const summaryTheme = {
+  cyan: { wrap: "border-cyan-400/40 bg-cyan-400/15 shadow-cyan-500/20", text: "text-cyan-300", grad: "from-cyan-500/20 via-cyan-500/[0.06] to-transparent", glow: "bg-cyan-500/15" },
+  emerald: { wrap: "border-emerald-400/40 bg-emerald-400/15 shadow-emerald-500/20", text: "text-emerald-300", grad: "from-emerald-500/20 via-emerald-500/[0.06] to-transparent", glow: "bg-emerald-500/15" },
+  blue: { wrap: "border-blue-400/40 bg-blue-400/15 shadow-blue-500/20", text: "text-blue-300", grad: "from-blue-500/20 via-blue-500/[0.06] to-transparent", glow: "bg-blue-500/15" },
+  amber: { wrap: "border-amber-400/40 bg-amber-400/15 shadow-amber-500/20", text: "text-amber-300", grad: "from-amber-500/20 via-amber-500/[0.06] to-transparent", glow: "bg-amber-500/15" },
+}
+
+function SummaryCard({ icon: Icon, label, value, color }) {
+  const c = summaryTheme[color]
+  return (
+    <div className={`group relative min-w-0 overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br ${c.grad} px-4 py-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20`}>
+      <Icon className={`absolute -right-2 -top-2 h-20 w-20 rotate-12 ${c.text} opacity-[0.07] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6`} />
+      <div className="relative flex items-center gap-3.5">
+        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border shadow-lg ${c.wrap}`}>
+          <Icon className={`h-5 w-5 ${c.text}`} />
+        </div>
+        <div className="min-w-0">
+          <p className="truncate text-2xl font-black leading-tight text-white tabular-nums">{value}</p>
+          <p className="truncate text-xs leading-tight text-slate-300/80">{label}</p>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -151,22 +253,19 @@ function Reports() {
     return { avgProjects, avgVisitors, activeUsers, newProjectsThisMonth }
   }, [projects, monthlyData])
 
-  const maxVisitors = Math.max(...monthlyData.map((d) => d.visitors), 1)
-  const maxProjects = Math.max(...monthlyData.map((d) => d.projects), 1)
-
   return (
     <AdminLayout>
       <AdminHeroBackground fullWidth>
         <div className="px-4 min-[260px]:px-3 pt-5 min-[260px]:pt-5 md:px-6 md:pt-6">
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 sm:h-16 sm:w-16">
-              <BarChart3 className="h-7 w-7 text-cyan-300 sm:h-8 sm:w-8" />
+          <div className="flex flex-col items-center text-center sm:flex-row sm:text-left gap-[clamp(0.75rem,0.5rem+1vw,1rem)]">
+            <div className="flex h-[clamp(2.75rem,2.25rem+2vw,3.5rem)] w-[clamp(2.75rem,2.25rem+2vw,3.5rem)] shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 sm:h-16 sm:w-16">
+              <BarChart3 className="h-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] w-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] text-cyan-300 sm:h-8 sm:w-8" />
             </div>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-black text-white">
+            <div className="min-w-0">
+              <h1 className="text-[clamp(1.25rem,0.9375rem+1.5vw,1.5rem)] sm:text-3xl font-black text-white">
                 Laporan & <span className="text-cyan-300">Statistik</span>
               </h1>
-              <p className="mt-1 text-sm text-slate-400 max-w-xl">Ringkasan aktivitas platform dalam periode tertentu.</p>
+              <p className="mt-1 text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400 max-w-xl">Ringkasan aktivitas platform dalam periode tertentu.</p>
             </div>
           </div>
         </div>
@@ -231,86 +330,44 @@ function Reports() {
       </AdminHeroBackground>
 
       <div className="px-4 pb-12 md:px-6 lg:px-8 md:pb-16">
-            <div className="mt-6 md:mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5 shadow-xl backdrop-blur-xl md:p-6">
-                <div className="mb-6 flex items-center gap-2.5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/15">
-                    <TrendingUp className="h-4 w-4 text-cyan-400" />
-                  </div>
-                  <h3 className="text-[17px] font-semibold text-white md:text-[18px]">Project per Bulan ({viewYear})</h3>
-                </div>
-                <div className="flex items-end gap-1.5 h-40">
-                  {monthlyData.map((d) => (
-                    <div key={d.month} className="flex flex-1 flex-col items-center gap-1.5">
-                      <span className="text-[10px] font-medium text-slate-500">{d.projects}</span>
-                      <div
-                        className="w-full rounded-t-md bg-gradient-to-t from-cyan-600 to-cyan-400 transition-all hover:opacity-80"
-                        style={{ height: `${(d.projects / maxProjects) * 100}%`, minHeight: 4 }}
-                      />
-                      <span className="text-[10px] text-slate-500">{d.month}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+        <div className="mt-6 grid grid-cols-1 gap-6 md:mt-8 lg:grid-cols-2">
+          <MonthlyBarChart
+            title="Project per Bulan"
+            subtitle={`Tahun ${viewYear}`}
+            data={monthlyData}
+            valueKey="projects"
+            color="cyan"
+            Icon={TrendingUp}
+            formatter={(v) => v.toString()}
+          />
+          <MonthlyBarChart
+            title="Pengunjung per Bulan"
+            subtitle={`Tahun ${viewYear}`}
+            data={monthlyData}
+            valueKey="visitors"
+            color="emerald"
+            Icon={Eye}
+            formatter={(v) => (v >= 1000 ? `${(v / 1000).toFixed(1)}K` : v.toString())}
+          />
+        </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5 shadow-xl backdrop-blur-xl md:p-6">
-                <div className="mb-6 flex items-center gap-2.5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/15">
-                    <Eye className="h-4 w-4 text-emerald-400" />
-                  </div>
-                  <h3 className="text-[17px] font-semibold text-white md:text-[18px]">Pengunjung per Bulan ({viewYear})</h3>
-                </div>
-                <div className="flex items-end gap-1.5 h-40">
-                  {monthlyData.map((d) => (
-                    <div key={d.month} className="flex flex-1 flex-col items-center gap-1.5">
-                      <span className="text-[10px] font-medium text-slate-500">{d.visitors >= 1000 ? `${(d.visitors / 1000).toFixed(1)}K` : d.visitors}</span>
-                      <div
-                        className="w-full rounded-t-md bg-gradient-to-t from-emerald-600 to-emerald-400 transition-all hover:opacity-80"
-                        style={{ height: `${(d.visitors / maxVisitors) * 100}%`, minHeight: 4 }}
-                      />
-                      <span className="text-[10px] text-slate-500">{d.month}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+        <div className="mt-6 rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-6 shadow-xl backdrop-blur-xl md:p-8">
+          <div className="mb-6 flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10 shadow-lg shadow-cyan-500/20">
+              <Calendar className="h-4 w-4 text-cyan-300" />
             </div>
-
-            <div className="mt-6 rounded-xl border border-white/10 bg-slate-800/20 p-5 shadow-lg backdrop-blur-xl md:p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Calendar className="h-4 w-4 text-slate-400" />
-                <h3 className="text-sm font-semibold text-white">Ringkasan Cepat</h3>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="group rounded-lg border border-white/10 bg-white/[0.08] p-4 transition-all duration-[250ms] hover:-translate-y-0.5 hover:border-white/25">
-                  <div className="flex items-center gap-1.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
-                    <p className="text-xs font-medium text-slate-400">Rata-rata Project/Bulan</p>
-                  </div>
-                  <p className="mt-2.5 text-[22px] font-bold tracking-tight text-white leading-none tabular-nums">{summary.avgProjects.toFixed(1)}</p>
-                </div>
-                <div className="group rounded-lg border border-white/10 bg-white/[0.08] p-4 transition-all duration-[250ms] hover:-translate-y-0.5 hover:border-white/25">
-                  <div className="flex items-center gap-1.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                    <p className="text-xs font-medium text-slate-400">Rata-rata Pengunjung/Bulan</p>
-                  </div>
-                  <p className="mt-2.5 text-[22px] font-bold tracking-tight text-white leading-none tabular-nums">{summary.avgVisitors >= 1000 ? `${(summary.avgVisitors / 1000).toFixed(1)}K` : summary.avgVisitors}</p>
-                </div>
-                <div className="group rounded-lg border border-white/10 bg-white/[0.08] p-4 transition-all duration-[250ms] hover:-translate-y-0.5 hover:border-white/25">
-                  <div className="flex items-center gap-1.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
-                    <p className="text-xs font-medium text-slate-400">User Aktif (Bulan Ini)</p>
-                  </div>
-                  <p className="mt-2.5 text-[22px] font-bold tracking-tight text-white leading-none tabular-nums">{summary.activeUsers}</p>
-                </div>
-                <div className="group rounded-lg border border-white/10 bg-white/[0.08] p-4 transition-all duration-[250ms] hover:-translate-y-0.5 hover:border-white/25">
-                  <div className="flex items-center gap-1.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                    <p className="text-xs font-medium text-slate-400">Proyek Baru (Bulan Ini)</p>
-                  </div>
-                  <p className="mt-2.5 text-[22px] font-bold tracking-tight text-white leading-none tabular-nums">{summary.newProjectsThisMonth}</p>
-                </div>
-              </div>
+            <div>
+              <h3 className="text-base font-semibold text-white">Ringkasan Cepat</h3>
+              <p className="text-xs text-slate-400">Gambaran singkat aktivitas platform.</p>
             </div>
+          </div>
+          <div className="grid grid-cols-1 gap-3 min-[600px]:grid-cols-2 min-[1500px]:grid-cols-4">
+            <SummaryCard icon={FolderKanban} label="Rata-rata Project/Bulan" value={summary.avgProjects.toFixed(1)} color="cyan" />
+            <SummaryCard icon={Eye} label="Rata-rata Pengunjung/Bulan" value={summary.avgVisitors >= 1000 ? `${(summary.avgVisitors / 1000).toFixed(1)}K` : summary.avgVisitors} color="emerald" />
+            <SummaryCard icon={UserCheck} label="User Aktif (Bulan Ini)" value={summary.activeUsers} color="blue" />
+            <SummaryCard icon={Sparkles} label="Proyek Baru (Bulan Ini)" value={summary.newProjectsThisMonth} color="amber" />
+          </div>
+        </div>
       </div>
     </AdminLayout>
   )

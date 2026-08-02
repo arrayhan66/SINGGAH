@@ -7,8 +7,10 @@ import ProfileStats from "./ProfileStats"
 import ProfilePassword from "./ProfilePassword"
 import ProfileDangerZone from "./ProfileDangerZone"
 import ProfileAction from "./ProfileAction"
+import GlowBackground from "../../../ui/GlowBackground"
+import DustBackground from "../../../ui/DustBackground"
 
-function ProfileForm() {
+function ProfileForm({ isAdmin = false }) {
   const { user } = useAuth()
 
   const [profileData, setProfileData] = useState(() => ({
@@ -50,8 +52,15 @@ function ProfileForm() {
   }
 
   return (
-    <section className="relative bg-brand-dark px-4 py-12 md:px-12">
-      <div className="mx-auto flex max-w-4xl flex-col gap-8">
+    <section className="relative overflow-hidden bg-brand-dark px-4 py-12 md:px-12">
+      {!isAdmin && (
+        <>
+          <GlowBackground />
+          <DustBackground />
+        </>
+      )}
+
+      <div className="relative z-10 mx-auto flex max-w-4xl flex-col gap-8">
         <ProfileAvatar
           value={profileData.avatar}
           existingUrl={originalAvatarUrl}

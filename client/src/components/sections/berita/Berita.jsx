@@ -25,7 +25,7 @@ function Berita() {
   return (
     <section
       id="berita"
-      className="relative overflow-hidden bg-brand-navy min-h-screen pt-[calc(var(--navbar-h)+24px)] sm:pt-[calc(var(--navbar-h)+32px)] pb-6 sm:pb-10 lg:pb-12 3xl:pb-16 4xl:pb-20"
+      className="relative overflow-hidden bg-brand-dark min-h-screen pt-[calc(var(--navbar-h)+24px)] sm:pt-[calc(var(--navbar-h)+32px)] pb-6 sm:pb-10 lg:pb-12 3xl:pb-16 4xl:pb-20"
     >
       <GlowBackground />
       <DustBackground />

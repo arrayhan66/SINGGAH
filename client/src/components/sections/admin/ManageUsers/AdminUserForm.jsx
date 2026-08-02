@@ -79,7 +79,7 @@ function AdminUserForm() {
           Kembali ke Kelola User
         </button>
 
-        <h1 className="mt-4 text-xl md:text-2xl font-bold text-white">
+        <h1 className="mt-4 text-[clamp(1.125rem,1rem+0.75vw,1.25rem)] md:text-2xl font-bold text-white">
           {isEditMode ? "Edit User" : "Tambah User Baru"}
         </h1>
 

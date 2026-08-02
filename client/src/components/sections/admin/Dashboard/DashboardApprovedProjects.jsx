@@ -10,22 +10,22 @@ function DashboardApprovedProjects() {
 
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5 shadow-xl backdrop-blur-xl md:p-6">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/15">
             <CheckCircle2 className="h-4 w-4 text-emerald-400" />
           </div>
-          <h2 className="text-[17px] font-semibold text-white md:text-[18px]">
-            Project Disetujui
+          <h2 className="text-[14px] font-semibold text-white min-[500px]:text-[17px] md:text-[18px]">
+            <span className="hidden min-[500px]:inline">Project </span>Disetujui
           </h2>
         </div>
 
         <button
           onClick={() => navigate("/projects?status=approved")}
-          className="group flex cursor-pointer items-center gap-1.5 text-xs font-medium text-cyan-400 transition-all duration-200 hover:text-cyan-300"
+          className="group ml-auto hidden cursor-pointer min-[600px]:flex items-center gap-1 text-[9px] font-medium text-cyan-400 transition-all duration-200 hover:text-cyan-300 min-[500px]:text-xs"
         >
           Lihat Semua
-          <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+          <ArrowRight size={14} className="hidden transition-transform duration-200 group-hover:translate-x-0.5 min-[500px]:block" />
         </button>
       </div>
 

@@ -1,9 +1,11 @@
 import { useState, useMemo, useRef, useCallback, useEffect, createElement } from "react"
+import { createPortal } from "react-dom"
 import {
   Image, Upload, Search, Trash2, Copy, Check,
   Grid3X3, List, FileImage, FileText, FileArchive,
   FileVideo, File, X, Download, ExternalLink,
-  AlertTriangle, Files, Database, LayoutGrid
+  AlertTriangle, Files, Database, LayoutGrid,
+  ChevronDown
 } from "lucide-react"
 import AdminLayout from "../../../layouts/AdminLayout"
 import AdminHeroBackground from "../../../components/ui/AdminHeroBackground"
@@ -141,10 +143,10 @@ function MediaCard({ item, view, onPreview, onCopy, onDelete, copiedId }) {
           </div>
         </div>
       </td>
-      <td className="px-4 py-3 text-slate-400 hidden md:table-cell">{getFileTypeLabel(item.type)}</td>
-      <td className="px-4 py-3 text-slate-400 hidden sm:table-cell">{item.size}</td>
-      <td className="px-4 py-3 text-slate-400 hidden lg:table-cell">{item.uploadedAt ? formatDate(item.uploadedAt) : "Baru saja"}</td>
-      <td className="px-4 py-3 hidden lg:table-cell">
+      <td className="px-4 py-3 text-slate-400">{getFileTypeLabel(item.type)}</td>
+      <td className="px-4 py-3 text-slate-400">{item.size}</td>
+      <td className="px-4 py-3 text-slate-400">{item.uploadedAt ? formatDate(item.uploadedAt) : "Baru saja"}</td>
+      <td className="px-4 py-3">
         <span className="rounded-md border border-cyan-400/30 bg-cyan-500/10 px-2 py-0.5 text-xs font-medium text-cyan-300">{item.usedIn || 0} kali</span>
       </td>
       <td className="px-4 py-3 text-right">
@@ -317,6 +319,48 @@ function MediaLibrary() {
   const [notification, setNotification] = useState(null)
   const fileInputRef = useRef(null)
   const dragCounter = useRef(0)
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [filterPos, setFilterPos] = useState(null)
+  const filterBtnRef = useRef(null)
+  const filterPanelRef = useRef(null)
+
+  const selectedTypeTab = typeTabs.find((t) => t.value === typeFilter) || typeTabs[0]
+  const SelectedTypeIcon = selectedTypeTab.icon
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      const inButton = filterBtnRef.current && filterBtnRef.current.contains(e.target)
+      const inPanel = filterPanelRef.current && filterPanelRef.current.contains(e.target)
+      if (!inButton && !inPanel) {
+        setFilterOpen(false)
+      }
+    }
+    function handleClose() {
+      setFilterOpen(false)
+    }
+    if (filterOpen) {
+      document.addEventListener("mousedown", handleClickOutside)
+      window.addEventListener("scroll", handleClose, true)
+      window.addEventListener("resize", handleClose)
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside)
+        window.removeEventListener("scroll", handleClose, true)
+        window.removeEventListener("resize", handleClose)
+      }
+    }
+  }, [filterOpen])
+
+  function toggleTypeFilter() {
+    if (!filterOpen && filterBtnRef.current) {
+      const rect = filterBtnRef.current.getBoundingClientRect()
+      setFilterPos({
+        top: rect.bottom + 6,
+        left: rect.left,
+        width: rect.width,
+      })
+    }
+    setFilterOpen((v) => !v)
+  }
 
   const filtered = useMemo(() => {
     const s = search.toLowerCase()
@@ -458,37 +502,37 @@ function MediaLibrary() {
     <AdminLayout>
       <AdminHeroBackground fullWidth>
         <div className="px-4 md:px-6 lg:px-8 pt-8 md:pt-10">
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 sm:h-16 sm:w-16">
-              <Image className="h-7 w-7 text-cyan-300 sm:h-8 sm:w-8" />
+          <div className="flex flex-col items-center text-center sm:flex-row sm:text-left gap-[clamp(0.75rem,0.5rem+1vw,1rem)]">
+            <div className="flex h-[clamp(2.75rem,2.25rem+2vw,3.5rem)] w-[clamp(2.75rem,2.25rem+2vw,3.5rem)] shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 sm:h-16 sm:w-16">
+              <Image className="h-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] w-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] text-cyan-300 sm:h-8 sm:w-8" />
             </div>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-black text-white">
+            <div className="min-w-0">
+              <h1 className="text-[clamp(1.25rem,0.9375rem+1.5vw,1.5rem)] sm:text-3xl font-black text-white">
                 Media <span className="text-cyan-300">Library</span>
               </h1>
-              <p className="mt-1 text-sm text-slate-400 max-w-xl">Kelola semua file dan gambar yang diupload.</p>
+              <p className="mt-1 text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400 max-w-xl">Kelola semua file dan gambar yang diupload.</p>
             </div>
           </div>
         </div>
 
         <div className="px-4 md:px-6 lg:px-8 py-5 md:py-6">
           <div className="rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-4 backdrop-blur-xl md:px-6 md:py-5">
-            <div className="grid grid-cols-2 gap-x-4 gap-y-5 min-[500px]:grid-cols-4 min-[500px]:gap-0 min-[500px]:divide-x min-[500px]:divide-white/[0.06]">
+            <div className="grid grid-cols-1 gap-3 min-[600px]:grid-cols-2 min-[1000px]:grid-cols-4 min-[1000px]:gap-0 min-[1000px]:divide-x min-[1000px]:divide-white/[0.06]">
               {statCards.map((stat) => {
                 const Icon = stat.icon
                 return (
                   <div
                     key={stat.key}
-                    className="group flex items-center gap-3 min-w-0 min-[500px]:px-5 min-[500px]:first:pl-0"
+                    className="group flex min-w-0 items-center gap-3.5 rounded-xl bg-white/[0.05] px-4 py-3.5 transition-colors duration-300 hover:bg-white/[0.09] min-[1000px]:rounded-none min-[1000px]:bg-transparent min-[1000px]:px-5 min-[1000px]:first:pl-0 min-[1000px]:hover:bg-transparent"
                   >
-                    <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-transform duration-300 group-hover:scale-105 ${stat.iconBg}`}>
-                      <Icon className={`h-[18px] w-[18px] ${stat.iconColor}`} />
+                    <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105 min-[1000px]:h-9 min-[1000px]:w-9 min-[1000px]:rounded-lg ${stat.iconBg}`}>
+                      <Icon className={`h-5 w-5 min-[1000px]:h-[18px] min-[1000px]:w-[18px] ${stat.iconColor}`} />
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-lg font-bold text-white leading-tight md:text-xl tabular-nums">
+                      <p className="truncate text-xl font-bold text-white leading-tight tabular-nums min-[1000px]:text-lg">
                         {stat.value}
                       </p>
-                      <p className="truncate text-[11px] text-slate-400 leading-tight">
+                      <p className="truncate text-xs text-slate-400 leading-tight min-[1000px]:text-[11px]">
                         {stat.label}
                       </p>
                     </div>
@@ -554,41 +598,127 @@ function MediaLibrary() {
             </div>
           </div>
 
-          <div className="mt-4 flex w-fit flex-wrap items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-1">
-            {typeTabs.map((tab) => {
-              const Icon = tab.icon
-              const isActive = typeFilter === tab.value
-              const count = typeCounts[tab.value]
-              return (
-                <button
-                  key={tab.value}
-                  type="button"
-                  onClick={() => setTypeFilter(tab.value)}
-                  className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-cyan-400/40 focus-visible:outline-none ${
-                    isActive
-                      ? "bg-white/10 text-white shadow-sm"
-                      : "text-slate-400 hover:text-white"
-                  }`}
-                  aria-pressed={isActive}
-                >
-                  <Icon
-                    className={`h-3.5 w-3.5 transition-colors duration-200 ${isActive ? "text-cyan-300" : "text-slate-500"}`}
-                  />
-                  {tab.label}
-                  {count !== undefined && (
-                    <span
-                      className={`rounded-full px-1.5 py-0.5 text-[10px] tabular-nums ${
-                        isActive
-                          ? "bg-cyan-500/20 text-cyan-300"
-                          : "bg-white/[0.07] text-slate-400"
-                      }`}
-                    >
-                      {count}
+          <div className="mt-4">
+            <div className="relative w-full min-[450px]:hidden">
+              <button
+                ref={filterBtnRef}
+                type="button"
+                onClick={toggleTypeFilter}
+                className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-200 backdrop-blur-xl transition-all duration-200 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/40"
+                aria-expanded={filterOpen}
+                aria-haspopup="listbox"
+              >
+                <span className="flex min-w-0 items-center gap-2">
+                  <SelectedTypeIcon className="h-4 w-4 shrink-0 text-cyan-300" />
+                  <span className="truncate">{selectedTypeTab.label}</span>
+                </span>
+                <span className="flex shrink-0 items-center gap-2">
+                  {typeCounts[selectedTypeTab.value] !== undefined && (
+                    <span className="rounded-full bg-cyan-500/20 px-2 py-0.5 text-[11px] tabular-nums text-cyan-300">
+                      {typeCounts[selectedTypeTab.value]}
                     </span>
                   )}
-                </button>
-              )
-            })}
+                  <ChevronDown
+                    className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${filterOpen ? "rotate-180" : ""}`}
+                  />
+                </span>
+              </button>
+
+              {filterOpen &&
+                filterPos &&
+                createPortal(
+                  <div
+                    ref={filterPanelRef}
+                    role="listbox"
+                    style={{
+                      position: "fixed",
+                      top: filterPos.top,
+                      left: filterPos.left,
+                      width: filterPos.width,
+                    }}
+                    className="z-50 min-w-[200px] animate-fade-in-up overflow-hidden rounded-xl border border-white/10 bg-slate-900/95 shadow-2xl shadow-black/40 backdrop-blur-xl"
+                  >
+                    {typeTabs.map((tab) => {
+                      const Icon = tab.icon
+                      const isActive = typeFilter === tab.value
+                      return (
+                        <button
+                          key={tab.value}
+                          type="button"
+                          role="option"
+                          aria-selected={isActive}
+                          onClick={() => {
+                            setTypeFilter(tab.value)
+                            setFilterOpen(false)
+                          }}
+                          className={`flex w-full cursor-pointer items-center gap-2.5 px-4 py-3 text-left text-sm font-medium transition-colors ${
+                            isActive
+                              ? "bg-cyan-400/10 text-cyan-300"
+                              : "text-slate-300 hover:bg-white/5 hover:text-white"
+                          }`}
+                        >
+                          <Icon
+                            className={`h-4 w-4 shrink-0 ${isActive ? "text-cyan-300" : "text-slate-500"}`}
+                          />
+                          <span className="min-w-0 flex-1 truncate">{tab.label}</span>
+                          {typeCounts[tab.value] !== undefined && (
+                            <span
+                              className={`rounded-full px-2 py-0.5 text-[11px] tabular-nums ${
+                                isActive
+                                  ? "bg-cyan-500/20 text-cyan-300"
+                                  : "bg-white/[0.07] text-slate-400"
+                              }`}
+                            >
+                              {typeCounts[tab.value]}
+                            </span>
+                          )}
+                          {isActive && <Check className="h-4 w-4 shrink-0 text-cyan-400" />}
+                        </button>
+                      )
+                    })}
+                  </div>,
+                  document.body
+                )}
+            </div>
+
+            <div className="hidden min-[450px]:grid w-full grid-cols-2 gap-1.5 rounded-xl border border-white/10 bg-white/5 p-1.5 min-[630px]:flex min-[630px]:w-fit min-[630px]:flex-wrap min-[630px]:items-center min-[630px]:gap-1 min-[630px]:p-1">
+              {typeTabs.map((tab) => {
+                const Icon = tab.icon
+                const isActive = typeFilter === tab.value
+                const count = typeCounts[tab.value]
+                return (
+                  <button
+                    key={tab.value}
+                    type="button"
+                    onClick={() => setTypeFilter(tab.value)}
+                    className={`inline-flex min-w-0 cursor-pointer items-center justify-between gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-cyan-400/40 focus-visible:outline-none min-[630px]:justify-center min-[630px]:gap-1.5 min-[630px]:px-3 min-[630px]:py-1.5 min-[630px]:text-xs ${
+                      isActive
+                        ? "bg-gradient-to-r from-cyan-500/25 to-blue-500/25 text-white shadow-sm ring-1 ring-cyan-400/30"
+                        : "text-slate-400 hover:bg-white/[0.06] hover:text-white"
+                    }`}
+                    aria-pressed={isActive}
+                  >
+                    <span className="flex min-w-0 items-center gap-2 min-[630px]:gap-1.5">
+                      <Icon
+                        className={`h-4 w-4 shrink-0 transition-colors duration-200 min-[630px]:h-3.5 min-[630px]:w-3.5 ${isActive ? "text-cyan-300" : "text-slate-500"}`}
+                      />
+                      {tab.label}
+                    </span>
+                    {count !== undefined && (
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[11px] tabular-nums min-[630px]:px-1.5 min-[630px]:text-[10px] ${
+                          isActive
+                            ? "bg-cyan-500/25 text-cyan-300"
+                            : "bg-white/[0.07] text-slate-400"
+                        }`}
+                      >
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
           </div>
         </div>
       </AdminHeroBackground>
@@ -649,15 +779,15 @@ function MediaLibrary() {
             ))}
           </div>
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
-            <table className="w-full text-left text-sm">
+          <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
+            <table className="w-full min-w-[720px] text-left text-sm">
               <thead>
                 <tr className="border-b border-white/5 bg-white/[0.03]">
                   <th className="px-4 py-3 font-medium text-slate-400">File</th>
-                  <th className="px-4 py-3 font-medium text-slate-400 hidden md:table-cell">Tipe</th>
-                  <th className="px-4 py-3 font-medium text-slate-400 hidden sm:table-cell">Ukuran</th>
-                  <th className="px-4 py-3 font-medium text-slate-400 hidden lg:table-cell">Tanggal</th>
-                  <th className="px-4 py-3 font-medium text-slate-400 hidden lg:table-cell">Digunakan</th>
+                  <th className="px-4 py-3 font-medium text-slate-400">Tipe</th>
+                  <th className="px-4 py-3 font-medium text-slate-400">Ukuran</th>
+                  <th className="px-4 py-3 font-medium text-slate-400">Tanggal</th>
+                  <th className="px-4 py-3 font-medium text-slate-400">Digunakan</th>
                   <th className="px-4 py-3 font-medium text-slate-400 text-right">Aksi</th>
                 </tr>
               </thead>

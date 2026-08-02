@@ -15,7 +15,7 @@ function DashboardActivityFeed() {
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-500/15">
           <Activity className="h-4 w-4 text-slate-400" />
         </div>
-        <h2 className="text-[17px] font-semibold text-white md:text-[18px]">
+        <h2 className="text-[15px] font-semibold text-white min-[500px]:text-[17px] md:text-[18px]">
           Aktivitas Terbaru
         </h2>
       </div>

@@ -12,7 +12,7 @@ function QuickActions() {
   const navigate = useNavigate()
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
       {actions.map((action) => {
         const Icon = action.icon
         return (

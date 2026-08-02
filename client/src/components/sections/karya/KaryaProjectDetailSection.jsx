@@ -34,7 +34,7 @@ function KaryaProjectDetailSection() {
 
   if (!project) {
     return (
-      <section className="relative overflow-hidden bg-brand-navy py-32 text-center">
+      <section className="relative overflow-hidden bg-brand-dark py-32 text-center">
         <p className="text-slate-300">Project tidak ditemukan.</p>
         <button
           onClick={() => navigate("/karya")}
@@ -112,7 +112,7 @@ function KaryaProjectDetailSection() {
   return (
     <section
       id="karya-project-detail"
-      className="relative min-h-screen overflow-hidden bg-brand-navy pb-16 2xl:pb-24"
+      className="relative min-h-screen overflow-hidden bg-brand-dark pb-16 2xl:pb-24"
     >
       <GlowBackground />
       <DustBackground />

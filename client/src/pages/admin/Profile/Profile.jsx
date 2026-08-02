@@ -6,7 +6,7 @@ function AdminProfile() {
   return (
     <AdminLayout>
       <ProfileHero isAdmin />
-      <ProfileForm />
+      <ProfileForm isAdmin />
     </AdminLayout>
   )
 }

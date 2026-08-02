@@ -80,20 +80,20 @@ function UserForm() {
             Kembali ke Kelola User
           </button>
 
-          <div className="mt-6 flex items-center gap-4 min-w-0">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10">
+          <div className="mt-6 flex items-center gap-[clamp(0.75rem,0.5rem+1vw,1rem)] min-w-0">
+            <div className="flex h-[clamp(2.75rem,2.25rem+2vw,3.5rem)] w-[clamp(2.75rem,2.25rem+2vw,3.5rem)] shrink-0 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10">
               {isEditMode ? (
-                <UserPen className="h-7 w-7 text-cyan-300" />
+                <UserPen className="h-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] w-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] text-cyan-300" />
               ) : (
-                <UserPlus className="h-7 w-7 text-cyan-300" />
+                <UserPlus className="h-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] w-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] text-cyan-300" />
               )}
             </div>
             <div className="min-w-0">
-              <h1 className="text-2xl font-black text-white sm:text-3xl">
+              <h1 className="text-[clamp(1.25rem,0.9375rem+1.5vw,1.5rem)] font-black text-white sm:text-3xl">
                 {isEditMode ? "Edit " : "Tambah "}
                 <span className="text-cyan-300">User</span>
               </h1>
-              <p className="mt-1 max-w-xl text-sm text-slate-400">
+              <p className="mt-1 max-w-xl text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400">
                 {isEditMode
                   ? "Perbarui informasi akun pengguna SINGGAH."
                   : "Lengkapi data untuk membuat akun pengguna baru di SINGGAH."}
@@ -104,14 +104,28 @@ function UserForm() {
       </AdminHeroBackground>
 
       <div className="px-4 md:px-6 lg:px-8 pb-12 md:pb-16">
-        <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_340px]">
+        <div className="mt-6 grid grid-cols-1 items-start gap-6 min-[1000px]:grid-cols-[1fr_340px]">
           <AdminUserFormMain
             formData={formData}
             updateField={updateField}
             onPublish={handlePublish}
             isEditMode={isEditMode}
           />
-          <AdminUserFormSidebar formData={formData} updateField={updateField} />
+          <div className="flex flex-col gap-6">
+            <AdminUserFormSidebar
+              formData={formData}
+              updateField={updateField}
+            />
+            <div className="border-t border-white/[0.06] pt-6 min-[1000px]:hidden">
+              <button
+                type="button"
+                onClick={handlePublish}
+                className="w-full cursor-pointer rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
+              >
+                {isEditMode ? "Simpan Perubahan" : "Tambah User"}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </AdminLayout>

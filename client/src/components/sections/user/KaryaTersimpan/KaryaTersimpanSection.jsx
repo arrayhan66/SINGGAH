@@ -2,6 +2,8 @@ import { useState, useEffect } from "react"
 import { Bookmark } from "lucide-react"
 import SearchBar from "../../../ui/SearchBar"
 import OutlineButton from "../../../ui/OutlineButton"
+import GlowBackground from "../../../ui/GlowBackground"
+import DustBackground from "../../../ui/DustBackground"
 import useSearchAndExpand from "../../../../hooks/useSearchAndExpand"
 import KaryaTersimpanCard from "./KaryaTersimpanCard"
 
@@ -41,7 +43,10 @@ function KaryaTersimpanSection() {
   } = useSearchAndExpand(dummyBookmarks, initialCount)
 
   return (
-    <section className="relative bg-brand-dark px-4 pt-[calc(var(--navbar-h)+24px)] pb-8 sm:px-5 sm:pt-[calc(var(--navbar-h)+32px)] sm:pb-10 md:px-8 lg:px-10 lg:pb-12 xl:px-12 3xl:px-16 4xl:px-20 4xl:pb-20">
+    <section className="relative overflow-hidden bg-brand-dark px-4 pt-[calc(var(--navbar-h)+24px)] pb-8 sm:px-5 sm:pt-[calc(var(--navbar-h)+32px)] sm:pb-10 md:px-8 lg:px-10 lg:pb-12 xl:px-12 3xl:px-16 4xl:px-20 4xl:pb-20">
+      <GlowBackground />
+      <DustBackground />
+
       <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 xl:max-w-[1280px] 3xl:max-w-[1600px] 3xl:px-10 4xl:max-w-[2000px] 4xl:px-14">
         {/* Title */}
         <div className="text-center">

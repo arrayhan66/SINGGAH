@@ -9,6 +9,8 @@ import UploadDocuments from "./UploadDocuments"
 import UploadPreview from "./UploadPreview"
 import UploadAction from "./UploadAction"
 import api from "../../../../services/api"
+import GlowBackground from "../../../ui/GlowBackground"
+import DustBackground from "../../../ui/DustBackground"
 
 const steps = [
   { icon: Image, label: "Thumbnail" },
@@ -117,8 +119,11 @@ function UploadForm() {
   }
 
   return (
-    <section className="relative bg-brand-dark px-4 py-10 sm:py-12 md:px-8 lg:px-12 2xl:px-16 3xl:px-20 4xl:px-24">
-      <div className="mx-auto flex max-w-5xl flex-col gap-6 sm:gap-8 2xl:gap-10 3xl:gap-12 4xl:gap-14">
+    <section className="relative overflow-hidden bg-brand-dark px-4 py-10 sm:py-12 md:px-8 lg:px-12 2xl:px-16 3xl:px-20 4xl:px-24">
+      <GlowBackground />
+      <DustBackground />
+
+      <div className="relative z-10 mx-auto flex max-w-5xl flex-col gap-6 sm:gap-8 2xl:gap-10 3xl:gap-12 4xl:gap-14">
         <StepDivider step={steps[0]} currentIndex={0} />
         <UploadThumbnail
           value={formData.thumbnail}

@@ -117,7 +117,7 @@ function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onCl
 
         <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
           <div className="grid lg:grid-cols-[minmax(0,1fr)_300px]">
-            <main className="min-w-0 p-5 md:p-6">
+            <main className="min-w-0 p-4 min-[400px]:p-5 md:p-6">
               <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-brand-dark">
                 <div className="aspect-video w-full">
                   <img
@@ -144,7 +144,7 @@ function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onCl
                         onClick={() => setActiveImage(img)}
                         aria-label={`Lihat gambar ${i + 1}`}
                         aria-pressed={active}
-                        className={`relative h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200 ${
+                        className={`relative h-12 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200 min-[400px]:h-16 min-[400px]:w-24 ${
                           active
                             ? "border-cyan-400 shadow-[0_0_16px_-4px_rgba(34,211,238,0.6)]"
                             : "border-white/10 opacity-60 hover:opacity-100"

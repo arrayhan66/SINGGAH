@@ -23,7 +23,7 @@ function AdminUserCard({ user, onEdit, onDelete, onDetail }) {
         className="relative z-10 cursor-pointer p-5"
         onClick={() => onDetail(user)}
       >
-        <div className="flex items-start gap-4">
+        <div className="flex flex-col items-center text-center gap-4 min-[420px]:flex-row min-[420px]:items-start min-[420px]:text-left">
           <div className="relative shrink-0">
             <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-cyan-500 to-blue-700 shadow-lg">
               {user.avatar ? (
@@ -51,7 +51,7 @@ function AdminUserCard({ user, onEdit, onDelete, onDetail }) {
             </h3>
             <p className="truncate text-sm text-slate-400">{user.email}</p>
 
-            <div className="mt-3 flex flex-wrap items-center gap-2">
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-2 min-[420px]:justify-start">
               <span
                 className={`rounded-md border px-2 py-0.5 text-[11px] font-medium ${tipeBadge[tipe.color]}`}
               >

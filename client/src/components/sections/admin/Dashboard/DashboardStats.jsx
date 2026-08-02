@@ -54,7 +54,7 @@ function DashboardStats() {
           </linearGradient>
         </defs>
       </svg>
-      <div className="grid grid-cols-1 min-[400px]:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-1 min-[640px]:grid-cols-2 min-[1200px]:grid-cols-4 gap-3 md:gap-4">
         {stats.map((stat) => {
           const Icon = stat.icon
           return (

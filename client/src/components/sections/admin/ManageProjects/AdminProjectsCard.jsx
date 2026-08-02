@@ -91,7 +91,7 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
           </span>
         </div>
 
-        <div className="mt-auto flex items-center gap-2 pt-4">
+        <div className="mt-auto flex flex-col items-stretch gap-2 pt-4 md:flex-row md:items-center lg:flex-row lg:items-center">
           {project.status === "pending" ? (
             <>
               <button

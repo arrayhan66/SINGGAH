@@ -64,7 +64,7 @@ function AdminUserFormMain({ formData, updateField, onPublish, isEditMode }) {
           Kategori pengguna di SINGGAH.
         </p>
 
-        <div className="mt-4 grid grid-cols-3 gap-3">
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {tipeOptions.map((opt) => {
             const Icon = opt.icon
             const isActive = formData.tipe === opt.value
@@ -93,7 +93,7 @@ function AdminUserFormMain({ formData, updateField, onPublish, isEditMode }) {
         </div>
       </div>
 
-      <div className="border-t border-white/[0.06] pt-6">
+      <div className="hidden border-t border-white/[0.06] pt-6 min-[1000px]:block">
         <button
           type="button"
           onClick={onPublish}

@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react"
+import { useState } from "react"
+import { ChevronDown } from "lucide-react"
 import SidebarAdmin from "../components/layout/SidebarAdmin"
 import AdminNavbar from "../components/layout/AdminNavbar"
 import Footer from "../components/layout/Footer"
@@ -9,18 +10,9 @@ function AdminLayout({ children }) {
     const saved = localStorage.getItem("admin-sidebar-collapsed")
     return saved === null ? false : saved === "true"
   })
-
-  const handleResize = useCallback(() => {
-    if (window.innerWidth < 1024) setCollapsed(true)
-  }, [])
-
-  useEffect(() => {
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [handleResize])
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   function handleToggle() {
-    if (typeof window !== "undefined" && window.innerWidth < 640) return
     setCollapsed((prev) => {
       const next = !prev
       localStorage.setItem("admin-sidebar-collapsed", String(next))
@@ -28,19 +20,40 @@ function AdminLayout({ children }) {
     })
   }
 
-  return (
-    <div className="min-h-screen bg-brand-dark">
-      <AdminNavbar />
-      <SidebarAdmin collapsed={collapsed} onToggle={handleToggle} />
+  const mainPad = collapsed
+    ? "pl-0 min-[700px]:pl-20"
+    : "pl-0 min-[700px]:pl-20 min-[1400px]:pl-64"
 
-      <main className={`min-h-screen pt-16 transition-all duration-300 ${collapsed ? "ml-0 lg:ml-20 5xl:ml-24 6xl:ml-24" : "ml-0 lg:ml-56 5xl:ml-64 6xl:ml-72"} min-[260px]:ml-0`}>
-        <div className="mx-auto w-full min-w-0 px-3 min-[260px]:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12 3xl:px-16 4xl:px-20 5xl:px-24 6xl:px-28">
-          <div className="mx-auto w-full min-w-0 max-w-[1800px] min-[2200px]:max-w-[2000px] min-[2800px]:max-w-[2400px] min-[3600px]:max-w-[3400px] min-[4400px]:max-w-[4200px]">
-            {children}
-          </div>
+  return (
+    <div className="min-h-screen w-full min-w-0 overflow-x-hidden bg-brand-dark">
+      <AdminNavbar />
+      <SidebarAdmin
+        collapsed={collapsed}
+        onToggle={handleToggle}
+        mobileOpen={mobileOpen}
+        onMobileToggle={() => setMobileOpen((v) => !v)}
+      />
+
+      <button
+        type="button"
+        onClick={() => setMobileOpen((v) => !v)}
+        aria-label={mobileOpen ? "Tutup menu sidebar" : "Buka menu sidebar"}
+        title={mobileOpen ? "Tutup menu sidebar" : "Buka menu sidebar"}
+        className="fixed left-3 top-[4.25rem] z-50 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-brand-dark/90 text-cyan-300 shadow-xl shadow-black/40 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/40 hover:bg-white/[0.06] hover:text-white active:scale-95 active:duration-100 min-[700px]:hidden"
+      >
+        <ChevronDown
+          size={22}
+          strokeWidth={2.5}
+          className={`transition-transform duration-300 ${mobileOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      <main className={`min-h-screen pt-14 min-[360px]:pt-16 5xl:pt-20 6xl:pt-24 transition-all duration-300 ${mainPad}`}>
+        <div className="mx-auto w-full min-w-0 px-[clamp(8px,2vw,32px)] pb-[clamp(16px,3vw,48px)]">
+          {children}
         </div>
       </main>
-      <div className={`transition-all duration-300 ${collapsed ? "ml-0 lg:ml-20 5xl:ml-24 6xl:ml-24" : "ml-0 lg:ml-56 5xl:ml-64 6xl:ml-72"} min-[260px]:ml-0`}>
+      <div className={`transition-all duration-300 ${mainPad}`}>
         <Footer />
       </div>
     </div>

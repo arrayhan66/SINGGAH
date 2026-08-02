@@ -114,14 +114,14 @@ function AdminProjectForm() {
           </button>
 
           <div className="mt-4 flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-400/10 border border-cyan-400/30">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10 border border-cyan-400/30">
               <FolderKanban className="h-6 w-6 text-cyan-300" />
             </div>
-            <div>
-              <h1 className="text-xl md:text-2xl font-bold text-white">
+            <div className="min-w-0">
+              <h1 className="text-[clamp(1.125rem,1rem+0.75vw,1.25rem)] md:text-2xl font-bold text-white">
                 {isEditMode ? "Edit Project Mahasiswa" : "Tambah Project Baru"}
               </h1>
-              <p className="text-xs md:text-sm text-slate-400">
+              <p className="text-[clamp(0.75rem,0.7rem+0.4vw,0.8125rem)] md:text-sm text-slate-400">
                 {isEditMode ? "Perbarui informasi project yang sudah ada." : "Tambahkan project baru ke dalam sistem katalog SINGGAH."}
               </p>
             </div>
@@ -248,17 +248,17 @@ function AdminProjectForm() {
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-6 border-t border-white/10">
+          <div className="flex flex-col items-stretch justify-end gap-3 pt-6 border-t border-white/10 sm:flex-row sm:items-center md:flex-row md:items-center lg:flex-row lg:items-center">
             <button
               type="button"
               onClick={() => navigate("/projects")}
-              className="cursor-pointer rounded-xl px-5 py-2.5 text-sm font-semibold text-slate-300 hover:bg-white/5 transition-all"
+              className="cursor-pointer rounded-xl px-5 py-2.5 text-sm font-semibold text-slate-300 hover:bg-white/5 transition-all sm:w-auto"
             >
               Batal
             </button>
             <button
               type="submit"
-              className="flex cursor-pointer items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] sm:w-auto"
             >
               <Sparkles size={16} />
               {isEditMode ? "Simpan Perubahan" : "Publikasikan Project"}

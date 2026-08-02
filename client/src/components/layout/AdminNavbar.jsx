@@ -94,7 +94,7 @@ function AdminNavbar() {
         {/* RIGHT */}
         <div className="flex items-center gap-2 min-[260px]:gap-1.5 5xl:gap-4 6xl:gap-5">
         {/* NOTIFICATION BELL */}
-        <div ref={notifRef} className="relative">
+        <div ref={notifRef} className="relative ml-2 min-[400px]:ml-0">
           <button
             onClick={toggleNotif}
             className="relative flex h-8 min-[360px]:h-9 5xl:h-11 6xl:h-12 w-8 min-[360px]:w-9 5xl:w-11 6xl:w-12 items-center justify-center rounded-md min-[360px]:rounded-lg 5xl:rounded-xl text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200 cursor-pointer"
@@ -184,14 +184,14 @@ function AdminNavbar() {
             onClick={() => setIsProfileOpen(!isProfileOpen)}
             className="flex cursor-pointer items-center gap-1.5 min-[260px]:gap-1 5xl:gap-2.5 rounded-md min-[360px]:rounded-lg 5xl:rounded-xl px-1.5 min-[360px]:px-2 5xl:px-3 py-1 transition-colors hover:bg-white/5"
           >
-            <div className="flex h-6 min-[320px]:h-7 min-[360px]:h-8 5xl:h-10 6xl:h-12 w-6 min-[320px]:w-7 min-[360px]:w-8 5xl:w-10 6xl:w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 text-[9px] min-[320px]:text-[10px] min-[360px]:text-[11px] 5xl:text-sm 6xl:text-base font-semibold text-white ring-2 ring-white/10">
+            <div className="flex h-5 min-[320px]:h-6 min-[400px]:h-8 5xl:h-10 6xl:h-12 w-5 min-[320px]:w-6 min-[400px]:w-8 5xl:w-10 6xl:w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 text-[8px] min-[320px]:text-[9px] min-[400px]:text-[11px] 5xl:text-sm 6xl:text-base font-semibold text-white ring-2 ring-white/10">
               {user?.avatar ? (
                 <img src={user.avatar} alt={name} className="h-full w-full rounded-full object-cover" />
               ) : (
                 initials
               )}
             </div>
-            <span className="hidden min-[360px]:block text-xs min-[360px]:text-sm 5xl:text-base 6xl:text-lg font-medium text-white">{name}</span>
+            <span className="hidden min-[360px]:block text-xs min-[400px]:text-sm 5xl:text-base 6xl:text-lg font-medium text-white">{name}</span>
             <ChevronDown size={14} className={`hidden min-[360px]:block text-slate-500 transition-transform duration-200 ${isProfileOpen ? "rotate-180" : ""}`} />
           </button>
 

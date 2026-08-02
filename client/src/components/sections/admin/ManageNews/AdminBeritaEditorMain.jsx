@@ -2,7 +2,7 @@ import { EditorContent, useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import Image from "@tiptap/extension-image"
 import Placeholder from "@tiptap/extension-placeholder"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { NodeSelection } from "@tiptap/pm/state"
 import "../../../../styles/tiptap.css"
 import Underline from "@tiptap/extension-underline"
@@ -104,6 +104,7 @@ const ResizableImage = Image.extend({
 })
 
 function AdminBeritaEditorMain({ formData, updateField }) {
+  const titleRef = useRef(null)
   const [linkPopover, setLinkPopover] = useState(false)
   const [linkUrl, setLinkUrl] = useState("")
   const [selectedImageAttrs, setSelectedImageAttrs] = useState(null)
@@ -182,6 +183,17 @@ function AdminBeritaEditorMain({ formData, updateField }) {
       setImageCaptionInput("")
     }
   }
+
+  function autoResizeTitle() {
+    const el = titleRef.current
+    if (!el) return
+    el.style.height = "auto"
+    el.style.height = `${el.scrollHeight}px`
+  }
+
+  useEffect(() => {
+    autoResizeTitle()
+  }, [formData.title])
 
   useEffect(() => {
     if (!editor) return
@@ -292,8 +304,9 @@ function AdminBeritaEditorMain({ formData, updateField }) {
   return (
     <div className="flex flex-col gap-6">
       {/* Title Input */}
-      <input
-        type="text"
+      <textarea
+        ref={titleRef}
+        rows={1}
         value={formData.title}
         onChange={(e) => {
           const title = e.target.value
@@ -308,9 +321,10 @@ function AdminBeritaEditorMain({ formData, updateField }) {
               .replace(/^-+|-+$/g, "")
             updateField("slug", slug)
           }
+          autoResizeTitle()
         }}
         placeholder="Judul Berita / Artikel..."
-        className="w-full bg-transparent text-2xl md:text-3xl font-bold text-white placeholder:text-slate-600 focus:outline-none"
+        className="w-full resize-none overflow-hidden bg-transparent text-2xl md:text-3xl font-bold text-white placeholder:text-slate-600 focus:outline-none"
       />
 
       {/* Event Name */}
@@ -442,7 +456,7 @@ function AdminBeritaEditorMain({ formData, updateField }) {
           <EditorContent editor={editor} />
 
           {linkPopover && (
-            <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 p-3 shadow-2xl backdrop-blur-md">
+            <div className="absolute top-16 inset-x-2 z-50 flex flex-col items-stretch gap-2 rounded-xl border border-slate-700 bg-slate-900 p-3 shadow-2xl backdrop-blur-md sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:flex-row sm:items-center">
               <div className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2">
                 <LinkIcon size={15} className="text-cyan-400 shrink-0" />
                 <input
@@ -450,7 +464,7 @@ function AdminBeritaEditorMain({ formData, updateField }) {
                   value={linkUrl}
                   onChange={(e) => setLinkUrl(e.target.value)}
                   placeholder="https://example.com"
-                  className="w-64 bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none"
+                  className="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none sm:w-64"
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === "Enter") applyLink()

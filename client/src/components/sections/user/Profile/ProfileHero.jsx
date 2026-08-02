@@ -60,11 +60,11 @@ function ProfileHero({ isAdmin = false }) {
   }
 
   return (
-    <section className="relative overflow-hidden bg-brand-dark px-4 pt-28 pb-6 md:px-12 md:pt-32 md:pb-8 lg:px-16 lg:pb-10 2xl:px-20 2xl:pt-36 2xl:pb-12">
-      <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center text-center lg:max-w-6xl 2xl:max-w-7xl">
+    <AdminHeroBackground className="px-4 pt-28 pb-6 md:px-12 md:pt-32 md:pb-8 lg:px-16 lg:pb-10 2xl:px-20 2xl:pt-36 2xl:pb-12">
+      <div className="mx-auto flex max-w-5xl flex-col items-center text-center lg:max-w-6xl 2xl:max-w-7xl">
         {content}
       </div>
-    </section>
+    </AdminHeroBackground>
   )
 }
 

@@ -29,7 +29,7 @@ function KaryaProjectSection() {
 
   if (!category) {
     return (
-      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-brand-navy py-16 text-center sm:py-20 md:py-24 lg:py-28 3xl:py-32 4xl:py-40">
+      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-brand-dark py-16 text-center sm:py-20 md:py-24 lg:py-28 3xl:py-32 4xl:py-40">
         <div className="relative z-10 flex flex-col items-center px-4">
           <p className="text-lg font-semibold text-slate-300 sm:text-xl md:text-2xl 3xl:text-3xl 4xl:text-4xl">
             Kategori tidak ditemukan.
@@ -48,7 +48,7 @@ function KaryaProjectSection() {
   return (
     <section
       id="karya-detail"
-      className="relative min-h-screen overflow-hidden bg-brand-navy pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-8 sm:pb-10 md:pb-12 lg:pb-16 xl:pb-18 3xl:pb-20 4xl:pb-24"
+      className="relative min-h-screen overflow-hidden bg-brand-dark pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-8 sm:pb-10 md:pb-12 lg:pb-16 xl:pb-18 3xl:pb-20 4xl:pb-24"
     >
       <GlowBackground />
       <DustBackground />

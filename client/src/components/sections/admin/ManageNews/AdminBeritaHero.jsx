@@ -20,15 +20,15 @@ function AdminBeritaHero({ search, onSearchChange, statusFilter, onStatusChange 
   return (
     <AdminHeroBackground fullWidth>
       <div className="px-4 md:px-6 lg:px-8 pt-8 md:pt-10">
-        <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 sm:h-16 sm:w-16">
-            <Newspaper className="h-7 w-7 text-cyan-300 sm:h-8 sm:w-8" />
+        <div className="flex flex-col items-center text-center sm:flex-row sm:text-left gap-[clamp(0.75rem,0.5rem+1vw,1rem)]">
+          <div className="flex h-[clamp(2.75rem,2.25rem+2vw,3.5rem)] w-[clamp(2.75rem,2.25rem+2vw,3.5rem)] shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 sm:h-16 sm:w-16">
+            <Newspaper className="h-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] w-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] text-cyan-300 sm:h-8 sm:w-8" />
           </div>
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white">
+          <div className="min-w-0">
+            <h1 className="text-[clamp(1.25rem,0.9375rem+1.5vw,1.5rem)] sm:text-3xl font-black text-white">
               Kelola <span className="text-cyan-300">Berita</span>
             </h1>
-            <p className="mt-1 text-sm text-slate-400 max-w-xl">
+            <p className="mt-1 text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400 max-w-xl">
               Tambah, ubah, atau hapus berita dan pencapaian SINGGAH.
             </p>
           </div>

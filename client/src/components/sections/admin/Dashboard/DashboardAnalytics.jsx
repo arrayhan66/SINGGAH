@@ -98,7 +98,7 @@ function DashboardAnalytics() {
             Status Project
           </h2>
         </div>
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-center sm:gap-4">
           <DonutChart />
           <div className="flex flex-col gap-2">
             {donutData.map((d) => (

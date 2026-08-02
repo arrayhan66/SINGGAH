@@ -54,15 +54,15 @@ function AdminUserDetail() {
             Kembali ke Kelola User
           </button>
 
-          <div className="mt-6 flex items-center gap-4 min-w-0">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10">
-              <UserRound className="h-7 w-7 text-cyan-300" />
+          <div className="mt-6 flex items-center gap-[clamp(0.75rem,0.5rem+1vw,1rem)] min-w-0">
+            <div className="flex h-[clamp(2.75rem,2.25rem+2vw,3.5rem)] w-[clamp(2.75rem,2.25rem+2vw,3.5rem)] shrink-0 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10">
+              <UserRound className="h-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] w-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] text-cyan-300" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-2xl font-black text-white sm:text-3xl">
+              <h1 className="text-[clamp(1.25rem,0.9375rem+1.5vw,1.5rem)] font-black text-white sm:text-3xl">
                 Detail <span className="text-cyan-300">User</span>
               </h1>
-              <p className="mt-1 max-w-xl text-sm text-slate-400">
+              <p className="mt-1 max-w-xl text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400">
                 Detail informasi akun pengguna SINGGAH.
               </p>
             </div>

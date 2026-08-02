@@ -4,10 +4,8 @@ import {
   Calendar,
   Newspaper,
   Eye,
-  Share2,
 } from "lucide-react"
 import { useBerita } from "../../../../context/BeritaContext"
-import DustBackground from "../../../ui/DustBackground"
 
 function AdminBeritaPreview() {
   const { slug } = useParams()
@@ -20,8 +18,7 @@ function AdminBeritaPreview() {
 
   if (!item) {
     return (
-      <section className="relative min-h-screen bg-brand-navy pt-16 pb-16">
-        <DustBackground />
+      <section className="relative min-h-screen bg-brand-dark pt-16 pb-16">
         <div className="relative z-10 mx-auto max-w-2xl px-4 text-center">
           <Newspaper className="mx-auto h-12 w-12 text-slate-500" />
           <h2 className="mt-4 text-xl font-bold text-white">
@@ -150,8 +147,7 @@ function AdminBeritaPreview() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-brand-navy min-h-screen pb-16 sm:pb-20 lg:pb-24">
-      <DustBackground />
+    <section className="relative overflow-hidden bg-brand-dark min-h-screen pb-16 sm:pb-20 lg:pb-24">
       <div className="relative z-10 mx-auto max-w-4xl px-3 sm:px-8 2xl:max-w-5xl pt-10 sm:pt-14 lg:pt-16">
         <div className="overflow-hidden border border-slate-700/60 shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-2xl sm:rounded-3xl bg-brand-navy">
           <div className="p-4 sm:p-8 lg:p-10 bg-brand-navy border-b border-slate-800/80">
@@ -172,8 +168,8 @@ function AdminBeritaPreview() {
                 </span>
               </Link>
 
-              <span className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-300 shadow-sm">
-                <Eye size={13} className="text-cyan-400 shrink-0" />
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-1 text-[11px] text-cyan-300 shadow-sm min-[650px]:gap-2 min-[650px]:px-4 min-[650px]:py-2 min-[650px]:text-sm">
+                <Eye size={11} className="shrink-0 text-cyan-400 min-[650px]:h-4 min-[650px]:w-4" />
                 <span className="font-semibold">Preview Mode</span>
               </span>
             </div>

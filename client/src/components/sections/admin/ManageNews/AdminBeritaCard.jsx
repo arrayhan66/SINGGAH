@@ -38,11 +38,11 @@ function AdminBeritaCard({ berita, onEdit, onDeleteClick, onPreview }) {
 
         <p className="truncate text-xs text-slate-400">{berita.date}</p>
 
-        <div className="mt-1 flex items-center gap-2 border-t border-white/10 pt-3">
+        <div className="mt-1 flex flex-wrap items-center gap-2 border-t border-white/10 pt-3">
           <button
             type="button"
             onClick={() => onPreview(berita)}
-            className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-white px-3 py-2 text-xs font-medium text-slate-800 hover:bg-slate-100 transition-colors"
+            className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-white px-2 py-2 text-xs font-medium text-slate-800 hover:bg-slate-100 transition-colors sm:px-3"
           >
             <Eye size={13} />
             Preview
@@ -51,7 +51,7 @@ function AdminBeritaCard({ berita, onEdit, onDeleteClick, onPreview }) {
           <button
             type="button"
             onClick={() => onEdit(berita)}
-            className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-white px-3 py-2 text-xs font-medium text-slate-800 hover:bg-slate-100 transition-colors"
+            className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-white px-2 py-2 text-xs font-medium text-slate-800 hover:bg-slate-100 transition-colors sm:px-3"
           >
             <Pencil size={13} />
             Edit
@@ -60,7 +60,7 @@ function AdminBeritaCard({ berita, onEdit, onDeleteClick, onPreview }) {
           <button
             type="button"
             onClick={() => onDeleteClick(berita)}
-            className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/5 px-3 py-2 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors"
+            className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/5 px-2 py-2 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors sm:px-3"
           >
             <Trash2 size={13} />
             Hapus

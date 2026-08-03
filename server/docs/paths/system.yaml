@@ -1,0 +1,71 @@
+activityLogs:
+  get:
+    tags:
+      - System & Audit
+    summary: Ambil daftar activity logs (admin)
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          example: 1
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          example: 20
+    responses:
+      "200":
+        description: Berhasil mengambil daftar activity logs
+      "403":
+        description: Hanya admin
+
+settings:
+  get:
+    tags:
+      - System & Settings
+    summary: Ambil pengaturan sistem
+    responses:
+      "200":
+        description: Berhasil
+  put:
+    tags:
+      - System & Settings
+    summary: Perbarui pengaturan sistem (admin)
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              site_name:
+                type: string
+                example: SINGGAH
+              site_description:
+                type: string
+                example: Sistem Informasi Galeri Karya
+    responses:
+      "200":
+        description: Pengaturan berhasil disimpan
+      "403":
+        description: Hanya admin
+
+reports:
+  get:
+    tags:
+      - System & Reports
+    summary: Ambil data laporan dan statistik ringkas (admin)
+    security:
+      - BearerAuth: []
+    responses:
+      "200":
+        description: Berhasil mengambil data laporan
+      "403":
+        description: Hanya admin

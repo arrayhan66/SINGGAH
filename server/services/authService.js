@@ -2,6 +2,8 @@ const {
   User,
   PasswordReset,
   VerificationCode,
+  Project,
+  ProjectImage,
   sequelize,
 } = require("../models")
 const bcrypt = require("bcryptjs")
@@ -9,8 +11,45 @@ const generateToken = require("../utils/generateToken")
 const generateCode = require("../utils/generateCode")
 const sendEmail = require("../utils/sendEmail")
 const AppError = require("../utils/AppError")
+const {
+  deleteImage,
+  getPublicIdFromUrl,
+} = require("../utils/uploadToCloudinary")
+const { logActivity } = require("./activityLogService")
 
 const CODE_EXPIRES_MINUTES = 5
+
+const deleteUserCloudinaryAssets = async (userId) => {
+  const projects = await Project.findAll({
+    where: { user_id: userId },
+    include: [
+      {
+        model: ProjectImage,
+        as: "images",
+        attributes: ["image_url"],
+      },
+    ],
+    attributes: ["thumbnail"],
+  })
+
+  const publicIds = []
+
+  projects.forEach((project) => {
+    const thumbnailId = getPublicIdFromUrl(project.thumbnail)
+    if (thumbnailId) publicIds.push(thumbnailId)
+
+    if (project.images && project.images.length > 0) {
+      project.images.forEach((image) => {
+        const imageId = getPublicIdFromUrl(image.image_url)
+        if (imageId) publicIds.push(imageId)
+      })
+    }
+  })
+
+  await Promise.all(
+    publicIds.map((publicId) => deleteImage(publicId).catch(() => {})),
+  )
+}
 
 exports.login = async (data) => {
   const { email, password } = data
@@ -40,6 +79,12 @@ exports.login = async (data) => {
 
   const token = generateToken(user)
 
+  await logActivity({
+    userId: user.id,
+    action: "user_login",
+    description: `${user.name} login ke sistem`,
+  })
+
   return {
     token,
     user: {
@@ -49,7 +94,11 @@ exports.login = async (data) => {
       email: user.email,
       role: user.role,
       tipe: user.tipe,
+      nim_nip: user.nim_nip,
       avatar: user.avatar,
+      status: user.status,
+      is_verified: user.is_verified,
+      created_at: user.created_at,
     },
   }
 }
@@ -98,6 +147,14 @@ exports.register = async (data) => {
     )
 
     return newUser
+  })
+
+  await logActivity({
+    userId: user.id,
+    action: "user_registered",
+    targetType: "user",
+    targetId: user.id,
+    description: `${user.name} mendaftar akun baru`,
   })
 
   try {
@@ -195,16 +252,20 @@ exports.resendVerification = async (data) => {
     user_id: user.id,
   })
 
-  await sendEmail({
-    to: user.email,
-    subject: "Kode Verifikasi Email - PamerIT",
-    html: `
-      <p>Halo ${user.name},</p>
-      <p>Kode verifikasi email baru Anda:</p>
-      <h2>${code}</h2>
-      <p>Kode berlaku selama ${CODE_EXPIRES_MINUTES} menit.</p>
-    `,
-  })
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: "Kode Verifikasi Email - PamerIT",
+      html: `
+        <p>Halo ${user.name},</p>
+        <p>Kode verifikasi email baru Anda:</p>
+        <h2>${code}</h2>
+        <p>Kode berlaku selama ${CODE_EXPIRES_MINUTES} menit.</p>
+      `,
+    })
+  } catch (err) {
+    console.error("Gagal mengirim email verifikasi:", err.message)
+  }
 
   return true
 }
@@ -233,16 +294,20 @@ exports.forgotPassword = async (data) => {
     user_id: user.id,
   })
 
-  await sendEmail({
-    to: user.email,
-    subject: "Kode Reset Password - PamerIT",
-    html: `
-      <p>Halo ${user.name},</p>
-      <p>Kode reset password Anda:</p>
-      <h2>${code}</h2>
-      <p>Kode berlaku selama ${CODE_EXPIRES_MINUTES} menit. Abaikan email ini jika Anda tidak meminta reset password.</p>
-    `,
-  })
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: "Kode Reset Password - PamerIT",
+      html: `
+        <p>Halo ${user.name},</p>
+        <p>Kode reset password Anda:</p>
+        <h2>${code}</h2>
+        <p>Kode berlaku selama ${CODE_EXPIRES_MINUTES} menit. Abaikan email ini jika Anda tidak meminta reset password.</p>
+      `,
+    })
+  } catch (err) {
+    console.error("Gagal mengirim email reset password:", err.message)
+  }
 
   return true
 }
@@ -339,6 +404,94 @@ exports.changePassword = async (userId, data) => {
 
   user.password = await bcrypt.hash(newPassword, 10)
   await user.save()
+
+  return true
+}
+
+exports.getProfileStats = async (userId) => {
+  const [published, pending, rejected, total] = await Promise.all([
+    Project.count({ where: { user_id: userId, status: "published" } }),
+    Project.count({ where: { user_id: userId, status: "pending" } }),
+    Project.count({ where: { user_id: userId, status: "rejected" } }),
+    Project.count({ where: { user_id: userId } }),
+  ])
+
+  return { published, pending, rejected, total }
+}
+
+exports.updateProfile = async (userId, data, avatarUrl) => {
+  const user = await User.findByPk(userId)
+
+  if (!user) {
+    throw new AppError("User tidak ditemukan", 404)
+  }
+
+  const { name, username, email, nim_nip } = data
+
+  if (email && email !== user.email) {
+    const emailExists = await User.findOne({ where: { email } })
+
+    if (emailExists) {
+      throw new AppError("Email sudah digunakan", 400)
+    }
+  }
+
+  if (username && username !== user.username) {
+    const usernameExists = await User.findOne({ where: { username } })
+
+    if (usernameExists) {
+      throw new AppError("Username sudah digunakan", 400)
+    }
+  }
+
+  user.name = name ?? user.name
+  user.username = username ?? user.username
+  user.email = email ?? user.email
+  user.nim_nip = nim_nip ?? user.nim_nip
+
+  if (avatarUrl !== undefined) {
+    user.avatar = avatarUrl
+  }
+
+  await user.save()
+
+  return {
+    id: user.id,
+    name: user.name,
+    username: user.username,
+    email: user.email,
+    role: user.role,
+    tipe: user.tipe,
+    avatar: user.avatar,
+    nim_nip: user.nim_nip,
+    status: user.status,
+    is_verified: user.is_verified,
+  }
+}
+
+exports.deleteAccount = async (userId, password) => {
+  const user = await User.findByPk(userId)
+
+  if (!user) {
+    throw new AppError("User tidak ditemukan", 404)
+  }
+
+  if (user.role === "admin") {
+    const adminCount = await User.count({ where: { role: "admin" } })
+
+    if (adminCount <= 1) {
+      throw new AppError("Tidak dapat menghapus admin terakhir", 400)
+    }
+  }
+
+  const isMatch = await bcrypt.compare(password || "", user.password)
+
+  if (!isMatch) {
+    throw new AppError("Password salah", 400)
+  }
+
+  await deleteUserCloudinaryAssets(userId)
+  await user.destroy()
 
   return true
 }

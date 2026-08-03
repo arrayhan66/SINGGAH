@@ -1,0 +1,781 @@
+me:
+  get:
+    tags:
+      - Authentication
+    summary: Ambil data user yang sedang login
+    security:
+      - BearerAuth: []
+    responses:
+      "200":
+        description: Berhasil mengambil data user
+      "401":
+        description: Token tidak valid atau tidak ada
+
+profileStats:
+  get:
+    tags:
+      - Authentication
+    summary: Statistik project milik user yang sedang login
+    security:
+      - BearerAuth: []
+    responses:
+      "200":
+        description: Berhasil
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                data:
+                  type: object
+                  properties:
+                    published:
+                      type: integer
+                      example: 2
+                    pending:
+                      type: integer
+                      example: 1
+                    rejected:
+                      type: integer
+                      example: 0
+                    total:
+                      type: integer
+                      example: 3
+
+updateProfile:
+  put:
+    tags:
+      - Authentication
+    summary: Perbarui profil user yang sedang login
+    description: |
+      Mengubah data profil. Upload avatar (multipart, field "avatar") bersifat opsional.
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: false
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                example: Ilham
+              username:
+                type: string
+                example: ilhambb666
+              email:
+                type: string
+                example: ilhambb666@gmail.com
+              nim_nip:
+                type: string
+                example: "2023001"
+              avatar:
+                type: string
+                format: binary
+    responses:
+      "200":
+        description: Profil berhasil diperbarui
+      "400":
+        description: Email atau username sudah digunakan
+      "404":
+        description: User tidak ditemukan
+
+deleteAccount:
+  delete:
+    tags:
+      - Authentication
+    summary: Hapus akun sendiri
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - password
+            properties:
+              password:
+                type: string
+                example: password123
+    responses:
+      "200":
+        description: Akun berhasil dihapus
+      "400":
+        description: Password salah, atau tidak dapat menghapus admin terakhir
+      "404":
+        description: User tidak ditemukan
+
+pending:
+  get:
+    tags:
+      - Projects
+    summary: Ambil daftar project pending (admin)
+    security:
+      - BearerAuth: []
+    responses:
+      "200":
+        description: Berhasil mengambil daftar project pending
+      "403":
+        description: Hanya admin
+
+updateProjectStatus:
+  patch:
+    tags:
+      - Projects
+    summary: Ubah status project (admin)
+    description: |
+      Mengubah status project menjadi pending, published, atau rejected.
+      Pemilik project otomatis menerima notifikasi.
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                example: published
+    responses:
+      "200":
+        description: Status project berhasil diperbarui
+      "400":
+        description: Status tidak valid
+      "404":
+        description: Project tidak ditemukan
+
+getComments:
+  get:
+    tags:
+      - Project Interactions
+    summary: Ambil daftar komentar project
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+    responses:
+      "200":
+        description: Berhasil
+
+addComment:
+  post:
+    tags:
+      - Project Interactions
+    summary: Tambah komentar project
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - text
+            properties:
+              text:
+                type: string
+                example: Keren!
+    responses:
+      "201":
+        description: Komentar ditambahkan
+      "400":
+        description: Komentar tidak boleh kosong
+      "404":
+        description: Project tidak ditemukan
+
+removeComment:
+  delete:
+    tags:
+      - Project Interactions
+    summary: Hapus komentar
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Komentar dihapus
+      "403":
+        description: Bukan pemilik komentar
+      "404":
+        description: Komentar tidak ditemukan
+
+getLikes:
+  get:
+    tags:
+      - Project Interactions
+    summary: Ambil jumlah like project
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Berhasil
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    likesCount:
+                      type: integer
+                      example: 5
+
+toggleLike:
+  post:
+    tags:
+      - Project Interactions
+    summary: Like atau batal like project
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Berhasil
+      "404":
+        description: Project tidak ditemukan
+
+addView:
+  post:
+    tags:
+      - Project Interactions
+    summary: Tambah view project
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Berhasil
+
+toggleBookmark:
+  post:
+    tags:
+      - Project Interactions
+    summary: Bookmark atau batal bookmark project
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Berhasil
+      "404":
+        description: Project tidak ditemukan
+
+myBookmarks:
+  get:
+    tags:
+      - Project Interactions
+    summary: Ambil daftar bookmark user
+    security:
+      - BearerAuth: []
+    responses:
+      "200":
+        description: Berhasil
+
+getVideos:
+  get:
+    tags:
+      - Project Resources
+    summary: Ambil daftar video project
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Berhasil
+
+addVideo:
+  post:
+    tags:
+      - Project Resources
+    summary: Tambah video project
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - video_url
+            properties:
+              video_url:
+                type: string
+                example: https://www.youtube.com/watch?v=abc123
+    responses:
+      "201":
+        description: Video ditambahkan
+
+removeVideo:
+  delete:
+    tags:
+      - Project Resources
+    summary: Hapus video project
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: videoId
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Video dihapus
+
+getDocuments:
+  get:
+    tags:
+      - Project Resources
+    summary: Ambil daftar dokumen project
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Berhasil
+
+addDocument:
+  post:
+    tags:
+      - Project Resources
+    summary: Tambah dokumen project
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - name
+              - file_url
+            properties:
+              name:
+                type: string
+                example: Laporan Akhir.pdf
+              file_url:
+                type: string
+                example: https://example.com/laporan.pdf
+    responses:
+      "201":
+        description: Dokumen ditambahkan
+
+removeDocument:
+  delete:
+    tags:
+      - Project Resources
+    summary: Hapus dokumen project
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: docId
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Dokumen dihapus
+
+getLinks:
+  get:
+    tags:
+      - Project Resources
+    summary: Ambil daftar link project
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Berhasil
+
+addLink:
+  post:
+    tags:
+      - Project Resources
+    summary: Tambah link project
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - label
+              - url
+            properties:
+              label:
+                type: string
+                example: Repository
+              url:
+                type: string
+                example: https://github.com/ilham/repo
+    responses:
+      "201":
+        description: Link ditambahkan
+
+removeLink:
+  delete:
+    tags:
+      - Project Resources
+    summary: Hapus link project
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: linkId
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Link dihapus
+
+getMembers:
+  get:
+    tags:
+      - Project Resources
+    summary: Ambil daftar anggota project
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Berhasil
+
+addMember:
+  post:
+    tags:
+      - Project Resources
+    summary: Tambah anggota project
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                type: string
+                example: Budi
+              role:
+                type: string
+                example: Frontend Developer
+    responses:
+      "201":
+        description: Anggota ditambahkan
+
+removeMember:
+  delete:
+    tags:
+      - Project Resources
+    summary: Hapus anggota project
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: memberId
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Anggota dihapus
+
+getImages:
+  get:
+    tags:
+      - Project Resources
+    summary: Ambil daftar gambar project
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Berhasil
+
+addImage:
+  post:
+    tags:
+      - Project Resources
+    summary: Tambah gambar project
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required:
+              - image
+            properties:
+              image:
+                type: string
+                format: binary
+    responses:
+      "201":
+        description: Gambar ditambahkan
+
+removeImage:
+  delete:
+    tags:
+      - Project Resources
+    summary: Hapus gambar project
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: imageId
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Gambar dihapus
+
+stats:
+  get:
+    tags:
+      - Stats
+    summary: Statistik publik (jumlah project, kategori, user)
+    responses:
+      "200":
+        description: Berhasil
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    totalProject:
+                      type: integer
+                      example: 10
+                    totalCategory:
+                      type: integer
+                      example: 6
+                    totalUser:
+                      type: integer
+                      example: 20
+
+getReplies:
+  get:
+    tags:
+      - Comments & Replies
+    summary: Ambil daftar balasan komentar
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Berhasil mengambil daftar balasan
+
+addReply:
+  post:
+    tags:
+      - Comments & Replies
+    summary: Tambah balasan pada komentar
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - text
+            properties:
+              text:
+                type: string
+                example: Terima kasih atas masukannya!
+    responses:
+      "201":
+        description: Balasan ditambahkan
+      "401":
+        description: Unauthorized
+
+removeReply:
+  delete:
+    tags:
+      - Comments & Replies
+    summary: Hapus balasan komentar
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: replyId
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Balasan dihapus
+      "403":
+        description: Forbidden
+

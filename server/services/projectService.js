@@ -1,6 +1,122 @@
-const { Project, Category, User, ProjectImage } = require("../models")
+const {
+  Project,
+  Category,
+  User,
+  ProjectImage,
+  ProjectMember,
+  ProjectDocument,
+  ProjectTechnology,
+  ProjectVideo,
+  ProjectLink,
+  ProjectLike,
+  ProjectView,
+  Bookmark,
+  Comment,
+  sequelize,
+} = require("../models")
 const AppError = require("../utils/AppError")
 const { Op } = require("sequelize")
+const { createNotification } = require("./notificationService")
+
+const parseJsonField = (value, label) => {
+  if (value === undefined || value === null || value === "") return []
+
+  if (Array.isArray(value)) return value
+
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value)
+    } catch {
+      throw new AppError(`${label} tidak valid`, 400)
+    }
+  }
+
+  throw new AppError(`${label} tidak valid`, 400)
+}
+
+const generateUniqueSlug = async (title) => {
+  const baseSlug = title
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 100)
+
+  let slug = baseSlug || "project"
+  let suffix = 1
+
+  while (await Project.findOne({ where: { slug } })) {
+    slug = `${baseSlug || "project"}-${suffix}`
+    suffix += 1
+  }
+
+  return slug
+}
+
+const replaceRelated = async (projectId, Model, rows, options = {}) => {
+  await Model.destroy({ where: { project_id: projectId }, ...options })
+
+  if (rows.length > 0) {
+    await Model.bulkCreate(rows, options)
+  }
+}
+
+const parseRelationFields = (data) => {
+  const technologies = parseJsonField(data.technologies, "Teknologi").map(
+    (item) => ({
+      name:
+        typeof item === "string"
+          ? item
+          : item.name || item.technology || String(item),
+    }),
+  )
+  const members = parseJsonField(data.members, "Anggota tim").map((item) => ({
+    name: item.name,
+    role: item.role || null,
+  }))
+  const links = parseJsonField(data.links, "Link eksternal").map((item) => ({
+    label: item.label,
+    url: item.url,
+  }))
+  const videos = parseJsonField(data.videos, "Video").map((item) => ({
+    video_url:
+      typeof item === "string"
+        ? item
+        : item.video_url || item.url || String(item),
+  }))
+
+  return { technologies, members, links, videos }
+}
+
+const persistRelations = async (project, relations, options = {}) => {
+  const attach = (rows) =>
+    rows.map((row) => ({ ...row, project_id: project.id }))
+
+  await replaceRelated(
+    project.id,
+    ProjectTechnology,
+    attach(relations.technologies),
+    options,
+  )
+  await replaceRelated(
+    project.id,
+    ProjectMember,
+    attach(relations.members),
+    options,
+  )
+  await replaceRelated(
+    project.id,
+    ProjectLink,
+    attach(relations.links),
+    options,
+  )
+  await replaceRelated(
+    project.id,
+    ProjectVideo,
+    attach(relations.videos),
+    options,
+  )
+}
 
 exports.getProjects = async (query = {}) => {
   const { search, category_id, status, year, page, limit } = query
@@ -37,6 +153,34 @@ exports.getProjects = async (query = {}) => {
 
   const { count, rows } = await Project.findAndCountAll({
     where,
+    attributes: {
+      include: [
+        [
+          sequelize.literal(
+            "(SELECT COUNT(*) FROM project_likes WHERE project_likes.project_id = Project.id)",
+          ),
+          "likesCount",
+        ],
+        [
+          sequelize.literal(
+            "(SELECT COUNT(*) FROM project_views WHERE project_views.project_id = Project.id)",
+          ),
+          "viewsCount",
+        ],
+        [
+          sequelize.literal(
+            "(SELECT COUNT(*) FROM bookmarks WHERE bookmarks.project_id = Project.id)",
+          ),
+          "bookmarksCount",
+        ],
+        [
+          sequelize.literal(
+            "(SELECT COUNT(*) FROM comments WHERE comments.project_id = Project.id)",
+          ),
+          "commentsCount",
+        ],
+      ],
+    },
     include: [
       {
         model: Category,
@@ -44,12 +188,17 @@ exports.getProjects = async (query = {}) => {
       },
       {
         model: User,
-        attributes: ["id", "name", "username"],
+        attributes: ["id", "name", "username", "nim_nip", "avatar"],
       },
       {
         model: ProjectImage,
         as: "images",
         attributes: ["id", "image_url"],
+      },
+      {
+        model: ProjectTechnology,
+        as: "technologies",
+        attributes: ["id", "name"],
       },
     ],
     order: [["created_at", "DESC"]],
@@ -81,20 +230,92 @@ exports.getPendingProjects = async () => {
       },
       {
         model: User,
-        attributes: ["id", "name", "username"],
+        attributes: ["id", "name", "username", "nim_nip", "avatar"],
       },
       {
         model: ProjectImage,
         as: "images",
         attributes: ["id", "image_url"],
       },
+      {
+        model: ProjectTechnology,
+        as: "technologies",
+        attributes: ["id", "name"],
+      },
     ],
     order: [["created_at", "ASC"]],
   })
 }
 
-exports.getProjectById = async (id) => {
+exports.updateProjectStatus = async (id, status) => {
+  const project = await Project.findByPk(id)
+
+  if (!project) {
+    throw new AppError("Project tidak ditemukan", 404)
+  }
+
+  if (!["pending", "published", "rejected"].includes(status)) {
+    throw new AppError("Status tidak valid", 400)
+  }
+
+  project.status = status
+  await project.save()
+
+  if (status === "published") {
+    await createNotification({
+      user_id: project.user_id,
+      type: "project_approved",
+      title: "Project disetujui",
+      message: `Project "${project.title}" telah disetujui dan dipublikasikan.`,
+      reference_type: "project",
+      reference_id: project.id,
+    })
+  }
+
+  if (status === "rejected") {
+    await createNotification({
+      user_id: project.user_id,
+      type: "project_rejected",
+      title: "Project ditolak",
+      message: `Project "${project.title}" ditolak oleh admin.`,
+      reference_type: "project",
+      reference_id: project.id,
+    })
+  }
+
+  return project
+}
+
+exports.getProjectById = async (id, currentUserId = null) => {
   const project = await Project.findByPk(id, {
+    attributes: {
+      include: [
+        [
+          sequelize.literal(
+            "(SELECT COUNT(*) FROM project_likes WHERE project_likes.project_id = Project.id)",
+          ),
+          "likesCount",
+        ],
+        [
+          sequelize.literal(
+            "(SELECT COUNT(*) FROM project_views WHERE project_views.project_id = Project.id)",
+          ),
+          "viewsCount",
+        ],
+        [
+          sequelize.literal(
+            "(SELECT COUNT(*) FROM bookmarks WHERE bookmarks.project_id = Project.id)",
+          ),
+          "bookmarksCount",
+        ],
+        [
+          sequelize.literal(
+            "(SELECT COUNT(*) FROM comments WHERE comments.project_id = Project.id)",
+          ),
+          "commentsCount",
+        ],
+      ],
+    },
     include: [
       {
         model: Category,
@@ -102,12 +323,37 @@ exports.getProjectById = async (id) => {
       },
       {
         model: User,
-        attributes: ["id", "name", "username"],
+        attributes: ["id", "name", "username", "nim_nip", "avatar"],
       },
       {
         model: ProjectImage,
         as: "images",
         attributes: ["id", "image_url"],
+      },
+      {
+        model: ProjectMember,
+        as: "members",
+        attributes: ["id", "name", "role"],
+      },
+      {
+        model: ProjectTechnology,
+        as: "technologies",
+        attributes: ["id", "name"],
+      },
+      {
+        model: ProjectDocument,
+        as: "documents",
+        attributes: ["id", "name", "file_url"],
+      },
+      {
+        model: ProjectVideo,
+        as: "videos",
+        attributes: ["id", "video_url"],
+      },
+      {
+        model: ProjectLink,
+        as: "links",
+        attributes: ["id", "label", "url"],
       },
     ],
   })
@@ -116,18 +362,39 @@ exports.getProjectById = async (id) => {
     throw new AppError("Project tidak ditemukan", 404)
   }
 
-  return project
+  const data = project.toJSON()
+
+  data.liked = false
+  data.bookmarked = false
+
+  if (currentUserId) {
+    const [like, bookmark] = await Promise.all([
+      ProjectLike.findOne({
+        where: { project_id: project.id, user_id: currentUserId },
+      }),
+      Bookmark.findOne({
+        where: { project_id: project.id, user_id: currentUserId },
+      }),
+    ])
+
+    data.liked = !!like
+    data.bookmarked = !!bookmark
+  }
+
+  return data
 }
 
-exports.createProject = async (data, user, imageUrls = []) => {
+exports.createProject = async (data, user, imageUrls = [], documentUrls = []) => {
   const { title, slug, description, thumbnail, year, category_id } = data
 
-  if (!title || !slug || !description || !thumbnail || !year || !category_id) {
+  if (!title || !description || !thumbnail || !year || !category_id) {
     throw new AppError("Semua field wajib diisi", 400)
   }
 
+  const finalSlug = slug || (await generateUniqueSlug(title))
+
   const slugExists = await Project.findOne({
-    where: { slug },
+    where: { slug: finalSlug },
   })
 
   if (slugExists) {
@@ -148,29 +415,53 @@ exports.createProject = async (data, user, imageUrls = []) => {
     )
   }
 
+  // Parse & validasi relasi SEBELUM menulis ke database
+  const relations = parseRelationFields(data)
+
   // Tentukan status berdasarkan tipe user
   const projectStatus =
     user.role === "admin" || user.tipe === "dosen" ? "published" : "pending"
 
-  const project = await Project.create({
-    title,
-    slug,
-    description,
-    thumbnail,
-    year,
-    category_id,
-    status: projectStatus,
-    user_id: user.id,
+  const project = await sequelize.transaction(async (t) => {
+    const created = await Project.create(
+      {
+        title,
+        slug: finalSlug,
+        description,
+        thumbnail,
+        year,
+        category_id,
+        status: projectStatus,
+        user_id: user.id,
+      },
+      { transaction: t },
+    )
+
+    if (imageUrls.length > 0) {
+      await ProjectImage.bulkCreate(
+        imageUrls.map((url) => ({
+          image_url: url,
+          project_id: created.id,
+        })),
+        { transaction: t },
+      )
+    }
+
+    if (documentUrls.length > 0) {
+      await ProjectDocument.bulkCreate(
+        documentUrls.map(({ name, file_url }) => ({
+          name,
+          file_url,
+          project_id: created.id,
+        })),
+        { transaction: t },
+      )
+    }
+
+    await persistRelations(created, relations, { transaction: t })
+
+    return created
   })
-
-  if (imageUrls.length > 0) {
-    const imagesData = imageUrls.map((url) => ({
-      image_url: url,
-      project_id: project.id,
-    }))
-
-    await ProjectImage.bulkCreate(imagesData)
-  }
 
   return await exports.getProjectById(project.id)
 }
@@ -187,6 +478,8 @@ exports.updateProject = async (id, data, user) => {
   if (user.role !== "admin" && project.user_id !== user.id) {
     throw new AppError("Akses ditolak", 403)
   }
+
+  const relations = parseRelationFields(data)
 
   const { title, slug, description, thumbnail, year, category_id, status } =
     data
@@ -222,7 +515,9 @@ exports.updateProject = async (id, data, user) => {
 
   await project.save()
 
-  return project
+  await persistRelations(project, relations)
+
+  return await exports.getProjectById(id)
 }
 
 exports.deleteProject = async (id, user) => {
@@ -234,9 +529,95 @@ exports.deleteProject = async (id, user) => {
     throw new AppError("Akses ditolak", 403)
   }
 
+  const childModels = [
+    ProjectImage,
+    ProjectMember,
+    ProjectDocument,
+    ProjectTechnology,
+    ProjectVideo,
+    ProjectLink,
+    ProjectLike,
+    ProjectView,
+    Bookmark,
+    Comment,
+  ]
+
+  await Promise.all(
+    childModels.map((Model) =>
+      Model.destroy({ where: { project_id: id } }),
+    ),
+  )
+
   await Project.destroy({
     where: { id },
   })
 
   return project
+}
+
+exports.getMyProjects = async (userId) => {
+  const [items, pending, published, rejected, total] = await Promise.all([
+    Project.findAll({
+      where: { user_id: userId },
+      attributes: {
+        include: [
+          [
+            sequelize.literal(
+              "(SELECT COUNT(*) FROM project_likes WHERE project_likes.project_id = Project.id)",
+            ),
+            "likesCount",
+          ],
+          [
+            sequelize.literal(
+              "(SELECT COUNT(*) FROM project_views WHERE project_views.project_id = Project.id)",
+            ),
+            "viewsCount",
+          ],
+          [
+            sequelize.literal(
+              "(SELECT COUNT(*) FROM bookmarks WHERE bookmarks.project_id = Project.id)",
+            ),
+            "bookmarksCount",
+          ],
+          [
+            sequelize.literal(
+              "(SELECT COUNT(*) FROM comments WHERE comments.project_id = Project.id)",
+            ),
+            "commentsCount",
+          ],
+        ],
+      },
+      include: [
+        {
+          model: Category,
+          attributes: ["id", "name", "slug"],
+        },
+        {
+          model: User,
+          attributes: ["id", "name", "username", "nim_nip", "avatar"],
+        },
+        {
+          model: ProjectImage,
+          as: "images",
+          attributes: ["id", "image_url"],
+        },
+        {
+          model: ProjectTechnology,
+          as: "technologies",
+          attributes: ["id", "name"],
+        },
+      ],
+      order: [["created_at", "DESC"]],
+      distinct: true,
+    }),
+    Project.count({ where: { user_id: userId, status: "pending" } }),
+    Project.count({ where: { user_id: userId, status: "published" } }),
+    Project.count({ where: { user_id: userId, status: "rejected" } }),
+    Project.count({ where: { user_id: userId } }),
+  ])
+
+  return {
+    items,
+    counts: { pending, published, rejected, total },
+  }
 }

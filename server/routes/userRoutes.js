@@ -2,8 +2,13 @@ const router = require("express").Router()
 
 const authMiddleware = require("../middlewares/authMiddleware")
 const roleMiddleware = require("../middlewares/roleMiddleware")
+const validate = require("../middlewares/validateMiddleware")
 
 const userController = require("../controllers/userController")
+const {
+  createUserValidator,
+  updateUserValidator,
+} = require("../validators/userValidator")
 
 router.get(
   "/",
@@ -23,6 +28,8 @@ router.post(
   "/",
   authMiddleware,
   roleMiddleware("admin"),
+  createUserValidator,
+  validate,
   userController.createUser,
 )
 
@@ -30,6 +37,8 @@ router.put(
   "/:id",
   authMiddleware,
   roleMiddleware("admin"),
+  updateUserValidator,
+  validate,
   userController.updateUser,
 )
 

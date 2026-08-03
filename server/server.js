@@ -4,12 +4,10 @@ require("./config/env")
 const express = require("express")
 const cors = require("cors")
 const helmet = require("helmet")
-const rateLimit = require("express-rate-limit")
 
 const { sequelize } = require("./models")
 
 const authRoutes = require("./routes/authRoutes")
-const testRoutes = require("./routes/testRoutes")
 const userRoutes = require("./routes/userRoutes")
 const errorMiddleware = require("./middlewares/errorMiddleware")
 const categoryRoutes = require("./routes/categoryRoutes")
@@ -17,23 +15,26 @@ const projectRoutes = require("./routes/projectRoutes")
 const newsRoutes = require("./routes/newsRoutes")
 const dashboardRoutes = require("./routes/dashboardRoutes")
 const notificationRoutes = require("./routes/notificationRoutes")
+const commentRoutes = require("./routes/commentRoutes")
+const bookmarkRoutes = require("./routes/bookmarkRoutes")
+const projectImageRoutes = require("./routes/projectImageRoutes")
+const projectVideoRoutes = require("./routes/projectVideoRoutes")
+const projectDocumentRoutes = require("./routes/projectDocumentRoutes")
+const projectLinkRoutes = require("./routes/projectLinkRoutes")
+const projectLikeRoutes = require("./routes/projectLikeRoutes")
+const projectMemberRoutes = require("./routes/projectMemberRoutes")
+const projectViewRoutes = require("./routes/projectViewRoutes")
+const publicStatsRoutes = require("./routes/publicStatsRoutes")
+const settingRoutes = require("./routes/settingRoutes")
+const activityLogRoutes = require("./routes/activityLogRoutes")
+const mediaRoutes = require("./routes/mediaRoutes")
+const reportRoutes = require("./routes/reportRoutes")
 
 const swaggerUi = require("swagger-ui-express")
 const loadSwagger = require("./config/swagger")
 
 const app = express()
 const PORT = process.env.PORT || 5000
-
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    success: false,
-    message: "Terlalu banyak percobaan login. Coba lagi 15 menit lagi.",
-  },
-})
 
 app.use(helmet())
 
@@ -46,17 +47,30 @@ app.use(
 
 app.use(express.json({ limit: "10mb" }))
 
-app.use("/api/auth/login", authLimiter)
-app.use("/api/auth/forgot-password", authLimiter)
-
-app.use("/api/test", testRoutes)
 app.use("/api/auth", authRoutes)
 app.use("/api/users", userRoutes)
 app.use("/api/categories", categoryRoutes)
-app.use("/api/projects", projectRoutes)
 app.use("/api/news", newsRoutes)
 app.use("/api/dashboard", dashboardRoutes)
 app.use("/api/notifications", notificationRoutes)
+app.use("/api/settings", settingRoutes)
+app.use("/api/activity-logs", activityLogRoutes)
+app.use("/api/media", mediaRoutes)
+app.use("/api/reports", reportRoutes)
+
+// Sub-routes project (dipasang sebelum projectRoutes agar "/my-bookmarks" tidak ketangkap ":id")
+app.use("/api/projects", bookmarkRoutes)
+app.use("/api/projects", commentRoutes)
+app.use("/api/projects", projectLikeRoutes)
+app.use("/api/projects", projectMemberRoutes)
+app.use("/api/projects", projectVideoRoutes)
+app.use("/api/projects", projectDocumentRoutes)
+app.use("/api/projects", projectLinkRoutes)
+app.use("/api/projects", projectViewRoutes)
+app.use("/api/projects/:id/images", projectImageRoutes)
+app.use("/api/projects", projectRoutes)
+
+app.use("/api/stats", publicStatsRoutes)
 
 app.get("/", (req, res) => {
   res.json({
@@ -68,6 +82,9 @@ const startServer = async () => {
   try {
     await sequelize.authenticate()
     console.log("Database connected")
+
+    // Buat tabel yang belum ada (tanpa mengubah tabel lama)
+    await sequelize.sync()
 
     const swaggerDocument = await loadSwagger()
     app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))

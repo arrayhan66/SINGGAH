@@ -1,8 +1,18 @@
-const { Category } = require("../models")
+const { Category, sequelize } = require("../models")
 const AppError = require("../utils/AppError")
 
 exports.getCategories = async () => {
   return await Category.findAll({
+    attributes: {
+      include: [
+        [
+          sequelize.literal(
+            "(SELECT COUNT(*) FROM projects WHERE projects.category_id = Category.id AND projects.status = 'published')",
+          ),
+          "projectCount",
+        ],
+      ],
+    },
     order: [["name", "ASC"]],
   })
 }

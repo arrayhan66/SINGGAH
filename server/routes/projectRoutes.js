@@ -4,8 +4,12 @@ const projectController = require("../controllers/projectController")
 const authMiddleware = require("../middlewares/authMiddleware")
 const roleMiddleware = require("../middlewares/roleMiddleware")
 const upload = require("../middlewares/uploadMiddleware")
+const validate = require("../middlewares/validateMiddleware")
+const {
+  createProjectValidator,
+  updateProjectValidator,
+} = require("../validators/projectValidator")
 
-router.get("/", projectController.getProjects)
 router.get("/", projectController.getProjects)
 
 router.get(
@@ -15,7 +19,7 @@ router.get(
   projectController.getPendingProjects,
 )
 
-router.get("/:id", projectController.getProjectById)
+router.get("/my", authMiddleware, projectController.getMyProjects)
 
 router.get("/:id", projectController.getProjectById)
 
@@ -26,7 +30,10 @@ router.post(
   upload.fields([
     { name: "thumbnail", maxCount: 1 },
     { name: "images", maxCount: 10 },
+    { name: "documents", maxCount: 10 },
   ]),
+  createProjectValidator,
+  validate,
   projectController.createProject,
 )
 
@@ -41,7 +48,13 @@ router.put(
   "/:id",
   authMiddleware,
   roleMiddleware("admin", "user"),
-  upload.fields([{ name: "thumbnail", maxCount: 1 }]),
+  upload.fields([
+    { name: "thumbnail", maxCount: 1 },
+    { name: "images", maxCount: 10 },
+    { name: "documents", maxCount: 10 },
+  ]),
+  updateProjectValidator,
+  validate,
   projectController.updateProject,
 )
 

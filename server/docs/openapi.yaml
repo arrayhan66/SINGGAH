@@ -33,6 +33,18 @@ paths:
   /auth/change-password:
     $ref: './paths/auth.yaml#/changePassword'
 
+  /auth/me:
+    $ref: './paths/interactions.yaml#/me'
+
+  /auth/profile-stats:
+    $ref: './paths/interactions.yaml#/profileStats'
+
+  /auth/profile:
+    $ref: './paths/interactions.yaml#/updateProfile'
+
+  /auth/account:
+    $ref: './paths/interactions.yaml#/deleteAccount'
+
   /users:
     $ref: './paths/users.yaml#/collection'
 
@@ -51,6 +63,106 @@ paths:
   /projects/{id}:
     $ref: './paths/projects.yaml#/single'
 
+  /projects/pending:
+    $ref: './paths/interactions.yaml#/pending'
+
+  /projects/{id}/status:
+    $ref: './paths/interactions.yaml#/updateProjectStatus'
+
+  /projects/{id}/comments:
+    get:
+      $ref: './paths/interactions.yaml#/getComments'
+    post:
+      $ref: './paths/interactions.yaml#/addComment'
+
+  /projects/{id}/comments/{commentId}:
+    delete:
+      $ref: './paths/interactions.yaml#/removeComment'
+
+  /projects/{id}/comments/{commentId}/replies:
+    get:
+      $ref: './paths/interactions.yaml#/getReplies'
+    post:
+      $ref: './paths/interactions.yaml#/addReply'
+
+  /projects/{id}/comments/{commentId}/replies/{replyId}:
+    delete:
+      $ref: './paths/interactions.yaml#/removeReply'
+
+  /projects/{id}/likes:
+    get:
+      $ref: './paths/interactions.yaml#/getLikes'
+
+  /projects/{id}/like:
+    post:
+      $ref: './paths/interactions.yaml#/toggleLike'
+
+  /projects/{id}/view:
+    post:
+      $ref: './paths/interactions.yaml#/addView'
+
+  /projects/{id}/bookmark:
+    post:
+      $ref: './paths/interactions.yaml#/toggleBookmark'
+
+  /projects/my-bookmarks:
+    get:
+      $ref: './paths/interactions.yaml#/myBookmarks'
+
+  /projects/{id}/videos:
+    get:
+      $ref: './paths/interactions.yaml#/getVideos'
+    post:
+      $ref: './paths/interactions.yaml#/addVideo'
+
+  /projects/{id}/videos/{videoId}:
+    delete:
+      $ref: './paths/interactions.yaml#/removeVideo'
+
+  /projects/{id}/documents:
+    get:
+      $ref: './paths/interactions.yaml#/getDocuments'
+    post:
+      $ref: './paths/interactions.yaml#/addDocument'
+
+  /projects/{id}/documents/{docId}:
+    delete:
+      $ref: './paths/interactions.yaml#/removeDocument'
+
+  /projects/{id}/links:
+    get:
+      $ref: './paths/interactions.yaml#/getLinks'
+    post:
+      $ref: './paths/interactions.yaml#/addLink'
+
+  /projects/{id}/links/{linkId}:
+    delete:
+      $ref: './paths/interactions.yaml#/removeLink'
+
+  /projects/{id}/members:
+    get:
+      $ref: './paths/interactions.yaml#/getMembers'
+    post:
+      $ref: './paths/interactions.yaml#/addMember'
+
+  /projects/{id}/members/{memberId}:
+    delete:
+      $ref: './paths/interactions.yaml#/removeMember'
+
+  /projects/{id}/images:
+    get:
+      $ref: './paths/interactions.yaml#/getImages'
+    post:
+      $ref: './paths/interactions.yaml#/addImage'
+
+  /projects/{id}/images/{imageId}:
+    delete:
+      $ref: './paths/interactions.yaml#/removeImage'
+
+  /stats:
+    get:
+      $ref: './paths/interactions.yaml#/stats'
+
   /news:
     $ref: './paths/news.yaml#/collection'
 
@@ -68,6 +180,20 @@ paths:
     
   /notifications/{id}/read:
     $ref: './paths/notifications.yaml#/markOneRead'
+
+  /activity-logs:
+    get:
+      $ref: './paths/system.yaml#/activityLogs'
+
+  /settings:
+    get:
+      $ref: './paths/system.yaml#/settings'
+    put:
+      $ref: './paths/system.yaml#/settings'
+
+  /reports:
+    get:
+      $ref: './paths/system.yaml#/reports'
 
 components:
   securitySchemes:

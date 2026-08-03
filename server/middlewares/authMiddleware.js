@@ -27,6 +27,18 @@ async function authMiddleware(req, res, next) {
       })
     }
 
+    if (user.status !== "active") {
+      return res.status(403).json({
+        message: "Akun Anda dinonaktifkan. Silakan hubungi admin.",
+      })
+    }
+
+    if (!user.is_verified) {
+      return res.status(403).json({
+        message: "Email belum diverifikasi. Silakan verifikasi email Anda terlebih dahulu.",
+      })
+    }
+
     req.user = user
 
     next()

@@ -7,6 +7,7 @@ const {
   getPublicIdFromUrl,
 } = require("../utils/uploadToCloudinary")
 const AppError = require("../utils/AppError")
+const { logActivity } = require("../services/activityLogService")
 
 exports.getNews = asyncHandler(async (req, res) => {
   const news = await newsService.getNews(req.query)
@@ -34,6 +35,14 @@ exports.createNews = asyncHandler(async (req, res) => {
 
   const news = await newsService.createNews(req.body, req.user.id)
 
+  await logActivity({
+    userId: req.user.id,
+    action: "news_created",
+    targetType: "news",
+    targetId: news.id,
+    description: `${req.user.name} membuat berita "${news.title}"`,
+  })
+
   success(res, news, "News berhasil dibuat", 201)
 })
 
@@ -57,11 +66,27 @@ exports.updateNews = asyncHandler(async (req, res) => {
 
   const news = await newsService.updateNews(req.params.id, req.body)
 
+  await logActivity({
+    userId: req.user.id,
+    action: "news_updated",
+    targetType: "news",
+    targetId: news.id,
+    description: `${req.user.name} memperbarui berita "${news.title}"`,
+  })
+
   success(res, news, "News berhasil diperbarui")
 })
 
 exports.deleteNews = asyncHandler(async (req, res) => {
   const news = await newsService.deleteNews(req.params.id)
+
+  await logActivity({
+    userId: req.user.id,
+    action: "news_deleted",
+    targetType: "news",
+    targetId: news.id,
+    description: `${req.user.name} menghapus berita "${news.title}"`,
+  })
 
   const headlinePublicId = getPublicIdFromUrl(news.headline_image)
 

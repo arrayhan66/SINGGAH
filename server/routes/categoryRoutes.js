@@ -4,6 +4,11 @@ const categoryController = require("../controllers/categoryController")
 
 const authMiddleware = require("../middlewares/authMiddleware")
 const roleMiddleware = require("../middlewares/roleMiddleware")
+const validate = require("../middlewares/validateMiddleware")
+const {
+  createCategoryValidator,
+  updateCategoryValidator,
+} = require("../validators/categoryValidator")
 
 router.get("/", categoryController.getCategories)
 
@@ -13,6 +18,8 @@ router.post(
   "/",
   authMiddleware,
   roleMiddleware("admin"),
+  createCategoryValidator,
+  validate,
   categoryController.createCategory,
 )
 
@@ -20,6 +27,8 @@ router.put(
   "/:id",
   authMiddleware,
   roleMiddleware("admin"),
+  updateCategoryValidator,
+  validate,
   categoryController.updateCategory,
 )
 

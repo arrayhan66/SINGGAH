@@ -1,6 +1,42 @@
-const { User } = require("../models")
+const { User, Project, ProjectImage } = require("../models")
 const bcrypt = require("bcryptjs")
 const AppError = require("../utils/AppError")
+const {
+  deleteImage,
+  getPublicIdFromUrl,
+} = require("../utils/uploadToCloudinary")
+
+const deleteUserCloudinaryAssets = async (userId) => {
+  const projects = await Project.findAll({
+    where: { user_id: userId },
+    include: [
+      {
+        model: ProjectImage,
+        as: "images",
+        attributes: ["image_url"],
+      },
+    ],
+    attributes: ["thumbnail"],
+  })
+
+  const publicIds = []
+
+  projects.forEach((project) => {
+    const thumbnailId = getPublicIdFromUrl(project.thumbnail)
+    if (thumbnailId) publicIds.push(thumbnailId)
+
+    if (project.images && project.images.length > 0) {
+      project.images.forEach((image) => {
+        const imageId = getPublicIdFromUrl(image.image_url)
+        if (imageId) publicIds.push(imageId)
+      })
+    }
+  })
+
+  await Promise.all(
+    publicIds.map((publicId) => deleteImage(publicId).catch(() => {})),
+  )
+}
 
 exports.getUsers = async (query = {}) => {
   const { page, limit } = query
@@ -182,6 +218,15 @@ exports.deleteUser = async (id) => {
     throw new AppError("User tidak ditemukan", 404)
   }
 
+  if (user.role === "admin") {
+    const adminCount = await User.count({ where: { role: "admin" } })
+
+    if (adminCount <= 1) {
+      throw new AppError("Tidak dapat menghapus admin terakhir", 400)
+    }
+  }
+
+  await deleteUserCloudinaryAssets(id)
   await user.destroy()
 
   return true

@@ -3,6 +3,7 @@ const router = require("express").Router()
 const authController = require("../controllers/authController")
 const authMiddleware = require("../middlewares/authMiddleware")
 const validate = require("../middlewares/validateMiddleware")
+const upload = require("../middlewares/uploadMiddleware")
 const {
   loginLimiter,
   registerLimiter,
@@ -66,6 +67,14 @@ router.post(
 )
 
 router.get("/me", authMiddleware, authController.me)
+router.get("/profile-stats", authMiddleware, authController.getProfileStats)
+router.put(
+  "/profile",
+  authMiddleware,
+  upload.single("avatar"),
+  authController.updateProfile,
+)
+router.delete("/account", authMiddleware, authController.deleteAccount)
 router.put(
   "/change-password",
   authMiddleware,

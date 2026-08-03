@@ -2,6 +2,22 @@ const { News, User } = require("../models")
 const AppError = require("../utils/AppError")
 const { Op } = require("sequelize")
 
+const parseJson = (value) => {
+  if (value === null || value === undefined || value === "") return null
+  try {
+    return JSON.parse(value)
+  } catch {
+    return value
+  }
+}
+
+const toJSON = (news) => {
+  const data = news.toJSON()
+  data.tags = parseJson(data.tags)
+  data.gallery = parseJson(data.gallery)
+  return data
+}
+
 exports.getNews = async (query = {}) => {
   const { search, status, from, to, page, limit } = query
 
@@ -50,7 +66,7 @@ exports.getNews = async (query = {}) => {
   })
 
   return {
-    items: rows,
+    items: rows.map(toJSON),
     pagination: {
       page: currentPage,
       limit: currentLimit,
@@ -74,11 +90,29 @@ exports.getNewsById = async (id) => {
     throw new AppError("News tidak ditemukan", 404)
   }
 
-  return news
+  return toJSON(news)
+}
+
+const serialize = (value) => {
+  if (value === undefined || value === null || value === "") return null
+  return typeof value === "string" ? value : JSON.stringify(value)
 }
 
 exports.createNews = async (data, userId) => {
-  const { title, slug, headline_image, content, status } = data
+  const {
+    title,
+    slug,
+    headline_image,
+    event,
+    winner,
+    date,
+    source,
+    summary,
+    tags,
+    gallery,
+    content,
+    status,
+  } = data
 
   if (!title || !slug || !headline_image || !content) {
     throw new AppError("Semua field wajib diisi", 400)
@@ -96,6 +130,13 @@ exports.createNews = async (data, userId) => {
     title,
     slug,
     headline_image,
+    event: event || null,
+    winner: winner || null,
+    date: date || null,
+    source: source || null,
+    summary: summary || null,
+    tags: serialize(tags),
+    gallery: serialize(gallery),
     content,
     status: status ?? "draft",
     published_at: status === "published" ? new Date() : null,
@@ -112,7 +153,20 @@ exports.updateNews = async (id, data) => {
     throw new AppError("News tidak ditemukan", 404)
   }
 
-  const { title, slug, headline_image, content, status } = data
+  const {
+    title,
+    slug,
+    headline_image,
+    event,
+    winner,
+    date,
+    source,
+    summary,
+    tags,
+    gallery,
+    content,
+    status,
+  } = data
 
   if (slug && slug !== news.slug) {
     const slugExists = await News.findOne({
@@ -135,12 +189,19 @@ exports.updateNews = async (id, data) => {
   news.title = title ?? news.title
   news.slug = slug ?? news.slug
   news.headline_image = headline_image ?? news.headline_image
+  news.event = event ?? news.event
+  news.winner = winner ?? news.winner
+  news.date = date ?? news.date
+  news.source = source ?? news.source
+  news.summary = summary ?? news.summary
+  news.tags = tags === undefined ? news.tags : serialize(tags)
+  news.gallery = gallery === undefined ? news.gallery : serialize(gallery)
   news.content = content ?? news.content
   news.status = status ?? news.status
 
   await news.save()
 
-  return news
+  return exports.getNewsById(id)
 }
 
 exports.deleteNews = async (id) => {

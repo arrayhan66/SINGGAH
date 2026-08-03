@@ -1,9 +1,7 @@
-import { useState } from "react"
 import { useGLTF } from "@react-three/drei"
 
 function Mahasiswa(props) {
   const { scene } = useGLTF("/models/mahasiswa.glb")
-  const [hovered, setHovered] = useState(false)
 
   return (
     <primitive
@@ -11,11 +9,9 @@ function Mahasiswa(props) {
       {...props}
       onPointerOver={() => {
         document.body.style.cursor = "pointer"
-        setHovered(true)
       }}
       onPointerOut={() => {
         document.body.style.cursor = "default"
-        setHovered(false)
       }}
     />
   )

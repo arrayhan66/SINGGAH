@@ -11,6 +11,7 @@ const generateToken = require("../utils/generateToken")
 const generateCode = require("../utils/generateCode")
 const sendEmail = require("../utils/sendEmail")
 const AppError = require("../utils/AppError")
+const logger = require("../utils/logger")
 const {
   deleteImage,
   getPublicIdFromUrl,
@@ -169,7 +170,7 @@ exports.register = async (data) => {
       `,
     })
   } catch (err) {
-    console.error("Gagal mengirim email verifikasi:", err.message)
+    logger.error("Gagal mengirim email verifikasi:", err.message)
   }
 
   return {
@@ -216,10 +217,12 @@ exports.verifyEmail = async (data) => {
     throw new AppError("Kode sudah kadaluarsa, silakan minta kode baru", 400)
   }
 
-  user.is_verified = true
-  await user.save()
+  await sequelize.transaction(async (t) => {
+    user.is_verified = true
+    await user.save({ transaction: t })
 
-  await VerificationCode.destroy({ where: { user_id: user.id } })
+    await VerificationCode.destroy({ where: { user_id: user.id }, transaction: t })
+  })
 
   return true
 }
@@ -241,15 +244,20 @@ exports.resendVerification = async (data) => {
     throw new AppError("Email sudah terverifikasi", 400)
   }
 
-  await VerificationCode.destroy({ where: { user_id: user.id } })
+  await sequelize.transaction(async (t) => {
+    await VerificationCode.destroy({ where: { user_id: user.id }, transaction: t })
 
-  const code = generateCode()
-  const expiresAt = new Date(Date.now() + CODE_EXPIRES_MINUTES * 60 * 1000)
+    const code = generateCode()
+    const expiresAt = new Date(Date.now() + CODE_EXPIRES_MINUTES * 60 * 1000)
 
-  await VerificationCode.create({
-    code,
-    expires_at: expiresAt,
-    user_id: user.id,
+    await VerificationCode.create(
+      {
+        code,
+        expires_at: expiresAt,
+        user_id: user.id,
+      },
+      { transaction: t },
+    )
   })
 
   try {
@@ -264,7 +272,7 @@ exports.resendVerification = async (data) => {
       `,
     })
   } catch (err) {
-    console.error("Gagal mengirim email verifikasi:", err.message)
+    logger.error("Gagal mengirim email verifikasi:", err.message)
   }
 
   return true
@@ -283,15 +291,20 @@ exports.forgotPassword = async (data) => {
     throw new AppError("Email tidak terdaftar", 404)
   }
 
-  await PasswordReset.destroy({ where: { user_id: user.id } })
+  await sequelize.transaction(async (t) => {
+    await PasswordReset.destroy({ where: { user_id: user.id }, transaction: t })
 
-  const code = generateCode()
-  const expiresAt = new Date(Date.now() + CODE_EXPIRES_MINUTES * 60 * 1000)
+    const code = generateCode()
+    const expiresAt = new Date(Date.now() + CODE_EXPIRES_MINUTES * 60 * 1000)
 
-  await PasswordReset.create({
-    code,
-    expires_at: expiresAt,
-    user_id: user.id,
+    await PasswordReset.create(
+      {
+        code,
+        expires_at: expiresAt,
+        user_id: user.id,
+      },
+      { transaction: t },
+    )
   })
 
   try {
@@ -306,7 +319,7 @@ exports.forgotPassword = async (data) => {
       `,
     })
   } catch (err) {
-    console.error("Gagal mengirim email reset password:", err.message)
+    logger.error("Gagal mengirim email reset password:", err.message)
   }
 
   return true
@@ -375,10 +388,12 @@ exports.resetPassword = async (data) => {
     throw new AppError("Kode sudah kadaluarsa, silakan minta kode baru", 400)
   }
 
-  user.password = await bcrypt.hash(newPassword, 10)
-  await user.save()
+  await sequelize.transaction(async (t) => {
+    user.password = await bcrypt.hash(newPassword, 10)
+    await user.save({ transaction: t })
 
-  await PasswordReset.destroy({ where: { user_id: user.id } })
+    await PasswordReset.destroy({ where: { user_id: user.id }, transaction: t })
+  })
 
   return true
 }

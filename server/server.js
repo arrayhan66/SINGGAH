@@ -4,6 +4,8 @@ require("./config/env")
 const express = require("express")
 const cors = require("cors")
 const helmet = require("helmet")
+const morgan = require("morgan")
+const logger = require("./utils/logger")
 
 const { sequelize } = require("./models")
 
@@ -47,6 +49,14 @@ app.use(
 
 app.use(express.json({ limit: "10mb" }))
 
+if (process.env.NODE_ENV !== "test") {
+  app.use(
+    morgan("combined", {
+      stream: { write: (message) => logger.http(message.trim()) },
+    }),
+  )
+}
+
 app.use("/api/auth", authRoutes)
 app.use("/api/users", userRoutes)
 app.use("/api/categories", categoryRoutes)
@@ -81,10 +91,12 @@ app.get("/", (req, res) => {
 const startServer = async () => {
   try {
     await sequelize.authenticate()
-    console.log("Database connected")
+    logger.info("Database connected")
 
     // Buat tabel yang belum ada (tanpa mengubah tabel lama)
-    await sequelize.sync()
+    if (process.env.NODE_ENV !== "test") {
+      await sequelize.sync()
+    }
 
     const swaggerDocument = await loadSwagger()
     app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
@@ -100,14 +112,29 @@ const startServer = async () => {
     // HARUS PALING BAWAH
     app.use(errorMiddleware)
 
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`)
-    })
+    if (process.env.NODE_ENV !== "test") {
+      app.listen(PORT, () => {
+        logger.info(`Server running on port ${PORT}`)
+      })
+    }
   } catch (err) {
-    console.error("Server failed to start:", err)
+    logger.error("Server failed to start:", err)
   }
 }
 
-startServer()
+if (process.env.NODE_ENV !== "test") {
+  startServer()
+} else {
+  loadSwagger().then((swaggerDocument) => {
+    app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+    app.use((req, res) => {
+      res.status(404).json({
+        success: false,
+        message: "Endpoint tidak ditemukan",
+      })
+    })
+    app.use(errorMiddleware)
+  })
+}
 
 module.exports = app

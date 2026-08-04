@@ -1,6 +1,9 @@
 const { News, User } = require("../models")
 const AppError = require("../utils/AppError")
 const { Op } = require("sequelize")
+const cache = require("../utils/cache")
+
+const NEWS_LIST_TTL = 60 * 1000
 
 const parseJson = (value) => {
   if (value === null || value === undefined || value === "") return null
@@ -51,6 +54,14 @@ exports.getNews = async (query = {}) => {
   const currentLimit = parseInt(limit) || 10
   const offset = (currentPage - 1) * currentLimit
 
+  const isUnfiltered = !search && !status && !from && !to
+
+  if (isUnfiltered) {
+    const cacheKey = `news:list:${currentPage}:${currentLimit}`
+    const cached = cache.get(cacheKey)
+    if (cached) return cached
+  }
+
   const { count, rows } = await News.findAndCountAll({
     where,
     include: [
@@ -65,7 +76,7 @@ exports.getNews = async (query = {}) => {
     distinct: true,
   })
 
-  return {
+  const result = {
     items: rows.map(toJSON),
     pagination: {
       page: currentPage,
@@ -74,6 +85,12 @@ exports.getNews = async (query = {}) => {
       totalPages: Math.ceil(count / currentLimit),
     },
   }
+
+  if (isUnfiltered) {
+    cache.set(`news:list:${currentPage}:${currentLimit}`, result, NEWS_LIST_TTL)
+  }
+
+  return result
 }
 
 exports.getNewsById = async (id) => {

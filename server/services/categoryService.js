@@ -1,8 +1,15 @@
 const { Category, sequelize } = require("../models")
 const AppError = require("../utils/AppError")
+const cache = require("../utils/cache")
+
+const CATEGORIES_TTL = 60 * 1000
+const CATEGORIES_KEY = "categories:list"
 
 exports.getCategories = async () => {
-  return await Category.findAll({
+  const cached = cache.get(CATEGORIES_KEY)
+  if (cached) return cached
+
+  const categories = await Category.findAll({
     attributes: {
       include: [
         [
@@ -15,6 +22,10 @@ exports.getCategories = async () => {
     },
     order: [["name", "ASC"]],
   })
+
+  cache.set(CATEGORIES_KEY, categories, CATEGORIES_TTL)
+
+  return categories
 }
 
 exports.getCategoryById = async (id) => {

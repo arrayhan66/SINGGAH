@@ -9,6 +9,9 @@ const transporter = nodemailer.createTransport({
 })
 
 const sendEmail = async ({ to, subject, html }) => {
+  if (process.env.NODE_ENV === "test") {
+    return Promise.resolve(true)
+  }
   await transporter.sendMail({
     from: `"PamerIT" <${process.env.EMAIL_USER}>`,
     to,

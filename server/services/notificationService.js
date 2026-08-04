@@ -50,20 +50,26 @@ exports.markAllAsRead = async (userId) => {
 
 // Dipanggil dari service lain (Comment, Like, Project approve/reject, dll),
 // bukan langsung dari Controller.
-exports.createNotification = async ({
-  user_id,
-  type,
-  title,
-  message,
-  reference_type = null,
-  reference_id = null,
-}) => {
-  return await Notification.create({
+exports.createNotification = async (
+  {
     user_id,
     type,
     title,
     message,
-    reference_type,
-    reference_id,
-  })
+    reference_type = null,
+    reference_id = null,
+  },
+  options = {},
+) => {
+  return await Notification.create(
+    {
+      user_id,
+      type,
+      title,
+      message,
+      reference_type,
+      reference_id,
+    },
+    options,
+  )
 }

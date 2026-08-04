@@ -258,30 +258,38 @@ exports.updateProjectStatus = async (id, status) => {
     throw new AppError("Status tidak valid", 400)
   }
 
-  project.status = status
-  await project.save()
+  await sequelize.transaction(async (t) => {
+    project.status = status
+    await project.save({ transaction: t })
 
-  if (status === "published") {
-    await createNotification({
-      user_id: project.user_id,
-      type: "project_approved",
-      title: "Project disetujui",
-      message: `Project "${project.title}" telah disetujui dan dipublikasikan.`,
-      reference_type: "project",
-      reference_id: project.id,
-    })
-  }
+    if (status === "published") {
+      await createNotification(
+        {
+          user_id: project.user_id,
+          type: "project_approved",
+          title: "Project disetujui",
+          message: `Project "${project.title}" telah disetujui dan dipublikasikan.`,
+          reference_type: "project",
+          reference_id: project.id,
+        },
+        { transaction: t },
+      )
+    }
 
-  if (status === "rejected") {
-    await createNotification({
-      user_id: project.user_id,
-      type: "project_rejected",
-      title: "Project ditolak",
-      message: `Project "${project.title}" ditolak oleh admin.`,
-      reference_type: "project",
-      reference_id: project.id,
-    })
-  }
+    if (status === "rejected") {
+      await createNotification(
+        {
+          user_id: project.user_id,
+          type: "project_rejected",
+          title: "Project ditolak",
+          message: `Project "${project.title}" ditolak oleh admin.`,
+          reference_type: "project",
+          reference_id: project.id,
+        },
+        { transaction: t },
+      )
+    }
+  })
 
   return project
 }
@@ -502,20 +510,22 @@ exports.updateProject = async (id, data, user) => {
     }
   }
 
-  project.title = title ?? project.title
-  project.slug = slug ?? project.slug
-  project.description = description ?? project.description
-  project.thumbnail = thumbnail ?? project.thumbnail
-  project.year = year ?? project.year
-  project.category_id = category_id ?? project.category_id
+  await sequelize.transaction(async (t) => {
+    project.title = title ?? project.title
+    project.slug = slug ?? project.slug
+    project.description = description ?? project.description
+    project.thumbnail = thumbnail ?? project.thumbnail
+    project.year = year ?? project.year
+    project.category_id = category_id ?? project.category_id
 
-  if (user.role === "admin") {
-    project.status = status ?? project.status
-  }
+    if (user.role === "admin") {
+      project.status = status ?? project.status
+    }
 
-  await project.save()
+    await project.save({ transaction: t })
 
-  await persistRelations(project, relations)
+    await persistRelations(project, relations, { transaction: t })
+  })
 
   return await exports.getProjectById(id)
 }
@@ -542,14 +552,17 @@ exports.deleteProject = async (id, user) => {
     Comment,
   ]
 
-  await Promise.all(
-    childModels.map((Model) =>
-      Model.destroy({ where: { project_id: id } }),
-    ),
-  )
+  await sequelize.transaction(async (t) => {
+    await Promise.all(
+      childModels.map((Model) =>
+        Model.destroy({ where: { project_id: id }, transaction: t }),
+      ),
+    )
 
-  await Project.destroy({
-    where: { id },
+    await Project.destroy({
+      where: { id },
+      transaction: t,
+    })
   })
 
   return project

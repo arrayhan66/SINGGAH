@@ -1,4 +1,4 @@
-const { ProjectLike, Project, User } = require("../models")
+const { ProjectLike, Project, User, sequelize } = require("../models")
 const AppError = require("../utils/AppError")
 const { createNotification } = require("./notificationService")
 const { logActivity } = require("./activityLogService")
@@ -16,9 +16,28 @@ exports.toggleLike = async (projectId, user) => {
     return { liked: false }
   }
 
-  await ProjectLike.create({
-    project_id: projectId,
-    user_id: user.id,
+  await sequelize.transaction(async (t) => {
+    await ProjectLike.create(
+      {
+        project_id: projectId,
+        user_id: user.id,
+      },
+      { transaction: t },
+    )
+
+    if (project.user_id !== user.id) {
+      await createNotification(
+        {
+          user_id: project.user_id,
+          type: "like",
+          title: "Disukai",
+          message: `${user.name} menyukai project Anda: "${project.title}"`,
+          reference_type: "project",
+          reference_id: project.id,
+        },
+        { transaction: t },
+      )
+    }
   })
 
   await logActivity({

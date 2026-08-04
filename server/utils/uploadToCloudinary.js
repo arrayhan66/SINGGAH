@@ -1,6 +1,12 @@
 const cloudinary = require("../config/cloudinary")
 
 exports.uploadImage = (fileBuffer, folder) => {
+  if (process.env.NODE_ENV === "test") {
+    return Promise.resolve({
+      secure_url: "https://res.cloudinary.com/test/image/upload/v123456/test.jpg",
+      public_id: "test/test",
+    })
+  }
   return new Promise((resolve, reject) => {
     cloudinary.uploader
       .upload_stream(
@@ -18,6 +24,9 @@ exports.uploadImage = (fileBuffer, folder) => {
 }
 
 exports.deleteImage = (publicId) => {
+  if (process.env.NODE_ENV === "test") {
+    return Promise.resolve({ result: "ok" })
+  }
   return cloudinary.uploader.destroy(publicId)
 }
 

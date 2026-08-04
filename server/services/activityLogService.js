@@ -1,4 +1,5 @@
 const { ActivityLog, User } = require("../models")
+const logger = require("../utils/logger")
 
 // Dipanggil dari controller/service lain. Tidak pernah melempar error agar
 // tidak mengganggu alur utama sistem.
@@ -18,7 +19,7 @@ exports.logActivity = async ({
       description,
     })
   } catch (err) {
-    console.error("Gagal mencatat aktivitas:", err.message)
+    logger.error("Gagal mencatat aktivitas:", err.message)
   }
 }
 

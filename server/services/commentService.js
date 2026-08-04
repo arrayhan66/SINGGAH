@@ -1,4 +1,4 @@
-const { Comment, CommentReply, Project, User } = require("../models")
+const { Comment, CommentReply, Project, User, sequelize } = require("../models")
 const AppError = require("../utils/AppError")
 const { createNotification } = require("./notificationService")
 const { logActivity } = require("./activityLogService")
@@ -34,22 +34,32 @@ exports.addComment = async (projectId, text, user) => {
     throw new AppError("Komentar tidak boleh kosong", 400)
   }
 
-  const comment = await Comment.create({
-    text,
-    user_id: user.id,
-    project_id: projectId,
-  })
+  const comment = await sequelize.transaction(async (t) => {
+    const created = await Comment.create(
+      {
+        text,
+        user_id: user.id,
+        project_id: projectId,
+      },
+      { transaction: t },
+    )
 
-  if (project.user_id !== user.id) {
-    await createNotification({
-      user_id: project.user_id,
-      type: "comment",
-      title: "Komentar baru",
-      message: `${user.name} mengomentari project Anda: "${project.title}"`,
-      reference_type: "project",
-      reference_id: project.id,
-    })
-  }
+    if (project.user_id !== user.id) {
+      await createNotification(
+        {
+          user_id: project.user_id,
+          type: "comment",
+          title: "Komentar baru",
+          message: `${user.name} mengomentari project Anda: "${project.title}"`,
+          reference_type: "project",
+          reference_id: project.id,
+        },
+        { transaction: t },
+      )
+    }
+
+    return created
+  })
 
   await logActivity({
     userId: user.id,
@@ -94,34 +104,47 @@ exports.addReply = async (commentId, text, user) => {
     throw new AppError("Balasan tidak boleh kosong", 400)
   }
 
-  const reply = await CommentReply.create({
-    text,
-    user_id: user.id,
-    comment_id: commentId,
+  const reply = await sequelize.transaction(async (t) => {
+    const created = await CommentReply.create(
+      {
+        text,
+        user_id: user.id,
+        comment_id: commentId,
+      },
+      { transaction: t },
+    )
+
+    const replyOwner = comment.user_id
+    const projectOwner = comment.Project ? comment.Project.user_id : null
+
+    if (replyOwner !== user.id) {
+      await createNotification(
+        {
+          user_id: replyOwner,
+          type: "comment",
+          title: "Balasan komentar",
+          message: `${user.name} membalas komentar Anda di project "${comment.Project ? comment.Project.title : "Project"}"`,
+          reference_type: "project",
+          reference_id: comment.project_id,
+        },
+        { transaction: t },
+      )
+    } else if (projectOwner && projectOwner !== user.id) {
+      await createNotification(
+        {
+          user_id: projectOwner,
+          type: "comment",
+          title: "Balasan komentar",
+          message: `${user.name} membalas komentar di project "${comment.Project.title}"`,
+          reference_type: "project",
+          reference_id: comment.project_id,
+        },
+        { transaction: t },
+      )
+    }
+
+    return created
   })
-
-  const replyOwner = comment.user_id
-  const projectOwner = comment.Project ? comment.Project.user_id : null
-
-  if (replyOwner !== user.id) {
-    await createNotification({
-      user_id: replyOwner,
-      type: "comment",
-      title: "Balasan komentar",
-      message: `${user.name} membalas komentar Anda di project "${comment.Project ? comment.Project.title : "Project"}"`,
-      reference_type: "project",
-      reference_id: comment.project_id,
-    })
-  } else if (projectOwner && projectOwner !== user.id) {
-    await createNotification({
-      user_id: projectOwner,
-      type: "comment",
-      title: "Balasan komentar",
-      message: `${user.name} membalas komentar di project "${comment.Project.title}"`,
-      reference_type: "project",
-      reference_id: comment.project_id,
-    })
-  }
 
   return reply
 }

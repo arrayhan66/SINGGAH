@@ -1,4 +1,4 @@
-const { Setting } = require("../models")
+const { Setting, sequelize } = require("../models")
 const AppError = require("../utils/AppError")
 
 const serialize = (value) => {
@@ -38,19 +38,21 @@ exports.updateSettings = async (data) => {
     throw new AppError("Tidak ada pengaturan yang dikirim", 400)
   }
 
-  await Promise.all(
-    keys.map(async (key) => {
-      const value = serialize(data[key])
-      const row = await Setting.findOne({ where: { key } })
+  await sequelize.transaction(async (t) => {
+    await Promise.all(
+      keys.map(async (key) => {
+        const value = serialize(data[key])
+        const row = await Setting.findOne({ where: { key }, transaction: t })
 
-      if (row) {
-        row.value = value
-        await row.save()
-      } else {
-        await Setting.create({ key, value })
-      }
-    }),
-  )
+        if (row) {
+          row.value = value
+          await row.save({ transaction: t })
+        } else {
+          await Setting.create({ key, value }, { transaction: t })
+        }
+      }),
+    )
+  })
 
   return exports.getSettings()
 }

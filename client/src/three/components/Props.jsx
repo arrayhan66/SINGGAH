@@ -29,9 +29,9 @@ function Bench({ position, rotationY }) {
   )
 }
 
-function Pedestal({ position, radius = 0.35, top = "sphere" }) {
+function Pedestal({ position, radius = 0.35, top = "sphere", scale = 1 }) {
   return (
-    <group position={position}>
+    <group position={position} scale={scale}>
       <mesh position={[0, 0.06, 0]}>
         <cylinderGeometry args={[radius + 0.06, radius + 0.12, 0.12, 24]} />
         <meshStandardMaterial color="#93b4d4" roughness={0.4} metalness={0.15} />
@@ -59,24 +59,115 @@ function Pedestal({ position, radius = 0.35, top = "sphere" }) {
   )
 }
 
-function Plant({ position }) {
+function Plant({ position, scale = 1, variant = "bush", flowerColor = "#38bdf8" }) {
+  const leaf = "#3a6a5a"
+  const leafDark = "#2f5f4f"
+  const stem = "#3a3322"
+  const petal = [0, 1, 2, 3, 4].map((j) => {
+    const a = (j / 5) * Math.PI * 2
+    return [Math.cos(a) * 0.08, 0, Math.sin(a) * 0.08]
+  })
+
   return (
-    <group position={position}>
+    <group position={position} scale={scale}>
+      {/* Pot */}
       <mesh position={[0, 0.22, 0]}>
         <cylinderGeometry args={[0.3, 0.24, 0.44, 20]} />
         <meshStandardMaterial color="#5a4a2b" roughness={0.6} />
       </mesh>
-      <mesh position={[0, 0.55, 0]}>
-        <cylinderGeometry args={[0.05, 0.09, 0.6, 10]} />
-        <meshStandardMaterial color="#3a3322" roughness={0.7} />
-      </mesh>
-      {[[0.3, 0.5, 0.1], [-0.25, 0.6, 0.2], [0.05, 0.75, -0.2], [-0.15, 0.5, -0.25], [0.2, 0.7, 0.22]].map(
-        (p, i) => (
-          <mesh key={i} position={p}>
-            <sphereGeometry args={[0.3, 12, 12]} />
-            <meshStandardMaterial color="#3a6a5a" roughness={0.85} />
+
+      {variant === "bush" && (
+        <>
+          <mesh position={[0, 0.55, 0]}>
+            <cylinderGeometry args={[0.05, 0.09, 0.6, 10]} />
+            <meshStandardMaterial color={stem} roughness={0.7} />
           </mesh>
-        ),
+          {[[0.3, 0.5, 0.1], [-0.25, 0.6, 0.2], [0.05, 0.75, -0.2], [-0.15, 0.5, -0.25], [0.2, 0.7, 0.22]].map(
+            (p, i) => (
+              <mesh key={i} position={p}>
+                <sphereGeometry args={[0.3, 12, 12]} />
+                <meshStandardMaterial color={leaf} roughness={0.85} />
+              </mesh>
+            ),
+          )}
+        </>
+      )}
+
+      {variant === "flower" && (
+        <>
+          {[[-0.18, 0, -0.05], [0.18, 0, 0.05], [0, 0, 0.12]].map((s, i) => (
+            <mesh
+              key={i}
+              position={[s[0], 0.75, s[2]]}
+              rotation={[s[2] * 0.6, 0, s[0] * 0.6]}
+            >
+              <cylinderGeometry args={[0.02, 0.035, 0.9, 6]} />
+              <meshStandardMaterial color={stem} roughness={0.7} />
+            </mesh>
+          ))}
+          {[[-0.2, 1.22, -0.1], [0.2, 1.18, 0.08], [0, 1.26, 0.15]].map((p, i) => (
+            <group key={i} position={p}>
+              {petal.map((pt, j) => (
+                <mesh key={j} position={pt}>
+                  <sphereGeometry args={[0.055, 10, 10]} />
+                  <meshStandardMaterial color={flowerColor} roughness={0.45} />
+                </mesh>
+              ))}
+              <mesh position={[0, 0.02, 0]}>
+                <sphereGeometry args={[0.055, 10, 10]} />
+                <meshStandardMaterial color="#fde68a" roughness={0.4} />
+              </mesh>
+            </group>
+          ))}
+          {[[-0.28, 1.05, 0.02], [0.3, 1.0, 0.12]].map((p, i) => (
+            <mesh key={i} position={p}>
+              <sphereGeometry args={[0.07, 10, 10]} />
+              <meshStandardMaterial color={flowerColor} roughness={0.5} />
+            </mesh>
+          ))}
+          {[[-0.16, 0.9, -0.02], [0.16, 0.86, 0.1]].map((p, i) => (
+            <mesh key={i} position={p}>
+              <sphereGeometry args={[0.09, 8, 8]} />
+              <meshStandardMaterial color={leaf} roughness={0.85} />
+            </mesh>
+          ))}
+        </>
+      )}
+
+      {variant === "tall" && (
+        <>
+          <mesh position={[0, 1.1, 0]}>
+            <cylinderGeometry args={[0.05, 0.09, 1.7, 10]} />
+            <meshStandardMaterial color={stem} roughness={0.7} />
+          </mesh>
+          {[[0, 1.35, 0], [0.12, 1.1, 0.1], [-0.12, 1.5, -0.1], [0.08, 1.7, 0.15]].map((p, i) => (
+            <mesh key={i} position={p}>
+              <sphereGeometry args={[0.34, 12, 12]} />
+              <meshStandardMaterial color={leaf} roughness={0.85} />
+            </mesh>
+          ))}
+          <mesh position={[0, 2.0, 0]}>
+            <sphereGeometry args={[0.3, 12, 12]} />
+            <meshStandardMaterial color={leafDark} roughness={0.85} />
+          </mesh>
+        </>
+      )}
+
+      {variant === "topiary" && (
+        <>
+          <mesh position={[0, 0.5, 0]}>
+            <cylinderGeometry args={[0.04, 0.08, 0.55, 10]} />
+            <meshStandardMaterial color={stem} roughness={0.7} />
+          </mesh>
+          <mesh position={[0, 0.92, 0]}>
+            <sphereGeometry args={[0.36, 16, 16]} />
+            <meshStandardMaterial color={leaf} roughness={0.85} />
+          </mesh>
+          <mesh position={[0, 1.18, 0]}>
+            <sphereGeometry args={[0.26, 16, 16]} />
+            <meshStandardMaterial color={leafDark} roughness={0.85} />
+          </mesh>
+        </>
       )}
     </group>
   )
@@ -86,32 +177,23 @@ function Chandelier({ position, lit = 0.8 }) {
   return (
     <group position={position}>
       <mesh position={[0, 0.4, 0]}>
-        <cylinderGeometry args={[0.05, 0.05, 0.8, 10]} />
+        <cylinderGeometry args={[0.02, 0.02, 0.8, 8]} />
         <meshStandardMaterial color="#223047" roughness={0.5} />
       </mesh>
-      <mesh position={[0, 0, 0]}>
-        <torusGeometry args={[0.9, 0.06, 10, 40]} />
-        <meshStandardMaterial color="#7f97b5" metalness={0.85} roughness={0.25} />
+      <mesh position={[0, -0.05, 0]} rotation={[Math.PI, 0, 0]}>
+        <sphereGeometry args={[0.34, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial color="#f3ecdf" roughness={0.85} />
       </mesh>
-      {Array.from({ length: 6 }).map((_, i) => {
-        const a = (i / 6) * Math.PI * 2
-        return (
-          <mesh key={i} position={[Math.cos(a) * 0.9, -0.12, Math.sin(a) * 0.9]}>
-            <sphereGeometry args={[0.09, 12, 12]} />
-            <meshStandardMaterial
-              color="#dff0ff"
-              emissive="#9cc6f0"
-              emissiveIntensity={lit * 2.2}
-            />
-          </mesh>
-        )
-      })}
-      <mesh position={[0, -0.28, 0]}>
-        <cylinderGeometry args={[0.16, 0.2, 0.14, 16]} />
+      <mesh position={[0, -0.05, 0]}>
+        <torusGeometry args={[0.34, 0.025, 8, 32]} />
+        <meshStandardMaterial color="#d8cdb8" metalness={0.3} roughness={0.4} />
+      </mesh>
+      <mesh position={[0, -0.02, 0]}>
+        <sphereGeometry args={[0.1, 12, 12]} />
         <meshStandardMaterial
-          color="#dff0ff"
-          emissive="#9cc6f0"
-          emissiveIntensity={lit * 1.8}
+          color="#fff6e0"
+          emissive="#ffd98a"
+          emissiveIntensity={lit * 2.5}
         />
       </mesh>
     </group>
@@ -176,29 +258,146 @@ function InfoPanel({ position, rotationY, entries = [] }) {
   )
 }
 
-function InfoKiosk({ position, rotationY }) {
+function InfoKiosk({ position, rotationY, stats, categories = [], variant = "stats" }) {
+  const isGuide = variant === "guide"
+  const total = categories.reduce((s, c) => s + (stats?.[c.slug]?.total || 0), 0) || 49
+  const catCount = categories.length || 7
+
+  const catList = categories.length > 0
+    ? categories.map(c => c.title)
+    : [
+        "Website",
+        "Mobile App",
+        "Internet of Things",
+        "Artificial Intelligence",
+        "UI/UX",
+        "Multimedia",
+        "Game Development"
+      ]
+
+  const cementColor = "#cbd5e1" // clean architectural concrete / semen
+  const postColor = "#94a3b8"
+
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
+      {/* Cement Base */}
       <mesh position={[0, 0.05, 0]} castShadow>
-        <boxGeometry args={[0.6, 0.1, 0.5]} />
-        <meshStandardMaterial color="#223047" roughness={0.4} metalness={0.7} />
+        <boxGeometry args={[0.75, 0.1, 0.5]} />
+        <meshStandardMaterial color={cementColor} roughness={0.75} />
       </mesh>
-      <mesh position={[0, 0.75, 0]} castShadow>
-        <boxGeometry args={[0.15, 1.3, 0.1]} />
-        <meshStandardMaterial color="#16283f" roughness={0.3} metalness={0.8} />
+      {/* Cement Post */}
+      <mesh position={[0, 1.15, 0]} castShadow>
+        <boxGeometry args={[0.14, 2.1, 0.1]} />
+        <meshStandardMaterial color={postColor} roughness={0.8} />
       </mesh>
-      <mesh position={[0, 1.45, 0.05]} rotation={[-0.2, 0, 0]} castShadow>
-        <boxGeometry args={[0.75, 0.5, 0.06]} />
-        <meshStandardMaterial color="#0b1220" roughness={0.2} metalness={0.8} />
+      {/* Cement Board Frame (Compact / Minimalist Size) */}
+      <mesh position={[0, 2.3, 0.03]} rotation={[-0.15, 0, 0]} castShadow>
+        <boxGeometry args={[1.7, 1.8, 0.05]} />
+        <meshStandardMaterial color={cementColor} roughness={0.75} />
       </mesh>
-      <mesh position={[0, 1.45, 0.085]} rotation={[-0.2, 0, 0]}>
-        <planeGeometry args={[0.68, 0.42]} />
-        <meshBasicMaterial color="#38bdf8" />
-      </mesh>
-      <mesh position={[0, 1.45, 0.078]} rotation={[-0.2, 0, 0]}>
-        <ringGeometry args={[0.35, 0.38, 32]} />
-        <meshBasicMaterial color="#7dd3fc" transparent opacity={0.4} />
-      </mesh>
+
+      {/* Board Panel + content (White background, Dark Navy text, Accent blue) */}
+      <group position={[0, 2.3, 0.06]} rotation={[-0.15, 0, 0]}>
+        <mesh>
+          <planeGeometry args={[1.6, 1.7]} />
+          <meshBasicMaterial color="#ffffff" />
+        </mesh>
+
+        {/* Top Section */}
+        <Text
+          position={[0, 0.65, 0.01]}
+          fontSize={0.2}
+          color="#1F2A44"
+          anchorX="center"
+          anchorY="middle"
+          maxWidth={1.5}
+          raycast={() => null}
+        >
+          SINGGAH
+        </Text>
+        <Text
+          position={[0, 0.48, 0.01]}
+          fontSize={0.11}
+          color="#3B82F6"
+          anchorX="center"
+          anchorY="middle"
+          maxWidth={1.5}
+          raycast={() => null}
+        >
+          Virtual Exhibition
+        </Text>
+
+        {/* Light Gray Separator */}
+        <mesh position={[0, 0.36, 0.01]}>
+          <planeGeometry args={[1.3, 0.015]} />
+          <meshBasicMaterial color="#e2e8f0" />
+        </mesh>
+
+        {/* Middle Statistics Section */}
+        <Text
+          position={[0, 0.22, 0.01]}
+          fontSize={0.12}
+          color="#1F2A44"
+          anchorX="center"
+          anchorY="middle"
+          maxWidth={1.5}
+          raycast={() => null}
+        >
+          {`${total} Karya  ·  ${catCount} Kategori`}
+        </Text>
+
+        {/* Light Gray Separator */}
+        <mesh position={[0, 0.1, 0.01]}>
+          <planeGeometry args={[1.3, 0.015]} />
+          <meshBasicMaterial color="#e2e8f0" />
+        </mesh>
+
+        {/* Bottom Category List */}
+        <group position={[0, -0.02, 0.01]}>
+          <Text
+            position={[-0.6, 0.04, 0]}
+            fontSize={0.1}
+            color="#3B82F6"
+            anchorX="left"
+            anchorY="middle"
+            maxWidth={1.3}
+            raycast={() => null}
+          >
+            Kategori:
+          </Text>
+          {catList.slice(0, 6).map((title, i) => {
+            const y = -0.12 - i * 0.11
+            return (
+              <Text
+                key={i}
+                position={[-0.55, y, 0]}
+                fontSize={0.095}
+                color="#1F2A44"
+                anchorX="left"
+                anchorY="middle"
+                maxWidth={1.3}
+                truncate
+                raycast={() => null}
+              >
+                {`• ${title}`}
+              </Text>
+            )
+          })}
+        </group>
+
+        {/* Footer Instruction Text */}
+        <Text
+          position={[0, -0.72, 0.01]}
+          fontSize={0.1}
+          color="#3B82F6"
+          anchorX="center"
+          anchorY="middle"
+          maxWidth={1.5}
+          raycast={() => null}
+        >
+          Masuki Portal Biru\nuntuk memulai penjelajahan.
+        </Text>
+      </group>
     </group>
   )
 }

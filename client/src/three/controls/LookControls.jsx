@@ -3,7 +3,8 @@ import { useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
 import { useWalkStore, EYE } from "../hooks/useWalk"
 import { getWalls, portals } from "../rooms/museumLayout"
-import { resolveCollision } from "../utils/collision"
+import { resolveCollision, resolveObjectCollision } from "../utils/collision"
+import { getObjectColliders } from "../utils/objectColliders"
 
 const SPEED = 6
 const DRAG_THRESHOLD = 6
@@ -22,6 +23,7 @@ function LookControls({ bounds, onSelectProject }) {
   const keysRef = useRef({})
   const wallsRef = useRef(getWalls())
   const portalsRef = useRef(portals)
+  const collidersRef = useRef(getObjectColliders())
   const dragRef = useRef({
     active: false,
     lastX: 0,
@@ -71,10 +73,13 @@ function LookControls({ bounds, onSelectProject }) {
 
   const applyTeleport = (prev, rawNext) => {
     const tp = checkPortalCross(prev, rawNext)
-    if (!tp) return { position: resolveCollision(rawNext, wallsRef.current), teleported: false }
+    if (!tp) return { position: resolveAll(rawNext), teleported: false }
     useWalkStore.setState({ position: tp.point, yaw: tp.yaw, target: null })
     return { position: tp.point, teleported: true }
   }
+
+  const resolveAll = (pos) =>
+    resolveObjectCollision(resolveCollision(pos, wallsRef.current), collidersRef.current)
 
   useEffect(() => {
     const el = gl.domElement

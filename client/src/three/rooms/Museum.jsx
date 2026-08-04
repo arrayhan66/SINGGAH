@@ -6,8 +6,7 @@ import Pillar from "../components/Pillar"
 import Painting from "../components/Painting"
 import ArchDoor from "../components/ArchDoor"
 import Portal from "../components/Portal"
-import Hologram from "../components/Hologram"
-import { Bench, Pedestal, Plant, Chandelier, InfoPanel, InfoKiosk, WallSconce } from "../components/Props"
+import { Bench, Pedestal, Plant, Chandelier, InfoKiosk, WallSconce } from "../components/Props"
 import {
   rooms,
   getWalls,
@@ -16,7 +15,6 @@ import {
   roomCategories,
   MUSEUM,
   HALL_PILLARS,
-  HALL_PORTAL_Z,
   LAYOUT,
 } from "./museumLayout"
 import { karyaCategories, karyaProjects } from "../../data/karyaData"
@@ -25,7 +23,6 @@ import { enrichProjects, getCategoryStats } from "../../utils/hallHelpers"
 const H = MUSEUM.height
 const HALL_Z0 = LAYOUT.hallZ[0]
 const HALL_Z1 = LAYOUT.hallZ[1]
-const PARTITION_Z = LAYOUT.partitionZ
 
 function FloorMesh({ room, floorMap, carpetMap }) {
   const w = room.x[1] - room.x[0]
@@ -44,9 +41,9 @@ function FloorMesh({ room, floorMap, carpetMap }) {
         <planeGeometry args={[w, d]} />
         <meshStandardMaterial
           map={floorMap}
-          color="#ffffff"
-          metalness={isMarble ? 0.15 : 0.05}
-          roughness={isMarble ? 0.35 : 0.6}
+          color={isMarble ? "#dbe6f2" : "#ffffff"}
+          metalness={0}
+          roughness={isMarble ? 0.9 : 0.6}
         />
       </mesh>
       {!isMarble && carpetMap && (
@@ -106,6 +103,7 @@ function WallBox({ wall, wallMap }) {
   const center = axis === "x" ? [at, cy, (from + to) / 2] : [(from + to) / 2, cy, at]
   const size = axis === "x" ? [t, hh, len] : [len, hh, t]
   const full = y0 <= 0.05
+  const topMold = y1 >= H - 0.05
 
   const overlay = (thick, y, h, color) => {
     const o = t + thick
@@ -125,12 +123,12 @@ function WallBox({ wall, wallMap }) {
         <boxGeometry args={size} />
         <meshStandardMaterial map={wallMap} color="#dfe9f4" roughness={0.9} />
       </mesh>
+      {topMold && overlay(0.12, H - 0.11, 0.2, "#e4eef9")}
       {full && (
         <>
           {overlay(0.06, 0.08, 0.16, "#1e293b")}
           {overlay(0.1, 0.62, 1.25, "#7b93ad")}
           {overlay(0.12, 1.32, 0.06, "#38bdf8")}
-          {overlay(0.12, H - 0.11, 0.2, "#e4eef9")}
         </>
       )}
     </group>
@@ -142,6 +140,7 @@ function Museum() {
   const marbleMap = useMemo(() => textures.marbleFloor(), [])
   const woodMap = useMemo(() => textures.woodFloor(), [])
   const carpetMap = useMemo(() => textures.carpet(), [])
+  const hallGradMap = useMemo(() => textures.hallGradient(), [])
   const stats = useMemo(() => getCategoryStats(karyaProjects), [])
   const groups = useMemo(() => {
     const enriched = enrichProjects(karyaProjects)
@@ -225,9 +224,20 @@ function Museum() {
 
       {/* Hall decor */}
       <group>
+        {/* Hall floor gradient vignette (darkens toward the edges) */}
+        <mesh
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[0, 0.03, 0]}
+          receiveShadow
+          userData={{ action: { type: "floor" } }}
+        >
+          <planeGeometry args={[LAYOUT.hallX[1] - LAYOUT.hallX[0], LAYOUT.hallZ[1] - LAYOUT.hallZ[0]]} />
+          <meshBasicMaterial map={hallGradMap} transparent depthWrite={false} />
+        </mesh>
+
         {/* Back wall banner */}
         <mesh position={[0, 4.6, HALL_Z0 + 0.15]}>
-          <planeGeometry args={[11, 2.4]} />
+          <planeGeometry args={[16, 2.4]} />
           <meshStandardMaterial color="#1e293b" roughness={0.6} />
         </mesh>
         <Text
@@ -254,38 +264,35 @@ function Museum() {
         </Text>
 
         {/* Central platform */}
-        <mesh position={[0, 0.06, 0]} receiveShadow>
-          <cylinderGeometry args={[4.2, 4.4, 0.12, 48]} />
-          <meshStandardMaterial color="#2d3748" roughness={0.4} metalness={0.2} />
+
+        <mesh position={[0, 0.135, 0]} receiveShadow>
+          <cylinderGeometry args={[4.1, 4.1, 0.03, 48]} />
+          <meshStandardMaterial color="#4b5a73" roughness={0.9} />
         </mesh>
-        <mesh position={[0, 0.14, 0]} receiveShadow>
-          <cylinderGeometry args={[4.1, 4.1, 0.04, 48]} />
-          <meshStandardMaterial color="#e2e8f0" roughness={0.3} metalness={0.1} />
-        </mesh>
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.17, 0]}>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.152, 0]}>
           <ringGeometry args={[4.15, 4.22, 64]} />
-          <meshStandardMaterial color="#94a3b8" roughness={0.5} />
+          <meshStandardMaterial color="#64748b" roughness={0.9} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-4} />
         </mesh>
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
           <ringGeometry args={[5.8, 5.86, 64]} />
-          <meshStandardMaterial color="#cbd5e1" roughness={0.6} />
+          <meshStandardMaterial color="#66758c" roughness={0.9} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-4} />
         </mesh>
 
         {/* Floor emblem */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.155, 0]}>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.153, 0]}>
           <ringGeometry args={[1.2, 1.35, 48]} />
-          <meshStandardMaterial color="#64748b" roughness={0.4} />
+          <meshStandardMaterial color="#2d3748" roughness={0.9} metalness={0.05} polygonOffset polygonOffsetFactor={-2} polygonOffsetUnits={-8} />
         </mesh>
-        <mesh position={[0, 0.15, 0]}>
-          <cylinderGeometry args={[0.9, 0.9, 0.02, 32]} />
-          <meshStandardMaterial color="#f8fafc" roughness={0.4} />
+        <mesh position={[0, 0.145, 0]}>
+          <cylinderGeometry args={[0.9, 0.9, 0.01, 32]} />
+          <meshStandardMaterial color="#2d3748" roughness={0.9} metalness={0.05} />
         </mesh>
         <Text
-          position={[0, 0.175, 0]}
+          position={[0, 0.158, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
           fontSize={0.34}
           letterSpacing={0.1}
-          color="#0b1220"
+          color="#eaf2fc"
           anchorX="center"
           anchorY="middle"
           raycast={() => null}
@@ -294,7 +301,6 @@ function Museum() {
         </Text>
 
         {/* Focal piece + spotlight */}
-        <Hologram title="HALL UTAMA" />
         <spotLight
           position={[0, H - 0.25, 0]}
           angle={0.55}
@@ -312,102 +318,58 @@ function Museum() {
         ))}
 
         {/* Benches in the four corners, angled toward the hall centre */}
-        <Bench position={[-11.8, 0, -25]} rotationY={0.45} />
-        <Bench position={[11.8, 0, -25]} rotationY={-0.45} />
-        <Bench position={[-11.8, 0, 25]} rotationY={Math.PI - 0.45} />
-        <Bench position={[11.8, 0, 25]} rotationY={-Math.PI + 0.45} />
+        <Bench position={[-12, 0, -25]} rotationY={0.45} />
+        <Bench position={[12, 0, -25]} rotationY={-0.45} />
+        <Bench position={[-12, 0, 25]} rotationY={Math.PI - 0.45} />
+        <Bench position={[12, 0, 25]} rotationY={-Math.PI + 0.45} />
 
-        {/* Plants flanking the front portal, the back banner and the side walls */}
-        <Plant position={[-3.5, 0, 25]} />
-        <Plant position={[3.5, 0, 25]} />
-        <Plant position={[-6.5, 0, -25]} />
-        <Plant position={[6.5, 0, -25]} />
-        <Plant position={[-11.8, 0, -13]} />
-        <Plant position={[11.8, 0, -13]} />
-        <Plant position={[-11.8, 0, 13]} />
-        <Plant position={[11.8, 0, 13]} />
+        {/* Struktur pot: dinding samping bunga saja, samping tiang pot daun tinggi */}
+        {/* Dinding kiri (x=-17.4) — bunga saja */}
+        <Plant position={[-17.4, 0, -22.5]} variant="flower" flowerColor="#60a5fa" scale={1.0} />
+        <Plant position={[-17.4, 0, -12]} variant="flower" flowerColor="#f8fafc" scale={1.0} />
+        <Plant position={[-17.4, 0, 0]} variant="flower" flowerColor="#60a5fa" scale={1.0} />
+        <Plant position={[-17.4, 0, 12]} variant="flower" flowerColor="#f8fafc" scale={1.0} />
+        <Plant position={[-17.4, 0, 22.5]} variant="flower" flowerColor="#60a5fa" scale={1.0} />
+
+        {/* Dinding kanan (x=17.4) — bunga saja */}
+        <Plant position={[17.4, 0, -22.5]} variant="flower" flowerColor="#f8fafc" scale={1.0} />
+        <Plant position={[17.4, 0, -9]} variant="flower" flowerColor="#60a5fa" scale={1.0} />
+        <Plant position={[17.4, 0, 9]} variant="flower" flowerColor="#f8fafc" scale={1.0} />
+        <Plant position={[17.4, 0, 22.5]} variant="flower" flowerColor="#60a5fa" scale={1.0} />
 
         {/* Aesthetic digital info kiosks near the center platform */}
-        <InfoKiosk position={[-4.5, 0, 6]} rotationY={0.35} />
-        <InfoKiosk position={[4.5, 0, 6]} rotationY={-0.35} />
+        <InfoKiosk position={[-4.5, 0, 6]} rotationY={0.35} stats={stats} categories={karyaCategories} />
+        <InfoKiosk position={[4.5, 0, 6]} rotationY={-0.35} variant="guide" />
 
-        {/* Decorative exhibit pedestals */}
-        <Pedestal position={[-7, 0, 0]} radius={0.3} top="sphere" />
-        <Pedestal position={[7, 0, 0]} radius={0.3} top="cone" />
-
-        {/* Wall sconces for aesthetic ambient side lighting */}
-        {[-18, -9, 0, 9, 18].map((zPos, i) => (
-          <group key={i}>
-            <WallSconce position={[-13.3, 2.8, zPos]} rotationY={Math.PI / 2} />
-            <WallSconce position={[13.3, 2.8, zPos]} rotationY={-Math.PI / 2} />
-          </group>
+        {/* Pot daun tinggi di samping tiang (menggantikan pedestal) */}
+        {HALL_PILLARS.map((p, i) => (
+          <Plant
+            key={`pillar-plant-${i}`}
+            position={[p.position[0] - Math.sign(p.position[0]) * 1.5, 0, p.position[2]]}
+            variant="tall"
+            scale={1.15}
+          />
         ))}
 
-        {/* Digital directory panels between side portals */}
-        {[0, 1].map((gap) => {
-          const zc = (HALL_PORTAL_Z[gap] + HALL_PORTAL_Z[gap + 1]) / 2
-          const left = [karyaCategories[gap], karyaCategories[gap + 1]]
-          const right = [karyaCategories[gap + 3], karyaCategories[gap + 4]]
-          const entry = (c) => ({
-            title: c.title,
-            count: stats[c.slug]?.total || 0,
-          })
-          return (
-            <group key={gap}>
-              <InfoPanel
-                position={[-12.9, 0, zc]}
-                rotationY={-Math.PI / 2}
-                entries={left.map(entry)}
-              />
-              <InfoPanel
-                position={[12.9, 0, zc]}
-                rotationY={Math.PI / 2}
-                entries={right.map(entry)}
-              />
-            </group>
-          )
-        })}
+        {/* Wall sconces for aesthetic ambient side lighting (kept clear of portals) */}
+        {[-12, 12].map((zPos, i) => (
+          <group key={i}>
+            <WallSconce position={[-17.8, 2.8, zPos]} rotationY={Math.PI / 2} />
+            <WallSconce position={[17.8, 2.8, zPos]} rotationY={-Math.PI / 2} />
+          </group>
+        ))}
       </group>
 
       {/* Room decor + zone signs + category titles */}
       {rooms.map((room) => {
         if (room.floor === "marble") return null
         const isDosen = room.id.endsWith("-dosen")
-        const cat = roomCategories[room.id]
         const cx = (room.x[0] + room.x[1]) / 2
-        const catTitle = karyaCategories.find((c) => c.slug === cat)
         return (
           <group key={`decor-${room.id}`}>
             <Pedestal
               position={[cx + (isDosen ? -10 : 10), 0, isDosen ? room.z[0] + 1.6 : room.z[1] - 1.6]}
             />
-            <Text
-              position={[cx, 5.3, isDosen ? PARTITION_Z - 0.22 : PARTITION_Z + 0.22]}
-              rotation={[0, isDosen ? Math.PI : 0, 0]}
-              fontSize={0.42}
-              color={isDosen ? "#22d3ee" : "#60a5fa"}
-              anchorX="center"
-              anchorY="middle"
-              outlineWidth={0.02}
-              outlineColor="#0b1220"
-              raycast={() => null}
-            >
-              {isDosen ? "KARYA DOSEN" : "KARYA MAHASISWA"}
-            </Text>
-            {isDosen && catTitle && (
-              <Text
-                position={[cx, 5.55, room.z[0] + 0.18]}
-                fontSize={0.4}
-                color="#7dd3fc"
-                anchorX="center"
-                anchorY="middle"
-                outlineWidth={0.02}
-                outlineColor="#0b1220"
-                raycast={() => null}
-              >
-                {catTitle.title.toUpperCase()}
-              </Text>
-            )}
           </group>
         )
       })}

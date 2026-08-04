@@ -33,7 +33,7 @@ function Hologram({ title = "SINGGAH" }) {
         <meshBasicMaterial
           color="#38bdf8"
           transparent
-          opacity={0.07}
+          opacity={0.05}
           side={THREE.DoubleSide}
           depthWrite={false}
           blending={THREE.AdditiveBlending}
@@ -44,7 +44,7 @@ function Hologram({ title = "SINGGAH" }) {
         <meshBasicMaterial
           color="#38bdf8"
           transparent
-          opacity={0.14}
+          opacity={0.1}
           depthWrite={false}
           blending={THREE.AdditiveBlending}
         />
@@ -69,7 +69,7 @@ function Hologram({ title = "SINGGAH" }) {
         <meshStandardMaterial
           color="#7dd3fc"
           emissive="#38bdf8"
-          emissiveIntensity={2.2}
+          emissiveIntensity={1.4}
           transparent
           opacity={0.9}
         />
@@ -79,7 +79,7 @@ function Hologram({ title = "SINGGAH" }) {
         <meshStandardMaterial
           color="#7dd3fc"
           emissive="#38bdf8"
-          emissiveIntensity={2}
+          emissiveIntensity={1.3}
           transparent
           opacity={0.85}
         />
@@ -89,7 +89,7 @@ function Hologram({ title = "SINGGAH" }) {
         <meshStandardMaterial
           color="#e0f2fe"
           emissive="#7dd3fc"
-          emissiveIntensity={2.4}
+          emissiveIntensity={1.6}
           transparent
           opacity={0.9}
         />
@@ -98,14 +98,14 @@ function Hologram({ title = "SINGGAH" }) {
       {/* Core sculpture */}
       <mesh ref={core} position={[0, 2.3, 0]}>
         <icosahedronGeometry args={[0.5, 0]} />
-        <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={2.6} roughness={0.2} metalness={0.4} />
+        <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={1.8} roughness={0.2} metalness={0.4} />
       </mesh>
       <mesh ref={wire} position={[0, 2.3, 0]}>
         <icosahedronGeometry args={[0.72, 1]} />
         <meshStandardMaterial
           color="#7dd3fc"
           emissive="#7dd3fc"
-          emissiveIntensity={1.4}
+          emissiveIntensity={1}
           wireframe
           transparent
           opacity={0.45}
@@ -126,7 +126,7 @@ function Hologram({ title = "SINGGAH" }) {
         {title}
       </Text>
 
-      <pointLight position={[0, 2.3, 0]} intensity={16} distance={16} color="#7dd3fc" />
+      <pointLight position={[0, 2.3, 0]} intensity={5} distance={16} color="#7dd3fc" />
     </group>
   )
 }

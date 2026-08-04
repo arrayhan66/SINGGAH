@@ -13,7 +13,7 @@ const PAINT_W = 2.2
 const PAINT_H = 1.5
 
 // Every karya room is as big as the main hall (same width & depth).
-const HALL_W = 27
+const HALL_W = 36
 const HALL_DEPTH = 54
 const HALL_HALF_X = HALL_W / 2
 const HALL_HALF_Z = HALL_DEPTH / 2
@@ -346,11 +346,14 @@ export const LAYOUT = {
 
 export const HALL_PILLARS = (() => {
   const allZ = [-HALL_HALF_Z, ...leftZ, HALL_HALF_Z]
+  const pillarX = HALL_HALF_X - 5.5
+  const portalZ = [...leftZ, ...rightZ]
   const out = []
   for (let i = 0; i < allZ.length - 1; i++) {
     const zm = (allZ[i] + allZ[i + 1]) / 2
-    out.push({ position: [-8, 0, zm] })
-    out.push({ position: [8, 0, zm] })
+    const shifted = portalZ.some((z) => Math.abs(z - zm) < 0.1) ? zm + 2.5 : zm
+    out.push({ position: [-pillarX, 0, shifted] })
+    out.push({ position: [pillarX, 0, shifted] })
   }
   return out
 })()

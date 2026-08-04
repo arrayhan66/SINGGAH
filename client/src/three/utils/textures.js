@@ -187,6 +187,33 @@ function steelTexture() {
   return toTexture(ctx.canvas, 1, 1)
 }
 
+function radialTexture(w, h, stops) {
+  const canvas = document.createElement("canvas")
+  canvas.width = w
+  canvas.height = h
+  const ctx = canvas.getContext("2d")
+  const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, h / 2)
+  for (const [pos, color] of stops) grad.addColorStop(pos, color)
+  ctx.fillStyle = grad
+  ctx.fillRect(0, 0, w, h)
+
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.wrapS = THREE.ClampToEdgeWrapping
+  texture.wrapT = THREE.ClampToEdgeWrapping
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.anisotropy = 8
+  return texture
+}
+
+function hallGradientTexture() {
+  return radialTexture(512, 1024, [
+    [0, "rgba(10,16,32,0)"],
+    [0.5, "rgba(10,16,32,0.08)"],
+    [0.85, "rgba(9,15,31,0.28)"],
+    [1, "rgba(8,13,27,0.5)"],
+  ])
+}
+
 function steelFrameTexture() {
   const size = 64
   const { ctx } = makeCanvas(size)
@@ -207,4 +234,5 @@ export const textures = {
   carpet: carpetTexture,
   steel: steelTexture,
   steelFrame: steelFrameTexture,
+  hallGradient: hallGradientTexture,
 }

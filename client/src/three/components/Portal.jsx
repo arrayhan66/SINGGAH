@@ -40,12 +40,13 @@ function Portal({ position, rotationY, width, title, subtitle, action }) {
       {/* Rift */}
       <mesh ref={riftRef} position={[0, RIFT_H / 2, 0]}>
         <planeGeometry args={[width, RIFT_H]} />
-        <meshBasicMaterial
-          color="#38bdf8"
-          transparent
-          opacity={0.85}
+        <meshStandardMaterial
+          color="#0a3a5c"
+          emissive="#38bdf8"
+          emissiveIntensity={0.8}
+          roughness={0.5}
+          metalness={0.1}
           side={THREE.DoubleSide}
-          depthWrite={false}
         />
       </mesh>
 

@@ -45,3 +45,24 @@ export function resolveCollision(position, walls) {
   }
   return p
 }
+
+export function resolveObjectCollision(position, colliders) {
+  const p = position.clone()
+  for (const c of colliders) {
+    const dx = p.x - c.x
+    const dz = p.z - c.z
+    const minDist = c.radius + PLAYER_RADIUS
+    const distSq = dx * dx + dz * dz
+    if (distSq === 0) {
+      p.x += minDist
+      continue
+    }
+    if (distSq < minDist * minDist) {
+      const dist = Math.sqrt(distSq)
+      const push = minDist - dist
+      p.x += (dx / dist) * push
+      p.z += (dz / dist) * push
+    }
+  }
+  return p
+}

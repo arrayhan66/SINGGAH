@@ -2,7 +2,8 @@ import { useEffect, useRef } from "react"
 import { useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
 import { useWalkStore, EYE } from "../hooks/useWalk"
-import { getWalls, portals } from "../rooms/museumLayout"
+import { useTransitionStore } from "../hooks/useTransition"
+import { getWalls, portals, findRoom } from "../rooms/museumLayout"
 import { resolveCollision, resolveObjectCollision } from "../utils/collision"
 import { getObjectColliders } from "../utils/objectColliders"
 
@@ -23,7 +24,6 @@ function LookControls({ bounds, onSelectProject }) {
   const keysRef = useRef({})
   const wallsRef = useRef(getWalls())
   const portalsRef = useRef(portals)
-  const collidersRef = useRef(getObjectColliders())
   const dragRef = useRef({
     active: false,
     lastX: 0,
@@ -44,8 +44,18 @@ function LookControls({ bounds, onSelectProject }) {
     } else if (action.type === "project") {
       onSelectProject(action.project)
     } else if (action.type === "teleport") {
-      useWalkStore.setState({ position: action.point.clone(), yaw: action.yaw, target: null })
+      teleportTo(action.point, action.yaw)
     }
+  }
+
+  const teleportTo = (point, yaw) => {
+    const room = findRoom(point.x, point.z)
+    const message =
+      room?.id === "hall"
+        ? "KEMBALI KE HALL UTAMA"
+        : `MEMASUKI ${room.label.split(" — ")[0]}`
+    useTransitionStore.getState().start(message)
+    useWalkStore.setState({ position: point.clone(), yaw, target: null })
   }
 
   const checkPortalCross = (prev, next) => {
@@ -74,12 +84,12 @@ function LookControls({ bounds, onSelectProject }) {
   const applyTeleport = (prev, rawNext) => {
     const tp = checkPortalCross(prev, rawNext)
     if (!tp) return { position: resolveAll(rawNext), teleported: false }
-    useWalkStore.setState({ position: tp.point, yaw: tp.yaw, target: null })
+    teleportTo(tp.point, tp.yaw)
     return { position: tp.point, teleported: true }
   }
 
   const resolveAll = (pos) =>
-    resolveObjectCollision(resolveCollision(pos, wallsRef.current), collidersRef.current)
+    resolveObjectCollision(resolveCollision(pos, wallsRef.current), getObjectColliders())
 
   useEffect(() => {
     const el = gl.domElement

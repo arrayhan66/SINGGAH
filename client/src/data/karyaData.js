@@ -5,6 +5,7 @@ import {
   Brain,
   Database,
   ShieldCheck,
+  Gamepad2,
 } from "lucide-react"
 
 export const karyaCategories = [
@@ -49,6 +50,12 @@ export const karyaCategories = [
     title: "UI/UX Design",
     slug: "ui-ux-design",
     desc: "Desain antarmuka dan pengalaman pengguna yang fungsional dan estetis.",
+  },
+  {
+    icon: Gamepad2,
+    title: "Game Development",
+    slug: "game-development",
+    desc: "Pengembangan game 2D/3D, game engine, dan realitas virtual.",
   },
 ]
 

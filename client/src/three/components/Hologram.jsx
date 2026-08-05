@@ -1,30 +1,7 @@
-import { useRef } from "react"
-import { useFrame } from "@react-three/fiber"
 import { Text } from "@react-three/drei"
 import * as THREE from "three"
 
 function Hologram({ title = "SINGGAH" }) {
-  const ringA = useRef()
-  const ringB = useRef()
-  const ringC = useRef()
-  const core = useRef()
-  const wire = useRef()
-  const orbit = useRef()
-
-  useFrame(({ clock }) => {
-    const t = clock.elapsedTime
-    if (ringA.current) ringA.current.rotation.z = t * 0.6
-    if (ringB.current) ringB.current.rotation.x = t * 0.42
-    if (ringC.current) ringC.current.rotation.y = t * 0.55
-    if (core.current) {
-      core.current.rotation.y = t * 0.85
-      core.current.rotation.x = Math.sin(t * 0.4) * 0.35
-      core.current.scale.setScalar(1 + 0.06 * Math.sin(t * 2.2))
-    }
-    if (wire.current) wire.current.rotation.y = -t * 0.35
-    if (orbit.current) orbit.current.rotation.y = t * 0.5
-  })
-
   return (
     <group>
       {/* Light beam */}
@@ -51,7 +28,7 @@ function Hologram({ title = "SINGGAH" }) {
       </mesh>
 
       {/* Orbiting sparks */}
-      <group ref={orbit} position={[0, 2.3, 0]}>
+      <group position={[0, 2.3, 0]}>
         {Array.from({ length: 10 }).map((_, i) => {
           const a = (i / 10) * Math.PI * 2
           return (
@@ -63,8 +40,8 @@ function Hologram({ title = "SINGGAH" }) {
         })}
       </group>
 
-      {/* Rotating holo-rings */}
-      <mesh ref={ringA} position={[0, 2.3, 0]}>
+      {/* Holo-rings */}
+      <mesh position={[0, 2.3, 0]}>
         <torusGeometry args={[1.35, 0.035, 12, 64]} />
         <meshStandardMaterial
           color="#7dd3fc"
@@ -74,7 +51,7 @@ function Hologram({ title = "SINGGAH" }) {
           opacity={0.9}
         />
       </mesh>
-      <mesh ref={ringB} position={[0, 2.3, 0]}>
+      <mesh position={[0, 2.3, 0]}>
         <torusGeometry args={[1.05, 0.025, 12, 64]} />
         <meshStandardMaterial
           color="#7dd3fc"
@@ -84,7 +61,7 @@ function Hologram({ title = "SINGGAH" }) {
           opacity={0.85}
         />
       </mesh>
-      <mesh ref={ringC} position={[0, 2.3, 0]}>
+      <mesh position={[0, 2.3, 0]}>
         <torusGeometry args={[0.72, 0.02, 12, 64]} />
         <meshStandardMaterial
           color="#e0f2fe"
@@ -96,11 +73,11 @@ function Hologram({ title = "SINGGAH" }) {
       </mesh>
 
       {/* Core sculpture */}
-      <mesh ref={core} position={[0, 2.3, 0]}>
+      <mesh position={[0, 2.3, 0]}>
         <icosahedronGeometry args={[0.5, 0]} />
         <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={1.8} roughness={0.2} metalness={0.4} />
       </mesh>
-      <mesh ref={wire} position={[0, 2.3, 0]}>
+      <mesh position={[0, 2.3, 0]}>
         <icosahedronGeometry args={[0.72, 1]} />
         <meshStandardMaterial
           color="#7dd3fc"

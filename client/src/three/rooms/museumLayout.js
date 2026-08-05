@@ -1,13 +1,13 @@
 import { karyaCategories } from "../../data/karyaData"
 
 const T = 0.25
-const H = 6.5
+const H = 8
 
 // Door / portal sizes
 const DOOR_W = 2.6
 const DOOR_H = 4.2
 const PORTAL_W = 2.8
-const PORTAL_H = 5.2
+const PORTAL_H = 4.8
 
 const PAINT_W = 2.2
 const PAINT_H = 1.5
@@ -200,6 +200,8 @@ for (let i = 0; i < hallPortals.length; i++) {
 // ---- Archways (for rendering) ----
 export const archways = []
 
+const NO_ANIMATED_SLUG = "game-development"
+
 for (let i = 0; i < N; i++) {
   const hp = hallPortals[i]
   const cat = karyaCategories[i]
@@ -207,6 +209,7 @@ for (let i = 0; i < N; i++) {
   const rotY = hp.at < 0 ? Math.PI / 2 : -Math.PI / 2
   const pos = [hp.at, 0, hp.zc]
   const rp = returnPoint(hp)
+  const animated = cat.slug !== NO_ANIMATED_SLUG
   archways.push({
     kind: "portal",
     pos,
@@ -214,6 +217,7 @@ for (let i = 0; i < N; i++) {
     width: PORTAL_W,
     title: cat.title,
     slug: cat.slug,
+    animated,
     target: [cx, ROW_Z0 + 4],
     yaw: Math.PI,
   })
@@ -224,6 +228,7 @@ for (let i = 0; i < N; i++) {
     width: PORTAL_W,
     title: null,
     slug: cat.slug,
+    animated,
     target: [rp.x, rp.z],
     yaw: rp.yaw,
   })

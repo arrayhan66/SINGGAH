@@ -1,27 +1,16 @@
-import { Suspense, useEffect, useState } from "react"
+import { Suspense, useState } from "react"
 import { Canvas } from "@react-three/fiber"
 import { ArrowLeft, MousePointerClick, DoorOpen, Frame, Eye, MapPin } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import VirtualExhibition from "../../three/scenes/VirtualExhibition"
 import ProjectDetailModal from "../../components/hall/ProjectDetailModal"
 import LoadingOverlay from "../../components/hall/LoadingOverlay"
+import PortalTransitionOverlay from "../../components/hall/PortalTransitionOverlay"
 
 function Hall() {
   const navigate = useNavigate()
   const [area, setArea] = useState("Hall Utama")
   const [selectedProject, setSelectedProject] = useState(null)
-  const [flash, setFlash] = useState(0)
-
-  useEffect(() => {
-    const t1 = setTimeout(() => setFlash(1), 10)
-    const t2 = setTimeout(() => setFlash(2), 190)
-    const t3 = setTimeout(() => setFlash(0), 950)
-    return () => {
-      clearTimeout(t1)
-      clearTimeout(t2)
-      clearTimeout(t3)
-    }
-  }, [area])
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-[#0b1220] text-white select-none">
@@ -37,15 +26,6 @@ function Hall() {
           <VirtualExhibition onArea={setArea} onSelectProject={setSelectedProject} />
         </Suspense>
       </Canvas>
-
-      {/* Room transition flash */}
-      <div
-        className="pointer-events-none fixed inset-0 z-30 bg-black/75"
-        style={{
-          opacity: flash === 1 ? 0.75 : 0,
-          transition: flash === 1 ? "opacity 180ms ease-out" : "opacity 700ms ease-out",
-        }}
-      />
 
       {/* HUD Top Bar */}
       <header className="absolute top-0 left-0 right-0 z-20 flex items-start justify-between pl-16 md:pl-24 lg:pl-28 py-4 pr-4 md:pr-6 pointer-events-none">
@@ -104,6 +84,9 @@ function Hall() {
 
       {/* Loading Overlay */}
       <LoadingOverlay />
+
+      {/* Portal transition overlay */}
+      <PortalTransitionOverlay />
 
       {/* Project Detail Modal */}
       {selectedProject && (

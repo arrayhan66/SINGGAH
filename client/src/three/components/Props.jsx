@@ -173,11 +173,11 @@ function Plant({ position, scale = 1, variant = "bush", flowerColor = "#38bdf8" 
   )
 }
 
-function Chandelier({ position, lit = 0.8 }) {
+function Chandelier({ position, lit = 0.8, drop = 1.2 }) {
   return (
     <group position={position}>
-      <mesh position={[0, 0.4, 0]}>
-        <cylinderGeometry args={[0.02, 0.02, 0.8, 8]} />
+      <mesh position={[0, drop / 2, 0]}>
+        <cylinderGeometry args={[0.02, 0.02, drop, 8]} />
         <meshStandardMaterial color="#223047" roughness={0.5} />
       </mesh>
       <mesh position={[0, -0.05, 0]} rotation={[Math.PI, 0, 0]}>
@@ -258,24 +258,11 @@ function InfoPanel({ position, rotationY, entries = [] }) {
   )
 }
 
-function InfoKiosk({ position, rotationY, stats, categories = [], variant = "stats" }) {
-  const isGuide = variant === "guide"
+function InfoKiosk({ position, rotationY, stats, categories = [], variant = "info" }) {
   const total = categories.reduce((s, c) => s + (stats?.[c.slug]?.total || 0), 0) || 49
   const catCount = categories.length || 7
 
-  const catList = categories.length > 0
-    ? categories.map(c => c.title)
-    : [
-        "Website",
-        "Mobile App",
-        "Internet of Things",
-        "Artificial Intelligence",
-        "UI/UX",
-        "Multimedia",
-        "Game Development"
-      ]
-
-  const cementColor = "#cbd5e1" // clean architectural concrete / semen
+  const cementColor = "#cbd5e1"
   const postColor = "#94a3b8"
 
   return (
@@ -290,113 +277,153 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "sta
         <boxGeometry args={[0.14, 2.1, 0.1]} />
         <meshStandardMaterial color={postColor} roughness={0.8} />
       </mesh>
-      {/* Cement Board Frame (Compact / Minimalist Size) */}
+      {/* Cement Board Frame */}
       <mesh position={[0, 2.3, 0.03]} rotation={[-0.15, 0, 0]} castShadow>
-        <boxGeometry args={[1.7, 1.8, 0.05]} />
+        <boxGeometry args={[1.75, 2.1, 0.05]} />
         <meshStandardMaterial color={cementColor} roughness={0.75} />
       </mesh>
 
       {/* Board Panel + content (White background, Dark Navy text, Accent blue) */}
       <group position={[0, 2.3, 0.06]} rotation={[-0.15, 0, 0]}>
         <mesh>
-          <planeGeometry args={[1.6, 1.7]} />
+          <planeGeometry args={[1.65, 2.0]} />
           <meshBasicMaterial color="#ffffff" />
         </mesh>
 
-        {/* Top Section */}
-        <Text
-          position={[0, 0.65, 0.01]}
-          fontSize={0.2}
-          color="#1F2A44"
-          anchorX="center"
-          anchorY="middle"
-          maxWidth={1.5}
-          raycast={() => null}
-        >
-          SINGGAH
-        </Text>
-        <Text
-          position={[0, 0.48, 0.01]}
-          fontSize={0.11}
-          color="#3B82F6"
-          anchorX="center"
-          anchorY="middle"
-          maxWidth={1.5}
-          raycast={() => null}
-        >
-          Virtual Exhibition
-        </Text>
+        {variant === "guide" ? (
+          <>
+            {/* Guide Header */}
+            <Text
+              position={[0, 0.74, 0.01]}
+              fontSize={0.2}
+              color="#1F2A44"
+              anchorX="center"
+              anchorY="middle"
+              maxWidth={1.5}
+              raycast={() => null}
+            >
+              PANDUAN
+            </Text>
+            <Text
+              position={[0, 0.58, 0.01]}
+              fontSize={0.1}
+              color="#3B82F6"
+              anchorX="center"
+              anchorY="middle"
+              maxWidth={1.5}
+              raycast={() => null}
+            >
+              Cara Menjelajah Museum
+            </Text>
 
-        {/* Light Gray Separator */}
-        <mesh position={[0, 0.36, 0.01]}>
-          <planeGeometry args={[1.3, 0.015]} />
-          <meshBasicMaterial color="#e2e8f0" />
-        </mesh>
+            <mesh position={[0, 0.42, 0.01]}>
+              <planeGeometry args={[1.3, 0.015]} />
+              <meshBasicMaterial color="#e2e8f0" />
+            </mesh>
 
-        {/* Middle Statistics Section */}
-        <Text
-          position={[0, 0.22, 0.01]}
-          fontSize={0.12}
-          color="#1F2A44"
-          anchorX="center"
-          anchorY="middle"
-          maxWidth={1.5}
-          raycast={() => null}
-        >
-          {`${total} Karya  ·  ${catCount} Kategori`}
-        </Text>
+            <Text
+              position={[-0.72, 0.34, 0.01]}
+              fontSize={0.1}
+              lineHeight={1.35}
+              color="#1F2A44"
+              anchorX="left"
+              anchorY="top"
+              maxWidth={1.5}
+              raycast={() => null}
+            >
+              {[
+                "Drag untuk melihat-lihat",
+                "Tekan WASD / klik lantai untuk berjalan",
+                "Klik lukisan untuk detail karya",
+                "Lewati portal biru untuk pindah kategori",
+              ]
+                .map((item) => `•  ${item}`)
+                .join("\n")}
+            </Text>
 
-        {/* Light Gray Separator */}
-        <mesh position={[0, 0.1, 0.01]}>
-          <planeGeometry args={[1.3, 0.015]} />
-          <meshBasicMaterial color="#e2e8f0" />
-        </mesh>
+            <Text
+              position={[0, -0.7, 0.01]}
+              fontSize={0.14}
+              color="#3B82F6"
+              anchorX="center"
+              anchorY="middle"
+              maxWidth={1.5}
+              raycast={() => null}
+            >
+              Selamat menjelajah!
+            </Text>
+          </>
+        ) : (
+          <>
+            {/* Info Header */}
+            <Text
+              position={[0, 0.74, 0.01]}
+              fontSize={0.2}
+              color="#1F2A44"
+              anchorX="center"
+              anchorY="middle"
+              maxWidth={1.5}
+              raycast={() => null}
+            >
+              SINGGAH
+            </Text>
+            <Text
+              position={[0, 0.58, 0.01]}
+              fontSize={0.1}
+              color="#3B82F6"
+              anchorX="center"
+              anchorY="middle"
+              maxWidth={1.5}
+              raycast={() => null}
+            >
+              Virtual Exhibition
+            </Text>
 
-        {/* Bottom Category List */}
-        <group position={[0, -0.02, 0.01]}>
-          <Text
-            position={[-0.6, 0.04, 0]}
-            fontSize={0.1}
-            color="#3B82F6"
-            anchorX="left"
-            anchorY="middle"
-            maxWidth={1.3}
-            raycast={() => null}
-          >
-            Kategori:
-          </Text>
-          {catList.slice(0, 6).map((title, i) => {
-            const y = -0.12 - i * 0.11
-            return (
+            <mesh position={[0, 0.42, 0.01]}>
+              <planeGeometry args={[1.3, 0.015]} />
+              <meshBasicMaterial color="#e2e8f0" />
+            </mesh>
+
+            <Text
+              position={[0, 0.26, 0.01]}
+              fontSize={0.12}
+              color="#1F2A44"
+              anchorX="center"
+              anchorY="middle"
+              maxWidth={1.5}
+              raycast={() => null}
+            >
+              {`${total} Karya  ·  ${catCount} Kategori`}
+            </Text>
+
+            <mesh position={[0, 0.1, 0.01]}>
+              <planeGeometry args={[1.3, 0.015]} />
+              <meshBasicMaterial color="#e2e8f0" />
+            </mesh>
+
+            {[
+              "Selamat datang di SINGGAH",
+              "Virtual Exhibition — pameran",
+              "karya Dosen & Mahasiswa.",
+              "Masuki portal biru untuk",
+              "menjelajahi setiap kategori.",
+            ].map((line, i) => (
               <Text
                 key={i}
-                position={[-0.55, y, 0]}
-                fontSize={0.095}
+                position={[0, -0.1 - i * 0.15, 0.01]}
+                fontSize={0.1}
+                lineHeight={1.35}
                 color="#1F2A44"
-                anchorX="left"
+                anchorX="center"
                 anchorY="middle"
-                maxWidth={1.3}
-                truncate
+                maxWidth={1.45}
                 raycast={() => null}
               >
-                {`• ${title}`}
+                {line}
               </Text>
-            )
-          })}
-        </group>
-
-        {/* Footer Instruction Text */}
-        <Text
-          position={[0, -0.72, 0.01]}
-          fontSize={0.1}
-          color="#3B82F6"
-          anchorX="center"
-          anchorY="middle"
-          maxWidth={1.5}
-          raycast={() => null}
-        >
-          Masuki Portal Biru\nuntuk memulai penjelajahan.
-        </Text>
+            ))}
+          </>
+        )}
       </group>
     </group>
   )
@@ -417,4 +444,51 @@ function WallSconce({ position, rotationY }) {
   )
 }
 
-export { Bench, Pedestal, Plant, Chandelier, InfoPanel, InfoKiosk, WallSconce }
+function CCTV({ position, rotation = [0, 0, 0] }) {
+  return (
+    <group position={position} rotation={rotation} scale={1.8}>
+      {/* Wall mounting base plate */}
+      <mesh position={[0, 0, -0.05]} castShadow>
+        <boxGeometry args={[0.22, 0.22, 0.05]} />
+        <meshStandardMaterial color="#0f172a" roughness={0.3} metalness={0.7} />
+      </mesh>
+      {/* Long extension arm extending forward from wall */}
+      <mesh position={[0, 0, 0.25]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.04, 0.04, 0.6, 16]} />
+        <meshStandardMaterial color="#334155" roughness={0.3} metalness={0.8} />
+      </mesh>
+      {/* Joint ball / connector */}
+      <mesh position={[0, 0, 0.55]}>
+        <sphereGeometry args={[0.06, 16, 16]} />
+        <meshStandardMaterial color="#1e293b" roughness={0.2} metalness={0.9} />
+      </mesh>
+      {/* Bullet camera main body (pointing downwards and forwards) */}
+      <mesh position={[0, -0.18, 0.65]} rotation={[0.6, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.09, 0.1, 0.38, 24]} />
+        <meshStandardMaterial color="#f8fafc" roughness={0.2} metalness={0.1} />
+      </mesh>
+      {/* Camera sunshield hood */}
+      <mesh position={[0, -0.08, 0.62]} rotation={[0.6, 0, 0]}>
+        <boxGeometry args={[0.2, 0.03, 0.32]} />
+        <meshStandardMaterial color="#cbd5e1" roughness={0.4} metalness={0.3} />
+      </mesh>
+      {/* Camera lens bezel front */}
+      <mesh position={[0, -0.32, 0.77]} rotation={[0.6, 0, 0]}>
+        <cylinderGeometry args={[0.075, 0.075, 0.05, 20]} />
+        <meshStandardMaterial color="#0f172a" roughness={0.1} metalness={0.9} />
+      </mesh>
+      {/* Glass camera lens */}
+      <mesh position={[0, -0.34, 0.78]} rotation={[0.6, 0, 0]}>
+        <cylinderGeometry args={[0.045, 0.045, 0.02, 16]} />
+        <meshStandardMaterial color="#0284c7" emissive="#38bdf8" emissiveIntensity={2.0} roughness={0.1} />
+      </mesh>
+      {/* Bright blinking recording LED */}
+      <mesh position={[0.06, -0.22, 0.72]}>
+        <sphereGeometry args={[0.015, 12, 12]} />
+        <meshStandardMaterial color="#ef4444" emissive="#ef4444" emissiveIntensity={5} />
+      </mesh>
+    </group>
+  )
+}
+
+export { Bench, Pedestal, Plant, Chandelier, InfoPanel, InfoKiosk, WallSconce, CCTV }

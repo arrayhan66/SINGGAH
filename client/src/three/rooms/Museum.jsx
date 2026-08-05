@@ -6,7 +6,24 @@ import Pillar from "../components/Pillar"
 import Painting from "../components/Painting"
 import ArchDoor from "../components/ArchDoor"
 import Portal from "../components/Portal"
-import { Bench, Pedestal, Plant, Chandelier, InfoKiosk, WallSconce } from "../components/Props"
+import Centerpiece from "../components/Centerpiece"
+import MuseumBarrier from "../components/MuseumBarrier"
+import LoungeSeating from "../components/LoungeSeating"
+import HallCeiling from "../components/HallCeiling"
+import {
+  Console,
+  Bookcase,
+  Armchair,
+  FloorLamp,
+  SideTable,
+  WallClock,
+  WindowCurtains,
+  Television,
+  HangingPlant,
+  RectRug,
+  RoundRug,
+} from "../components/HomeDecor"
+import { Bench, Pedestal, Plant, Chandelier, InfoKiosk, WallSconce, CCTV } from "../components/Props"
 import {
   rooms,
   getWalls,
@@ -141,6 +158,8 @@ function Museum() {
   const woodMap = useMemo(() => textures.woodFloor(), [])
   const carpetMap = useMemo(() => textures.carpet(), [])
   const hallGradMap = useMemo(() => textures.hallGradient(), [])
+  const rugMap = useMemo(() => textures.roundRug(), [])
+  const rugRectMap = useMemo(() => textures.rugRect(), [])
   const stats = useMemo(() => getCategoryStats(karyaProjects), [])
   const groups = useMemo(() => {
     const enriched = enrichProjects(karyaProjects)
@@ -168,7 +187,11 @@ function Museum() {
             floorMap={room.floor === "marble" ? marbleMap : woodMap}
             carpetMap={room.floor === "marble" ? null : carpetMap}
           />
-          <CeilingMesh room={room} />
+          {room.id === "hall" ? (
+            <HallCeiling room={room} height={H} />
+          ) : (
+            <CeilingMesh room={room} />
+          )}
         </group>
       ))}
 
@@ -180,7 +203,6 @@ function Museum() {
       {/* Portals + flush doors */}
       {archways.map((a, i) => {
         if (a.kind === "portal") {
-          const cat = a.slug ? karyaCategories.find((c) => c.slug === a.slug) : null
           return (
             <Portal
               key={i}
@@ -188,11 +210,7 @@ function Museum() {
               rotationY={a.rotY}
               width={a.width}
               title={a.title}
-              subtitle={
-                cat
-                  ? `${stats[a.slug]?.total || 0} Karya · ${stats[a.slug]?.dosen || 0} Dosen · ${stats[a.slug]?.mahasiswa || 0} Mhs`
-                  : undefined
-              }
+              animated={a.animated}
               action={{
                 type: "teleport",
                 point: new THREE.Vector3(a.target[0], 0, a.target[1]),
@@ -264,43 +282,52 @@ function Museum() {
         </Text>
 
         {/* Central platform */}
-
         <mesh position={[0, 0.135, 0]} receiveShadow>
           <cylinderGeometry args={[4.1, 4.1, 0.03, 48]} />
           <meshStandardMaterial color="#4b5a73" roughness={0.9} />
         </mesh>
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.152, 0]}>
-          <ringGeometry args={[4.15, 4.22, 64]} />
-          <meshStandardMaterial color="#64748b" roughness={0.9} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-4} />
-        </mesh>
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
           <ringGeometry args={[5.8, 5.86, 64]} />
-          <meshStandardMaterial color="#66758c" roughness={0.9} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-4} />
+          <meshStandardMaterial color="#a98f5e" metalness={0.5} roughness={0.4} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-4} />
         </mesh>
 
-        {/* Floor emblem */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.153, 0]}>
-          <ringGeometry args={[1.2, 1.35, 48]} />
-          <meshStandardMaterial color="#2d3748" roughness={0.9} metalness={0.05} polygonOffset polygonOffsetFactor={-2} polygonOffsetUnits={-8} />
+        {/* Round foyer rug */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.141, 0]} receiveShadow>
+          <circleGeometry args={[3.6, 64]} />
+          <meshStandardMaterial map={rugMap} roughness={0.95} />
         </mesh>
-        <mesh position={[0, 0.145, 0]}>
-          <cylinderGeometry args={[0.9, 0.9, 0.01, 32]} />
-          <meshStandardMaterial color="#2d3748" roughness={0.9} metalness={0.05} />
-        </mesh>
-        <Text
-          position={[0, 0.158, 0]}
-          rotation={[-Math.PI / 2, 0, 0]}
-          fontSize={0.34}
-          letterSpacing={0.1}
-          color="#eaf2fc"
-          anchorX="center"
-          anchorY="middle"
-          raycast={() => null}
-        >
-          SINGGAH
-        </Text>
 
-        {/* Focal piece + spotlight */}
+        {/* Decorative concentric bands around the rug */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.154, 0]}>
+          <ringGeometry args={[3.98, 4.08, 80]} />
+          <meshStandardMaterial color="#a98f5e" metalness={0.55} roughness={0.35} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-4} />
+        </mesh>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.156, 0]}>
+          <ringGeometry args={[3.9, 3.93, 80]} />
+          <meshStandardMaterial color="#7dd3fc" emissive="#38bdf8" emissiveIntensity={1.5} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-4} />
+        </mesh>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.154, 0]}>
+          <ringGeometry args={[3.7, 3.78, 80]} />
+          <meshStandardMaterial color="#6b7c96" roughness={0.7} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-4} />
+        </mesh>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.156, 0]}>
+          <ringGeometry args={[3.63, 3.67, 80]} />
+          <meshStandardMaterial color="#c9a35e" metalness={0.7} roughness={0.3} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-4} />
+        </mesh>
+
+        {/* Brass studs ringing the rug */}
+        {Array.from({ length: 12 }).map((_, i) => {
+          const a = (i / 12) * Math.PI * 2
+          return (
+            <mesh key={i} position={[Math.cos(a) * 3.84, 0.155, Math.sin(a) * 3.84]}>
+              <sphereGeometry args={[0.05, 16, 16]} />
+              <meshStandardMaterial color="#c9a35e" metalness={0.75} roughness={0.25} />
+            </mesh>
+          )
+        })}
+
+        {/* Focal 3D centerpiece + spotlight */}
+        <Centerpiece title="HALL UTAMA" />
         <spotLight
           position={[0, H - 0.25, 0]}
           angle={0.55}
@@ -310,8 +337,18 @@ function Museum() {
           color="#e6f4ff"
         />
 
-        <Chandelier position={[0, H - 1.4, HALL_Z0 + 13.5]} lit={1} />
-        <Chandelier position={[0, H - 1.4, HALL_Z1 - 13.5]} lit={0.9} />
+        {/* Cozy topiary flanking the centre */}
+        <Plant position={[-2.6, 0, 0]} variant="topiary" scale={1} />
+        <Plant position={[2.6, 0, 0]} variant="topiary" scale={1} />
+
+        {/* Museum stanchion barrier around the big circle */}
+        <MuseumBarrier />
+
+        {/* Cozy lounge seating around the circle, facing outward */}
+        <LoungeSeating />
+
+        <Chandelier position={[0, H - 1.4, HALL_Z0 + 13.5]} lit={1} drop={1.4} />
+        <Chandelier position={[0, H - 1.4, HALL_Z1 - 13.5]} lit={0.9} drop={1.4} />
 
         {HALL_PILLARS.map((p, i) => (
           <Pillar key={i} position={p.position} />
@@ -341,16 +378,6 @@ function Museum() {
         <InfoKiosk position={[-4.5, 0, 6]} rotationY={0.35} stats={stats} categories={karyaCategories} />
         <InfoKiosk position={[4.5, 0, 6]} rotationY={-0.35} variant="guide" />
 
-        {/* Pot daun tinggi di samping tiang (menggantikan pedestal) */}
-        {HALL_PILLARS.map((p, i) => (
-          <Plant
-            key={`pillar-plant-${i}`}
-            position={[p.position[0] - Math.sign(p.position[0]) * 1.5, 0, p.position[2]]}
-            variant="tall"
-            scale={1.15}
-          />
-        ))}
-
         {/* Wall sconces for aesthetic ambient side lighting (kept clear of portals) */}
         {[-12, 12].map((zPos, i) => (
           <group key={i}>
@@ -358,6 +385,53 @@ function Museum() {
             <WallSconce position={[17.8, 2.8, zPos]} rotationY={-Math.PI / 2} />
           </group>
         ))}
+
+        {/* CCTV cameras in every corner of the main hall */}
+        <CCTV position={[-16.8, H - 0.9, -25.6]} rotation={[0.35, Math.PI / 4, 0]} />
+        <CCTV position={[16.8, H - 0.9, -25.6]} rotation={[0.35, -Math.PI / 4, 0]} />
+        <CCTV position={[-16.8, H - 0.9, 25.6]} rotation={[0.35, (3 * Math.PI) / 4, 0]} />
+        <CCTV position={[16.8, H - 0.9, 25.6]} rotation={[0.35, -(3 * Math.PI) / 4, 0]} />
+
+        {/* ==== Homey decor ==== */}
+        {/* Front wall: runner rug + console + windows + clock + gallery */}
+        <RectRug position={[0, 0.015, 22.0]} w={7.2} d={2.5} map={rugRectMap} />
+        <Console position={[0, 0, 26.6]} rotationY={Math.PI} scale={1.35} />
+        <Television position={[0, 1.2, 26.55]} rotationY={Math.PI} />
+        <WindowCurtains position={[-7, 2.4, 26.7]} rotationY={Math.PI} />
+        <WindowCurtains position={[7, 2.4, 26.7]} rotationY={Math.PI} />
+        <WallClock position={[0, 5.6, 26.55]} rotationY={Math.PI} scale={1.6} />
+
+        {/* Back wall: a row of 8 bookcases centered under the banner */}
+        {[-7.35, -5.25, -3.15, -1.05, 1.05, 3.15, 5.25, 7.35].map((x, i) => (
+          <Bookcase key={`bc-${i}`} position={[x, 0, -26.55]} variant={i} />
+        ))}
+
+        {/* Reading nook (right, between pillar and wall) */}
+        <RoundRug position={[15.2, 0.015, 9.2]} radius={1.35} map={rugMap} />
+        <Armchair position={[15.0, 0, 9.4]} rotationY={-2.1} />
+        <FloorLamp position={[16.35, 0, 9.0]} rotationY={-1.1} />
+        <SideTable position={[13.8, 0, 9.0]} rotationY={1.9} />
+
+        {/* Reading nook (left, mirror of right with Es Teh & Tech books) */}
+        <RoundRug position={[-15.2, 0.015, 9.2]} radius={1.35} map={rugMap} />
+        <Armchair position={[-15.0, 0, 9.4]} rotationY={2.1} />
+        <FloorLamp position={[-16.35, 0, 9.0]} rotationY={1.1} />
+        <SideTable
+          position={[-13.8, 0, 9.0]}
+          rotationY={-1.9}
+          drink="icedTea"
+          book1="golang"
+          book2="fullstack"
+        />
+
+        {/* Left accent (asymmetric on purpose) */}
+        <FloorLamp position={[-14.9, 0, -15]} rotationY={0.9} />
+        <Plant position={[-15.3, 0, -10]} variant="tall" scale={1.05} />
+
+        {/* Hanging plants from the ceiling beams */}
+        <HangingPlant position={[0, H - 0.55, 6]} drop={0.85} />
+        <HangingPlant position={[7.2, H - 0.55, -6]} drop={0.7} />
+        <HangingPlant position={[-7.2, H - 0.55, 18]} drop={1.0} />
       </group>
 
       {/* Room decor + zone signs + category titles */}
@@ -375,9 +449,9 @@ function Museum() {
       })}
 
       {/* Lights */}
-      <pointLight position={[0, 5.6, HALL_Z0 + 9]} intensity={22} distance={26} color="#cfe9ff" />
-      <pointLight position={[0, 5.6, 0]} intensity={22} distance={26} color="#cfe9ff" />
-      <pointLight position={[0, 5.6, HALL_Z1 - 9]} intensity={22} distance={26} color="#cfe9ff" />
+      <pointLight position={[0, H - 1.6, HALL_Z0 + 9]} intensity={22} distance={26} color="#cfe9ff" />
+      <pointLight position={[0, H - 1.6, 0]} intensity={22} distance={26} color="#cfe9ff" />
+      <pointLight position={[0, H - 1.6, HALL_Z1 - 9]} intensity={22} distance={26} color="#cfe9ff" />
 
       {rooms.map((room) => {
         if (room.floor === "marble") return null
@@ -386,7 +460,7 @@ function Museum() {
         return (
           <pointLight
             key={`light-${room.id}`}
-            position={[cx, 5.4, cz]}
+            position={[cx, H - 1.2, cz]}
             intensity={16}
             distance={26}
             color="#cfe8ff"

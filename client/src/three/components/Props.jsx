@@ -2,16 +2,11 @@ import { Text } from "@react-three/drei"
 
 function Bench({ position, rotationY }) {
   const wood = "#2a3d5f"
-  const cushion = "#4a6382"
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
       <mesh position={[0, 0.52, 0]}>
         <boxGeometry args={[2.6, 0.12, 0.75]} />
         <meshStandardMaterial color={wood} roughness={0.5} />
-      </mesh>
-      <mesh position={[0, 0.56, 0]}>
-        <boxGeometry args={[2.6, 0.1, 0.72]} />
-        <meshStandardMaterial color={cushion} roughness={0.9} />
       </mesh>
       <mesh position={[0, 1.0, -0.3]}>
         <boxGeometry args={[2.6, 0.9, 0.1]} />
@@ -446,45 +441,40 @@ function WallSconce({ position, rotationY }) {
 
 function CCTV({ position, rotation = [0, 0, 0] }) {
   return (
-    <group position={position} rotation={rotation} scale={1.8}>
-      {/* Wall mounting base plate */}
-      <mesh position={[0, 0, -0.05]} castShadow>
-        <boxGeometry args={[0.22, 0.22, 0.05]} />
-        <meshStandardMaterial color="#0f172a" roughness={0.3} metalness={0.7} />
+    <group position={position} rotation={rotation} scale={1.6}>
+      {/* Wall corner mounting bracket (sits in the corner) */}
+      <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.1, 0.12, 0.1, 20]} />
+        <meshStandardMaterial color="#0f172a" roughness={0.35} metalness={0.75} />
       </mesh>
-      {/* Long extension arm extending forward from wall */}
-      <mesh position={[0, 0, 0.25]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-        <cylinderGeometry args={[0.04, 0.04, 0.6, 16]} />
-        <meshStandardMaterial color="#334155" roughness={0.3} metalness={0.8} />
+      {/* Short joint / neck */}
+      <mesh position={[0, 0, 0.16]}>
+        <sphereGeometry args={[0.055, 14, 14]} />
+        <meshStandardMaterial color="#1e293b" roughness={0.3} metalness={0.85} />
       </mesh>
-      {/* Joint ball / connector */}
-      <mesh position={[0, 0, 0.55]}>
-        <sphereGeometry args={[0.06, 16, 16]} />
-        <meshStandardMaterial color="#1e293b" roughness={0.2} metalness={0.9} />
-      </mesh>
-      {/* Bullet camera main body (pointing downwards and forwards) */}
-      <mesh position={[0, -0.18, 0.65]} rotation={[0.6, 0, 0]} castShadow>
-        <cylinderGeometry args={[0.09, 0.1, 0.38, 24]} />
-        <meshStandardMaterial color="#f8fafc" roughness={0.2} metalness={0.1} />
+      {/* Bullet camera main body (tilted down into the room) */}
+      <mesh position={[0, -0.16, 0.2]} rotation={[0.85, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.12, 0.13, 0.46, 24]} />
+        <meshStandardMaterial color="#f8fafc" roughness={0.25} metalness={0.15} />
       </mesh>
       {/* Camera sunshield hood */}
-      <mesh position={[0, -0.08, 0.62]} rotation={[0.6, 0, 0]}>
-        <boxGeometry args={[0.2, 0.03, 0.32]} />
-        <meshStandardMaterial color="#cbd5e1" roughness={0.4} metalness={0.3} />
+      <mesh position={[0, -0.06, 0.17]} rotation={[0.85, 0, 0]}>
+        <boxGeometry args={[0.26, 0.035, 0.4]} />
+        <meshStandardMaterial color="#94a3b8" roughness={0.4} metalness={0.4} />
       </mesh>
       {/* Camera lens bezel front */}
-      <mesh position={[0, -0.32, 0.77]} rotation={[0.6, 0, 0]}>
-        <cylinderGeometry args={[0.075, 0.075, 0.05, 20]} />
+      <mesh position={[0, -0.36, 0.38]} rotation={[0.85, 0, 0]}>
+        <cylinderGeometry args={[0.09, 0.09, 0.06, 20]} />
         <meshStandardMaterial color="#0f172a" roughness={0.1} metalness={0.9} />
       </mesh>
       {/* Glass camera lens */}
-      <mesh position={[0, -0.34, 0.78]} rotation={[0.6, 0, 0]}>
-        <cylinderGeometry args={[0.045, 0.045, 0.02, 16]} />
-        <meshStandardMaterial color="#0284c7" emissive="#38bdf8" emissiveIntensity={2.0} roughness={0.1} />
+      <mesh position={[0, -0.4, 0.4]} rotation={[0.85, 0, 0]}>
+        <cylinderGeometry args={[0.055, 0.055, 0.03, 16]} />
+        <meshStandardMaterial color="#0284c7" emissive="#38bdf8" emissiveIntensity={1.8} roughness={0.05} />
       </mesh>
       {/* Bright blinking recording LED */}
-      <mesh position={[0.06, -0.22, 0.72]}>
-        <sphereGeometry args={[0.015, 12, 12]} />
+      <mesh position={[0.075, -0.2, 0.26]}>
+        <sphereGeometry args={[0.018, 12, 12]} />
         <meshStandardMaterial color="#ef4444" emissive="#ef4444" emissiveIntensity={5} />
       </mesh>
     </group>

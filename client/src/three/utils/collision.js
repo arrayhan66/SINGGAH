@@ -1,28 +1,19 @@
 const PLAYER_RADIUS = 0.35
 const PLAYER_HEIGHT = 1.7
 
-function wallAABB(w, r) {
-  if (w.axis === "x") {
-    return {
-      minX: w.at - w.t / 2 - r,
-      maxX: w.at + w.t / 2 + r,
-      minZ: w.from - r,
-      maxZ: w.to + r,
-    }
-  }
-  return {
-    minX: w.from - r,
-    maxX: w.to + r,
-    minZ: w.at - w.t / 2 - r,
-    maxZ: w.at + w.t / 2 + r,
-  }
-}
-
-export function resolveCollision(position, walls) {
+// Resolve a circular player against a list of axis-aligned boxes.
+// Each box is { minX, maxX, minZ, maxZ } in world space (any height) and is
+// expanded by the player radius before resolving, so the push-out keeps the
+// player exactly `radius` away from the box faces.
+function resolveBoxes(position, boxes, radius) {
   const p = position.clone()
-  for (const w of walls) {
-    if (w.y0 > PLAYER_HEIGHT) continue
-    const a = wallAABB(w, PLAYER_RADIUS)
+  for (const b of boxes) {
+    const a = {
+      minX: b.minX - radius,
+      maxX: b.maxX + radius,
+      minZ: b.minZ - radius,
+      maxZ: b.maxZ + radius,
+    }
     const cx = Math.max(a.minX, Math.min(p.x, a.maxX))
     const cz = Math.max(a.minZ, Math.min(p.z, a.maxZ))
     const dx = p.x - cx
@@ -35,15 +26,43 @@ export function resolveCollision(position, walls) {
       else p.z = pushZ
       continue
     }
-    if (distSq < PLAYER_RADIUS * PLAYER_RADIUS) {
+    if (distSq < radius * radius) {
       const dist = Math.sqrt(distSq)
       const nx = dx / dist
       const nz = dz / dist
-      p.x = cx + nx * PLAYER_RADIUS
-      p.z = cz + nz * PLAYER_RADIUS
+      p.x = cx + nx * radius
+      p.z = cz + nz * radius
     }
   }
   return p
+}
+
+export function resolveCollision(position, walls) {
+  const boxes = []
+  for (const w of walls) {
+    if (w.y0 > PLAYER_HEIGHT) continue
+    if (w.axis === "x") {
+      boxes.push({
+        minX: w.at - w.t / 2,
+        maxX: w.at + w.t / 2,
+        minZ: w.from,
+        maxZ: w.to,
+      })
+    } else {
+      boxes.push({
+        minX: w.from,
+        maxX: w.to,
+        minZ: w.at - w.t / 2,
+        maxZ: w.at + w.t / 2,
+      })
+    }
+  }
+  return resolveBoxes(position, boxes, PLAYER_RADIUS)
+}
+
+// Resolve the player against arbitrary world-space AABBs (3D models).
+export function resolveAABBs(position, boxes, radius = PLAYER_RADIUS) {
+  return resolveBoxes(position, boxes, radius)
 }
 
 export function resolveObjectCollision(position, colliders) {

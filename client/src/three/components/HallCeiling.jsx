@@ -1,5 +1,24 @@
 import * as THREE from "three"
 
+function Lantern({ position, color = "#ffd98a" }) {
+  return (
+    <group position={position}>
+      <mesh position={[0, -0.1, 0]}>
+        <cylinderGeometry args={[0.012, 0.012, 0.2, 6]} />
+        <meshStandardMaterial color="#9aa7b8" metalness={0.5} roughness={0.4} />
+      </mesh>
+      <mesh position={[0, -0.28, 0]}>
+        <sphereGeometry args={[0.13, 16, 16]} />
+        <meshStandardMaterial color="#fff1d6" emissive={color} emissiveIntensity={1.8} />
+      </mesh>
+      <mesh position={[0, -0.42, 0]}>
+        <cylinderGeometry args={[0.09, 0.11, 0.045, 12]} />
+        <meshStandardMaterial color="#c9a35e" metalness={0.6} roughness={0.35} />
+      </mesh>
+    </group>
+  )
+}
+
 function HallCeiling({ room, height = 6.5 }) {
   const x0 = room.x[0]
   const x1 = room.x[1]
@@ -22,14 +41,6 @@ function HallCeiling({ room, height = 6.5 }) {
   const BEAM = "#8ea9c9"
   const BEAM_DARK = "#6e87a6"
   const TRIM = "#7dd3fc"
-
-  // Recessed LED bands running just inside the perimeter beams
-  const ledBands = [
-    { pos: [cx, H - 0.02, z0 + 1.1], size: [w - 0.6, 0.34] },
-    { pos: [cx, H - 0.02, z1 - 1.1], size: [w - 0.6, 0.34] },
-    { pos: [x0 + 1.1, H - 0.02, cz], size: [0.34, d - 0.6] },
-    { pos: [x1 - 1.1, H - 0.02, cz], size: [0.34, d - 0.6] },
-  ]
 
   const medallionRings = [
     { r: 0.85, size: 0.06 },
@@ -70,20 +81,6 @@ function HallCeiling({ room, height = 6.5 }) {
         </mesh>
       ))}
 
-      {/* Recessed LED bands around the ceiling perimeter */}
-      {ledBands.map((b, i) => (
-        <mesh key={`band-${i}`} rotation={[Math.PI / 2, 0, 0]} position={b.pos}>
-          <planeGeometry args={b.size} />
-          <meshBasicMaterial
-            color="#7dd3fc"
-            transparent
-            opacity={0.5}
-            depthWrite={false}
-            blending={THREE.AdditiveBlending}
-          />
-        </mesh>
-      ))}
-
       {/* Soft glow above the central platform */}
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, H - 0.36, 0]}>
         <circleGeometry args={[3.0, 48]} />
@@ -116,6 +113,20 @@ function HallCeiling({ room, height = 6.5 }) {
             <meshStandardMaterial color={TRIM} emissive="#38bdf8" emissiveIntensity={0.6} metalness={0.5} roughness={0.3} />
           </mesh>
         </group>
+      ))}
+
+      {/* Ceiling decorations */}
+      {[
+        [-9, 6.75],
+        [9, -6.75],
+        [9, 6.75],
+        [-9, -6.75],
+        [-9, 20.25],
+        [9, -20.25],
+        [9, 20.25],
+        [-9, -20.25],
+      ].map(([x, z], i) => (
+        <Lantern key={`lan-${i}`} position={[x, H - 0.15, z]} />
       ))}
     </group>
   )

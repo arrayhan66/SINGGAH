@@ -466,18 +466,18 @@ function bookSpineSet() {
   const h = 160
 
   const styles = [
-    { cloth: "#1e3a5f", text: "#e9d8a6", title: "SINGGAH", author: "R. A. Kartini", serif: true, classic: true },
-    { cloth: "#274b63", text: "#f1f5f9", title: "Arsip Nusantara", author: "M. Yamin", serif: true, classic: false },
-    { cloth: "#dbe7f5", text: "#274b63", title: "The Long Voyage", author: "A. Christie", serif: false, classic: false },
-    { cloth: "#2f4a6b", text: "#e9d8a6", title: "Sejarah Rakyat", author: "Pramoedya A.", serif: true, classic: true },
-    { cloth: "#eef3f9", text: "#1e3a5f", title: "Malam di Museum", author: "Soe Hok Gie", serif: false, classic: false },
-    { cloth: "#35506f", text: "#f3ecd9", title: "Catatan Timur", author: "Mochtar Lubis", serif: true, classic: true },
-    { cloth: "#5a7f9e", text: "#f8fafc", title: "Rumah & Hati", author: "Ayu Utami", serif: false, classic: false },
-    { cloth: "#93b4d4", text: "#1e3a5f", title: "Kumpulan Sajak", author: "Chairil A.", serif: true, classic: false },
-    { cloth: "#c9a35e", text: "#1e3a5f", title: "Atlas Dunia", author: "J. Verne", serif: true, classic: true },
-    { cloth: "#274b63", text: "#7dd3fc", title: "Peta & Jejak", author: "Andrea H.", serif: false, classic: false },
-    { cloth: "#3f5a7f", text: "#f3ecd9", title: "Warisan Leluhur", author: "Hamka", serif: true, classic: true },
-    { cloth: "#6f87a6", text: "#f8fafc", title: "Perjalanan", author: "Iwan S.", serif: false, classic: true },
+    { cloth: "#1e3a5f", text: "#e9d8a6", title: "Jejak Karya", serif: true, classic: true },
+    { cloth: "#274b63", text: "#f1f5f9", title: "Arsip Nusantara", serif: true, classic: false },
+    { cloth: "#dbe7f5", text: "#274b63", title: "Long Voyage", serif: false, classic: false },
+    { cloth: "#2f4a6b", text: "#e9d8a6", title: "Sejarah Rakyat", serif: true, classic: true },
+    { cloth: "#eef3f9", text: "#1e3a5f", title: "Malam Museum", serif: false, classic: false },
+    { cloth: "#35506f", text: "#f3ecd9", title: "Catatan Timur", serif: true, classic: true },
+    { cloth: "#5a7f9e", text: "#f8fafc", title: "Rumah Hati", serif: false, classic: false },
+    { cloth: "#93b4d4", text: "#1e3a5f", title: "Kumpulan Sajak", serif: true, classic: false },
+    { cloth: "#c9a35e", text: "#1e3a5f", title: "Atlas Dunia", serif: true, classic: true },
+    { cloth: "#274b63", text: "#7dd3fc", title: "Peta Jejak", serif: false, classic: false },
+    { cloth: "#3f5a7f", text: "#f3ecd9", title: "Warisan Leluhur", serif: true, classic: true },
+    { cloth: "#6f87a6", text: "#f8fafc", title: "Jalan Terang", serif: false, classic: true },
   ]
 
   const gold = "#e9d8a6"
@@ -505,37 +505,29 @@ function bookSpineSet() {
     if (s.classic) {
       ctx.strokeStyle = gold
       ctx.lineWidth = 1.5
-      for (const yy of [8, h - 12]) {
-        ctx.beginPath()
-        ctx.moveTo(w / 2 - 13, yy)
-        ctx.lineTo(w / 2 + 13, yy)
-        ctx.stroke()
-      }
+      ctx.beginPath()
+      ctx.moveTo(w / 2 - 13, 10)
+      ctx.lineTo(w / 2 + 13, 10)
+      ctx.stroke()
     }
 
     ctx.save()
-    ctx.translate(w / 2, h / 2 - 8)
+    ctx.translate(w / 2, h / 2)
     ctx.rotate(Math.PI / 2)
-    ctx.font = s.serif
-      ? "bold 12px Georgia, 'Times New Roman', serif"
-      : "bold 11px 'Arial Black', Arial, sans-serif"
+    const face = s.serif
+      ? "Georgia, 'Times New Roman', serif"
+      : "'Arial Black', Arial, sans-serif"
+    let titleSize = s.serif ? 12 : 11
+    ctx.font = `bold ${titleSize}px ${face}`
     ctx.textAlign = "center"
     ctx.textBaseline = "middle"
+    while (ctx.measureText(s.title).width > 84 && titleSize > 6) {
+      titleSize -= 0.5
+      ctx.font = `bold ${titleSize}px ${face}`
+    }
     ctx.fillStyle = s.text
     ctx.fillText(s.title, 0, 0)
     ctx.restore()
-
-    ctx.save()
-    ctx.translate(w / 2, h - 26)
-    ctx.rotate(Math.PI / 2)
-    ctx.font = s.serif ? "italic 8px Georgia, serif" : "8px Arial, sans-serif"
-    ctx.textAlign = "center"
-    ctx.textBaseline = "middle"
-    ctx.fillStyle = s.text
-    ctx.globalAlpha = 0.85
-    ctx.fillText(s.author, 0, 0)
-    ctx.restore()
-    ctx.globalAlpha = 1
 
     if (s.classic) {
       ctx.strokeStyle = gold

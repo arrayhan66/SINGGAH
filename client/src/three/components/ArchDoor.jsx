@@ -10,7 +10,7 @@ function ArchDoor({ position, rotationY, width }) {
   const hw = width / 2
 
   return (
-    <group position={position} rotation={[0, rotationY, 0]}>
+    <group position={position} rotation={[0, rotationY, 0]} userData={{ noCollide: true }}>
       {/* Flush door panel */}
       <mesh position={[0, DOOR_H / 2, FACE_Z]} castShadow>
         <boxGeometry args={[width - 0.08, DOOR_H - 0.08, DOOR_T]} />

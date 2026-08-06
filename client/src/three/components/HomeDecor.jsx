@@ -1,6 +1,8 @@
-import { useMemo } from "react"
+import { Component, Suspense, useMemo } from "react"
+import { useTexture } from "@react-three/drei"
 import * as THREE from "three"
 import { textures } from "../utils/textures"
+import { BOOK_COVER_FILES, DEFAULT_COVER_KEY } from "../utils/bookCovers"
 
 const WOOD = "#2a3d5f"
 const WOOD_DARK = "#1f2f4e"
@@ -43,27 +45,35 @@ function BookMesh({ x, y, w, h, c, tex }) {
 }
 
 function FlatStack({ x, y, z = -0.04, w = 0.24, rand }) {
-  const n = 2 + ((rand() * 2) | 0)
   const pages = textures.bookPages()
-  const boxes = []
+  const n = 2 + ((rand() * 2) | 0)
+  const books = []
   let yy = y
   for (let i = 0; i < n; i++) {
-    const h = 0.05
-    boxes.push({ x, y: yy + h / 2, w, h, c: BOOK_COLORS[(rand() * BOOK_COLORS.length) | 0] })
+    const h = 0.07 + rand() * 0.03
+    books.push({ y: yy, h, c: BOOK_COLORS[(rand() * BOOK_COLORS.length) | 0] })
     yy += h
   }
-  return boxes.map((b, i) => (
-    <group key={i} position={[b.x, b.y, z]}>
-      <mesh castShadow>
-        <boxGeometry args={[b.w, b.h, 0.2]} />
-        <meshStandardMaterial color={b.c} roughness={0.75} />
-      </mesh>
-      <mesh position={[0, 0, 0.104]}>
-        <planeGeometry args={[b.w, b.h]} />
-        <meshStandardMaterial map={pages} roughness={0.9} />
-      </mesh>
+  return (
+    <group position={[0, 0, z]}>
+      {books.map((b, i) => (
+        <group key={i} position={[x, b.y + b.h / 2, 0]}>
+          <mesh castShadow>
+            <boxGeometry args={[w, b.h, 0.2]} />
+            <meshStandardMaterial color={b.c} roughness={0.8} />
+          </mesh>
+          <mesh position={[0, 0, 0.101]}>
+            <planeGeometry args={[w, b.h]} />
+            <meshStandardMaterial map={pages} roughness={0.9} />
+          </mesh>
+          <mesh position={[0, b.h / 2 - 0.004, 0.102]}>
+            <planeGeometry args={[w, 0.008]} />
+            <meshStandardMaterial color={b.c} roughness={0.8} />
+          </mesh>
+        </group>
+      ))}
     </group>
-  ))
+  )
 }
 
 function ShelfObject({ type, x, y, z = -0.04, rand }) {
@@ -101,7 +111,7 @@ function ShelfObject({ type, x, y, z = -0.04, rand }) {
       )
     case "vase":
       return (
-        <group position={[x, y, z]}>
+        <group position={[x, y, z + 0.1]}>
           <mesh position={[0, 0.08, 0]} castShadow>
             <cylinderGeometry args={[0.06, 0.08, 0.16, 14]} />
             <meshStandardMaterial color={CYAN} roughness={0.4} />
@@ -115,14 +125,28 @@ function ShelfObject({ type, x, y, z = -0.04, rand }) {
             <meshStandardMaterial color={BRASS} metalness={0.6} roughness={0.35} />
           </mesh>
           {[
-            [0.04, 0.28, 0.01],
-            [-0.03, 0.32, -0.02],
-            [0.01, 0.26, 0.03],
+            [0.04, 0.21, 0.01],
+            [-0.03, 0.25, -0.02],
+            [0.01, 0.19, 0.03],
           ].map((p, i) => (
-            <mesh key={i} position={p} rotation={[0, 0, (i - 1) * 0.2]}>
-              <cylinderGeometry args={[0.006, 0.006, 0.12, 6]} />
-              <meshStandardMaterial color={LEAF} roughness={0.8} />
-            </mesh>
+            <group key={i} position={p} rotation={[0, 0, (i - 1) * 0.2]}>
+              <mesh position={[0, 0.03, 0]}>
+                <cylinderGeometry args={[0.005, 0.005, 0.06, 6]} />
+                <meshStandardMaterial color={LEAF_DARK} roughness={0.8} />
+              </mesh>
+              <mesh position={[0, 0.06, 0]} castShadow>
+                <sphereGeometry args={[0.045, 10, 10]} />
+                <meshStandardMaterial color={LEAF} roughness={0.85} />
+              </mesh>
+              <mesh position={[0.022, 0.05, 0.01]} castShadow>
+                <sphereGeometry args={[0.035, 10, 10]} />
+                <meshStandardMaterial color={i % 2 ? LEAF_DARK : LEAF} roughness={0.85} />
+              </mesh>
+              <mesh position={[-0.02, 0.055, -0.012]} castShadow>
+                <sphereGeometry args={[0.03, 10, 10]} />
+                <meshStandardMaterial color={LEAF_DARK} roughness={0.85} />
+              </mesh>
+            </group>
           ))}
         </group>
       )
@@ -478,17 +502,20 @@ function FloorLamp({ position, rotationY = 0 }) {
   )
 }
 
-function RealBook({ coverKey, w, d, h = 0.035, x, y, z, rot = 0 }) {
+function RealBook({ coverKey, x, y, z, rot = 0, w = 0.15, h = 0.03 }) {
   const pages = textures.bookPages()
-  const cover = textures.bookCover(coverKey)
+  const cover = useTexture(BOOK_COVER_FILES[coverKey] || BOOK_COVER_FILES[DEFAULT_COVER_KEY])
+  const img = cover.image
+  const aspect = img && img.width ? img.width / img.height : 0.66
+  const depth = w / aspect
   return (
     <group position={[x, y, z]} rotation={[0, rot, 0]}>
       <mesh castShadow>
-        <boxGeometry args={[w, h, d]} />
+        <boxGeometry args={[w, h, depth]} />
         <meshStandardMaterial map={pages} roughness={0.9} />
       </mesh>
       <mesh position={[0, h / 2 + 0.001, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[w - 0.015, d - 0.015]} />
+        <planeGeometry args={[w - 0.012, depth - 0.012]} />
         <meshStandardMaterial map={cover} roughness={0.5} />
       </mesh>
     </group>
@@ -567,7 +594,100 @@ function IcedTea({ position }) {
   )
 }
 
-function SideTable({ position, rotationY = 0, drink = "coffee", book1 = "atomic", book2 = "teras" }) {
+function GreenTea({ position }) {
+  return (
+    <group position={position}>
+      {/* Saucer */}
+      <mesh position={[0, 0.006, 0]} castShadow>
+        <cylinderGeometry args={[0.055, 0.048, 0.012, 20]} />
+        <meshStandardMaterial color="#dbe7f5" roughness={0.4} />
+      </mesh>
+      {/* Tall glass */}
+      <mesh position={[0, 0.05, 0]} castShadow>
+        <cylinderGeometry args={[0.035, 0.027, 0.09, 20]} />
+        <meshStandardMaterial color="#e0f2fe" transparent opacity={0.4} roughness={0.1} />
+      </mesh>
+      {/* Green tea liquid */}
+      <mesh position={[0, 0.05, 0]}>
+        <cylinderGeometry args={[0.031, 0.024, 0.072, 16]} />
+        <meshStandardMaterial color="#7fb069" transparent opacity={0.85} roughness={0.2} />
+      </mesh>
+      {/* Teabag string */}
+      <mesh position={[-0.028, 0.1, 0.01]} rotation={[0, 0, 0.35]}>
+        <cylinderGeometry args={[0.003, 0.003, 0.09, 6]} />
+        <meshStandardMaterial color="#d9c9a3" roughness={0.6} />
+      </mesh>
+      {/* Teabag tag */}
+      <mesh position={[-0.042, 0.125, 0.005]} rotation={[0, 0, 0.2]}>
+        <boxGeometry args={[0.02, 0.026, 0.004]} />
+        <meshStandardMaterial color="#f3ecd9" roughness={0.6} />
+      </mesh>
+      {/* Steam */}
+      <mesh position={[0, 0.12, 0]}>
+        <sphereGeometry args={[0.009, 6, 6]} />
+        <meshStandardMaterial color="#ffffff" transparent opacity={0.4} />
+      </mesh>
+      <mesh position={[-0.012, 0.14, 0.012]}>
+        <sphereGeometry args={[0.006, 6, 6]} />
+        <meshStandardMaterial color="#ffffff" transparent opacity={0.28} />
+      </mesh>
+    </group>
+  )
+}
+
+function Mixue({ position }) {
+  return (
+    <group position={position}>
+      {/* Coaster */}
+      <mesh position={[0, 0.005, 0]} castShadow>
+        <cylinderGeometry args={[0.06, 0.055, 0.01, 20]} />
+        <meshStandardMaterial color="#8a5a2b" roughness={0.5} />
+      </mesh>
+      {/* Clear cup */}
+      <mesh position={[0, 0.07, 0]} castShadow>
+        <cylinderGeometry args={[0.032, 0.024, 0.13, 20]} />
+        <meshStandardMaterial color="#f8fafc" transparent opacity={0.6} roughness={0.15} />
+      </mesh>
+      {/* Milk tea liquid */}
+      <mesh position={[0, 0.07, 0]}>
+        <cylinderGeometry args={[0.03, 0.022, 0.112, 16]} />
+        <meshStandardMaterial color="#d9b38c" transparent opacity={0.9} roughness={0.2} />
+      </mesh>
+      {/* Boba pearls at the bottom */}
+      {[
+        [0.012, 0.02, 0.006],
+        [-0.011, 0.024, -0.008],
+        [0, 0.016, 0.011],
+        [0.009, 0.014, -0.012],
+        [-0.004, 0.012, 0.006],
+      ].map((p, i) => (
+        <mesh key={i} position={p}>
+          <sphereGeometry args={[0.0055, 8, 8]} />
+          <meshStandardMaterial color="#2b1810" roughness={0.6} />
+        </mesh>
+      ))}
+      {/* Dome lid */}
+      <mesh position={[0, 0.14, 0]} scale={[1, 0.45, 1]}>
+        <sphereGeometry args={[0.032, 16, 8]} />
+        <meshStandardMaterial color="#f1f5f9" roughness={0.3} side={THREE.DoubleSide} />
+      </mesh>
+      {/* Wide straw */}
+      <mesh position={[0.015, 0.1, 0.015]} rotation={[0.15, 0, -0.1]}>
+        <cylinderGeometry args={[0.006, 0.006, 0.17, 10]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.3} />
+      </mesh>
+    </group>
+  )
+}
+
+const DRINK_RENDER = {
+  coffee: Mug,
+  icedTea: IcedTea,
+  greenTea: GreenTea,
+  mixue: Mixue,
+}
+
+function SideTable({ position, rotationY = 0, drink = "coffee", book1 = "atomic", book2 = "teras", drinks }) {
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
       <mesh position={[0, 0.03, 0]} castShadow>
@@ -582,9 +702,23 @@ function SideTable({ position, rotationY = 0, drink = "coffee", book1 = "atomic"
         <cylinderGeometry args={[0.42, 0.42, 0.06, 24]} />
         <meshStandardMaterial color={WOOD} roughness={0.55} />
       </mesh>
-      <RealBook coverKey={book1} w={0.25} d={0.18} h={0.032} x={0.14} y={0.626} z={0.08} rot={0.15} />
-      <RealBook coverKey={book2} w={0.22} d={0.15} h={0.028} x={-0.14} y={0.624} z={-0.08} rot={-0.25} />
-      {drink === "icedTea" ? <IcedTea position={[-0.22, 0.61, 0.14]} /> : <Mug position={[-0.22, 0.61, 0.14]} />}
+      {drinks && drinks.length ? (
+        <>
+          {drinks.map((d, i) => {
+            const Comp = DRINK_RENDER[d] || Mug
+            return <Comp key={i} position={[i === 1 ? 0 : i === 0 ? -0.17 : 0.17, 0.61, -0.04]} />
+          })}
+          <RealBook coverKey={book1} w={0.16} x={0.2} y={0.624} z={-0.22} rot={0.15} />
+          <RealBook coverKey={book2} w={0.14} x={-0.2} y={0.622} z={-0.22} rot={-0.15} />
+        </>
+      ) : (
+        <>
+          <RealBook coverKey={book1} w={0.16} x={0.14} y={0.626} z={0.08} rot={0.15} />
+          <RealBook coverKey={book2} w={0.14} x={-0.14} y={0.624} z={-0.08} rot={-0.25} />
+          {drink === "icedTea" ? <IcedTea position={[-0.22, 0.61, 0.14]} /> : <Mug position={[-0.22, 0.61, 0.14]} />}
+          {drink === "icedTea" ? <IcedTea position={[-0.22, 0.61, 0.14]} /> : <Mug position={[-0.22, 0.61, 0.14]} />}
+        </>
+      )}
     </group>
   )
 }
@@ -773,50 +907,144 @@ function Television({ position, rotationY = 0, scale = 1, width = 3.2, height = 
   )
 }
 
-function HangingPlant({ position, drop = 0.85 }) {
+function Flower({ position = [0, 0, 0], rotation = [0, 0, 0], color = "#38bdf8", size = 1 }) {
+  const petalLen = 0.15 * size
+  const petals = Array.from({ length: 6 }).map((_, i) => {
+    const a = (i / 6) * Math.PI * 2
+    return (
+      <group
+        key={i}
+        position={[Math.cos(a) * petalLen * 0.45, Math.sin(a) * petalLen * 0.45, 0]}
+        rotation={[0, 0, a]}
+      >
+        <mesh scale={[1, 0.5, 0.3]} castShadow>
+          <sphereGeometry args={[petalLen * 0.5, 10, 8]} />
+          <meshStandardMaterial color={color} roughness={0.45} />
+        </mesh>
+      </group>
+    )
+  })
+  return (
+    <group position={position} rotation={rotation}>
+      <group rotation={[-Math.PI / 2, 0, 0]}>
+        {petals}
+        <mesh position={[0, 0, 0.012]}>
+          <sphereGeometry args={[0.055 * size, 12, 10]} />
+          <meshStandardMaterial
+            color="#fde047"
+            emissive="#facc15"
+            emissiveIntensity={0.45}
+            roughness={0.4}
+          />
+        </mesh>
+      </group>
+    </group>
+  )
+}
+
+function HangingPlant({ position, drop = 0.85, seed = 0 }) {
+  const rand = useMemo(() => {
+    const s =
+      seed ||
+      Math.round((position[0] + 3) * 31 + (position[2] + 3) * 17 + drop * 100) + 7
+    return mulberry32(s >>> 0)
+  }, [seed, position, drop])
+
+  const potR = 0.18
+  const potTop = -drop - 0.1
+
+  const ropeStrands = [
+    { p: [0.005, 0, 0], r: 0.1 },
+    { p: [-0.005, 0, 0], r: -0.12 },
+    { p: [0, 0, 0.005], r: 0.07 },
+    { p: [0, 0, -0.005], r: -0.09 },
+  ]
+
+  // Big blue blossoms bursting out of the pot — the star of the hanging plant
+  const flowerColors = ["#7dd3fc", "#38bdf8", "#0ea5e9", "#93c5fd"]
+  const flowers = Array.from({ length: 12 }).map((_, i) => {
+    const a = rand() * Math.PI * 2
+    const r = potR * (0.1 + rand() * 0.75)
+    const y = -drop - 0.05 + rand() * 0.34
+    const col = flowerColors[(rand() * flowerColors.length) | 0]
+    return (
+      <Flower
+        key={`f-${i}`}
+        position={[Math.cos(a) * r, y, Math.sin(a) * r]}
+        rotation={[(rand() - 0.5) * 0.9, rand() * Math.PI, (rand() - 0.5) * 0.9]}
+        color={col}
+        size={1.5 + rand() * 0.7}
+      />
+    )
+  })
+
+  // Trailing vines cascading below the pot with blossoms at the tips
+  const vines = Array.from({ length: 5 }).map((_, vi) => {
+    const a = rand() * Math.PI * 2
+    const vlen = 0.45 + rand() * 0.55
+    const baseX = Math.cos(a) * potR * 0.8
+    const baseZ = Math.sin(a) * potR * 0.8
+    return (
+      <group key={`v-${vi}`}>
+        <mesh
+          position={[baseX, potTop - (vlen * 0.6) / 2, baseZ]}
+          rotation={[vlen > 0.7 ? 0.4 : 0.25, a, 0]}
+        >
+          <cylinderGeometry args={[0.007, 0.013, vlen * 0.6, 6]} />
+          <meshStandardMaterial color={LEAF_DARK} roughness={0.9} />
+        </mesh>
+        <Flower
+          position={[
+            baseX + Math.cos(a + 0.9) * 0.04,
+            potTop - vlen * 0.58,
+            baseZ + Math.sin(a + 0.9) * 0.04,
+          ]}
+          rotation={[0.8, a, 0.3]}
+          color={flowerColors[(rand() * flowerColors.length) | 0]}
+          size={0.9 + rand() * 0.4}
+        />
+      </group>
+    )
+  })
+
   return (
     <group position={position}>
-      <mesh position={[0, -drop / 2, 0]}>
-        <cylinderGeometry args={[0.014, 0.014, drop, 8]} />
-        <meshStandardMaterial color="#9aa7b8" roughness={0.4} metalness={0.5} />
+      {/* Hook loop */}
+      <mesh position={[0, 0.02, 0]}>
+        <torusGeometry args={[0.032, 0.008, 8, 20]} />
+        <meshStandardMaterial color="#9aa7b8" metalness={0.6} roughness={0.4} />
       </mesh>
-      <mesh position={[0, -drop - 0.1, 0]} castShadow>
-        <cylinderGeometry args={[0.17, 0.12, 0.22, 14]} />
-        <meshStandardMaterial color={CYAN} roughness={0.5} />
-      </mesh>
-      {[
-        [0, -drop - 0.16, 0],
-        [0.1, -drop - 0.22, 0.05],
-        [-0.09, -drop - 0.2, -0.04],
-        [0.02, -drop - 0.26, 0.06],
-      ].map((p, i) => (
-        <mesh key={i} position={p}>
-          <sphereGeometry args={[0.13, 10, 10]} />
-          <meshStandardMaterial color={i === 1 ? LEAF_DARK : LEAF} roughness={0.85} />
+
+      {/* Twisted rope */}
+      {ropeStrands.map((s, i) => (
+        <mesh key={i} position={[s.p[0], -drop / 2 + 0.03, s.p[2]]} rotation={[0, 0, s.r]}>
+          <cylinderGeometry args={[0.005, 0.005, drop - 0.06, 6]} />
+          <meshStandardMaterial color="#b9a98c" roughness={0.9} />
         </mesh>
       ))}
-      {[
-        [-0.12, 0.3],
-        [0.1, 0.2],
-        [-0.02, 0.5],
-      ].map(([vx, vlen], i) => (
-        <group
-          key={i}
-          position={[vx, 0, i === 2 ? 0.06 : -0.02]}
-          rotation={[0.25 + i * 0.1, 0, i % 2 ? 0.2 : -0.25]}
-        >
-          <mesh position={[0, -vlen / 2, 0]}>
-            <cylinderGeometry args={[0.012, 0.012, vlen, 6]} />
-            <meshStandardMaterial color={LEAF_DARK} roughness={0.8} />
-          </mesh>
-          {[0.35, 0.65].map((t, j) => (
-            <mesh key={j} position={[t > 0.5 ? 0.03 : -0.03, -vlen * t, 0]}>
-              <sphereGeometry args={[0.035, 8, 8]} />
-              <meshStandardMaterial color={LEAF} roughness={0.85} />
-            </mesh>
-          ))}
-        </group>
-      ))}
+
+      {/* Ceramic pot with rim */}
+      <mesh position={[0, potTop + 0.05, 0]} castShadow>
+        <cylinderGeometry args={[0.12, 0.16, 0.2, 16]} />
+        <meshStandardMaterial color={CYAN} roughness={0.4} />
+      </mesh>
+      <mesh position={[0, potTop + 0.165, 0]}>
+        <cylinderGeometry args={[0.175, 0.175, 0.03, 16]} />
+        <meshStandardMaterial color={CYAN} roughness={0.35} />
+      </mesh>
+      <mesh position={[0, potTop + 0.02, 0]}>
+        <cylinderGeometry args={[0.09, 0.12, 0.04, 14]} />
+        <meshStandardMaterial color="#2f5a4a" roughness={0.6} />
+      </mesh>
+
+      {/* Soil */}
+      <mesh position={[0, potTop + 0.15, 0]}>
+        <cylinderGeometry args={[0.14, 0.14, 0.015, 16]} />
+        <meshStandardMaterial color="#3b2a1a" roughness={1} />
+      </mesh>
+
+      {flowers}
+      {vines}
     </group>
   )
 }
@@ -841,6 +1069,99 @@ function RoundRug({ position, radius = 1.3, map }) {
   )
 }
 
+const PORTRAIT_W = 1.3
+const PORTRAIT_H = 1.7
+
+function PortraitFallback() {
+  const map = useMemo(() => {
+    const c = document.createElement("canvas")
+    c.width = 512
+    c.height = Math.round((512 * PORTRAIT_H) / PORTRAIT_W)
+    const ctx = c.getContext("2d")
+    ctx.fillStyle = "#0f2239"
+    ctx.fillRect(0, 0, c.width, c.height)
+    ctx.fillStyle = "#1e3a5f"
+    ctx.beginPath()
+    ctx.arc(c.width / 2, c.height * 0.34, c.width * 0.16, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.beginPath()
+    ctx.ellipse(c.width / 2, c.height * 0.72, c.width * 0.28, c.height * 0.14, 0, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = "rgba(186,230,253,0.6)"
+    ctx.font = `bold ${Math.round(c.width * 0.055)}px Georgia, serif`
+    ctx.textAlign = "center"
+    ctx.fillText("FOTO RESMI", c.width / 2, c.height * 0.94)
+    const t = new THREE.CanvasTexture(c)
+    t.colorSpace = THREE.SRGBColorSpace
+    t.anisotropy = 8
+    return t
+  }, [])
+  return (
+    <mesh position={[0, 0, 0.055]}>
+      <planeGeometry args={[PORTRAIT_W - 0.12, PORTRAIT_H - 0.12]} />
+      <meshStandardMaterial map={map} roughness={0.9} />
+    </mesh>
+  )
+}
+
+class PortraitImageBoundary extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { failed: false }
+  }
+  static getDerivedStateFromError() {
+    return { failed: true }
+  }
+  render() {
+    if (this.state.failed) return <PortraitFallback />
+    return this.props.children
+  }
+}
+
+function PortraitPhoto({ image }) {
+  const tex = useTexture(image)
+  const img = useMemo(() => {
+    const t = tex.clone()
+    t.colorSpace = THREE.SRGBColorSpace
+    t.anisotropy = 8
+    return t
+  }, [tex])
+  return (
+    <mesh position={[0, 0, 0.055]}>
+      <planeGeometry args={[PORTRAIT_W - 0.12, PORTRAIT_H - 0.12]} />
+      <meshStandardMaterial map={img} color="#eaf3fc" roughness={0.85} />
+    </mesh>
+  )
+}
+
+function PresidentPortrait({ position, rotationY = 0, image }) {
+  return (
+    <group position={position} rotation={[0, rotationY, 0]}>
+      {/* Brass frame */}
+      <mesh position={[0, 0, -0.02]} castShadow>
+        <boxGeometry args={[PORTRAIT_W + 0.16, PORTRAIT_H + 0.16, 0.04]} />
+        <meshStandardMaterial color={BRASS} metalness={0.6} roughness={0.35} />
+      </mesh>
+      {/* White mat */}
+      <mesh position={[0, 0, 0.02]}>
+        <planeGeometry args={[PORTRAIT_W + 0.02, PORTRAIT_H + 0.02]} />
+        <meshStandardMaterial color="#eef3f9" roughness={0.85} />
+      </mesh>
+      {/* Photo */}
+      <Suspense fallback={<PortraitFallback />}>
+        <PortraitImageBoundary>
+          <PortraitPhoto image={image} />
+        </PortraitImageBoundary>
+      </Suspense>
+      {/* Glass gloss */}
+      <mesh position={[0, 0, 0.08]}>
+        <planeGeometry args={[PORTRAIT_W - 0.12, PORTRAIT_H - 0.12]} />
+        <meshStandardMaterial color="#ffffff" transparent opacity={0.08} roughness={0.1} />
+      </mesh>
+    </group>
+  )
+}
+
 export {
   Console,
   Bookcase,
@@ -855,4 +1176,9 @@ export {
   HangingPlant,
   RectRug,
   RoundRug,
+  RealBook,
+  Mug,
+  GreenTea,
+  Mixue,
+  PresidentPortrait,
 }

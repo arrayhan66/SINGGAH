@@ -6,6 +6,7 @@ import VirtualExhibition from "../../three/scenes/VirtualExhibition"
 import ProjectDetailModal from "../../components/hall/ProjectDetailModal"
 import LoadingOverlay from "../../components/hall/LoadingOverlay"
 import PortalTransitionOverlay from "../../components/hall/PortalTransitionOverlay"
+import CanvasErrorBoundary from "../../components/hall/CanvasErrorBoundary"
 
 function Hall() {
   const navigate = useNavigate()
@@ -15,20 +16,22 @@ function Hall() {
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-[#0b1220] text-white select-none">
       {/* 3D Scene */}
-      <Canvas
-        shadows
-        dpr={[1, 1.5]}
-        camera={{ position: [0, 1.7, 0], fov: 70, near: 0.1, far: 220 }}
-        className="!absolute !inset-0"
-      >
-        <color attach="background" args={["#0b1220"]} />
-        <Suspense fallback={null}>
-          <VirtualExhibition onArea={setArea} onSelectProject={setSelectedProject} />
-        </Suspense>
-      </Canvas>
+      <CanvasErrorBoundary>
+        <Canvas
+          shadows
+          dpr={[1, 1.5]}
+          camera={{ position: [0, 1.7, 0], fov: 70, near: 0.1, far: 220 }}
+          className="!absolute !inset-0"
+        >
+          <color attach="background" args={["#0b1220"]} />
+          <Suspense fallback={null}>
+            <VirtualExhibition onArea={setArea} onSelectProject={setSelectedProject} />
+          </Suspense>
+        </Canvas>
+      </CanvasErrorBoundary>
 
       {/* HUD Top Bar */}
-      <header className="absolute top-0 left-0 right-0 z-20 flex items-start justify-between pl-16 md:pl-24 lg:pl-28 py-4 pr-4 md:pr-6 pointer-events-none">
+      <header className="absolute top-0 left-0 right-0 z-20 flex items-start justify-between pl-4 py-4 pr-4 md:pr-6 pointer-events-none">
         <div className="pointer-events-auto flex flex-col items-start gap-2">
           <div className="flex items-center space-x-3 rounded-2xl border border-[#223047] bg-black/50 px-4 py-2.5 backdrop-blur-md shadow-xl">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#1d4ed8] to-[#38bdf8] flex items-center justify-center shadow-lg shadow-blue-900/40">
@@ -47,13 +50,13 @@ function Hall() {
 
           <button
             onClick={() => navigate("/")}
-            className="group flex items-center gap-2 rounded-2xl border border-[#223047] bg-black/50 px-3.5 py-2.5 backdrop-blur-md shadow-xl transition-all duration-300 hover:border-cyan-400/50 hover:bg-cyan-400/10 hover:shadow-cyan-500/20 active:scale-95 cursor-pointer"
+            className="group flex items-center gap-2.5 rounded-2xl border border-[#223047] bg-black/50 px-4 py-2.5 backdrop-blur-md shadow-xl transition-all duration-300 hover:border-white/25 hover:bg-white/[0.06] hover:shadow-[0_8px_25px_-8px_rgba(255,255,255,0.25)] hover:scale-[1.03] active:scale-95 cursor-pointer"
             aria-label="Kembali ke Beranda"
           >
-            <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-cyan-400/10 transition-colors duration-300 group-hover:bg-cyan-400/20">
-              <ArrowLeft className="w-4 h-4 text-[#38bdf8] transition-transform duration-300 group-hover:-translate-x-0.5" />
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/[0.06] transition-colors duration-300 group-hover:bg-white/15">
+              <ArrowLeft className="w-4 h-4 text-[#93b4d4] transition-all duration-300 group-hover:-translate-x-1 group-hover:text-white" />
             </span>
-            <span className="text-xs font-semibold text-[#93b4d4] transition-colors duration-300 group-hover:text-cyan-300">
+            <span className="text-xs font-semibold text-[#93b4d4] transition-colors duration-300 group-hover:text-white">
               Kembali
             </span>
           </button>

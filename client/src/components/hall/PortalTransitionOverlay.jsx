@@ -1,39 +1,42 @@
 import { useEffect, useState } from "react"
 import { useTransitionStore } from "../../three/hooks/useTransition"
 
+const MIN_DURATION = 1500
+
 function PortalTransitionOverlay() {
   const active = useTransitionStore((s) => s.active)
   const message = useTransitionStore((s) => s.message)
   const runId = useTransitionStore((s) => s.runId)
-  const [progress, setProgress] = useState(0)
+  const startedAt = useTransitionStore((s) => s.startedAt)
+  const [display, setDisplay] = useState(0)
   const [lastRun, setLastRun] = useState(runId)
 
   if (runId !== lastRun) {
     setLastRun(runId)
-    setProgress(0)
+    setDisplay(0)
   }
 
   useEffect(() => {
     if (!active) return
-    const duration = 950
-    const started = Date.now()
     const id = setInterval(() => {
-      const p = Math.min(100, Math.round(((Date.now() - started) / duration) * 100))
-      setProgress(p)
-      if (p >= 100) clearInterval(id)
-    }, 60)
+      setDisplay(Math.min(100, Math.round(((Date.now() - startedAt) / MIN_DURATION) * 100)))
+    }, 30)
     return () => clearInterval(id)
-  }, [active, runId])
+  }, [active, startedAt, runId])
 
   return (
     <div
-      className={`fixed inset-0 z-40 flex flex-col items-center justify-center gap-6 bg-[#0b1220]/95 backdrop-blur-sm transition-opacity duration-300 ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-[#0b1220] transition-opacity duration-700 ${
         active ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
     >
-      <div className="flex items-center gap-3">
-        <div className="h-3 w-3 animate-spin rounded-full border-2 border-[#38bdf8] border-t-transparent" />
-        <div className="text-xl md:text-2xl font-extrabold tracking-wide text-[#7dd3fc]">
+      <div className="flex items-center gap-4">
+        <div className="relative flex h-12 w-12 items-center justify-center">
+          <div className="absolute h-full w-full rounded-full bg-cyan-400/10 blur-xl" />
+          <div className="absolute h-12 w-12 animate-ping rounded-full border-2 border-cyan-400/30" />
+          <div className="absolute h-8 w-8 animate-spin rounded-full border-2 border-transparent border-t-cyan-400 border-r-cyan-400/50 [animation-duration:1.2s]" />
+        </div>
+        <div className="text-3xl md:text-4xl font-extrabold tracking-wide text-[#7dd3fc]">
           SINGGAH
         </div>
       </div>
@@ -41,10 +44,10 @@ function PortalTransitionOverlay() {
       <div className="w-56 h-1.5 rounded-full bg-[#1e3a5f] overflow-hidden">
         <div
           className="h-full rounded-full bg-gradient-to-r from-[#1d4ed8] to-[#38bdf8] transition-all duration-150"
-          style={{ width: `${progress}%` }}
+          style={{ width: `${display}%` }}
         />
       </div>
-      <div className="text-xs text-[#5b7ba0]">{progress}%</div>
+      <div className="text-xs text-[#5b7ba0]">{display}%</div>
     </div>
   )
 }

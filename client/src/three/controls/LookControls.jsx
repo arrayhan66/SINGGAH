@@ -4,8 +4,9 @@ import * as THREE from "three"
 import { useWalkStore, EYE } from "../hooks/useWalk"
 import { useTransitionStore } from "../hooks/useTransition"
 import { getWalls, portals, findRoom } from "../rooms/museumLayout"
-import { resolveCollision, resolveObjectCollision } from "../utils/collision"
+import { resolveCollision, resolveObjectCollision, resolveAABBs } from "../utils/collision"
 import { getObjectColliders } from "../utils/objectColliders"
+import { getCollidableAABBs } from "../utils/sceneColliders"
 
 const SPEED = 6
 const DRAG_THRESHOLD = 6
@@ -35,6 +36,8 @@ function LookControls({ bounds, onSelectProject }) {
   const mouse = useRef(new THREE.Vector2())
   const euler = useRef(new THREE.Euler(0, 0, 0, "YXZ"))
   const stuckRef = useRef(0)
+  const modelCollidersRef = useRef([])
+  const modelColliderBuilt = useRef(false)
 
   const handleAction = (action, point) => {
     if (action.type === "floor") {
@@ -52,7 +55,7 @@ function LookControls({ bounds, onSelectProject }) {
     const room = findRoom(point.x, point.z)
     const message =
       room?.id === "hall"
-        ? "KEMBALI KE HALL UTAMA"
+        ? "MEMPERSIAPKAN VIRTUAL HALL"
         : `MEMASUKI ${room.label.split(" — ")[0]}`
     useTransitionStore.getState().start(message)
     useWalkStore.setState({ position: point.clone(), yaw, target: null })
@@ -88,8 +91,12 @@ function LookControls({ bounds, onSelectProject }) {
     return { position: tp.point, teleported: true }
   }
 
-  const resolveAll = (pos) =>
-    resolveObjectCollision(resolveCollision(pos, wallsRef.current), getObjectColliders())
+  const resolveAll = (pos) => {
+    let p = resolveCollision(pos, wallsRef.current)
+    p = resolveObjectCollision(p, getObjectColliders())
+    p = resolveAABBs(p, modelCollidersRef.current)
+    return resolveCollision(p, wallsRef.current)
+  }
 
   useEffect(() => {
     const el = gl.domElement
@@ -164,7 +171,25 @@ function LookControls({ bounds, onSelectProject }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
+    // Build the model collider cache once the scene is fully mounted, then
+    // rebuild once more shortly after (catches late-mounted props / textures).
+    if (!modelColliderBuilt.current) {
+      modelCollidersRef.current = getCollidableAABBs(scene)
+      modelColliderBuilt.current = 1
+    } else if (modelColliderBuilt.current === 1 && state.clock.elapsedTime > 1.5) {
+      modelCollidersRef.current = getCollidableAABBs(scene)
+      modelColliderBuilt.current = 2
+    }
+
+    if (useTransitionStore.getState().active) {
+      const cur = useWalkStore.getState()
+      camera.position.set(cur.position.x, EYE, cur.position.z)
+      euler.current.set(cur.pitch, cur.yaw, 0)
+      camera.quaternion.setFromEuler(euler.current)
+      return
+    }
+
     const store = useWalkStore.getState()
     const keys = keysRef.current
     const pos = store.position.clone()

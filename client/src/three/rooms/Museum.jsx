@@ -9,7 +9,9 @@ import Portal from "../components/Portal"
 import Centerpiece from "../components/Centerpiece"
 import MuseumBarrier from "../components/MuseumBarrier"
 import LoungeSeating from "../components/LoungeSeating"
+import BenchNook from "../components/BenchNook"
 import HallCeiling from "../components/HallCeiling"
+import WallGuard from "../components/WallGuard"
 import {
   Console,
   Bookcase,
@@ -22,8 +24,11 @@ import {
   HangingPlant,
   RectRug,
   RoundRug,
+  PresidentPortrait,
 } from "../components/HomeDecor"
-import { Bench, Pedestal, Plant, Chandelier, InfoKiosk, WallSconce, CCTV } from "../components/Props"
+import prabowoImg from "../../assets/images/prabowo.png"
+import gibranImg from "../../assets/images/gibran.png"
+import { Pedestal, Plant, Chandelier, InfoKiosk, WallSconce, CCTV } from "../components/Props"
 import {
   rooms,
   getWalls,
@@ -354,11 +359,11 @@ function Museum() {
           <Pillar key={i} position={p.position} />
         ))}
 
-        {/* Benches in the four corners, angled toward the hall centre */}
-        <Bench position={[-12, 0, -25]} rotationY={0.45} />
-        <Bench position={[12, 0, -25]} rotationY={-0.45} />
-        <Bench position={[-12, 0, 25]} rotationY={Math.PI - 0.45} />
-        <Bench position={[12, 0, 25]} rotationY={-Math.PI + 0.45} />
+        {/* Corner benches — all four corners get the cozy + holo reading nook */}
+        <BenchNook position={[-12, 0, -25]} rotationY={0.45} side="left" set="A" />
+        <BenchNook position={[12, 0, -25]} rotationY={-0.45} side="right" set="B" />
+        <BenchNook position={[-12, 0, 25]} rotationY={Math.PI - 0.45} side="left" set="C" />
+        <BenchNook position={[12, 0, 25]} rotationY={-Math.PI + 0.45} side="right" set="D" />
 
         {/* Struktur pot: dinding samping bunga saja, samping tiang pot daun tinggi */}
         {/* Dinding kiri (x=-17.4) — bunga saja */}
@@ -387,10 +392,10 @@ function Museum() {
         ))}
 
         {/* CCTV cameras in every corner of the main hall */}
-        <CCTV position={[-16.8, H - 0.9, -25.6]} rotation={[0.35, Math.PI / 4, 0]} />
-        <CCTV position={[16.8, H - 0.9, -25.6]} rotation={[0.35, -Math.PI / 4, 0]} />
-        <CCTV position={[-16.8, H - 0.9, 25.6]} rotation={[0.35, (3 * Math.PI) / 4, 0]} />
-        <CCTV position={[16.8, H - 0.9, 25.6]} rotation={[0.35, -(3 * Math.PI) / 4, 0]} />
+        <CCTV position={[-17.75, H - 0.9, -26.75]} rotation={[0, Math.PI / 4, 0]} />
+        <CCTV position={[17.75, H - 0.9, -26.75]} rotation={[0, -Math.PI / 4, 0]} />
+        <CCTV position={[-17.75, H - 0.9, 26.75]} rotation={[0, (3 * Math.PI) / 4, 0]} />
+        <CCTV position={[17.75, H - 0.9, 26.75]} rotation={[0, -(3 * Math.PI) / 4, 0]} />
 
         {/* ==== Homey decor ==== */}
         {/* Front wall: runner rug + console + windows + clock + gallery */}
@@ -400,38 +405,73 @@ function Museum() {
         <WindowCurtains position={[-7, 2.4, 26.7]} rotationY={Math.PI} />
         <WindowCurtains position={[7, 2.4, 26.7]} rotationY={Math.PI} />
         <WallClock position={[0, 5.6, 26.55]} rotationY={Math.PI} scale={1.6} />
+        {/* Potret presiden & wapres di samping jam (kiri = prabowo, kanan = gibran) */}
+        <PresidentPortrait position={[2.2, 5.6, 26.55]} rotationY={Math.PI} image={prabowoImg} />
+        <PresidentPortrait position={[-2.2, 5.6, 26.55]} rotationY={Math.PI} image={gibranImg} />
 
         {/* Back wall: a row of 8 bookcases centered under the banner */}
         {[-7.35, -5.25, -3.15, -1.05, 1.05, 3.15, 5.25, 7.35].map((x, i) => (
           <Bookcase key={`bc-${i}`} position={[x, 0, -26.55]} variant={i} />
         ))}
 
+        {/* Back wall: windows beside the bookcases, above the benches */}
+        <WindowCurtains position={[-12, 2.4, -26.55]} rotationY={0} />
+        <WindowCurtains position={[12, 2.4, -26.55]} rotationY={0} />
+
         {/* Reading nook (right, between pillar and wall) */}
         <RoundRug position={[15.2, 0.015, 9.2]} radius={1.35} map={rugMap} />
-        <Armchair position={[15.0, 0, 9.4]} rotationY={-2.1} />
+        <Armchair position={[15.0, 0, 9.4]} rotationY={-1.89} />
         <FloorLamp position={[16.35, 0, 9.0]} rotationY={-1.1} />
-        <SideTable position={[13.8, 0, 9.0]} rotationY={1.9} />
+        <SideTable
+          position={[13.4, 0, 9.0]}
+          rotationY={1.9}
+          book1="gahzi"
+          book2="gadisjalanan"
+        />
 
         {/* Reading nook (left, mirror of right with Es Teh & Tech books) */}
         <RoundRug position={[-15.2, 0.015, 9.2]} radius={1.35} map={rugMap} />
-        <Armchair position={[-15.0, 0, 9.4]} rotationY={2.1} />
+        <Armchair position={[-15.0, 0, 9.4]} rotationY={1.89} />
         <FloorLamp position={[-16.35, 0, 9.0]} rotationY={1.1} />
         <SideTable
-          position={[-13.8, 0, 9.0]}
+          position={[-13.4, 0, 9.0]}
           rotationY={-1.9}
           drink="icedTea"
-          book1="golang"
-          book2="fullstack"
+          book1="laskar"
+          book2="tanahjawa"
         />
 
-        {/* Left accent (asymmetric on purpose) */}
-        <FloorLamp position={[-14.9, 0, -15]} rotationY={0.9} />
-        <Plant position={[-15.3, 0, -10]} variant="tall" scale={1.05} />
+        {/* Reading nook (right, near pillar z=-12) */}
+        <RoundRug position={[15.2, 0.015, -9.2]} radius={1.35} map={rugMap} />
+        <Armchair position={[15.0, 0, -9.4]} rotationY={-1.25} />
+        <FloorLamp position={[16.35, 0, -9.0]} rotationY={1.1} />
+        <SideTable position={[13.4, 0, -9.0]} rotationY={-1.9} book1="makanyamikir" book2="khilafah" />
+
+        {/* Reading nook (left, mirror with Es Teh & Tech books) */}
+        <RoundRug position={[-15.2, 0.015, -9.2]} radius={1.35} map={rugMap} />
+        <Armchair position={[-15.0, 0, -9.4]} rotationY={1.25} />
+        <FloorLamp position={[-16.35, 0, -9.0]} rotationY={-1.1} />
+        <SideTable
+          position={[-13.4, 0, -9.0]}
+          rotationY={1.9}
+          drink="icedTea"
+          book1="ananda"
+          book2="putusin"
+        />
 
         {/* Hanging plants from the ceiling beams */}
         <HangingPlant position={[0, H - 0.55, 6]} drop={0.85} />
         <HangingPlant position={[7.2, H - 0.55, -6]} drop={0.7} />
         <HangingPlant position={[-7.2, H - 0.55, 18]} drop={1.0} />
+
+        {/* Hanging plants in the four hall corners */}
+        <HangingPlant position={[14.5, H - 0.55, 22.5]} drop={0.8} />
+        <HangingPlant position={[-14.5, H - 0.55, 22.5]} drop={0.7} />
+        <HangingPlant position={[14.5, H - 0.55, -22.5]} drop={0.9} />
+        <HangingPlant position={[-14.5, H - 0.55, -22.5]} drop={0.75} />
+
+        {/* Transparent guard tracing the hall walls (visual boundary, no collision) */}
+        <WallGuard />
       </group>
 
       {/* Room decor + zone signs + category titles */}

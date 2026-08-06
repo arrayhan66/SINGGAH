@@ -43,6 +43,18 @@ const KIOSKS = [
   { x: 4.5, z: 6 },
 ]
 
+// Corner bench nooks (must stay in sync with BenchNook.jsx).
+// Only the back corners render BenchNook (front corners use plain Bench):
+// side table, floor lamp, hologram. Plant was removed, so no collider for it.
+const BENCH_NOOK = [
+  { x: -11.41, z: -23.78, radius: 0.45 },
+  { x: -13.47, z: -23.9, radius: 0.3 },
+  { x: -10.49, z: -24.17, radius: 0.35 },
+  { x: 11.41, z: -23.78, radius: 0.45 },
+  { x: 13.47, z: -23.9, radius: 0.3 },
+  { x: 10.49, z: -24.17, radius: 0.35 },
+]
+
 // Homey furniture (must stay in sync with Museum.jsx homey decor)
 const HOME_DECOR = [
   { x: -1.8, z: 26.6, radius: 0.6 },
@@ -57,13 +69,17 @@ const HOME_DECOR = [
   { x: 5.25, z: -26.55, radius: 0.85 },
   { x: 7.35, z: -26.55, radius: 0.85 },
   { x: 15.0, z: 9.4, radius: 0.75 },
-  { x: 13.8, z: 9.0, radius: 0.55 },
+  { x: 13.4, z: 9.0, radius: 0.55 },
   { x: 16.35, z: 9.0, radius: 0.35 },
   { x: -15.0, z: 9.4, radius: 0.75 },
-  { x: -13.8, z: 9.0, radius: 0.55 },
+  { x: -13.4, z: 9.0, radius: 0.55 },
   { x: -16.35, z: 9.0, radius: 0.35 },
-  { x: -14.9, z: -15, radius: 0.35 },
-  { x: -15.3, z: -10, radius: 0.45 },
+  { x: 15.0, z: -9.4, radius: 0.75 },
+  { x: 13.4, z: -9.0, radius: 0.55 },
+  { x: 16.35, z: -9.0, radius: 0.35 },
+  { x: -15.0, z: -9.4, radius: 0.75 },
+  { x: -13.4, z: -9.0, radius: 0.55 },
+  { x: -16.35, z: -9.0, radius: 0.35 },
 ]
 
 function benchCircles() {
@@ -157,6 +173,7 @@ export function getObjectColliders() {
       radius: 0.45,
     })),
     ...benchCircles(),
+    ...BENCH_NOOK,
     ...HALL_PLANTS.map(([x, z]) => ({ x, z, radius: 0.45 })),
     ...KIOSKS.map((k) => ({ x: k.x, z: k.z, radius: 0.75 })),
     ...HOME_DECOR,

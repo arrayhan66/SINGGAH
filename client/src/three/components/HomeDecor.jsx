@@ -1,4 +1,5 @@
-import { Component, Suspense, useMemo } from "react"
+import { Component, Suspense, useMemo, useRef } from "react"
+import { useFrame } from "@react-three/fiber"
 import { useTexture } from "@react-three/drei"
 import * as THREE from "three"
 import { textures } from "../utils/textures"
@@ -723,37 +724,124 @@ function SideTable({ position, rotationY = 0, drink = "coffee", book1 = "atomic"
   )
 }
 
+function createClockFaceTexture() {
+  const size = 512
+  const canvas = document.createElement("canvas")
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext("2d")
+  const cx = size / 2
+  const cy = size / 2
+
+  const grad = ctx.createRadialGradient(cx, cy, 40, cx, cy, 235)
+  grad.addColorStop(0, "#fffdf6")
+  grad.addColorStop(0.7, "#f6efdd")
+  grad.addColorStop(1, "#e8dcbf")
+  ctx.beginPath()
+  ctx.arc(cx, cy, 235, 0, Math.PI * 2)
+  ctx.fillStyle = grad
+  ctx.fill()
+
+  ctx.lineCap = "round"
+  ctx.beginPath()
+  ctx.arc(cx, cy, 233, 0, Math.PI * 2)
+  ctx.lineWidth = 10
+  ctx.strokeStyle = "#c9a35e"
+  ctx.stroke()
+
+  ctx.beginPath()
+  ctx.arc(cx, cy, 218, 0, Math.PI * 2)
+  ctx.lineWidth = 3
+  ctx.strokeStyle = "rgba(31,47,78,0.35)"
+  ctx.stroke()
+
+  for (let i = 0; i < 60; i++) {
+    const a = (i / 60) * Math.PI * 2
+    const major = i % 5 === 0
+    ctx.beginPath()
+    ctx.moveTo(cx + Math.sin(a) * (major ? 184 : 196), cy - Math.cos(a) * (major ? 184 : 196))
+    ctx.lineTo(cx + Math.sin(a) * (major ? 204 : 205), cy - Math.cos(a) * (major ? 204 : 205))
+    ctx.strokeStyle = major ? "#1f2f4e" : "rgba(31,47,78,0.45)"
+    ctx.lineWidth = major ? 5 : 2
+    ctx.stroke()
+  }
+
+  ctx.fillStyle = "#1f2f4e"
+  ctx.font = "700 54px Georgia, 'Times New Roman', serif"
+  ctx.textAlign = "center"
+  ctx.textBaseline = "middle"
+  for (let i = 1; i <= 12; i++) {
+    const a = (i / 12) * Math.PI * 2
+    const r = 158
+    ctx.fillText(String(i), cx + Math.sin(a) * r, cy - Math.cos(a) * r)
+  }
+
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.anisotropy = 8
+  return texture
+}
+
 function WallClock({ position, rotationY = 0, scale = 1 }) {
+  const hourRef = useRef()
+  const minuteRef = useRef()
+  const secondRef = useRef()
+  const faceTex = useMemo(() => createClockFaceTexture(), [])
+
+  useFrame(() => {
+    const now = new Date()
+    const s = now.getSeconds() + now.getMilliseconds() / 1000
+    const m = now.getMinutes() + s / 60
+    const h = (now.getHours() % 12) + m / 60
+    if (secondRef.current) secondRef.current.rotation.z = -(s / 60) * Math.PI * 2
+    if (minuteRef.current) minuteRef.current.rotation.z = -(m / 60) * Math.PI * 2
+    if (hourRef.current) hourRef.current.rotation.z = -(h / 12) * Math.PI * 2
+  })
+
   return (
     <group position={position} rotation={[0, rotationY, 0]} scale={scale}>
       <mesh position={[0, 0, -0.03]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.55, 0.55, 0.06, 32]} />
         <meshStandardMaterial color={OFFWHITE} roughness={0.6} />
       </mesh>
-      <mesh position={[0, 0, -0.015]}>
-        <ringGeometry args={[0.45, 0.56, 48]} />
+      <mesh position={[0, 0, -0.02]}>
+        <ringGeometry args={[0.42, 0.56, 48]} />
         <meshStandardMaterial color={BRASS} metalness={0.7} roughness={0.3} />
       </mesh>
-      {Array.from({ length: 12 }).map((_, i) => {
-        const a = (i / 12) * Math.PI * 2
-        return (
-          <mesh key={i} position={[Math.sin(a) * 0.47, Math.cos(a) * 0.47, 0]}>
-            <sphereGeometry args={[0.022, 8, 8]} />
-            <meshStandardMaterial color={WOOD_DARK} roughness={0.5} />
-          </mesh>
-        )
-      })}
-      <mesh position={[0, 0.12, 0.005]} rotation={[0, 0, -0.9]}>
-        <boxGeometry args={[0.035, 0.26, 0.02]} />
-        <meshStandardMaterial color={WOOD_DARK} roughness={0.5} />
+      <mesh position={[0, 0, 0.012]} castShadow>
+        <circleGeometry args={[0.415, 48]} />
+        <meshStandardMaterial map={faceTex} roughness={0.55} />
       </mesh>
-      <mesh position={[0.13, 0.03, 0.008]} rotation={[0, 0, -1.2]}>
-        <boxGeometry args={[0.025, 0.3, 0.02]} />
-        <meshStandardMaterial color={WOOD_DARK} roughness={0.5} />
+
+      <group ref={hourRef}>
+        <mesh position={[0, 0.115, 0.022]}>
+          <boxGeometry args={[0.045, 0.27, 0.02]} />
+          <meshStandardMaterial color={WOOD_DARK} metalness={0.4} roughness={0.4} />
+        </mesh>
+        <mesh position={[0, 0.115, 0.02]}>
+          <cylinderGeometry args={[0.0225, 0.0225, 0.27, 8]} />
+          <meshStandardMaterial color={WOOD_DARK} metalness={0.4} roughness={0.4} />
+        </mesh>
+      </group>
+      <group ref={minuteRef}>
+        <mesh position={[0, 0.155, 0.025]}>
+          <boxGeometry args={[0.032, 0.35, 0.015]} />
+          <meshStandardMaterial color={WOOD_DARK} metalness={0.4} roughness={0.4} />
+        </mesh>
+      </group>
+      <group ref={secondRef}>
+        <mesh position={[0, 0.19, 0.03]} rotation={[0, 0, 0]}>
+          <boxGeometry args={[0.014, 0.42, 0.01]} />
+          <meshStandardMaterial color={BRASS} metalness={0.8} roughness={0.2} />
+        </mesh>
+      </group>
+      <mesh position={[0, 0, 0.035]}>
+        <sphereGeometry args={[0.045, 16, 16]} />
+        <meshStandardMaterial color={BRASS} metalness={0.8} roughness={0.25} />
       </mesh>
-      <mesh position={[0, 0, 0.015]}>
-        <sphereGeometry args={[0.04, 12, 12]} />
-        <meshStandardMaterial color={BRASS} metalness={0.7} roughness={0.3} />
+      <mesh position={[0, 0, 0.045]}>
+        <sphereGeometry args={[0.016, 10, 10]} />
+        <meshStandardMaterial color={WOOD_DARK} roughness={0.4} />
       </mesh>
     </group>
   )

@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react"
 import { useProgress } from "@react-three/drei"
 
-const MIN_DURATION = 2000
+const MIN_DURATION = 500
 const MAX_WAIT = 12000
 
 function LoadingOverlay() {
   const { active } = useProgress()
   const [display, setDisplay] = useState(0)
-  const [done, setDone] = useState(false)
+  const [timedOut, setTimedOut] = useState(false)
+  const [hidden, setHidden] = useState(false)
 
   useEffect(() => {
     const started = Date.now()
@@ -17,22 +18,22 @@ function LoadingOverlay() {
     return () => clearInterval(id)
   }, [])
 
-  const ready = display >= 100 && !active
-
   useEffect(() => {
-    if (!ready) return
-    const t = setTimeout(() => setDone(true), 400)
-    return () => clearTimeout(t)
-  }, [ready])
-
-  useEffect(() => {
-    const t = setTimeout(() => setDone(true), MAX_WAIT)
+    const t = setTimeout(() => setTimedOut(true), MAX_WAIT)
     return () => clearTimeout(t)
   }, [])
 
+  useEffect(() => {
+    if (hidden || display < 100 || active) return
+    const t = setTimeout(() => setHidden(true), 150)
+    return () => clearTimeout(t)
+  }, [display, active, hidden])
+
+  const done = hidden || timedOut
+
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-[#0b1220] transition-opacity duration-700 ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-[#0b1220] transition-opacity duration-300 ${
         done ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >

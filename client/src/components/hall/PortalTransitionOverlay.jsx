@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
 import { useTransitionStore } from "../../three/hooks/useTransition"
 
-const MIN_DURATION = 1500
+const MIN_DURATION = 800
+const SETTLE_MS = 150
 
 function PortalTransitionOverlay() {
   const active = useTransitionStore((s) => s.active)
@@ -10,11 +11,24 @@ function PortalTransitionOverlay() {
   const startedAt = useTransitionStore((s) => s.startedAt)
   const [display, setDisplay] = useState(0)
   const [lastRun, setLastRun] = useState(runId)
+  const [hidden, setHidden] = useState(true)
 
   if (runId !== lastRun) {
     setLastRun(runId)
     setDisplay(0)
   }
+
+  useEffect(() => {
+    if (!active) return
+    const t = setTimeout(() => setHidden(false), 0)
+    return () => clearTimeout(t)
+  }, [active])
+
+  useEffect(() => {
+    if (active || hidden) return
+    const t = setTimeout(() => setHidden(true), SETTLE_MS)
+    return () => clearTimeout(t)
+  }, [active, hidden])
 
   useEffect(() => {
     if (!active) return
@@ -26,8 +40,8 @@ function PortalTransitionOverlay() {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-[#0b1220] transition-opacity duration-700 ${
-        active ? "opacity-100" : "opacity-0 pointer-events-none"
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-[#0b1220] transition-opacity duration-300 ${
+        hidden ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
       <div className="flex items-center gap-4">

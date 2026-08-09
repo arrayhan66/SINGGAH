@@ -209,21 +209,28 @@ function drawArtwork(ctx, w, h, palette, style, project) {
   ctx.fillText(String(author).toUpperCase(), cx, h * 0.96)
 }
 
+const placeholderCache = new Map()
+
+function getPlaceholderTexture(project) {
+  const key = String(project.id) + "|" + (project.title || "")
+  if (placeholderCache.has(key)) return placeholderCache.get(key)
+  const seed = hashString(key)
+  const palette = PALETTES[seed % PALETTES.length]
+  const style = seed % 6
+  const c = document.createElement("canvas")
+  c.width = 512
+  c.height = Math.round((512 * H) / W)
+  const ctx = c.getContext("2d")
+  drawArtwork(ctx, c.width, c.height, palette, style, project)
+  const t = new THREE.CanvasTexture(c)
+  t.colorSpace = THREE.SRGBColorSpace
+  t.anisotropy = 8
+  placeholderCache.set(key, t)
+  return t
+}
+
 function Placeholder({ project }) {
-  const map = useMemo(() => {
-    const seed = hashString(String(project.id) + (project.title || ""))
-    const palette = PALETTES[seed % PALETTES.length]
-    const style = seed % 6
-    const c = document.createElement("canvas")
-    c.width = 1024
-    c.height = Math.round((1024 * H) / W)
-    const ctx = c.getContext("2d")
-    drawArtwork(ctx, c.width, c.height, palette, style, project)
-    const t = new THREE.CanvasTexture(c)
-    t.colorSpace = THREE.SRGBColorSpace
-    t.anisotropy = 8
-    return t
-  }, [project])
+  const map = useMemo(() => getPlaceholderTexture(project), [project])
 
   return (
     <mesh position={[0, 0, 0.11]}>

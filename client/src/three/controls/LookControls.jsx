@@ -10,6 +10,7 @@ import { getCollidableAABBs } from "../utils/sceneColliders"
 
 const SPEED = 6
 const DRAG_THRESHOLD = 6
+const TELEPORT_RANGE = 4
 
 function findAction(object) {
   let node = object
@@ -18,6 +19,13 @@ function findAction(object) {
     node = node.parent
   }
   return null
+}
+
+function withinRange(point, range) {
+  const from = useWalkStore.getState().position
+  const dx = point.x - from.x
+  const dz = point.z - from.z
+  return Math.hypot(dx, dz) <= range
 }
 
 function LookControls({ bounds, onSelectProject }) {
@@ -133,7 +141,13 @@ function LookControls({ bounds, onSelectProject }) {
         raycaster.current.setFromCamera(mouse.current, camera)
         const hits = raycaster.current.intersectObjects(scene.children, true)
         const action = hits.length ? findAction(hits[0].object) : null
-        document.body.style.cursor = action ? "pointer" : "default"
+        const actionable =
+          action && action.type !== "teleport"
+            ? action
+            : action && withinRange(hits[0].point, TELEPORT_RANGE)
+              ? action
+              : null
+        document.body.style.cursor = actionable ? "pointer" : "default"
       }
     }
 
@@ -145,7 +159,9 @@ function LookControls({ bounds, onSelectProject }) {
       const hits = raycaster.current.intersectObjects(scene.children, true)
       const hit = hits.find((h) => findAction(h.object))
       if (!hit) return
-      handleAction(findAction(hit.object), hit.point)
+      const action = findAction(hit.object)
+      if (action.type === "teleport" && !withinRange(hit.point, TELEPORT_RANGE)) return
+      handleAction(action, hit.point)
     }
 
     const onKeyDown = (e) => {

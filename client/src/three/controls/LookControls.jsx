@@ -3,7 +3,7 @@ import { useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
 import { useWalkStore, EYE } from "../hooks/useWalk"
 import { useTransitionStore } from "../hooks/useTransition"
-import { getWalls, portals, findRoom } from "../rooms/museumLayout"
+import { getWalls, portals, findRoom, resolveHeight } from "../rooms/museumLayout"
 import { resolveCollision, resolveObjectCollision, resolveAABBs } from "../utils/collision"
 import { getObjectColliders } from "../utils/objectColliders"
 import { getCollidableAABBs } from "../utils/sceneColliders"
@@ -66,24 +66,30 @@ function LookControls({ bounds, onSelectProject }) {
         ? "MEMPERSIAPKAN VIRTUAL HALL"
         : `MEMASUKI ${room.label.split(" — ")[0]}`
     useTransitionStore.getState().start(message)
-    useWalkStore.setState({ position: point.clone(), yaw, target: null })
+    const rh = resolveHeight(point.x, point.z, 0)
+    point.y = rh.height
+    useWalkStore.setState({ position: point.clone(), yaw, target: null, level: rh.level })
   }
 
   const checkPortalCross = (prev, next) => {
     for (const p of portalsRef.current) {
       if (p.axis === "x") {
-        if (prev.z >= p.from && prev.z <= p.to && next.z >= p.from && next.z <= p.to) {
+        if (next.z >= p.from && next.z <= p.to) {
           const a = prev.x - p.at
           const b = next.x - p.at
-          if (a * b <= 0 && Math.abs(next.x - p.at) < 1.6) {
+          const crossed = a * b <= 0 && Math.abs(b) < 1.6
+          const captured = Math.abs(b) < 1.6 && Math.abs(b) < Math.abs(a)
+          if (crossed || captured) {
             return { point: new THREE.Vector3(p.target[0], 0, p.target[1]), yaw: p.yaw }
           }
         }
       } else {
-        if (prev.x >= p.from && prev.x <= p.to && next.x >= p.from && next.x <= p.to) {
+        if (next.x >= p.from && next.x <= p.to) {
           const a = prev.z - p.at
           const b = next.z - p.at
-          if (a * b <= 0 && Math.abs(next.z - p.at) < 1.6) {
+          const crossed = a * b <= 0 && Math.abs(b) < 1.6
+          const captured = Math.abs(b) < 1.6 && Math.abs(b) < Math.abs(a)
+          if (crossed || captured) {
             return { point: new THREE.Vector3(p.target[0], 0, p.target[1]), yaw: p.yaw }
           }
         }
@@ -101,22 +107,31 @@ function LookControls({ bounds, onSelectProject }) {
 
   const resolveAll = (pos) => {
     let p = resolveCollision(pos, wallsRef.current)
-    p = resolveObjectCollision(p, getObjectColliders())
+    p = resolveObjectCollision(p, getObjectColliders(), useWalkStore.getState().level)
     p = resolveAABBs(p, modelCollidersRef.current)
-    return resolveCollision(p, wallsRef.current)
+    p = resolveCollision(p, wallsRef.current)
+    const rh = resolveHeight(p.x, p.z, useWalkStore.getState().level)
+    p.y = rh.height
+    useWalkStore.setState({ level: rh.level })
+    return p
   }
 
   useEffect(() => {
     const el = gl.domElement
 
     const onPointerDown = (e) => {
-      if (e.button !== 0) return
+      if (e.button !== 0 || !e.isPrimary) return
       dragRef.current.active = true
       dragRef.current.lastX = e.clientX
       dragRef.current.lastY = e.clientY
       dragRef.current.startX = e.clientX
       dragRef.current.startY = e.clientY
       useWalkStore.getState().setDragMoved(false)
+      try {
+        el.setPointerCapture(e.pointerId)
+      } catch {
+        /* pointer already released */
+      }
       e.preventDefault()
     }
 
@@ -154,6 +169,7 @@ function LookControls({ bounds, onSelectProject }) {
     const onPointerUp = (e) => {
       if (e.button !== 0) return
       dragRef.current.active = false
+      if (useTransitionStore.getState().active || useTransitionStore.getState().loading) return
       if (useWalkStore.getState().dragMoved) return
       raycaster.current.setFromCamera(mouse.current, camera)
       const hits = raycaster.current.intersectObjects(scene.children, true)
@@ -164,6 +180,10 @@ function LookControls({ bounds, onSelectProject }) {
       handleAction(action, hit.point)
     }
 
+    const onPointerCancel = () => {
+      dragRef.current.active = false
+    }
+
     const onKeyDown = (e) => {
       keysRef.current[e.code] = true
     }
@@ -172,15 +192,17 @@ function LookControls({ bounds, onSelectProject }) {
     }
 
     el.addEventListener("pointerdown", onPointerDown)
-    window.addEventListener("pointermove", onPointerMove)
-    window.addEventListener("pointerup", onPointerUp)
+    el.addEventListener("pointermove", onPointerMove)
+    el.addEventListener("pointerup", onPointerUp)
+    el.addEventListener("pointercancel", onPointerCancel)
     window.addEventListener("keydown", onKeyDown)
     window.addEventListener("keyup", onKeyUp)
 
     return () => {
       el.removeEventListener("pointerdown", onPointerDown)
-      window.removeEventListener("pointermove", onPointerMove)
-      window.removeEventListener("pointerup", onPointerUp)
+      el.removeEventListener("pointermove", onPointerMove)
+      el.removeEventListener("pointerup", onPointerUp)
+      el.removeEventListener("pointercancel", onPointerCancel)
       window.removeEventListener("keydown", onKeyDown)
       window.removeEventListener("keyup", onKeyUp)
     }
@@ -198,9 +220,10 @@ function LookControls({ bounds, onSelectProject }) {
       modelColliderBuilt.current = 2
     }
 
-    if (useTransitionStore.getState().active) {
+    if (useTransitionStore.getState().active || useTransitionStore.getState().loading) {
+      if (useWalkStore.getState().target) useWalkStore.setState({ target: null })
       const cur = useWalkStore.getState()
-      camera.position.set(cur.position.x, EYE, cur.position.z)
+      camera.position.set(cur.position.x, cur.position.y + EYE, cur.position.z)
       euler.current.set(cur.pitch, cur.yaw, 0)
       camera.quaternion.setFromEuler(euler.current)
       return
@@ -278,7 +301,7 @@ function LookControls({ bounds, onSelectProject }) {
     }
 
     const cur = useWalkStore.getState()
-    camera.position.set(cur.position.x, EYE, cur.position.z)
+    camera.position.set(cur.position.x, cur.position.y + EYE, cur.position.z)
     euler.current.set(cur.pitch, cur.yaw, 0)
     camera.quaternion.setFromEuler(euler.current)
   })

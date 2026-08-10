@@ -95,6 +95,9 @@ const exitMat = (dark = false) => (
 const glowMat = (intensity = 1.1) => (
   <meshStandardMaterial color={GLOW_LIGHT} emissive={GLOW} emissiveIntensity={intensity} />
 )
+const exitGlowMat = (intensity = 1.1) => (
+  <meshStandardMaterial color={EXIT_RED} emissive={EXIT_RED} emissiveIntensity={intensity} />
+)
 
 function Portal({ position, rotationY, width, title, action }) {
   const hw = width / 2
@@ -143,41 +146,41 @@ function Portal({ position, rotationY, width, title, action }) {
         <ExitIcon />
       )}
 
-      {/* Trim tepi dalam (putih + glow) supaya simetris dan rapi */}
+      {/* Trim tepi dalam (merah untuk exit) supaya simetris dan rapi */}
       {[-1, 1].map((s) => (
         <mesh key={s} position={[s * (hw - 0.02), RIFT_H / 2, 0.08]}>
           <boxGeometry args={[0.05, RIFT_H - 0.1, 0.1]} />
-          {navyMat(true)}
+          {title ? navyMat(true) : exitMat(true)}
         </mesh>
       ))}
       {[-1, 1].map((s) => (
         <mesh key={s} position={[s * (hw - 0.02), RIFT_H / 2, 0.16]}>
           <boxGeometry args={[0.04, RIFT_H - 0.12, 0.05]} />
-          {glowMat()}
+          {title ? glowMat() : exitGlowMat()}
         </mesh>
       ))}
       <mesh position={[0, RIFT_H - 0.02, 0.08]}>
         <boxGeometry args={[width + 0.08, 0.05, 0.1]} />
-        {navyMat(true)}
+        {title ? navyMat(true) : exitMat(true)}
       </mesh>
       <mesh position={[0, RIFT_H - 0.02, 0.16]}>
         <boxGeometry args={[width + 0.04, 0.04, 0.05]} />
-        {glowMat()}
+        {title ? glowMat() : exitGlowMat()}
       </mesh>
       <mesh position={[0, FRAME_T + 0.03, 0.08]}>
         <boxGeometry args={[width + 0.08, 0.05, 0.1]} />
-        {navyMat(true)}
+        {title ? navyMat(true) : exitMat(true)}
       </mesh>
       <mesh position={[0, FRAME_T + 0.03, 0.16]}>
         <boxGeometry args={[width + 0.04, 0.04, 0.05]} />
-        {glowMat()}
+        {title ? glowMat() : exitGlowMat()}
       </mesh>
 
       {/* ==== Rift ==== */}
       <mesh position={[0, RIFT_H / 2, 0]}>
         <planeGeometry args={[width, RIFT_H]} />
         <meshStandardMaterial
-          color="#1a4a7f"
+          color={title ? "#1a4a7f" : EXIT_RED_DARK}
           emissive="#ffffff"
           emissiveIntensity={0.9}
           roughness={0.5}

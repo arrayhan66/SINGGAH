@@ -3,6 +3,7 @@ import { Text, useTexture } from "@react-three/drei"
 import * as THREE from "three"
 import { textures } from "../utils/textures"
 import { PAINTING_SIZE } from "../rooms/museumLayout"
+import { CATEGORY_COLORS } from "../../utils/hallHelpers"
 
 const W = PAINTING_SIZE.w
 const H = PAINTING_SIZE.h
@@ -203,7 +204,7 @@ function drawArtwork(ctx, w, h, palette, style, project) {
   const maxChars = 30
   ctx.fillText(title.length > maxChars ? title.slice(0, maxChars - 1) + "…" : title, cx, h * 0.915)
 
-  const author = project.author?.[0] || project.User?.name || "SINGGAH"
+  const author = project.User?.name || project.author?.[0] || "SINGGAH"
   ctx.fillStyle = "rgba(234,242,252,0.75)"
   ctx.font = `${Math.round(w * 0.022)}px Georgia, serif`
   ctx.fillText(String(author).toUpperCase(), cx, h * 0.96)
@@ -254,110 +255,207 @@ class ImageBoundary extends Component {
   }
 }
 
-function Painting({ project, position, rotationY, index = 1, isDosen = false }) {
+function getCategoryColor(project) {
+  const slug = project.Category?.slug || project.category
+  return CATEGORY_COLORS[slug] || "#60a5fa"
+}
+
+function Painting({ project, position, rotationY, index = 1, isDosen = false, railY = null }) {
   const [hovered, setHovered] = useState(false)
   const steelMap = useMemo(() => textures.steelFrame(), [])
-  const accent = isDosen ? "#22d3ee" : "#60a5fa"
-  const image = project.image || project.thumbnail
-  const hasImage = Boolean(image)
+  const goldMap = useMemo(() => textures.goldFrame(), [])
 
-  const inset = 0.09
-  const lipY = (H + 0.36) / 2 - inset
-  const lipX = (W + 0.36) / 2 - inset
+  const accent = isDosen ? "#22d3ee" : getCategoryColor(project)
+  const authorName = project.User?.name || project.author?.[0] || "Kreator"
+  const categoryName =
+    project.Category?.name ||
+    String(project.category || "")
+      .replace(/-/g, " ")
+      .toUpperCase()
+  const title = project.title || "Karya"
+  const thumbnail = project.thumbnail || project.image
+  const hasImage = Boolean(thumbnail)
+
+  const frameW = W + 0.34
+  const frameH = H + 0.34
+  const barT = 0.1
+  const lipY = frameH / 2 - barT / 2
+  const lipX = frameW / 2 - barT / 2
 
   return (
     <group
       position={position}
       rotation={[0, rotationY, 0]}
-      scale={hovered ? 1.04 : 1}
+      scale={hovered ? 1.03 : 1}
       userData={{ action: { type: "project", project } }}
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
     >
-      {/* Cool glow behind */}
+      {/* Hanging wires to the picture rail (home gallery look) */}
+      {railY != null && (
+        <>
+          {[-frameW * 0.28, frameW * 0.28].map((wx, i) => {
+            const topLocal = railY - position[1]
+            const bottomLocal = frameH / 2 + 0.03
+            const len = Math.max(0.05, topLocal - bottomLocal)
+            return (
+              <mesh key={i} position={[wx, bottomLocal + len / 2, 0.02]}>
+                <cylinderGeometry args={[0.008, 0.008, len, 6]} />
+                <meshStandardMaterial color="#2a3d5f" roughness={0.4} metalness={0.6} />
+              </mesh>
+            )
+          })}
+        </>
+      )}
+
+      {/* Soft glow behind (category tinted) */}
       <mesh position={[0, 0, -0.012]}>
-        <planeGeometry args={[W + 0.5, H + 0.5]} />
-        <meshBasicMaterial color="#cfe8ff" transparent opacity={hovered ? 0.45 : 0.22} />
+        <planeGeometry args={[W + 0.56, H + 0.56]} />
+        <meshBasicMaterial
+          color={accent}
+          transparent
+          opacity={hovered ? 0.5 : 0.24}
+        />
       </mesh>
 
       {/* Steel backplate */}
       <mesh position={[0, 0, 0.02]}>
-        <planeGeometry args={[W + 0.36, H + 0.36]} />
+        <planeGeometry args={[frameW, frameH]} />
         <meshStandardMaterial map={steelMap} metalness={0.7} roughness={0.3} />
       </mesh>
 
+      {/* Gold outer rim */}
+      <mesh position={[0, 0, 0.07]}>
+        <planeGeometry args={[frameW, frameH]} />
+        <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.28} />
+      </mesh>
+
+      {/* Gold dimensional bars */}
+      <mesh position={[0, lipY, 0.075]}>
+        <boxGeometry args={[frameW, barT, 0.08]} />
+        <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.28} />
+      </mesh>
+      <mesh position={[0, -lipY, 0.075]}>
+        <boxGeometry args={[frameW, barT, 0.08]} />
+        <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.28} />
+      </mesh>
+      <mesh position={[lipX, 0, 0.075]}>
+        <boxGeometry args={[barT, frameH, 0.08]} />
+        <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.28} />
+      </mesh>
+      <mesh position={[-lipX, 0, 0.075]}>
+        <boxGeometry args={[barT, frameH, 0.08]} />
+        <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.28} />
+      </mesh>
+
+      {/* Dark inner bevel */}
+      <mesh position={[0, 0, 0.085]}>
+        <planeGeometry args={[W + 0.16, H + 0.16]} />
+        <meshStandardMaterial color="#232e3c" metalness={0.3} roughness={0.5} />
+      </mesh>
+
       {/* Mat */}
-      <mesh position={[0, 0, 0.06]}>
+      <mesh position={[0, 0, 0.095]}>
         <planeGeometry args={[W - 0.02, H - 0.02]} />
-        <meshStandardMaterial color="#dbe6f2" roughness={0.8} />
+        <meshStandardMaterial color="#e9eff8" roughness={0.85} />
       </mesh>
 
       {/* Canvas */}
       <Suspense fallback={<Placeholder project={project} />}>
         <ImageBoundary project={project}>
-          {hasImage && !isPlaceholderUrl(image) ? (
-            <PaintingImage url={image} />
+          {hasImage && !isPlaceholderUrl(thumbnail) ? (
+            <PaintingImage url={thumbnail} />
           ) : (
             <Placeholder project={project} />
           )}
         </ImageBoundary>
       </Suspense>
 
-      {/* Dimensional steel lips */}
-      <mesh position={[0, lipY, 0.1]}>
-        <boxGeometry args={[W + 0.36, 0.18, 0.08]} />
-        <meshStandardMaterial map={steelMap} metalness={0.7} roughness={0.3} />
+      {/* Picture light */}
+      <mesh position={[0, H / 2 + 0.24, 0.06]}>
+        <boxGeometry args={[frameW + 0.06, 0.08, 0.22]} />
+        <meshStandardMaterial
+          color="#94a3b8"
+          emissive="#bfe3ff"
+          emissiveIntensity={hovered ? 2.8 : 1.7}
+          metalness={0.6}
+          roughness={0.3}
+        />
       </mesh>
-      <mesh position={[0, -lipY, 0.1]}>
-        <boxGeometry args={[W + 0.36, 0.18, 0.08]} />
-        <meshStandardMaterial map={steelMap} metalness={0.7} roughness={0.3} />
-      </mesh>
-      <mesh position={[lipX, 0, 0.1]}>
-        <boxGeometry args={[0.18, H + 0.36, 0.08]} />
-        <meshStandardMaterial map={steelMap} metalness={0.7} roughness={0.3} />
-      </mesh>
-      <mesh position={[-lipX, 0, 0.1]}>
-        <boxGeometry args={[0.18, H + 0.36, 0.08]} />
-        <meshStandardMaterial map={steelMap} metalness={0.7} roughness={0.3} />
+      <mesh position={[0, H / 2 - 0.14, 0.1]}>
+        <planeGeometry args={[W + 0.2, 0.55]} />
+        <meshBasicMaterial color="#cfe9ff" transparent opacity={hovered ? 0.5 : 0.26} />
       </mesh>
 
-      {/* Picture light */}
-      <mesh position={[0, H / 2 + 0.22, 0.05]}>
-        <boxGeometry args={[W + 0.1, 0.08, 0.22]} />
-        <meshStandardMaterial color="#94a3b8" emissive="#bfe3ff" emissiveIntensity={hovered ? 2.6 : 1.6} metalness={0.6} roughness={0.3} />
-      </mesh>
-      <mesh position={[0, H / 2 - 0.12, 0.09]}>
-        <planeGeometry args={[W + 0.1, 0.5]} />
-        <meshBasicMaterial color="#cfe9ff" transparent opacity={hovered ? 0.5 : 0.28} />
-      </mesh>
+      {/* Light cone on hover */}
+      {hovered && (
+        <mesh
+          position={[0, H / 2 - 0.55, 0.2]}
+          rotation={[Math.PI, 0, 0]}
+        >
+          <coneGeometry args={[W * 0.62, 1.5, 24, 1, true]} />
+          <meshBasicMaterial
+            color="#cfe9ff"
+            transparent
+            opacity={0.16}
+            side={THREE.DoubleSide}
+            depthWrite={false}
+          />
+        </mesh>
+      )}
 
       {/* Plaque */}
-      <mesh position={[0, -H / 2 - 0.22, 0.05]}>
-        <planeGeometry args={[W + 0.08, 0.6]} />
-        <meshStandardMaterial color="#1e293b" roughness={0.5} metalness={0.3} />
+      <mesh position={[0, -H / 2 - 0.58, 0.045]}>
+        <planeGeometry args={[frameW - 0.04, 0.72]} />
+        <meshStandardMaterial color="#16222f" roughness={0.45} metalness={0.35} />
       </mesh>
+      <mesh position={[0, -H / 2 - 0.4, 0.06]}>
+        <planeGeometry args={[frameW + 0.08, 0.035]} />
+        <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.3} />
+      </mesh>
+      <mesh position={[0, -H / 2 - 0.8, 0.06]}>
+        <planeGeometry args={[frameW + 0.08, 0.035]} />
+        <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.3} />
+      </mesh>
+
       <Text
-        position={[0, -H / 2 - 0.08, 0.09]}
-        fontSize={0.16}
-        color="#bae6fd"
+        position={[0, -H / 2 - 0.46, 0.08]}
+        fontSize={0.115}
+        color="#f1f5f9"
         anchorX="center"
         anchorY="middle"
-        maxWidth={W + 0.08}
+        maxWidth={frameW - 0.12}
+        lineHeight={1.15}
       >
-        No. {String(index).padStart(2, "0")} · {isDosen ? "Dosen" : "Mahasiswa"} ·{" "}
-        {project.author?.[0] || project.User?.name || "Kreator"}
+        {title}
+      </Text>
+      <Text
+        position={[0, -H / 2 - 0.64, 0.08]}
+        fontSize={0.085}
+        color="#93c5fd"
+        anchorX="center"
+        anchorY="middle"
+        maxWidth={frameW - 0.12}
+      >
+        {`No. ${String(index).padStart(2, "0")} · ${categoryName} · ${isDosen ? "Dosen" : "Mahasiswa"} · ${authorName}`}
       </Text>
 
       {/* Accent stripe */}
-      <mesh position={[0, -H / 2 - 0.52, 0.07]}>
-        <planeGeometry args={[W + 0.36, 0.05]} />
+      <mesh position={[0, -H / 2 - 0.9, 0.06]}>
+        <planeGeometry args={[frameW + 0.08, 0.05]} />
         <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.6} />
+      </mesh>
+
+      {/* Category dot */}
+      <mesh position={[frameW / 2 - 0.06, -H / 2 - 0.66, 0.09]}>
+        <circleGeometry args={[0.045, 20]} />
+        <meshBasicMaterial color={accent} />
       </mesh>
 
       {hovered && (
         <Text
-          position={[0, -H / 2 - 0.78, 0.09]}
-          fontSize={0.13}
+          position={[0, -H / 2 - 1.12, 0.09]}
+          fontSize={0.12}
           color="#7dd3fc"
           anchorX="center"
           anchorY="middle"

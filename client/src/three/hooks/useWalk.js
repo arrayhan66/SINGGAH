@@ -1,16 +1,18 @@
 import { create } from "zustand"
 import * as THREE from "three"
+import { MUSEUM } from "../rooms/museumLayout"
 
 const EYE_HEIGHT = 1.7
 
 export const useWalkStore = create((set, get) => ({
-  position: new THREE.Vector3(0, 0, 20),
+  position: new THREE.Vector3(...MUSEUM.spawn.position),
   yaw: 0,
   pitch: 0,
   target: null,
   onArrive: null,
   dragMoved: false,
   pendingClick: null,
+  level: 0,
 
   look(dx, dy, sensitivity = 0.0035) {
     const state = get()
@@ -44,6 +46,7 @@ export const useWalkStore = create((set, get) => ({
       onArrive: null,
       dragMoved: false,
       pendingClick: null,
+      level: 0,
     })
   },
 }))

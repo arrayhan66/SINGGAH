@@ -1,31 +1,42 @@
 import { Suspense, useState } from "react"
 import { Canvas } from "@react-three/fiber"
-import { ArrowLeft, MousePointerClick, DoorOpen, Frame, Eye, MapPin } from "lucide-react"
+import { ArrowLeft, MousePointerClick, DoorOpen, Frame, Eye, MapPin, Gauge } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import VirtualExhibition from "../../three/scenes/VirtualExhibition"
 import ProjectDetailModal from "../../components/hall/ProjectDetailModal"
 import LoadingOverlay from "../../components/hall/LoadingOverlay"
 import PortalTransitionOverlay from "../../components/hall/PortalTransitionOverlay"
 import CanvasErrorBoundary from "../../components/hall/CanvasErrorBoundary"
+import { useQualityStore, DPR_FOR, TIERS } from "../../three/hooks/useQuality"
 
 function Hall() {
   const navigate = useNavigate()
   const [area, setArea] = useState("Hall Utama")
   const [selectedProject, setSelectedProject] = useState(null)
+  const [sceneReady, setSceneReady] = useState(false)
+  const tier = useQualityStore((s) => s.tier)
+  const cycleQuality = useQualityStore((s) => s.cycle)
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-[#0b1220] text-white select-none">
+      {/* Loading Overlay: rendered first so it always covers the canvas on mount */}
+      <LoadingOverlay ready={sceneReady} />
+
       {/* 3D Scene */}
       <CanvasErrorBoundary>
         <Canvas
           shadows
-          dpr={[1, 1.5]}
+          dpr={DPR_FOR[tier]}
           camera={{ position: [0, 1.7, 0], fov: 70, near: 0.1, far: 220 }}
-          className="!absolute !inset-0"
+          className="!absolute !inset-0 hall-canvas"
         >
           <color attach="background" args={["#0b1220"]} />
           <Suspense fallback={null}>
-            <VirtualExhibition onArea={setArea} onSelectProject={setSelectedProject} />
+            <VirtualExhibition
+              onArea={setArea}
+              onSelectProject={setSelectedProject}
+              onReady={() => setSceneReady(true)}
+            />
           </Suspense>
         </Canvas>
       </CanvasErrorBoundary>
@@ -63,6 +74,21 @@ function Hall() {
         </div>
       </header>
 
+      {/* HUD Quality Toggle (right side) */}
+      <div className="absolute top-4 right-4 z-20 md:right-6">
+        <button
+          onClick={cycleQuality}
+          className="flex items-center gap-2 rounded-2xl border border-[#223047] bg-black/50 px-3 py-2.5 backdrop-blur-md shadow-xl transition-all duration-300 hover:border-white/25 hover:bg-white/[0.06] active:scale-95 cursor-pointer"
+          aria-label="Ubah kualitas grafis"
+          title="Ubah kualitas grafis"
+        >
+          <Gauge className="w-4 h-4 text-[#38bdf8]" />
+          <span className="text-[11px] font-semibold text-[#93b4d4] capitalize">
+            {TIERS.includes(tier) ? tier : "sedang"}
+          </span>
+        </button>
+      </div>
+
       {/* HUD Bottom Hint */}
       <footer className="absolute bottom-4 left-0 right-0 z-20 flex justify-center px-4 pointer-events-none">
         <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 rounded-2xl border border-[#223047] bg-black/50 px-5 py-2.5 text-[11px] md:text-xs text-[#93b4d4] backdrop-blur-md shadow-xl">
@@ -84,9 +110,6 @@ function Hall() {
           </span>
         </div>
       </footer>
-
-      {/* Loading Overlay */}
-      <LoadingOverlay />
 
       {/* Portal transition overlay */}
       <PortalTransitionOverlay />

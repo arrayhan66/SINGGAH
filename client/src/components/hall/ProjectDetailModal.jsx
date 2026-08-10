@@ -1,8 +1,20 @@
-import { X, ExternalLink, Eye, Heart, GraduationCap, User } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { X, ExternalLink, Eye, Heart, GraduationCap, User, ArrowRight } from "lucide-react"
 
 function ProjectDetailModal({ project, categoryTitle, onClose }) {
+  const navigate = useNavigate()
   const isDosen = project.authorType === "dosen"
-  const authorName = project.author?.[0] || project.User?.name || "Kreator"
+  const authorName = project.User?.name || project.author?.[0] || "Kreator"
+  const categorySlug = project.Category?.slug || project.category
+  const coverImage = project.thumbnail || project.image || "https://placehold.co/800x500/0f172a/38bdf8?text=Preview"
+  const description = project.description || project.desc || ""
+  const technologies = Array.isArray(project.technologies) ? project.technologies : []
+  const links = Array.isArray(project.links) ? project.links : []
+
+  function openDetail() {
+    onClose()
+    navigate(`/karya/${categorySlug}/${project.id}`)
+  }
 
   return (
     <div
@@ -15,7 +27,7 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
       >
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 w-10 h-10 rounded-full bg-sky-900/60 hover:bg-sky-800 border border-sky-700/50 flex items-center justify-center text-white transition-colors"
+          className="absolute top-5 right-5 w-10 h-10 rounded-full bg-sky-900/60 hover:bg-sky-800 border border-sky-700/50 flex items-center justify-center text-white transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -32,14 +44,16 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
             {isDosen ? <GraduationCap className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
             <span>{isDosen ? "Karya Dosen" : "Karya Mahasiswa"}</span>
           </span>
-          <span className="text-xs text-sky-300/70">Kategori: {categoryTitle || project.category}</span>
+          <span className="text-xs text-sky-300/70">
+            Kategori: {categoryTitle || project.Category?.name || project.category}
+          </span>
         </div>
 
         <h3 className="text-2xl md:text-3xl font-extrabold text-white">{project.title}</h3>
 
         <div className="rounded-2xl overflow-hidden border border-sky-800/60 bg-black/50 flex items-center justify-center">
           <img
-            src={project.image || project.thumbnail || "https://placehold.co/800x500/0f172a/38bdf8?text=Preview"}
+            src={coverImage}
             alt={project.title}
             className="w-full max-h-72 object-contain"
           />
@@ -47,7 +61,7 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
 
         <div className="space-y-2">
           <h4 className="text-sm font-semibold text-sky-300">Deskripsi Karya</h4>
-          <p className="text-sm text-slate-100/80 leading-relaxed">{project.desc}</p>
+          <p className="text-sm text-slate-100/80 leading-relaxed line-clamp-4">{description}</p>
         </div>
 
         <div className="bg-sky-900/30 border border-sky-800/50 rounded-xl p-4 flex items-center justify-between">
@@ -75,40 +89,52 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
           </div>
         </div>
 
-        {project.techStack && project.techStack.length > 0 && (
+        {technologies.length > 0 && (
           <div className="space-y-2">
             <h4 className="text-sm font-semibold text-sky-300">Teknologi Digunakan</h4>
             <div className="flex flex-wrap gap-2">
-              {project.techStack.map((tech, i) => (
-                <span
-                  key={i}
-                  className="text-xs bg-sky-900/60 border border-sky-700/50 px-3 py-1 rounded-lg text-sky-200"
-                >
-                  {tech}
-                </span>
-              ))}
+              {technologies.map((tech, i) => {
+                const label = typeof tech === "string" ? tech : tech?.name
+                return (
+                  <span
+                    key={i}
+                    className="text-xs bg-sky-900/60 border border-sky-700/50 px-3 py-1 rounded-lg text-sky-200"
+                  >
+                    {label}
+                  </span>
+                )
+              })}
             </div>
           </div>
         )}
 
-        <div className="pt-4 border-t border-sky-900/80 flex items-center justify-end space-x-4">
+        <div className="pt-4 border-t border-sky-900/80 flex items-center justify-end gap-3 flex-wrap">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-sky-950 hover:bg-sky-900 border border-sky-800 text-sm font-medium text-sky-200 transition-colors"
+            className="px-5 py-2.5 rounded-xl bg-sky-950 hover:bg-sky-900 border border-sky-800 text-sm font-medium text-sky-200 transition-colors cursor-pointer"
           >
             Tutup
           </button>
-          {project.liveUrl && (
+
+          {links[0]?.url && (
             <a
-              href={project.liveUrl}
+              href={links[0].url}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-400 hover:from-sky-500 hover:to-cyan-300 text-sm font-bold text-white flex items-center space-x-2 shadow-lg shadow-sky-500/20 transition-all"
+              className="px-5 py-2.5 rounded-xl bg-sky-900 hover:bg-sky-800 border border-sky-700 text-sm font-semibold text-sky-100 flex items-center space-x-2 transition-colors"
             >
               <span>Kunjungi Demo</span>
               <ExternalLink className="w-4 h-4" />
             </a>
           )}
+
+          <button
+            onClick={openDetail}
+            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-400 hover:from-sky-500 hover:to-cyan-300 text-sm font-bold text-white flex items-center space-x-2 shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+          >
+            <span>Lihat Detail Lengkap</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </div>

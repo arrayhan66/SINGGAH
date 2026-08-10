@@ -1,4 +1,5 @@
 import * as THREE from "three"
+import { getAnisotropy } from "../hooks/useQuality"
 
 function makeCanvas(size) {
   const canvas = document.createElement("canvas")
@@ -14,7 +15,7 @@ function toTexture(canvas, repeatX = 1, repeatY = 1) {
   texture.wrapT = THREE.RepeatWrapping
   texture.repeat.set(repeatX, repeatY)
   texture.colorSpace = THREE.SRGBColorSpace
-  texture.anisotropy = 8
+  texture.anisotropy = getAnisotropy()
   return texture
 }
 
@@ -216,7 +217,7 @@ function radialTexture(w, h, stops) {
   texture.wrapS = THREE.ClampToEdgeWrapping
   texture.wrapT = THREE.ClampToEdgeWrapping
   texture.colorSpace = THREE.SRGBColorSpace
-  texture.anisotropy = 8
+  texture.anisotropy = getAnisotropy()
   return texture
 }
 
@@ -323,7 +324,7 @@ function roundRugTexture() {
   texture.wrapS = THREE.ClampToEdgeWrapping
   texture.wrapT = THREE.ClampToEdgeWrapping
   texture.colorSpace = THREE.SRGBColorSpace
-  texture.anisotropy = 8
+  texture.anisotropy = getAnisotropy()
   return texture
 }
 
@@ -388,7 +389,7 @@ function rugRectTexture() {
   texture.wrapS = THREE.ClampToEdgeWrapping
   texture.wrapT = THREE.ClampToEdgeWrapping
   texture.colorSpace = THREE.SRGBColorSpace
-  texture.anisotropy = 8
+  texture.anisotropy = getAnisotropy()
   return texture
 }
 
@@ -442,7 +443,7 @@ function frameArtTexture(index = 0) {
   texture.wrapS = THREE.ClampToEdgeWrapping
   texture.wrapT = THREE.ClampToEdgeWrapping
   texture.colorSpace = THREE.SRGBColorSpace
-  texture.anisotropy = 8
+  texture.anisotropy = getAnisotropy()
   return texture
 }
 
@@ -455,6 +456,23 @@ function steelFrameTexture() {
   grad.addColorStop(1, "#45597a")
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, size, size)
+  return toTexture(ctx.canvas, 1, 1)
+}
+
+function goldFrameTexture() {
+  const size = 128
+  const { ctx } = makeCanvas(size)
+  const grad = ctx.createLinearGradient(0, 0, size, size)
+  grad.addColorStop(0, "#f6e6b4")
+  grad.addColorStop(0.35, "#d4ab62")
+  grad.addColorStop(0.65, "#9c7433")
+  grad.addColorStop(1, "#5f4718")
+  ctx.fillStyle = grad
+  ctx.fillRect(0, 0, size, size)
+  ctx.fillStyle = "rgba(255,250,220,0.09)"
+  for (let i = 0; i < 36; i++) {
+    ctx.fillRect(rand(0, size), rand(0, size), size, rand(1, 2))
+  }
   return toTexture(ctx.canvas, 1, 1)
 }
 
@@ -769,7 +787,7 @@ function bookCoverTexture(key) {
   }
   const texture = new THREE.CanvasTexture(canvas)
   texture.colorSpace = THREE.SRGBColorSpace
-  texture.anisotropy = 8
+  texture.anisotropy = getAnisotropy()
   _bookCovers[key] = texture
   return texture
 }
@@ -908,7 +926,7 @@ function globeTexture() {
   texture.wrapS = THREE.ClampToEdgeWrapping
   texture.wrapT = THREE.ClampToEdgeWrapping
   texture.colorSpace = THREE.SRGBColorSpace
-  texture.anisotropy = 8
+  texture.anisotropy = getAnisotropy()
   _globeMap = texture
   return texture
 }
@@ -977,7 +995,7 @@ function tvScreenTexture() {
   texture.wrapS = THREE.ClampToEdgeWrapping
   texture.wrapT = THREE.ClampToEdgeWrapping
   texture.colorSpace = THREE.SRGBColorSpace
-  texture.anisotropy = 8
+  texture.anisotropy = getAnisotropy()
   return texture
 }
 
@@ -989,6 +1007,7 @@ export const textures = {
   carpet: carpetTexture,
   steel: steelTexture,
   steelFrame: steelFrameTexture,
+  goldFrame: goldFrameTexture,
   hallGradient: hallGradientTexture,
   roundRug: roundRugTexture,
   rugRect: rugRectTexture,

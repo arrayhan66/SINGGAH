@@ -12,6 +12,14 @@ import {
 // Positions must stay in sync with the decor rendered in Museum.jsx.
 const PLATFORM_RADIUS = 4.0
 
+// Category-room furniture (must stay in sync with RoomDecorGround/RoomDecorUpper).
+// The thin tabletops of LesehanTable/SideTable are filtered out of the AABB
+// pass (FLAT_THRESHOLD), so they need explicit circular colliders. Each has a
+// level so the mezzanine furniture only blocks mezzanine players.
+const LESEHAN_RADIUS = 1.15
+const LESEHAN_BIG_RADIUS = 1.8
+const SIDE_TABLE_RADIUS = 0.5
+
 // Barrier geometry must stay in sync with MuseumBarrier.jsx (posts + entrance gap).
 const BARRIER_RADIUS = 6.05
 const BARRIER_POSTS = 24
@@ -19,40 +27,17 @@ const BARRIER_SEG = (Math.PI * 2) / BARRIER_POSTS
 const BARRIER_OPEN_CENTER = Math.PI / 2
 const BARRIER_OPEN_HALF = BARRIER_SEG * 0.55
 
-const BENCHES = [
-  { x: -12, z: -25, ry: 0.45 },
-  { x: 12, z: -25, ry: -0.45 },
-  { x: -12, z: 25, ry: Math.PI - 0.45 },
-  { x: 12, z: 25, ry: -Math.PI + 0.45 },
-]
-
 const HALL_PLANTS = [
-  [-17.4, -22.5],
   [-17.4, -12],
   [-17.4, 0],
   [-17.4, 12],
-  [-17.4, 22.5],
-  [17.4, -22.5],
   [17.4, -9],
   [17.4, 9],
-  [17.4, 22.5],
 ]
 
 const KIOSKS = [
   { x: -4.5, z: 6 },
   { x: 4.5, z: 6 },
-]
-
-// Corner bench nooks (must stay in sync with BenchNook.jsx).
-// Only the back corners render BenchNook (front corners use plain Bench):
-// side table, floor lamp, hologram. Plant was removed, so no collider for it.
-const BENCH_NOOK = [
-  { x: -11.41, z: -23.78, radius: 0.45 },
-  { x: -13.47, z: -23.9, radius: 0.3 },
-  { x: -10.49, z: -24.17, radius: 0.35 },
-  { x: 11.41, z: -23.78, radius: 0.45 },
-  { x: 13.47, z: -23.9, radius: 0.3 },
-  { x: 10.49, z: -24.17, radius: 0.35 },
 ]
 
 // Homey furniture (must stay in sync with Museum.jsx homey decor)
@@ -81,35 +66,6 @@ const HOME_DECOR = [
   { x: -13.4, z: -9.0, radius: 0.55 },
   { x: -16.35, z: -9.0, radius: 0.35 },
 ]
-
-function benchCircles() {
-  const out = []
-  for (const b of BENCHES) {
-    for (const off of [-0.85, 0, 0.85]) {
-      out.push({
-        x: b.x + Math.cos(b.ry) * off,
-        z: b.z - Math.sin(b.ry) * off,
-        radius: 0.5,
-      })
-    }
-  }
-  return out
-}
-
-function pedestalCircles() {
-  const out = []
-  for (const room of rooms) {
-    if (room.floor === "marble") continue
-    const isDosen = room.id.endsWith("-dosen")
-    const cx = (room.x[0] + room.x[1]) / 2
-    out.push({
-      x: cx + (isDosen ? -10 : 10),
-      z: isDosen ? room.z[0] + 1.6 : room.z[1] - 1.6,
-      radius: 0.6,
-    })
-  }
-  return out
-}
 
 function wrapAngle(a) {
   while (a > Math.PI) a -= Math.PI * 2
@@ -163,6 +119,26 @@ function loungeCircles() {
   return out
 }
 
+function roomFurnitureColliders() {
+  const out = []
+  for (const room of rooms) {
+    if (room.id === "hall") continue
+    const cx = (room.x[0] + room.x[1]) / 2
+    for (const [x, z] of [
+      [cx, 45],
+      [cx + 3.5, 56],
+      [cx - 3.5, 67],
+      [cx, 78],
+    ]) {
+      out.push({ x, z, radius: LESEHAN_RADIUS, level: 0 })
+    }
+    out.push({ x: cx, z: 68, radius: LESEHAN_BIG_RADIUS, level: 1 })
+    out.push({ x: room.x[1] - 8, z: 45.2, radius: SIDE_TABLE_RADIUS, level: 1 })
+    out.push({ x: room.x[0] + 8, z: 45.2, radius: SIDE_TABLE_RADIUS, level: 1 })
+  }
+  return out
+}
+
 export function getObjectColliders() {
   return [
     { x: 0, z: 0, radius: PLATFORM_RADIUS },
@@ -172,13 +148,11 @@ export function getObjectColliders() {
       z: p.position[2],
       radius: 0.45,
     })),
-    ...benchCircles(),
-    ...BENCH_NOOK,
     ...HALL_PLANTS.map(([x, z]) => ({ x, z, radius: 0.45 })),
     ...KIOSKS.map((k) => ({ x: k.x, z: k.z, radius: 0.75 })),
     ...HOME_DECOR,
-    ...pedestalCircles(),
     ...barrierCircles(),
     ...loungeCircles(),
+    ...roomFurnitureColliders(),
   ]
 }

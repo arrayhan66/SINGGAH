@@ -1,10 +1,11 @@
+import { lazy, Suspense } from "react"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { ProtectedRoute } from "./ProtectedRoute"
 import { GuestRoute } from "./GuestRoute"
 import { ResetFlowRoute } from "./ResetFlowRoute"
 import RoleSplit from "./RoleSplit"
 
-import Hall from "../pages/Hall/Hall"
+const Hall = lazy(() => import("../pages/Hall/Hall"))
 import Home from "../pages/Home/Home"
 import News from "../pages/News/News"
 import NewsDetail from "../pages/News/NewsDetail"
@@ -60,7 +61,20 @@ function AppRouter() {
           element={<KaryaProjectDetail />}
         />
         <Route path="/about" element={<About />} />
-        <Route path="/hall" element={<Hall />} />
+        <Route
+          path="/hall"
+          element={
+            <Suspense
+              fallback={
+                <div className="flex h-screen w-screen items-center justify-center bg-[#0b1220]">
+                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#38bdf8] border-t-transparent" />
+                </div>
+              }
+            >
+              <Hall />
+            </Suspense>
+          }
+        />
         <Route path="/berita" element={<RoleSplit admin={<ManageNews />} visitor={<News />} />} />
         <Route path="/berita/:slug" element={<NewsDetail />} />
 

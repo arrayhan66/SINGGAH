@@ -1,13 +1,23 @@
 const PLAYER_RADIUS = 0.35
 const PLAYER_HEIGHT = 1.7
 
+// A collider blocks a player only when its vertical span overlaps the player's
+// body (feet at position.y, head at position.y + PLAYER_HEIGHT). This lets the
+// same 2D grid serve both the ground floor (y=0) and the mezzanine (y≈4).
+function boxBlocksLevel(b, py) {
+  const minY = b.minY ?? 0
+  const maxY = b.maxY ?? Infinity
+  return minY < py + PLAYER_HEIGHT && maxY > py
+}
+
 // Resolve a circular player against a list of axis-aligned boxes.
-// Each box is { minX, maxX, minZ, maxZ } in world space (any height) and is
+// Each box is { minX, maxX, minZ, maxZ, minY?, maxY? } in world space and is
 // expanded by the player radius before resolving, so the push-out keeps the
 // player exactly `radius` away from the box faces.
 function resolveBoxes(position, boxes, radius) {
   const p = position.clone()
   for (const b of boxes) {
+    if (!boxBlocksLevel(b, p.y)) continue
     const a = {
       minX: b.minX - radius,
       maxX: b.maxX + radius,
@@ -40,13 +50,14 @@ function resolveBoxes(position, boxes, radius) {
 export function resolveCollision(position, walls) {
   const boxes = []
   for (const w of walls) {
-    if (w.y0 > PLAYER_HEIGHT) continue
     if (w.axis === "x") {
       boxes.push({
         minX: w.at - w.t / 2,
         maxX: w.at + w.t / 2,
         minZ: w.from,
         maxZ: w.to,
+        minY: w.y0,
+        maxY: w.y1,
       })
     } else {
       boxes.push({
@@ -54,6 +65,8 @@ export function resolveCollision(position, walls) {
         maxX: w.to,
         minZ: w.at - w.t / 2,
         maxZ: w.at + w.t / 2,
+        minY: w.y0,
+        maxY: w.y1,
       })
     }
   }
@@ -65,9 +78,10 @@ export function resolveAABBs(position, boxes, radius = PLAYER_RADIUS) {
   return resolveBoxes(position, boxes, radius)
 }
 
-export function resolveObjectCollision(position, colliders) {
+export function resolveObjectCollision(position, colliders, level = 0) {
   const p = position.clone()
   for (const c of colliders) {
+    if (c.level !== undefined && c.level !== level) continue
     const dx = p.x - c.x
     const dz = p.z - c.z
     const minDist = c.radius + PLAYER_RADIUS

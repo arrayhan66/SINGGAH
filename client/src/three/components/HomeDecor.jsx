@@ -4,6 +4,7 @@ import { useTexture } from "@react-three/drei"
 import * as THREE from "three"
 import { textures } from "../utils/textures"
 import { BOOK_COVER_FILES, DEFAULT_COVER_KEY } from "../utils/bookCovers"
+import logo from "../../assets/icons/logo.png"
 
 const WOOD = "#2a3d5f"
 const WOOD_DARK = "#1f2f4e"
@@ -724,8 +725,39 @@ function SideTable({ position, rotationY = 0, drink = "coffee", book1 = "atomic"
   )
 }
 
-function createClockFaceTexture() {
-  const size = 512
+function RoundTable({ position, rotationY = 0, radius = 0.9, books = true }) {
+  const top = 0.76
+  const topY = top + 0.03
+  return (
+    <group position={position} rotation={[0, rotationY, 0]}>
+      <mesh position={[0, 0.045, 0]} castShadow>
+        <cylinderGeometry args={[radius * 0.4, radius * 0.5, 0.09, 20]} />
+        <meshStandardMaterial color={WOOD_DARK} roughness={0.6} />
+      </mesh>
+      <mesh position={[0, top / 2, 0]} castShadow>
+        <cylinderGeometry args={[0.075, 0.11, top - 0.09, 16]} />
+        <meshStandardMaterial color={WOOD} roughness={0.55} />
+      </mesh>
+      <mesh position={[0, top, 0]} castShadow>
+        <cylinderGeometry args={[radius, radius, 0.06, 32]} />
+        <meshStandardMaterial color={WOOD} roughness={0.5} />
+      </mesh>
+      <mesh position={[0, topY, 0]}>
+        <cylinderGeometry args={[radius - 0.06, radius - 0.06, 0.012, 32]} />
+        <meshStandardMaterial color={FABRIC_LIGHT} roughness={0.6} />
+      </mesh>
+      {books && (
+        <>
+          <RealBook coverKey="laskar" x={0.2} y={topY + 0.016} z={-0.18} rot={0.3} />
+          <RealBook coverKey="teras" x={-0.18} y={topY + 0.015} z={0.16} rot={-0.25} />
+          <Mug position={[-0.28, topY + 0.02, -0.1]} />
+        </>
+      )}
+    </group>
+  )
+}
+
+function createClockFaceTexture() {  const size = 512
   const canvas = document.createElement("canvas")
   canvas.width = size
   canvas.height = size
@@ -1137,6 +1169,108 @@ function HangingPlant({ position, drop = 0.85, seed = 0 }) {
   )
 }
 
+// Low round table with floor cushions around it, for groups sitting lesehan.
+function LesehanTable({
+  position,
+  rotationY = 0,
+  radius = 1.15,
+  cushionCount = 6,
+  rug = true,
+  rugRadius = 2.15,
+  books = [],
+  drink = null,
+}) {
+  const rugMap = useMemo(() => textures.roundRug(), [])
+  const logoMap = useTexture(logo)
+  const logoTex = useMemo(() => {
+    const clone = logoMap.clone()
+    clone.colorSpace = THREE.SRGBColorSpace
+    clone.needsUpdate = true
+    return clone
+  }, [logoMap])
+  const topH = 0.34
+  const cushionColors = [FABRIC, BRASS, LEAF, FABRIC_LIGHT, CREAM, CYAN]
+  const DrinkComp = drink ? DRINK_RENDER[drink.type] || Mug : null
+  return (
+    <group position={position} rotation={[0, rotationY, 0]}>
+      {rug && <RoundRug position={[0, 0.015, 0]} radius={rugRadius} map={rugMap} />}
+      {/* Table base */}
+      <mesh position={[0, 0.06, 0]} castShadow>
+        <cylinderGeometry args={[radius * 0.45, radius * 0.55, 0.12, 24]} />
+        <meshStandardMaterial color={WOOD_DARK} roughness={0.6} />
+      </mesh>
+      {/* Table leg */}
+      <mesh position={[0, topH / 2, 0]} castShadow>
+        <cylinderGeometry args={[0.07, 0.12, topH - 0.12, 16]} />
+        <meshStandardMaterial color={WOOD} roughness={0.55} />
+      </mesh>
+      {/* Low table top */}
+      <mesh position={[0, topH, 0]} castShadow>
+        <cylinderGeometry args={[radius, radius, 0.06, 32]} />
+        <meshStandardMaterial color={WOOD} roughness={0.5} />
+      </mesh>
+      {/* Decorative warm inlay disc (not plain white) */}
+      <mesh position={[0, topH + 0.03, 0]}>
+        <cylinderGeometry args={[radius - 0.06, radius - 0.06, 0.012, 40]} />
+        <meshStandardMaterial color="#e6d3a6" roughness={0.55} />
+      </mesh>
+      {/* Gold rim band around the inlay */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, topH + 0.037, 0]}>
+        <ringGeometry args={[radius - 0.1, radius - 0.06, 48]} />
+        <meshStandardMaterial color={BRASS} metalness={0.85} roughness={0.3} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-4} />
+      </mesh>
+      {/* SINGGAH logo in the centre */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, topH + 0.055, 0]}>
+        <planeGeometry args={[radius * 0.5, radius * 0.5]} />
+        <meshStandardMaterial
+          map={logoTex}
+          transparent
+          toneMapped={false}
+          emissive="#ffffff"
+          emissiveMap={logoTex}
+          emissiveIntensity={0.25}
+          roughness={0.5}
+        />
+      </mesh>
+      {/* Books laid on the tabletop */}
+      {books.map((b, i) => (
+        <RealBook
+          key={i}
+          coverKey={b.cover}
+          x={b.x ?? 0}
+          y={b.y ?? topH + 0.04}
+          z={b.z ?? 0}
+          rot={b.rot ?? i * 0.8}
+          w={b.w ?? 0.16}
+          h={b.h ?? 0.03}
+        />
+      ))}
+      {/* Drink on the tabletop */}
+      {DrinkComp && drink && <DrinkComp position={[drink.x ?? 0, topH + 0.04, drink.z ?? 0]} />}
+      {/* Floor cushions for sitting lesehan */}
+      {Array.from({ length: cushionCount }).map((_, i) => {
+        const a = (i / cushionCount) * Math.PI * 2
+        return (
+          <group
+            key={i}
+            position={[Math.cos(a) * (radius + 0.5), 0, Math.sin(a) * (radius + 0.5)]}
+            rotation={[0, -a, 0]}
+          >
+            <mesh position={[0, 0.09, 0]} castShadow>
+              <boxGeometry args={[0.58, 0.12, 0.42]} />
+              <meshStandardMaterial color={cushionColors[i % cushionColors.length]} roughness={0.95} />
+            </mesh>
+            <mesh position={[0, 0.17, 0]}>
+              <boxGeometry args={[0.48, 0.08, 0.33]} />
+              <meshStandardMaterial color={cushionColors[i % cushionColors.length]} roughness={0.95} />
+            </mesh>
+          </group>
+        )
+      })}
+    </group>
+  )
+}
+
 function RectRug({ position, rotationY = 0, w = 5.4, d = 1.9, map }) {
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
@@ -1264,6 +1398,8 @@ export {
   HangingPlant,
   RectRug,
   RoundRug,
+  RoundTable,
+  LesehanTable,
   RealBook,
   Mug,
   GreenTea,

@@ -24,36 +24,6 @@ function Bench({ position, rotationY }) {
   )
 }
 
-function Pedestal({ position, radius = 0.35, top = "sphere", scale = 1 }) {
-  return (
-    <group position={position} scale={scale}>
-      <mesh position={[0, 0.06, 0]}>
-        <cylinderGeometry args={[radius + 0.06, radius + 0.12, 0.12, 24]} />
-        <meshStandardMaterial color="#93b4d4" roughness={0.4} metalness={0.15} />
-      </mesh>
-      <mesh position={[0, 0.55, 0]}>
-        <cylinderGeometry args={[radius * 0.82, radius, 0.9, 24]} />
-        <meshStandardMaterial color="#7f97b5" roughness={0.3} metalness={0.5} />
-      </mesh>
-      <mesh position={[0, 1.05, 0]}>
-        <cylinderGeometry args={[radius + 0.02, radius * 0.8, 0.1, 24]} />
-        <meshStandardMaterial color="#93b4d4" roughness={0.4} metalness={0.15} />
-      </mesh>
-      {top === "sphere" ? (
-        <mesh position={[0, 1.22, 0]}>
-          <sphereGeometry args={[0.14, 20, 20]} />
-          <meshStandardMaterial color="#7dd3fc" metalness={0.9} roughness={0.2} />
-        </mesh>
-      ) : (
-        <mesh position={[0, 1.28, 0]}>
-          <coneGeometry args={[0.12, 0.3, 16]} />
-          <meshStandardMaterial color="#7dd3fc" metalness={0.9} roughness={0.2} />
-        </mesh>
-      )}
-    </group>
-  )
-}
-
 function Plant({ position, scale = 1, variant = "bush", flowerColor = "#38bdf8" }) {
   const leaf = "#3a6a5a"
   const leafDark = "#2f5f4f"
@@ -481,4 +451,4 @@ function CCTV({ position, rotation = [0, 0, 0] }) {
   )
 }
 
-export { Bench, Pedestal, Plant, Chandelier, InfoPanel, InfoKiosk, WallSconce, CCTV }
+export { Bench, Plant, Chandelier, InfoPanel, InfoKiosk, WallSconce, CCTV }

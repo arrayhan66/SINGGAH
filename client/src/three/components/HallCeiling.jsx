@@ -1,6 +1,7 @@
 import * as THREE from "three"
+import { useLow } from "../hooks/useQuality"
 
-function Lantern({ position, color = "#ffd98a" }) {
+function Lantern({ position, color = "#ffd98a", low = false }) {
   return (
     <group position={position}>
       <mesh position={[0, -0.1, 0]}>
@@ -8,11 +9,11 @@ function Lantern({ position, color = "#ffd98a" }) {
         <meshStandardMaterial color="#9aa7b8" metalness={0.5} roughness={0.4} />
       </mesh>
       <mesh position={[0, -0.28, 0]}>
-        <sphereGeometry args={[0.13, 16, 16]} />
+        <sphereGeometry args={[0.13, low ? 10 : 16, low ? 10 : 16]} />
         <meshStandardMaterial color="#fff1d6" emissive={color} emissiveIntensity={1.8} />
       </mesh>
       <mesh position={[0, -0.42, 0]}>
-        <cylinderGeometry args={[0.09, 0.11, 0.045, 12]} />
+        <cylinderGeometry args={[0.09, 0.11, 0.045, low ? 8 : 12]} />
         <meshStandardMaterial color="#c9a35e" metalness={0.6} roughness={0.35} />
       </mesh>
     </group>
@@ -20,6 +21,7 @@ function Lantern({ position, color = "#ffd98a" }) {
 }
 
 function HallCeiling({ room, height = 6.5 }) {
+  const low = useLow()
   const x0 = room.x[0]
   const x1 = room.x[1]
   const z0 = room.z[0]
@@ -83,7 +85,7 @@ function HallCeiling({ room, height = 6.5 }) {
 
       {/* Soft glow above the central platform */}
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, H - 0.36, 0]}>
-        <circleGeometry args={[3.0, 48]} />
+        <circleGeometry args={[3.0, low ? 32 : 48]} />
         <meshBasicMaterial
           color="#bfe3ff"
           transparent
@@ -96,7 +98,7 @@ function HallCeiling({ room, height = 6.5 }) {
       {/* Central ceiling rosette / medallion */}
       {medallionRings.map((r, i) => (
         <mesh key={`ring-${i}`} position={[0, H - 0.02, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[r.r, r.size, 12, 80]} />
+          <torusGeometry args={[r.r, r.size, 12, low ? 48 : 80]} />
           <meshStandardMaterial color={TRIM} emissive="#38bdf8" emissiveIntensity={0.6} metalness={0.5} roughness={0.3} />
         </mesh>
       ))}
@@ -105,11 +107,11 @@ function HallCeiling({ room, height = 6.5 }) {
       {chandelierZ.map((z, i) => (
         <group key={`rosette-${i}`} position={[0, H - 0.02, z]}>
           <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <torusGeometry args={[0.5, 0.06, 12, 48]} />
+            <torusGeometry args={[0.5, 0.06, 12, low ? 32 : 48]} />
             <meshStandardMaterial color={TRIM} emissive="#38bdf8" emissiveIntensity={0.6} metalness={0.5} roughness={0.3} />
           </mesh>
           <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <torusGeometry args={[0.85, 0.07, 12, 48]} />
+            <torusGeometry args={[0.85, 0.07, 12, low ? 32 : 48]} />
             <meshStandardMaterial color={TRIM} emissive="#38bdf8" emissiveIntensity={0.6} metalness={0.5} roughness={0.3} />
           </mesh>
         </group>
@@ -126,7 +128,7 @@ function HallCeiling({ room, height = 6.5 }) {
         [9, 20.25],
         [-9, -20.25],
       ].map(([x, z], i) => (
-        <Lantern key={`lan-${i}`} position={[x, H - 0.15, z]} />
+        <Lantern key={`lan-${i}`} position={[x, H - 0.15, z]} low={low} />
       ))}
     </group>
   )

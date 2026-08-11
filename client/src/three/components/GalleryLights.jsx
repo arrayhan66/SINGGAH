@@ -11,7 +11,7 @@ function GalleryLights() {
         position={[15, 24, 10]}
         intensity={1.3}
         color="#e4f1ff"
-        castShadow
+        castShadow={tier === "tinggi"}
         shadow-mapSize-width={shadow}
         shadow-mapSize-height={shadow}
         shadow-camera-left={-26}

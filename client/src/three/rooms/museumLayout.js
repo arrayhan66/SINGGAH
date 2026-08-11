@@ -135,14 +135,18 @@ for (let i = 0; i < N; i++) {
   // Return portal (front wall), solid back wall.
   addWall("z", ROW_Z0, x0, x1, [{ c: cx, w: PORTAL_W, h: PORTAL_H }])
   addWall("z", ROW_Z1, x0, x1)
-  // Solid panel along the open side of the staircase (right of the stairs).
-  addWall("x", x0 + STAIR_WIDTH, STAIR_Z0, STAIR_Z1, [], { y0: 0, y1: STAIR_PANEL_H })
-  // Guard railing on floor 2 in front of the stair void.
-  addWall("z", STAIR_Z0, x0, x0 + STAIR_WIDTH, [], { y0: FLOOR2_Y, y1: FLOOR2_Y + 1.2 })
+  // Solid panel along the open side of the staircase (right of the stairs), moved forward slightly and widened to cover horizontal closing walls.
+  addWall("x", x0 + STAIR_WIDTH + 0.04, STAIR_Z0 - T / 2, STAIR_Z1 + T / 2, [], { y0: 0, y1: STAIR_PANEL_H })
+  // Guard railing on floor 2 in front of the stair void. Its +z face is placed
+  // exactly flush with the stair panel's -z face, and its span is inset by T/2
+  // on both ends to prevent intersecting the outer wall and stair panel.
+  addWall("z", STAIR_Z0 - T / 2, x0 + T / 2, x0 + STAIR_WIDTH + 0.04 - T / 2, [], { y0: FLOOR2_Y, y1: FLOOR2_Y + 1.2 })
   // Wall sealing the back of the stair void at ground level (prevents ground
   // players approaching the top of the stairs from behind; floor-2 walkers at
-  // feet y=FLOOR2_Y pass over it because its top is exactly at FLOOR2_Y).
-  addWall("z", STAIR_Z1, x0, x0 + STAIR_WIDTH, [], { y0: 0, y1: FLOOR2_Y })
+  // feet y=FLOOR2_Y pass over it because its top is exactly at FLOOR2_Y). Its -z
+  // face is flush with the stair panel's +z end face, and its span is inset by T/2
+  // on both ends to form clean T-junctions without overlapping.
+  addWall("z", STAIR_Z1 + T / 2, x0 + T / 2, x0 + STAIR_WIDTH + 0.04 - T / 2, [], { y0: 0, y1: FLOOR2_Y })
 }
 
 export function getWalls() {
@@ -310,21 +314,35 @@ for (let i = 0; i < N; i++) {
 }
 
 // ---- Painting walls per room id (ground = student, upper = lecturer) ----
-function wallDef(axis, at, from, to, face, y = 2.75) {
-  return { axis, at, from, to, face, y }
+// `dir` tells the packing direction along the wall (+1 = pack from `from` edge,
+// -1 = pack from `to` edge). `endPad` reserves a bare margin at the far end of
+// the packing run (used so frames never get flush against the exit portal).
+function wallDef(axis, at, from, to, face, y = 2.75, dir = 1, endPad = 0) {
+  return { axis, at, from, to, face, y, dir, endPad }
 }
 
-function carveWallDefs(axis, at, from, to, face, centers, w, y = 2.75) {
-  return carve(from, to, centers.map((c) => ({ a: c - w / 2, b: c + w / 2 }))).map(([a, b]) =>
-    wallDef(axis, at, a, b, face, y),
-  )
+// Bare stretch left empty around the exit portal so frames don't hug the door.
+const PORTAL_MARGIN = 1.8
+
+// Carve the front wall around the portal into two segments that each pack from
+// the room's outer corner toward the door, both reserving PORTAL_MARGIN beside
+// the opening — so the row ends neatly aligned with, but not flush against,
+// the exit portal.
+function portalWallDefs(axis, at, from, to, face, center, w, y = 2.75) {
+  const segs = carve(from, to, [{ a: center - w / 2, b: center + w / 2 }])
+  return segs.map(([a, b], i) => wallDef(axis, at, a, b, face, y, i > 0 ? -1 : 1, PORTAL_MARGIN))
 }
+
+// Lower the whole painting row + picture rail together (frames, wires, info
+// plaques and rail all drop by the same amount, so their relative layout stays
+// correct). Tune this to move the rail up/down.
+const PAINT_ROW_DROP = 0.4
 
 // Centre heights of the painting rows on each storey (ground = student,
 // upper = lecturer). Raised together with the building; the floor name boards
 // stay on the floor.
-export const GROUND_PAINT_Y = 3.5
-export const UPPER_PAINT_OFFSET = 3.5
+export const GROUND_PAINT_Y = 3.5 - PAINT_ROW_DROP
+export const UPPER_PAINT_OFFSET = 3.5 - PAINT_ROW_DROP
 
 export const paintingWalls = {}
 
@@ -338,18 +356,51 @@ for (let i = 0; i < N; i++) {
   const GROUND_Y = GROUND_PAINT_Y
   const UPPER_Y = FLOOR2_Y + UPPER_PAINT_OFFSET
 
+  // Wall order = fill order: one wall is fully populated before the next
+  // begins, starting with the most prominent back wall, then the front wall
+  // beside the portal, and finally the two short side walls.
   paintingWalls[id] = {
     ground: [
+      wallDef("z", ROW_Z1, x0, x1, "-z", GROUND_Y),
+      ...portalWallDefs("z", ROW_Z0, x0, x1, "+z", cx, PORTAL_W, GROUND_Y),
       wallDef("x", x0, gZ[0], gZ[1], "+x", GROUND_Y),
       wallDef("x", x1, gZ[0], gZ[1], "-x", GROUND_Y),
-      ...carveWallDefs("z", ROW_Z0, x0, x1, "+z", [cx], PORTAL_W, GROUND_Y),
-      wallDef("z", ROW_Z1, x0, x1, "-z", GROUND_Y),
     ],
     upper: [
+      wallDef("z", ROW_Z1, x0, x1, "-z", UPPER_Y),
+      ...portalWallDefs("z", ROW_Z0, x0, x1, "+z", cx, PORTAL_W, UPPER_Y),
       wallDef("x", x0, uZ[0], uZ[1], "+x", UPPER_Y),
       wallDef("x", x1, uZ[0], uZ[1], "-x", UPPER_Y),
-      ...carveWallDefs("z", ROW_Z0, x0, x1, "+z", [cx], PORTAL_W, UPPER_Y),
-      wallDef("z", ROW_Z1, x0, x1, "-z", UPPER_Y),
+    ],
+  }
+}
+
+// ---- Extra gallery rails filling the wall stretches that carry no paintings,
+// so every wall in a room gets a continuous rail ("jalur karya"). The rail is
+// cut at the staircase band (STAIR_Z0..STAIR_Z1) on the stair-side wall only —
+// the "KARYA DOSEN" area stays rail-free, while the wall across from it runs
+// straight through. ----
+export const roomRails = {}
+
+for (let i = 0; i < N; i++) {
+  const cat = karyaCategories[i]
+  const [x0, x1] = roomX(i)
+  const id = cat.slug
+  const GROUND_Y = GROUND_PAINT_Y
+  const UPPER_Y = FLOOR2_Y + UPPER_PAINT_OFFSET
+
+  roomRails[id] = {
+    ground: [
+      // Stair-side wall (left) resumes behind the staircase, cut at the band;
+      // the opposite wall (right) runs the full depth.
+      wallDef("x", x0, STAIR_Z1, ROW_Z1, "+x", GROUND_Y),
+      wallDef("x", x1, STAIR_Z0, ROW_Z1, "-x", GROUND_Y),
+    ],
+    upper: [
+      // Stair-side wall (left) gets only the walkable front stretch; the
+      // opposite wall (right) continues past the stair band.
+      wallDef("x", x0, ROW_Z0, STAIR_Z0, "+x", UPPER_Y),
+      wallDef("x", x1, ROW_Z0, STAIR_Z1, "-x", UPPER_Y),
     ],
   }
 }
@@ -368,68 +419,75 @@ function faceOffset(face) {
 // Height of the picture rail above each painting wall row (wires hang down).
 export const RAIL_OFFSET = 1.08
 
+// Frames sit adjacent in a row ("berjejer") with a clear gap between works and
+// a generous inset from each wall's start edge (the room corners). Each wall is
+// populated to its full capacity before the next wall starts (no round-robin
+// spreading), so a room always fills one complete wall first, then continues on
+// the next one.
+const FRAME_GAP = 0.9
+const FRAME_EDGE_PAD = 1.0
+
 export function layoutPaintings(roomId, projects, level = "ground") {
   const wallsDef = paintingWalls[roomId]?.[level] || []
   const list = projects || []
-  const caps = wallsDef.map((wd) =>
-    Math.max(0, Math.floor((wd.to - wd.from - 0.7) / (PAINT_W + 1.0))),
-  )
+  const caps = wallsDef.map((wd) => {
+    const len = wd.to - wd.from
+    const usable = len - wd.endPad
+    return Math.max(
+      0,
+      Math.floor((usable - FRAME_EDGE_PAD * 2 + FRAME_GAP) / (PAINT_W + FRAME_GAP)),
+    )
+  })
   const total = caps.reduce((s, c) => s + c, 0)
 
-  // Pass 1: round-robin assign each work to a wall (skipping full walls) so a
-  // room's pieces are spread across every wall, not stacked on the first one.
+  // Pass 1: fill walls one after another (each to its full capacity) so the
+  // frames gather on a single wall in a neat row before spilling to the next.
   const counts = caps.map(() => 0)
   let wi = 0
-  for (let i = 0; i < list.length; i++) {
-    if (i >= total) break
-    let tries = 0
-    while (tries < caps.length && counts[wi] >= caps[wi]) {
-      wi = (wi + 1) % caps.length
-      tries++
-    }
-    if (tries >= caps.length) break
+  for (let i = 0; i < list.length && i < total; i++) {
+    while (wi < caps.length && counts[wi] >= caps[wi]) wi++
+    if (wi >= caps.length) break
     counts[wi]++
-    wi = (wi + 1) % caps.length
   }
 
-  // Pass 2: place each wall's works evenly across its full length.
-  const used = caps.map(() => 0)
+  // Pass 2: place each wall's works as a single row PACKED from the wall's
+  // start edge (the room corner) toward the far end, so a partially-filled
+  // wall begins at the corner instead of the middle. Adding a work just
+  // appends the next frame flush beside the last one ("saling isi terus").
+  // FRAME_EDGE_PAD stays at the start edge and endPad stays reserved at the
+  // far end (the portal margin), so the row never overflows the wall.
   const placed = []
   let pi = 0
-  wi = 0
-  for (const p of list) {
-    if (pi >= total) break
-    let tries = 0
-    while (tries < caps.length && used[wi] >= counts[wi]) {
-      wi = (wi + 1) % caps.length
-      tries++
-    }
-    if (tries >= caps.length) break
+  for (let wi = 0; wi < caps.length; wi++) {
+    const n = counts[wi]
+    if (!n) continue
     const wd = wallsDef[wi]
-    const len = wd.to - wd.from
-    const n = used[wi]
-    const cnt = Math.max(1, counts[wi])
-    // Evenly spread this wall's assigned works across its full length.
-    const t = ((n + 0.5) / cnt) * len
-    let fx, fz
-    if (wd.axis === "x") {
-      fx = wd.at + faceOffset(wd.face)
-      fz = wd.from + t
-    } else {
-      fx = wd.from + t
-      fz = wd.at + faceOffset(wd.face)
+    for (let k = 0; k < n; k++) {
+      // dir=-1 walls pack from their `to` (corner) edge toward `from` (the
+      // portal side); dir=1 walls pack from `from` toward `to`.
+      const t =
+        wd.dir === -1
+          ? wd.to - FRAME_EDGE_PAD - PAINT_W / 2 - k * (PAINT_W + FRAME_GAP)
+          : wd.from + FRAME_EDGE_PAD + PAINT_W / 2 + k * (PAINT_W + FRAME_GAP)
+      const p = list[pi]
+      let fx, fz
+      if (wd.axis === "x") {
+        fx = wd.at + faceOffset(wd.face)
+        fz = t
+      } else {
+        fx = t
+        fz = wd.at + faceOffset(wd.face)
+      }
+      placed.push({
+        project: p,
+        position: [fx, wd.y, fz],
+        rotationY: rotationYFor(wd.face),
+        index: pi + 1,
+        isDosen: level === "upper",
+        railY: wd.y + RAIL_OFFSET,
+      })
+      pi++
     }
-    placed.push({
-      project: p,
-      position: [fx, wd.y, fz],
-      rotationY: rotationYFor(wd.face),
-      index: pi + 1,
-      isDosen: level === "upper",
-      railY: wd.y + RAIL_OFFSET,
-    })
-    used[wi]++
-    pi++
-    wi = (wi + 1) % caps.length
   }
   return placed
 }

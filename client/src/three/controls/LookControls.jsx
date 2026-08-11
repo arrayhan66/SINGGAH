@@ -44,6 +44,7 @@ function LookControls({ bounds, onSelectProject }) {
   const mouse = useRef(new THREE.Vector2())
   const euler = useRef(new THREE.Euler(0, 0, 0, "YXZ"))
   const stuckRef = useRef(0)
+  const lastCast = useRef(0)
   const modelCollidersRef = useRef([])
   const modelColliderBuilt = useRef(false)
 
@@ -105,6 +106,25 @@ function LookControls({ bounds, onSelectProject }) {
     return { position: tp.point, teleported: true }
   }
 
+  // Anti-tunneling: split a frame's movement into small substeps and resolve
+  // collision after each one, so a big frame step can never skip over a wall.
+  const MOVE_SUBSTEP = 0.25
+  const moveWithCollision = (from, move) => {
+    const total = move.length()
+    if (total <= 0.0001) return { position: from.clone(), teleported: false }
+    const steps = Math.max(1, Math.ceil(total / MOVE_SUBSTEP))
+    const dir = move.clone().normalize()
+    let pos = from.clone()
+    for (let i = 0; i < steps; i++) {
+      const stepLen = Math.min(MOVE_SUBSTEP, total - i * MOVE_SUBSTEP)
+      const next = pos.clone().addScaledVector(dir, stepLen)
+      const res = applyTeleport(pos, next)
+      if (res.teleported) return res
+      pos = res.position
+    }
+    return { position: pos, teleported: false }
+  }
+
   const resolveAll = (pos) => {
     let p = resolveCollision(pos, wallsRef.current)
     p = resolveObjectCollision(p, getObjectColliders(), useWalkStore.getState().level)
@@ -153,6 +173,11 @@ function LookControls({ bounds, onSelectProject }) {
           ) > DRAG_THRESHOLD
         useWalkStore.getState().setDragMoved(moved)
       } else {
+        // Hover raycasts are expensive on a scene this dense — throttle them
+        // so a fast mouse sweep only samples a few times per frame.
+        const now = performance.now()
+        if (now - lastCast.current < 80) return
+        lastCast.current = now
         raycaster.current.setFromCamera(mouse.current, camera)
         const hits = raycaster.current.intersectObjects(scene.children, true)
         const action = hits.length ? findAction(hits[0].object) : null
@@ -231,7 +256,7 @@ function LookControls({ bounds, onSelectProject }) {
 
     const store = useWalkStore.getState()
     const keys = keysRef.current
-    const pos = store.position.clone()
+    const dt = Math.min(delta, 0.05)
 
     const forwardPressed = keys.KeyW || keys.ArrowUp
     const backPressed = keys.KeyS || keys.ArrowDown
@@ -243,12 +268,13 @@ function LookControls({ bounds, onSelectProject }) {
 
     if (forwardPressed || backPressed || rightPressed || leftPressed) {
       if (store.target) useWalkStore.setState({ target: null })
-      if (forwardPressed) pos.add(forward.clone().multiplyScalar(SPEED * delta))
-      if (backPressed) pos.sub(forward.clone().multiplyScalar(SPEED * delta))
-      if (rightPressed) pos.add(right.clone().multiplyScalar(SPEED * delta))
-      if (leftPressed) pos.sub(right.clone().multiplyScalar(SPEED * delta))
-      const tp1 = applyTeleport(store.position, pos)
-      let resolved = tp1.position
+      const move = new THREE.Vector3()
+      if (forwardPressed) move.addScaledVector(forward, SPEED * dt)
+      if (backPressed) move.addScaledVector(forward, -SPEED * dt)
+      if (rightPressed) move.addScaledVector(right, SPEED * dt)
+      if (leftPressed) move.addScaledVector(right, -SPEED * dt)
+      const res = moveWithCollision(store.position, move)
+      const resolved = res.position
       resolved.x = THREE.MathUtils.clamp(resolved.x, bounds.minX, bounds.maxX)
       resolved.z = THREE.MathUtils.clamp(resolved.z, bounds.minZ, bounds.maxZ)
       useWalkStore.setState({ position: resolved })
@@ -264,19 +290,18 @@ function LookControls({ bounds, onSelectProject }) {
           onArrive()
         }
       } else {
-        const step = Math.min(dist, SPEED * delta)
+        const step = Math.min(dist, SPEED * dt)
         const move = dir.clone().normalize().multiplyScalar(step)
-        const next = store.position.clone().add(move)
-        const tp = applyTeleport(store.position, next)
-        const resolved = tp.position
+        const res = moveWithCollision(store.position, move)
+        const resolved = res.position
         resolved.x = THREE.MathUtils.clamp(resolved.x, bounds.minX, bounds.maxX)
         resolved.z = THREE.MathUtils.clamp(resolved.z, bounds.minZ, bounds.maxZ)
 
         const moved = resolved.distanceTo(store.position)
-        if (tp.teleported) {
+        if (res.teleported) {
           useWalkStore.setState({ position: resolved })
         } else if (moved < 0.004) {
-          stuckRef.current += delta
+          stuckRef.current += dt
           if (stuckRef.current > 0.6) {
             stuckRef.current = 0
             useWalkStore.setState({ target: null })
@@ -286,14 +311,14 @@ function LookControls({ bounds, onSelectProject }) {
         }
 
         const setState = {}
-        if (!tp.teleported) setState.position = resolved
-        if (moved >= 0.01 && !dragRef.current.active && !tp.teleported) {
+        if (!res.teleported) setState.position = resolved
+        if (moved >= 0.01 && !dragRef.current.active && !res.teleported) {
           const desiredYaw = Math.atan2(-move.x, -move.z)
           let yaw = store.yaw
           let diff = desiredYaw - yaw
           while (diff > Math.PI) diff -= Math.PI * 2
           while (diff < -Math.PI) diff += Math.PI * 2
-          yaw += diff * Math.min(1, delta * 6)
+          yaw += diff * Math.min(1, dt * 6)
           setState.yaw = yaw
         }
         useWalkStore.setState(setState)

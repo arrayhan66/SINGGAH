@@ -447,7 +447,10 @@ function frameArtTexture(index = 0) {
   return texture
 }
 
+let _steelFrame = null
+
 function steelFrameTexture() {
+  if (_steelFrame) return _steelFrame
   const size = 64
   const { ctx } = makeCanvas(size)
   const grad = ctx.createLinearGradient(0, 0, size, size)
@@ -456,10 +459,14 @@ function steelFrameTexture() {
   grad.addColorStop(1, "#45597a")
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, size, size)
-  return toTexture(ctx.canvas, 1, 1)
+  _steelFrame = toTexture(ctx.canvas, 1, 1)
+  return _steelFrame
 }
 
+let _goldFrame = null
+
 function goldFrameTexture() {
+  if (_goldFrame) return _goldFrame
   const size = 128
   const { ctx } = makeCanvas(size)
   const grad = ctx.createLinearGradient(0, 0, size, size)
@@ -473,7 +480,8 @@ function goldFrameTexture() {
   for (let i = 0; i < 36; i++) {
     ctx.fillRect(rand(0, size), rand(0, size), size, rand(1, 2))
   }
-  return toTexture(ctx.canvas, 1, 1)
+  _goldFrame = toTexture(ctx.canvas, 1, 1)
+  return _goldFrame
 }
 
 let _bookSpines = null

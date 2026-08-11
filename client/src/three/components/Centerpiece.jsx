@@ -2,6 +2,7 @@ import { useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import { Text, useTexture, Billboard } from "@react-three/drei"
 import * as THREE from "three"
+import { useLow } from "../hooks/useQuality"
 import logoPoliban from "../../assets/icons/Logo_Poliban.png"
 
 const GOLD = "#c9a35e"
@@ -13,6 +14,7 @@ function Centerpiece({ title = "HALL UTAMA" }) {
   const ringA = useRef()
   const ringB = useRef()
   const glow = useRef()
+  const low = useLow()
   const logoMap = useTexture(logoPoliban)
 
   useFrame((state, delta) => {
@@ -32,35 +34,35 @@ function Centerpiece({ title = "HALL UTAMA" }) {
     <group>
       {/* ---- Pedestal ---- */}
       <mesh position={[0, 0.21, 0]} receiveShadow castShadow>
-        <cylinderGeometry args={[1.15, 1.3, 0.12, 48]} />
+        <cylinderGeometry args={[1.15, 1.3, 0.12, low ? 32 : 48]} />
         <meshStandardMaterial color={MARBLE} roughness={0.4} metalness={0.05} />
       </mesh>
       <mesh position={[0, 0.28, 0]}>
-        <cylinderGeometry args={[1.06, 1.09, 0.05, 48]} />
+        <cylinderGeometry args={[1.06, 1.09, 0.05, low ? 32 : 48]} />
         <meshStandardMaterial color={GOLD} metalness={0.85} roughness={0.25} />
       </mesh>
       <mesh position={[0, 0.95, 0]} castShadow>
-        <cylinderGeometry args={[0.5, 0.85, 1.45, 40]} />
+        <cylinderGeometry args={[0.5, 0.85, 1.45, low ? 28 : 40]} />
         <meshStandardMaterial color={MARBLE_DARK} roughness={0.35} metalness={0.1} />
       </mesh>
       {[0.32, 0.46].map((r) => (
         <mesh key={r} position={[0, 0.95, 0]}>
-          <torusGeometry args={[r, 0.013, 8, 48]} />
+          <torusGeometry args={[r, 0.013, 8, low ? 32 : 48]} />
           <meshStandardMaterial color="#b9c7d8" metalness={0.5} roughness={0.3} />
         </mesh>
       ))}
       <mesh position={[0, 1.62, 0]}>
-        <cylinderGeometry args={[0.62, 0.56, 0.1, 40]} />
+        <cylinderGeometry args={[0.62, 0.56, 0.1, low ? 28 : 40]} />
         <meshStandardMaterial color={GOLD} metalness={0.85} roughness={0.25} />
       </mesh>
       <mesh position={[0, 1.78, 0]} castShadow>
-        <cylinderGeometry args={[0.74, 0.62, 0.14, 40]} />
+        <cylinderGeometry args={[0.74, 0.62, 0.14, low ? 28 : 40]} />
         <meshStandardMaterial color={MARBLE} roughness={0.35} metalness={0.05} />
       </mesh>
 
       {/* ---- Pulsing glow disc above the plinth ---- */}
       <mesh ref={glow} position={[0, 1.86, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[0.44, 48]} />
+        <circleGeometry args={[0.44, low ? 32 : 48]} />
         <meshBasicMaterial
           color="#38bdf8"
           transparent
@@ -74,7 +76,7 @@ function Centerpiece({ title = "HALL UTAMA" }) {
       <group ref={orb} position={[0, 2.42, 0]}>
         {/* Glass globe */}
         <mesh castShadow>
-          <sphereGeometry args={[0.72, 64, 48]} />
+          <sphereGeometry args={[0.72, low ? 32 : 64, low ? 24 : 48]} />
           <meshStandardMaterial
             color="#1c3a5e"
             metalness={0.4}
@@ -105,7 +107,7 @@ function Centerpiece({ title = "HALL UTAMA" }) {
       {/* ---- Orbital rings with satellites ---- */}
       <group ref={ringA} position={[0, 2.42, 0]}>
         <mesh>
-          <torusGeometry args={[1.06, 0.02, 12, 96]} />
+          <torusGeometry args={[1.06, 0.02, 12, low ? 64 : 96]} />
           <meshStandardMaterial
             color="#7dd3fc"
             emissive="#38bdf8"
@@ -115,7 +117,7 @@ function Centerpiece({ title = "HALL UTAMA" }) {
           />
         </mesh>
         <mesh position={[1.06, 0, 0]}>
-          <sphereGeometry args={[0.06, 16, 16]} />
+          <sphereGeometry args={[0.06, low ? 10 : 16, low ? 10 : 16]} />
           <meshStandardMaterial
             color="#f8fafc"
             emissive="#7dd3fc"
@@ -127,7 +129,7 @@ function Centerpiece({ title = "HALL UTAMA" }) {
       </group>
       <group ref={ringB} position={[0, 2.42, 0]}>
         <mesh>
-          <torusGeometry args={[1.3, 0.014, 12, 96]} />
+          <torusGeometry args={[1.3, 0.014, 12, low ? 64 : 96]} />
           <meshStandardMaterial
             color={GOLD}
             emissive="#f5d488"
@@ -137,7 +139,7 @@ function Centerpiece({ title = "HALL UTAMA" }) {
           />
         </mesh>
         <mesh position={[-1.3, 0, 0]}>
-          <sphereGeometry args={[0.045, 12, 12]} />
+          <sphereGeometry args={[0.045, 10, 10]} />
           <meshStandardMaterial color="#e8f4ff" metalness={0.9} roughness={0.2} />
         </mesh>
       </group>
@@ -155,7 +157,7 @@ function Centerpiece({ title = "HALL UTAMA" }) {
 
       {/* ---- Engraved title ring around the base ---- */}
       <mesh position={[0, 0.162, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[1.42, 1.6, 64]} />
+        <ringGeometry args={[1.42, 1.6, low ? 48 : 64]} />
         <meshStandardMaterial
           color="#223047"
           roughness={0.4}

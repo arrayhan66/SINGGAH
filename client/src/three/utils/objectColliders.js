@@ -124,17 +124,45 @@ function roomFurnitureColliders() {
   for (const room of rooms) {
     if (room.id === "hall") continue
     const cx = (room.x[0] + room.x[1]) / 2
-    for (const [x, z] of [
-      [cx, 45],
-      [cx + 3.5, 56],
-      [cx - 3.5, 67],
-      [cx, 78],
-    ]) {
-      out.push({ x, z, radius: LESEHAN_RADIUS, level: 0 })
+    const x0 = room.x[0]
+    const x1 = room.x[1]
+
+    // 3 center Lesehan tables (z = 48, 60, 72)
+    for (const z of [48, 60, 72]) {
+      out.push({ x: cx, z, radius: LESEHAN_RADIUS, level: 0 })
+      out.push({ x: cx - 2.8, z, radius: 0.5, level: 0 })
+      out.push({ x: cx + 2.8, z, radius: 0.5, level: 0 })
     }
+
+    // 2 big round tables for balance at z = 54
+    out.push({ x: cx - 3.5, z: 54, radius: LESEHAN_BIG_RADIUS, level: 0 })
+    out.push({ x: cx + 3.5, z: 54, radius: LESEHAN_BIG_RADIUS, level: 0 })
+
+    // Ottoman stations and bookcases on left and right walls (z = 48, 60, 72)
+    for (const z of [48, 60, 72]) {
+      out.push({ x: x0 + 4.0, z, radius: 0.6, level: 0 })
+      out.push({ x: x0 + 5.8, z, radius: 0.5, level: 0 })
+      out.push({ x: x1 - 4.0, z, radius: 0.6, level: 0 })
+      out.push({ x: x1 - 5.8, z, radius: 0.5, level: 0 })
+    }
+
+    // Plants / topiary
+    out.push({ x: cx - 4.5, z: 52, radius: 0.5, level: 0 })
+    out.push({ x: cx + 4.5, z: 52, radius: 0.5, level: 0 })
+    out.push({ x: cx - 6, z: 50, radius: 0.6, level: 0 })
+    out.push({ x: cx + 6, z: 50, radius: 0.6, level: 0 })
+
+    // Featured work podium on right side
+    out.push({ x: cx + 9.5, z: 32, radius: 2.8, level: 0 })
+
+    // Upper floor furniture (level 1)
     out.push({ x: cx, z: 68, radius: LESEHAN_BIG_RADIUS, level: 1 })
     out.push({ x: room.x[1] - 8, z: 45.2, radius: SIDE_TABLE_RADIUS, level: 1 })
     out.push({ x: room.x[0] + 8, z: 45.2, radius: SIDE_TABLE_RADIUS, level: 1 })
+    out.push({ x: room.x[1] - 1.55, z: 60, radius: 0.6, level: 1 })
+    out.push({ x: room.x[1] - 1.6, z: 50, radius: 0.5, level: 1 })
+    out.push({ x: room.x[1] - 1.6, z: 66, radius: 0.5, level: 1 })
+    out.push({ x: room.x[0] + 1.6, z: 54, radius: 0.5, level: 1 })
   }
   return out
 }

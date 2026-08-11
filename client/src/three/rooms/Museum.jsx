@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react"
 import { Text } from "@react-three/drei"
 import * as THREE from "three"
+import { useQualityStore } from "../hooks/useQuality"
 import { textures } from "../utils/textures"
 import Pillar from "../components/Pillar"
 import Painting from "../components/Painting"
@@ -9,8 +10,10 @@ import Centerpiece from "../components/Centerpiece"
 import MuseumBarrier from "../components/MuseumBarrier"
 import LoungeSeating from "../components/LoungeSeating"
 import HallCeiling from "../components/HallCeiling"
+import HaloPendant from "../components/HaloPendant"
+import KaryaCeiling from "../components/KaryaCeiling"
 import WallGuard from "../components/WallGuard"
-import CategoryCenterpiece from "../components/CategoryCenterpiece"
+import FeaturedWork from "../components/FeaturedWork"
 import {
   Console,
   Bookcase,
@@ -18,6 +21,7 @@ import {
   FloorLamp,
   SideTable,
   WallClock,
+  Ottoman,
   WindowCurtains,
   Television,
   HangingPlant,
@@ -40,6 +44,7 @@ import {
   getWalls,
   archways,
   paintingWalls,
+  roomRails,
   layoutPaintings,
   roomCategories,
   upperSlabPieces,
@@ -47,7 +52,6 @@ import {
   HALL_PILLARS,
   LAYOUT,
   RAIL_OFFSET,
-  GROUND_PAINT_Y,
   FLOOR2_Y,
   STAIR_WIDTH,
   STAIR_Z0,
@@ -63,6 +67,11 @@ const H = MUSEUM.height
 const HALL_H = MUSEUM.hallHeight
 const HALL_Z0 = LAYOUT.hallZ[0]
 const HALL_Z1 = LAYOUT.hallZ[1]
+
+// Number of student works taken OFF the wall and moved onto the featured podium
+// ("KARYA UNGGULAN") per category room. Kept at 2 so the works can render at
+// full wall size on the 7.0m podium (3 full-size frames would need ~9.4m).
+const FEATURED_ON_PODIUM = 2
 
 function FloorMesh({ room, floorMap }) {
   const w = room.x[1] - room.x[0]
@@ -84,40 +93,6 @@ function FloorMesh({ room, floorMap }) {
         roughness={0.9}
       />
     </mesh>
-  )
-}
-
-function CeilingMesh({ room }) {
-  const w = room.x[1] - room.x[0]
-  const d = room.z[1] - room.z[0]
-  const cx = (room.x[0] + room.x[1]) / 2
-  const cz = (room.z[0] + room.z[1]) / 2
-  const x0 = room.x[0]
-  const x1 = room.x[1]
-  const z0 = room.z[0]
-  const z1 = room.z[1]
-  const coveMat = <meshBasicMaterial color="#9cc2e6" />
-
-  const strips = [
-    { pos: [x0 + 0.03, H - 0.4, cz], rotY: Math.PI / 2, size: [0.32, d - 0.2] },
-    { pos: [x1 - 0.03, H - 0.4, cz], rotY: -Math.PI / 2, size: [0.32, d - 0.2] },
-    { pos: [cx, H - 0.4, z0 + 0.03], rotY: 0, size: [w - 0.2, 0.32] },
-    { pos: [cx, H - 0.4, z1 - 0.03], rotY: Math.PI, size: [w - 0.2, 0.32] },
-  ]
-
-  return (
-    <group>
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[cx, H, cz]}>
-        <planeGeometry args={[w, d]} />
-        <meshStandardMaterial color="#dbe7f5" roughness={0.9} />
-      </mesh>
-      {strips.map((s, i) => (
-        <mesh key={i} rotation={[0, s.rotY, 0]} position={s.pos}>
-          <planeGeometry args={s.size} />
-          {coveMat}
-        </mesh>
-      ))}
-    </group>
   )
 }
 
@@ -273,7 +248,7 @@ function Stairs({ room }) {
 // storey with a "KARYA DOSEN" plaque and a right-pointing arrow, facing the
 // room interior (the panel's +x face).
 function DosenStairSign({ room }) {
-  const x = room.x[0] + STAIR_WIDTH + 0.17
+  const x = room.x[0] + STAIR_WIDTH + 0.10 + 0.17
   const cz = (STAIR_Z0 + STAIR_Z1) / 2
   const textRef = useRef(null)
   const [textW, setTextW] = useState(0)
@@ -337,47 +312,6 @@ function DosenStairSign({ room }) {
   )
 }
 
-// Painting rail along the vertical stairwell panel (skips the "KARYA DOSEN" sign),
-// plus horizontal painting rails at the stair barriers (STAIR_Z0 and STAIR_Z1).
-function StairPanelRail({ room }) {
-  const cz = (STAIR_Z0 + STAIR_Z1) / 2
-  const signHalf = 2.4
-  const railY = GROUND_PAINT_Y + RAIL_OFFSET
-  const x = room.x[0] + STAIR_WIDTH + 0.15
-  const segs = [
-    [STAIR_Z0, cz - signHalf],
-    [cz + signHalf, STAIR_Z1],
-  ]
-
-  const x0 = room.x[0]
-  const x1 = room.x[0] + STAIR_WIDTH
-  const cx = (x0 + x1) / 2
-  const lenH = x1 - x0
-
-  return (
-    <group userData={{ noCollide: true }}>
-      {segs.map(([a, b], i) => {
-        if (b - a <= 0.1) return null
-        return (
-          <mesh key={`v-${i}`} position={[x, railY, (a + b) / 2]}>
-            <boxGeometry args={[0.06, 0.05, b - a]} />
-            <meshStandardMaterial color="#c9a35e" metalness={0.7} roughness={0.35} />
-          </mesh>
-        )
-      })}
-      {/* Horizontal rails on stair barriers */}
-      <mesh position={[cx, railY, STAIR_Z0 + 0.15]}>
-        <boxGeometry args={[lenH, 0.05, 0.06]} />
-        <meshStandardMaterial color="#c9a35e" metalness={0.7} roughness={0.35} />
-      </mesh>
-      <mesh position={[cx, railY, STAIR_Z1 - 0.15]}>
-        <boxGeometry args={[lenH, 0.05, 0.06]} />
-        <meshStandardMaterial color="#c9a35e" metalness={0.7} roughness={0.35} />
-      </mesh>
-    </group>
-  )
-}
-
 // Upper storey slab: full room footprint minus the stair void, split into
 // pieces so the open staircase stays clear.
 function UpperSlab({ room }) {  const pieces = upperSlabPieces(room)
@@ -393,7 +327,7 @@ function UpperSlab({ room }) {  const pieces = upperSlabPieces(room)
           <meshStandardMaterial color="#dbe6f2" roughness={0.9} />
         </mesh>
       ))}
-      <mesh position={[room.x[0] + STAIR_WIDTH, FLOOR2_Y - 0.1, (STAIR_Z0 + STAIR_Z1) / 2]}>
+      <mesh position={[room.x[0] + STAIR_WIDTH + 0.10, FLOOR2_Y - 0.1, (STAIR_Z0 + STAIR_Z1) / 2]}>
         <boxGeometry args={[0.08, 0.3, STAIR_Z1 - STAIR_Z0]} />
         <meshStandardMaterial color="#7b93ad" roughness={0.6} />
       </mesh>
@@ -403,7 +337,7 @@ function UpperSlab({ room }) {  const pieces = upperSlabPieces(room)
 
 // Ground storey (lantai 1): entrance gallery of student works in the front
 // strip (open to the tall ceiling), beneath the staircase foot.
-function RoomDecorGround({ room, category }) {
+function RoomDecorGround({ room, projects }) {
   const x0 = room.x[0]
   const x1 = room.x[1]
   const cx = (x0 + x1) / 2
@@ -412,76 +346,115 @@ function RoomDecorGround({ room, category }) {
     <group key={`decor-ground-${room.id}`}>
       <FloorLabel position={[cx, 0.06, 29]} text="LANTAI 1 · KARYA MAHASISWA" />
 
-      {/* Category Focal Centerpiece */}
-      {category && <CategoryCenterpiece category={category} position={[cx, 0, 36]} />}
-
       <Plant position={[x1 - 2.5, 0, 29]} variant="flower" flowerColor="#60a5fa" />
-      <Plant position={[x0 + 1.5, 0, 29]} variant="flower" flowerColor="#f8fafc" />
-      <Plant position={[cx - 4.8, 0, 29]} variant="tall" />
-      <Plant position={[cx + 4.8, 0, 29]} variant="tall" />
+      <Plant position={[x0 + 4.5, 0, 29]} variant="flower" flowerColor="#f8fafc" />
+      <Plant position={[cx - 6.6, 0, 29]} variant="tall" />
+      <Plant position={[cx + 6.6, 0, 29]} variant="tall" />
 
-      <Chandelier position={[cx, H - 1.4, 29]} lit={0.8} drop={1.4} />
+      {/* 1. Tempat Duduk Ottoman (3 di kiri, 3 di kanan = seberang-seberangan, masing-masing 3 kursi + tiang lampu + rak kecil) */}
+      {[46, 60, 74].map((z, i) => (
+        <group key={`ott-l-${i}`}>
+          <Ottoman position={[x0 + 3.2, 0, z - 0.4]} rotationY={0.3} />
+          <Ottoman position={[x0 + 4.6, 0, z - 0.2]} rotationY={-0.3} />
+          <Ottoman position={[x0 + 4.0, 0, z + 0.5]} rotationY={Math.PI} />
+          <FloorLamp position={[x0 + 2.0, 0, z]} rotationY={0.8} />
+          <Bookcase position={[x0 + 6.0, 0, z]} rotationY={-Math.PI / 2} variant={i % 3} low />
+        </group>
+      ))}
 
-      {/* Round lesehan reading tables across the student-works floor */}
+      {[46, 60, 74].map((z, i) => (
+        <group key={`ott-r-${i}`}>
+          <Ottoman position={[x1 - 3.2, 0, z - 0.4]} rotationY={-0.3} />
+          <Ottoman position={[x1 - 4.6, 0, z - 0.2]} rotationY={0.3} />
+          <Ottoman position={[x1 - 4.0, 0, z + 0.5]} rotationY={Math.PI} />
+          <FloorLamp position={[x1 - 2.0, 0, z]} rotationY={-0.8} />
+          <Bookcase position={[x1 - 6.0, 0, z]} rotationY={Math.PI / 2} variant={i % 3} low />
+        </group>
+      ))}
+
+      {/* 2. Meja Bundar Kecil (3 di kiri, 3 di kanan = total 6 meja bundar kecil, seberang-seberangan) */}
+      {[40, 53, 66].map((z, i) => (
+        <LesehanTable
+          key={`small-table-l-${i}`}
+          position={[x0 + 4.0, 0, z]}
+          rotationY={i * 0.3}
+          radius={1.1}
+          cushionCount={4}
+          rugRadius={1.6}
+          books={[
+            { cover: i === 0 ? "laskar" : i === 1 ? "sherlock" : "python", x: -0.4, z: 0.35, rot: 0.2, w: 0.15 },
+          ]}
+          drink={{ type: i === 0 ? "greenTea" : i === 1 ? "mixue" : "icedTea", x: 0.4, z: -0.3 }}
+        />
+      ))}
+
+      {[40, 53, 66].map((z, i) => (
+        <LesehanTable
+          key={`small-table-r-${i}`}
+          position={[x1 - 4.0, 0, z]}
+          rotationY={i * 0.3}
+          radius={1.1}
+          cushionCount={4}
+          rugRadius={1.6}
+          books={[
+            { cover: i === 0 ? "eragon" : i === 1 ? "bintang" : "gahzi", x: -0.4, z: 0.35, rot: -0.2, w: 0.15 },
+          ]}
+          drink={{ type: i === 0 ? "coffee" : "greenTea", x: 0.4, z: 0.3 }}
+        />
+      ))}
+
+      {/* 3. Meja Bundar Besar (2 buah tepat di tengah) */}
       <LesehanTable
-        position={[cx, 0, 45]}
-        rotationY={0}
+        position={[cx - 3.5, 0, 54]}
+        rotationY={0.2}
+        radius={1.6}
+        cushionCount={8}
+        rugRadius={2.4}
         books={[
           { cover: "laskar", x: -0.5, z: 0.45, rot: 0.2, w: 0.18 },
-          { cover: "teras", x: -0.18, z: 0.55, rot: 0.65, w: 0.15 },
+          { cover: "gahzi", x: -0.18, z: 0.55, rot: 0.65, w: 0.15 },
         ]}
-        drink={{ type: "greenTea", x: 0.55, z: -0.4 }}
+        drink={{ type: "coffee", x: 0.55, z: -0.4 }}
       />
       <LesehanTable
-        position={[cx + 3.5, 0, 56]}
-        rotationY={0.4}
+        position={[cx + 3.5, 0, 54]}
+        rotationY={-0.2}
+        radius={1.6}
+        cushionCount={8}
+        rugRadius={2.4}
         books={[
-          { cover: "sherlock", x: -0.55, z: -0.35, rot: -0.15, w: 0.17 },
-          { cover: "gahzi", x: -0.2, z: -0.45, rot: 0.35, w: 0.15 },
-          { cover: "makanyamikir", x: 0.18, z: -0.4, rot: 0.1, w: 0.13 },
+          { cover: "eragon", x: -0.5, z: 0.45, rot: -0.2, w: 0.18 },
+          { cover: "bintang", x: -0.18, z: 0.55, rot: -0.65, w: 0.15 },
         ]}
-        drink={{ type: "mixue", x: 0.5, z: 0.45 }}
+        drink={{ type: "greenTea", x: 0.55, z: 0.4 }}
       />
-      <LesehanTable
-        position={[cx - 3.5, 0, 67]}
-        rotationY={0.8}
-        books={[
-          { cover: "python", x: -0.45, z: 0.4, rot: 0.3, w: 0.18 },
-          { cover: "tanahjawa", x: -0.1, z: 0.5, rot: -0.2, w: 0.15 },
-        ]}
-        drink={{ type: "icedTea", x: 0.55, z: -0.35 }}
-      />
-      <LesehanTable
-        position={[cx, 0, 78]}
-        rotationY={1.2}
-        books={[
-          { cover: "eragon", x: -0.55, z: -0.3, rot: -0.25, w: 0.17 },
-          { cover: "bintang", x: -0.2, z: -0.4, rot: 0.4, w: 0.15 },
-          { cover: "gadisjalanan", x: 0.18, z: -0.35, rot: 0.05, w: 0.14 },
-        ]}
-        drink={{ type: "coffee", x: 0.5, z: 0.4 }}
-      />
+      <Text
+        position={[cx, 0.05, 52]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        fontSize={0.14}
+        letterSpacing={0.05}
+        color="#7dd3fc"
+        anchorX="center"
+        anchorY="middle"
+        raycast={() => null}
+      >
+        KARYA ROOM
+      </Text>
 
-      {/* Rak buku berjejer di samping setiap meja lesehan */}
-      {[
-        { x: cx, z: 45 },
-        { x: cx + 3.5, z: 56 },
-        { x: cx - 3.5, z: 67 },
-        { x: cx, z: 78 },
-      ].flatMap((t, i) => [
-        <Bookcase
-          key={`bk-l-${i}`}
-          position={[t.x - 2.8, 0, t.z]}
-          rotationY={Math.PI / 2}
-          variant={i % 3}
-        />,
-        <Bookcase
-          key={`bk-r-${i}`}
-          position={[t.x + 2.8, 0, t.z]}
-          rotationY={-Math.PI / 2}
-          variant={(i + 1) % 3}
-        />,
-      ])}
+      {/* Symmetric plants flanking the center table - moved further away from seating */}
+      <Plant position={[cx - 8.0, 0, 52]} variant="topiary" />
+      <Plant position={[cx + 8.0, 0, 52]} variant="topiary" />
+      <Plant position={[cx - 9.5, 0, 48]} variant="tall" scale={1.5} potColor="#f1f5f9" />
+      <Plant position={[cx + 9.5, 0, 48]} variant="tall" scale={1.5} potColor="#f1f5f9" />
+
+      {/* Featured works on the right side near the entrance: the wall works
+      moved here are no longer shown on the wall */}
+      <FeaturedWork position={[cx + 9.5, 0, 32]} rotationY={-0.46} projects={projects.slice(-FEATURED_ON_PODIUM)} />
+
+      {/* Back-wall clock + president portraits above the student works */}
+      <WallClock position={[cx, 5.6, room.z[1] - 0.45]} rotationY={Math.PI} scale={1.3} />
+      <PresidentPortrait position={[cx + 2.0, 5.5, room.z[1] - 0.45]} rotationY={Math.PI} image={prabowoImg} />
+      <PresidentPortrait position={[cx - 2.0, 5.5, room.z[1] - 0.45]} rotationY={Math.PI} image={gibranImg} />
     </group>
   )
 }
@@ -516,9 +489,9 @@ function RoomDecorUpper({ room }) {
 
       {/* Plants */}
       <Plant position={[x1 - 2.5, Y, 68]} variant="tall" />
-      <Plant position={[x0 + 1.5, Y, 44]} variant="flower" flowerColor="#f8fafc" />
-      <Plant position={[cx - 4.8, Y, 44]} variant="tall" />
-      <Plant position={[cx + 4.8, Y, 44]} variant="tall" />
+      <Plant position={[x0 + 4.5, Y, 44]} variant="flower" flowerColor="#f8fafc" />
+      <Plant position={[cx - 6.6, Y, 44]} variant="tall" />
+      <Plant position={[cx + 6.6, Y, 44]} variant="tall" />
       <Plant position={[cx - 4, Y, 74]} variant="topiary" />
       <Plant position={[cx + 4, Y, 74]} variant="topiary" />
 
@@ -528,8 +501,8 @@ function RoomDecorUpper({ room }) {
       <WallSconce position={[x0 + 0.22, Y + 4.8, 50]} rotationY={Math.PI / 2} />
       <WallSconce position={[x0 + 0.22, Y + 4.8, 64]} rotationY={Math.PI / 2} />
 
-      <Chandelier position={[cx, H - 1.4, 46]} lit={0.85} drop={1.4} />
-      <Chandelier position={[cx, H - 1.4, 62]} lit={0.7} drop={1.4} />
+      <HaloPendant position={[cx, H - 1.4, 46]} drop={2.2} glow={0.85} />
+      <HaloPendant position={[cx, H - 1.4, 62]} drop={2.2} glow={0.7} />
 
       {/* Cozy lesehan reading corners: low side tables + lamps, no chairs */}
       <SideTable position={[x1 - 8, Y, 45.2]} rotationY={1.5} book1="gahzi" book2="gadisjalanan" />
@@ -553,6 +526,8 @@ function Museum() {
   const hallGradMap = useMemo(() => textures.hallGradient(), [])
   const rugMap = useMemo(() => textures.roundRug(), [])
   const rugRectMap = useMemo(() => textures.rugRect(), [])
+  const tier = useQualityStore((s) => s.tier)
+  const low = tier === "rendah"
   const stats = useMemo(() => getCategoryStats(karyaProjects), [])
   const groups = useMemo(() => {
     const enriched = enrichProjects(karyaProjects.map(normalizeProject))
@@ -578,7 +553,7 @@ function Museum() {
           {room.id === "hall" ? (
             <HallCeiling room={room} height={HALL_H} />
           ) : (
-            <CeilingMesh room={room} />
+            <KaryaCeiling room={room} height={H} />
           )}
         </group>
       ))}
@@ -596,7 +571,6 @@ function Museum() {
             <Stairs room={room} />
             <UpperSlab room={room} />
             <DosenStairSign room={room} />
-            <StairPanelRail room={room} />
           </group>
         )
       })}
@@ -631,16 +605,21 @@ function Museum() {
         return (
           <group key={`paint-${room.id}`}>
             {["ground", "upper"].map((level) => {
+              const mhsAll = groups.mhs[cat] || []
               const list =
                 level === "ground"
-                  ? groups.mhs[cat] || []
+                  ? mhsAll.slice(0, mhsAll.length - FEATURED_ON_PODIUM)
                   : groups.dosen[cat] || []
               const wallDefs = paintingWalls[room.id]?.[level] || []
+              const extraRails = roomRails[room.id]?.[level] || []
               const placed = layoutPaintings(room.id, list, level)
               return (
                 <group key={level}>
                   {wallDefs.map((wd, i) => (
                     <PaintingRail key={`r-${level}-${i}`} wall={wd} />
+                  ))}
+                  {extraRails.map((wd, i) => (
+                    <PaintingRail key={`xr-${level}-${i}`} wall={wd} />
                   ))}
                   {placed.map((p) => (
                     <Painting
@@ -664,12 +643,11 @@ function Museum() {
       {rooms.map((room) => {
         const cat = roomCategories[room.id]
         if (!cat) return null
-        const catObj = karyaCategories.find((c) => c.slug === room.id)
         return (
           <group key={`room-title-${room.id}`}>
             <RoomTitlePlaque room={room} title={cat} />
-            <RoomDecorGround room={room} category={catObj} />
-            <RoomDecorUpper room={room} category={catObj} />
+            <RoomDecorGround room={room} projects={groups.mhs[cat] || []} />
+            <RoomDecorUpper room={room} />
           </group>
         )
       })}
@@ -762,14 +740,16 @@ function Museum() {
 
         {/* Focal 3D centerpiece + spotlight */}
         <Centerpiece title="HALL UTAMA" />
-        <spotLight
-          position={[0, HALL_H - 0.25, 0]}
-          angle={0.55}
-          penumbra={0.5}
-          intensity={380}
-          distance={28}
-          color="#e6f4ff"
-        />
+        {tier === "tinggi" && (
+          <spotLight
+            position={[0, HALL_H - 0.25, 0]}
+            angle={0.55}
+            penumbra={0.5}
+            intensity={380}
+            distance={28}
+            color="#e6f4ff"
+          />
+        )}
 
         {/* Cozy topiary flanking the centre */}
         <Plant position={[-2.6, 0, 0]} variant="topiary" scale={1} />
@@ -885,19 +865,25 @@ function Museum() {
         <WallGuard />
       </group>
 
-      {/* Lights */}
-      <pointLight position={[0, HALL_H - 1.6, HALL_Z0 + 9]} intensity={22} distance={26} color="#cfe9ff" />
+      {/* Lights: one warm point light per room keeps the look while keeping the
+      per-fragment light count low — many point lights are the #1 GPU killer. */}
       <pointLight position={[0, HALL_H - 1.6, 0]} intensity={22} distance={26} color="#cfe9ff" />
-      <pointLight position={[0, HALL_H - 1.6, HALL_Z1 - 9]} intensity={22} distance={26} color="#cfe9ff" />
 
       {rooms.map((room) => {
         if (room.floor === "marble") return null
         const cx = (room.x[0] + room.x[1]) / 2
+        const zs = low ? [46] : [46]
         return (
           <group key={`light-${room.id}`}>
-            <pointLight position={[cx, H - 1.6, 29]} intensity={16} distance={26} color="#cfe8ff" />
-            <pointLight position={[cx, H - 1.6, 46]} intensity={14} distance={26} color="#cfe8ff" />
-            <pointLight position={[cx, H - 1.6, 66]} intensity={14} distance={26} color="#cfe8ff" />
+            {zs.map((z, i) => (
+              <pointLight
+                key={i}
+                position={[cx, H - 1.6, z]}
+                intensity={z === 29 ? 16 : 14}
+                distance={26}
+                color="#cfe8ff"
+              />
+            ))}
           </group>
         )
       })}

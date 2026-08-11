@@ -24,7 +24,7 @@ function Bench({ position, rotationY }) {
   )
 }
 
-function Plant({ position, scale = 1, variant = "bush", flowerColor = "#38bdf8" }) {
+function Plant({ position, scale = 1, variant = "bush", flowerColor = "#38bdf8", potColor = "#5a4a2b" }) {
   const leaf = "#3a6a5a"
   const leafDark = "#2f5f4f"
   const stem = "#3a3322"
@@ -38,7 +38,7 @@ function Plant({ position, scale = 1, variant = "bush", flowerColor = "#38bdf8" 
       {/* Pot */}
       <mesh position={[0, 0.22, 0]}>
         <cylinderGeometry args={[0.3, 0.24, 0.44, 20]} />
-        <meshStandardMaterial color="#5a4a2b" roughness={0.6} />
+        <meshStandardMaterial color={potColor} roughness={0.6} />
       </mesh>
 
       {variant === "bush" && (

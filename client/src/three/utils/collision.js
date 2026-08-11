@@ -16,33 +16,33 @@ function boxBlocksLevel(b, py) {
 // player exactly `radius` away from the box faces.
 function resolveBoxes(position, boxes, radius) {
   const p = position.clone()
-  for (const b of boxes) {
-    if (!boxBlocksLevel(b, p.y)) continue
-    const a = {
-      minX: b.minX - radius,
-      maxX: b.maxX + radius,
-      minZ: b.minZ - radius,
-      maxZ: b.maxZ + radius,
+  const active = boxes.filter((b) => boxBlocksLevel(b, p.y))
+  // Multi-pass: pushing the player out of one box can push them into a
+  // neighbour (adjacent walls, overlapping props). A few passes let the
+  // least-penetration push-out settle so the player doesn't clip through.
+  for (let pass = 0; pass < 4; pass++) {
+    let moved = false
+    for (const b of active) {
+      const a = {
+        minX: b.minX - radius,
+        maxX: b.maxX + radius,
+        minZ: b.minZ - radius,
+        maxZ: b.maxZ + radius,
+      }
+      const cx = Math.max(a.minX, Math.min(p.x, a.maxX))
+      const cz = Math.max(a.minZ, Math.min(p.z, a.maxZ))
+      const dx = p.x - cx
+      const dz = p.z - cz
+      const distSq = dx * dx + dz * dz
+      if (distSq === 0) {
+        const pushX = Math.abs(p.x - a.minX) < Math.abs(p.x - a.maxX) ? a.minX : a.maxX
+        const pushZ = Math.abs(p.z - a.minZ) < Math.abs(p.z - a.maxZ) ? a.minZ : a.maxZ
+        if (Math.abs(p.x - pushX) < Math.abs(p.z - pushZ)) p.x = pushX
+        else p.z = pushZ
+        moved = true
+      }
     }
-    const cx = Math.max(a.minX, Math.min(p.x, a.maxX))
-    const cz = Math.max(a.minZ, Math.min(p.z, a.maxZ))
-    const dx = p.x - cx
-    const dz = p.z - cz
-    const distSq = dx * dx + dz * dz
-    if (distSq === 0) {
-      const pushX = Math.abs(p.x - a.minX) < Math.abs(p.x - a.maxX) ? a.minX : a.maxX
-      const pushZ = Math.abs(p.z - a.minZ) < Math.abs(p.z - a.maxZ) ? a.minZ : a.maxZ
-      if (Math.abs(p.x - pushX) < Math.abs(p.z - pushZ)) p.x = pushX
-      else p.z = pushZ
-      continue
-    }
-    if (distSq < radius * radius) {
-      const dist = Math.sqrt(distSq)
-      const nx = dx / dist
-      const nz = dz / dist
-      p.x = cx + nx * radius
-      p.z = cz + nz * radius
-    }
+    if (!moved) break
   }
   return p
 }

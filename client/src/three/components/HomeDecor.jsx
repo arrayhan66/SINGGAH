@@ -2,6 +2,7 @@ import { Component, Suspense, useMemo, useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import { useTexture } from "@react-three/drei"
 import * as THREE from "three"
+import { useLow } from "../hooks/useQuality"
 import { textures } from "../utils/textures"
 import { BOOK_COVER_FILES, DEFAULT_COVER_KEY } from "../utils/bookCovers"
 import logo from "../../assets/icons/logo.png"
@@ -271,19 +272,20 @@ function ShelfContent({ y, seed, z = -0.04 }) {
   )
 }
 
-function Bookcase({ position, rotationY = 0, variant = 0 }) {
+function Bookcase({ position, rotationY = 0, variant = 0, low = false }) {
   const W = 1.86
-  const H = 2.8
+  const H = low ? 1.05 : 2.8
   const D = 0.32
-  const SHELVES = [0.35, 0.85, 1.35, 1.85, 2.35]
+  const SHELVES = low ? [0.32, 0.68] : [0.35, 0.85, 1.35, 1.85, 2.35]
   const FRAME = "#7fa0c4"
   const FRAME_DARK = "#6890b5"
   const SHELF = "#eef3f9"
   const topGlobe = useMemo(() => {
+    if (low) return 0
     if (variant === 0 || variant === 4) return 3.5
     if (variant === 2) return 2.7
     return 0
-  }, [variant])
+  }, [variant, low])
 
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
@@ -337,6 +339,7 @@ function Bookcase({ position, rotationY = 0, variant = 0 }) {
 }
 
 function DeskLamp({ position }) {
+  const low = useLow()
   return (
     <group position={position}>
       <mesh position={[0, 0.02, 0]}>
@@ -351,7 +354,7 @@ function DeskLamp({ position }) {
         <cylinderGeometry args={[0.16, 0.2, 0.24, 16]} />
         <meshStandardMaterial color={CREAM} emissive="#ffd98a" emissiveIntensity={0.9} />
       </mesh>
-      <pointLight position={[0, 0.5, 0]} intensity={2.5} distance={7} color="#ffd9a0" />
+      {!low && <pointLight position={[0, 0.5, 0]} intensity={2.5} distance={7} color="#ffd9a0" />}
     </group>
   )
 }
@@ -485,6 +488,7 @@ function Ottoman({ position, rotationY = 0 }) {
 }
 
 function FloorLamp({ position, rotationY = 0 }) {
+  const low = useLow()
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
       <mesh position={[0, 0.03, 0]} castShadow>
@@ -499,7 +503,7 @@ function FloorLamp({ position, rotationY = 0 }) {
         <cylinderGeometry args={[0.22, 0.3, 0.5, 16]} />
         <meshStandardMaterial color={CREAM} emissive="#ffd98a" emissiveIntensity={1.2} />
       </mesh>
-      <pointLight position={[0, 1.45, 0]} intensity={2.2} distance={8} color="#ffd9a0" />
+      {!low && <pointLight position={[0, 1.45, 0]} intensity={2.2} distance={8} color="#ffd9a0" />}
     </group>
   )
 }

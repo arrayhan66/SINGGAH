@@ -2,6 +2,7 @@ import { Component, Suspense, useMemo, useState } from "react"
 import { Text, useTexture } from "@react-three/drei"
 import * as THREE from "three"
 import { textures } from "../utils/textures"
+import { getAnisotropy, useQualityStore } from "../hooks/useQuality"
 import { PAINTING_SIZE } from "../rooms/museumLayout"
 import { CATEGORY_COLORS } from "../../utils/hallHelpers"
 
@@ -38,7 +39,7 @@ function PaintingImage({ url }) {
     t.repeat.set(p.repeat.x, p.repeat.y)
     t.offset.set(p.offset.x, p.offset.y)
     t.colorSpace = THREE.SRGBColorSpace
-    t.anisotropy = 8
+    t.anisotropy = getAnisotropy()
     return t
   }, [tex])
   return (
@@ -64,7 +65,7 @@ function hashString(s) {
   return h
 }
 
-function drawArtwork(ctx, w, h, palette, style, project) {
+function drawArtwork(ctx, w, h, palette, style) {
   const [c1, c2, c3, c4] = palette
   const cx = w / 2
   const cy = h / 2
@@ -196,18 +197,6 @@ function drawArtwork(ctx, w, h, palette, style, project) {
   ctx.strokeStyle = "rgba(198,214,232,0.55)"
   ctx.lineWidth = 2
   ctx.strokeRect(w * 0.045, h * 0.045, w * 0.91, w * 0.91)
-
-  const title = project.title || "Karya"
-  ctx.fillStyle = "#eaf2fc"
-  ctx.textAlign = "center"
-  ctx.font = `bold ${Math.round(w * 0.045)}px Georgia, serif`
-  const maxChars = 30
-  ctx.fillText(title.length > maxChars ? title.slice(0, maxChars - 1) + "…" : title, cx, h * 0.915)
-
-  const author = project.User?.name || project.author?.[0] || "SINGGAH"
-  ctx.fillStyle = "rgba(234,242,252,0.75)"
-  ctx.font = `${Math.round(w * 0.022)}px Georgia, serif`
-  ctx.fillText(String(author).toUpperCase(), cx, h * 0.96)
 }
 
 const placeholderCache = new Map()
@@ -222,10 +211,10 @@ function getPlaceholderTexture(project) {
   c.width = 512
   c.height = Math.round((512 * H) / W)
   const ctx = c.getContext("2d")
-  drawArtwork(ctx, c.width, c.height, palette, style, project)
+  drawArtwork(ctx, c.width, c.height, palette, style)
   const t = new THREE.CanvasTexture(c)
   t.colorSpace = THREE.SRGBColorSpace
-  t.anisotropy = 8
+  t.anisotropy = getAnisotropy()
   placeholderCache.set(key, t)
   return t
 }
@@ -260,19 +249,22 @@ function getCategoryColor(project) {
   return CATEGORY_COLORS[slug] || "#60a5fa"
 }
 
-function Painting({ project, position, rotationY, index = 1, isDosen = false, railY = null }) {
+function Painting({
+  project,
+  position = [0, 0, 0],
+  rotationY = 0,
+  isDosen = false,
+  railY = null,
+  goldPlaque = false,
+}) {
   const [hovered, setHovered] = useState(false)
   const steelMap = useMemo(() => textures.steelFrame(), [])
   const goldMap = useMemo(() => textures.goldFrame(), [])
+  const low = useQualityStore((s) => s.tier) === "rendah"
 
   const accent = isDosen ? "#22d3ee" : getCategoryColor(project)
-  const authorName = project.User?.name || project.author?.[0] || "Kreator"
-  const categoryName =
-    project.Category?.name ||
-    String(project.category || "")
-      .replace(/-/g, " ")
-      .toUpperCase()
   const title = project.title || "Karya"
+  const authorName = project.User?.name || project.author?.[0] || "Kreator"
   const thumbnail = project.thumbnail || project.image
   const hasImage = Boolean(thumbnail)
 
@@ -292,7 +284,7 @@ function Painting({ project, position, rotationY, index = 1, isDosen = false, ra
       onPointerOut={() => setHovered(false)}
     >
       {/* Hanging wires to the picture rail (home gallery look) */}
-      {railY != null && (
+      {!low && railY != null && (
         <>
           {[-frameW * 0.28, frameW * 0.28].map((wx, i) => {
             const topLocal = railY - position[1]
@@ -309,14 +301,16 @@ function Painting({ project, position, rotationY, index = 1, isDosen = false, ra
       )}
 
       {/* Soft glow behind (category tinted) */}
-      <mesh position={[0, 0, -0.012]}>
-        <planeGeometry args={[W + 0.56, H + 0.56]} />
-        <meshBasicMaterial
-          color={accent}
-          transparent
-          opacity={hovered ? 0.5 : 0.24}
-        />
-      </mesh>
+      {!low && (
+        <mesh position={[0, 0, -0.012]}>
+          <planeGeometry args={[W + 0.56, H + 0.56]} />
+          <meshBasicMaterial
+            color={accent}
+            transparent
+            opacity={hovered ? 0.5 : 0.24}
+          />
+        </mesh>
+      )}
 
       {/* Steel backplate */}
       <mesh position={[0, 0, 0.02]}>
@@ -372,23 +366,27 @@ function Painting({ project, position, rotationY, index = 1, isDosen = false, ra
       </Suspense>
 
       {/* Picture light */}
-      <mesh position={[0, H / 2 + 0.24, 0.06]}>
-        <boxGeometry args={[frameW + 0.06, 0.08, 0.22]} />
-        <meshStandardMaterial
-          color="#94a3b8"
-          emissive="#bfe3ff"
-          emissiveIntensity={hovered ? 2.8 : 1.7}
-          metalness={0.6}
-          roughness={0.3}
-        />
-      </mesh>
-      <mesh position={[0, H / 2 - 0.14, 0.1]}>
-        <planeGeometry args={[W + 0.2, 0.55]} />
-        <meshBasicMaterial color="#cfe9ff" transparent opacity={hovered ? 0.5 : 0.26} />
-      </mesh>
+      {!low && (
+        <>
+          <mesh position={[0, H / 2 + 0.24, 0.06]}>
+            <boxGeometry args={[frameW + 0.06, 0.08, 0.22]} />
+            <meshStandardMaterial
+              color="#94a3b8"
+              emissive="#bfe3ff"
+              emissiveIntensity={hovered ? 2.8 : 1.7}
+              metalness={0.6}
+              roughness={0.3}
+            />
+          </mesh>
+          <mesh position={[0, H / 2 - 0.14, 0.1]}>
+            <planeGeometry args={[W + 0.2, 0.55]} />
+            <meshBasicMaterial color="#cfe9ff" transparent opacity={hovered ? 0.5 : 0.26} />
+          </mesh>
+        </>
+      )}
 
       {/* Light cone on hover */}
-      {hovered && (
+      {hovered && !low && (
         <mesh
           position={[0, H / 2 - 0.55, 0.2]}
           rotation={[Math.PI, 0, 0]}
@@ -404,53 +402,57 @@ function Painting({ project, position, rotationY, index = 1, isDosen = false, ra
         </mesh>
       )}
 
-      {/* Plaque */}
+      {/* Plaque (info board, no text) */}
       <mesh position={[0, -H / 2 - 0.58, 0.045]}>
         <planeGeometry args={[frameW - 0.04, 0.72]} />
-        <meshStandardMaterial color="#16222f" roughness={0.45} metalness={0.35} />
+        {goldPlaque ? (
+          <meshStandardMaterial
+            map={goldMap}
+            metalness={0.4}
+            roughness={0.3}
+            emissive="#c9a35e"
+            emissiveIntensity={0.25}
+          />
+        ) : (
+          <meshStandardMaterial color="#16222f" roughness={0.45} metalness={0.35} />
+        )}
       </mesh>
-      <mesh position={[0, -H / 2 - 0.4, 0.06]}>
-        <planeGeometry args={[frameW + 0.08, 0.035]} />
-        <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.3} />
-      </mesh>
-      <mesh position={[0, -H / 2 - 0.8, 0.06]}>
-        <planeGeometry args={[frameW + 0.08, 0.035]} />
-        <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.3} />
-      </mesh>
+      {!goldPlaque && (
+        <>
+          <mesh position={[0, -H / 2 - 0.4, 0.06]}>
+            <planeGeometry args={[frameW + 0.08, 0.035]} />
+            <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.3} />
+          </mesh>
+          <mesh position={[0, -H / 2 - 0.8, 0.06]}>
+            <planeGeometry args={[frameW + 0.08, 0.035]} />
+            <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.3} />
+          </mesh>
+        </>
+      )}
 
       <Text
-        position={[0, -H / 2 - 0.46, 0.08]}
+        position={[0, -H / 2 - (goldPlaque ? 0.48 : 0.46), 0.08]}
         fontSize={0.115}
-        color="#f1f5f9"
+        color={goldPlaque ? "#123a63" : "#f1f5f9"}
         anchorX="center"
         anchorY="middle"
         maxWidth={frameW - 0.12}
         lineHeight={1.15}
+        font="/fonts/PlusJakartaSans.ttf"
       >
         {title}
       </Text>
       <Text
-        position={[0, -H / 2 - 0.64, 0.08]}
-        fontSize={0.085}
-        color="#93c5fd"
+        position={[0, -H / 2 - (goldPlaque ? 0.70 : 0.66), 0.08]}
+        fontSize={0.09}
+        color={goldPlaque ? "#1d4e79" : "#93c5fd"}
         anchorX="center"
         anchorY="middle"
         maxWidth={frameW - 0.12}
+        font="/fonts/PlusJakartaSans.ttf"
       >
-        {`No. ${String(index).padStart(2, "0")} · ${categoryName} · ${isDosen ? "Dosen" : "Mahasiswa"} · ${authorName}`}
+        {authorName}
       </Text>
-
-      {/* Accent stripe */}
-      <mesh position={[0, -H / 2 - 0.9, 0.06]}>
-        <planeGeometry args={[frameW + 0.08, 0.05]} />
-        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.6} />
-      </mesh>
-
-      {/* Category dot */}
-      <mesh position={[frameW / 2 - 0.06, -H / 2 - 0.66, 0.09]}>
-        <circleGeometry args={[0.045, 20]} />
-        <meshBasicMaterial color={accent} />
-      </mesh>
 
       {hovered && (
         <Text
@@ -460,6 +462,7 @@ function Painting({ project, position, rotationY, index = 1, isDosen = false, ra
           anchorX="center"
           anchorY="middle"
           raycast={() => null}
+          font="/fonts/PlusJakartaSans.ttf"
         >
           KLIK UNTUK LIHAT DETAIL
         </Text>

@@ -4,8 +4,6 @@ import { Text } from "@react-three/drei"
 import * as THREE from "three"
 
 const GOLD = "#c9a35e"
-const MARBLE = "#eef3f9"
-const MARBLE_DARK = "#dfe9f4"
 
 function CategoryCenterpiece({ category, position = [0, 0, 0] }) {
   const orb = useRef()
@@ -57,34 +55,6 @@ function CategoryCenterpiece({ category, position = [0, 0, 0] }) {
 
   return (
     <group position={position}>
-      {/* ---- Pedestal ---- */}
-      <mesh position={[0, 0.21, 0]} receiveShadow castShadow>
-        <cylinderGeometry args={[1.15, 1.3, 0.12, 48]} />
-        <meshStandardMaterial color={MARBLE} roughness={0.4} metalness={0.05} />
-      </mesh>
-      <mesh position={[0, 0.28, 0]}>
-        <cylinderGeometry args={[1.06, 1.09, 0.05, 48]} />
-        <meshStandardMaterial color={GOLD} metalness={0.85} roughness={0.25} />
-      </mesh>
-      <mesh position={[0, 0.95, 0]} castShadow>
-        <cylinderGeometry args={[0.5, 0.85, 1.45, 40]} />
-        <meshStandardMaterial color={MARBLE_DARK} roughness={0.35} metalness={0.1} />
-      </mesh>
-      {[0.32, 0.46].map((r) => (
-        <mesh key={r} position={[0, 0.95, 0]}>
-          <torusGeometry args={[r, 0.013, 8, 48]} />
-          <meshStandardMaterial color="#b9c7d8" metalness={0.5} roughness={0.3} />
-        </mesh>
-      ))}
-      <mesh position={[0, 1.62, 0]}>
-        <cylinderGeometry args={[0.62, 0.56, 0.1, 40]} />
-        <meshStandardMaterial color={GOLD} metalness={0.85} roughness={0.25} />
-      </mesh>
-      <mesh position={[0, 1.78, 0]} castShadow>
-        <cylinderGeometry args={[0.74, 0.62, 0.14, 40]} />
-        <meshStandardMaterial color={MARBLE} roughness={0.35} metalness={0.05} />
-      </mesh>
-
       {/* ---- Pulsing glow disc above the plinth ---- */}
       <mesh ref={glow} position={[0, 1.86, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[0.44, 48]} />

@@ -122,31 +122,6 @@ function TopCeiling({ room, height }) {
         </mesh>
       ))}
 
-      {/* Centre medallion + glow */}
-      <SoftGlow position={[cx, H - 0.36, cz]} low={low} />
-      <TrimRings
-        position={[cx, H - 0.02, cz]}
-        rings={[
-          { r: 0.55, t: 0.05 },
-          { r: 0.95, t: 0.08 },
-          { r: 1.4, t: 0.1 },
-          { r: 1.9, t: 0.06 },
-        ]}
-        low={low}
-      />
-
-      {/* Rosettes above the chandeliers */}
-      {chandelierZ.map((z, i) => (
-        <TrimRings
-          key={`r-${i}`}
-          position={[cx, H - 0.02, z]}
-          rings={[
-            { r: 0.35, t: 0.05 },
-            { r: 0.55, t: 0.05 },
-          ]}
-          low={low}
-        />
-      ))}
     </group>
   )
 }

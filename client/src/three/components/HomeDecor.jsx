@@ -1,9 +1,9 @@
 import { Component, Suspense, useMemo, useRef } from "react"
 import { useFrame } from "@react-three/fiber"
-import { useTexture } from "@react-three/drei"
 import * as THREE from "three"
-import { useLow } from "../hooks/useQuality"
+import InstancedMeshes from "../utils/InstancedMeshes"
 import { textures } from "../utils/textures"
+import { useDownscaledTexture } from "../utils/useDownscaledTexture"
 import { BOOK_COVER_FILES, DEFAULT_COVER_KEY } from "../utils/bookCovers"
 import logo from "../../assets/icons/logo.png"
 
@@ -20,6 +20,11 @@ const LEAF = "#3a6a5a"
 const LEAF_DARK = "#2f5f4f"
 
 const BOOK_COLORS = ["#3f6a9e", "#7fa4c9", "#a9c4e0", "#dbe7f5", "#eef3f9", "#c9a35e", "#7dd3fc", "#93b4d4", "#5a7f9e"]
+
+// Shared geometry/material for the ring of floor cushions (tinted per instance).
+const CUSHION_GEO = new THREE.BoxGeometry(0.58, 0.12, 0.42)
+const CUSHION_TOP_GEO = new THREE.BoxGeometry(0.48, 0.08, 0.33)
+const CUSHION_MAT = new THREE.MeshStandardMaterial({ color: "#ffffff", roughness: 0.95 })
 
 function mulberry32(seed) {
   let a = seed >>> 0
@@ -320,7 +325,9 @@ function Bookcase({ position, rotationY = 0, variant = 0, low = false }) {
         </group>
       ))}
 
-      <mesh position={[0, H - 0.025, -0.01]}>
+      {/* Top horizontal cover, lifted clear of the vertical posts so it never
+      overlaps them (sits right on top of the posts instead) */}
+      <mesh position={[0, H + 0.025, -0.01]}>
         <boxGeometry args={[W, 0.05, D]} />
         <meshStandardMaterial color={FRAME_DARK} roughness={0.55} />
       </mesh>
@@ -339,7 +346,6 @@ function Bookcase({ position, rotationY = 0, variant = 0, low = false }) {
 }
 
 function DeskLamp({ position }) {
-  const low = useLow()
   return (
     <group position={position}>
       <mesh position={[0, 0.02, 0]}>
@@ -354,7 +360,6 @@ function DeskLamp({ position }) {
         <cylinderGeometry args={[0.16, 0.2, 0.24, 16]} />
         <meshStandardMaterial color={CREAM} emissive="#ffd98a" emissiveIntensity={0.9} />
       </mesh>
-      {!low && <pointLight position={[0, 0.5, 0]} intensity={2.5} distance={7} color="#ffd9a0" />}
     </group>
   )
 }
@@ -488,7 +493,6 @@ function Ottoman({ position, rotationY = 0 }) {
 }
 
 function FloorLamp({ position, rotationY = 0 }) {
-  const low = useLow()
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
       <mesh position={[0, 0.03, 0]} castShadow>
@@ -503,14 +507,16 @@ function FloorLamp({ position, rotationY = 0 }) {
         <cylinderGeometry args={[0.22, 0.3, 0.5, 16]} />
         <meshStandardMaterial color={CREAM} emissive="#ffd98a" emissiveIntensity={1.2} />
       </mesh>
-      {!low && <pointLight position={[0, 1.45, 0]} intensity={2.2} distance={8} color="#ffd9a0" />}
     </group>
   )
 }
 
 function RealBook({ coverKey, x, y, z, rot = 0, w = 0.15, h = 0.03 }) {
   const pages = textures.bookPages()
-  const cover = useTexture(BOOK_COVER_FILES[coverKey] || BOOK_COVER_FILES[DEFAULT_COVER_KEY])
+  const cover = useDownscaledTexture(
+    BOOK_COVER_FILES[coverKey] || BOOK_COVER_FILES[DEFAULT_COVER_KEY],
+    256,
+  )
   const img = cover.image
   const aspect = img && img.width ? img.width / img.height : 0.66
   const depth = w / aspect
@@ -1185,16 +1191,26 @@ function LesehanTable({
   drink = null,
 }) {
   const rugMap = useMemo(() => textures.roundRug(), [])
-  const logoMap = useTexture(logo)
-  const logoTex = useMemo(() => {
-    const clone = logoMap.clone()
-    clone.colorSpace = THREE.SRGBColorSpace
-    clone.needsUpdate = true
-    return clone
-  }, [logoMap])
+  const logoTex = useDownscaledTexture(logo, 512)
   const topH = 0.34
   const cushionColors = [FABRIC, BRASS, LEAF, FABRIC_LIGHT, CREAM, CYAN]
   const DrinkComp = drink ? DRINK_RENDER[drink.type] || Mug : null
+  const cushionData = useMemo(() => {
+    const base = []
+    const top = []
+    const colors = []
+    for (let i = 0; i < cushionCount; i++) {
+      const a = (i / cushionCount) * Math.PI * 2
+      const x = Math.cos(a) * (radius + 0.5)
+      const z = Math.sin(a) * (radius + 0.5)
+      const rot = [0, -a, 0]
+      base.push({ position: [x, 0.09, z], rotation: rot })
+      top.push({ position: [x, 0.17, z], rotation: rot })
+      colors.push(cushionColors[i % cushionColors.length])
+    }
+    return { base, top, colors }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cushionCount, radius])
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
       {rug && <RoundRug position={[0, 0.015, 0]} radius={rugRadius} map={rugMap} />}
@@ -1252,25 +1268,21 @@ function LesehanTable({
       {/* Drink on the tabletop */}
       {DrinkComp && drink && <DrinkComp position={[drink.x ?? 0, topH + 0.04, drink.z ?? 0]} />}
       {/* Floor cushions for sitting lesehan */}
-      {Array.from({ length: cushionCount }).map((_, i) => {
-        const a = (i / cushionCount) * Math.PI * 2
-        return (
-          <group
-            key={i}
-            position={[Math.cos(a) * (radius + 0.5), 0, Math.sin(a) * (radius + 0.5)]}
-            rotation={[0, -a, 0]}
-          >
-            <mesh position={[0, 0.09, 0]} castShadow>
-              <boxGeometry args={[0.58, 0.12, 0.42]} />
-              <meshStandardMaterial color={cushionColors[i % cushionColors.length]} roughness={0.95} />
-            </mesh>
-            <mesh position={[0, 0.17, 0]}>
-              <boxGeometry args={[0.48, 0.08, 0.33]} />
-              <meshStandardMaterial color={cushionColors[i % cushionColors.length]} roughness={0.95} />
-            </mesh>
-          </group>
-        )
-      })}
+      <InstancedMeshes
+        geometry={CUSHION_GEO}
+        material={CUSHION_MAT}
+        transforms={cushionData.base}
+        colors={cushionData.colors}
+        count={cushionData.base.length}
+        castShadow
+      />
+      <InstancedMeshes
+        geometry={CUSHION_TOP_GEO}
+        material={CUSHION_MAT}
+        transforms={cushionData.top}
+        colors={cushionData.colors}
+        count={cushionData.top.length}
+      />
     </group>
   )
 }
@@ -1345,7 +1357,7 @@ class PortraitImageBoundary extends Component {
 }
 
 function PortraitPhoto({ image }) {
-  const tex = useTexture(image)
+  const tex = useDownscaledTexture(image, 512)
   const img = useMemo(() => {
     const t = tex.clone()
     t.colorSpace = THREE.SRGBColorSpace

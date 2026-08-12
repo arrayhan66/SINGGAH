@@ -1,4 +1,3 @@
-import { useLow } from "../hooks/useQuality"
 import { Plant } from "./Props"
 import {
   LOUNGE_LAYOUT,
@@ -41,7 +40,6 @@ function TableVase() {
 }
 
 function TableLamp() {
-  const low = useLow()
   return (
     <group position={[0, 0.88, 0]}>
       <mesh>
@@ -56,7 +54,6 @@ function TableLamp() {
         <cylinderGeometry args={[0.24, 0.3, 0.32, 16]} />
         <meshStandardMaterial color="#f5d488" emissive="#ffd98a" emissiveIntensity={1.6} />
       </mesh>
-      {!low && <pointLight position={[0, 0.84, 0]} intensity={3.5} distance={8} color="#ffd9a0" />}
     </group>
   )
 }

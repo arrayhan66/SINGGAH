@@ -9,8 +9,8 @@ const H = 14
 const HALL_H = 10
 
 // Door / portal sizes
-const PORTAL_W = 2.8
-const PORTAL_H = 4.8
+export const PORTAL_W = 2.8
+export const PORTAL_H = 4.8
 
 const PAINT_W = 2.2
 const PAINT_H = 1.5
@@ -42,7 +42,7 @@ const N = karyaCategories.length
 const ROW_X0 = -(N * ROOM_W) / 2
 const ROW_X1 = ROW_X0 + N * ROOM_W
 // Buildings sit flush behind the hall's front wall (front wall at z = +HALL_HALF_Z).
-const ROW_Z0 = HALL_HALF_Z + T
+export const ROW_Z0 = HALL_HALF_Z + T
 const ROW_Z1 = ROW_Z0 + ROOM_DEPTH
 
 // Staircase along the LEFT wall (x0). Bottom step near the room front.
@@ -54,6 +54,25 @@ export const STAIR_STEPS_COUNT = STAIR_STEPS
 export const STAIR_HALF = STAIR_WIDTH / 2
 // Height of the solid panel on the open side of the staircase.
 const STAIR_PANEL_H = FLOOR2_Y + 1.2
+// The stair-closing panel (which carries the "KARYA DOSEN" sign) has its two
+// ends mitered (miterFront/miterBack) into sharp 45° points that tuck flush
+// into the perpendicular closing walls, so the corners look "runcing" and the
+// junction never overlaps. Its covering bands (dark base, wainscot, cyan line)
+// are plain raised boxes that stop short of the runcing taper (INSET) so the
+// stripe edges never climb the mitered tips or overlap them — the tips stay
+// clean white, exactly like the theme bands on the other flat walls.
+const STAIR_PANEL_BAND_INSET = 0.28
+
+// Floor-2 theme bands: the second storey's walls carry the same blue wainscot
+// covering as ground level so the upper floor doesn't read as a plain white
+// void. Rendered at absolute height (upperBands), not relative to the wall's
+// y0, so they also land correctly on the portal-carved front-wall segments
+// (which start at y0 = PORTAL_H).
+const UPPER_BANDS = [
+  [0.06, FLOOR2_Y + 0.08, 0.16, "#1e293b"],
+  [0.1, FLOOR2_Y + 0.62, 1.25, "#7b93ad"],
+  [0.12, FLOOR2_Y + 1.32, 0.06, "#38bdf8"],
+]
 
 const roomCx = (i) => ROW_X0 + i * ROOM_W + ROOM_W / 2
 const roomX = (i) => [ROW_X0 + i * ROOM_W, ROW_X0 + i * ROOM_W + ROOM_W]
@@ -76,18 +95,18 @@ function carve(from, to, cuts) {
 
 const walls = []
 
-function addWall(axis, at, from, to, openings = [], yRange = { y0: 0, y1: H }) {
+function addWall(axis, at, from, to, openings = [], yRange = { y0: 0, y1: H }, props = {}) {
   if (!openings.length) {
-    walls.push({ axis, at, from, to, y0: yRange.y0, y1: yRange.y1, t: T })
+    walls.push({ axis, at, from, to, y0: yRange.y0, y1: yRange.y1, t: T, ...props })
     return
   }
   const cuts = openings.map((o) => ({ a: o.c - o.w / 2, b: o.c + o.w / 2 }))
   carve(from, to, cuts).forEach(([a, b]) =>
-    walls.push({ axis, at, from: a, to: b, y0: yRange.y0, y1: yRange.y1, t: T }),
+    walls.push({ axis, at, from: a, to: b, y0: yRange.y0, y1: yRange.y1, t: T, ...props }),
   )
   for (const o of openings) {
     if (o.h < yRange.y1) {
-      walls.push({ axis, at, from: o.c - o.w / 2, to: o.c + o.w / 2, y0: o.h, y1: yRange.y1, t: T })
+      walls.push({ axis, at, from: o.c - o.w / 2, to: o.c + o.w / 2, y0: o.h, y1: yRange.y1, t: T, ...props })
     }
   }
 }
@@ -108,6 +127,7 @@ addWall(
   HALL_HALF_Z,
   leftZ.map((z) => ({ c: z, w: PORTAL_W, h: PORTAL_H })),
   { y0: 0, y1: HALL_H },
+  { hall: true },
 )
 addWall(
   "x",
@@ -116,37 +136,48 @@ addWall(
   HALL_HALF_Z,
   rightZ.map((z) => ({ c: z, w: PORTAL_W, h: PORTAL_H })),
   { y0: 0, y1: HALL_H },
+  { hall: true },
 )
 // Back wall (solid, banner hangs here)
-addWall("z", -HALL_HALF_Z, -HALL_HALF_X, HALL_HALF_X, [], { y0: 0, y1: HALL_H })
+addWall("z", -HALL_HALF_Z, -HALL_HALF_X, HALL_HALF_X, [], { y0: 0, y1: HALL_H }, { hall: true })
 // Front wall (solid, no portals on the straight path)
-addWall("z", HALL_HALF_Z, ROW_X0, ROW_X1, [], { y0: 0, y1: HALL_H })
+addWall("z", HALL_HALF_Z, ROW_X0, ROW_X1, [], { y0: 0, y1: HALL_H }, { hall: true })
 
 // ---- Room row (behind the hall front wall) ----
-addWall("x", ROW_X0, ROW_Z0, ROW_Z1)
-addWall("x", ROW_X1, ROW_Z0, ROW_Z1)
+addWall("x", ROW_X0, ROW_Z0, ROW_Z1, [], {}, { upperBands: UPPER_BANDS })
+addWall("x", ROW_X1, ROW_Z0, ROW_Z1, [], {}, { upperBands: UPPER_BANDS })
 for (let i = 1; i < N; i++) {
-  addWall("x", ROW_X0 + i * ROOM_W, ROW_Z0, ROW_Z1)
+  addWall("x", ROW_X0 + i * ROOM_W, ROW_Z0, ROW_Z1, [], {}, { upperBands: UPPER_BANDS })
 }
 
 for (let i = 0; i < N; i++) {
   const [x0, x1] = roomX(i)
   const cx = roomCx(i)
-  // Return portal (front wall), solid back wall.
-  addWall("z", ROW_Z0, x0, x1, [{ c: cx, w: PORTAL_W, h: PORTAL_H }])
-  addWall("z", ROW_Z1, x0, x1)
-  // Solid panel along the open side of the staircase (right of the stairs), moved forward slightly and widened to cover horizontal closing walls.
-  addWall("x", x0 + STAIR_WIDTH + 0.04, STAIR_Z0 - T / 2, STAIR_Z1 + T / 2, [], { y0: 0, y1: STAIR_PANEL_H })
-  // Guard railing on floor 2 in front of the stair void. Its +z face is placed
-  // exactly flush with the stair panel's -z face, and its span is inset by T/2
-  // on both ends to prevent intersecting the outer wall and stair panel.
-  addWall("z", STAIR_Z0 - T / 2, x0 + T / 2, x0 + STAIR_WIDTH + 0.04 - T / 2, [], { y0: FLOOR2_Y, y1: FLOOR2_Y + 1.2 })
+  // Return portal (front wall), solid back wall. The front wall's covering bands
+  // are inset from each end so they never collide with the side walls' bands.
+  addWall("z", ROW_Z0, x0, x1, [{ c: cx, w: PORTAL_W, h: PORTAL_H }], { y0: 0, y1: H }, { bandInset: 0.35, upperBands: UPPER_BANDS })
+  addWall("z", ROW_Z1, x0, x1, [], {}, { upperBands: UPPER_BANDS })
+  // Solid panel along the open side of the staircase (right of the stairs),
+  // covering the full stair void. Its ends are mitered to sharp points that
+  // tuck into the closing walls, and its covering bands stop short of both
+  // ends so they never run into the bands of the perpendicular walls.
+  addWall("x", x0 + STAIR_WIDTH + 0.04, STAIR_Z0 - T / 2, STAIR_Z1 + T / 2, [], { y0: 0, y1: STAIR_PANEL_H }, { bandInset: STAIR_PANEL_BAND_INSET, miterFront: true, miterBack: true })
+  // Guard railing on floor 2 in front of the stair void. Its +x end is tucked
+  // inside the panel so the butt end never shows, and its +z face is set back
+  // slightly from the panel's front miter face (z = STAIR_Z0 - T/2) so it never
+  // sits coplanar with it. The railing is left plain white (no covering bands):
+  // the theme stripes belong on ground-level walls, putting them on a floor-2
+  // railing would only look like blue floating high in the air.
+  addWall("z", STAIR_Z0 - T / 2 - 0.03, x0 + T / 2, x0 + STAIR_WIDTH + 0.04, [], { y0: FLOOR2_Y - 0.01, y1: FLOOR2_Y + 1.19 })
   // Wall sealing the back of the stair void at ground level (prevents ground
   // players approaching the top of the stairs from behind; floor-2 walkers at
-  // feet y=FLOOR2_Y pass over it because its top is exactly at FLOOR2_Y). Its -z
-  // face is flush with the stair panel's +z end face, and its span is inset by T/2
-  // on both ends to form clean T-junctions without overlapping.
-  addWall("z", STAIR_Z1 + T / 2, x0 + T / 2, x0 + STAIR_WIDTH + 0.04 - T / 2, [], { y0: 0, y1: FLOOR2_Y })
+  // feet y=FLOOR2_Y pass over it because its top stays just below FLOOR2_Y). Its
+  // -z face is flush with the mitered panel's back point, its +x end tucks
+  // inside the panel. Collision is limited to a low band (collideY) and the
+  // mesh is flagged noCollide so climbers nearing the top of the stairs step
+  // over it instead of hitting an invisible wall — the tall render stays for
+  // looks.
+  addWall("z", STAIR_Z1 + T / 2, x0 + T / 2, x0 + STAIR_WIDTH + 0.04, [], { y0: 0, y1: FLOOR2_Y - 0.01 }, { bandInset: 0.05, collideY: [0, 2], noCollide: true })
 }
 
 export function getWalls() {
@@ -199,14 +230,27 @@ function onStairs(room, x, z) {
   return x >= s.x0 && x <= s.x1 && z >= s.z0 && z <= s.z1
 }
 
+// Smooth easing (smoothstep) used to interpolate the climb across each tread.
+function smooth01(t) {
+  return t * t * (3 - 2 * t)
+}
+
+// Height at (x, z) on the staircase. Instead of snapping to each discrete step
+// top (which made the camera hop up the risers), the rise is eased continuously
+// across each tread, so climbing glides smoothly up the stairs.
 function stairHeight(x, z) {
-  const i = Math.min(STAIR_STEPS, Math.floor((z - STAIR_Z0) / STAIR_TREAD))
-  return Math.min(FLOOR2_Y, (i + 1) * STAIR_RISE)
+  const zt = z - STAIR_Z0
+  const treadIdx = Math.min(STAIR_STEPS, Math.max(0, Math.floor(zt / STAIR_TREAD)))
+  const frac = Math.min(1, (zt - treadIdx * STAIR_TREAD) / STAIR_TREAD)
+  const base = Math.min(FLOOR2_Y, treadIdx * STAIR_RISE)
+  const next = Math.min(FLOOR2_Y, (treadIdx + 1) * STAIR_RISE)
+  return base + (next - base) * smooth01(frac)
 }
 
 // ---- Height field: which floor the player stands on at (x, z) ----
 // `level` is the player's current level (0 = ground, 1 = upper). Standing on the
-// staircase lifts/lowers the camera step by step and flips the level at the top.
+// staircase lifts/lowers the camera smoothly (eased per tread) and flips the
+// level at the top.
 export function resolveHeight(x, z, level = 0) {
   const room = findRoom(x, z)
   if (!room || room.floor === "marble") return { height: 0, level: 0 }
@@ -225,13 +269,15 @@ export function floorHeightAt(x, z) {
 }
 
 // ---- Upper-floor slab: full footprint minus the stair void, split into pieces
-// so the void (open staircase) stays clear. Returns [x0, z0, x1, z1] rects. ----
+// so the void (open staircase) stays clear. Returns [x0, z0, x1, z1] rects.
+// The two faces that would sit flush against the mitered stair panel's front
+// face (z = STAIR_Z0) are set back 3cm so they never sit coplanar with it. ----
 export function upperSlabPieces(room) {
   const x0 = room.x[0]
   const x1 = room.x[1]
   return [
-    [x0, ROW_Z0, x1, STAIR_Z0],
-    [x0 + STAIR_WIDTH, STAIR_Z0, x1, STAIR_Z1],
+    [x0, ROW_Z0, x1, STAIR_Z0 + 0.03],
+    [x0 + STAIR_WIDTH, STAIR_Z0 + 0.03, x1, STAIR_Z1],
     [x0, STAIR_Z1, x1, ROW_Z1],
   ]
 }
@@ -351,35 +397,38 @@ for (let i = 0; i < N; i++) {
   const [x0, x1] = roomX(i)
   const cx = roomCx(i)
   const id = cat.slug
-  const gZ = [ROW_Z0, STAIR_Z0]
-  const uZ = [STAIR_Z1, ROW_Z1]
   const GROUND_Y = GROUND_PAINT_Y
   const UPPER_Y = FLOOR2_Y + UPPER_PAINT_OFFSET
 
   // Wall order = fill order: one wall is fully populated before the next
-  // begins, starting with the most prominent back wall, then the front wall
-  // beside the portal, and finally the two short side walls.
+  // begins. The stair-side (left) wall is filled FIRST so every room's row of
+  // works starts at the corner where the staircase ends — right beside the
+  // "KARYA DOSEN" sign — and then grows toward the back-left end of the room
+  // as more works are added. Only when that wall is full does the row spill
+  // onto the back wall, then the front wall beside the portal, then the
+  // short right-side wall.
   paintingWalls[id] = {
     ground: [
+      wallDef("x", x0, STAIR_Z1, ROW_Z1, "+x", GROUND_Y),
       wallDef("z", ROW_Z1, x0, x1, "-z", GROUND_Y),
       ...portalWallDefs("z", ROW_Z0, x0, x1, "+z", cx, PORTAL_W, GROUND_Y),
-      wallDef("x", x0, gZ[0], gZ[1], "+x", GROUND_Y),
-      wallDef("x", x1, gZ[0], gZ[1], "-x", GROUND_Y),
+      wallDef("x", x1, ROW_Z0, STAIR_Z0, "-x", GROUND_Y),
     ],
     upper: [
+      wallDef("x", x0, STAIR_Z1, ROW_Z1, "+x", UPPER_Y),
       wallDef("z", ROW_Z1, x0, x1, "-z", UPPER_Y),
-      ...portalWallDefs("z", ROW_Z0, x0, x1, "+z", cx, PORTAL_W, UPPER_Y),
-      wallDef("x", x0, uZ[0], uZ[1], "+x", UPPER_Y),
-      wallDef("x", x1, uZ[0], uZ[1], "-x", UPPER_Y),
+      wallDef("z", ROW_Z0, x0, x1, "+z", UPPER_Y),
+      wallDef("x", x1, STAIR_Z1, ROW_Z1, "-x", UPPER_Y),
     ],
   }
 }
 
 // ---- Extra gallery rails filling the wall stretches that carry no paintings,
-// so every wall in a room gets a continuous rail ("jalur karya"). The rail is
-// cut at the staircase band (STAIR_Z0..STAIR_Z1) on the stair-side wall only —
-// the "KARYA DOSEN" area stays rail-free, while the wall across from it runs
-// straight through. ----
+// so every wall in a room gets a continuous rail ("jalur karya"). On the ground
+// floor the rail is cut at the staircase band (STAIR_Z0..STAIR_Z1) on the
+// stair-side wall only, because the staircase foot cuts through that stretch.
+// On the upper floor no passage crosses the stair band, so both side walls get
+// a full continuous rail. ----
 export const roomRails = {}
 
 for (let i = 0; i < N; i++) {
@@ -391,15 +440,16 @@ for (let i = 0; i < N; i++) {
 
   roomRails[id] = {
     ground: [
-      // Stair-side wall (left) resumes behind the staircase, cut at the band;
-      // the opposite wall (right) runs the full depth.
-      wallDef("x", x0, STAIR_Z1, ROW_Z1, "+x", GROUND_Y),
+      // Stair-side (left) wall keeps a bare rail on the short stretch in front
+      // of the staircase (its back stretch carries the works); the opposite
+      // wall (right) runs straight through with a continuous rail.
+      wallDef("x", x0, ROW_Z0, STAIR_Z0, "+x", GROUND_Y),
       wallDef("x", x1, STAIR_Z0, ROW_Z1, "-x", GROUND_Y),
     ],
     upper: [
-      // Stair-side wall (left) gets only the walkable front stretch; the
-      // opposite wall (right) continues past the stair band.
-      wallDef("x", x0, ROW_Z0, STAIR_Z0, "+x", UPPER_Y),
+      // Both side walls run a full continuous rail on the upper floor: nothing
+      // cuts through up there (no stair passage), so the rail never breaks.
+      wallDef("x", x0, ROW_Z0, STAIR_Z1, "+x", UPPER_Y),
       wallDef("x", x1, ROW_Z0, STAIR_Z1, "-x", UPPER_Y),
     ],
   }

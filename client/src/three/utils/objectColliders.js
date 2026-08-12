@@ -18,7 +18,6 @@ const PLATFORM_RADIUS = 4.0
 // level so the mezzanine furniture only blocks mezzanine players.
 const LESEHAN_RADIUS = 1.15
 const LESEHAN_BIG_RADIUS = 1.8
-const SIDE_TABLE_RADIUS = 0.5
 
 // Barrier geometry must stay in sync with MuseumBarrier.jsx (posts + entrance gap).
 const BARRIER_RADIUS = 6.05
@@ -127,42 +126,73 @@ function roomFurnitureColliders() {
     const x0 = room.x[0]
     const x1 = room.x[1]
 
-    // 3 center Lesehan tables (z = 48, 60, 72)
-    for (const z of [48, 60, 72]) {
-      out.push({ x: cx, z, radius: LESEHAN_RADIUS, level: 0 })
-      out.push({ x: cx - 2.8, z, radius: 0.5, level: 0 })
-      out.push({ x: cx + 2.8, z, radius: 0.5, level: 0 })
-    }
+    // 2 big round tables in the middle, arranged vertically (z = 52, 62)
+    out.push({ x: cx, z: 52, radius: LESEHAN_BIG_RADIUS, level: 0 })
+    out.push({ x: cx, z: 62, radius: LESEHAN_BIG_RADIUS, level: 0 })
 
-    // 2 big round tables for balance at z = 54
-    out.push({ x: cx - 3.5, z: 54, radius: LESEHAN_BIG_RADIUS, level: 0 })
-    out.push({ x: cx + 3.5, z: 54, radius: LESEHAN_BIG_RADIUS, level: 0 })
-
-    // Ottoman stations and bookcases on left and right walls (z = 48, 60, 72)
-    for (const z of [48, 60, 72]) {
-      out.push({ x: x0 + 4.0, z, radius: 0.6, level: 0 })
+    // Ottoman seating + small round table + small & big bookcases, 3 pairs per wall (z = 44, 56, 68)
+    for (const z of [44, 56, 68]) {
+      // Per-ottoman colliders matching the actual instanced cluster (one big
+      // circle used to block the gap between them, which looked like a wall).
+      // Slightly smaller than the seat's max extent so the gap between the two
+      // front ottomans stays walkable for a player radius of 0.35.
+      out.push({ x: x0 + 3.2, z: z - 0.4, radius: 0.32, level: 0 })
+      out.push({ x: x0 + 4.6, z: z - 0.2, radius: 0.32, level: 0 })
+      out.push({ x: x0 + 4.0, z: z + 0.5, radius: 0.32, level: 0 })
       out.push({ x: x0 + 5.8, z, radius: 0.5, level: 0 })
-      out.push({ x: x1 - 4.0, z, radius: 0.6, level: 0 })
+      out.push({ x: x0 + 11.0, z, radius: LESEHAN_RADIUS, level: 0 })
+      out.push({ x: x0 + 13.5, z, radius: 0.5, level: 0 })
+      out.push({ x: x0 + 4.0, z: z + 1.6, radius: 0.35, level: 0 })
+      out.push({ x: x1 - 3.2, z: z - 0.4, radius: 0.32, level: 0 })
+      out.push({ x: x1 - 4.6, z: z - 0.2, radius: 0.32, level: 0 })
+      out.push({ x: x1 - 4.0, z: z + 0.5, radius: 0.32, level: 0 })
       out.push({ x: x1 - 5.8, z, radius: 0.5, level: 0 })
+      out.push({ x: x1 - 11.0, z, radius: LESEHAN_RADIUS, level: 0 })
+      out.push({ x: x1 - 13.5, z, radius: 0.5, level: 0 })
+      out.push({ x: x1 - 4.0, z: z + 1.6, radius: 0.35, level: 0 })
     }
 
     // Plants / topiary
-    out.push({ x: cx - 4.5, z: 52, radius: 0.5, level: 0 })
-    out.push({ x: cx + 4.5, z: 52, radius: 0.5, level: 0 })
-    out.push({ x: cx - 6, z: 50, radius: 0.6, level: 0 })
-    out.push({ x: cx + 6, z: 50, radius: 0.6, level: 0 })
+    out.push({ x: cx - 8, z: 52, radius: 0.45, level: 0 })
+    out.push({ x: cx + 8, z: 52, radius: 0.45, level: 0 })
+    out.push({ x: cx - 9.5, z: 48, radius: 0.5, level: 0 })
+    out.push({ x: cx + 9.5, z: 48, radius: 0.5, level: 0 })
 
     // Featured work podium on right side
     out.push({ x: cx + 9.5, z: 32, radius: 2.8, level: 0 })
 
-    // Upper floor furniture (level 1)
-    out.push({ x: cx, z: 68, radius: LESEHAN_BIG_RADIUS, level: 1 })
-    out.push({ x: room.x[1] - 8, z: 45.2, radius: SIDE_TABLE_RADIUS, level: 1 })
-    out.push({ x: room.x[0] + 8, z: 45.2, radius: SIDE_TABLE_RADIUS, level: 1 })
-    out.push({ x: room.x[1] - 1.55, z: 60, radius: 0.6, level: 1 })
-    out.push({ x: room.x[1] - 1.6, z: 50, radius: 0.5, level: 1 })
-    out.push({ x: room.x[1] - 1.6, z: 66, radius: 0.5, level: 1 })
-    out.push({ x: room.x[0] + 1.6, z: 54, radius: 0.5, level: 1 })
+    // Upper floor (level 1): same layout as the ground storey, mirrored
+    out.push({ x: cx, z: 60, radius: LESEHAN_BIG_RADIUS, level: 1 })
+    out.push({ x: cx, z: 72, radius: LESEHAN_BIG_RADIUS, level: 1 })
+
+    for (const z of [54, 66, 78]) {
+      out.push({ x: x0 + 3.2, z: z - 0.4, radius: 0.32, level: 1 })
+      out.push({ x: x0 + 4.6, z: z - 0.2, radius: 0.32, level: 1 })
+      out.push({ x: x0 + 4.0, z: z + 0.5, radius: 0.32, level: 1 })
+      out.push({ x: x0 + 5.8, z, radius: 0.5, level: 1 })
+      out.push({ x: x0 + 11.0, z, radius: LESEHAN_RADIUS, level: 1 })
+      out.push({ x: x0 + 13.5, z, radius: 0.5, level: 1 })
+      out.push({ x: x0 + 4.0, z: z + 1.6, radius: 0.35, level: 1 })
+      out.push({ x: x1 - 3.2, z: z - 0.4, radius: 0.32, level: 1 })
+      out.push({ x: x1 - 4.6, z: z - 0.2, radius: 0.32, level: 1 })
+      out.push({ x: x1 - 4.0, z: z + 0.5, radius: 0.32, level: 1 })
+      out.push({ x: x1 - 5.8, z, radius: 0.5, level: 1 })
+      out.push({ x: x1 - 11.0, z, radius: LESEHAN_RADIUS, level: 1 })
+      out.push({ x: x1 - 13.5, z, radius: 0.5, level: 1 })
+      out.push({ x: x1 - 4.0, z: z + 1.6, radius: 0.35, level: 1 })
+    }
+
+    // Plants / topiary (level 1)
+    out.push({ x: cx - 8, z: 60, radius: 0.45, level: 1 })
+    out.push({ x: cx + 8, z: 60, radius: 0.45, level: 1 })
+    out.push({ x: cx - 9.5, z: 60, radius: 0.5, level: 1 })
+    out.push({ x: cx + 9.5, z: 60, radius: 0.5, level: 1 })
+
+    // Featured lecturer works podium on right side (level 1)
+    out.push({ x: cx + 9.5, z: 32, radius: 2.8, level: 1 })
+
+    // Wall cover over middle portal space on floor 2
+    out.push({ x: cx, z: 27.25, radius: 2.0, level: 1 })
   }
   return out
 }

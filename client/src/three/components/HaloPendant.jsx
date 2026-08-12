@@ -14,7 +14,7 @@ function HaloPendant({ position, drop = 2.2, glow = 0.8 }) {
 
   return (
     <group position={position}>
-      {/* Brass canopy rosette pinned under the ceiling rosette */}
+      {/* Brass canopy rosette pinned flush under the ceiling */}
       <mesh position={[0, -0.02, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.16, 0.025, 10, ringSeg]} />
         <meshStandardMaterial color={BRASS} metalness={0.7} roughness={0.3} />

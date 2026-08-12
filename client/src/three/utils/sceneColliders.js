@@ -21,6 +21,12 @@ export function getCollidableAABBs(scene) {
   scene.updateMatrixWorld(true)
   scene.traverse((obj) => {
     if (!obj.isMesh) return
+    // Instanced meshes are skipped: Box3.setFromObject collapses every instance
+    // into ONE bounding box (the full spread of the instances), so e.g. the
+    // museum barrier's 24 posts would become a single giant invisible wall
+    // around the whole hall. Instanced pieces are decorative and already get
+    // their blocking from the explicit colliders in objectColliders.js.
+    if (obj.isInstancedMesh) return
     for (let node = obj; node; node = node.parent) {
       if (node.userData?.noCollide) return
     }

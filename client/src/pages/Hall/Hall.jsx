@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { Canvas } from "@react-three/fiber"
 import { ArrowLeft, MousePointerClick, DoorOpen, Frame, Eye, MapPin } from "lucide-react"
 import { useNavigate } from "react-router-dom"
@@ -8,6 +8,7 @@ import LoadingOverlay from "../../components/hall/LoadingOverlay"
 import PortalTransitionOverlay from "../../components/hall/PortalTransitionOverlay"
 import CanvasErrorBoundary from "../../components/hall/CanvasErrorBoundary"
 import { useQualityStore, DPR_FOR } from "../../three/hooks/useQuality"
+import { useWalkStore } from "../../three/hooks/useWalk"
 
 function Hall() {
   const navigate = useNavigate()
@@ -15,6 +16,12 @@ function Hall() {
   const [selectedProject, setSelectedProject] = useState(null)
   const [sceneReady, setSceneReady] = useState(false)
   const tier = useQualityStore((s) => s.tier)
+
+  // While the project popup is open, freeze the player (WASD / walk).
+  useEffect(() => {
+    useWalkStore.getState().setLocked(Boolean(selectedProject))
+    return () => useWalkStore.getState().setLocked(false)
+  }, [selectedProject])
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-[#0b1220] text-white select-none">

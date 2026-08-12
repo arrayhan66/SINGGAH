@@ -1,8 +1,25 @@
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { X, ExternalLink, Eye, Heart, GraduationCap, User, ArrowRight } from "lucide-react"
+import {
+  X,
+  ExternalLink,
+  Eye,
+  Heart,
+  GraduationCap,
+  User,
+  ArrowRight,
+  Users,
+  FileText,
+  CalendarDays,
+  CheckCircle2,
+} from "lucide-react"
+import { useAuth } from "../../context/AuthContext"
+import { saveHallReturn } from "../../three/hooks/useWalk"
 
 function ProjectDetailModal({ project, categoryTitle, onClose }) {
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const isLoggedIn = Boolean(user)
   const isDosen = project.authorType === "dosen"
   const authorName = project.User?.name || project.author?.[0] || "Kreator"
   const categorySlug = project.Category?.slug || project.category
@@ -10,17 +27,51 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
   const description = project.description || project.desc || ""
   const technologies = Array.isArray(project.technologies) ? project.technologies : []
   const links = Array.isArray(project.links) ? project.links : []
+  const members = Array.isArray(project.members) ? project.members : []
+  const documents = Array.isArray(project.documents) ? project.documents : []
+  const videos = Array.isArray(project.videos) ? project.videos : []
+  const year = project.year || "-"
+  const status = project.status || "published"
+
+  const [isLiked, setIsLiked] = useState(Boolean(project.isLiked))
+  const [likeCount, setLikeCount] = useState(project.likesCount || 0)
 
   function openDetail() {
+    saveHallReturn()
     onClose()
-    navigate(`/karya/${categorySlug}/${project.id}`)
+    navigate(`/karya/${categorySlug}/${project.id}`, { state: { fromHall: true } })
   }
 
+  function handleLike() {
+    if (!isLoggedIn) {
+      onClose()
+      navigate("/login")
+      return
+    }
+    setIsLiked((prev) => {
+      setLikeCount((c) => c + (prev ? -1 : 1))
+      return !prev
+    })
+  }
+
+  const statusLabel =
+    status === "draft"
+      ? "Draft"
+      : status === "pending"
+        ? "Menunggu Review"
+        : "Dipublikasikan"
+
+  const statusColor =
+    status === "draft"
+      ? "bg-amber-500/20 text-amber-300 border-amber-400/40"
+      : status === "pending"
+        ? "bg-orange-500/20 text-orange-300 border-orange-400/40"
+        : "bg-emerald-500/20 text-emerald-300 border-emerald-400/40"
+
+  const techLabel = (tech) => (typeof tech === "string" ? tech : tech?.name || "")
+
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in">
       <div
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-sky-700/60 bg-gradient-to-b from-sky-950 via-slate-950 to-sky-950 p-6 md:p-8 space-y-6 shadow-2xl relative"
@@ -44,8 +95,13 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
             {isDosen ? <GraduationCap className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
             <span>{isDosen ? "Karya Dosen" : "Karya Mahasiswa"}</span>
           </span>
-          <span className="text-xs text-sky-300/70">
-            Kategori: {categoryTitle || project.Category?.name || project.category}
+          <span className="inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1 rounded-full border border-sky-700/40 bg-sky-900/40 text-sky-200">
+            <CalendarDays className="w-3.5 h-3.5" />
+            <span>{year}</span>
+          </span>
+          <span className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1 rounded-full border ${statusColor}`}>
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>{statusLabel}</span>
           </span>
         </div>
 
@@ -61,7 +117,7 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
 
         <div className="space-y-2">
           <h4 className="text-sm font-semibold text-sky-300">Deskripsi Karya</h4>
-          <p className="text-sm text-slate-100/80 leading-relaxed line-clamp-4">{description}</p>
+          <p className="text-sm text-slate-100/80 leading-relaxed">{description}</p>
         </div>
 
         <div className="bg-sky-900/30 border border-sky-800/50 rounded-xl p-4 flex items-center justify-between">
@@ -72,7 +128,7 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
             <div>
               <div className="text-sm font-bold text-white">{authorName}</div>
               <div className="text-xs text-sky-300/70">
-                {isDosen ? "Dosen / Peneliti" : "Mahasiswa"} • Tahun {project.year || "-"}
+                {isDosen ? "Dosen / Peneliti" : "Mahasiswa"} • {project.Category?.name || categoryTitle}
               </div>
             </div>
           </div>
@@ -82,46 +138,120 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
               <Eye className="w-4 h-4 text-sky-400" />
               <span>{project.viewsCount || 0}</span>
             </span>
-            <span className="flex items-center space-x-1">
-              <Heart className="w-4 h-4 text-red-400" />
-              <span>{project.likesCount || 0}</span>
-            </span>
+            <button
+              onClick={handleLike}
+              title={isLoggedIn ? (isLiked ? "Batalkan suka" : "Sukai karya ini") : "Masuk untuk menyukai karya"}
+              className={`flex items-center space-x-1 transition-transform cursor-pointer ${isLoggedIn ? "hover:scale-110 active:scale-95" : ""}`}
+            >
+              <Heart
+                className={`w-4 h-4 transition-colors ${
+                  isLiked ? "fill-red-500 text-red-500" : "text-red-400"
+                } ${isLoggedIn ? "" : "opacity-70"}`}
+              />
+              <span>{likeCount}</span>
+            </button>
           </div>
         </div>
+
+        {members.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-sky-300 flex items-center space-x-2">
+              <Users className="w-4 h-4" />
+              <span>Tim Pengembang</span>
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {members.map((m, i) => (
+                <span
+                  key={m.id || i}
+                  className="text-xs bg-sky-900/60 border border-sky-700/50 px-3 py-1.5 rounded-lg text-sky-100"
+                >
+                  {m.name}
+                  {m.role && <span className="ml-1.5 text-sky-400/70">({m.role})</span>}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {technologies.length > 0 && (
           <div className="space-y-2">
             <h4 className="text-sm font-semibold text-sky-300">Teknologi Digunakan</h4>
             <div className="flex flex-wrap gap-2">
-              {technologies.map((tech, i) => {
-                const label = typeof tech === "string" ? tech : tech?.name
-                return (
-                  <span
-                    key={i}
-                    className="text-xs bg-sky-900/60 border border-sky-700/50 px-3 py-1 rounded-lg text-sky-200"
-                  >
-                    {label}
-                  </span>
-                )
-              })}
+              {technologies.map((tech, i) => (
+                <span
+                  key={i}
+                  className="text-xs bg-sky-900/60 border border-sky-700/50 px-3 py-1 rounded-lg text-sky-200"
+                >
+                  {techLabel(tech)}
+                </span>
+              ))}
             </div>
           </div>
         )}
 
-        <div className="pt-4 border-t border-sky-900/80 flex items-center justify-end gap-3 flex-wrap">
-          <button
-            onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-sky-950 hover:bg-sky-900 border border-sky-800 text-sm font-medium text-sky-200 transition-colors cursor-pointer"
-          >
-            Tutup
-          </button>
+        {links.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-sky-300">Tautan</h4>
+            <div className="flex flex-wrap gap-2">
+              {links.map((link, i) => (
+                <a
+                  key={link.id || i}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs bg-sky-900/60 border border-sky-700/50 px-3 py-1.5 rounded-lg text-sky-200 hover:bg-sky-800 hover:border-sky-500 flex items-center space-x-1.5 transition-colors cursor-pointer"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>{link.label || "Kunjungi"}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
 
+        {documents.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-sky-300">Dokumen Pendukung</h4>
+            <div className="flex flex-wrap gap-2">
+              {documents.map((doc, i) => (
+                <a
+                  key={doc.id || i}
+                  href={doc.file_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs bg-sky-900/60 border border-sky-700/50 px-3 py-1.5 rounded-lg text-sky-200 hover:bg-sky-800 hover:border-sky-500 flex items-center space-x-1.5 transition-colors cursor-pointer"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>{doc.name}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {videos.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-sky-300">Video Demo</h4>
+            {videos.map((vid, i) => (
+              <div key={vid.id || i} className="aspect-video w-full overflow-hidden rounded-xl border border-sky-800/60">
+                <iframe
+                  src={vid.video_url}
+                  title="Video Demo"
+                  className="h-full w-full border-0"
+                  allowFullScreen
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="pt-4 border-t border-sky-900/80 flex items-center justify-end gap-3 flex-wrap">
           {links[0]?.url && (
             <a
               href={links[0].url}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-2.5 rounded-xl bg-sky-900 hover:bg-sky-800 border border-sky-700 text-sm font-semibold text-sky-100 flex items-center space-x-2 transition-colors"
+              className="px-5 py-2.5 rounded-xl bg-sky-900 hover:bg-sky-800 border border-sky-700 text-sm font-semibold text-sky-100 flex items-center space-x-2 transition-colors cursor-pointer"
             >
               <span>Kunjungi Demo</span>
               <ExternalLink className="w-4 h-4" />

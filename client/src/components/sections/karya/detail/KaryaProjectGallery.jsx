@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
 function KaryaProjectGallery({
@@ -8,21 +8,39 @@ function KaryaProjectGallery({
   setActiveImage,
   projectTitle,
 }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  // When the visitor came from the 3D hall popup, "Kembali" drops them back
+  // into the exact karya room they were standing in.
+  const fromHall = location.state?.fromHall;
+
+  const backClass =
+    "group absolute left-4 top-4 z-10 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 p-2 sm:py-2 sm:pl-3 sm:pr-4 text-sm text-slate-300 backdrop-blur-md transition-colors duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 cursor-pointer";
+
+  const backContent = (
+    <>
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 transition-colors duration-300 group-hover:bg-cyan-400/20">
+        <ArrowLeft
+          size={14}
+          className="transition-transform duration-300 group-hover:-translate-x-0.5"
+        />
+      </span>
+      <span className="hidden sm:inline">{fromHall ? "Kembali ke Hall 3D" : "Kembali"}</span>
+    </>
+  );
+
   return (
     <div className="relative overflow-hidden bg-slate-950/40">
       {/* Tombol Kembali di Pojok Kiri Atas */}
-      <Link
-        to={`/karya/${slug}`}
-        className="group absolute left-4 top-4 z-10 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 p-2 sm:py-2 sm:pl-3 sm:pr-4 text-sm text-slate-300 backdrop-blur-md transition-colors duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 cursor-pointer"
-      >
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 transition-colors duration-300 group-hover:bg-cyan-400/20">
-          <ArrowLeft
-            size={14}
-            className="transition-transform duration-300 group-hover:-translate-x-0.5"
-          />
-        </span>
-        <span className="hidden sm:inline">Kembali</span>
-      </Link>
+      {fromHall ? (
+        <button onClick={() => navigate("/hall")} className={backClass}>
+          {backContent}
+        </button>
+      ) : (
+        <Link to={`/karya/${slug}`} className={backClass}>
+          {backContent}
+        </Link>
+      )}
 
       {/* Area Gambar Utama */}
       <div className="aspect-video w-full overflow-hidden bg-slate-900">

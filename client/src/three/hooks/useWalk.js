@@ -4,6 +4,12 @@ import { MUSEUM } from "../rooms/museumLayout"
 
 const EYE_HEIGHT = 1.7
 
+// How close the player must be before a work (painting) becomes hoverable and
+// clickable. Shared by the painting highlight and the cursor/click gates.
+export const INTERACT_RANGE = 6
+
+const HALL_RETURN_KEY = "singgah_hall_return"
+
 export const useWalkStore = create((set, get) => ({
   position: new THREE.Vector3(...MUSEUM.spawn.position),
   yaw: 0,
@@ -13,6 +19,11 @@ export const useWalkStore = create((set, get) => ({
   dragMoved: false,
   pendingClick: null,
   level: 0,
+  locked: false,
+
+  setLocked(value) {
+    set({ locked: Boolean(value) })
+  },
 
   look(dx, dy, sensitivity = 0.0035) {
     const state = get()
@@ -47,8 +58,46 @@ export const useWalkStore = create((set, get) => ({
       dragMoved: false,
       pendingClick: null,
       level: 0,
+      locked: false,
     })
   },
 }))
+
+export function saveHallReturn() {
+  const { position, yaw, pitch, level } = useWalkStore.getState()
+  try {
+    localStorage.setItem(
+      HALL_RETURN_KEY,
+      JSON.stringify({
+        x: position.x,
+        y: position.y,
+        z: position.z,
+        yaw,
+        pitch,
+        level,
+      }),
+    )
+  } catch {
+    /* storage unavailable — fall back to default spawn */
+  }
+}
+
+export function loadHallReturn() {
+  try {
+    const raw = localStorage.getItem(HALL_RETURN_KEY)
+    if (!raw) return null
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
+export function clearHallReturn() {
+  try {
+    localStorage.removeItem(HALL_RETURN_KEY)
+  } catch {
+    /* ignore */
+  }
+}
 
 export const EYE = EYE_HEIGHT

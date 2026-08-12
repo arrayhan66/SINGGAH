@@ -1,8 +1,9 @@
 import { useRef } from "react"
 import { useFrame } from "@react-three/fiber"
-import { Text, useTexture, Billboard } from "@react-three/drei"
+import { Text, Billboard } from "@react-three/drei"
 import * as THREE from "three"
 import { useLow } from "../hooks/useQuality"
+import { useDownscaledTexture } from "../utils/useDownscaledTexture"
 import logoPoliban from "../../assets/icons/Logo_Poliban.png"
 
 const GOLD = "#c9a35e"
@@ -15,7 +16,7 @@ function Centerpiece({ title = "HALL UTAMA" }) {
   const ringB = useRef()
   const glow = useRef()
   const low = useLow()
-  const logoMap = useTexture(logoPoliban)
+  const logoMap = useDownscaledTexture(logoPoliban, 512)
 
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime

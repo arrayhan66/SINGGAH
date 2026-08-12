@@ -50,14 +50,19 @@ function resolveBoxes(position, boxes, radius) {
 export function resolveCollision(position, walls) {
   const boxes = []
   for (const w of walls) {
+    // Optional collideY override lets a wall render full-height while only
+    // blocking a chosen vertical band (e.g. the stair-void sealing wall stops
+    // ground walkers but lets climbers step over it at the top of the stairs).
+    const minY = w.collideY ? w.collideY[0] : w.y0
+    const maxY = w.collideY ? w.collideY[1] : w.y1
     if (w.axis === "x") {
       boxes.push({
         minX: w.at - w.t / 2,
         maxX: w.at + w.t / 2,
         minZ: w.from,
         maxZ: w.to,
-        minY: w.y0,
-        maxY: w.y1,
+        minY,
+        maxY,
       })
     } else {
       boxes.push({
@@ -65,8 +70,8 @@ export function resolveCollision(position, walls) {
         maxX: w.to,
         minZ: w.at - w.t / 2,
         maxZ: w.at + w.t / 2,
-        minY: w.y0,
-        maxY: w.y1,
+        minY,
+        maxY,
       })
     }
   }

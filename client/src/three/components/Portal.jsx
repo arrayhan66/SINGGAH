@@ -1,12 +1,20 @@
 import { Text, useTexture } from "@react-three/drei"
 import { useMemo } from "react"
 import * as THREE from "three"
+import { useDownscaledTexture } from "../utils/useDownscaledTexture"
 import logo from "../../assets/icons/logo.png"
 import exitImg from "../../assets/images/exit.jpg"
 
 const RIFT_H = 4.8
 const FRAME_T = 0.3
 const DEPTH = 0.5
+
+// The frame rails sit at the bottom (0..FRAME_T) and top (RIFT_H..RIFT_H+FRAME_T),
+// so the visible opening is y = FRAME_T .. RIFT_H. Center the logo + caption as
+// one unit on that opening (caption hangs one step below the plate).
+const OPENING_MID = (FRAME_T + RIFT_H) / 2
+const LOGO_Y = OPENING_MID + 0.25
+const TEXT_Y = OPENING_MID - 0.75
 
 const NAVY = "#123a63"
 const NAVY_EDGE = "#1a4a7f"
@@ -17,7 +25,7 @@ const EXIT_RED = "#dc2626"
 const EXIT_RED_DARK = "#7f1d1d"
 
 function LogoPlate({ position, width }) {
-  const tex = useTexture(logo)
+  const tex = useDownscaledTexture(logo, 256)
   const t = useMemo(() => {
     const clone = tex.clone()
     clone.colorSpace = THREE.SRGBColorSpace
@@ -45,10 +53,25 @@ function ExitIcon() {
   const img = t.image
   const aspect = img && img.width && img.height ? img.width / img.height : 1
   return (
-    <mesh position={[0, RIFT_H / 2, 0.06]}>
-      <planeGeometry args={[1.25, 1.25 / aspect]} />
-      <meshBasicMaterial map={t} transparent toneMapped={false} />
-    </mesh>
+    <group position={[0, OPENING_MID, 0]}>
+      <mesh position={[0, 0.38, 0.06]}>
+        <planeGeometry args={[1.25, 1.25 / aspect]} />
+        <meshBasicMaterial map={t} transparent toneMapped={false} />
+      </mesh>
+      <Text
+        position={[0, -0.5, 0.08]}
+        fontSize={0.28}
+        color="#b91c1c"
+        anchorX="center"
+        anchorY="middle"
+        letterSpacing={0.12}
+        outlineWidth={0.01}
+        outlineColor="#b91c1c"
+        raycast={() => null}
+      >
+        KELUAR
+      </Text>
+    </group>
   )
 }
 
@@ -129,9 +152,9 @@ function Portal({ position, rotationY, width, title, action }) {
       {/* ==== Tengah portal: logo SINGGAH (masuk) / icon EXIT merah (keluar) ==== */}
       {title ? (
         <>
-          <LogoPlate position={[0, RIFT_H / 2, 0.02]} width={1.25} />
+          <LogoPlate position={[0, LOGO_Y, 0.02]} width={1.25} />
           <Text
-            position={[0, RIFT_H / 2 - 1.0, 0.03]}
+            position={[0, TEXT_Y, 0.03]}
             fontSize={0.24}
             color={NAVY}
             anchorX="center"

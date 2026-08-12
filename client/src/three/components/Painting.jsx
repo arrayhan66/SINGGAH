@@ -3,6 +3,7 @@ import { Text, useTexture } from "@react-three/drei"
 import * as THREE from "three"
 import { textures } from "../utils/textures"
 import { getAnisotropy, useQualityStore } from "../hooks/useQuality"
+import { useWalkStore, INTERACT_RANGE } from "../hooks/useWalk"
 import { PAINTING_SIZE } from "../rooms/museumLayout"
 import { CATEGORY_COLORS } from "../../utils/hallHelpers"
 
@@ -274,13 +275,27 @@ function Painting({
   const lipY = frameH / 2 - barT / 2
   const lipX = frameW / 2 - barT / 2
 
+  // Only allow hover/glow once the player is close enough to actually reach
+  // the work — otherwise distant frames flicker on every look-away.
+  const inRange = () => {
+    const p = useWalkStore.getState().position
+    const dx = p.x - position[0]
+    const dz = p.z - position[2]
+    return Math.hypot(dx, dz) <= INTERACT_RANGE
+  }
+
   return (
     <group
       position={position}
       rotation={[0, rotationY, 0]}
       scale={hovered ? 1.03 : 1}
       userData={{ action: { type: "project", project } }}
-      onPointerOver={() => setHovered(true)}
+      onPointerOver={() => {
+        if (inRange()) setHovered(true)
+      }}
+      onPointerMove={() => {
+        if (!inRange()) setHovered(false)
+      }}
       onPointerOut={() => setHovered(false)}
     >
       {/* Hanging wires to the picture rail (home gallery look) */}

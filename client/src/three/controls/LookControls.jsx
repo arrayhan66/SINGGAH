@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react"
 import { useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
-import { useWalkStore, EYE } from "../hooks/useWalk"
+import { useWalkStore, EYE, INTERACT_RANGE } from "../hooks/useWalk"
 import { useTransitionStore } from "../hooks/useTransition"
-import { getWalls, portals, findRoom, resolveHeight } from "../rooms/museumLayout"
+import { getWalls, portals, findRoom, resolveHeight, FLOOR2_Y } from "../rooms/museumLayout"
 import { resolveCollision, resolveObjectCollision, resolveAABBs } from "../utils/collision"
 import { getObjectColliders } from "../utils/objectColliders"
 import { getCollidableAABBs } from "../utils/sceneColliders"
@@ -28,6 +28,29 @@ function withinRange(point, range) {
   return Math.hypot(dx, dz) <= range
 }
 
+// Raycaster never skips invisible objects, so rooms culled for performance
+// would still be hovered/clicked through the walls. Collect only visible
+// objects (depth-first, respecting each ancestor's `visible` flag).
+function visibleObjects(root) {
+  const out = []
+  const stack = []
+  for (const c of root.children) stack.push(c)
+  while (stack.length) {
+    const o = stack.pop()
+    if (!o.visible) continue
+    out.push(o)
+    for (const c of o.children) stack.push(c)
+  }
+  return out
+}
+
+function pickVisible(raycaster, scene) {
+  const objects = visibleObjects(scene)
+  const hits = raycaster.intersectObjects(objects, false)
+  hits.sort((a, b) => a.distance - b.distance)
+  return hits
+}
+
 function LookControls({ bounds, onSelectProject }) {
   const { camera, gl, scene } = useThree()
   const keysRef = useRef({})
@@ -47,6 +70,11 @@ function LookControls({ bounds, onSelectProject }) {
   const lastCast = useRef(0)
   const modelCollidersRef = useRef([])
   const modelColliderBuilt = useRef(false)
+  const camYRef = useRef(0)
+  const camYInit = useRef(false)
+  const bobPhaseRef = useRef(0)
+  const bobAmpRef = useRef(0)
+  const lastPosRef = useRef(new THREE.Vector3())
 
   const handleAction = (action, point) => {
     if (action.type === "floor") {
@@ -70,6 +98,9 @@ function LookControls({ bounds, onSelectProject }) {
     const rh = resolveHeight(point.x, point.z, 0)
     point.y = rh.height
     useWalkStore.setState({ position: point.clone(), yaw, target: null, level: rh.level })
+    camYRef.current = point.y + EYE
+    camYInit.current = true
+    lastPosRef.current.copy(point)
   }
 
   const checkPortalCross = (prev, next) => {
@@ -179,12 +210,14 @@ function LookControls({ bounds, onSelectProject }) {
         if (now - lastCast.current < 80) return
         lastCast.current = now
         raycaster.current.setFromCamera(mouse.current, camera)
-        const hits = raycaster.current.intersectObjects(scene.children, true)
+        const hits = pickVisible(raycaster.current, scene)
         const action = hits.length ? findAction(hits[0].object) : null
+        // Movement actions (walk / floor) work at any distance; interactions
+        // (project, teleport) need the player close enough to reach them.
         const actionable =
-          action && action.type !== "teleport"
+          action && (action.type === "floor" || action.type === "walk")
             ? action
-            : action && withinRange(hits[0].point, TELEPORT_RANGE)
+            : action && withinRange(hits[0].point, INTERACT_RANGE)
               ? action
               : null
         document.body.style.cursor = actionable ? "pointer" : "default"
@@ -197,10 +230,11 @@ function LookControls({ bounds, onSelectProject }) {
       if (useTransitionStore.getState().active || useTransitionStore.getState().loading) return
       if (useWalkStore.getState().dragMoved) return
       raycaster.current.setFromCamera(mouse.current, camera)
-      const hits = raycaster.current.intersectObjects(scene.children, true)
+      const hits = pickVisible(raycaster.current, scene)
       const hit = hits.find((h) => findAction(h.object))
       if (!hit) return
       const action = findAction(hit.object)
+      if (action.type === "project" && !withinRange(hit.point, INTERACT_RANGE)) return
       if (action.type === "teleport" && !withinRange(hit.point, TELEPORT_RANGE)) return
       handleAction(action, hit.point)
     }
@@ -248,7 +282,10 @@ function LookControls({ bounds, onSelectProject }) {
     if (useTransitionStore.getState().active || useTransitionStore.getState().loading) {
       if (useWalkStore.getState().target) useWalkStore.setState({ target: null })
       const cur = useWalkStore.getState()
-      camera.position.set(cur.position.x, cur.position.y + EYE, cur.position.z)
+      camYRef.current = cur.position.y + EYE
+      camYInit.current = true
+      lastPosRef.current.copy(cur.position)
+      camera.position.set(cur.position.x, camYRef.current, cur.position.z)
       euler.current.set(cur.pitch, cur.yaw, 0)
       camera.quaternion.setFromEuler(euler.current)
       return
@@ -258,75 +295,107 @@ function LookControls({ bounds, onSelectProject }) {
     const keys = keysRef.current
     const dt = Math.min(delta, 0.05)
 
-    const forwardPressed = keys.KeyW || keys.ArrowUp
-    const backPressed = keys.KeyS || keys.ArrowDown
-    const rightPressed = keys.KeyD || keys.ArrowRight
-    const leftPressed = keys.KeyA || keys.ArrowLeft
-
-    const forward = new THREE.Vector3(0, 0, -1).applyEuler(new THREE.Euler(0, store.yaw, 0))
-    const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0))
-
-    if (forwardPressed || backPressed || rightPressed || leftPressed) {
+    // While a project popup is open, freeze the player: no WASD, no walk-to
+    // click target. The camera still follows the last position so the scene
+    // keeps rendering behind the modal.
+    if (store.locked) {
       if (store.target) useWalkStore.setState({ target: null })
-      const move = new THREE.Vector3()
-      if (forwardPressed) move.addScaledVector(forward, SPEED * dt)
-      if (backPressed) move.addScaledVector(forward, -SPEED * dt)
-      if (rightPressed) move.addScaledVector(right, SPEED * dt)
-      if (leftPressed) move.addScaledVector(right, -SPEED * dt)
-      const res = moveWithCollision(store.position, move)
-      const resolved = res.position
-      resolved.x = THREE.MathUtils.clamp(resolved.x, bounds.minX, bounds.maxX)
-      resolved.z = THREE.MathUtils.clamp(resolved.z, bounds.minZ, bounds.maxZ)
-      useWalkStore.setState({ position: resolved })
-    } else if (store.target) {
-      const dir = new THREE.Vector3().subVectors(store.target, store.position)
-      dir.y = 0
-      const dist = dir.length()
-      if (dist < 0.4) {
-        useWalkStore.setState({ target: null })
-        const { onArrive } = useWalkStore.getState()
-        if (onArrive) {
-          useWalkStore.setState({ onArrive: null })
-          onArrive()
-        }
-      } else {
-        const step = Math.min(dist, SPEED * dt)
-        const move = dir.clone().normalize().multiplyScalar(step)
+      if (document.body.style.cursor !== "default") document.body.style.cursor = "default"
+    } else {
+      const forwardPressed = keys.KeyW || keys.ArrowUp
+      const backPressed = keys.KeyS || keys.ArrowDown
+      const rightPressed = keys.KeyD || keys.ArrowRight
+      const leftPressed = keys.KeyA || keys.ArrowLeft
+
+      const forward = new THREE.Vector3(0, 0, -1).applyEuler(new THREE.Euler(0, store.yaw, 0))
+      const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0))
+
+      if (forwardPressed || backPressed || rightPressed || leftPressed) {
+        if (store.target) useWalkStore.setState({ target: null })
+        const move = new THREE.Vector3()
+        if (forwardPressed) move.addScaledVector(forward, SPEED * dt)
+        if (backPressed) move.addScaledVector(forward, -SPEED * dt)
+        if (rightPressed) move.addScaledVector(right, SPEED * dt)
+        if (leftPressed) move.addScaledVector(right, -SPEED * dt)
         const res = moveWithCollision(store.position, move)
         const resolved = res.position
         resolved.x = THREE.MathUtils.clamp(resolved.x, bounds.minX, bounds.maxX)
         resolved.z = THREE.MathUtils.clamp(resolved.z, bounds.minZ, bounds.maxZ)
-
-        const moved = resolved.distanceTo(store.position)
-        if (res.teleported) {
-          useWalkStore.setState({ position: resolved })
-        } else if (moved < 0.004) {
-          stuckRef.current += dt
-          if (stuckRef.current > 0.6) {
-            stuckRef.current = 0
-            useWalkStore.setState({ target: null })
+        useWalkStore.setState({ position: resolved })
+      } else if (store.target) {
+        const dir = new THREE.Vector3().subVectors(store.target, store.position)
+        dir.y = 0
+        const dist = dir.length()
+        if (dist < 0.4) {
+          useWalkStore.setState({ target: null })
+          const { onArrive } = useWalkStore.getState()
+          if (onArrive) {
+            useWalkStore.setState({ onArrive: null })
+            onArrive()
           }
         } else {
-          stuckRef.current = 0
-        }
+          const step = Math.min(dist, SPEED * dt)
+          const move = dir.clone().normalize().multiplyScalar(step)
+          const res = moveWithCollision(store.position, move)
+          const resolved = res.position
+          resolved.x = THREE.MathUtils.clamp(resolved.x, bounds.minX, bounds.maxX)
+          resolved.z = THREE.MathUtils.clamp(resolved.z, bounds.minZ, bounds.maxZ)
 
-        const setState = {}
-        if (!res.teleported) setState.position = resolved
-        if (moved >= 0.01 && !dragRef.current.active && !res.teleported) {
-          const desiredYaw = Math.atan2(-move.x, -move.z)
-          let yaw = store.yaw
-          let diff = desiredYaw - yaw
-          while (diff > Math.PI) diff -= Math.PI * 2
-          while (diff < -Math.PI) diff += Math.PI * 2
-          yaw += diff * Math.min(1, dt * 6)
-          setState.yaw = yaw
+          const moved = resolved.distanceTo(store.position)
+          if (res.teleported) {
+            useWalkStore.setState({ position: resolved })
+          } else if (moved < 0.004) {
+            stuckRef.current += dt
+            if (stuckRef.current > 0.6) {
+              stuckRef.current = 0
+              useWalkStore.setState({ target: null })
+            }
+          } else {
+            stuckRef.current = 0
+          }
+
+          const setState = {}
+          if (!res.teleported) setState.position = resolved
+          if (moved >= 0.01 && !dragRef.current.active && !res.teleported) {
+            const desiredYaw = Math.atan2(-move.x, -move.z)
+            let yaw = store.yaw
+            let diff = desiredYaw - yaw
+            while (diff > Math.PI) diff -= Math.PI * 2
+            while (diff < -Math.PI) diff += Math.PI * 2
+            yaw += diff * Math.min(1, dt * 6)
+            setState.yaw = yaw
+          }
+          useWalkStore.setState(setState)
         }
-        useWalkStore.setState(setState)
       }
     }
 
     const cur = useWalkStore.getState()
-    camera.position.set(cur.position.x, cur.position.y + EYE, cur.position.z)
+    const targetY = cur.position.y + EYE
+
+    // Ease the camera height toward the height field so stair climbs glide
+    // instead of snapping (the field itself is already eased per-tread).
+    if (!camYInit.current) {
+      camYRef.current = targetY
+      lastPosRef.current.copy(cur.position)
+      camYInit.current = true
+    }
+    camYRef.current = THREE.MathUtils.damp(camYRef.current, targetY, 14, dt)
+
+    // Subtle head bob while climbing the stairs; amplitude fades out when the
+    // player stops or reaches a flat floor so it never feels like a wobble.
+    const speed = lastPosRef.current.distanceTo(cur.position) / Math.max(dt, 1e-4)
+    lastPosRef.current.copy(cur.position)
+    const climbing = cur.position.y > 0.05 && cur.position.y < FLOOR2_Y - 0.05
+    if (climbing && speed > 1.5) {
+      bobPhaseRef.current += dt * speed * 2.2
+      bobAmpRef.current = THREE.MathUtils.damp(bobAmpRef.current, 0.035, 6, dt)
+    } else {
+      bobAmpRef.current = THREE.MathUtils.damp(bobAmpRef.current, 0, 6, dt)
+    }
+    const bob = Math.sin(bobPhaseRef.current) * bobAmpRef.current
+
+    camera.position.set(cur.position.x, camYRef.current + bob, cur.position.z)
     euler.current.set(cur.pitch, cur.yaw, 0)
     camera.quaternion.setFromEuler(euler.current)
   })

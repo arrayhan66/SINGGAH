@@ -75,6 +75,20 @@ function AppRouter() {
             </Suspense>
           }
         />
+        <Route
+          path="/hall/:categorySlug"
+          element={
+            <Suspense
+              fallback={
+                <div className="flex h-screen w-screen items-center justify-center bg-[#0b1220]">
+                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#38bdf8] border-t-transparent" />
+                </div>
+              }
+            >
+              <Hall />
+            </Suspense>
+          }
+        />
         <Route path="/berita" element={<RoleSplit admin={<ManageNews />} visitor={<News />} />} />
         <Route path="/berita/:slug" element={<NewsDetail />} />
 

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, useRef } from "react"
+import { Suspense, useCallback, useMemo, useState, useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import { Text } from "@react-three/drei"
 import * as THREE from "three"
@@ -13,13 +13,18 @@ import {
   Bookcase,
   FloorLamp,
   WallClock,
+  WallFrames,
   LesehanTable,
   PresidentPortrait,
   RoundRug,
+  HangingPlant,
+  RectRug,
 } from "../components/HomeDecor"
-import prabowoImg from "../../assets/images/prabowo.png"
-import gibranImg from "../../assets/images/gibran.png"
-import { Plant } from "../components/Props"
+import prabowoImg from "../../assets/images/prabowo.webp"
+import gibranImg from "../../assets/images/gibran.webp"
+import pkkmbImg from "../../assets/images/pkkmb.webp"
+import { useDownscaledTexture } from "../utils/useDownscaledTexture"
+import { Plant, WallSconce } from "../components/Props"
 import { textures } from "../utils/textures"
 import {
   rooms,
@@ -43,6 +48,22 @@ import {
 
 const H = MUSEUM.height
 const FEATURED_ON_PODIUM = 2
+
+// ---- Shared geometry & materials for the decorated staircase ----
+const STAIR_RUNNER_W = STAIR_WIDTH - 0.14
+const STAIR_RUNNER_D = STAIR_TREAD - 0.12
+
+const STAIR_TREAD_GEO = new THREE.BoxGeometry(STAIR_WIDTH, STAIR_RISE + 0.02, STAIR_TREAD + 0.02)
+const STAIR_RISER_GEO = new THREE.BoxGeometry(STAIR_WIDTH - 0.06, STAIR_RISE - 0.02, 0.035)
+const STAIR_NOSING_GEO = new THREE.BoxGeometry(STAIR_WIDTH, 0.05, 0.02)
+const STAIR_CARPET_GEO = new THREE.BoxGeometry(STAIR_RUNNER_W, 0.035, STAIR_RUNNER_D)
+const STAIR_TRIM_GEO = new THREE.BoxGeometry(0.035, 0.045, STAIR_RUNNER_D + 0.04)
+
+const STAIR_TREAD_MAT = new THREE.MeshStandardMaterial({ color: "#d9c8a8", roughness: 0.8 })
+const STAIR_RISER_MAT = new THREE.MeshStandardMaterial({ color: "#1d2b42", roughness: 0.85 })
+const STAIR_NOSING_MAT = new THREE.MeshStandardMaterial({ color: "#c9a35e", metalness: 0.75, roughness: 0.3 })
+const STAIR_CARPET_MAT = new THREE.MeshStandardMaterial({ color: "#16304f", roughness: 0.95 })
+const STAIR_TRIM_MAT = new THREE.MeshStandardMaterial({ color: "#c9a35e", metalness: 0.6, roughness: 0.35 })
 
 // Shared geometry/material for the ring of reading ottomans, instanced per room.
 const OTTOMAN_LEG_GEO = new THREE.BoxGeometry(0.06, 0.32, 0.06)
@@ -154,24 +175,48 @@ function FloorLabel({ position, text }) {
 }
 
 function Stairs({ room }) {
-  const steps = []
-  for (let i = 0; i < STAIR_STEPS_COUNT; i++) {
-    steps.push({
-      z: STAIR_Z0 + i * STAIR_TREAD + STAIR_TREAD / 2,
-      y: i * STAIR_RISE + STAIR_RISE / 2,
-    })
+  const x0 = room.x[0]
+  const xc = x0 + STAIR_WIDTH / 2
+  const n = STAIR_STEPS_COUNT
+  const rugRectMap = useMemo(() => textures.rugRect(), [])
+
+  const treads = []
+  const risers = []
+  const nosings = []
+  const carpets = []
+  const trimL = []
+  const trimR = []
+  const treadTint = []
+  const riserTint = []
+
+  for (let i = 0; i < n; i++) {
+    const z = STAIR_Z0 + i * STAIR_TREAD + STAIR_TREAD / 2
+    const y = i * STAIR_RISE + STAIR_RISE / 2
+    const top = y + (STAIR_RISE + 0.02) / 2
+    treads.push({ position: [xc, y, z] })
+    risers.push({ position: [xc, y - STAIR_RISE / 2, z + STAIR_TREAD / 2] })
+    nosings.push({ position: [xc, top + 0.02, z + STAIR_TREAD / 2 + 0.014] })
+    carpets.push({ position: [xc, top + 0.012, z] })
+    trimL.push({ position: [xc - STAIR_RUNNER_W / 2 + 0.03, top + 0.016, z] })
+    trimR.push({ position: [xc + STAIR_RUNNER_W / 2 - 0.03, top + 0.016, z] })
+    treadTint.push(i % 2 ? "#cbb691" : "#d9c8a8")
+    riserTint.push(i % 2 ? "#16283f" : "#1d2b42")
   }
+
   return (
     <group userData={{ noCollide: true }}>
-      {steps.map((s, i) => (
-        <mesh key={i} position={[room.x[0] + STAIR_WIDTH / 2, s.y, s.z]}>
-          <boxGeometry args={[STAIR_WIDTH, STAIR_RISE + 0.02, STAIR_TREAD + 0.02]} />
-          <meshStandardMaterial color="#c3cede" roughness={0.8} />
-        </mesh>
-      ))}
+      {/* Steps: wood treads, dark risers, brass nosings, navy runner + gold trim */}
+      <InstancedMeshes geometry={STAIR_TREAD_GEO} material={STAIR_TREAD_MAT} transforms={treads} colors={treadTint} count={n} castShadow />
+      <InstancedMeshes geometry={STAIR_RISER_GEO} material={STAIR_RISER_MAT} transforms={risers} colors={riserTint} count={n} />
+      <InstancedMeshes geometry={STAIR_NOSING_GEO} material={STAIR_NOSING_MAT} transforms={nosings} count={n} />
+      <InstancedMeshes geometry={STAIR_CARPET_GEO} material={STAIR_CARPET_MAT} transforms={carpets} count={n} />
+      <InstancedMeshes geometry={STAIR_TRIM_GEO} material={STAIR_TRIM_MAT} transforms={trimL} count={n} />
+      <InstancedMeshes geometry={STAIR_TRIM_GEO} material={STAIR_TRIM_MAT} transforms={trimR} count={n} />
+
+      {/* Brass cap rail on top of the stair panel */}
       <mesh
         position={[
-          room.x[0] + STAIR_WIDTH + 0.04,
+          x0 + STAIR_WIDTH + 0.04,
           FLOOR2_Y + 1.2 + 0.08,
           (STAIR_Z0 + STAIR_Z1) / 2,
         ]}
@@ -179,6 +224,36 @@ function Stairs({ room }) {
         <boxGeometry args={[0.06, 0.06, STAIR_Z1 - STAIR_Z0]} />
         <meshStandardMaterial color="#c9a35e" metalness={0.7} roughness={0.35} />
       </mesh>
+
+      {/* Glowing wall sconces climbing the panel side */}
+      {[
+        [STAIR_Z0 + 1.6, 3.0],
+        [STAIR_Z0 + 4.8, 4.8],
+        [STAIR_Z0 + 8.0, 6.6],
+      ].map(([z, y], i) => (
+        <WallSconce key={`sconce-${i}`} position={[x0 + STAIR_WIDTH - 0.12, y, z]} rotationY={-Math.PI / 2} />
+      ))}
+
+      {/* Framed art climbing the left wall alongside the stairs, each at eye height for its step */}
+      <WallFrames
+        position={[x0 + 0.16, 0, STAIR_Z0]}
+        rotationY={Math.PI / 2}
+        variants={[
+          { pos: [-2.25, 3.7, 0], size: [0.62, 0.85], tilt: 0.02 },
+          { pos: [-4.25, 5.1, 0], size: [0.7, 0.95], tilt: -0.02 },
+          { pos: [-6.25, 6.4, 0], size: [0.62, 0.85], tilt: 0.02 },
+          { pos: [-8.25, 7.5, 0], size: [0.7, 0.95], tilt: -0.02 },
+        ]}
+      />
+
+      {/* Welcome mat at the bottom of the stairs */}
+      <RectRug position={[xc, 0.015, STAIR_Z0 - 0.55]} rotationY={0} w={2.0} d={0.8} map={rugRectMap} />
+
+      {/* White potted flowers at the entrance before the left turn, right of the KARYA DOSEN wall (rear) */}
+      <Plant position={[x0 + STAIR_WIDTH + 1.2, 0, STAIR_Z0 - 0.6]} variant="flower" flowerColor="#f8fafc" />
+
+      {/* Hanging plant above the top of the stairs */}
+      <HangingPlant position={[xc, H - 0.2, STAIR_Z1 - 0.6]} drop={1.1} />
     </group>
   )
 }
@@ -315,7 +390,7 @@ function RoomDecorGround({ room, projects }) {
       <FloorLabel position={[cx, 0.06, 29]} text="LANTAI 1 · KARYA MAHASISWA" />
 
       <Plant position={[x1 - 2.5, 0, 29]} variant="flower" flowerColor="#60a5fa" />
-      <Plant position={[x0 + 4.5, 0, 29]} variant="flower" flowerColor="#f8fafc" />
+      <Plant position={[x0 + STAIR_WIDTH + 1.2, 0, STAIR_Z0 - 3.4]} variant="flower" flowerColor="#f8fafc" />
       <Plant position={[cx - 6.6, 0, 29]} variant="tall" />
       <Plant position={[cx + 6.6, 0, 29]} variant="tall" />
 
@@ -420,12 +495,47 @@ function RoomDecorGround({ room, projects }) {
   )
 }
 
+// Framed PKKMB poster hung on the solid wall cover that closes off the
+// upper-floor portal opening (only the ground-floor portal should exist).
+function PKKMPoster({ position, rotationY = 0 }) {
+  const tex = useDownscaledTexture(pkkmbImg, 1024)
+  const img = useMemo(() => {
+    const t = tex.clone()
+    t.colorSpace = THREE.SRGBColorSpace
+    t.anisotropy = 8
+    return t
+  }, [tex])
+  const iw = tex.image?.width || 1
+  const ih = tex.image?.height || 1
+  const posterH = 5.0
+  const posterW = posterH * (iw / ih)
+  const frameT = 0.1
+
+  return (
+    <group position={position} rotation={[0, rotationY, 0]}>
+      <mesh position={[0, 0, 0]} castShadow>
+        <boxGeometry args={[posterW + frameT * 2, posterH + frameT * 2, 0.06]} />
+        <meshStandardMaterial color="#c9a35e" metalness={0.6} roughness={0.35} />
+      </mesh>
+      <mesh position={[0, 0, 0.032]}>
+        <planeGeometry args={[posterW, posterH]} />
+        <meshStandardMaterial map={img} color="#eaf3fc" roughness={0.85} />
+      </mesh>
+      <mesh position={[0, 0, 0.058]}>
+        <planeGeometry args={[posterW, posterH]} />
+        <meshStandardMaterial color="#ffffff" transparent opacity={0.08} roughness={0.1} />
+      </mesh>
+    </group>
+  )
+}
+
 function RoomDecorUpper({ room, projects }) {
   const x0 = room.x[0]
   const x1 = room.x[1]
   const cx = (x0 + x1) / 2
   const Y = FLOOR2_Y
   const rugMap = useMemo(() => textures.roundRug(), [])
+  const wallPlaster = useMemo(() => textures.wallPlaster(), [])
 
   const ottLeft = useMemo(
     () =>
@@ -448,11 +558,61 @@ function RoomDecorUpper({ room, projects }) {
 
   return (
     <group key={`decor-upper-${room.id}`}>
-      {/* Solid wall cover over the middle portal space on floor 2 (from FLOOR2_Y to ceiling H) */}
-      <mesh position={[cx, (Y + H) / 2, ROW_Z0]} castShadow receiveShadow>
-        <boxGeometry args={[PORTAL_W + 1.2, H - Y, 0.6]} />
-        <meshStandardMaterial color="#dbe6f2" roughness={0.9} />
-      </mesh>
+      {/* Decorative wall panel closing off the upper-floor portal opening.
+          Reads as a real wall (plaster + pilasters + cornice + wainscot bands),
+          not a leftover portal bug. */}
+      <group>
+        {/* Backing panel, same plaster texture as the other walls */}
+        <mesh position={[cx, Y + 3, ROW_Z0]} castShadow receiveShadow>
+          <boxGeometry args={[PORTAL_W + 1.2, 6, 0.6]} />
+          <meshStandardMaterial map={wallPlaster} color="#dbe6f2" roughness={0.9} />
+        </mesh>
+
+        {/* Side pilasters framing the panel */}
+        {[-1, 1].map((s) => (
+          <group key={s}>
+            <mesh position={[cx + s * 1.72, Y + 3, ROW_Z0 + 0.26]} castShadow>
+              <boxGeometry args={[0.26, 6, 0.34]} />
+              <meshStandardMaterial color="#eef3f9" roughness={0.6} />
+            </mesh>
+            <mesh position={[cx + s * 1.72, Y + 5.9, ROW_Z0 + 0.26]} castShadow>
+              <boxGeometry args={[0.36, 0.22, 0.42]} />
+              <meshStandardMaterial color="#dfe9f4" roughness={0.6} />
+            </mesh>
+            <mesh position={[cx + s * 1.72, Y + 0.12, ROW_Z0 + 0.26]} castShadow>
+              <boxGeometry args={[0.36, 0.24, 0.42]} />
+              <meshStandardMaterial color="#1e293b" roughness={0.6} />
+            </mesh>
+          </group>
+        ))}
+
+        {/* Top cornice + cyan accent line */}
+        <mesh position={[cx, Y + 5.9, ROW_Z0 + 0.32]} castShadow>
+          <boxGeometry args={[4.3, 0.24, 0.42]} />
+          <meshStandardMaterial color="#e4eef9" roughness={0.6} />
+        </mesh>
+        <mesh position={[cx, Y + 5.72, ROW_Z0 + 0.34]}>
+          <boxGeometry args={[4.2, 0.06, 0.3]} />
+          <meshStandardMaterial color="#38bdf8" roughness={0.5} />
+        </mesh>
+
+        {/* Floor bands continuing the upper-storey wainscot, tucked behind the poster */}
+        <mesh position={[cx, Y + 0.08, ROW_Z0 + 0.34]} castShadow>
+          <boxGeometry args={[3.96, 0.16, 0.12]} />
+          <meshStandardMaterial color="#1e293b" roughness={0.6} />
+        </mesh>
+        <mesh position={[cx, Y + 0.62, ROW_Z0 + 0.33]} castShadow>
+          <boxGeometry args={[3.96, 1.25, 0.12]} />
+          <meshStandardMaterial color="#7b93ad" roughness={0.6} />
+        </mesh>
+        <mesh position={[cx, Y + 1.32, ROW_Z0 + 0.36]}>
+          <boxGeometry args={[3.96, 0.06, 0.14]} />
+          <meshStandardMaterial color="#38bdf8" roughness={0.5} />
+        </mesh>
+      </group>
+      <Suspense fallback={null}>
+        <PKKMPoster position={[cx, Y + 3, ROW_Z0 + 0.42]} rotationY={0} />
+      </Suspense>
 
       <FloorLabel position={[cx, Y + 0.06, 30]} text="LANTAI 2 · KARYA DOSEN" />
 
@@ -568,8 +728,11 @@ function RoomDecorUpper({ room, projects }) {
 }
 
 const CULL_REGISTRY = {}
+const CULL_SHOW_DIST = 45
+const CULL_HIDE_DIST = 60
 
 function RoomCuller({ rooms }) {
+  const visibleRef = useRef({})
   useFrame(() => {
     const p = useWalkStore.getState().position
     for (const room of rooms) {
@@ -577,7 +740,9 @@ function RoomCuller({ rooms }) {
       const cx = (room.x[0] + room.x[1]) / 2
       const cz = (room.z[0] + room.z[1]) / 2
       const dist = Math.hypot(p.x - cx, p.z - cz)
-      const visible = dist < 75
+      const prev = visibleRef.current[room.id]
+      const visible = prev ? dist < CULL_HIDE_DIST : dist < CULL_SHOW_DIST
+      visibleRef.current[room.id] = visible
       for (const type of ["storey", "paint", "room-title"]) {
         const g = CULL_REGISTRY[`${type}-${room.id}`]
         if (g) g.visible = visible
@@ -670,7 +835,7 @@ export function KaryaRooms({ groups, marbleMap, archways }) {
                   ))}
                   {placed.map((p) => (
                     <Painting
-                      key={`${room.id}-${level}-${p.project.id}`}
+                      key={`${room.id}-${level}-${p.key}`}
                       project={p.project}
                       position={p.position}
                       rotationY={p.rotationY}

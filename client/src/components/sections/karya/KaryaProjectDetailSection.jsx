@@ -1,11 +1,11 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import DustBackground from "../../ui/DustBackground"
 import GlowBackground from "../../ui/GlowBackground"
 import GlassCard from "../../ui/GlassCard"
 import { X, MessageCircle, Copy, Check, Send } from "lucide-react"
-import { karyaProjects, normalizeProject } from "../../../data/karyaData"
 import { useAuth } from "../../../context/AuthContext"
+import api from "../../../services/api"
 
 import KaryaProjectGallery from "./detail/KaryaProjectGallery"
 import KaryaProjectHeader from "./detail/KaryaProjectHeader"
@@ -18,19 +18,32 @@ function KaryaProjectDetailSection() {
   const { user } = useAuth()
   const isLoggedIn = user !== null
 
-  const rawProject = karyaProjects.find((p) => p.id === Number(projectId))
-  const project = rawProject ? normalizeProject(rawProject) : null
+  const [project, setProject] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const [activeImage, setActiveImage] = useState(0)
   const [newComment, setNewComment] = useState("")
-  const [comments, setComments] = useState(
-    Array.isArray(project?.comments) ? project.comments : [],
-  )
+  const [comments, setComments] = useState([])
   const [isLiked, setIsLiked] = useState(false)
-  const [likeCount, setLikeCount] = useState(project?.likesCount || 0)
+  const [likeCount, setLikeCount] = useState(0)
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
+
+  useEffect(() => {
+    api.get(`/projects/${projectId}`)
+      .then((res) => {
+        const p = res.data.data
+        setProject(p)
+        setLikeCount(p.likesCount || 0)
+        setComments(Array.isArray(p.comments) ? p.comments : [])
+        setLoading(false)
+      })
+      .catch((err) => {
+        console.error("Failed to fetch project detail:", err)
+        setLoading(false)
+      })
+  }, [projectId])
 
   if (!project) {
     return (

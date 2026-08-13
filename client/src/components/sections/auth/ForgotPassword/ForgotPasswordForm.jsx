@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
 import api from "../../../../services/api";
-import logo from "../../../../assets/icons/logo.png";
+import logo from "../../../../assets/icons/logo.webp";
 import FormAlert from "../../../ui/FormAlert";
 
 function ForgotPasswordForm() {

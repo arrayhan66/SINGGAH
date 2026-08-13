@@ -9,10 +9,7 @@ import { create } from "zustand"
 
 function detectTier() {
   const nav = typeof navigator !== "undefined" ? navigator : {}
-  const ua = nav.userAgent || ""
-  const isMobile =
-    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) ||
-    (nav.maxTouchPoints || 0) > 1
+  const isMobile = detectMobile()
   const cores = nav.hardwareConcurrency || (isMobile ? 4 : 8)
   const mem = nav.deviceMemory || (isMobile ? 4 : 8)
   if (cores <= 2 || mem <= 2) return "rendah"
@@ -20,6 +17,15 @@ function detectTier() {
   if (isMobile) return "sedang"
   if (cores <= 4 || mem <= 4) return "sedang"
   return "sedang"
+}
+
+function detectMobile() {
+  const nav = typeof navigator !== "undefined" ? navigator : {}
+  const ua = nav.userAgent || ""
+  return (
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) ||
+    (nav.maxTouchPoints || 0) > 1
+  )
 }
 
 // Cap device pixel ratio against a screen-pixel budget so hi-res monitors
@@ -41,8 +47,8 @@ export const useQualityStore = create(() => ({
 
 export const DPR_FOR = {
   rendah: [1, 1],
-  sedang: [1, dprCapFor(1.5)],
-  tinggi: [1, dprCapFor(1.5)],
+  sedang: [1, 1],
+  tinggi: [1, dprCapFor(1.25)],
 }
 export const SHADOW_FOR = { rendah: 512, sedang: 512, tinggi: 1024 }
 export const ANISO_FOR = { rendah: 2, sedang: 4, tinggi: 4 }
@@ -53,4 +59,8 @@ export function getAnisotropy() {
 
 export function useLow() {
   return useQualityStore((s) => s.tier === "rendah")
+}
+
+export function isMobile() {
+  return detectMobile()
 }

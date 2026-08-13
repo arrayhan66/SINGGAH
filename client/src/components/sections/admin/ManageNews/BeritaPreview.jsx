@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom"
 import { Newspaper, ArrowRight, BookOpen } from "lucide-react"
-import { beritaData } from "../../../../data/beritaData"
+import { useBerita } from "../../../../context/BeritaContext"
 
 function DashboardLatestNews() {
   const navigate = useNavigate()
-  const latestNews = beritaData.slice(0, 4)
+  const { beritaList } = useBerita()
+  const latestNews = beritaList.slice(0, 4)
 
   return (
     <div className="rounded-2xl border border-white/[0.08] bg-slate-800/30 p-5 shadow-xl backdrop-blur-xl md:p-6">

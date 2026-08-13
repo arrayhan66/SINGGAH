@@ -1,11 +1,11 @@
-import { Component, Suspense, useMemo, useRef } from "react"
+import { Component, Suspense, useLayoutEffect, useMemo, useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
 import InstancedMeshes from "../utils/InstancedMeshes"
 import { textures } from "../utils/textures"
 import { useDownscaledTexture } from "../utils/useDownscaledTexture"
 import { BOOK_COVER_FILES, DEFAULT_COVER_KEY } from "../utils/bookCovers"
-import logo from "../../assets/icons/logo.png"
+import logo from "../../assets/icons/logo.webp"
 
 const WOOD = "#2a3d5f"
 const WOOD_DARK = "#1f2f4e"
@@ -26,6 +26,92 @@ const CUSHION_GEO = new THREE.BoxGeometry(0.58, 0.12, 0.42)
 const CUSHION_TOP_GEO = new THREE.BoxGeometry(0.48, 0.08, 0.33)
 const CUSHION_MAT = new THREE.MeshStandardMaterial({ color: "#ffffff", roughness: 0.95 })
 
+const BC_W = 1.86
+const BC_D = 0.32
+const BOOKCASE_POST_TALL = new THREE.BoxGeometry(0.09, 2.8, BC_D)
+const BOOKCASE_POST_SHORT = new THREE.BoxGeometry(0.09, 1.05, BC_D)
+const BOOKCASE_FOOT = new THREE.BoxGeometry(0.12, 0.06, 0.24)
+const BOOKCASE_SHELF = new THREE.BoxGeometry(BC_W - 0.2, 0.045, BC_D)
+const BOOKCASE_SHELF_EDGE = new THREE.BoxGeometry(BC_W - 0.24, 0.09, 0.02)
+const BOOKCASE_TOP = new THREE.BoxGeometry(BC_W, 0.05, BC_D)
+const BOOKCASE_FRAME_MAT = new THREE.MeshStandardMaterial({ color: "#7fa0c4", roughness: 0.55 })
+const BOOKCASE_FRAME_DARK_MAT = new THREE.MeshStandardMaterial({ color: "#6890b5", roughness: 0.55 })
+const BOOKCASE_SHELF_MAT = new THREE.MeshStandardMaterial({ color: "#eef3f9", roughness: 0.5 })
+
+// Books are instanced: a unit box scaled per book + per-instance cloth color,
+// and one instanced spine plane per spine texture. This collapses the ~150
+// book meshes per full bookcase into ~10 draw calls with zero visual change.
+const BOOK_BOX_GEO = new THREE.BoxGeometry(1, 1, 1)
+const BOOK_SPINE_GEO = new THREE.PlaneGeometry(1, 1)
+const BOOK_BOX_MAT = new THREE.MeshStandardMaterial({ color: "#ffffff", roughness: 0.8 })
+const _bookSpineDefs = textures.bookSpines()
+const BOOK_SPINE_MATS = _bookSpineDefs.map(
+  (s) => new THREE.MeshStandardMaterial({ map: s.tex, roughness: 0.55 }),
+)
+const BOOK_SPINE_MAT_BY_TEX = new Map(
+  _bookSpineDefs.map((s, i) => [s.tex, BOOK_SPINE_MATS[i]]),
+)
+const _iq = new THREE.Quaternion()
+const _im = new THREE.Matrix4()
+const _iv = new THREE.Vector3()
+const _ic = new THREE.Color()
+
+function BookShelfInstances({ books, y }) {
+  const boxRef = useRef(null)
+  const groups = useMemo(() => {
+    const byTex = new Map()
+    for (const b of books) {
+      if (!byTex.has(b.tex)) byTex.set(b.tex, [])
+      byTex.get(b.tex).push(b)
+    }
+    return [...byTex.entries()].map(([tex, bs]) => ({ tex, bs }))
+  }, [books])
+  const spineRefs = useRef([])
+
+  useLayoutEffect(() => {
+    if (boxRef.current) {
+      const n = books.length
+      for (let i = 0; i < n; i++) {
+        const b = books[i]
+        _im.compose(_iv.set(b.x, y + b.h / 2, 0), _iq, _iv.set(b.w, b.h, 0.2))
+        boxRef.current.setMatrixAt(i, _im)
+        boxRef.current.setColorAt(i, _ic.set(b.c))
+      }
+      boxRef.current.instanceMatrix.needsUpdate = true
+      if (boxRef.current.instanceColor) boxRef.current.instanceColor.needsUpdate = true
+    }
+    groups.forEach((g, gi) => {
+      const im = spineRefs.current[gi]
+      if (!im) return
+      im.count = g.bs.length
+      g.bs.forEach((b, k) => {
+        _im.compose(_iv.set(b.x, y + b.h / 2, 0.104), _iq, _iv.set(b.w, b.h, 1))
+        im.setMatrixAt(k, _im)
+      })
+      im.instanceMatrix.needsUpdate = true
+    })
+  }, [books, groups, y])
+
+  return (
+    <group>
+      <instancedMesh
+        ref={boxRef}
+        args={[BOOK_BOX_GEO, BOOK_BOX_MAT, books.length]}
+        frustumCulled={false}
+        castShadow
+      />
+      {groups.map((g, gi) => (
+        <instancedMesh
+          key={gi}
+          ref={(el) => (spineRefs.current[gi] = el)}
+          args={[BOOK_SPINE_GEO, BOOK_SPINE_MAT_BY_TEX.get(g.tex), g.bs.length]}
+          frustumCulled={false}
+        />
+      ))}
+    </group>
+  )
+}
+
 function mulberry32(seed) {
   let a = seed >>> 0
   return function () {
@@ -35,21 +121,6 @@ function mulberry32(seed) {
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296
   }
-}
-
-function BookMesh({ x, y, w, h, c, tex }) {
-  return (
-    <group position={[x, y + h / 2, 0]}>
-      <mesh castShadow>
-        <boxGeometry args={[w, h, 0.2]} />
-        <meshStandardMaterial color={c} roughness={0.8} />
-      </mesh>
-      <mesh position={[0, 0, 0.104]}>
-        <planeGeometry args={[w, h]} />
-        <meshStandardMaterial map={tex} roughness={0.55} />
-      </mesh>
-    </group>
-  )
 }
 
 function FlatStack({ x, y, z = -0.04, w = 0.24, rand }) {
@@ -264,27 +335,27 @@ function ShelfContent({ y, seed, z = -0.04 }) {
     return arr
   }, [seed])
 
+  const books = useMemo(() => items.filter((it) => it.t === "book"), [items])
+
   return (
     <group position={[0, 0, z]}>
+      <BookShelfInstances books={books} y={y} />
       {items.map((it, i) => {
-        if (it.t === "book")
-          return <BookMesh key={i} x={it.x} y={y} w={it.w} h={it.h} c={it.c} tex={it.tex} />
         if (it.t === "stack")
           return <FlatStack key={i} x={it.x} y={y} w={it.w} rand={mulberry32((seed + i * 101) >>> 0)} />
-        return <ShelfObject key={i} type={it.ob} x={it.x} y={y} rand={mulberry32((seed + i * 53) >>> 0)} />
+        if (it.t === "obj")
+          return <ShelfObject key={i} type={it.ob} x={it.x} y={y} rand={mulberry32((seed + i * 53) >>> 0)} />
+        return null
       })}
     </group>
   )
 }
 
 function Bookcase({ position, rotationY = 0, variant = 0, low = false }) {
-  const W = 1.86
+  const W = BC_W
   const H = low ? 1.05 : 2.8
-  const D = 0.32
   const SHELVES = low ? [0.32, 0.68] : [0.35, 0.85, 1.35, 1.85, 2.35]
-  const FRAME = "#7fa0c4"
-  const FRAME_DARK = "#6890b5"
-  const SHELF = "#eef3f9"
+  const postGeo = low ? BOOKCASE_POST_SHORT : BOOKCASE_POST_TALL
   const topGlobe = useMemo(() => {
     if (low) return 0
     if (variant === 0 || variant === 4) return 3.5
@@ -294,43 +365,22 @@ function Bookcase({ position, rotationY = 0, variant = 0, low = false }) {
 
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
-      <mesh position={[-W / 2 + 0.05, H / 2, -0.01]} castShadow>
-        <boxGeometry args={[0.09, H, D]} />
-        <meshStandardMaterial color={FRAME} roughness={0.55} />
-      </mesh>
-      <mesh position={[W / 2 - 0.05, H / 2, -0.01]} castShadow>
-        <boxGeometry args={[0.09, H, D]} />
-        <meshStandardMaterial color={FRAME} roughness={0.55} />
-      </mesh>
+      <mesh geometry={postGeo} material={BOOKCASE_FRAME_MAT} position={[-W / 2 + 0.05, H / 2, -0.01]} castShadow />
+      <mesh geometry={postGeo} material={BOOKCASE_FRAME_MAT} position={[W / 2 - 0.05, H / 2, -0.01]} castShadow />
 
-      <mesh position={[-W / 2 + 0.16, 0.03, -0.01]} castShadow>
-        <boxGeometry args={[0.12, 0.06, 0.24]} />
-        <meshStandardMaterial color={FRAME_DARK} roughness={0.55} />
-      </mesh>
-      <mesh position={[W / 2 - 0.16, 0.03, -0.01]} castShadow>
-        <boxGeometry args={[0.12, 0.06, 0.24]} />
-        <meshStandardMaterial color={FRAME_DARK} roughness={0.55} />
-      </mesh>
+      <mesh geometry={BOOKCASE_FOOT} material={BOOKCASE_FRAME_DARK_MAT} position={[-W / 2 + 0.16, 0.03, -0.01]} castShadow />
+      <mesh geometry={BOOKCASE_FOOT} material={BOOKCASE_FRAME_DARK_MAT} position={[W / 2 - 0.16, 0.03, -0.01]} castShadow />
 
       {SHELVES.map((sy, i) => (
         <group key={i}>
-          <mesh position={[0, sy, -0.01]}>
-            <boxGeometry args={[W - 0.2, 0.045, D]} />
-            <meshStandardMaterial color={SHELF} roughness={0.5} />
-          </mesh>
-          <mesh position={[0, sy - 0.03, -0.14]}>
-            <boxGeometry args={[W - 0.24, 0.09, 0.02]} />
-            <meshStandardMaterial color={FRAME_DARK} roughness={0.55} />
-          </mesh>
+          <mesh geometry={BOOKCASE_SHELF} material={BOOKCASE_SHELF_MAT} position={[0, sy, -0.01]} />
+          <mesh geometry={BOOKCASE_SHELF_EDGE} material={BOOKCASE_FRAME_DARK_MAT} position={[0, sy - 0.03, -0.14]} />
         </group>
       ))}
 
       {/* Top horizontal cover, lifted clear of the vertical posts so it never
       overlaps them (sits right on top of the posts instead) */}
-      <mesh position={[0, H + 0.025, -0.01]}>
-        <boxGeometry args={[W, 0.05, D]} />
-        <meshStandardMaterial color={FRAME_DARK} roughness={0.55} />
-      </mesh>
+      <mesh geometry={BOOKCASE_TOP} material={BOOKCASE_FRAME_DARK_MAT} position={[0, H + 0.025, -0.01]} />
 
       {SHELVES.map((sy, i) => (
         <ShelfContent key={i} y={sy + 0.0225} seed={(variant + 1) * 10007 + i + 1} />
@@ -356,7 +406,7 @@ function DeskLamp({ position }) {
         <cylinderGeometry args={[0.025, 0.04, 0.78, 12]} />
         <meshStandardMaterial color={BRASS} metalness={0.6} roughness={0.35} />
       </mesh>
-      <mesh position={[0, 0.62, 0]} rotation={[0.35, 0, 0]}>
+      <mesh position={[0, 0.78, 0]}>
         <cylinderGeometry args={[0.16, 0.2, 0.24, 16]} />
         <meshStandardMaterial color={CREAM} emissive="#ffd98a" emissiveIntensity={0.9} />
       </mesh>

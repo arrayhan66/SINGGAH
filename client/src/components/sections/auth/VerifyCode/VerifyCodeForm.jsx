@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Clock } from "lucide-react";
-import logo from "../../../../assets/icons/logo.png";
+import logo from "../../../../assets/icons/logo.webp";
 import FormAlert from "../../../ui/FormAlert";
 import api from "../../../../services/api";
 

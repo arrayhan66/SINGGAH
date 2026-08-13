@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { Library } from "lucide-react"
 import DustBackground from "../../ui/DustBackground"
@@ -6,11 +7,34 @@ import useSearchAndExpand from "../../../hooks/useSearchAndExpand"
 import SearchBar from "../../ui/SearchBar"
 import OutlineButton from "../../ui/OutlineButton"
 import KaryaCategoryCard from "./KaryaCategoryCard"
-import { karyaCategories } from "../../../data/karyaData"
+import api from "../../../services/api"
+
+const DEFAULT_CATEGORIES = [
+  { name: "Website", slug: "website", description: "Aplikasi web modern berbasis React, Laravel, MERN dan teknologi terbaru.", color: "#3b82f6" },
+  { name: "Mobile App", slug: "mobile-app", description: "Android dan iOS menggunakan Flutter maupun React Native.", color: "#a78bfa" },
+  { name: "IoT", slug: "iot", description: "Internet of Things, Smart Device, Embedded System dan Automation.", color: "#06b6d4" },
+  { name: "Artificial Intelligence", slug: "artificial-intelligence", description: "Machine Learning, Computer Vision, Deep Learning dan NLP.", color: "#ec4899" },
+  { name: "Data Science", slug: "data-science", description: "Analisis data, dashboard interaktif, visualisasi dan Big Data.", color: "#34d399" },
+  { name: "Cyber Security", slug: "cyber-security", description: "Keamanan jaringan, penetration testing dan digital forensics.", color: "#fbbf24" },
+  { name: "UI/UX Design", slug: "ui-ux-design", description: "Desain antarmuka dan pengalaman pengguna yang fungsional dan estetis.", color: "#fb7185" },
+  { name: "Game Development", slug: "game-development", description: "Pengembangan game 2D/3D, game engine, dan realitas virtual.", color: "#a855f7" },
+]
 
 function KaryaSection() {
   const navigate = useNavigate()
   const initialCount = 6
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES)
+
+  useEffect(() => {
+    api.get("/categories")
+      .then((res) => {
+        const items = res.data.data.items || res.data.data || []
+        if (items.length > 0) setCategories(items)
+      })
+      .catch((err) => {
+        console.error("Failed to fetch categories, using fallback:", err)
+      })
+  }, [])
 
   const {
     search,
@@ -19,7 +43,7 @@ function KaryaSection() {
     filteredData: filteredCategories,
     showAll,
     setShowAll,
-  } = useSearchAndExpand(karyaCategories, initialCount)
+  } = useSearchAndExpand(categories, initialCount)
 
   function handleCategoryClick(slug) {
     navigate(`/karya/${slug}`)

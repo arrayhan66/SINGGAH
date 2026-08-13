@@ -31,7 +31,13 @@ function withinRange(point, range) {
 // Raycaster never skips invisible objects, so rooms culled for performance
 // would still be hovered/clicked through the walls. Collect only visible
 // objects (depth-first, respecting each ancestor's `visible` flag).
-function visibleObjects(root) {
+// The scene graph is static after mount, so the traversal result is cached
+// and only refreshed when the culler toggles room visibility — hover casts
+// (already throttled) then skip the full-scene walk most of the time.
+let VISIBLE_CACHE = null
+let VISIBLE_CACHE_AT = 0
+function visibleObjects(root, now) {
+  if (VISIBLE_CACHE && now - VISIBLE_CACHE_AT < 200) return VISIBLE_CACHE
   const out = []
   const stack = []
   for (const c of root.children) stack.push(c)
@@ -41,11 +47,13 @@ function visibleObjects(root) {
     out.push(o)
     for (const c of o.children) stack.push(c)
   }
+  VISIBLE_CACHE = out
+  VISIBLE_CACHE_AT = now
   return out
 }
 
-function pickVisible(raycaster, scene) {
-  const objects = visibleObjects(scene)
+function pickVisible(raycaster, scene, now) {
+  const objects = visibleObjects(scene, now)
   const hits = raycaster.intersectObjects(objects, false)
   hits.sort((a, b) => a.distance - b.distance)
   return hits
@@ -207,10 +215,10 @@ function LookControls({ bounds, onSelectProject }) {
         // Hover raycasts are expensive on a scene this dense — throttle them
         // so a fast mouse sweep only samples a few times per frame.
         const now = performance.now()
-        if (now - lastCast.current < 80) return
+        if (now - lastCast.current < 150) return
         lastCast.current = now
         raycaster.current.setFromCamera(mouse.current, camera)
-        const hits = pickVisible(raycaster.current, scene)
+        const hits = pickVisible(raycaster.current, scene, now)
         const action = hits.length ? findAction(hits[0].object) : null
         // Movement actions (walk / floor) work at any distance; interactions
         // (project, teleport) need the player close enough to reach them.
@@ -230,7 +238,7 @@ function LookControls({ bounds, onSelectProject }) {
       if (useTransitionStore.getState().active || useTransitionStore.getState().loading) return
       if (useWalkStore.getState().dragMoved) return
       raycaster.current.setFromCamera(mouse.current, camera)
-      const hits = pickVisible(raycaster.current, scene)
+      const hits = pickVisible(raycaster.current, scene, performance.now())
       const hit = hits.find((h) => findAction(h.object))
       if (!hit) return
       const action = findAction(hit.object)

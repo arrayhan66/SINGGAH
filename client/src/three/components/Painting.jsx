@@ -1,6 +1,7 @@
 import { Component, Suspense, useMemo, useState } from "react"
 import { Text, useTexture } from "@react-three/drei"
 import * as THREE from "three"
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js"
 import { textures } from "../utils/textures"
 import { getAnisotropy, useQualityStore } from "../hooks/useQuality"
 import { useWalkStore, INTERACT_RANGE } from "../hooks/useWalk"
@@ -9,6 +10,97 @@ import { CATEGORY_COLORS } from "../../utils/hallHelpers"
 
 const W = PAINTING_SIZE.w
 const H = PAINTING_SIZE.h
+
+const FRAME_W = W + 0.34
+const FRAME_H = H + 0.34
+const BAR_T = 0.1
+
+const GEO_CANVAS = new THREE.PlaneGeometry(W - 0.18, H - 0.18)
+const GEO_FRAME = new THREE.PlaneGeometry(FRAME_W, FRAME_H)
+const GEO_BAR_H = new THREE.BoxGeometry(FRAME_W, BAR_T, 0.08)
+const GEO_BAR_V = new THREE.BoxGeometry(BAR_T, FRAME_H, 0.08)
+const GEO_BEVEL = new THREE.PlaneGeometry(W + 0.16, H + 0.16)
+const GEO_MAT = new THREE.PlaneGeometry(W - 0.02, H - 0.02)
+const GEO_GLOW = new THREE.PlaneGeometry(W + 0.56, H + 0.56)
+const GEO_LIGHT_BOX = new THREE.BoxGeometry(FRAME_W + 0.06, 0.08, 0.22)
+const GEO_LIGHT_PLANE = new THREE.PlaneGeometry(W + 0.2, 0.55)
+const GEO_CONE = new THREE.ConeGeometry(W * 0.62, 1.5, 24, 1, true)
+const GEO_PLAQUE = new THREE.PlaneGeometry(FRAME_W - 0.04, 0.72)
+const GEO_STRIPE = new THREE.PlaneGeometry(FRAME_W + 0.08, 0.035)
+const GEO_WIRE = new THREE.CylinderGeometry(0.008, 0.008, 1, 6)
+
+const BAR_Y = FRAME_H / 2 - BAR_T / 2
+const BAR_X = FRAME_W / 2 - BAR_T / 2
+
+// The four gold frame bars are identical across every painting, so they merge
+// into a single mesh (positions baked in) -> 1 draw call instead of 4.
+const GEO_GOLD_BARS = (() => {
+  const at = (geo, x, y) => {
+    const c = geo.clone()
+    c.translate(x, y, 0)
+    return c
+  }
+  return mergeGeometries(
+    [at(GEO_BAR_H, 0, BAR_Y), at(GEO_BAR_H, 0, -BAR_Y), at(GEO_BAR_V, BAR_X, 0), at(GEO_BAR_V, -BAR_X, 0)],
+    false,
+  )
+})()
+
+// The two gold stripes under the plaque merge into one draw call.
+const GEO_GOLD_STRIPES = (() => {
+  const s1 = GEO_STRIPE.clone()
+  s1.translate(0, -H / 2 - 0.4, 0)
+  const s2 = GEO_STRIPE.clone()
+  s2.translate(0, -H / 2 - 0.8, 0)
+  return mergeGeometries([s1, s2], false)
+})()
+
+// Hanging wires (both same length) merge into one unit-height geometry that is
+// scaled per painting by the wire length.
+const GEO_WIRE_PAIR = (() => {
+  const w1 = GEO_WIRE.clone()
+  w1.translate(-FRAME_W * 0.28, 0.5, 0)
+  const w2 = GEO_WIRE.clone()
+  w2.translate(FRAME_W * 0.28, 0.5, 0)
+  return mergeGeometries([w1, w2], false)
+})()
+
+const GOLD_MAT = new THREE.MeshStandardMaterial({
+  map: textures.goldFrame(),
+  metalness: 0.85,
+  roughness: 0.28,
+})
+const GOLD_STRIPE_MAT = new THREE.MeshStandardMaterial({
+  map: textures.goldFrame(),
+  metalness: 0.85,
+  roughness: 0.3,
+})
+const BEVEL_MAT = new THREE.MeshStandardMaterial({
+  color: "#232e3c",
+  metalness: 0.3,
+  roughness: 0.5,
+})
+const MAT_MAT = new THREE.MeshStandardMaterial({
+  color: "#e9eff8",
+  roughness: 0.85,
+})
+const PLAQUE_GOLD_MAT = new THREE.MeshStandardMaterial({
+  map: textures.goldFrame(),
+  metalness: 0.4,
+  roughness: 0.3,
+  emissive: "#c9a35e",
+  emissiveIntensity: 0.25,
+})
+const PLAQUE_DARK_MAT = new THREE.MeshStandardMaterial({
+  color: "#16222f",
+  roughness: 0.45,
+  metalness: 0.35,
+})
+const WIRE_MAT = new THREE.MeshStandardMaterial({
+  color: "#2a3d5f",
+  roughness: 0.4,
+  metalness: 0.6,
+})
 
 function isPlaceholderUrl(url) {
   return /placehold\.co/i.test(url || "")
@@ -44,8 +136,7 @@ function PaintingImage({ url }) {
     return t
   }, [tex])
   return (
-    <mesh position={[0, 0, 0.11]}>
-      <planeGeometry args={[W - 0.18, H - 0.18]} />
+    <mesh geometry={GEO_CANVAS} position={[0, 0, 0.11]}>
       <meshStandardMaterial map={img} color="#eaf3fc" roughness={0.85} />
     </mesh>
   )
@@ -224,8 +315,7 @@ function Placeholder({ project }) {
   const map = useMemo(() => getPlaceholderTexture(project), [project])
 
   return (
-    <mesh position={[0, 0, 0.11]}>
-      <planeGeometry args={[W - 0.18, H - 0.18]} />
+    <mesh geometry={GEO_CANVAS} position={[0, 0, 0.11]}>
       <meshStandardMaterial map={map} roughness={0.9} />
     </mesh>
   )
@@ -259,8 +349,6 @@ function Painting({
   goldPlaque = false,
 }) {
   const [hovered, setHovered] = useState(false)
-  const steelMap = useMemo(() => textures.steelFrame(), [])
-  const goldMap = useMemo(() => textures.goldFrame(), [])
   const low = useQualityStore((s) => s.tier) === "rendah"
 
   const accent = isDosen ? "#22d3ee" : getCategoryColor(project)
@@ -269,11 +357,8 @@ function Painting({
   const thumbnail = project.thumbnail || project.image
   const hasImage = Boolean(thumbnail)
 
-  const frameW = W + 0.34
-  const frameH = H + 0.34
-  const barT = 0.1
-  const lipY = frameH / 2 - barT / 2
-  const lipX = frameW / 2 - barT / 2
+  const railLen =
+    railY != null ? Math.max(0.05, railY - position[1] - FRAME_H / 2 - 0.03) : 0
 
   // Only allow hover/glow once the player is close enough to actually reach
   // the work — otherwise distant frames flicker on every look-away.
@@ -300,25 +385,17 @@ function Painting({
     >
       {/* Hanging wires to the picture rail (home gallery look) */}
       {!low && railY != null && (
-        <>
-          {[-frameW * 0.28, frameW * 0.28].map((wx, i) => {
-            const topLocal = railY - position[1]
-            const bottomLocal = frameH / 2 + 0.03
-            const len = Math.max(0.05, topLocal - bottomLocal)
-            return (
-              <mesh key={i} position={[wx, bottomLocal + len / 2, 0.02]}>
-                <cylinderGeometry args={[0.008, 0.008, len, 6]} />
-                <meshStandardMaterial color="#2a3d5f" roughness={0.4} metalness={0.6} />
-              </mesh>
-            )
-          })}
-        </>
+        <mesh
+          geometry={GEO_WIRE_PAIR}
+          material={WIRE_MAT}
+          position={[0, FRAME_H / 2 + 0.03 + railLen / 2, 0.02]}
+          scale={[1, railLen, 1]}
+        />
       )}
 
       {/* Soft glow behind (category tinted) */}
       {!low && (
-        <mesh position={[0, 0, -0.012]}>
-          <planeGeometry args={[W + 0.56, H + 0.56]} />
+        <mesh geometry={GEO_GLOW} position={[0, 0, -0.012]}>
           <meshBasicMaterial
             color={accent}
             transparent
@@ -327,47 +404,17 @@ function Painting({
         </mesh>
       )}
 
-      {/* Steel backplate */}
-      <mesh position={[0, 0, 0.02]}>
-        <planeGeometry args={[frameW, frameH]} />
-        <meshStandardMaterial map={steelMap} metalness={0.7} roughness={0.3} />
-      </mesh>
-
       {/* Gold outer rim */}
-      <mesh position={[0, 0, 0.07]}>
-        <planeGeometry args={[frameW, frameH]} />
-        <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.28} />
-      </mesh>
+      <mesh geometry={GEO_FRAME} material={GOLD_MAT} position={[0, 0, 0.07]} />
 
-      {/* Gold dimensional bars */}
-      <mesh position={[0, lipY, 0.075]}>
-        <boxGeometry args={[frameW, barT, 0.08]} />
-        <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.28} />
-      </mesh>
-      <mesh position={[0, -lipY, 0.075]}>
-        <boxGeometry args={[frameW, barT, 0.08]} />
-        <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.28} />
-      </mesh>
-      <mesh position={[lipX, 0, 0.075]}>
-        <boxGeometry args={[barT, frameH, 0.08]} />
-        <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.28} />
-      </mesh>
-      <mesh position={[-lipX, 0, 0.075]}>
-        <boxGeometry args={[barT, frameH, 0.08]} />
-        <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.28} />
-      </mesh>
+      {/* Gold dimensional bars (single merged mesh) */}
+      <mesh geometry={GEO_GOLD_BARS} material={GOLD_MAT} position={[0, 0, 0.075]} />
 
       {/* Dark inner bevel */}
-      <mesh position={[0, 0, 0.085]}>
-        <planeGeometry args={[W + 0.16, H + 0.16]} />
-        <meshStandardMaterial color="#232e3c" metalness={0.3} roughness={0.5} />
-      </mesh>
+      <mesh geometry={GEO_BEVEL} material={BEVEL_MAT} position={[0, 0, 0.085]} />
 
       {/* Mat */}
-      <mesh position={[0, 0, 0.095]}>
-        <planeGeometry args={[W - 0.02, H - 0.02]} />
-        <meshStandardMaterial color="#e9eff8" roughness={0.85} />
-      </mesh>
+      <mesh geometry={GEO_MAT} material={MAT_MAT} position={[0, 0, 0.095]} />
 
       {/* Canvas */}
       <Suspense fallback={<Placeholder project={project} />}>
@@ -383,8 +430,7 @@ function Painting({
       {/* Picture light */}
       {!low && (
         <>
-          <mesh position={[0, H / 2 + 0.24, 0.06]}>
-            <boxGeometry args={[frameW + 0.06, 0.08, 0.22]} />
+          <mesh geometry={GEO_LIGHT_BOX} position={[0, H / 2 + 0.24, 0.06]}>
             <meshStandardMaterial
               color="#94a3b8"
               emissive="#bfe3ff"
@@ -393,8 +439,7 @@ function Painting({
               roughness={0.3}
             />
           </mesh>
-          <mesh position={[0, H / 2 - 0.14, 0.1]}>
-            <planeGeometry args={[W + 0.2, 0.55]} />
+          <mesh geometry={GEO_LIGHT_PLANE} position={[0, H / 2 - 0.14, 0.1]}>
             <meshBasicMaterial color="#cfe9ff" transparent opacity={hovered ? 0.5 : 0.26} />
           </mesh>
         </>
@@ -402,11 +447,7 @@ function Painting({
 
       {/* Light cone on hover */}
       {hovered && !low && (
-        <mesh
-          position={[0, H / 2 - 0.55, 0.2]}
-          rotation={[Math.PI, 0, 0]}
-        >
-          <coneGeometry args={[W * 0.62, 1.5, 24, 1, true]} />
+        <mesh geometry={GEO_CONE} position={[0, H / 2 - 0.55, 0.2]} rotation={[Math.PI, 0, 0]}>
           <meshBasicMaterial
             color="#cfe9ff"
             transparent
@@ -418,31 +459,13 @@ function Painting({
       )}
 
       {/* Plaque (info board, no text) */}
-      <mesh position={[0, -H / 2 - 0.58, 0.045]}>
-        <planeGeometry args={[frameW - 0.04, 0.72]} />
-        {goldPlaque ? (
-          <meshStandardMaterial
-            map={goldMap}
-            metalness={0.4}
-            roughness={0.3}
-            emissive="#c9a35e"
-            emissiveIntensity={0.25}
-          />
-        ) : (
-          <meshStandardMaterial color="#16222f" roughness={0.45} metalness={0.35} />
-        )}
-      </mesh>
+      <mesh
+        geometry={GEO_PLAQUE}
+        material={goldPlaque ? PLAQUE_GOLD_MAT : PLAQUE_DARK_MAT}
+        position={[0, -H / 2 - 0.58, 0.045]}
+      />
       {!goldPlaque && (
-        <>
-          <mesh position={[0, -H / 2 - 0.4, 0.06]}>
-            <planeGeometry args={[frameW + 0.08, 0.035]} />
-            <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.3} />
-          </mesh>
-          <mesh position={[0, -H / 2 - 0.8, 0.06]}>
-            <planeGeometry args={[frameW + 0.08, 0.035]} />
-            <meshStandardMaterial map={goldMap} metalness={0.85} roughness={0.3} />
-          </mesh>
-        </>
+        <mesh geometry={GEO_GOLD_STRIPES} material={GOLD_STRIPE_MAT} position={[0, 0, 0.06]} />
       )}
 
       <Text
@@ -451,8 +474,9 @@ function Painting({
         color={goldPlaque ? "#123a63" : "#f1f5f9"}
         anchorX="center"
         anchorY="middle"
-        maxWidth={frameW - 0.12}
+        maxWidth={FRAME_W - 0.12}
         lineHeight={1.15}
+        raycast={() => null}
         font="/fonts/PlusJakartaSans.ttf"
       >
         {title}
@@ -463,7 +487,8 @@ function Painting({
         color={goldPlaque ? "#1d4e79" : "#93c5fd"}
         anchorX="center"
         anchorY="middle"
-        maxWidth={frameW - 0.12}
+        maxWidth={FRAME_W - 0.12}
+        raycast={() => null}
         font="/fonts/PlusJakartaSans.ttf"
       >
         {authorName}

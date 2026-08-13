@@ -1,11 +1,15 @@
 import { ArrowRight } from "lucide-react";
+import { Suspense, lazy } from "react";
 import DustBackground from "../../ui/DustBackground";
 import GlowBackground from "../../ui/GlowBackground";
 import PCBBackground from "../../ui/PCBBackground";
-import HeroModel3D from "./HeroModel3D";
 import logoPoliban from "../../../assets/icons/Logo_Poliban.png";
 import { useNavigate } from "react-router-dom";
 import HeroStats, { statsData } from "./HeroStats";
+
+const HeroModel3D = lazy(() => import("./HeroModel3D"));
+const HERO_MODEL_BOX =
+  "h-[400px] w-full lg:h-[680px] lg:w-[520px] xl:h-[760px] xl:w-[620px] 2xl:h-[900px] 2xl:w-[860px]";
 
 function Hero() {
   const navigate = useNavigate();
@@ -73,7 +77,9 @@ function Hero() {
         {/* Di desktop margin dibikin normal lg:mt-0 biar sejajar persis di tengah sama teks kiri */}
         <div className="mt-8 flex w-full lg:w-[45%] xl:w-1/2 items-center justify-center shrink-0 lg:-mt-20">
           <div className="w-full max-w-xs md:max-w-lg lg:max-w-full">
-            <HeroModel3D />
+            <Suspense fallback={<div className={HERO_MODEL_BOX} aria-hidden="true" />}>
+              <HeroModel3D />
+            </Suspense>
           </div>
         </div>
 

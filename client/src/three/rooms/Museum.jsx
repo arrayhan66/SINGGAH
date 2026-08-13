@@ -23,8 +23,8 @@ import {
   Television,
   HangingPlant,
 } from "../components/HomeDecor"
-import prabowoImg from "../../assets/images/prabowo.png"
-import gibranImg from "../../assets/images/gibran.png"
+import prabowoImg from "../../assets/images/prabowo.webp"
+import gibranImg from "../../assets/images/gibran.webp"
 import {
   Plant,
   Chandelier,
@@ -40,9 +40,8 @@ import {
   HALL_PILLARS,
   LAYOUT,
 } from "./museumLayout"
-import { karyaCategories, karyaProjects, normalizeProject } from "../../data/karyaData"
-import { enrichProjects, getCategoryStats } from "../../utils/hallHelpers"
 import { KaryaRooms } from "./KaryaRooms"
+import { enrichProjects, getCategoryStats } from "../../utils/hallHelpers"
 
 const H = MUSEUM.height
 const HALL_H = MUSEUM.hallHeight
@@ -98,7 +97,7 @@ function WallBox({ wall, wallMap }) {
         </mesh>
       )}
       {topMold && overlay(0.12, H - 0.11, 0.2, "#e4eef9")}
-      {full && (
+      {full && !wall.noCover && (
         <>
           {wall.hall ? (
             <>
@@ -148,7 +147,7 @@ function HallFloorMesh({ room, floorMap }) {
   )
 }
 
-function Museum() {
+function Museum({ hallData }) {
   const wallMap = useMemo(() => textures.wallPlaster(), [])
   const marbleMap = useMemo(() => textures.marbleFloor(), [])
   const hallGradMap = useMemo(() => textures.hallGradient(), [])
@@ -156,17 +155,21 @@ function Museum() {
   const rugRectMap = useMemo(() => textures.rugRect(), [])
   const tier = useQualityStore((s) => s.tier)
   const low = tier === "rendah"
-  const stats = useMemo(() => getCategoryStats(karyaProjects), [])
+
+  const categories = hallData?.categories || []
+  const projects = hallData?.projects || []
+
+  const stats = useMemo(() => getCategoryStats(projects, categories), [projects, categories])
   const groups = useMemo(() => {
-    const enriched = enrichProjects(karyaProjects.map(normalizeProject))
+    const enriched = enrichProjects(projects)
     const dosen = {}
     const mhs = {}
-    for (const c of karyaCategories) {
-      dosen[c.slug] = enriched.filter((p) => p.category === c.slug && p.authorType === "dosen")
-      mhs[c.slug] = enriched.filter((p) => p.category === c.slug && p.authorType === "mahasiswa")
+    for (const c of categories) {
+      dosen[c.slug] = enriched.filter((p) => (p.category || p.Category?.slug) === c.slug && p.authorType === "dosen").slice(0, 4)
+      mhs[c.slug] = enriched.filter((p) => (p.category || p.Category?.slug) === c.slug && p.authorType === "mahasiswa").slice(0, 12)
     }
     return { dosen, mhs }
-  }, [])
+  }, [categories, projects])
 
   marbleMap.repeat.set(9, 9)
   const walls = getWalls()
@@ -304,7 +307,7 @@ function Museum() {
         <Plant position={[17.4, 0, -9]} variant="flower" flowerColor="#60a5fa" scale={1.0} />
         <Plant position={[17.4, 0, 9]} variant="flower" flowerColor="#f8fafc" scale={1.0} />
 
-        <InfoKiosk position={[-4.5, 0, 6]} rotationY={0.35} stats={stats} categories={karyaCategories} />
+        <InfoKiosk position={[-4.5, 0, 6]} rotationY={0.35} stats={stats} categories={categories} />
         <InfoKiosk position={[4.5, 0, 6]} rotationY={-0.35} variant="guide" />
 
         {[-12, 12].map((zPos, i) => (
@@ -379,7 +382,7 @@ function Museum() {
         <WallGuard />
       </group>
 
-      <pointLight position={[0, HALL_H - 1.6, 0]} intensity={22} distance={26} color="#cfe9ff" />
+      <pointLight position={[0, HALL_H - 1.6, 0]} intensity={22} distance={20} color="#cfe9ff" />
 
       {rooms.map((room) => {
         if (room.floor === "marble") return null

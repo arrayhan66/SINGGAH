@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Mail, Lock, EyeOff, Eye, ArrowLeft } from "lucide-react";
-import logo from "../../../../assets/icons/logo.png";
+import logo from "../../../../assets/icons/logo.webp";
 import api from "../../../../services/api";
 import { useAuth } from "../../../../context/AuthContext";
 import FormAlert from "../../../ui/FormAlert";

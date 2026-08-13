@@ -168,23 +168,51 @@ function BeritaDetail() {
 
           <div className="p-4 min-[350px]:p-6 sm:p-10 lg:p-14 pt-6 min-[350px]:pt-8 space-y-6 min-[350px]:space-y-8 bg-white text-slate-900">
             <div className="flex flex-col gap-6 min-[350px]:gap-8 text-sm min-[350px]:text-base sm:text-lg leading-relaxed text-slate-700 font-normal">
-              {item.content?.map((paragraph, index) => {
-                const correspondingPhoto = item.gallery?.[index]
+              {Array.isArray(item.content) ? (
+                item.content.map((paragraph, index) => {
+                  const correspondingPhoto = item.gallery?.[index]
 
-                if (index === 0) {
-                  const firstLetter = paragraph.charAt(0)
-                  const restOfParagraph = paragraph.slice(1)
+                  if (index === 0) {
+                    const firstLetter = paragraph.charAt(0)
+                    const restOfParagraph = paragraph.slice(1)
+
+                    return (
+                      <div
+                        key={index}
+                        className="space-y-6 min-[350px]:space-y-8"
+                      >
+                        <p className="text-base min-[350px]:text-lg sm:text-xl leading-relaxed text-slate-800 font-normal">
+                          <span className="float-left text-4xl min-[350px]:text-5xl sm:text-6xl font-black text-cyan-600 mr-2.5 min-[350px]:mr-3.5 leading-none pt-1">
+                            {firstLetter}
+                          </span>
+                          {restOfParagraph}
+                        </p>
+
+                        {correspondingPhoto && (
+                          <figure className="my-6 min-[350px]:my-8 overflow-hidden rounded-xl min-[350px]:rounded-2xl border border-slate-200 bg-slate-50 shadow-md">
+                            <div className="w-full max-h-[500px] overflow-hidden bg-slate-200">
+                              <img
+                                src={correspondingPhoto.url}
+                                alt={correspondingPhoto.caption}
+                                className="w-full h-auto object-cover transition-transform duration-500 hover:scale-[1.02]"
+                              />
+                            </div>
+                            <figcaption className="px-3 min-[350px]:px-5 py-2.5 min-[350px]:py-3.5 text-[10px] min-[350px]:text-xs sm:text-sm text-slate-600 border-t border-slate-200 italic leading-relaxed flex flex-col min-[350px]:flex-row items-start min-[350px]:items-center justify-between gap-2 min-[350px]:gap-0 bg-white">
+                              <span>{correspondingPhoto.caption}</span>
+                              <span className="not-italic text-cyan-700 font-bold uppercase tracking-wider text-[9px] min-[350px]:text-[10px] bg-cyan-50 px-2 min-[350px]:px-2.5 py-0.5 min-[350px]:py-1 rounded border border-cyan-200 min-[350px]:ml-2 shrink-0">
+                                Dok. SINGGAH
+                              </span>
+                            </figcaption>
+                          </figure>
+                        )}
+                      </div>
+                    )
+                  }
 
                   return (
-                    <div
-                      key={index}
-                      className="space-y-6 min-[350px]:space-y-8"
-                    >
-                      <p className="text-base min-[350px]:text-lg sm:text-xl leading-relaxed text-slate-800 font-normal">
-                        <span className="float-left text-4xl min-[350px]:text-5xl sm:text-6xl font-black text-cyan-600 mr-2.5 min-[350px]:mr-3.5 leading-none pt-1">
-                          {firstLetter}
-                        </span>
-                        {restOfParagraph}
+                    <div key={index} className="space-y-6 min-[350px]:space-y-8">
+                      <p className="leading-relaxed text-slate-700">
+                        {paragraph}
                       </p>
 
                       {correspondingPhoto && (
@@ -206,34 +234,12 @@ function BeritaDetail() {
                       )}
                     </div>
                   )
-                }
-
-                return (
-                  <div key={index} className="space-y-6 min-[350px]:space-y-8">
-                    <p className="leading-relaxed text-slate-700">
-                      {paragraph}
-                    </p>
-
-                    {correspondingPhoto && (
-                      <figure className="my-6 min-[350px]:my-8 overflow-hidden rounded-xl min-[350px]:rounded-2xl border border-slate-200 bg-slate-50 shadow-md">
-                        <div className="w-full max-h-[500px] overflow-hidden bg-slate-200">
-                          <img
-                            src={correspondingPhoto.url}
-                            alt={correspondingPhoto.caption}
-                            className="w-full h-auto object-cover transition-transform duration-500 hover:scale-[1.02]"
-                          />
-                        </div>
-                        <figcaption className="px-3 min-[350px]:px-5 py-2.5 min-[350px]:py-3.5 text-[10px] min-[350px]:text-xs sm:text-sm text-slate-600 border-t border-slate-200 italic leading-relaxed flex flex-col min-[350px]:flex-row items-start min-[350px]:items-center justify-between gap-2 min-[350px]:gap-0 bg-white">
-                          <span>{correspondingPhoto.caption}</span>
-                          <span className="not-italic text-cyan-700 font-bold uppercase tracking-wider text-[9px] min-[350px]:text-[10px] bg-cyan-50 px-2 min-[350px]:px-2.5 py-0.5 min-[350px]:py-1 rounded border border-cyan-200 min-[350px]:ml-2 shrink-0">
-                            Dok. SINGGAH
-                          </span>
-                        </figcaption>
-                      </figure>
-                    )}
-                  </div>
-                )
-              })}
+                })
+              ) : (
+                <p className="text-base min-[350px]:text-lg sm:text-xl leading-relaxed text-slate-800 font-normal whitespace-pre-line">
+                  {typeof item.content === "string" ? item.content : (item.description || "Tidak ada konten")}
+                </p>
+              )}
             </div>
 
             <div className="pt-6 min-[350px]:pt-8 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 min-[350px]:gap-4">

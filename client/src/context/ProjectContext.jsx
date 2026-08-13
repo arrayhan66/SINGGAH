@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useCallback } from "react"
-import { dummyAdminProjects } from "../components/sections/admin/dummyAdminProjects"
+import { createContext, useContext, useState, useEffect, useCallback } from "react"
+import api from "../services/api"
 
 const ProjectContext = createContext(null)
 
@@ -14,89 +14,89 @@ function slugify(text) {
 }
 
 export function ProjectProvider({ children }) {
-  const [projects, setProjects] = useState(() =>
-    dummyAdminProjects.map((p) => ({ ...p, slug: p.slug || slugify(p.title) })),
-  )
-
-  const addProject = useCallback((formData) => {
-    const newId = Math.max(...projects.map((p) => p.id), 0) + 1
-    const newProject = {
-      id: newId,
-      slug: slugify(formData.title) + "-" + newId,
-      title: formData.title,
-      description: formData.description,
-      year: Number(formData.year) || new Date().getFullYear(),
-      thumbnail: formData.thumbnail || "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400",
-      images: formData.images || [{ image_url: formData.thumbnail || "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800" }],
-      User: {
-        name: formData.userName || "Admin SINGGAH",
-        nim: formData.userNim || "ADMIN001",
-      },
-      Category: {
-        id: Number(formData.categoryId) || 1,
-        name: formData.categoryName || "IoT",
-        slug: (formData.categoryName || "iot").toLowerCase().replace(/\s+/g, "-"),
-      },
-      technologies: Array.isArray(formData.technologies)
-        ? formData.technologies
-        : (formData.technologies || "").split(",").map((t) => t.trim()).filter(Boolean),
-      status: formData.status || "pending",
-      created_at: new Date().toISOString().split("T")[0],
-      likesCount: 0,
-      viewsCount: 0,
+  const [projects, setProjects] = useState([
+    {
+      id: 1,
+      slug: "sistem-informasi-akademik-poliban",
+      title: "Sistem Informasi Akademik Poliban",
+      description: "Platform manajemen akademik kampus berbasis web menggunakan Laravel.",
+      thumbnail: "https://placehold.co/600x400/0f172a/38bdf8?text=Website",
+      images: [{ image_url: "https://placehold.co/600x400/0f172a/38bdf8?text=Website" }],
+      User: { name: "Ahmad Fauzan" },
+      Category: { id: 1, name: "Website", slug: "website" },
+      status: "approved",
+      created_at: "2024-01-10",
+      likesCount: 30,
+      viewsCount: 150,
     }
+  ])
 
-    setProjects((prev) => [newProject, ...prev])
-    return newId
-  }, [projects])
-
-  const updateProject = useCallback((id, formData) => {
-    setProjects((prev) =>
-      prev.map((p) => {
-        if (p.id !== id) return p
-        return {
-          ...p,
-          title: formData.title !== undefined ? formData.title : p.title,
-          description: formData.description !== undefined ? formData.description : p.description,
-          year: formData.year !== undefined ? Number(formData.year) : p.year,
-          thumbnail: formData.thumbnail !== undefined ? formData.thumbnail : p.thumbnail,
-          images: formData.images !== undefined ? formData.images : p.images,
-          User: {
-            ...p.User,
-            name: formData.userName !== undefined ? formData.userName : p.User?.name,
-            nim: formData.userNim !== undefined ? formData.userNim : p.User?.nim,
-          },
-          Category: formData.categoryName ? {
-            id: Number(formData.categoryId) || p.Category?.id || 1,
-            name: formData.categoryName,
-            slug: formData.categoryName.toLowerCase().replace(/\s+/g, "-"),
-          } : p.Category,
-          technologies: formData.technologies !== undefined
-            ? (Array.isArray(formData.technologies) ? formData.technologies : formData.technologies.split(",").map((t) => t.trim()).filter(Boolean))
-            : p.technologies,
-          status: formData.status !== undefined ? formData.status : p.status,
-          approveNote: formData.approveNote !== undefined ? formData.approveNote : p.approveNote,
-          rejectionReason: formData.rejectionReason !== undefined ? formData.rejectionReason : p.rejectionReason,
-        }
-      })
-    )
+  const fetchProjects = useCallback(async () => {
+    try {
+      const res = await api.get("/projects")
+      const items = res.data.data.items || res.data.data || []
+      if (items.length > 0) {
+        setProjects(items)
+      }
+    } catch (err) {
+      console.error("Failed to fetch projects, keeping fallback:", err)
+    }
   }, [])
 
-  const deleteProject = useCallback((id) => {
-    setProjects((prev) => prev.filter((p) => p.id !== id))
-  }, [])
+  useEffect(() => {
+    fetchProjects()
+  }, [fetchProjects])
 
-  const approveProject = useCallback((id, note = "") => {
-    setProjects((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, status: "approved", approveNote: note, rejectionReason: undefined } : p))
-    )
-  }, [])
+  const addProject = useCallback(async (formData) => {
+    try {
+      const res = await api.post("/projects", formData)
+      await fetchProjects()
+      return res.data.data.id
+    } catch (err) {
+      console.error("Failed to add project:", err)
+      throw err
+    }
+  }, [fetchProjects])
 
-  const rejectProject = useCallback((id, reason = "") => {
-    setProjects((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, status: "rejected", rejectionReason: reason } : p))
-    )
-  }, [])
+  const updateProject = useCallback(async (id, formData) => {
+    try {
+      await api.put(`/projects/${id}`, formData)
+      await fetchProjects()
+    } catch (err) {
+      console.error("Failed to update project:", err)
+      throw err
+    }
+  }, [fetchProjects])
+
+  const deleteProject = useCallback(async (id) => {
+    try {
+      await api.delete(`/projects/${id}`)
+      await fetchProjects()
+    } catch (err) {
+      console.error("Failed to delete project:", err)
+      throw err
+    }
+  }, [fetchProjects])
+
+  const approveProject = useCallback(async (id, note = "") => {
+    try {
+      await api.post(`/projects/${id}/approve`, { note })
+      await fetchProjects()
+    } catch (err) {
+      console.error("Failed to approve project:", err)
+      throw err
+    }
+  }, [fetchProjects])
+
+  const rejectProject = useCallback(async (id, reason = "") => {
+    try {
+      await api.post(`/projects/${id}/reject`, { reason })
+      await fetchProjects()
+    } catch (err) {
+      console.error("Failed to reject project:", err)
+      throw err
+    }
+  }, [fetchProjects])
 
   const getProjectById = useCallback((id) => {
     return projects.find((p) => String(p.id) === String(id))

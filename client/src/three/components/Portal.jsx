@@ -2,7 +2,7 @@ import { Text, useTexture } from "@react-three/drei"
 import { useMemo } from "react"
 import * as THREE from "three"
 import { useDownscaledTexture } from "../utils/useDownscaledTexture"
-import logo from "../../assets/icons/logo.png"
+import logo from "../../assets/icons/logo.webp"
 import exitImg from "../../assets/images/exit.jpg"
 
 const RIFT_H = 4.8

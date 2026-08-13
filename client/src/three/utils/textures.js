@@ -1007,6 +1007,66 @@ function tvScreenTexture() {
   return texture
 }
 
+function premiumMarbleTexture() {
+  const size = 512
+  const { ctx } = makeCanvas(size)
+
+  const base = ctx.createLinearGradient(0, 0, size, size)
+  base.addColorStop(0, "#f7f9fd")
+  base.addColorStop(0.5, "#eef2f8")
+  base.addColorStop(1, "#e3eaf3")
+  ctx.fillStyle = base
+  ctx.fillRect(0, 0, size, size)
+
+  for (let i = 0; i < 3200; i++) {
+    const a = rand(0, 0.055)
+    const t = rand(215, 245)
+    ctx.fillStyle = `rgba(${t}, ${t}, ${t + 4}, ${a})`
+    ctx.fillRect(rand(0, size), rand(0, size), rand(2, 9), rand(2, 9))
+  }
+
+  ctx.lineWidth = 2.5
+  for (let i = 0; i < 12; i++) {
+    ctx.strokeStyle = `rgba(201,163,94,${rand(0.15, 0.4)})`
+    ctx.beginPath()
+    let x = rand(0, size)
+    let y = rand(0, size)
+    ctx.moveTo(x, y)
+    const segs = 4 + ((Math.random() * 4) | 0)
+    for (let s = 0; s < segs; s++) {
+      x += rand(-95, 95)
+      y += rand(-95, 95)
+      ctx.lineTo(x, y)
+    }
+    ctx.stroke()
+  }
+
+  ctx.strokeStyle = "rgba(140,160,190,0.22)"
+  ctx.lineWidth = 1.5
+  for (let i = 0; i < 8; i++) {
+    ctx.beginPath()
+    let x = rand(0, size)
+    let y = rand(0, size)
+    ctx.moveTo(x, y)
+    const segs = 3 + ((Math.random() * 3) | 0)
+    for (let s = 0; s < segs; s++) {
+      x += rand(-85, 85)
+      y += rand(-85, 85)
+      ctx.lineTo(x, y)
+    }
+    ctx.stroke()
+  }
+
+  const sheen = ctx.createLinearGradient(0, 0, 0, size)
+  sheen.addColorStop(0, "rgba(255,255,255,0.3)")
+  sheen.addColorStop(0.5, "rgba(255,255,255,0)")
+  sheen.addColorStop(1, "rgba(170,195,225,0.14)")
+  ctx.fillStyle = sheen
+  ctx.fillRect(0, 0, size, size)
+
+  return toTexture(ctx.canvas, 1, 1)
+}
+
 export const textures = {
   woodFloor: woodFloorTexture,
   marbleFloor: marbleFloorTexture,
@@ -1025,4 +1085,5 @@ export const textures = {
   bookSpines: bookSpineSet,
   bookPages: bookPagesTexture,
   bookCover: bookCoverTexture,
+  premiumMarble: premiumMarbleTexture,
 }

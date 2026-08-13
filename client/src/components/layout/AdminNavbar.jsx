@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import { Bell, CheckCheck, BellOff, User, LogOut, ChevronDown } from "lucide-react"
 import { useAuth } from "../../context/AuthContext"
-import logo from "../../assets/icons/logo.png"
+import logo from "../../assets/icons/logo.webp"
 import useNotifications from "../../hooks/useNotifications"
 import {
   formatRelativeTime,

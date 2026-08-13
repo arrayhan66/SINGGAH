@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom"
 import { CheckCircle2, ArrowRight, FolderOpen } from "lucide-react"
-import { dummyAdminProjects } from "../dummyAdminProjects"
+import { useProjects } from "../../../../context/ProjectContext"
 
 function DashboardApprovedProjects() {
   const navigate = useNavigate()
-  const approvedProjects = dummyAdminProjects
-    .filter((p) => p.status === "approved")
+  const { projects } = useProjects()
+  const approvedProjects = projects
+    .filter((p) => p.status === "approved" || p.status === "published")
     .slice(0, 4)
 
   return (

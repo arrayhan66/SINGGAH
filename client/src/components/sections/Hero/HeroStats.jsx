@@ -1,13 +1,36 @@
+import { useState, useEffect } from "react";
 import GlassCard from "../../ui/GlassCard";
 import { Layers, Grid3x3, Users } from "lucide-react";
-
-export const statsData = [
-  { icon: Layers, value: "50", label: "Proyek" },
-  { icon: Grid3x3, value: "10", label: "Kategori" },
-  { icon: Users, value: "1000", label: "Pengunjung" },
-];
+import api from "../../../services/api";
 
 function HeroStats() {
+  const [stats, setStats] = useState({
+    projectsCount: "50",
+    categoriesCount: "10",
+    visitorsCount: "1000",
+  });
+
+  useEffect(() => {
+    api.get("/stats")
+      .then((res) => {
+        const d = res.data.data || res.data;
+        setStats({
+          projectsCount: String(d.totalProject ?? "50"),
+          categoriesCount: String(d.totalCategory ?? "10"),
+          visitorsCount: String(d.totalUser ?? "1000"),
+        });
+      })
+      .catch((err) => {
+        console.error("Failed to fetch public stats:", err);
+      });
+  }, []);
+
+  const statsData = [
+    { icon: Layers, value: stats.projectsCount, label: "Proyek" },
+    { icon: Grid3x3, value: stats.categoriesCount, label: "Kategori" },
+    { icon: Users, value: stats.visitorsCount, label: "Pengunjung" },
+  ];
+
   return (
     <div className="w-full">
       <div className="flex w-full gap-4">

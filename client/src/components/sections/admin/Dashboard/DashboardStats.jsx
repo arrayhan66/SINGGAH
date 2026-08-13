@@ -1,6 +1,6 @@
 import { FolderOpen, Newspaper, Users, Clock } from "lucide-react"
-import { dummyAdminProjects } from "../dummyAdminProjects"
-import { beritaData } from "../../../../data/beritaData"
+import { useProjects } from "../../../../context/ProjectContext"
+import { useBerita } from "../../../../context/BeritaContext"
 import { useUsers } from "../../../../context/UserContext"
 
 const ACCENT = {
@@ -28,13 +28,15 @@ function Sparkline({ d }) {
 }
 
 function DashboardStats() {
+  const { projects } = useProjects()
+  const { beritaList } = useBerita()
   const { userList } = useUsers()
 
-  const totalProject = dummyAdminProjects.length
-  const pendingProject = dummyAdminProjects.filter(
+  const totalProject = projects.length
+  const pendingProject = projects.filter(
     (p) => p.status === "pending",
   ).length
-  const totalBerita = beritaData.length
+  const totalBerita = beritaList.length
   const totalUser = userList.length
 
   const stats = [

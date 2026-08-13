@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import logo from "../../assets/icons/logo.png";
+import logo from "../../assets/icons/logo.webp";
 
 function Footer() {
   return (

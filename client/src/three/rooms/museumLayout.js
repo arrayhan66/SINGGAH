@@ -1,44 +1,15 @@
-import { karyaCategories } from "../../data/karyaData"
+export const DEFAULT_CATEGORIES = [
+  { slug: "website", title: "Website" },
+  { slug: "mobile-app", title: "Mobile App" },
+  { slug: "iot", title: "IoT" },
+  { slug: "artificial-intelligence", title: "Artificial Intelligence" },
+  { slug: "data-science", title: "Data Science" },
+  { slug: "cyber-security", title: "Cyber Security" },
+  { slug: "ui-ux-design", title: "UI/UX Design" },
+  { slug: "game-development", title: "Game Development" },
+]
 
-const T = 0.25
-const H = 14
-
-// The main hall keeps its own (original tall) ceiling height, while the
-// category buildings behind it are taller (H) so each of their two storeys
-// gets generous headroom.
-const HALL_H = 10
-
-// Door / portal sizes
-export const PORTAL_W = 2.8
-export const PORTAL_H = 4.8
-
-const PAINT_W = 2.2
-const PAINT_H = 1.5
-
-// Every category building is as big as the main hall (same width & depth).
-const HALL_W = 36
-const HALL_DEPTH = 54
-const HALL_HALF_X = HALL_W / 2
-const HALL_HALF_Z = HALL_DEPTH / 2
-
-const ROOM_W = HALL_W
-const ROOM_DEPTH = HALL_DEPTH
-
-// ---- Two-storey building geometry (house style) ----
-// Floor 1 (ground): student works. Floor 2 (upper): lecturer works. The upper
-// floor is a full slab covering the whole room footprint (minus the stair void),
-// so floor 2 sits directly above floor 1 like a real house. The overall building
-// height stays tall (H = 10), giving each storey generous headroom.
-export const FLOOR2_Y = 7.0
-const STAIR_DEPTH = 10
-export const STAIR_WIDTH = 2.6
-const STAIR_STEPS = 20
-
-// Where a player spawns inside a category building after crossing a portal.
-const ENTRY_DEPTH = 3
-
-// ---- Dynamic sizing from the category list ----
-const N = karyaCategories.length
+const N = DEFAULT_CATEGORIES.length
 const ROW_X0 = -(N * ROOM_W) / 2
 const ROW_X1 = ROW_X0 + N * ROOM_W
 // Buildings sit flush behind the hall's front wall (front wall at z = +HALL_HALF_Z).
@@ -161,7 +132,7 @@ for (let i = 0; i < N; i++) {
   // covering the full stair void. Its ends are mitered to sharp points that
   // tuck into the closing walls, and its covering bands stop short of both
   // ends so they never run into the bands of the perpendicular walls.
-  addWall("x", x0 + STAIR_WIDTH + 0.04, STAIR_Z0 - T / 2, STAIR_Z1 + T / 2, [], { y0: 0, y1: STAIR_PANEL_H }, { bandInset: STAIR_PANEL_BAND_INSET, miterFront: true, miterBack: true })
+  addWall("x", x0 + STAIR_WIDTH + 0.04, STAIR_Z0 - T / 2, STAIR_Z1 + T / 2, [], { y0: 0, y1: STAIR_PANEL_H }, { bandInset: STAIR_PANEL_BAND_INSET, miterFront: true, miterBack: true, noCover: true })
   // Guard railing on floor 2 in front of the stair void. Its +x end is tucked
   // inside the panel so the butt end never shows, and its +z face is set back
   // slightly from the panel's front miter face (z = STAIR_Z0 - T/2) so it never
@@ -197,7 +168,7 @@ export const rooms = [
 ]
 
 for (let i = 0; i < N; i++) {
-  const cat = karyaCategories[i]
+  const cat = DEFAULT_CATEGORIES[i]
   const x = roomX(i)
   rooms.push({
     id: cat.slug,
@@ -254,10 +225,16 @@ function stairHeight(x, z) {
 export function resolveHeight(x, z, level = 0) {
   const room = findRoom(x, z)
   if (!room || room.floor === "marble") return { height: 0, level: 0 }
-  if (level === 1 && !onStairs(room, x, z)) return { height: FLOOR2_Y, level: 1 }
   if (onStairs(room, x, z)) {
     const height = stairHeight(x, z)
-    return { height, level: height >= FLOOR2_Y - 0.05 ? 1 : 0 }
+    const newLevel = (level === 1 && height > 1.0) || height >= FLOOR2_Y - 0.05 ? 1 : 0
+    return { height, level: newLevel }
+  }
+  if (level === 1 && z >= room.z[0] && z <= room.z[1] && x >= room.x[0] && x <= room.x[1]) {
+    return { height: FLOOR2_Y, level: 1 }
+  }
+  if (z >= STAIR_Z1 && x >= room.x[0] && x <= room.x[1] && z <= room.z[1]) {
+    return { height: FLOOR2_Y, level: 1 }
   }
   return { height: 0, level: 0 }
 }
@@ -329,7 +306,7 @@ const NO_ANIMATED_SLUG = "game-development"
 
 for (let i = 0; i < N; i++) {
   const hp = hallPortals[i]
-  const cat = karyaCategories[i]
+  const cat = DEFAULT_CATEGORIES[i]
   const cx = roomCx(i)
   const rotY = hp.at < 0 ? Math.PI / 2 : -Math.PI / 2
   const pos = [hp.at, 0, hp.zc]
@@ -390,10 +367,17 @@ const PAINT_ROW_DROP = 0.4
 export const GROUND_PAINT_Y = 3.5 - PAINT_ROW_DROP
 export const UPPER_PAINT_OFFSET = 3.5 - PAINT_ROW_DROP
 
+// The framed PKKMB poster on the upper floor hangs centered on the room's
+// front wall (portrait pkkmb.jpg, 5.0 m tall → 3.75 m wide) above the exit
+// portal's cover panel (4.0 m wide). Reserve a clear band around it so framed
+// works never overlap the poster or its panel — the front-wall rails stop at
+// this band on both sides and keep a bare margin around it.
+const POSTER_CLEAR_HALF = 5.0
+
 export const paintingWalls = {}
 
 for (let i = 0; i < N; i++) {
-  const cat = karyaCategories[i]
+  const cat = DEFAULT_CATEGORIES[i]
   const [x0, x1] = roomX(i)
   const cx = roomCx(i)
   const id = cat.slug
@@ -417,7 +401,12 @@ for (let i = 0; i < N; i++) {
     upper: [
       wallDef("x", x0, STAIR_Z1, ROW_Z1, "+x", UPPER_Y),
       wallDef("z", ROW_Z1, x0, x1, "-z", UPPER_Y),
-      wallDef("z", ROW_Z0, x0, x1, "+z", UPPER_Y),
+      // Front wall split around the PKKMB poster zone: two segments packing
+      // from the room corners toward the poster, each stopping at the clear
+      // band so no frame touches the poster.
+      ...carve(x0, x1, [{ a: cx - POSTER_CLEAR_HALF, b: cx + POSTER_CLEAR_HALF }]).map(
+        ([a, b], si) => wallDef("z", ROW_Z0, a, b, "+z", UPPER_Y, si > 0 ? -1 : 1, 0),
+      ),
       wallDef("x", x1, STAIR_Z1, ROW_Z1, "-x", UPPER_Y),
     ],
   }
@@ -432,7 +421,7 @@ for (let i = 0; i < N; i++) {
 export const roomRails = {}
 
 for (let i = 0; i < N; i++) {
-  const cat = karyaCategories[i]
+  const cat = DEFAULT_CATEGORIES[i]
   const [x0, x1] = roomX(i)
   const id = cat.slug
   const GROUND_Y = GROUND_PAINT_Y
@@ -475,11 +464,14 @@ export const RAIL_OFFSET = 1.08
 // spreading), so a room always fills one complete wall first, then continues on
 // the next one.
 const FRAME_GAP = 0.9
-const FRAME_EDGE_PAD = 1.0
+const FRAME_EDGE_PAD = 0.5
 
 export function layoutPaintings(roomId, projects, level = "ground") {
-  const wallsDef = paintingWalls[roomId]?.[level] || []
+  // Combine the work walls with the extra gallery rails so EVERY rail stretch
+  // in the room carries framed works ("fullkan semua space rel").
+  const wallsDef = [...(paintingWalls[roomId]?.[level] || []), ...(roomRails[roomId]?.[level] || [])]
   const list = projects || []
+  if (!list.length) return []
   const caps = wallsDef.map((wd) => {
     const len = wd.to - wd.from
     const usable = len - wd.endPad
@@ -490,36 +482,39 @@ export function layoutPaintings(roomId, projects, level = "ground") {
   })
   const total = caps.reduce((s, c) => s + c, 0)
 
-  // Pass 1: fill walls one after another (each to its full capacity) so the
-  // frames gather on a single wall in a neat row before spilling to the next.
+  // Pass 1: fill every wall to its full capacity, cycling through the available
+  // works so no rail space is left empty. Walls are filled one after another so
+  // the frames gather in neat rows per wall before spilling to the next.
   const counts = caps.map(() => 0)
   let wi = 0
-  for (let i = 0; i < list.length && i < total; i++) {
+  for (let i = 0; i < total; i++) {
     while (wi < caps.length && counts[wi] >= caps[wi]) wi++
     if (wi >= caps.length) break
     counts[wi]++
   }
 
-  // Pass 2: place each wall's works as a single row PACKED from the wall's
-  // start edge (the room corner) toward the far end, so a partially-filled
-  // wall begins at the corner instead of the middle. Adding a work just
-  // appends the next frame flush beside the last one ("saling isi terus").
-  // FRAME_EDGE_PAD stays at the start edge and endPad stays reserved at the
-  // far end (the portal margin), so the row never overflows the wall.
+  // Pass 2: place each wall's works as a single row spread EVENLY across the
+  // full wall — first frame at the wall's start edge, last frame at the far
+  // end, equal gaps in between. This absorbs the leftover space so no wall
+  // ends with an empty hole ("rapikan jarak antar rel").
   const placed = []
   let pi = 0
   for (let wi = 0; wi < caps.length; wi++) {
     const n = counts[wi]
     if (!n) continue
     const wd = wallsDef[wi]
+    const start = wd.from + FRAME_EDGE_PAD
+    const end = wd.to - wd.endPad - FRAME_EDGE_PAD
+    const span = Math.max(0, end - start)
+    const step = n > 1 ? (span - n * PAINT_W) / (n - 1) : 0
     for (let k = 0; k < n; k++) {
-      // dir=-1 walls pack from their `to` (corner) edge toward `from` (the
-      // portal side); dir=1 walls pack from `from` toward `to`.
+      const c = start + PAINT_W / 2 + k * (PAINT_W + step)
+      // dir=-1 walls order the works from the `to` edge (corner) toward
+      // `from`; dir=1 order from `from` toward `to`. A lone frame centers
+      // itself on the wall instead of hugging one end.
       const t =
-        wd.dir === -1
-          ? wd.to - FRAME_EDGE_PAD - PAINT_W / 2 - k * (PAINT_W + FRAME_GAP)
-          : wd.from + FRAME_EDGE_PAD + PAINT_W / 2 + k * (PAINT_W + FRAME_GAP)
-      const p = list[pi]
+        n === 1 ? start + span / 2 : wd.dir === -1 ? end + start - c : c
+      const p = list[pi % list.length]
       let fx, fz
       if (wd.axis === "x") {
         fx = wd.at + faceOffset(wd.face)
@@ -535,6 +530,7 @@ export function layoutPaintings(roomId, projects, level = "ground") {
         index: pi + 1,
         isDosen: level === "upper",
         railY: wd.y + RAIL_OFFSET,
+        key: `${pi}-${p.id}`,
       })
       pi++
     }

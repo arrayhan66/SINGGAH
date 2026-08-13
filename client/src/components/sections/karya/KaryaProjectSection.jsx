@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import { useNavigate, useParams, Link } from "react-router-dom"
 import { ArrowLeft } from "lucide-react"
 import DustBackground from "../../ui/DustBackground"
@@ -6,17 +7,35 @@ import useSearchAndExpand from "../../../hooks/useSearchAndExpand"
 import SearchBar from "../../ui/SearchBar"
 import OutlineButton from "../../ui/OutlineButton"
 import KaryaProjectCard from "./KaryaProjectCard"
-import { karyaCategories, karyaProjects, normalizeProject } from "../../../data/karyaData"
+import api from "../../../services/api"
 
 function KaryaProjectSection() {
   const { slug } = useParams()
   const navigate = useNavigate()
   const initialCount = 6
 
-  const category = karyaCategories.find((c) => c.slug === slug)
-  const categoryProjects = karyaProjects
-    .filter((p) => p.category === slug)
-    .map(normalizeProject)
+  const [category, setCategory] = useState(null)
+  const [projects, setProjects] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    Promise.all([
+      api.get("/categories"),
+      api.get(`/projects?category=${slug}`)
+    ])
+      .then(([catRes, projRes]) => {
+        const cats = catRes.data.data.items || catRes.data.data || []
+        const found = cats.find((c) => c.slug === slug)
+        setCategory(found)
+        const projs = projRes.data.data.items || projRes.data.data || []
+        setProjects(projs)
+        setLoading(false)
+      })
+      .catch((err) => {
+        console.error("Failed to load category projects:", err)
+        setLoading(false)
+      })
+  }, [slug])
 
   const {
     search,
@@ -25,7 +44,7 @@ function KaryaProjectSection() {
     filteredData: filteredProjects,
     showAll,
     setShowAll,
-  } = useSearchAndExpand(categoryProjects, initialCount)
+  } = useSearchAndExpand(projects, initialCount)
 
   if (!category) {
     return (

@@ -1,8 +1,30 @@
 import GlassCard from "../../ui/GlassCard";
+import { Globe, Smartphone, Cpu, Brain, Database, ShieldCheck, Layout, Gamepad2, Layers } from "lucide-react";
+
+const ICON_MAP = {
+  website: Globe,
+  "mobile-app": Smartphone,
+  iot: Cpu,
+  "artificial-intelligence": Brain,
+  "data-science": Database,
+  "cyber-security": ShieldCheck,
+  "ui-ux-design": Layout,
+  "game-development": Gamepad2,
+};
 
 function KaryaCategoryCard({ item, onClick }) {
-  const { icon: Icon, title, desc, projectCount } = item;
+  const { icon, title, description, desc, slug, projectCount } = item;
 
+  let IconComponent = Layers;
+  if (typeof icon === "function") {
+    IconComponent = icon;
+  } else if (typeof icon === "string" && ICON_MAP[icon]) {
+    IconComponent = ICON_MAP[icon];
+  } else if (slug && ICON_MAP[slug]) {
+    IconComponent = ICON_MAP[slug];
+  }
+
+  const cardDesc = description || desc || "";
   const hasProjectCount = typeof projectCount === "number";
 
   return (
@@ -13,7 +35,7 @@ function KaryaCategoryCard({ item, onClick }) {
       {/* Header Card */}
       <div className="flex items-start justify-between">
         <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-cyan-400 to-blue-600 text-white shadow-xl transition group-hover:scale-110 sm:h-20 sm:w-20 2xl:h-24 2xl:w-24 3xl:h-28 3xl:w-28 4xl:h-32 4xl:w-32">
-          <Icon size={36} className="sm:size-9 2xl:size-11 3xl:size-12 4xl:size-14" />
+          <IconComponent size={36} className="sm:size-9 2xl:size-11 3xl:size-12 4xl:size-14" />
         </div>
 
         {hasProjectCount && (
@@ -29,7 +51,7 @@ function KaryaCategoryCard({ item, onClick }) {
       </h3>
 
       <p className="mt-4 leading-7 text-slate-300 2xl:mt-5 2xl:text-lg 2xl:leading-8 3xl:mt-6 3xl:text-xl 3xl:leading-9 4xl:mt-7 4xl:text-2xl 4xl:leading-10">
-        {desc}
+        {cardDesc}
       </p>
 
       {/* Button */}

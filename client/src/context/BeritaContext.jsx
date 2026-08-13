@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useCallback } from "react"
-import { beritaData as initialBeritaData } from "../data/beritaData"
+import { createContext, useContext, useState, useEffect, useCallback } from "react"
+import api from "../services/api"
 
 function slugify(text) {
   return text
@@ -15,31 +15,68 @@ function slugify(text) {
 const BeritaContext = createContext(null)
 
 export function BeritaProvider({ children }) {
-  const [beritaList, setBeritaList] = useState(initialBeritaData)
+  const [beritaList, setBeritaList] = useState([
+    {
+      id: 1,
+      slug: "pameran-karya-teknik-elektro-2026",
+      title: "Pameran Karya Mahasiswa Teknik Elektro 2026 Resmi Dibuka",
+      content: "Pameran tahunan SINGGAH menampilkan berbagai inovasi digital dari mahasiswa dan dosen.",
+      image: "https://placehold.co/600x400/0f172a/38bdf8?text=Berita",
+      date: "2026-07-27",
+      status: "published",
+    }
+  ])
   const [tempPreviewData, setTempPreviewData] = useState(null)
 
-  function addBerita(formData) {
-    const newId = Math.max(...beritaList.map((b) => b.id), 0) + 1
-    const slug = formData.slug || slugify(formData.title) + "-" + newId
-    setBeritaList((prev) => [
-      ...prev,
-      { ...formData, id: newId, slug, status: formData.status || "draft" },
-    ])
-    return newId
+  const fetchNews = useCallback(async () => {
+    try {
+      const res = await api.get("/news")
+      const items = res.data.data.items || res.data.data || []
+      if (items.length > 0) {
+        setBeritaList(items)
+      }
+    } catch (err) {
+      console.error("Failed to fetch news, keeping fallback:", err)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchNews()
+  }, [fetchNews])
+
+  async function addBerita(formData) {
+    try {
+      const res = await api.post("/news", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      await fetchNews()
+      return res.data.data.id
+    } catch (err) {
+      console.error("Failed to add berita:", err)
+      throw err
+    }
   }
 
-  function updateBerita(id, formData) {
-    setBeritaList((prev) =>
-      prev.map((b) => {
-        if (b.id !== id) return b
-        const slug = formData.slug || b.slug || slugify(formData.title || b.title) + "-" + id
-        return { ...b, ...formData, id, slug, status: formData.status || b.status || "draft" }
-      }),
-    )
+  async function updateBerita(id, formData) {
+    try {
+      await api.put(`/news/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      await fetchNews()
+    } catch (err) {
+      console.error("Failed to update berita:", err)
+      throw err
+    }
   }
 
-  function deleteBerita(id) {
-    setBeritaList((prev) => prev.filter((b) => b.id !== id))
+  async function deleteBerita(id) {
+    try {
+      await api.delete(`/news/${id}`)
+      await fetchNews()
+    } catch (err) {
+      console.error("Failed to delete berita:", err)
+      throw err
+    }
   }
 
   function getBeritaById(id) {

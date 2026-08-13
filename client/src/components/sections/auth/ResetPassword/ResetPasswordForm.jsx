@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
-import logo from "../../../../assets/icons/logo.png";
+import logo from "../../../../assets/icons/logo.webp";
 import SuccessPopup from "../../../ui/SuccessPopup";
 
 function ResetPasswordForm() {

@@ -45,10 +45,10 @@ function HallCeiling({ room, height = 6.5 }) {
   const TRIM = "#7dd3fc"
 
   const medallionRings = [
-    { r: 0.85, size: 0.06 },
-    { r: 1.45, size: 0.09 },
-    { r: 2.2, size: 0.11 },
-    { r: 2.95, size: 0.06 },
+    { r: 0.6, size: 0.06 },
+    { r: 1.05, size: 0.09 },
+    { r: 1.6, size: 0.11 },
+    { r: 2.2, size: 0.06 },
   ]
 
   const chandelierZ = [z0 + 13.5, z1 - 13.5]
@@ -85,7 +85,7 @@ function HallCeiling({ room, height = 6.5 }) {
 
       {/* Soft glow above the central platform */}
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, H - 0.36, 0]}>
-        <circleGeometry args={[3.0, low ? 32 : 48]} />
+        <circleGeometry args={[2.3, low ? 32 : 48]} />
         <meshBasicMaterial
           color="#bfe3ff"
           transparent

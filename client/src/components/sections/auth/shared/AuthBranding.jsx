@@ -1,8 +1,8 @@
 // File: src/components/auth/LoginBranding.jsx
 import { Link } from "react-router-dom";
 import { ArrowLeft, ShieldCheck, Cpu } from "lucide-react";
-import logo from "../../../../assets/icons/logo.png";
-import bglogin from "../../../../assets/images/bg-login.jpg";
+import logo from "../../../../assets/icons/logo.webp";
+import bglogin from "../../../../assets/images/bg-login.webp";
 import logoPoliban from "../../../../assets/icons/Logo_Poliban.png";
 
 function AuthBranding({ backTo = "/" }) {

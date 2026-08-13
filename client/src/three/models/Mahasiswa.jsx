@@ -17,6 +17,4 @@ function Mahasiswa(props) {
   )
 }
 
-useGLTF.preload("/models/mahasiswa.glb")
-
 export default Mahasiswa

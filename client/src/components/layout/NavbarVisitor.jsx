@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import { NavLink } from "react-router-dom"
-import logo from "../../assets/icons/logo.png"
+import logo from "../../assets/icons/logo.webp"
 import { visitorMenu } from "../../constants/navigation"
 
 function NavbarVisitor() {

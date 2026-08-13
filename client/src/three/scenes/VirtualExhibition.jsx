@@ -36,7 +36,7 @@ function AreaLabel({ onArea }) {
   return null
 }
 
-function VirtualExhibition({ onArea, onSelectProject, onReady }) {
+function VirtualExhibition({ onArea, onSelectProject, onReady, hallData }) {
   const { categorySlug } = useParams()
 
   useEffect(() => {
@@ -66,7 +66,7 @@ function VirtualExhibition({ onArea, onSelectProject, onReady }) {
   return (
     <>
       <GalleryLights />
-      <Museum />
+      <Museum hallData={hallData} />
       <LookControls bounds={MUSEUM.bounds} onSelectProject={onSelectProject} />
       <AreaLabel onArea={onArea} />
     </>

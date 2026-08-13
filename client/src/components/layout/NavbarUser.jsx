@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { User, LogOut, UploadCloud, ChevronDown, Bookmark } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
-import logo from "../../assets/icons/logo.png";
+import logo from "../../assets/icons/logo.webp";
 import { useAuth } from "../../context/AuthContext";
 import useNotifications from "../../hooks/useNotifications";
 import NotificationBell from "./NotificationBell";

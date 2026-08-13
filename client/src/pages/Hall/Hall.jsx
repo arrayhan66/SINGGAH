@@ -7,15 +7,56 @@ import ProjectDetailModal from "../../components/hall/ProjectDetailModal"
 import LoadingOverlay from "../../components/hall/LoadingOverlay"
 import PortalTransitionOverlay from "../../components/hall/PortalTransitionOverlay"
 import CanvasErrorBoundary from "../../components/hall/CanvasErrorBoundary"
-import { useQualityStore, DPR_FOR } from "../../three/hooks/useQuality"
+import { useQualityStore, DPR_FOR, isMobile } from "../../three/hooks/useQuality"
 import { useWalkStore } from "../../three/hooks/useWalk"
+import api from "../../services/api"
+
+const DEFAULT_HALL_DATA = {
+  categories: [
+    { name: "Website", slug: "website", color: "#3b82f6" },
+    { name: "Mobile App", slug: "mobile-app", color: "#a78bfa" },
+    { name: "IoT", slug: "iot", color: "#06b6d4" },
+    { name: "Artificial Intelligence", slug: "artificial-intelligence", color: "#ec4899" },
+    { name: "Data Science", slug: "data-science", color: "#34d399" },
+    { name: "Cyber Security", slug: "cyber-security", color: "#fbbf24" },
+    { name: "UI/UX Design", slug: "ui-ux-design", color: "#fb7185" },
+    { name: "Game Development", slug: "game-development", color: "#a855f7" },
+  ],
+  projects: [
+    {
+      id: 1,
+      slug: "sistem-informasi-akademik-poliban",
+      category: "website",
+      title: "Sistem Informasi Akademik Poliban",
+      description: "Platform manajemen akademik kampus berbasis web menggunakan Laravel.",
+      thumbnail: "https://placehold.co/600x400/0f172a/38bdf8?text=Website",
+      images: [{ image_url: "https://placehold.co/600x400/0f172a/38bdf8?text=Website" }],
+      User: { name: "Ahmad Fauzan", tipe: "mahasiswa" },
+      status: "published",
+    }
+  ]
+}
 
 function Hall() {
   const navigate = useNavigate()
   const [area, setArea] = useState("Hall Utama")
   const [selectedProject, setSelectedProject] = useState(null)
   const [sceneReady, setSceneReady] = useState(false)
+  const [hallData, setHallData] = useState(DEFAULT_HALL_DATA)
   const tier = useQualityStore((s) => s.tier)
+
+  useEffect(() => {
+    api.get("/hall")
+      .then((res) => {
+        const data = res.data.data
+        if (data && data.categories && data.categories.length > 0) {
+          setHallData(data)
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load hall data, using default:", err)
+      })
+  }, [])
 
   // While the project popup is open, freeze the player (WASD / walk).
   useEffect(() => {
@@ -33,13 +74,14 @@ function Hall() {
         <Canvas
           shadows={tier === "tinggi"}
           dpr={DPR_FOR[tier]}
-          gl={{ powerPreference: "high-performance", antialias: tier !== "rendah" }}
+          gl={{ powerPreference: "high-performance", antialias: tier !== "rendah" && !isMobile() }}
           camera={{ position: [0, 1.7, 0], fov: 70, near: 0.1, far: 220 }}
           className="!absolute !inset-0 hall-canvas"
         >
           <color attach="background" args={["#0b1220"]} />
           <Suspense fallback={null}>
             <VirtualExhibition
+              hallData={hallData}
               onArea={setArea}
               onSelectProject={setSelectedProject}
               onReady={() => setSceneReady(true)}

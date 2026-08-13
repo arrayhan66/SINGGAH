@@ -17,6 +17,98 @@ const {
 const AppError = require("../utils/AppError")
 const { Op } = require("sequelize")
 const { createNotification } = require("./notificationService")
+const cache = require("../utils/cache")
+
+// ---- Shape bersama agar response project konsisten dengan kebutuhan hall 3D ----
+const PROJECT_COUNT_ATTRIBUTES = [
+  [
+    sequelize.literal(
+      "(SELECT COUNT(*) FROM project_likes WHERE project_likes.project_id = Project.id)",
+    ),
+    "likesCount",
+  ],
+  [
+    sequelize.literal(
+      "(SELECT COUNT(*) FROM project_views WHERE project_views.project_id = Project.id)",
+    ),
+    "viewsCount",
+  ],
+  [
+    sequelize.literal(
+      "(SELECT COUNT(*) FROM bookmarks WHERE bookmarks.project_id = Project.id)",
+    ),
+    "bookmarksCount",
+  ],
+  [
+    sequelize.literal(
+      "(SELECT COUNT(*) FROM comments WHERE comments.project_id = Project.id)",
+    ),
+    "commentsCount",
+  ],
+]
+
+const CATEGORY_INCLUDE = {
+  model: Category,
+  attributes: [
+    "id",
+    "name",
+    "slug",
+    "description",
+    "icon",
+    "color",
+    "sort_order",
+    "is_active",
+  ],
+}
+
+const USER_INCLUDE = {
+  model: User,
+  attributes: ["id", "name", "username", "nim_nip", "avatar", "tipe"],
+}
+
+const IMAGES_INCLUDE = {
+  model: ProjectImage,
+  as: "images",
+  attributes: ["id", "image_url"],
+}
+
+const MEMBERS_INCLUDE = {
+  model: ProjectMember,
+  as: "members",
+  attributes: ["id", "name", "role"],
+}
+
+const TECHNOLOGIES_INCLUDE = {
+  model: ProjectTechnology,
+  as: "technologies",
+  attributes: ["id", "name"],
+}
+
+const DOCUMENTS_INCLUDE = {
+  model: ProjectDocument,
+  as: "documents",
+  attributes: ["id", "name", "file_url"],
+}
+
+const VIDEOS_INCLUDE = {
+  model: ProjectVideo,
+  as: "videos",
+  attributes: ["id", "video_url"],
+}
+
+const LINKS_INCLUDE = {
+  model: ProjectLink,
+  as: "links",
+  attributes: ["id", "label", "url"],
+}
+
+// Konversi instance Sequelize ke plain object + field `category` (slug) di
+// level atas, persis seperti yang dipakai komponen hall 3D (Painting,
+// ProjectDetailModal, hallHelpers) yaitu project.category / project.Category.slug.
+const toProjectJSON = (row) => {
+  const data = row.toJSON?.() || row
+  return { ...data, category: data.Category?.slug || null }
+}
 
 const parseJsonField = (value, label) => {
   if (value === undefined || value === null || value === "") return []
@@ -154,52 +246,13 @@ exports.getProjects = async (query = {}) => {
   const { count, rows } = await Project.findAndCountAll({
     where,
     attributes: {
-      include: [
-        [
-          sequelize.literal(
-            "(SELECT COUNT(*) FROM project_likes WHERE project_likes.project_id = Project.id)",
-          ),
-          "likesCount",
-        ],
-        [
-          sequelize.literal(
-            "(SELECT COUNT(*) FROM project_views WHERE project_views.project_id = Project.id)",
-          ),
-          "viewsCount",
-        ],
-        [
-          sequelize.literal(
-            "(SELECT COUNT(*) FROM bookmarks WHERE bookmarks.project_id = Project.id)",
-          ),
-          "bookmarksCount",
-        ],
-        [
-          sequelize.literal(
-            "(SELECT COUNT(*) FROM comments WHERE comments.project_id = Project.id)",
-          ),
-          "commentsCount",
-        ],
-      ],
+      include: PROJECT_COUNT_ATTRIBUTES,
     },
     include: [
-      {
-        model: Category,
-        attributes: ["id", "name", "slug"],
-      },
-      {
-        model: User,
-        attributes: ["id", "name", "username", "nim_nip", "avatar"],
-      },
-      {
-        model: ProjectImage,
-        as: "images",
-        attributes: ["id", "image_url"],
-      },
-      {
-        model: ProjectTechnology,
-        as: "technologies",
-        attributes: ["id", "name"],
-      },
+      CATEGORY_INCLUDE,
+      USER_INCLUDE,
+      IMAGES_INCLUDE,
+      TECHNOLOGIES_INCLUDE,
     ],
     order: [["created_at", "DESC"]],
     limit: currentLimit,
@@ -208,7 +261,7 @@ exports.getProjects = async (query = {}) => {
   })
 
   return {
-    items: rows,
+    items: rows.map(toProjectJSON),
     pagination: {
       page: currentPage,
       limit: currentLimit,
@@ -224,24 +277,10 @@ exports.getPendingProjects = async () => {
       status: "pending",
     },
     include: [
-      {
-        model: Category,
-        attributes: ["id", "name", "slug"],
-      },
-      {
-        model: User,
-        attributes: ["id", "name", "username", "nim_nip", "avatar"],
-      },
-      {
-        model: ProjectImage,
-        as: "images",
-        attributes: ["id", "image_url"],
-      },
-      {
-        model: ProjectTechnology,
-        as: "technologies",
-        attributes: ["id", "name"],
-      },
+      CATEGORY_INCLUDE,
+      USER_INCLUDE,
+      IMAGES_INCLUDE,
+      TECHNOLOGIES_INCLUDE,
     ],
     order: [["created_at", "ASC"]],
   })
@@ -291,78 +330,25 @@ exports.updateProjectStatus = async (id, status) => {
     }
   })
 
+  cache.del("categories:list")
+
   return project
 }
 
 exports.getProjectById = async (id, currentUserId = null) => {
   const project = await Project.findByPk(id, {
     attributes: {
-      include: [
-        [
-          sequelize.literal(
-            "(SELECT COUNT(*) FROM project_likes WHERE project_likes.project_id = Project.id)",
-          ),
-          "likesCount",
-        ],
-        [
-          sequelize.literal(
-            "(SELECT COUNT(*) FROM project_views WHERE project_views.project_id = Project.id)",
-          ),
-          "viewsCount",
-        ],
-        [
-          sequelize.literal(
-            "(SELECT COUNT(*) FROM bookmarks WHERE bookmarks.project_id = Project.id)",
-          ),
-          "bookmarksCount",
-        ],
-        [
-          sequelize.literal(
-            "(SELECT COUNT(*) FROM comments WHERE comments.project_id = Project.id)",
-          ),
-          "commentsCount",
-        ],
-      ],
+      include: PROJECT_COUNT_ATTRIBUTES,
     },
     include: [
-      {
-        model: Category,
-        attributes: ["id", "name", "slug"],
-      },
-      {
-        model: User,
-        attributes: ["id", "name", "username", "nim_nip", "avatar"],
-      },
-      {
-        model: ProjectImage,
-        as: "images",
-        attributes: ["id", "image_url"],
-      },
-      {
-        model: ProjectMember,
-        as: "members",
-        attributes: ["id", "name", "role"],
-      },
-      {
-        model: ProjectTechnology,
-        as: "technologies",
-        attributes: ["id", "name"],
-      },
-      {
-        model: ProjectDocument,
-        as: "documents",
-        attributes: ["id", "name", "file_url"],
-      },
-      {
-        model: ProjectVideo,
-        as: "videos",
-        attributes: ["id", "video_url"],
-      },
-      {
-        model: ProjectLink,
-        as: "links",
-        attributes: ["id", "label", "url"],
-      },
+      CATEGORY_INCLUDE,
+      USER_INCLUDE,
+      IMAGES_INCLUDE,
+      MEMBERS_INCLUDE,
+      TECHNOLOGIES_INCLUDE,
+      DOCUMENTS_INCLUDE,
+      VIDEOS_INCLUDE,
+      LINKS_INCLUDE,
     ],
   })
 
@@ -372,6 +358,7 @@ exports.getProjectById = async (id, currentUserId = null) => {
 
   const data = project.toJSON()
 
+  data.category = data.Category?.slug || null
   data.liked = false
   data.bookmarked = false
 
@@ -573,52 +560,13 @@ exports.getMyProjects = async (userId) => {
     Project.findAll({
       where: { user_id: userId },
       attributes: {
-        include: [
-          [
-            sequelize.literal(
-              "(SELECT COUNT(*) FROM project_likes WHERE project_likes.project_id = Project.id)",
-            ),
-            "likesCount",
-          ],
-          [
-            sequelize.literal(
-              "(SELECT COUNT(*) FROM project_views WHERE project_views.project_id = Project.id)",
-            ),
-            "viewsCount",
-          ],
-          [
-            sequelize.literal(
-              "(SELECT COUNT(*) FROM bookmarks WHERE bookmarks.project_id = Project.id)",
-            ),
-            "bookmarksCount",
-          ],
-          [
-            sequelize.literal(
-              "(SELECT COUNT(*) FROM comments WHERE comments.project_id = Project.id)",
-            ),
-            "commentsCount",
-          ],
-        ],
+        include: PROJECT_COUNT_ATTRIBUTES,
       },
       include: [
-        {
-          model: Category,
-          attributes: ["id", "name", "slug"],
-        },
-        {
-          model: User,
-          attributes: ["id", "name", "username", "nim_nip", "avatar"],
-        },
-        {
-          model: ProjectImage,
-          as: "images",
-          attributes: ["id", "image_url"],
-        },
-        {
-          model: ProjectTechnology,
-          as: "technologies",
-          attributes: ["id", "name"],
-        },
+        CATEGORY_INCLUDE,
+        USER_INCLUDE,
+        IMAGES_INCLUDE,
+        TECHNOLOGIES_INCLUDE,
       ],
       order: [["created_at", "DESC"]],
       distinct: true,
@@ -630,7 +578,36 @@ exports.getMyProjects = async (userId) => {
   ])
 
   return {
-    items,
+    items: items.map(toProjectJSON),
     counts: { pending, published, rejected, total },
   }
+}
+
+// ---- Data project untuk hall 3D: seluruh project published dengan semua
+// relasi yang dipakai modal detail hall, dalam satu kali request. ----
+exports.getHallProjects = async () => {
+  const projects = await Project.findAll({
+    where: { status: "published" },
+    attributes: {
+      include: PROJECT_COUNT_ATTRIBUTES,
+    },
+    include: [
+      {
+        ...CATEGORY_INCLUDE,
+        required: true,
+        where: { is_active: true },
+      },
+      USER_INCLUDE,
+      IMAGES_INCLUDE,
+      MEMBERS_INCLUDE,
+      TECHNOLOGIES_INCLUDE,
+      DOCUMENTS_INCLUDE,
+      VIDEOS_INCLUDE,
+      LINKS_INCLUDE,
+    ],
+    order: [["created_at", "DESC"]],
+    distinct: true,
+  })
+
+  return projects.map(toProjectJSON)
 }

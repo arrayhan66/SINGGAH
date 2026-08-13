@@ -1,0 +1,246 @@
+overview:
+  get:
+    tags:
+      - Hall
+
+    summary: Ambil data lengkap hall 3D
+
+    description: |
+      Endpoint khusus hall 3D: mengembalikan seluruh kategori aktif (urut
+      sesuai `sort_order`) beserta seluruh project berstatus published dengan
+      semua relasi yang dibutuhkan komponen hall (images, members,
+      technologies, documents, videos, links, Category, User). Satu kali
+      request sudah cukup untuk membangun hall.
+
+    responses:
+
+      "200":
+        description: Berhasil mengambil data hall
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil
+                data:
+                  type: object
+                  properties:
+                    categories:
+                      type: array
+                      description: Kategori aktif yang ditampilkan sebagai ruangan di hall
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: Website
+                          slug:
+                            type: string
+                            example: website
+                          description:
+                            type: string
+                            example: Aplikasi web modern berbasis React, Laravel, MERN.
+                          icon:
+                            type: string
+                            example: globe
+                          color:
+                            type: string
+                            example: "#3b82f6"
+                          sort_order:
+                            type: integer
+                            example: 1
+                          is_active:
+                            type: boolean
+                            example: true
+                          projectCount:
+                            type: integer
+                            example: 12
+                    projects:
+                      type: array
+                      description: Seluruh project published untuk hall
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          title:
+                            type: string
+                            example: Sistem Informasi Akademik
+                          slug:
+                            type: string
+                            example: sistem-informasi-akademik
+                          category_id:
+                            type: integer
+                            example: 1
+                          user_id:
+                            type: integer
+                            example: 2
+                          created_at:
+                            type: string
+                            format: date-time
+                            example: "2026-06-01T10:00:00.000Z"
+                          updated_at:
+                            type: string
+                            format: date-time
+                            example: "2026-06-01T10:00:00.000Z"
+                          category:
+                            type: string
+                            nullable: true
+                            description: Slug kategori (level atas, dipakai hall)
+                            example: website
+                          description:
+                            type: string
+                            example: Platform manajemen akademik kampus berbasis web.
+                          thumbnail:
+                            type: string
+                            example: https://res.cloudinary.com/.../thumb.jpg
+                          year:
+                            type: integer
+                            example: 2024
+                          status:
+                            type: string
+                            example: published
+                          likesCount:
+                            type: integer
+                            example: 30
+                          viewsCount:
+                            type: integer
+                            example: 150
+                          bookmarksCount:
+                            type: integer
+                            example: 8
+                          commentsCount:
+                            type: integer
+                            example: 3
+                          Category:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              name:
+                                type: string
+                                example: Website
+                              slug:
+                                type: string
+                                example: website
+                              description:
+                                type: string
+                                example: Web development apps
+                              icon:
+                                type: string
+                                example: globe
+                              color:
+                                type: string
+                                example: "#3b82f6"
+                              sort_order:
+                                type: integer
+                                example: 1
+                              is_active:
+                                type: boolean
+                                example: true
+                          User:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 2
+                              name:
+                                type: string
+                                example: Ahmad Fauzan
+                              username:
+                                type: string
+                                example: ahmadf
+                              nim_nip:
+                                type: string
+                                example: "20220101"
+                              avatar:
+                                type: string
+                                example: https://res.cloudinary.com/.../avatar.jpg
+                              tipe:
+                                type: string
+                                example: mahasiswa
+                          images:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 5
+                                image_url:
+                                  type: string
+                                  example: https://res.cloudinary.com/.../1.jpg
+                          members:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 9
+                                name:
+                                  type: string
+                                  example: Budi Santoso
+                                role:
+                                  type: string
+                                  example: Programmer
+                          technologies:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 3
+                                name:
+                                  type: string
+                                  example: React
+                          documents:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 2
+                                name:
+                                  type: string
+                                  example: proposal.pdf
+                                file_url:
+                                  type: string
+                                  example: https://res.cloudinary.com/.../proposal.pdf
+                          videos:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                video_url:
+                                  type: string
+                                  example: https://youtube.com/embed/abc123
+                          links:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 4
+                                label:
+                                  type: string
+                                  example: GitHub
+                                url:
+                                  type: string
+                                  example: https://github.com/ahmad/project

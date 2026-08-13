@@ -31,6 +31,7 @@ const settingRoutes = require("./routes/settingRoutes")
 const activityLogRoutes = require("./routes/activityLogRoutes")
 const mediaRoutes = require("./routes/mediaRoutes")
 const reportRoutes = require("./routes/reportRoutes")
+const hallRoutes = require("./routes/hallRoutes")
 
 const swaggerUi = require("swagger-ui-express")
 const loadSwagger = require("./config/swagger")
@@ -81,6 +82,8 @@ app.use("/api/projects/:id/images", projectImageRoutes)
 app.use("/api/projects", projectRoutes)
 
 app.use("/api/stats", publicStatsRoutes)
+
+app.use("/api/hall", hallRoutes)
 
 app.get("/", (req, res) => {
   res.json({

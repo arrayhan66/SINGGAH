@@ -6,7 +6,7 @@ collection:
     summary: Ambil daftar kategori
 
     description: |
-      Mengambil seluruh kategori, diurutkan berdasarkan nama.
+      Mengambil seluruh kategori, diurutkan berdasarkan `sort_order` (urutan tampil di hall 3D) lalu nama.
 
     responses:
 
@@ -33,10 +33,28 @@ collection:
                         example: 1
                       name:
                         type: string
-                        example: Teknologi Informasi
+                        example: Website
                       slug:
                         type: string
-                        example: teknologi-informasi
+                        example: website
+                      description:
+                        type: string
+                        example: Aplikasi web modern berbasis React, Laravel, MERN.
+                      icon:
+                        type: string
+                        example: globe
+                      color:
+                        type: string
+                        example: "#3b82f6"
+                      sort_order:
+                        type: integer
+                        example: 1
+                      is_active:
+                        type: boolean
+                        example: true
+                      projectCount:
+                        type: integer
+                        example: 12
 
   post:
     tags:
@@ -64,11 +82,31 @@ collection:
 
               name:
                 type: string
-                example: Teknologi Informasi
+                example: Website
 
               slug:
                 type: string
-                example: teknologi-informasi
+                example: website
+
+              description:
+                type: string
+                example: Aplikasi web modern berbasis React, Laravel, MERN.
+
+              icon:
+                type: string
+                example: globe
+
+              color:
+                type: string
+                example: "#3b82f6"
+
+              sort_order:
+                type: integer
+                example: 1
+
+              is_active:
+                type: boolean
+                example: true
 
     responses:
 
@@ -93,10 +131,25 @@ collection:
                       example: 1
                     name:
                       type: string
-                      example: Teknologi Informasi
+                      example: Website
                     slug:
                       type: string
-                      example: teknologi-informasi
+                      example: website
+                    description:
+                      type: string
+                      example: Aplikasi web modern berbasis React, Laravel, MERN.
+                    icon:
+                      type: string
+                      example: globe
+                    color:
+                      type: string
+                      example: "#3b82f6"
+                    sort_order:
+                      type: integer
+                      example: 1
+                    is_active:
+                      type: boolean
+                      example: true
 
       "400":
         description: Nama/slug kosong, atau nama/slug sudah digunakan
@@ -139,10 +192,28 @@ single:
                       example: 1
                     name:
                       type: string
-                      example: Teknologi Informasi
+                      example: Website
                     slug:
                       type: string
-                      example: teknologi-informasi
+                      example: website
+                    description:
+                      type: string
+                      example: Aplikasi web modern berbasis React, Laravel, MERN.
+                    icon:
+                      type: string
+                      example: globe
+                    color:
+                      type: string
+                      example: "#3b82f6"
+                    sort_order:
+                      type: integer
+                      example: 1
+                    is_active:
+                      type: boolean
+                      example: true
+                    projectCount:
+                      type: integer
+                      example: 12
 
       "404":
         description: Kategori tidak ditemukan
@@ -177,11 +248,31 @@ single:
 
               name:
                 type: string
-                example: Teknologi Informasi
+                example: Website
 
               slug:
                 type: string
-                example: teknologi-informasi
+                example: website
+
+              description:
+                type: string
+                example: Aplikasi web modern berbasis React, Laravel, MERN.
+
+              icon:
+                type: string
+                example: globe
+
+              color:
+                type: string
+                example: "#3b82f6"
+
+              sort_order:
+                type: integer
+                example: 1
+
+              is_active:
+                type: boolean
+                example: true
 
     responses:
 
@@ -206,10 +297,25 @@ single:
                       example: 1
                     name:
                       type: string
-                      example: Teknologi Informasi
+                      example: Website
                     slug:
                       type: string
-                      example: teknologi-informasi
+                      example: website
+                    description:
+                      type: string
+                      example: Aplikasi web modern berbasis React, Laravel, MERN.
+                    icon:
+                      type: string
+                      example: globe
+                    color:
+                      type: string
+                      example: "#3b82f6"
+                    sort_order:
+                      type: integer
+                      example: 1
+                    is_active:
+                      type: boolean
+                      example: true
 
       "400":
         description: Nama/slug sudah digunakan

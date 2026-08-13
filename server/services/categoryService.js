@@ -20,12 +20,36 @@ exports.getCategories = async () => {
         ],
       ],
     },
-    order: [["name", "ASC"]],
+    order: [
+      ["sort_order", "ASC"],
+      ["name", "ASC"],
+    ],
   })
 
   cache.set(CATEGORIES_KEY, categories, CATEGORIES_TTL)
 
   return categories
+}
+
+// Kategori yang aktif & urut sesuai hall 3D (hanya yang ditampilkan di hall).
+exports.getActiveCategories = async () => {
+  return await Category.findAll({
+    where: { is_active: true },
+    attributes: {
+      include: [
+        [
+          sequelize.literal(
+            "(SELECT COUNT(*) FROM projects WHERE projects.category_id = Category.id AND projects.status = 'published')",
+          ),
+          "projectCount",
+        ],
+      ],
+    },
+    order: [
+      ["sort_order", "ASC"],
+      ["name", "ASC"],
+    ],
+  })
 }
 
 exports.getCategoryById = async (id) => {
@@ -39,7 +63,7 @@ exports.getCategoryById = async (id) => {
 }
 
 exports.createCategory = async (data) => {
-  const { name, slug } = data
+  const { name, slug, description, icon, color, sort_order, is_active } = data
 
   if (!name || !slug) {
     throw new AppError("Nama dan slug wajib diisi", 400)
@@ -61,10 +85,19 @@ exports.createCategory = async (data) => {
     throw new AppError("Slug sudah digunakan", 400)
   }
 
-  return await Category.create({
+  const category = await Category.create({
     name,
     slug,
+    description: description || null,
+    icon: icon || null,
+    color: color || null,
+    sort_order: sort_order ?? 0,
+    is_active: is_active ?? true,
   })
+
+  cache.del(CATEGORIES_KEY)
+
+  return category
 }
 
 exports.updateCategory = async (id, data) => {
@@ -74,7 +107,15 @@ exports.updateCategory = async (id, data) => {
     throw new AppError("Kategori tidak ditemukan", 404)
   }
 
-  const { name, slug } = data
+  const {
+    name,
+    slug,
+    description,
+    icon,
+    color,
+    sort_order,
+    is_active,
+  } = data
 
   if (name && name !== category.name) {
     const exists = await Category.findOne({
@@ -98,8 +139,15 @@ exports.updateCategory = async (id, data) => {
 
   category.name = name ?? category.name
   category.slug = slug ?? category.slug
+  category.description = description ?? category.description
+  category.icon = icon ?? category.icon
+  category.color = color ?? category.color
+  category.sort_order = sort_order ?? category.sort_order
+  category.is_active = is_active ?? category.is_active
 
   await category.save()
+
+  cache.del(CATEGORIES_KEY)
 
   return category
 }
@@ -113,6 +161,7 @@ exports.deleteCategory = async (id) => {
 
   try {
     await category.destroy()
+    cache.del(CATEGORIES_KEY)
   } catch (error) {
     if (error.name === "SequelizeForeignKeyConstraintError") {
       throw new AppError("Kategori masih digunakan oleh project", 400)

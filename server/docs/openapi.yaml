@@ -163,6 +163,10 @@ paths:
     get:
       $ref: './paths/interactions.yaml#/stats'
 
+  /hall:
+    get:
+      $ref: './paths/hall.yaml#/overview'
+
   /news:
     $ref: './paths/news.yaml#/collection'
 

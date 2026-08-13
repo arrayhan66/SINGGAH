@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "seed:hall": "node scripts/seedHall.js"
   },
   "keywords": [],
   "author": "",

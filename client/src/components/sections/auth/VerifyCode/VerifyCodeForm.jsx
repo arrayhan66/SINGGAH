@@ -3,15 +3,25 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Clock } from "lucide-react";
 import logo from "../../../../assets/icons/logo.webp";
 import FormAlert from "../../../ui/FormAlert";
+import SuccessPopup from "../../../ui/SuccessPopup";
 import api from "../../../../services/api";
+import { useAuth } from "../../../../context/AuthContext";
+import VerificationPendingModal from "./VerificationPendingModal";
 
 function VerifyCodeForm() {
   const navigate = useNavigate();
+  const { user, login, token } = useAuth();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ message: "", type: "" });
   const [countdown, setCountdown] = useState(60);
   const [isResending, setIsResending] = useState(false);
+  const [showPending, setShowPending] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [pendingTipe, setPendingTipe] = useState(null);
+  const [verifiedFlow] = useState(
+    () => localStorage.getItem("verifyType") || "reset",
+  );
   const inputs = useRef([]);
 
   useEffect(() => {
@@ -121,7 +131,15 @@ function VerifyCodeForm() {
   const currentEmail =
     verifyType === "register"
       ? localStorage.getItem("registerEmail")
-      : localStorage.getItem("resetEmail");
+      : verifyType === "profile"
+        ? localStorage.getItem("profileEmail")
+        : localStorage.getItem("resetEmail");
+  const backLink =
+    verifyType === "profile"
+      ? "/profile"
+      : verifyType === "register"
+        ? "/register"
+        : "/forgot-password";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -149,20 +167,50 @@ function VerifyCodeForm() {
 
     try {
       if (verifyType === "register") {
-        await api.post("/auth/verify-email", {
+        const res = await api.post("/auth/verify-email", {
           code: otpString,
           email: currentEmail,
         });
         localStorage.removeItem("registerEmail");
         localStorage.removeItem("verifyType");
         setLoading(false);
-        navigate("/login");
+
+        const pending = res.data?.data?.pending_tipe;
+
+        if (pending) {
+          setPendingTipe(pending);
+          setShowPending(true);
+          return;
+        }
+
+        setShowSuccess(true);
+        setTimeout(() => {
+          navigate("/login");
+        }, 2500);
+      } else if (verifyType === "profile") {
+        const res = await api.post("/auth/verify-email", {
+          code: otpString,
+          email: currentEmail,
+        });
+        localStorage.removeItem("profileEmail");
+        localStorage.removeItem("verifyType");
+        setLoading(false);
+
+        if (res.data?.data && login && token) {
+          login({ ...user, ...res.data.data }, token);
+        }
+
+        setShowSuccess(true);
+        setTimeout(() => {
+          navigate("/profile");
+        }, 2500);
       } else {
         await api.post("/auth/verify-reset-code", {
           code: otpString,
           email: currentEmail,
         });
         localStorage.setItem("otpVerified", "true");
+        localStorage.setItem("resetCode", otpString);
         setLoading(false);
         navigate("/reset-password");
       }
@@ -192,7 +240,7 @@ function VerifyCodeForm() {
     setAlert({ message: "", type: "" });
 
     try {
-      if (verifyType === "register") {
+      if (verifyType === "register" || verifyType === "profile") {
         await api.post("/auth/resend-verification", {
           email: currentEmail,
         });
@@ -215,7 +263,18 @@ function VerifyCodeForm() {
   };
 
   return (
-    <div className="flex w-full flex-col justify-center overflow-y-auto px-4 py-5 sm:p-10 lg:w-1/2 lg:px-16 lg:py-12 2xl:px-20">
+    <>
+      <SuccessPopup
+        isOpen={showSuccess}
+        title="Verifikasi Berhasil!"
+        message={
+          verifiedFlow === "profile"
+            ? "Email baru berhasil diverifikasi dan diterapkan ke akun kamu."
+            : "Email Anda berhasil diverifikasi. Akun Anda siap digunakan."
+        }
+      />
+
+      <div className="flex w-full flex-col justify-center overflow-y-auto px-4 py-5 sm:p-10 lg:w-1/2 lg:px-16 lg:py-12 2xl:px-20">
       <div className="mb-8 flex items-center justify-between sm:mb-12 lg:hidden">
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-100/30 bg-white/10 p-3 shadow-md backdrop-blur-md sm:h-16 sm:w-16 sm:p-3.5">
@@ -231,7 +290,7 @@ function VerifyCodeForm() {
         </div>
 
         <Link
-          to="/forgot-password"
+          to={backLink}
           aria-label="Kembali"
           className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-300 shadow-sm backdrop-blur-md transition hover:text-cyan-300 sm:h-10 sm:w-10"
         >
@@ -249,7 +308,7 @@ function VerifyCodeForm() {
 
         <div className="mx-auto mt-3 flex w-fit items-center gap-1.5 rounded-md border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-xs text-amber-400/90 shadow-sm sm:px-3 sm:py-1.5 sm:text-sm">
           <Clock className="h-3.5 w-3.5 min-[350px]:h-4 min-[350px]:w-4" />
-          <span>Kode ini hanya berlaku selama 15 menit.</span>
+          <span>Kode ini hanya berlaku selama 5 menit.</span>
         </div>
       </div>
 
@@ -325,7 +384,15 @@ function VerifyCodeForm() {
           )}
         </button>
       </div>
+
+      {showPending && (
+        <VerificationPendingModal
+          tipe={pendingTipe}
+          onClose={() => navigate("/login")}
+        />
+      )}
     </div>
+    </>
   );
 }
 

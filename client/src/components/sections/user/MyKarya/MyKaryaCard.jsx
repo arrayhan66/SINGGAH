@@ -5,11 +5,11 @@ import {
   CheckCircle2,
   XCircle,
   AlertTriangle,
-  Eye,
   Calendar,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import GlassCard from "../../../ui/GlassCard";
+import { imageUrl } from "../../../../utils/imageUrl";
 
 const statusConfig = {
   pending: {
@@ -45,25 +45,33 @@ const categoryLabels = {
 function MyKaryaCard({ karya, onDeleteClick, isDosen = false }) {
   const navigate = useNavigate();
 
-  const showEdit = isDosen || karya.status === "pending" || karya.status === "rejected";
+  const showEdit = true;
   const status = statusConfig[isDosen ? "published" : karya.status] || statusConfig.published;
   const StatusIcon = status.icon;
 
   const year = karya.year || (karya.createdAt ? new Date(karya.createdAt).getFullYear() : "");
-  const categoryLabel = categoryLabels[karya.category] || karya.category;
-  const technologies = karya.technologies || karya.techStack || [];
-  const slug = karya.slug || "";
+  const categorySlug = karya.Category?.slug || karya.category || "";
+  const categoryLabel = karya.Category?.name || categoryLabels[karya.category] || karya.category;
+  const rawTechnologies = karya.technologies || karya.techStack || [];
+  const technologies = rawTechnologies
+    .map((tech) => (typeof tech === "string" ? tech : tech?.name || ""))
+    .filter(Boolean);
+  const projectSlug = karya.slug || karya.id;
+  const coverImage =
+    Array.isArray(karya.images) && karya.images.length > 0
+      ? karya.images[0]?.image_url || karya.images[0]
+      : karya.thumbnail;
 
   function handleDetail(e) {
     if (e) e.stopPropagation();
-    if (slug) {
-      navigate(`/karya/${slug}/${karya.id}`);
+    if (projectSlug) {
+      navigate(`/karya/${categorySlug}/${projectSlug}`);
     }
   }
 
   function handleEdit(e) {
     e.stopPropagation();
-    navigate(`/edit-karya/${karya.id}`);
+    navigate(`/edit-karya/${karya.slug || karya.id}`);
   }
 
   function handleDelete(e) {
@@ -74,15 +82,15 @@ function MyKaryaCard({ karya, onDeleteClick, isDosen = false }) {
   return (
     <GlassCard
       hover
-      onClick={slug ? handleDetail : undefined}
+      onClick={projectSlug ? handleDetail : undefined}
       className="group flex h-full flex-col overflow-hidden p-0"
     >
       {/* Cover */}
       <div className="relative overflow-hidden">
         <img
-          src={karya.thumbnail}
+          src={imageUrl(coverImage)}
           alt={karya.title}
-          className="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-110 sm:h-48 md:h-52 lg:h-56 xl:h-60 3xl:h-72 4xl:h-80"
+          className="h-40 w-full object-cover transition-all duration-500 sm:h-48 md:h-52 lg:h-56 xl:h-60 3xl:h-72 4xl:h-80"
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-brand-navy via-transparent to-transparent" />
@@ -143,13 +151,24 @@ function MyKaryaCard({ karya, onDeleteClick, isDosen = false }) {
         )}
 
         {/* Rejection reason */}
-        {!isDosen && karya.status === "rejected" && karya.rejectionReason && (
+        {!isDosen && karya.status === "rejected" && karya.rejection_reason && (
           <div className="mt-3 flex items-start gap-2 rounded-xl border border-red-400/20 bg-red-400/5 p-3 text-xs sm:mt-4 sm:text-sm md:text-sm text-red-300 3xl:mt-5 3xl:p-4 3xl:text-base 4xl:text-lg">
             <AlertTriangle
               size={16}
               className="mt-0.5 shrink-0 sm:size-[18px] md:size-5 3xl:size-[22px] 4xl:size-6"
             />
-            <span>{karya.rejectionReason}</span>
+            <span><span className="font-semibold">Alasan Penolakan:</span> {karya.rejection_reason}</span>
+          </div>
+        )}
+
+        {/* Approve note */}
+        {!isDosen && karya.status === "published" && karya.approve_note && (
+          <div className="mt-3 flex items-start gap-2 rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-3 text-xs sm:mt-4 sm:text-sm md:text-sm text-emerald-300 3xl:mt-5 3xl:p-4 3xl:text-base 4xl:text-lg">
+            <CheckCircle2
+              size={16}
+              className="mt-0.5 shrink-0 sm:size-[18px] md:size-5 3xl:size-[22px] 4xl:size-6"
+            />
+            <span>Catatan Admin: {karya.approve_note}</span>
           </div>
         )}
 

@@ -33,7 +33,7 @@ function AdminProjectRejectModal({ project, onConfirm, onCancel }) {
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 animate-[fade-in_0.15s_ease-out]">
       <div className="w-full max-w-md rounded-2xl border border-red-500/20 bg-gradient-to-br from-brand-navy to-brand-dark p-6 shadow-2xl backdrop-blur-xl animate-modal-in max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
         <div className="flex items-start justify-between gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-500/10 border border-red-500/30">

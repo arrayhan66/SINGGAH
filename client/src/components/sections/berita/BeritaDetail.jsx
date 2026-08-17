@@ -5,20 +5,258 @@ import {
   Calendar,
   Newspaper,
   Share2,
-  Eye,
   X,
   Check,
   Copy,
   MessageCircle,
   Send,
+  BookOpen,
+  Megaphone,
 } from "lucide-react"
 import { useBerita } from "../../../context/BeritaContext"
 import DustBackground from "../../ui/DustBackground"
+import { DetailHeroSkeleton } from "../../ui/Skeleton"
+import { imageUrl } from "../../../utils/imageUrl"
+import { processContentHtml } from "../../../utils/processContentHtml"
+
+function parseSeeAlsoItems(htmlStr) {
+  if (!htmlStr) return []
+  try {
+    return JSON.parse(htmlStr)
+  } catch {
+    return []
+  }
+}
+
+function SeeAlsoBlock({ htmlAttributes }) {
+  const items = parseSeeAlsoItems(htmlAttributes["data-see-also-items"])
+
+  return (
+    <div className="my-8 overflow-hidden rounded-2xl border border-amber-200 bg-white shadow-md">
+      <div className="flex items-center gap-3 bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-3">
+        <BookOpen size={18} className="text-white" />
+        <span className="text-sm font-black uppercase tracking-widest text-white">
+          Baca Juga
+        </span>
+        <div className="h-px flex-1 bg-white/30" />
+      </div>
+      {items.length > 0 ? (
+        <div className="grid divide-y divide-amber-100">
+          {items.map((item, index) => (
+            <a
+              key={index}
+              href={item.url || "#"}
+              target={item.url ? "_blank" : undefined}
+              rel={item.url ? "noopener noreferrer" : undefined}
+              className={`flex items-start gap-3 px-5 py-3.5 transition-colors ${
+                item.url ? "hover:bg-amber-50/80 cursor-pointer" : ""
+              }`}
+            >
+              {item.image ? (
+                <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-amber-100">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+              ) : (
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-sm font-bold text-amber-500">
+                  {index + 1}
+                </div>
+              )}
+              <div className="min-w-0 flex-1 py-0.5">
+                <p className="text-sm font-bold leading-snug text-slate-800 line-clamp-2 group-hover:text-amber-700">
+                  {item.title}
+                </p>
+                {item.url && (
+                  <p className="mt-1 text-[11px] text-cyan-600 truncate">
+                    {item.url}
+                  </p>
+                )}
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <div className="px-5 py-6 text-center">
+          <p className="text-xs text-amber-400 italic">
+            Tidak ada rekomendasi artikel.
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function AdBlockRender({ htmlAttributes }) {
+  const title = htmlAttributes["data-ad-title"] || ""
+  const content = htmlAttributes["data-ad-content"] || ""
+  const url = htmlAttributes["data-ad-url"] || ""
+
+  return (
+    <div className="my-8 overflow-hidden rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-sm">
+      <div className="flex items-center gap-3 bg-gradient-to-r from-blue-500 to-indigo-500 px-5 py-3">
+        <Megaphone size={16} className="text-white" />
+        <span className="text-xs font-black uppercase tracking-widest text-white">
+          {title || "Promo"}
+        </span>
+        <div className="h-px flex-1 bg-white/30" />
+      </div>
+      <div className="px-5 py-4">
+        {content && (
+          <p className="text-sm leading-relaxed text-slate-700">{content}</p>
+        )}
+        {url && (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+          >
+            Selengkapnya &rarr;
+          </a>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function NewsContent({ item }) {
+  const hasHTML =
+    item.contentHTML &&
+    typeof item.contentHTML === "string" &&
+    item.contentHTML.includes("<")
+
+  const hasCustomBlocks =
+    hasHTML &&
+    (item.contentHTML.includes('data-type="see-also"') ||
+      item.contentHTML.includes('data-type="ad-block"'))
+
+  if (hasCustomBlocks) {
+    const parts = item.contentHTML.split(
+      /(<div[^>]*data-type="(?:see-also|ad-block)"[^>]*>[\s\S]*?<\/div>)/g
+    )
+
+    return (
+      <>
+        {parts.map((part, index) => {
+          if (part.includes('data-type="see-also"')) {
+            const parser = new DOMParser()
+            const doc = parser.parseFromString(part, "text/html")
+            const el = doc.body.firstChild
+            if (!el) return null
+            const attrs = {}
+            for (const attr of el.attributes) {
+              attrs[attr.name] = attr.value
+            }
+            return <SeeAlsoBlock key={index} htmlAttributes={attrs} />
+          }
+          if (part.includes('data-type="ad-block"')) {
+            const parser = new DOMParser()
+            const doc = parser.parseFromString(part, "text/html")
+            const el = doc.body.firstChild
+            if (!el) return null
+            const attrs = {}
+            for (const attr of el.attributes) {
+              attrs[attr.name] = attr.value
+            }
+            return <AdBlockRender key={index} htmlAttributes={attrs} />
+          }
+          if (part.trim()) {
+            return (
+              <div
+                key={index}
+                className="prose prose-slate prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-a:text-cyan-600 prose-img:rounded-xl prose-img:mx-auto prose-p:leading-relaxed prose-p:my-4 prose-img:my-6"
+                dangerouslySetInnerHTML={{ __html: processContentHtml(part) }}
+              />
+            )
+          }
+          return null
+        })}
+      </>
+    )
+  }
+
+  if (hasHTML) {
+    return (
+      <div
+        className="prose prose-slate prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-a:text-cyan-600 prose-img:rounded-xl prose-img:mx-auto prose-p:leading-relaxed prose-p:my-4 prose-img:my-6"
+        dangerouslySetInnerHTML={{ __html: processContentHtml(item.contentHTML) }}
+      />
+    )
+  }
+
+  if (Array.isArray(item.content)) {
+    return item.content.map((paragraph, index) => {
+      const correspondingPhoto = item.gallery?.[index]
+
+      if (index === 0) {
+        const firstLetter = paragraph.charAt(0)
+        const restOfParagraph = paragraph.slice(1)
+
+        return (
+          <div key={index} className="space-y-6 min-[350px]:space-y-8">
+            <p className="text-base min-[350px]:text-lg sm:text-xl leading-relaxed text-slate-800 font-normal">
+              <span className="float-left text-4xl min-[350px]:text-5xl sm:text-6xl font-black text-cyan-600 mr-2.5 min-[350px]:mr-3.5 leading-none pt-1">
+                {firstLetter}
+              </span>
+              {restOfParagraph}
+            </p>
+            {correspondingPhoto && (
+              <figure className="my-4 min-[350px]:my-5 rounded-xl overflow-hidden">
+                <div className="w-full max-h-[500px] overflow-hidden bg-slate-100">
+                  <img
+                    src={imageUrl(correspondingPhoto.url)}
+                    alt={correspondingPhoto.caption}
+                    className="w-full h-auto object-cover block"
+                  />
+                </div>
+                {correspondingPhoto.caption && (
+                  <figcaption className="text-center text-[10px] min-[350px]:text-[11px] sm:text-xs text-slate-500 italic pt-2">{correspondingPhoto.caption}</figcaption>
+                )}
+              </figure>
+            )}
+          </div>
+        )
+      }
+
+      return (
+        <div key={index} className="space-y-6 min-[350px]:space-y-8">
+          <p className="leading-relaxed text-slate-700">{paragraph}</p>
+          {correspondingPhoto && (
+            <figure className="my-4 min-[350px]:my-5 rounded-xl overflow-hidden">
+              <div className="w-full max-h-[500px] overflow-hidden bg-slate-100">
+                <img
+                  src={correspondingPhoto.url}
+                  alt={correspondingPhoto.caption}
+                  className="w-full h-auto object-cover block"
+                />
+              </div>
+              {correspondingPhoto.caption && (
+                <figcaption className="text-center text-[10px] min-[350px]:text-[11px] sm:text-xs text-slate-500 italic pt-2">{correspondingPhoto.caption}</figcaption>
+              )}
+            </figure>
+          )}
+        </div>
+      )
+    })
+  }
+
+  return (
+    <p className="text-base min-[350px]:text-lg sm:text-xl leading-relaxed text-slate-800 font-normal whitespace-pre-line">
+      {typeof item.content === "string"
+        ? item.content
+        : item.description || "Tidak ada konten"}
+    </p>
+  )
+}
 
 function BeritaDetail() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const { beritaList } = useBerita()
+  const { beritaList, loading } = useBerita()
 
   const [isShareModalOpen, setIsShareModalOpen] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -33,6 +271,17 @@ function BeritaDetail() {
     navigator.clipboard.writeText(currentUrl)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  if (loading) {
+    return (
+      <section className="relative min-h-screen overflow-hidden bg-brand-dark pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-16 sm:pb-20">
+        <DustBackground />
+        <div className="pt-6 sm:pt-8">
+          <DetailHeroSkeleton />
+        </div>
+      </section>
+    )
   }
 
   if (!item) {
@@ -139,14 +388,6 @@ function BeritaDetail() {
                       <span>{item.date}</span>
                     </div>
                   )}
-
-                  <div className="flex items-center gap-1 min-[350px]:gap-1.5 font-medium">
-                    <Eye
-                      size={12}
-                      className="min-[350px]:w-3.5 min-[350px]:h-3.5 text-cyan-400"
-                    />
-                    <span>1.4RB Views</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -154,7 +395,7 @@ function BeritaDetail() {
 
           <div className="relative h-48 min-[350px]:h-64 sm:h-88 lg:h-[420px] w-full overflow-hidden bg-slate-950 border-b border-slate-800">
             <img
-              src={item.image}
+              src={imageUrl(item.image)}
               alt={item.title}
               className="h-full w-full object-cover transition-transform duration-700 hover:scale-102"
             />
@@ -168,78 +409,7 @@ function BeritaDetail() {
 
           <div className="p-4 min-[350px]:p-6 sm:p-10 lg:p-14 pt-6 min-[350px]:pt-8 space-y-6 min-[350px]:space-y-8 bg-white text-slate-900">
             <div className="flex flex-col gap-6 min-[350px]:gap-8 text-sm min-[350px]:text-base sm:text-lg leading-relaxed text-slate-700 font-normal">
-              {Array.isArray(item.content) ? (
-                item.content.map((paragraph, index) => {
-                  const correspondingPhoto = item.gallery?.[index]
-
-                  if (index === 0) {
-                    const firstLetter = paragraph.charAt(0)
-                    const restOfParagraph = paragraph.slice(1)
-
-                    return (
-                      <div
-                        key={index}
-                        className="space-y-6 min-[350px]:space-y-8"
-                      >
-                        <p className="text-base min-[350px]:text-lg sm:text-xl leading-relaxed text-slate-800 font-normal">
-                          <span className="float-left text-4xl min-[350px]:text-5xl sm:text-6xl font-black text-cyan-600 mr-2.5 min-[350px]:mr-3.5 leading-none pt-1">
-                            {firstLetter}
-                          </span>
-                          {restOfParagraph}
-                        </p>
-
-                        {correspondingPhoto && (
-                          <figure className="my-6 min-[350px]:my-8 overflow-hidden rounded-xl min-[350px]:rounded-2xl border border-slate-200 bg-slate-50 shadow-md">
-                            <div className="w-full max-h-[500px] overflow-hidden bg-slate-200">
-                              <img
-                                src={correspondingPhoto.url}
-                                alt={correspondingPhoto.caption}
-                                className="w-full h-auto object-cover transition-transform duration-500 hover:scale-[1.02]"
-                              />
-                            </div>
-                            <figcaption className="px-3 min-[350px]:px-5 py-2.5 min-[350px]:py-3.5 text-[10px] min-[350px]:text-xs sm:text-sm text-slate-600 border-t border-slate-200 italic leading-relaxed flex flex-col min-[350px]:flex-row items-start min-[350px]:items-center justify-between gap-2 min-[350px]:gap-0 bg-white">
-                              <span>{correspondingPhoto.caption}</span>
-                              <span className="not-italic text-cyan-700 font-bold uppercase tracking-wider text-[9px] min-[350px]:text-[10px] bg-cyan-50 px-2 min-[350px]:px-2.5 py-0.5 min-[350px]:py-1 rounded border border-cyan-200 min-[350px]:ml-2 shrink-0">
-                                Dok. SINGGAH
-                              </span>
-                            </figcaption>
-                          </figure>
-                        )}
-                      </div>
-                    )
-                  }
-
-                  return (
-                    <div key={index} className="space-y-6 min-[350px]:space-y-8">
-                      <p className="leading-relaxed text-slate-700">
-                        {paragraph}
-                      </p>
-
-                      {correspondingPhoto && (
-                        <figure className="my-6 min-[350px]:my-8 overflow-hidden rounded-xl min-[350px]:rounded-2xl border border-slate-200 bg-slate-50 shadow-md">
-                          <div className="w-full max-h-[500px] overflow-hidden bg-slate-200">
-                            <img
-                              src={correspondingPhoto.url}
-                              alt={correspondingPhoto.caption}
-                              className="w-full h-auto object-cover transition-transform duration-500 hover:scale-[1.02]"
-                            />
-                          </div>
-                          <figcaption className="px-3 min-[350px]:px-5 py-2.5 min-[350px]:py-3.5 text-[10px] min-[350px]:text-xs sm:text-sm text-slate-600 border-t border-slate-200 italic leading-relaxed flex flex-col min-[350px]:flex-row items-start min-[350px]:items-center justify-between gap-2 min-[350px]:gap-0 bg-white">
-                            <span>{correspondingPhoto.caption}</span>
-                            <span className="not-italic text-cyan-700 font-bold uppercase tracking-wider text-[9px] min-[350px]:text-[10px] bg-cyan-50 px-2 min-[350px]:px-2.5 py-0.5 min-[350px]:py-1 rounded border border-cyan-200 min-[350px]:ml-2 shrink-0">
-                              Dok. SINGGAH
-                            </span>
-                          </figcaption>
-                        </figure>
-                      )}
-                    </div>
-                  )
-                })
-              ) : (
-                <p className="text-base min-[350px]:text-lg sm:text-xl leading-relaxed text-slate-800 font-normal whitespace-pre-line">
-                  {typeof item.content === "string" ? item.content : (item.description || "Tidak ada konten")}
-                </p>
-              )}
+              <NewsContent item={item} />
             </div>
 
             <div className="pt-6 min-[350px]:pt-8 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 min-[350px]:gap-4">
@@ -298,7 +468,7 @@ function BeritaDetail() {
                 >
                   <div className="h-40 min-[350px]:h-44 w-full overflow-hidden bg-slate-950 relative">
                     <img
-                      src={news.image}
+                      src={imageUrl(news.image)}
                       alt={news.title}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
@@ -328,117 +498,96 @@ function BeritaDetail() {
       </div>
 
       {isShareModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 min-[350px]:p-4 bg-slate-950/80 backdrop-blur-md transition-all">
-          <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl min-[350px]:rounded-3xl p-5 min-[350px]:p-6 sm:p-8 shadow-2xl space-y-5 min-[350px]:space-y-6 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3 min-[350px]:pb-4">
-              <div className="flex items-center gap-2 min-[350px]:gap-2.5">
-                <div className="h-7 w-7 min-[350px]:h-9 min-[350px]:w-9 rounded-lg min-[350px]:rounded-xl bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center text-cyan-400 shrink-0">
-                  <Share2
-                    size={14}
-                    className="min-[350px]:w-[18px] min-[350px]:h-[18px]"
-                  />
-                </div>
-                <h3 className="text-base min-[350px]:text-lg font-bold text-white leading-tight">
-                  Bagikan Berita Ini
-                </h3>
-              </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-0">
+          <div
+            className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+            onClick={() => setIsShareModalOpen(false)}
+          ></div>
+
+          <div className="relative w-full max-w-md transform overflow-hidden rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl shadow-cyan-900/20 transition-all sm:p-8">
+            <div className="mb-6 flex items-center justify-between">
+              <h3 className="text-xl font-bold text-white">Bagikan ke...</h3>
               <button
                 onClick={() => setIsShareModalOpen(false)}
-                className="h-7 w-7 min-[350px]:h-8 min-[350px]:w-8 shrink-0 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                className="cursor-pointer rounded-full bg-white/80 p-2 text-slate-500 transition hover:bg-white hover:text-slate-800"
               >
-                <X size={14} className="min-[350px]:w-4 min-[350px]:h-4" />
+                <X size={20} />
               </button>
             </div>
 
-            {/* Dibikin 1 kolom di 260px, 3 kolom di 350px ke atas biar gak numpuk/melar */}
-            <div className="grid grid-cols-1 min-[350px]:grid-cols-3 gap-2 min-[350px]:gap-3">
+            <div className="mb-8 grid grid-cols-4 gap-4">
               <a
                 href={`https://api.whatsapp.com/send?text=${shareTitle}%20-%20${currentUrl}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-row min-[350px]:flex-col items-center justify-start min-[350px]:justify-center gap-3 min-[350px]:gap-2 p-3 min-[350px]:p-4 rounded-xl min-[350px]:rounded-2xl bg-slate-800/60 border border-slate-700/60 hover:border-cyan-400/50 hover:bg-cyan-500/10 text-slate-300 hover:text-cyan-300 transition-all cursor-pointer group"
+                className="group flex flex-col items-center gap-2"
               >
-                <div className="h-8 w-8 min-[350px]:h-10 min-[350px]:w-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                  <MessageCircle
-                    size={16}
-                    className="min-[350px]:w-5 min-[350px]:h-5"
-                  />
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-[#25D366]/10 text-[#25D366] transition group-hover:bg-[#25D366] group-hover:text-white">
+                  <MessageCircle size={24} />
                 </div>
-                <span className="text-[11px] min-[350px]:text-xs font-semibold">
+                <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">
                   WhatsApp
                 </span>
               </a>
 
               <a
-                href={`https://twitter.com/intent/tweet?text=${shareTitle}&url=${currentUrl}`}
+                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${shareTitle}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-row min-[350px]:flex-col items-center justify-start min-[350px]:justify-center gap-3 min-[350px]:gap-2 p-3 min-[350px]:p-4 rounded-xl min-[350px]:rounded-2xl bg-slate-800/60 border border-slate-700/60 hover:border-cyan-400/50 hover:bg-cyan-500/10 text-slate-300 hover:text-cyan-300 transition-all cursor-pointer group"
+                className="group flex flex-col items-center gap-2"
               >
-                <div className="h-8 w-8 min-[350px]:h-10 min-[350px]:w-10 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                  <Send
-                    size={14}
-                    className="min-[350px]:w-[18px] min-[350px]:h-[18px]"
-                  />
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-white/5 text-slate-300 transition group-hover:bg-slate-800 group-hover:text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+                  </svg>
                 </div>
-                <span className="text-[11px] min-[350px]:text-xs font-semibold">
-                  Twitter / X
+                <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">
+                  Twitter
                 </span>
               </a>
 
               <a
-                href={`https://www.linkedin.com/sharing/share-offsite/?url=${currentUrl}`}
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-row min-[350px]:flex-col items-center justify-start min-[350px]:justify-center gap-3 min-[350px]:gap-2 p-3 min-[350px]:p-4 rounded-xl min-[350px]:rounded-2xl bg-slate-800/60 border border-slate-700/60 hover:border-cyan-400/50 hover:bg-cyan-500/10 text-slate-300 hover:text-cyan-300 transition-all cursor-pointer group"
+                className="group flex flex-col items-center gap-2"
               >
-                <div className="h-8 w-8 min-[350px]:h-10 min-[350px]:w-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                  <Share2
-                    size={14}
-                    className="min-[350px]:w-[18px] min-[350px]:h-[18px]"
-                  />
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-[#1877F2]/10 text-[#1877F2] transition group-hover:bg-[#1877F2] group-hover:text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                  </svg>
                 </div>
-                <span className="text-[11px] min-[350px]:text-xs font-semibold">
-                  LinkedIn
+                <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">
+                  Facebook
+                </span>
+              </a>
+
+              <a
+                href={`https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${shareTitle}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col items-center gap-2"
+              >
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-[#0088cc]/10 text-[#0088cc] transition group-hover:bg-[#0088cc] group-hover:text-white">
+                  <Send size={24} />
+                </div>
+                <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">
+                  Telegram
                 </span>
               </a>
             </div>
 
-            <div className="space-y-1.5 min-[350px]:space-y-2">
-              <label className="text-[10px] min-[350px]:text-xs font-semibold text-slate-400">
-                Atau salin tautan artikel
-              </label>
-              {/* Flex-col di layar 260px biar input & tombol ga saling dempet sampe jebol */}
-              <div className="flex flex-col min-[350px]:flex-row items-stretch min-[350px]:items-center gap-2 bg-slate-950 border border-slate-800 rounded-xl min-[350px]:rounded-2xl p-1.5 min-[350px]:p-2 min-[350px]:pl-3">
-                <input
-                  type="text"
-                  readOnly
-                  value={currentUrl}
-                  className="w-full bg-slate-900 min-[350px]:bg-transparent rounded-lg min-[350px]:rounded-none p-2 min-[350px]:p-0 text-[10px] min-[350px]:text-xs text-slate-300 focus:outline-none truncate"
-                />
-                <button
-                  onClick={handleCopyLink}
-                  className="px-3 min-[350px]:px-4 py-2 min-[350px]:py-2 rounded-lg min-[350px]:rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-[11px] min-[350px]:text-xs font-bold transition-colors shrink-0 flex items-center justify-center gap-1.5 cursor-pointer w-full min-[350px]:w-auto"
-                >
-                  {copied ? (
-                    <>
-                      <Check
-                        size={12}
-                        className="min-[350px]:w-3.5 min-[350px]:h-3.5"
-                      />
-                      <span>Disalin!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy
-                        size={12}
-                        className="min-[350px]:w-3.5 min-[350px]:h-3.5"
-                      />
-                      <span>Salin</span>
-                    </>
-                  )}
-                </button>
+            <div className="flex items-center justify-between rounded-xl border border-white/10 bg-black/30 p-1.5 pl-4">
+              <div className="mr-4 overflow-hidden text-ellipsis whitespace-nowrap text-sm text-slate-400">
+                {currentUrl}
               </div>
+              <button
+                onClick={handleCopyLink}
+                className="flex shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 border border-slate-200"
+              >
+                {copied ? <Check size={16} /> : <Copy size={16} />}
+                {copied ? "Tersalin!" : "Salin"}
+              </button>
             </div>
           </div>
         </div>

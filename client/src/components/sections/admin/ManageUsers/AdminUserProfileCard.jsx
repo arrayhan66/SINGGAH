@@ -12,6 +12,9 @@ import {
   Crown,
   Pencil,
   Trash2,
+  CreditCard,
+  ImageOff,
+  IdCard,
 } from "lucide-react"
 
 const tipeConfig = {
@@ -137,6 +140,21 @@ function AdminUserProfileCard({ user, onEdit, onDelete }) {
                   </p>
                 </div>
               </div>
+              {user.nim_nip && (
+                <div className="flex items-center gap-3 rounded-xl border border-white/[0.04] bg-white/[0.03] px-4 py-3">
+                  <CreditCard className="h-4 w-4 shrink-0 text-slate-400" />
+                  <div className="min-w-0">
+                    <p className="text-[11px] text-slate-500">
+                      {user.tipe === "dosen" || user.pending_tipe === "dosen"
+                        ? "NIP"
+                        : "NIM"}
+                    </p>
+                    <p className="truncate font-mono text-sm text-slate-200">
+                      {user.nim_nip}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -166,9 +184,36 @@ function AdminUserProfileCard({ user, onEdit, onDelete }) {
               </div>
             </div>
           </div>
-        </div>
+          </div>
 
-        {/* Actions */}
+          {user.identitas_photo && (
+            <div className="mt-6">
+              <div className="flex items-center gap-2">
+                <IdCard className="h-4 w-4 text-cyan-300" />
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Foto Identitas
+                </h3>
+              </div>
+              <div className="mt-3 rounded-xl border border-white/[0.04] bg-white/[0.03] p-4">
+                {user.identitas_photo ? (
+                  <img
+                    src={user.identitas_photo}
+                    alt="Foto identitas"
+                    className="mx-auto max-h-72 rounded-lg border border-white/10 object-contain"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center gap-2 py-6 text-slate-500">
+                    <ImageOff className="h-8 w-8" />
+                    <span className="text-xs">
+                      Foto identitas tidak diunggah
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Actions */}
         <div className="mt-6 flex gap-3 border-t border-white/[0.06] pt-6">
           <button
             type="button"

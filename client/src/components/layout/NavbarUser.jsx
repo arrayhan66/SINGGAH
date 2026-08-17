@@ -8,6 +8,8 @@ import NotificationBell from "./NotificationBell";
 import NotificationPanel from "./NotificationPanel";
 import MobileMenu from "./MobileMenu";
 import LogoutConfirmModal from "../ui/LogoutConfirmModal";
+import DeleteConfirmModal from "../ui/DeleteConfirmModal";
+import NotificationDetailModal from "../ui/NotificationDetailModal";
 
 function NavbarUser() {
   const { user, logout } = useAuth();
@@ -36,6 +38,7 @@ function NavbarUser() {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [detailNotif, setDetailNotif] = useState(null);
   const navRef = useRef(null);
   const headerRef = useRef(null);
   const profileRef = useRef(null);
@@ -47,11 +50,24 @@ function NavbarUser() {
     isOpen: isNotifOpen,
     hasMore,
     isLoadingMore,
+    isSelectionMode,
+    selectedIds,
+    isBulkLoading,
+    confirmDeleteAll,
+    setConfirmDeleteAll,
     togglePanel: toggleNotif,
     closePanel: closeNotif,
     loadMore,
     handleMarkAsRead: readNotif,
+    handleMarkAsUnread: unreadNotif,
     handleMarkAllAsRead: readAllNotif,
+    handleDeleteNotification: deleteNotif,
+    handleDeleteAll: deleteAllNotif,
+    enterSelectionMode,
+    exitSelectionMode,
+    handleToggleSelect,
+    handleSelectAll,
+    handleBulkAction,
   } = useNotifications();
 
   const roleLabel =
@@ -93,12 +109,13 @@ function NavbarUser() {
 
   const handleNotifClick = (notif) => {
     readNotif(notif.id);
+    setDetailNotif(notif);
+  };
+
+  const handleNotifNavigate = (path) => {
+    setDetailNotif(null);
     closeNotif();
-    if (notif.reference_type === "project" && notif.reference_id) {
-      navigate("/karya");
-    } else if (notif.reference_type === "news" && notif.reference_id) {
-      navigate("/berita");
-    }
+    if (path) navigate(path);
   };
 
   const handleLogout = () => {
@@ -108,7 +125,6 @@ function NavbarUser() {
 
   const confirmLogout = () => {
     logout();
-    navigate("/login", { replace: true });
   };
 
   useEffect(() => {
@@ -149,9 +165,20 @@ function NavbarUser() {
     notifications,
     hasMore,
     isLoadingMore,
+    isSelectionMode,
+    selectedIds,
+    isBulkLoading,
     onMarkAllRead: readAllNotif,
     onLoadMore: loadMore,
     onClickNotif: handleNotifClick,
+    onDeleteNotif: deleteNotif,
+    onMarkUnread: unreadNotif,
+    onEnterSelection: enterSelectionMode,
+    onExitSelection: exitSelectionMode,
+    onToggleSelect: handleToggleSelect,
+    onSelectAll: handleSelectAll,
+    onBulkAction: handleBulkAction,
+    onRequestDeleteAll: () => setConfirmDeleteAll(true),
   };
 
   return (
@@ -369,6 +396,25 @@ function NavbarUser() {
         <LogoutConfirmModal
           onConfirm={confirmLogout}
           onCancel={() => setShowLogoutConfirm(false)}
+        />
+      )}
+
+      {confirmDeleteAll && (
+        <DeleteConfirmModal
+          title="Hapus semua notifikasi?"
+          message="Semua notifikasi kamu akan dihapus permanen dan tidak bisa dikembalikan."
+          confirmLabel="Ya, Hapus Semua"
+          onConfirm={deleteAllNotif}
+          onCancel={() => setConfirmDeleteAll(false)}
+        />
+      )}
+
+      {detailNotif && (
+        <NotificationDetailModal
+          key={detailNotif.id}
+          notif={detailNotif}
+          onClose={() => setDetailNotif(null)}
+          onNavigate={handleNotifNavigate}
         />
       )}
     </header>

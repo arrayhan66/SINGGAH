@@ -93,24 +93,41 @@ function AdminAddProjectView() {
     setError(null)
 
     try {
-      const payload = {
-        title: formData.title.trim(),
-        description: formData.description.trim(),
-        categoryName: formData.categoryName || "IoT",
-        userName: formData.userName.trim() || "Mahasiswa SINGGAH",
-        userNim: formData.userNim.trim() || "TE2025000",
-        year: Number(formData.year) || new Date().getFullYear(),
-        technologies: formData.technologies,
-        thumbnail: formData.thumbnail
-          ? URL.createObjectURL(formData.thumbnail)
-          : "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400",
-        images: formData.images.length > 0
-          ? formData.images.map((f) => ({ image_url: URL.createObjectURL(f) }))
-          : [{ image_url: formData.thumbnail ? URL.createObjectURL(formData.thumbnail) : "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800" }],
-        status: "approved",
+      const fd = new FormData()
+      fd.append("title", formData.title.trim())
+      fd.append("description", formData.description.trim())
+      fd.append("category_id", formData.category_id)
+      fd.append("year", parseInt(formData.year, 10))
+
+      if (formData.thumbnail) {
+        fd.append("thumbnail", formData.thumbnail)
       }
 
-      addProject(payload)
+      if (formData.images.length > 0) {
+        formData.images.forEach((file) => fd.append("images", file))
+      }
+
+      if (formData.documents.length > 0) {
+        formData.documents.forEach((file) => fd.append("documents", file))
+      }
+
+      if (formData.technologies.length > 0) {
+        fd.append("technologies", JSON.stringify(formData.technologies))
+      }
+
+      if (formData.members.length > 0) {
+        fd.append("members", JSON.stringify(formData.members))
+      }
+
+      if (formData.links.length > 0) {
+        fd.append("links", JSON.stringify(formData.links))
+      }
+
+      if (formData.videoUrl.trim()) {
+        fd.append("videos", JSON.stringify([{ video_url: formData.videoUrl.trim() }]))
+      }
+
+      await addProject(fd)
       navigate("/projects")
     } catch (err) {
       const msg =
@@ -154,7 +171,6 @@ function AdminAddProjectView() {
           <UploadInformation
             formData={formData}
             updateField={updateField}
-            showUserFields
           />
 
           <StepDivider step={steps[2]} currentIndex={2} />
@@ -185,7 +201,6 @@ function AdminAddProjectView() {
             submitting={submitting}
             apiError={error}
             submitLabel="Publikasikan"
-            cancelPath="/projects"
           />
         </div>
       </div>

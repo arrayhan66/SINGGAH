@@ -1,20 +1,97 @@
-import { useParams, useNavigate, Link } from "react-router-dom"
+import { useMemo } from "react"
+import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom"
 import {
   ArrowLeft,
   Calendar,
   Newspaper,
   Eye,
+  BookOpen,
+  Megaphone,
 } from "lucide-react"
 import { useBerita } from "../../../../context/BeritaContext"
+import { imageUrl } from "../../../../utils/imageUrl"
+import { processContentHtml } from "../../../../utils/processContentHtml"
+
+function parseSeeAlsoItems(htmlStr) {
+  if (!htmlStr) return []
+  try { return JSON.parse(htmlStr) } catch { return [] }
+}
+
+function SeeAlsoBlockPreview({ htmlAttributes }) {
+  const items = parseSeeAlsoItems(htmlAttributes["data-see-also-items"])
+  return (
+    <div className="my-8 overflow-hidden rounded-2xl border border-amber-200 bg-white shadow-md">
+      <div className="flex items-center gap-3 bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-3">
+        <BookOpen size={18} className="text-white" />
+        <span className="text-sm font-black uppercase tracking-widest text-white">Baca Juga</span>
+        <div className="h-px flex-1 bg-white/30" />
+      </div>
+      {items.length > 0 ? (
+        <div className="grid divide-y divide-amber-100">
+          {items.map((item, index) => (
+            <div key={index} className="flex items-start gap-3 px-5 py-3.5">
+              {item.image ? (
+                <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-amber-100">
+                  <img src={item.image} alt={item.title} className="h-full w-full object-cover" loading="lazy" />
+                </div>
+              ) : (
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-sm font-bold text-amber-500">{index + 1}</div>
+              )}
+              <div className="min-w-0 flex-1 py-0.5">
+                <p className="text-sm font-bold leading-snug text-slate-800 line-clamp-2">{item.title}</p>
+                {item.url && <p className="mt-1 text-[11px] text-cyan-600 truncate">{item.url}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="px-5 py-6 text-center"><p className="text-xs text-amber-400 italic">Tidak ada rekomendasi.</p></div>
+      )}
+    </div>
+  )
+}
+
+function AdBlockPreview({ htmlAttributes }) {
+  const title = htmlAttributes["data-ad-title"] || ""
+  const content = htmlAttributes["data-ad-content"] || ""
+  const url = htmlAttributes["data-ad-url"] || ""
+  return (
+    <div className="my-8 overflow-hidden rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-sm">
+      <div className="flex items-center gap-3 bg-gradient-to-r from-blue-500 to-indigo-500 px-5 py-3">
+        <Megaphone size={16} className="text-white" />
+        <span className="text-xs font-black uppercase tracking-widest text-white">{title || "Promo"}</span>
+        <div className="h-px flex-1 bg-white/30" />
+      </div>
+      <div className="px-5 py-4">
+        {content && <p className="text-sm leading-relaxed text-slate-700">{content}</p>}
+        {url && <a href={url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors">Selengkapnya &rarr;</a>}
+      </div>
+    </div>
+  )
+}
 
 function AdminBeritaPreview() {
   const { slug } = useParams()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { beritaList, getBeritaBySlug, tempPreviewData } = useBerita()
 
   const isTempPreview = String(slug) === "temp"
+  const fromEditor = isTempPreview && searchParams.get("from") === "edit"
+  const editSlug = searchParams.get("slug")
   const item = isTempPreview ? tempPreviewData : getBeritaBySlug(slug)
   const relatedNews = isTempPreview ? [] : beritaList.filter((b) => b.slug !== slug).slice(0, 3)
+
+  const backTarget = isTempPreview
+    ? (fromEditor && editSlug ? `/berita/edit/${editSlug}` : "/berita/tambah")
+    : "/berita"
+
+  const headlineSrc = useMemo(() => {
+    if (!item?.image) return null
+    if (typeof item.image === "string") return imageUrl(item.image)
+    if (item.image instanceof File) return URL.createObjectURL(item.image)
+    return null
+  }, [item?.image])
 
   if (!item) {
     return (
@@ -43,10 +120,54 @@ function AdminBeritaPreview() {
     const hasHTML = item.contentHTML && typeof item.contentHTML === "string" && item.contentHTML.includes("<")
 
     if (hasHTML) {
+      const hasCustomBlocks =
+        item.contentHTML.includes('data-type="see-also"') ||
+        item.contentHTML.includes('data-type="ad-block"')
+
+      if (hasCustomBlocks) {
+        const parts = item.contentHTML.split(
+          /(<div[^>]*data-type="(?:see-also|ad-block)"[^>]*>[\s\S]*?<\/div>)/g
+        )
+        return (
+          <>
+            {parts.map((part, index) => {
+              if (part.includes('data-type="see-also"')) {
+                const parser = new DOMParser()
+                const doc = parser.parseFromString(part, "text/html")
+                const el = doc.body.firstChild
+                if (!el) return null
+                const attrs = {}
+                for (const attr of el.attributes) { attrs[attr.name] = attr.value }
+                return <SeeAlsoBlockPreview key={index} htmlAttributes={attrs} />
+              }
+              if (part.includes('data-type="ad-block"')) {
+                const parser = new DOMParser()
+                const doc = parser.parseFromString(part, "text/html")
+                const el = doc.body.firstChild
+                if (!el) return null
+                const attrs = {}
+                for (const attr of el.attributes) { attrs[attr.name] = attr.value }
+                return <AdBlockPreview key={index} htmlAttributes={attrs} />
+              }
+              if (part.trim()) {
+                return (
+                  <div
+                    key={index}
+                    className="prose prose-slate prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-a:text-cyan-600 prose-img:rounded-xl prose-img:mx-auto prose-p:leading-relaxed prose-p:my-4 prose-img:my-6"
+                    dangerouslySetInnerHTML={{ __html: processContentHtml(part) }}
+                  />
+                )
+              }
+              return null
+            })}
+          </>
+        )
+      }
+
       return (
         <div
-          className="prose prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-a:text-cyan-600 prose-img:rounded-xl prose-img:mx-auto prose-p:leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: item.contentHTML }}
+          className="prose prose-slate prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-a:text-cyan-600 prose-img:rounded-xl prose-img:mx-auto prose-p:leading-relaxed prose-p:my-4 prose-img:my-6"
+          dangerouslySetInnerHTML={{ __html: processContentHtml(item.contentHTML) }}
         />
       )
     }
@@ -72,20 +193,17 @@ function AdminBeritaPreview() {
                 </p>
 
                 {correspondingPhoto && (
-                  <figure className="my-6 sm:my-8 overflow-hidden rounded-xl sm:rounded-2xl border border-slate-200 bg-slate-50 shadow-md">
-                    <div className="w-full max-h-[500px] overflow-hidden bg-slate-200">
+                  <figure className="my-4 sm:my-5 rounded-xl overflow-hidden">
+                    <div className="w-full max-h-[500px] overflow-hidden bg-slate-100">
                       <img
-                        src={correspondingPhoto.url}
+                        src={imageUrl(correspondingPhoto.url)}
                         alt={correspondingPhoto.caption}
-                        className="w-full h-auto object-cover transition-transform duration-500 hover:scale-[1.02]"
+                        className="w-full h-auto object-cover block"
                       />
                     </div>
-                    <figcaption className="px-3 sm:px-5 py-2.5 sm:py-3.5 text-xs sm:text-sm text-slate-600 border-t border-slate-200 italic leading-relaxed flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-white">
-                      <span>{correspondingPhoto.caption}</span>
-                      <span className="not-italic text-cyan-700 font-bold uppercase tracking-wider text-[10px] bg-cyan-50 px-2.5 py-1 rounded border border-cyan-200 shrink-0">
-                        Dok. SINGGAH
-                      </span>
-                    </figcaption>
+                    {correspondingPhoto.caption && (
+                      <figcaption className="text-center text-[11px] sm:text-xs text-slate-500 italic pt-2">{correspondingPhoto.caption}</figcaption>
+                    )}
                   </figure>
                 )}
               </div>
@@ -97,20 +215,17 @@ function AdminBeritaPreview() {
               <p className="leading-relaxed text-slate-700">{paragraph}</p>
 
               {correspondingPhoto && (
-                <figure className="my-6 sm:my-8 overflow-hidden rounded-xl sm:rounded-2xl border border-slate-200 bg-slate-50 shadow-md">
-                  <div className="w-full max-h-[500px] overflow-hidden bg-slate-200">
+                <figure className="my-4 sm:my-5 rounded-xl overflow-hidden">
+                  <div className="w-full max-h-[500px] overflow-hidden bg-slate-100">
                     <img
-                      src={correspondingPhoto.url}
+                      src={imageUrl(correspondingPhoto.url)}
                       alt={correspondingPhoto.caption}
-                      className="w-full h-auto object-cover transition-transform duration-500 hover:scale-[1.02]"
+                      className="w-full h-auto object-cover block"
                     />
                   </div>
-                  <figcaption className="px-3 sm:px-5 py-2.5 sm:py-3.5 text-xs sm:text-sm text-slate-600 border-t border-slate-200 italic leading-relaxed flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-white">
-                    <span>{correspondingPhoto.caption}</span>
-                    <span className="not-italic text-cyan-700 font-bold uppercase tracking-wider text-[10px] bg-cyan-50 px-2.5 py-1 rounded border border-cyan-200 shrink-0">
-                      Dok. SINGGAH
-                    </span>
-                  </figcaption>
+                  {correspondingPhoto.caption && (
+                    <figcaption className="text-center text-[11px] sm:text-xs text-slate-500 italic pt-2">{correspondingPhoto.caption}</figcaption>
+                  )}
                 </figure>
               )}
             </div>
@@ -125,18 +240,16 @@ function AdminBeritaPreview() {
               <h3 className="text-lg font-bold text-slate-800">Dokumentasi Lainnya</h3>
             </div>
             {item.gallery.slice(paragraphs.length).map((photo, i) => (
-              <figure key={i} className="overflow-hidden rounded-xl sm:rounded-2xl border border-slate-200 bg-slate-50 shadow-md">
-                <div className="w-full max-h-[500px] overflow-hidden bg-slate-200">
+              <figure key={i} className="rounded-xl overflow-hidden">
+                <div className="w-full max-h-[500px] overflow-hidden bg-slate-100">
                   <img
-                    src={photo.url}
+                    src={imageUrl(photo.url)}
                     alt={photo.caption}
-                    className="w-full h-auto object-cover"
+                    className="w-full h-auto object-cover block"
                   />
                 </div>
                 {photo.caption && (
-                  <figcaption className="px-3 sm:px-5 py-2.5 sm:py-3.5 text-xs sm:text-sm text-slate-600 border-t border-slate-200 italic bg-white">
-                    {photo.caption}
-                  </figcaption>
+                  <figcaption className="text-center text-[11px] sm:text-xs text-slate-500 italic pt-2">{photo.caption}</figcaption>
                 )}
               </figure>
             ))}
@@ -153,7 +266,7 @@ function AdminBeritaPreview() {
           <div className="p-4 sm:p-8 lg:p-10 bg-brand-navy border-b border-slate-800/80">
             <div className="flex flex-wrap items-center justify-between gap-3 pb-0">
               <Link
-                to="/berita"
+                to={backTarget}
                 className="group inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 sm:py-2 sm:pl-3 sm:pr-4 text-xs sm:text-sm text-slate-300 transition-all duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 shadow-sm"
               >
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 shrink-0">
@@ -164,7 +277,7 @@ function AdminBeritaPreview() {
                 </span>
                 <span className="font-semibold">
                   Kembali{" "}
-                  <span className="hidden sm:inline">ke Kelola Berita</span>
+                  <span className="hidden sm:inline">{backTarget === "/berita" ? "ke Kelola Berita" : "ke Editor"}</span>
                 </span>
               </Link>
 
@@ -224,14 +337,10 @@ function AdminBeritaPreview() {
             </div>
           </div>
 
-          {item.image && (
+          {headlineSrc && (
             <div className="relative h-48 sm:h-88 lg:h-[420px] w-full overflow-hidden bg-slate-950 border-b border-slate-800">
               <img
-                src={
-                  typeof item.image === "string"
-                    ? item.image
-                    : URL.createObjectURL(item.image)
-                }
+                src={headlineSrc}
                 alt={item.title}
                 className="h-full w-full object-cover transition-transform duration-700 hover:scale-102"
               />
@@ -246,12 +355,6 @@ function AdminBeritaPreview() {
 
           <div className="p-4 sm:p-10 lg:p-14 pt-6 sm:pt-8 space-y-6 sm:space-y-8 bg-white text-slate-900">
             <div className="flex flex-col gap-6 sm:gap-8 text-sm sm:text-base sm:text-lg leading-relaxed text-slate-700 font-normal">
-              {item.desc && (
-                <div className="rounded-xl border border-cyan-100 bg-cyan-50 p-4 text-cyan-800 text-sm italic">
-                  {item.desc}
-                </div>
-              )}
-
               {renderContent()}
             </div>
 
@@ -299,7 +402,7 @@ function AdminBeritaPreview() {
                 >
                   <div className="h-40 sm:h-44 w-full overflow-hidden bg-slate-950 relative">
                     <img
-                      src={news.image}
+                      src={imageUrl(news.image)}
                       alt={news.title}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />

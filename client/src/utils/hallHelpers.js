@@ -13,23 +13,21 @@ const DOSEN_MARKERS = ["dr.", "prof.", "dra.", "h."]
 const MAX_DOSEN = 4
 const MAX_MAHASISWA = 12
 
-function classify(project, indexInCategory) {
+function classify(project) {
   const tipe = project.User?.tipe || project.authorType
   if (tipe === "dosen") return "dosen"
   if (tipe === "mahasiswa") return "mahasiswa"
 
   const name = String(project.author?.[0] || project.User?.name || "").toLowerCase()
   if (DOSEN_MARKERS.some((m) => name.includes(m))) return "dosen"
-  return (indexInCategory - 1) % 4 === 0 ? "dosen" : "mahasiswa"
+  return "mahasiswa"
 }
 
 export function enrichProjects(projects = []) {
-  const counter = {}
-  return projects.map((project) => {
-    const cat = project.category || project.Category?.slug || "other"
-    counter[cat] = (counter[cat] || 0) + 1
-    return { ...project, authorType: classify(project, counter[cat]) }
-  })
+  return projects.map((project) => ({
+    ...project,
+    authorType: classify(project),
+  }))
 }
 
 export function getCategoryStats(projects = [], categories = []) {

@@ -14,11 +14,11 @@ function MainLayout({ children }) {
   const isLoggedIn = user !== null
 
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       {isLoggedIn ? <NavbarUser /> : <NavbarVisitor />}
-      <main>{children}</main>
+      <main className="flex-1">{children}</main>
       <Footer />
-    </>
+    </div>
   )
 }
 

@@ -1,20 +1,24 @@
 import { useState, useMemo, useCallback } from "react"
 import { FolderX } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 import { useProjects } from "../../../../context/ProjectContext"
 import AdminProjectsCard from "./AdminProjectsCard"
-import AdminProjectsDetailModal from "./AdminProjectsDetailModal"
 import AdminProjectApproveModal from "./AdminProjectApproveModal"
 import AdminProjectRejectModal from "./AdminProjectRejectModal"
+import DeleteConfirmModal from "../../../ui/DeleteConfirmModal"
 import ShowMoreButton from "../../../ui/ShowMoreButton"
 
 const INITIAL_VISIBLE = 6
 
 function AdminProjectsList({ search, statusFilter }) {
-  const { projects, approveProject, rejectProject } = useProjects()
+  const navigate = useNavigate()
+  const { projects, approveProject, rejectProject, deleteProject } = useProjects()
 
-  const [selectedProject, setSelectedProject] = useState(null)
   const [approveModalProject, setApproveModalProject] = useState(null)
   const [rejectModalProject, setRejectModalProject] = useState(null)
+  const [deleteProjectTarget, setDeleteProjectTarget] = useState(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [deleteSuccess, setDeleteSuccess] = useState(false)
   const [showAll, setShowAll] = useState(false)
 
   const filterKey = `${search}|${statusFilter}`
@@ -29,7 +33,7 @@ function AdminProjectsList({ search, statusFilter }) {
       const matchStatus = statusFilter === "all" || p.status === statusFilter
       const keyword = search.toLowerCase()
       const matchSearch =
-        p.title.toLowerCase().includes(keyword) ||
+        (p.title || "").toLowerCase().includes(keyword) ||
         (p.User?.name || "").toLowerCase().includes(keyword)
       return matchStatus && matchSearch
     })
@@ -38,11 +42,7 @@ function AdminProjectsList({ search, statusFilter }) {
   const visibleProjects = showAll ? filteredProjects : filteredProjects.slice(0, INITIAL_VISIBLE)
 
   function handleViewDetail(project) {
-    setSelectedProject(project)
-  }
-
-  function handleCloseModal() {
-    setSelectedProject(null)
+    navigate(`/projects/detail/${project.slug || project.id}`)
   }
 
   const handleApproveClick = useCallback((project) => {
@@ -53,16 +53,35 @@ function AdminProjectsList({ search, statusFilter }) {
     setRejectModalProject(project)
   }, [])
 
+  const handleEditClick = useCallback((project) => {
+    navigate(`/projects/edit/${project.slug || project.id}`)
+  }, [navigate])
+
+  const handleDeleteClick = useCallback((project) => {
+    setDeleteProjectTarget(project)
+  }, [])
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!deleteProjectTarget || deleteLoading) return
+    setDeleteLoading(true)
+    try {
+      await deleteProject(deleteProjectTarget.id)
+      setDeleteLoading(false)
+      setDeleteSuccess(true)
+    } catch {
+      setDeleteLoading(false)
+      setDeleteProjectTarget(null)
+    }
+  }, [deleteProject, deleteProjectTarget, deleteLoading])
+
   const handleConfirmApprove = useCallback((projectId, note) => {
     approveProject(projectId, note)
     setApproveModalProject(null)
-    setSelectedProject(null)
   }, [approveProject])
 
   const handleConfirmReject = useCallback((projectId, reason) => {
     rejectProject(projectId, reason)
     setRejectModalProject(null)
-    setSelectedProject(null)
   }, [rejectProject])
 
   return (
@@ -93,6 +112,8 @@ function AdminProjectsList({ search, statusFilter }) {
                   onViewDetail={handleViewDetail}
                   onQuickApprove={handleApproveClick}
                   onQuickReject={handleRejectClick}
+                  onEdit={handleEditClick}
+                  onDelete={handleDeleteClick}
                 />
               </div>
             ))}
@@ -109,13 +130,6 @@ function AdminProjectsList({ search, statusFilter }) {
         )}
       </div>
 
-      <AdminProjectsDetailModal
-        project={selectedProject}
-        onApproveClick={handleApproveClick}
-        onRejectClick={handleRejectClick}
-        onClose={handleCloseModal}
-      />
-
       {approveModalProject && (
         <AdminProjectApproveModal
           project={approveModalProject}
@@ -129,6 +143,22 @@ function AdminProjectsList({ search, statusFilter }) {
           project={rejectModalProject}
           onConfirm={handleConfirmReject}
           onCancel={() => setRejectModalProject(null)}
+        />
+      )}
+
+      {deleteProjectTarget && (
+        <DeleteConfirmModal
+          title="Hapus project ini?"
+          message={`Project "${deleteProjectTarget.title}" akan dihapus permanen bersama semua data terkait (gambar, komentar, dll) dan tidak bisa dikembalikan.`}
+          confirmLabel="Ya, Hapus Project"
+          onConfirm={handleConfirmDelete}
+          onCancel={() => {
+            setDeleteProjectTarget(null)
+            setDeleteLoading(false)
+            setDeleteSuccess(false)
+          }}
+          loading={deleteLoading}
+          success={deleteSuccess}
         />
       )}
     </div>

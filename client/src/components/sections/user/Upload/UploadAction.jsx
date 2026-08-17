@@ -1,6 +1,5 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { Send, X, AlertCircle } from "lucide-react"
+import { Send, AlertCircle } from "lucide-react"
 
 function validateForm(formData, isEdit = false) {
   const errors = []
@@ -11,12 +10,15 @@ function validateForm(formData, isEdit = false) {
     errors.push("Deskripsi karya wajib diisi")
   if (!isEdit && !formData.thumbnail) errors.push("Thumbnail wajib diupload")
   if (!formData.year) errors.push("Tahun wajib diisi")
+  else {
+    const y = parseInt(formData.year, 10)
+    if (isNaN(y) || y < 1900 || y > 2100) errors.push("Tahun tidak valid (1900-2100)")
+  }
 
   return errors
 }
 
-function UploadAction({ formData, onSubmit, submitting, apiError, isEdit = false, cancelPath = "/" }) {
-  const navigate = useNavigate()
+function UploadAction({ formData, onSubmit, submitting, apiError, isEdit = false, submitLabel }) {
   const [validationErrors, setValidationErrors] = useState([])
 
   function handleSubmit() {
@@ -29,10 +31,6 @@ function UploadAction({ formData, onSubmit, submitting, apiError, isEdit = false
 
     setValidationErrors([])
     onSubmit()
-  }
-
-  function handleCancel() {
-    navigate(cancelPath)
   }
 
   const showValidationErrors = validationErrors.length > 0
@@ -61,26 +59,15 @@ function UploadAction({ formData, onSubmit, submitting, apiError, isEdit = false
         </div>
       )}
 
-      <div className="flex flex-col min-[400px]:flex-row gap-3 min-[280px]:gap-4 2xl:gap-5 3xl:gap-6 4xl:gap-7">
-        <button
-          type="button"
-          onClick={handleCancel}
-          className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-2.5 min-[280px]:px-6 min-[280px]:py-3 text-xs min-[280px]:text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors 2xl:text-base 2xl:px-7 2xl:py-3.5 3xl:text-lg 3xl:px-8 3xl:py-4 4xl:text-xl 4xl:px-9 4xl:py-4.5"
-        >
-          <X className="h-5 w-5 2xl:h-6 2xl:w-6 3xl:h-7 3xl:w-7 4xl:h-8 4xl:w-8" />
-          Batal
-        </button>
-
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={submitting}
-          className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-5 py-2.5 min-[280px]:px-6 min-[280px]:py-3 text-xs min-[280px]:text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] disabled:cursor-not-allowed disabled:opacity-60 2xl:text-base 2xl:px-7 2xl:py-3.5 3xl:text-lg 3xl:px-8 3xl:py-4 4xl:text-xl 4xl:px-9 4xl:py-4.5"
-        >
-          <Send className="h-5 w-5 2xl:h-6 2xl:w-6 3xl:h-7 3xl:w-7 4xl:h-8 4xl:w-8" />
-          {submitting ? "Menyimpan..." : isEdit ? "Simpan Perubahan" : "Submit untuk Ditinjau"}
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={handleSubmit}
+        disabled={submitting}
+        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-5 py-2.5 min-[280px]:px-6 min-[280px]:py-3 text-xs min-[280px]:text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] disabled:cursor-not-allowed disabled:opacity-60 2xl:text-base 2xl:px-7 2xl:py-3.5 3xl:text-lg 3xl:px-8 3xl:py-4 4xl:text-xl 4xl:px-9 4xl:py-4.5"
+      >
+        <Send className="h-5 w-5 2xl:h-6 2xl:w-6 3xl:h-7 3xl:w-7 4xl:h-8 4xl:w-8" />
+        {submitting ? "Menyimpan..." : submitLabel || (isEdit ? "Simpan Perubahan" : "Submit untuk Ditinjau")}
+      </button>
     </div>
   )
 }

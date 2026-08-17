@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react"
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { Routes, Route } from "react-router-dom"
 import { ProtectedRoute } from "./ProtectedRoute"
 import { GuestRoute } from "./GuestRoute"
 import { ResetFlowRoute } from "./ResetFlowRoute"
@@ -33,6 +33,7 @@ import UserKaryaTersimpan from "../pages/user/KaryaTersimpan/KaryaTersimpan"
 /* === ADMIN IMPORT === */
 import AdminHome from "../pages/admin/Home/Home"
 import AdminProjects from "../pages/admin/ManageProjects/Projects"
+import AdminProjectDetail from "../pages/admin/ManageProjects/AdminProjectDetail"
 import ProjectForm from "../pages/admin/ManageProjects/ProjectForm"
 import AdminAddProjectView from "../components/sections/admin/ManageProjects/AdminAddProjectView"
 import ManageNews from "../pages/admin/ManageNews/Berita"
@@ -49,7 +50,7 @@ import Settings from "../pages/admin/Settings/Settings"
 
 function AppRouter() {
   return (
-    <BrowserRouter>
+    <>
       <ScrollToTop />
       <Routes>
         {/* === VISITOR ROUTES === */}
@@ -57,7 +58,7 @@ function AppRouter() {
         <Route path="/karya" element={<Karya />} />
         <Route path="/karya/:slug" element={<KaryaDetail />} />
         <Route
-          path="/karya/:slug/:projectId"
+          path="/karya/:slug/:projectSlug"
           element={<KaryaProjectDetail />}
         />
         <Route path="/about" element={<About />} />
@@ -129,7 +130,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/edit-karya/:id"
+          path="/edit-karya/:slug"
           element={
             <ProtectedRoute allowedRoles={["user", "admin"]}>
               <UserEditKarya />
@@ -202,6 +203,14 @@ function AppRouter() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AdminProjects />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/projects/detail/:slug"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminProjectDetail />
             </ProtectedRoute>
           }
         />
@@ -288,7 +297,7 @@ function AppRouter() {
         {/* === NOT FOUND === */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </BrowserRouter>
+    </>
   )
 }
 

@@ -24,7 +24,41 @@ export async function markAsRead(id) {
   return data.data
 }
 
+export async function markAsUnread(id) {
+  const { data } = await api.patch(`/notifications/${id}/unread`)
+  return data.data
+}
+
 export async function markAllAsRead() {
   const { data } = await api.patch("/notifications/read-all")
+  return data.data
+}
+
+export async function deleteNotification(id) {
+  const { data } = await api.delete(`/notifications/${id}`)
+  return data.data
+}
+
+export async function deleteAllNotifications() {
+  const { data } = await api.delete("/notifications/all")
+  return data.data
+}
+
+export async function bulkUpdateNotifications(ids, action) {
+  const { data } = await api.post("/notifications/bulk", { ids, action })
+  return data.data
+}
+
+export async function bulkDeleteNotifications(ids) {
+  const { data } = await api.delete("/notifications/bulk", { data: { ids } })
+  return data.data
+}
+
+export async function sendAnnouncement({ title, message, audience }) {
+  const { data } = await api.post("/notifications/announcements", {
+    title,
+    message,
+    audience,
+  })
   return data.data
 }

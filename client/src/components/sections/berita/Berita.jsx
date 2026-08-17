@@ -7,10 +7,12 @@ import GlassCard from "../../ui/GlassCard"
 import SearchBar from "../../ui/SearchBar"
 import OutlineButton from "../../ui/OutlineButton"
 import { useBerita } from "../../../context/BeritaContext"
+import { NewsGridSkeleton } from "../../ui/Skeleton"
+import { imageUrl } from "../../../utils/imageUrl"
 
 function Berita() {
   const navigate = useNavigate()
-  const { beritaList } = useBerita()
+  const { beritaList, loading } = useBerita()
   const initialCount = 6
 
   const {
@@ -55,19 +57,19 @@ function Berita() {
 
         {/* Grid Card Berita */}
         <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 sm:mt-12 md:gap-7 lg:grid-cols-3 lg:gap-8 xl:gap-9 3xl:mt-16 3xl:grid-cols-4 3xl:gap-10 4xl:mt-20 4xl:grid-cols-5 4xl:gap-12">
-          {visibleBerita.length > 0 ? (
+          {loading ? (
+            <NewsGridSkeleton count={6} />
+          ) : visibleBerita.length > 0 ? (
             visibleBerita.map((item) => (
               <GlassCard
                 key={item.id}
-                hover
-                onClick={() => navigate(`/berita/${item.slug}`)}
-                className="group cursor-pointer overflow-hidden flex flex-col justify-between"
+                className="group overflow-hidden flex flex-col justify-between transition duration-300 hover:-translate-y-3 hover:border-cyan-400/40 hover:bg-white/10"
               >
                 {/* Gambar Berita */}
                 <div className="relative h-40 w-full overflow-hidden bg-gradient-to-br from-[#0a2472]/40 to-brand-navy/60 flex-shrink-0 sm:h-48 md:h-52 lg:h-56 3xl:h-64 4xl:h-72">
                   {item.image ? (
                     <img
-                      src={item.image}
+                      src={imageUrl(item.image)}
                       alt={item.title}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
@@ -119,7 +121,21 @@ function Berita() {
                     <span className="text-[10px] text-slate-400 font-medium sm:text-xs md:text-xs lg:text-sm 3xl:text-sm 4xl:text-base">
                       Selengkapnya
                     </span>
-                    <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white text-slate-900 text-xs font-semibold hover:bg-slate-200 transition-colors duration-300 sm:px-5 sm:py-2.5 sm:text-sm md:text-sm lg:text-base 3xl:text-base 4xl:px-6 4xl:py-3 4xl:text-lg">
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        navigate(`/berita/${item.slug}`)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.stopPropagation()
+                          navigate(`/berita/${item.slug}`)
+                        }
+                      }}
+                      className="flex cursor-pointer items-center gap-1.5 px-4 py-2 rounded-xl bg-white text-slate-900 text-xs font-semibold hover:bg-slate-200 transition-colors duration-300 sm:px-5 sm:py-2.5 sm:text-sm md:text-sm lg:text-base 3xl:text-base 4xl:px-6 4xl:py-3 4xl:text-lg"
+                    >
                       <span>Baca</span>
                       <ArrowRight
                         size={14}

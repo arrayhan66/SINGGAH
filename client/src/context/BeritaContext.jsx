@@ -1,42 +1,30 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react"
 import api from "../services/api"
 
-function slugify(text) {
-  return text
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "")
-}
-
 const BeritaContext = createContext(null)
 
 export function BeritaProvider({ children }) {
-  const [beritaList, setBeritaList] = useState([
-    {
-      id: 1,
-      slug: "pameran-karya-teknik-elektro-2026",
-      title: "Pameran Karya Mahasiswa Teknik Elektro 2026 Resmi Dibuka",
-      content: "Pameran tahunan SINGGAH menampilkan berbagai inovasi digital dari mahasiswa dan dosen.",
-      image: "https://placehold.co/600x400/0f172a/38bdf8?text=Berita",
-      date: "2026-07-27",
-      status: "published",
-    }
-  ])
+  const [beritaList, setBeritaList] = useState([])
   const [tempPreviewData, setTempPreviewData] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const fetchNews = useCallback(async () => {
+    setLoading(true)
     try {
       const res = await api.get("/news")
       const items = res.data.data.items || res.data.data || []
-      if (items.length > 0) {
-        setBeritaList(items)
-      }
+      const normalized = items.map((item) => ({
+        ...item,
+        image: item.image || item.headline_image || "",
+        desc: item.desc || item.summary || "",
+        contentHTML: item.contentHTML || "",
+      }))
+      setBeritaList(normalized)
     } catch (err) {
-      console.error("Failed to fetch news, keeping fallback:", err)
+      console.error("Failed to fetch news:", err)
+      setBeritaList([])
+    } finally {
+      setLoading(false)
     }
   }, [])
 
@@ -44,11 +32,23 @@ export function BeritaProvider({ children }) {
     fetchNews()
   }, [fetchNews])
 
+  function toFormData(data) {
+    const fd = new FormData()
+    for (const [key, value] of Object.entries(data)) {
+      if (value instanceof File) {
+        fd.append(key, value)
+      } else if (Array.isArray(value)) {
+        fd.append(key, JSON.stringify(value))
+      } else if (value != null) {
+        fd.append(key, String(value))
+      }
+    }
+    return fd
+  }
+
   async function addBerita(formData) {
     try {
-      const res = await api.post("/news", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      })
+      const res = await api.post("/news", toFormData(formData))
       await fetchNews()
       return res.data.data.id
     } catch (err) {
@@ -59,9 +59,7 @@ export function BeritaProvider({ children }) {
 
   async function updateBerita(id, formData) {
     try {
-      await api.put(`/news/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      })
+      await api.put(`/news/${id}`, toFormData(formData))
       await fetchNews()
     } catch (err) {
       console.error("Failed to update berita:", err)
@@ -90,6 +88,7 @@ export function BeritaProvider({ children }) {
 
   const value = {
     beritaList,
+    loading,
     addBerita,
     updateBerita,
     deleteBerita,

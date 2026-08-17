@@ -4,18 +4,24 @@ import { Save, X, AlertCircle, CheckCircle } from "lucide-react"
 import api from "../../../../services/api"
 import { useAuth } from "../../../../context/AuthContext"
 
-function ProfileAction({ profileData, passwordData, onResetPassword }) {
+function ProfileAction({ profileData, passwordData, onResetPassword, identitasPhoto }) {
   const navigate = useNavigate()
-  const { token, login } = useAuth()
+  const { token, user, login } = useAuth()
   const [errors, setErrors] = useState([])
   const [submitting, setSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [emailChanged, setEmailChanged] = useState(false)
 
   useEffect(() => {
     if (!showSuccess) return
-    const t = setTimeout(() => setShowSuccess(false), 3000)
+    const t = setTimeout(() => {
+      setShowSuccess(false)
+      if (emailChanged) {
+        navigate("/verify-code")
+      }
+    }, emailChanged ? 2500 : 3000)
     return () => clearTimeout(t)
-  }, [showSuccess])
+  }, [showSuccess, emailChanged, navigate])
 
   useEffect(() => {
     if (showSuccess) {
@@ -66,13 +72,32 @@ function ProfileAction({ profileData, passwordData, onResetPassword }) {
     setSubmitting(true)
 
     try {
+      if (isChangingPassword) {
+        await api.put(
+          "/auth/change-password",
+          {
+            oldPassword: passwordData.currentPassword,
+            newPassword: passwordData.newPassword,
+          },
+          { headers: { Authorization: `Bearer ${token}` } },
+        )
+      }
+
       const formData = new FormData()
       formData.append("name", profileData.name.trim())
       formData.append("username", profileData.username.trim())
       formData.append("email", profileData.email.trim())
 
+      if (profileData.nim_nip) {
+        formData.append("nim_nip", profileData.nim_nip.trim())
+      }
+
       if (profileData.avatar) {
         formData.append("avatar", profileData.avatar)
+      }
+
+      if (identitasPhoto) {
+        formData.append("identitas_photo", identitasPhoto)
       }
 
       const res = await api.put("/auth/profile", formData, {
@@ -83,17 +108,14 @@ function ProfileAction({ profileData, passwordData, onResetPassword }) {
       })
 
       const updatedUser = res.data.data
-      login(updatedUser, token)
+      login({ ...user, ...updatedUser }, token)
 
-      if (isChangingPassword) {
-        await api.put(
-          "/auth/change-password",
-          {
-            oldPassword: passwordData.currentPassword,
-            newPassword: passwordData.newPassword,
-          },
-          { headers: { Authorization: `Bearer ${token}` } },
-        )
+      const changedEmail = Boolean(updatedUser.email_changed)
+      setEmailChanged(changedEmail)
+
+      if (changedEmail) {
+        localStorage.setItem("verifyType", "profile")
+        localStorage.setItem("profileEmail", updatedUser.pending_email)
       }
 
       if (onResetPassword) onResetPassword()
@@ -132,9 +154,13 @@ function ProfileAction({ profileData, passwordData, onResetPassword }) {
             <CheckCircle className="h-10 w-10 text-green-400" />
           </div>
 
-          <h3 className="mb-2 text-2xl font-bold text-white">Berhasil!</h3>
+          <h3 className="mb-2 text-2xl font-bold text-white">
+            {emailChanged ? "Periksa Email Baru!" : "Berhasil!"}
+          </h3>
           <p className="text-sm text-slate-300">
-            Profil kamu berhasil diperbarui.
+            {emailChanged
+              ? "Kami mengirim kode verifikasi ke email baru kamu. Email aktif baru berubah setelah kode berhasil diverifikasi."
+              : "Profil kamu berhasil diperbarui."}
           </p>
 
           <div className="mt-6 flex items-center justify-center gap-1.5">

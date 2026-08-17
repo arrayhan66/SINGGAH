@@ -1,4 +1,4 @@
-import { Pencil, Trash2, BadgeCheck, FolderKanban } from "lucide-react"
+import { Pencil, Trash2, BadgeCheck, FolderKanban, ShieldCheck, ShieldX, Hourglass } from "lucide-react"
 
 const tipeConfig = {
   mahasiswa: { label: "Mahasiswa", color: "cyan" },
@@ -14,11 +14,26 @@ const tipeBadge = {
   slate: "border-slate-400/20 bg-slate-400/10 text-slate-300",
 }
 
-function AdminUserCard({ user, onEdit, onDelete, onDetail }) {
+const pendingTipeLabel = {
+  mahasiswa: "Mahasiswa",
+  dosen: "Dosen",
+}
+
+function AdminUserCard({ user, onEdit, onDelete, onDetail, onApprove, onReject, approving }) {
   const tipe = tipeConfig[user.tipe] || tipeConfig.umum
+  const isPending = Boolean(user.pending_tipe)
+  const pendingLabel = pendingTipeLabel[user.pending_tipe] || "Tipe Baru"
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-xl transition-all duration-500 hover:border-white/20 hover:shadow-2xl hover:shadow-cyan-500/5">
+    <div className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-xl transition-all duration-500 hover:shadow-2xl ${
+      isPending
+        ? "border-amber-400/30 shadow-amber-500/10 hover:border-amber-400/50"
+        : "border-white/[0.06] hover:border-white/20 hover:shadow-cyan-500/5"
+    }`}>
+      {isPending && (
+        <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400" />
+      )}
+
       <div
         className="relative z-10 cursor-pointer p-5"
         onClick={() => onDetail(user)}
@@ -38,10 +53,16 @@ function AdminUserCard({ user, onEdit, onDelete, onDetail }) {
                 </span>
               )}
             </div>
-            {user.is_verified && (
-              <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 shadow-md">
-                <BadgeCheck className="h-3.5 w-3.5 text-white" />
+            {isPending ? (
+              <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 shadow-md">
+                <Hourglass className="h-3 w-3 text-white" />
               </div>
+            ) : (
+              user.is_verified && (
+                <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 shadow-md">
+                  <BadgeCheck className="h-3.5 w-3.5 text-white" />
+                </div>
+              )
             )}
           </div>
 
@@ -57,6 +78,12 @@ function AdminUserCard({ user, onEdit, onDelete, onDetail }) {
               >
                 {tipe.label}
               </span>
+              {isPending && (
+                <span className="inline-flex items-center gap-1 rounded-md border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-[11px] font-semibold text-amber-300">
+                  <Hourglass className="h-3 w-3" />
+                  Verifikasi {pendingLabel}
+                </span>
+              )}
               <span
                 className={`rounded-md border px-2 py-0.5 text-[11px] font-medium ${
                   user.status === "Aktif"
@@ -76,26 +103,55 @@ function AdminUserCard({ user, onEdit, onDelete, onDetail }) {
       </div>
 
       <div className="relative z-10 flex gap-2 border-t border-white/[0.06] px-5 py-3">
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onEdit(user)
-          }}
-          className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-white/[0.06] bg-white/[0.04] py-2 text-xs font-medium text-slate-300 transition-all hover:border-cyan-400/30 hover:bg-cyan-400/10 hover:text-cyan-300"
-        >
-          <Pencil size={13} />
-          Edit
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onDelete(user)
-          }}
-          className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/[0.04] py-2 text-xs font-medium text-red-400 transition-all hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
-        >
-          <Trash2 size={13} />
-          Hapus
-        </button>
+        {isPending ? (
+          <>
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onApprove(user)
+              }}
+              disabled={approving}
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-emerald-500/25 bg-emerald-500/[0.06] py-2 text-xs font-semibold text-emerald-300 transition-all hover:border-emerald-500/40 hover:bg-emerald-500/15 hover:text-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <ShieldCheck size={13} />
+              Setujui
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onReject(user)
+              }}
+              disabled={approving}
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-red-500/25 bg-red-500/[0.04] py-2 text-xs font-semibold text-red-400 transition-all hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <ShieldX size={13} />
+              Tolak
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onEdit(user)
+              }}
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-white/[0.06] bg-white/[0.04] py-2 text-xs font-medium text-slate-300 transition-all hover:border-cyan-400/30 hover:bg-cyan-400/10 hover:text-cyan-300"
+            >
+              <Pencil size={13} />
+              Edit
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onDelete(user)
+              }}
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/[0.04] py-2 text-xs font-medium text-red-400 transition-all hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
+            >
+              <Trash2 size={13} />
+              Hapus
+            </button>
+          </>
+        )}
       </div>
     </div>
   )

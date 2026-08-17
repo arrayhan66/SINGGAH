@@ -11,8 +11,12 @@ const emptyForm = {
   username: "",
   email: "",
   avatar: "",
-  role: "Mahasiswa",
+  tipe: "umum",
+  nim_nip: "",
+  identitas_photo: "",
+  role: "user",
   status: "Aktif",
+  is_verified: true,
 }
 
 function AdminUserForm() {
@@ -32,8 +36,12 @@ function AdminUserForm() {
           username: existing.username || "",
           email: existing.email || "",
           avatar: existing.avatar || "",
-          role: existing.role || "Mahasiswa",
+          tipe: existing.tipe || "umum",
+          nim_nip: existing.nim_nip || "",
+          identitas_photo: existing.identitas_photo || "",
+          role: existing.role || "user",
           status: existing.status || "Aktif",
+          is_verified: existing.is_verified,
         })
       }
     }
@@ -41,31 +49,53 @@ function AdminUserForm() {
   }, [slug])
 
   function updateField(field, value) {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormData((prev) => {
+      const next = { ...prev, [field]: value }
+      if (field === "role" && value === "admin") {
+        next.tipe = "umum"
+      }
+      return next
+    })
   }
 
-  function handlePublish() {
+  const [saving, setSaving] = useState(false)
+
+  async function handlePublish() {
     if (!formData.name.trim() || !formData.email.trim()) {
       alert("Nama dan email wajib diisi")
       return
     }
 
-    if (isEditMode) {
-      const existing = getUserByUsername(slug)
-      if (existing) updateUser(existing.id, formData)
-    } else {
-      addUser({
-        ...formData,
-        joinedAt: new Date().toLocaleDateString("id-ID", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        }),
-        projectCount: 0,
-      })
-    }
+    setSaving(true)
 
-    navigate("/users")
+    try {
+      if (isEditMode) {
+        const existing = getUserByUsername(slug)
+        if (!existing) {
+          alert("User tidak ditemukan di daftar. Muat ulang halaman lalu coba lagi.")
+          setSaving(false)
+          return
+        }
+        await updateUser(existing.id, formData)
+      } else {
+        await addUser({
+          ...formData,
+          joinedAt: new Date().toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          }),
+          projectCount: 0,
+        })
+      }
+      navigate("/users")
+    } catch (err) {
+      setSaving(false)
+      alert(
+        err.response?.data?.message ||
+          "Gagal menyimpan user. Silakan coba lagi.",
+      )
+    }
   }
 
   return (
@@ -84,7 +114,13 @@ function AdminUserForm() {
         </h1>
 
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
-          <AdminUserFormMain formData={formData} updateField={updateField} />
+          <AdminUserFormMain
+            formData={formData}
+            updateField={updateField}
+            onPublish={handlePublish}
+            isEditMode={isEditMode}
+            saving={saving}
+          />
           <AdminUserFormSidebar
             formData={formData}
             updateField={updateField}

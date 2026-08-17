@@ -1,5 +1,6 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { imageUrl } from "../../../../utils/imageUrl";
 
 function KaryaProjectGallery({
   slug,
@@ -13,6 +14,16 @@ function KaryaProjectGallery({
   // When the visitor came from the 3D hall popup, "Kembali" drops them back
   // into the exact karya room they were standing in.
   const fromHall = location.state?.fromHall;
+
+  // Kembali ke halaman terakhir yang dikunjungi (misal My Karya), bukan selalu
+  // ke halaman kategori. Kalau dibuka langsung (tanpa riwayat) baru ke kategori.
+  function handleBack() {
+    if (location.key !== "default") {
+      navigate(-1);
+    } else {
+      navigate(`/karya/${slug}`);
+    }
+  }
 
   const backClass =
     "group absolute left-4 top-4 z-10 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 p-2 sm:py-2 sm:pl-3 sm:pr-4 text-sm text-slate-300 backdrop-blur-md transition-colors duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 cursor-pointer";
@@ -32,20 +43,14 @@ function KaryaProjectGallery({
   return (
     <div className="relative overflow-hidden bg-slate-950/40">
       {/* Tombol Kembali di Pojok Kiri Atas */}
-      {fromHall ? (
-        <button onClick={() => navigate("/hall")} className={backClass}>
-          {backContent}
-        </button>
-      ) : (
-        <Link to={`/karya/${slug}`} className={backClass}>
-          {backContent}
-        </Link>
-      )}
+      <button onClick={handleBack} className={backClass}>
+        {backContent}
+      </button>
 
       {/* Area Gambar Utama */}
       <div className="aspect-video w-full overflow-hidden bg-slate-900">
         <img
-          src={gallery[activeImage]}
+          src={imageUrl(gallery[activeImage])}
           alt={projectTitle}
           className="h-full w-full object-cover transition-all duration-300"
         />
@@ -65,7 +70,7 @@ function KaryaProjectGallery({
               }`}
             >
               <img
-                src={img}
+                src={imageUrl(img)}
                 alt={`${projectTitle} ${index + 1}`}
                 className="h-full w-full object-cover"
               />

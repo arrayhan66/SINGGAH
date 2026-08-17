@@ -2,11 +2,14 @@ import { useRef, useState } from "react"
 import { ImagePlus, X } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
 
-function UploadThumbnail({ value, onChange }) {
+function UploadThumbnail({ value, onChange, existingValue, onRemoveExisting }) {
   const inputRef = useRef(null)
   const [dragOver, setDragOver] = useState(false)
 
-  const previewUrl = value ? URL.createObjectURL(value) : null
+  const isEdit = Boolean(existingValue && !value)
+  const previewUrl = value
+    ? URL.createObjectURL(value)
+    : existingValue || null
 
   function handleFileChange(e) {
     const file = e.target.files?.[0]
@@ -54,11 +57,26 @@ function UploadThumbnail({ value, onChange }) {
               />
               <button
                 type="button"
-                onClick={handleRemove}
+                onClick={() => {
+                  if (isEdit) {
+                    onRemoveExisting?.()
+                  } else {
+                    handleRemove()
+                  }
+                }}
                 className="absolute -right-1.5 -top-1.5 min-[280px]:-right-2 min-[280px]:-top-2 flex h-6 w-6 min-[280px]:h-8 min-[280px]:w-8 cursor-pointer items-center justify-center rounded-full bg-red-500 text-white shadow-lg hover:bg-red-600 transition-colors 2xl:h-9 2xl:w-9 3xl:h-10 3xl:w-10 4xl:h-12 4xl:w-12"
               >
                 <X className="h-3.5 w-3.5 min-[280px]:h-4 min-[280px]:w-4 2xl:h-[18px] 2xl:w-[18px] 3xl:h-5 3xl:w-5 4xl:h-6 4xl:w-6" />
               </button>
+              {isEdit && (
+                <button
+                  type="button"
+                  onClick={() => inputRef.current?.click()}
+                  className="absolute bottom-3 right-3 rounded-lg bg-white/90 px-3 py-1.5 text-xs font-medium text-slate-800 shadow-lg backdrop-blur-sm hover:bg-white transition-colors cursor-pointer"
+                >
+                  Ganti
+                </button>
+              )}
             </div>
           ) : (
             <button

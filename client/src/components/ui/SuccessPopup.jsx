@@ -1,6 +1,11 @@
 import { CheckCircle } from "lucide-react"
 
-function SuccessPopup({ isOpen }) {
+function SuccessPopup({
+  isOpen,
+  title = "Berhasil!",
+  message = "Password akun Anda telah berhasil diubah.",
+  subMessage = "Mengalihkan ke halaman login...",
+}) {
   return (
     // Background overlay (fade in effect)
     <div
@@ -23,13 +28,9 @@ function SuccessPopup({ isOpen }) {
           <CheckCircle className="h-10 w-10 text-green-400" />
         </div>
 
-        <h3 className="mb-2 text-2xl font-bold text-white">Berhasil!</h3>
-        <p className="text-sm text-slate-300">
-          Password akun Anda telah berhasil diubah.
-        </p>
-        <p className="mt-1 text-xs text-slate-400">
-          Mengalihkan ke halaman login...
-        </p>
+        <h3 className="mb-2 text-2xl font-bold text-white">{title}</h3>
+        <p className="text-sm text-slate-300">{message}</p>
+        <p className="mt-1 text-xs text-slate-400">{subMessage}</p>
 
         {/* Animasi titik loading keren */}
         <div className="mt-6 flex items-center justify-center gap-1.5">

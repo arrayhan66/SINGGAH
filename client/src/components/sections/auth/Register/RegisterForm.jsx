@@ -1,7 +1,8 @@
-import { useState, Fragment } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   User,
+  AtSign,
   Mail,
   Lock,
   EyeOff,
@@ -13,7 +14,10 @@ import {
   Users,
   ChevronRight,
   CheckCircle2,
+  AlertCircle,
+  Hourglass,
 } from "lucide-react";
+import api from "../../../../services/api";
 
 function RegisterForm() {
   const navigate = useNavigate();
@@ -22,10 +26,24 @@ function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [registrationClosed, setRegistrationClosed] = useState(false);
+  const [requireEmailVerification, setRequireEmailVerification] = useState(true);
+
+  useEffect(() => {
+    api.get("/settings")
+      .then((res) => {
+        const data = res.data.data || {};
+        if (data.registrationOpen === false) setRegistrationClosed(true);
+        if (data.emailVerification === false) setRequireEmailVerification(false);
+      })
+      .catch(() => {});
+  }, []);
 
   const [formData, setFormData] = useState({
     role: "umum",
     nama: "",
+    username: "",
     email: "",
     nim: "",
     password: "",
@@ -36,7 +54,12 @@ function RegisterForm() {
   const [fotoIdentitas, setFotoIdentitas] = useState(null);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setError("");
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "username" ? value.toLowerCase() : value,
+    }));
   };
 
   const handleFileChange = (e, setFileState) => {
@@ -46,11 +69,31 @@ function RegisterForm() {
   };
 
   const nextStep = () => {
-    if (step === 2 && (!formData.nama || !formData.email)) return;
+    if (step === 2) {
+      if (!formData.nama || !formData.username || !formData.email) return;
+      if (!/^[a-zA-Z0-9_]{3,}$/.test(formData.username)) {
+        setError(
+          "Username minimal 3 karakter dan hanya boleh huruf, angka, dan underscore.",
+        );
+        return;
+      }
+    }
     if (step === 3) {
-      if (formData.role === "mahasiswa" && !formData.nim) return;
-      if (!fotoProfil) return;
-      if (formData.role !== "umum" && !fotoIdentitas) return;
+      if (formData.role === "mahasiswa" && !formData.nim) {
+        setError("NIM wajib diisi untuk pendaftaran mahasiswa.");
+        return;
+      }
+      if (
+        (formData.role === "mahasiswa" || formData.role === "dosen") &&
+        !fotoIdentitas
+      ) {
+        setError(
+          formData.role === "mahasiswa"
+            ? "Foto KTM wajib diunggah untuk pendaftaran mahasiswa."
+            : "Foto Kartu Identitas wajib diunggah untuk pendaftaran dosen.",
+        );
+        return;
+      }
     }
     setStep((prev) => prev + 1);
   };
@@ -59,27 +102,99 @@ function RegisterForm() {
     setStep((prev) => prev - 1);
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Kata sandi tidak cocok!");
+      setError("Kata sandi tidak cocok!");
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9_]{3,}$/.test(formData.username)) {
+      setError(
+        "Username minimal 3 karakter dan hanya boleh huruf, angka, dan underscore.",
+      );
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setError("Password minimal 8 karakter.");
+      return;
+    }
+
+    if (!/[A-Z]/.test(formData.password) || !/[0-9]/.test(formData.password)) {
+      setError("Password harus mengandung minimal 1 huruf besar dan 1 angka.");
       return;
     }
 
     setIsLoading(true);
 
-    setTimeout(() => {
+    try {
+      const fd = new FormData();
+      fd.append("name", formData.nama);
+      fd.append("username", formData.username);
+      fd.append("email", formData.email);
+      fd.append("password", formData.password);
+      fd.append("tipe", formData.role);
+
+      if (
+        formData.role === "mahasiswa" ||
+        formData.role === "dosen"
+      ) {
+        fd.append("nim_nip", formData.nim);
+      }
+
+      if (fotoProfil) {
+        fd.append("avatar", fotoProfil);
+      }
+
+      if (
+        (formData.role === "mahasiswa" || formData.role === "dosen") &&
+        fotoIdentitas
+      ) {
+        fd.append("identitas_photo", fotoIdentitas);
+      }
+
+      await api.post("/auth/register", fd);
+
+      if (requireEmailVerification) {
+        localStorage.setItem("registerEmail", formData.email);
+        localStorage.setItem("verifyType", "register");
+        navigate("/verify-code");
+      } else {
+        navigate("/login");
+      }
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          "Gagal mendaftar. Silakan coba lagi.",
+      );
       setIsLoading(false);
-      localStorage.setItem("registerEmail", formData.email);
-      localStorage.setItem("verifyType", "register");
-      navigate("/verify-code");
-    }, 1500);
+    }
   };
 
   return (
     <div className="custom-scrollbar flex w-full flex-col justify-center overflow-y-auto px-3 py-6 sm:px-6 sm:py-8 md:px-12 md:py-12 lg:w-1/2 lg:px-20 2xl:px-24">
       <div className="w-full">
+        {registrationClosed ? (
+          <div className="flex flex-col items-center text-center">
+            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-amber-400/30 bg-amber-400/10">
+              <AlertCircle className="h-8 w-8 text-amber-300" />
+            </div>
+            <h2 className="text-2xl font-bold text-white sm:text-3xl">Pendaftaran Ditutup</h2>
+            <p className="mt-3 text-sm text-slate-400">
+              Saat ini pendaftaran akun baru sedang ditutup oleh admin. Silakan coba lagi nanti.
+            </p>
+            <Link
+              to="/login"
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-cyan-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-cyan-500"
+            >
+              Kembali ke Login
+            </Link>
+          </div>
+        ) : (
+        <>
         <div className="mb-4 sm:mb-8 md:mb-12">
           <div className="mb-4 sm:mb-6 md:mb-8 w-full">
             <div className="flex w-full items-center px-0.5 sm:px-1 md:px-2">
@@ -115,12 +230,21 @@ function RegisterForm() {
             {step === 1 && "Pilih jenis akun yang ingin Anda daftarkan."}
             {step === 2 && "Gunakan email aktif untuk keperluan verifikasi."}
             {step === 3 &&
-              "Unggah dokumen yang diperlukan untuk memvalidasi akun."}
+              (formData.role === "mahasiswa" || formData.role === "dosen"
+                ? "Lengkapi identitas Anda. NIM/NIP dan Foto KTM wajib diunggah."
+                : "Lengkapi identitas akun Anda. Foto bersifat opsional.")}
             {step === 4 && "Buat kata sandi yang kuat dan mudah diingat."}
           </p>
         </div>
 
         <form onSubmit={handleRegister} className="flex flex-col gap-5 sm:gap-6 md:gap-8">
+          {error && (
+            <div className="flex items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs sm:text-sm text-red-300">
+              <AlertCircle size={16} className="mt-0.5 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
           {step === 1 && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-3">
               {[
@@ -183,6 +307,25 @@ function RegisterForm() {
               </div>
               <div>
                 <label className="mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium text-slate-300">
+                  Username
+                </label>
+                <div className="relative text-cyan-500 focus-within:text-cyan-400">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 sm:pl-4">
+                    <AtSign size={18} />
+                  </div>
+                  <input
+                    type="text"
+                    name="username"
+                    required
+                    value={formData.username}
+                    onChange={handleChange}
+                    placeholder="Masukkan username"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 sm:py-2.5 pl-9 sm:pl-10 pr-3 text-sm text-slate-900 shadow-sm focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-cyan-500/20 [&:-webkit-autofill]:[-webkit-text-fill-color:#0f172a] [&:-webkit-autofill]:shadow-[0_0_0_1000px_#f8fafc_inset] [&:-webkit-autofill]:transition-none focus:[&:-webkit-autofill]:shadow-[0_0_0_1000px_#fff_inset]"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium text-slate-300">
                   Email Aktif
                 </label>
                 <div className="relative text-cyan-500 focus-within:text-cyan-400">
@@ -205,10 +348,26 @@ function RegisterForm() {
 
           {step === 3 && (
             <div className="flex flex-col gap-4 sm:gap-5">
-              {formData.role === "mahasiswa" && (
+              {(formData.role === "mahasiswa" || formData.role === "dosen") && (
+                <div className="flex items-start gap-2.5 rounded-xl border border-amber-400/25 bg-amber-400/10 p-3 text-xs sm:text-sm text-amber-200">
+                  <Hourglass size={16} className="mt-0.5 shrink-0" />
+                  <span>
+                    Pendaftaran sebagai{" "}
+                    <strong className="text-amber-100">
+                      {formData.role === "mahasiswa" ? "Mahasiswa" : "Dosen"}
+                    </strong>{" "}
+                    akan ditinjau admin terlebih dahulu. Tipe akun berubah setelah
+                    data kamu disetujui.
+                  </span>
+                </div>
+              )}
+
+              {(formData.role === "mahasiswa" || formData.role === "dosen") && (
                 <div>
                   <label className="mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium text-slate-300">
-                    Nomor Induk Mahasiswa
+                    {formData.role === "mahasiswa"
+                      ? "Nomor Induk Mahasiswa"
+                      : "Nomor Induk Pegawai / NIDN (Opsional)"}
                   </label>
                   <div className="relative text-cyan-500 focus-within:text-cyan-400">
                     <div className="absolute inset-y-0 left-0 flex items-center pl-3 sm:pl-4">
@@ -217,10 +376,14 @@ function RegisterForm() {
                     <input
                       type="text"
                       name="nim"
-                      required
+                      required={formData.role === "mahasiswa"}
                       value={formData.nim}
                       onChange={handleChange}
-                      placeholder="Masukkan NIM"
+                      placeholder={
+                        formData.role === "mahasiswa"
+                          ? "Masukkan NIM"
+                          : "Masukkan NIP / NIDN (Opsional)"
+                      }
                       className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 sm:py-3 pl-9 sm:pl-11 pr-4 text-sm text-slate-900 shadow-sm focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-cyan-500/20 [&:-webkit-autofill]:[-webkit-text-fill-color:#0f172a] [&:-webkit-autofill]:shadow-[0_0_0_1000px_#f8fafc_inset] [&:-webkit-autofill]:transition-none focus:[&:-webkit-autofill]:shadow-[0_0_0_1000px_#fff_inset]"
                     />
                   </div>
@@ -259,6 +422,7 @@ function RegisterForm() {
                       {formData.role === "mahasiswa"
                         ? "Foto KTM"
                         : "Kartu Identitas Dosen"}
+                      <span className="ml-1 text-red-500">*</span>
                     </label>
 
                     <label className="flex w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 py-4 sm:py-6 shadow-sm transition-all hover:border-cyan-500 hover:bg-white">
@@ -268,8 +432,8 @@ function RegisterForm() {
                         {fotoIdentitas
                           ? fotoIdentitas.name
                           : formData.role === "mahasiswa"
-                            ? "Unggah Foto KTM"
-                            : "Unggah Kartu Identitas Dosen"}
+                            ? "Unggah Foto KTM (wajib)"
+                            : "Unggah Kartu Identitas Dosen (wajib)"}
                       </span>
 
                       <input
@@ -396,6 +560,8 @@ function RegisterForm() {
             Masuk
           </Link>
         </p>
+        </>
+        )}
       </div>
     </div>
   );

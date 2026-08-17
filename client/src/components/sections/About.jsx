@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   GraduationCap,
   Users,
@@ -10,8 +11,39 @@ import {
 import DustBackground from "../ui/DustBackground"
 import GlowBackground from "../ui/GlowBackground"
 import GlassCard from "../ui/GlassCard"
+import api from "../../services/api"
 
 function About() {
+  const [stats, setStats] = useState([
+    { num: "-", label: "Project" },
+    { num: "-", label: "Visitor" },
+  ])
+  const [settings, setSettings] = useState({})
+
+  useEffect(() => {
+    api.get("/settings")
+      .then((res) => {
+        const d = res.data.data || res.data || {}
+        setSettings(d)
+      })
+      .catch((err) => {
+        console.error("Failed to fetch settings:", err)
+      })
+  }, [])
+
+  useEffect(() => {
+    api.get("/stats")
+      .then((res) => {
+        const d = res.data.data || res.data
+        setStats([
+          { num: String(d.totalProject ?? "-"), label: "Project" },
+          { num: String(d.totalVisitors ?? "-"), label: "Visitor" },
+        ])
+      })
+      .catch((err) => {
+        console.error("Failed to fetch stats:", err)
+      })
+  }, [])
   return (
     <section
       id="about"
@@ -29,10 +61,8 @@ function About() {
           </h2>
 
           <p className="mt-6 text-justify text-base leading-relaxed text-slate-300 lg:mt-8 lg:text-lg 2xl:mt-10 2xl:text-2xl 2xl:leading-loose 3xl:mt-12 3xl:text-3xl 3xl:leading-loose 4xl:mt-14 4xl:text-4xl 4xl:leading-loose">
-            Pamer<span className="text-cyan-300">IT</span> merupakan platform
-            digital yang menampilkan berbagai karya terbaik mahasiswa di bidang
-            teknologi informasi. Pengunjung dapat mengeksplorasi project secara
-            interaktif layaknya memasuki sebuah exhibition hall virtual.
+            {settings.siteDescription ||
+              "PamerIT merupakan platform digital yang menampilkan berbagai karya terbaik mahasiswa di bidang teknologi informasi. Pengunjung dapat mengeksplorasi project secara interaktif layaknya memasuki sebuah exhibition hall virtual."}
           </p>
         </div>
 
@@ -53,7 +83,7 @@ function About() {
                     Email
                   </h4>
                   <p className="break-all text-xs min-[280px]:text-sm text-slate-300 sm:text-base 2xl:mt-2 2xl:text-xl 3xl:text-2xl 4xl:mt-3 4xl:text-3xl">
-                    elektro@poliban.ac.id
+                    {settings.email || "elektro@poliban.ac.id"}
                   </p>
                 </div>
               </div>
@@ -67,7 +97,7 @@ function About() {
                     Telepon
                   </h4>
                   <p className="text-xs min-[280px]:text-sm text-slate-300 sm:text-base 2xl:mt-2 2xl:text-xl 3xl:text-2xl 4xl:mt-3 4xl:text-3xl">
-                    (0511) 487566
+                    {settings.phone || "(0511) 487566"}
                   </p>
                 </div>
               </div>
@@ -81,7 +111,8 @@ function About() {
                     Alamat
                   </h4>
                   <p className="text-xs min-[280px]:text-sm text-slate-300 sm:text-base 2xl:mt-2 2xl:text-xl 3xl:text-2xl 4xl:mt-3 4xl:text-3xl">
-                    Jl. Brigjen H. Hasan Basri, Banjarmasin, Kalimantan Selatan
+                    {settings.address ||
+                      "Jl. Brigjen H. Hasan Basri, Banjarmasin, Kalimantan Selatan"}
                   </p>
                 </div>
               </div>
@@ -135,10 +166,7 @@ function About() {
 
         {/* 4. KOTAK STATISTIK */}
         <div className="mt-10 grid grid-cols-2 gap-4 sm:gap-6 2xl:mt-16 2xl:gap-10 3xl:mt-20 3xl:gap-12 4xl:mt-24 4xl:gap-14">
-          {[
-            { num: "50", label: "Project" },
-            { num: "1000", label: "Visitor" },
-          ].map((stat, idx) => (
+          {stats.map((stat, idx) => (
             <GlassCard
               key={idx}
               className="group relative flex flex-col items-center justify-center p-4 sm:p-8 2xl:p-12 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-cyan-500/40 hover:bg-white/[0.02] 3xl:p-16 4xl:p-20"

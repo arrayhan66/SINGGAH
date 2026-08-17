@@ -1,4 +1,6 @@
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useState, useEffect, useCallback } from "react"
+import api from "../services/api"
+import { useAuth } from "./AuthContext"
 
 const UserContext = createContext()
 
@@ -12,96 +14,155 @@ function slugify(text) {
     .replace(/^-+|-+$/g, "")
 }
 
-const initialUsers = [
-  {
-    id: 1,
-    name: "Muhammad Raihan",
-    username: "raihan",
-    email: "raihan@gmail.com",
-    role: "Admin",
-    status: "Aktif",
-    tipe: "admin",
-    avatar: "https://i.pravatar.cc/300?img=1",
-    is_verified: true,
-    created_at: "2026-01-15T08:30:00Z",
-    projectCount: 12,
-  },
-  {
-    id: 2,
-    name: "Budi Santoso",
-    username: "budi",
-    email: "budi@gmail.com",
-    role: "Mahasiswa",
-    status: "Aktif",
-    tipe: "mahasiswa",
-    avatar: "https://i.pravatar.cc/300?img=2",
-    is_verified: true,
-    created_at: "2026-03-10T10:00:00Z",
-    projectCount: 5,
-  },
-  {
-    id: 3,
-    name: "Citra Dewi",
-    username: "citra",
-    email: "citra@gmail.com",
-    role: "Mahasiswa",
-    status: "Nonaktif",
-    tipe: "mahasiswa",
-    avatar: "https://i.pravatar.cc/300?img=5",
-    is_verified: false,
-    created_at: "2026-04-22T14:15:00Z",
-    projectCount: 0,
-  },
-  {
-    id: 4,
-    name: "Dr. Ahmad Fauzi",
-    username: "ahmadf",
-    email: "ahmadf@gmail.com",
-    role: "Admin",
-    status: "Aktif",
-    tipe: "dosen",
-    avatar: "https://i.pravatar.cc/300?img=8",
-    is_verified: true,
-    created_at: "2025-11-05T09:00:00Z",
-    projectCount: 8,
-  },
-  {
-    id: 5,
-    name: "Siti Nurhaliza",
-    username: "sitin",
-    email: "sitin@gmail.com",
-    role: "Mahasiswa",
-    status: "Aktif",
-    tipe: "umum",
-    avatar: "https://i.pravatar.cc/300?img=9",
-    is_verified: false,
-    created_at: "2026-06-01T16:45:00Z",
-    projectCount: 2,
-  },
-]
+const toDisplay = (user) => ({
+  ...user,
+  is_verified: Boolean(user.is_verified),
+  status:
+    user.status === "active"
+      ? "Aktif"
+      : user.status === "inactive"
+        ? "Nonaktif"
+        : user.status,
+  role: user.role || "user",
+})
+
+const toApi = (payload) => {
+  const { password, ...rest } = payload
+
+  const cleaned = {
+    ...rest,
+    status:
+      payload.status === "Aktif"
+        ? "active"
+        : payload.status === "Nonaktif"
+          ? "inactive"
+          : payload.status,
+  }
+
+  if (password && String(password).trim()) {
+    cleaned.password = password
+  }
+
+  if (cleaned.avatar && String(cleaned.avatar).startsWith("blob:")) {
+    delete cleaned.avatar
+  }
+
+  const hasFile = cleaned.avatar instanceof File || cleaned.identitas_photo instanceof File
+
+  if (hasFile) {
+    const fd = new FormData()
+    for (const [key, value] of Object.entries(cleaned)) {
+      if (value != null) {
+        fd.append(key, value)
+      }
+    }
+    return fd
+  }
+
+  return cleaned
+}
 
 export function UserProvider({ children }) {
-  const [userList, setUserList] = useState(initialUsers)
+  const { user } = useAuth()
+  const [userList, setUserList] = useState([])
+  const [loading, setLoading] = useState(false)
 
-  function addUser(user) {
-    setUserList((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        username: user.username || slugify(user.name),
-        ...user,
-      },
-    ])
+  const isAdmin = user?.role === "admin"
+
+  const fetchUsers = useCallback(async () => {
+    if (!isAdmin) return
+    setLoading(true)
+    try {
+      const res = await api.get("/users", { params: { limit: 100 } })
+      const items = res.data.data.items || res.data.data || []
+      setUserList(items.map(toDisplay))
+    } catch (err) {
+      console.error("Failed to fetch users:", err)
+      setUserList([])
+    } finally {
+      setLoading(false)
+    }
+  }, [isAdmin])
+
+  useEffect(() => {
+    if (!isAdmin) return
+    api.get("/users", { params: { limit: 100 } })
+      .then((res) => {
+        const items = res.data.data.items || res.data.data || []
+        setUserList(items.map(toDisplay))
+      })
+      .catch((err) => {
+        console.error("Failed to fetch users:", err)
+        setUserList([])
+      })
+      .finally(() => setLoading(false))
+  }, [isAdmin])
+
+  async function addUser(user) {
+    try {
+      await api.post("/users", toApi({ ...user, username: user.username || slugify(user.name) }))
+      await fetchUsers()
+    } catch (err) {
+      console.error("Failed to add user:", err)
+      throw err
+    }
   }
 
-  function updateUser(id, user) {
-    setUserList((prev) =>
-      prev.map((u) => (u.id === id ? { ...u, ...user } : u)),
-    )
+  async function updateUser(id, user) {
+    try {
+      await api.put(`/users/${id}`, toApi(user))
+      await fetchUsers()
+    } catch (err) {
+      console.error("Failed to update user:", err)
+      throw err
+    }
   }
 
-  function deleteUser(id) {
-    setUserList((prev) => prev.filter((u) => u.id !== id))
+  async function deleteUser(id) {
+    try {
+      await api.delete(`/users/${id}`)
+      await fetchUsers()
+    } catch (err) {
+      console.error("Failed to delete user:", err)
+      throw err
+    }
+  }
+
+  async function approveTipe(id) {
+    try {
+      await api.post(`/users/${id}/approve-tipe`, { approved: true })
+      setUserList((prev) =>
+        prev.map((u) =>
+          u.id === Number(id)
+            ? { ...u, tipe: u.pending_tipe || u.tipe, pending_tipe: null }
+            : u,
+        ),
+      )
+      fetchUsers().catch(() => {})
+    } catch (err) {
+      console.error("Failed to approve tipe:", err)
+      throw err
+    }
+  }
+
+  async function rejectTipe(id, reason = "") {
+    try {
+      await api.post(`/users/${id}/approve-tipe`, {
+        approved: false,
+        reason,
+      })
+      setUserList((prev) =>
+        prev.map((u) =>
+          u.id === Number(id)
+            ? { ...u, pending_tipe: null, rejection_reason: reason }
+            : u,
+        ),
+      )
+      fetchUsers().catch(() => {})
+    } catch (err) {
+      console.error("Failed to reject tipe:", err)
+      throw err
+    }
   }
 
   function getUserById(id) {
@@ -114,15 +175,40 @@ export function UserProvider({ children }) {
     )
   }
 
+  async function fetchUserByUsername(username) {
+    try {
+      const res = await api.get("/users", {
+        params: { username, limit: 1 },
+      })
+      const items = (res.data.data.items || res.data.data || []).map(toDisplay)
+      const found = items[0]
+      if (found) {
+        setUserList((prev) => [
+          ...prev.filter((u) => u.id !== found.id),
+          found,
+        ])
+      }
+      return found ? { ...found } : null
+    } catch (err) {
+      console.error("Failed to fetch user by username:", err)
+      return null
+    }
+  }
+
   return (
     <UserContext.Provider
       value={{
         userList,
+        loading,
         addUser,
         updateUser,
         deleteUser,
+        approveTipe,
+        rejectTipe,
         getUserById,
         getUserByUsername,
+        fetchUserByUsername,
+        refetchUsers: fetchUsers,
       }}
     >
       {children}

@@ -1,4 +1,6 @@
 import { ExternalLink, FileText } from "lucide-react";
+import { toEmbedUrl } from "../../../../utils/videoUrl";
+import { openDocument } from "../../../../utils/projectDocument";
 
 function KaryaProjectContent({ project }) {
   const descriptionText = project.description || "";
@@ -27,16 +29,15 @@ function KaryaProjectContent({ project }) {
 
   function renderDocumentItem(doc) {
     return (
-      <a
+      <button
         key={doc.id || doc.file_url}
-        href={doc.file_url}
-        target="_blank"
-        rel="noopener noreferrer"
+        type="button"
+        onClick={() => openDocument(doc)}
         className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-600 shadow-sm transition hover:bg-slate-50 hover:text-slate-800 sm:w-auto sm:justify-start 2xl:px-5 2xl:py-3 2xl:text-base"
       >
         <FileText size={14} className="2xl:size-4" />
         {doc.name}
-      </a>
+      </button>
     );
   }
 
@@ -88,7 +89,7 @@ function KaryaProjectContent({ project }) {
               className="aspect-video w-full overflow-hidden rounded-xl"
             >
               <iframe
-                src={vid.video_url}
+                src={toEmbedUrl(vid.video_url)}
                 title="Video Demo"
                 className="h-full w-full border-0"
                 allowFullScreen
@@ -122,7 +123,7 @@ function KaryaProjectContent({ project }) {
                 key={index}
                 className="rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-300 sm:px-3"
               >
-                {tech}
+                {typeof tech === "string" ? tech : tech?.name || ""}
               </span>
             ))}
           </div>

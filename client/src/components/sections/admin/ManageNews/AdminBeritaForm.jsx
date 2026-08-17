@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { ArrowLeft, CheckCircle, XCircle } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import { useBerita } from "../../../../context/BeritaContext"
 import AdminHeroBackground from "../../../ui/AdminHeroBackground"
 import AdminBeritaEditorMain from "../../../../components/sections/admin/ManageNews/AdminBeritaEditorMain"
 import AdminBeritaEditorSidebar from "../../../../components/sections/admin/ManageNews/AdminBeritaEditorSidebar"
+import Toast from "../../../ui/Toast"
 
 const emptyForm = {
   title: "",
@@ -19,6 +20,17 @@ const emptyForm = {
   gallery: [],
   slug: "",
   status: "draft",
+}
+
+function slugify(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "")
 }
 
 function extractParagraphsFromHTML(html) {
@@ -48,14 +60,14 @@ function contentArrayToHTML(content) {
 function AdminBeritaForm() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const { getBeritaBySlug, addBerita, updateBerita, setTempPreviewData } = useBerita()
+  const { getBeritaBySlug, addBerita, updateBerita, setTempPreviewData, tempPreviewData, loading } = useBerita()
 
   const isEditMode = Boolean(slug)
   const [formData, setFormData] = useState(emptyForm)
   const [notification, setNotification] = useState(null)
 
   useEffect(() => {
-    if (isEditMode) {
+    if (isEditMode && !loading) {
       const existing = getBeritaBySlug(slug)
       if (existing) {
         setFormData({
@@ -65,7 +77,7 @@ function AdminBeritaForm() {
           date: existing.date || "",
           source: existing.source || "",
           desc: existing.desc || "",
-          image: existing.image || null,
+          image: existing.headline_image || existing.image || null,
           tags: existing.tags || [],
           contentText:
             existing.contentHTML || contentArrayToHTML(existing.content),
@@ -78,20 +90,41 @@ function AdminBeritaForm() {
           status: existing.status || "draft",
         })
       }
+    } else if (!isEditMode && tempPreviewData) {
+      setFormData({
+        title: tempPreviewData.title || "",
+        event: tempPreviewData.event || "",
+        winner: tempPreviewData.winner || "",
+        date: tempPreviewData.date || "",
+        source: tempPreviewData.source || "",
+        desc: tempPreviewData.desc || "",
+        image: tempPreviewData.image || null,
+        tags: tempPreviewData.tags || [],
+        contentText: tempPreviewData.contentHTML || contentArrayToHTML(tempPreviewData.content),
+        gallery: (tempPreviewData.gallery || []).map((g) => ({
+          file: null,
+          url: g.url || "",
+          caption: g.caption || "",
+        })),
+        slug: tempPreviewData.slug || "",
+        status: tempPreviewData.status || "draft",
+      })
+      setTempPreviewData(null)
+    } else if (!isEditMode && !tempPreviewData) {
+      setFormData(emptyForm)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug])
+  }, [slug, loading])
 
   function showNotification(message, type) {
     setNotification({ message, type })
-    setTimeout(() => setNotification(null), 3000)
   }
 
   function updateField(field, value) {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  function handlePublish() {
+  async function handlePublish() {
     if (!formData.title.trim() || !formData.event.trim()) {
       showNotification("Judul dan nama event wajib diisi", "error")
       return
@@ -117,28 +150,40 @@ function AdminBeritaForm() {
       date: formData.date,
       source: formData.source,
       desc: formData.desc,
-      image: formData.image,
+      headline_image: formData.image,
       tags: formData.tags,
       content: contentParagraphs.length > 0 ? contentParagraphs : [stripHtml(formData.contentText)],
       contentHTML: formData.contentText,
       gallery,
-      slug: formData.slug,
+      slug: formData.slug ? slugify(formData.slug) : slugify(formData.title),
       status: formData.status || "draft",
     }
 
-    if (isEditMode) {
-      const existing = getBeritaBySlug(slug)
-      if (existing) updateBerita(existing.id, payload)
-    } else {
-      addBerita(payload)
+    try {
+      if (isEditMode) {
+        const existing = getBeritaBySlug(slug)
+        if (existing) await updateBerita(existing.id, payload)
+      } else {
+        await addBerita(payload)
+      }
+
+      const status = formData.status || "draft"
+      let successMsg
+      if (isEditMode) {
+        successMsg = "Berita berhasil diperbarui"
+      } else if (status === "draft") {
+        successMsg = "Berita berhasil disimpan sebagai draft"
+      } else {
+        successMsg = "Berita berhasil dipublikasikan"
+      }
+      showNotification(successMsg, "success")
+
+      setTimeout(() => navigate("/berita"), 1000)
+    } catch (err) {
+      const message =
+        err.response?.data?.message || "Gagal menyimpan berita"
+      showNotification(message, "error")
     }
-
-    showNotification(
-      isEditMode ? "Berita berhasil diperbarui" : "Berita berhasil dipublikasikan",
-      "success",
-    )
-
-    setTimeout(() => navigate("/berita"), 1000)
   }
 
   function handlePreview() {
@@ -149,7 +194,11 @@ function AdminBeritaForm() {
       gallery: (formData.gallery || []).filter((g) => g.url),
     }
     setTempPreviewData(data)
-    navigate(`/berita/preview/temp`)
+    if (isEditMode) {
+      navigate(`/berita/preview/temp?from=edit&slug=${slug}`)
+    } else {
+      navigate("/berita/preview/temp")
+    }
   }
 
   function stripHtml(html) {
@@ -162,20 +211,11 @@ function AdminBeritaForm() {
     <AdminHeroBackground fullWidth>
       <div className="px-6 py-8 md:px-10 md:py-10">
         {notification && (
-          <div
-            className={`fixed top-6 right-6 z-50 flex max-w-[calc(100vw-3rem)] items-center gap-3 rounded-xl border px-5 py-3.5 text-sm font-semibold shadow-2xl backdrop-blur-md transition-all ${
-              notification.type === "success"
-                ? "border-emerald-500/30 bg-emerald-500/20 text-emerald-300"
-                : "border-red-500/30 bg-red-500/20 text-red-300"
-            }`}
-          >
-            {notification.type === "success" ? (
-              <CheckCircle size={18} />
-            ) : (
-              <XCircle size={18} />
-            )}
-            {notification.message}
-          </div>
+          <Toast
+            message={notification.message}
+            type={notification.type}
+            onDone={() => setNotification(null)}
+          />
         )}
 
         <button
@@ -203,6 +243,7 @@ function AdminBeritaForm() {
           <AdminBeritaEditorMain
             formData={formData}
             updateField={updateField}
+            isEditMode={isEditMode}
           />
           <AdminBeritaEditorSidebar
             formData={formData}

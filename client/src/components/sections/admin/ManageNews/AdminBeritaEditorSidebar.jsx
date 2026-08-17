@@ -1,15 +1,5 @@
-import { X, Image as ImageIcon, Upload, Trash, Eye, Globe, Save } from "lucide-react"
-
-function slugify(text) {
-  return text
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "")
-}
+import { useState } from "react"
+import { X, Plus, Image as ImageIcon, Upload, Trash, Eye, Save } from "lucide-react"
 
 function AdminBeritaEditorSidebar({
   formData,
@@ -18,18 +8,24 @@ function AdminBeritaEditorSidebar({
   isEditMode,
   onPreview,
 }) {
-  function handleTagAdd(e) {
-    if (e.key !== "Enter") return
-    e.preventDefault()
-    const trimmed = e.target.value.trim()
+  const [tagInput, setTagInput] = useState("")
+
+  function addTag() {
+    const trimmed = tagInput.trim()
     if (!trimmed) return
-    if (formData.tags.includes(trimmed)) {
-      e.target.classList.add("border-yellow-400/50")
-      setTimeout(() => e.target.classList.remove("border-yellow-400/50"), 1000)
+    if (formData.tags.some((t) => t.toLowerCase() === trimmed.toLowerCase())) {
+      setTagInput("")
       return
     }
     updateField("tags", [...formData.tags, trimmed])
-    e.target.value = ""
+    setTagInput("")
+  }
+
+  function handleTagKeyDown(e) {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      addTag()
+    }
   }
 
   function handleTagRemove(tag) {
@@ -47,13 +43,6 @@ function AdminBeritaEditorSidebar({
 
   function handleRemoveHeadline() {
     updateField("image", null)
-  }
-
-  function handleTitleSlug(title) {
-    updateField("title", title)
-    if (!isEditMode && !formData.slug) {
-      updateField("slug", slugify(title))
-    }
   }
 
   function handleStatusChange(status) {
@@ -117,26 +106,6 @@ function AdminBeritaEditorSidebar({
         </button>
       </div>
 
-      {/* Slug / Permalink */}
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-        <div className="flex items-center gap-2 text-sm font-semibold text-white">
-          <Globe size={15} className="text-cyan-400" />
-          Permalink
-        </div>
-        <div className="mt-3 flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2">
-          <span className="text-[10px] text-slate-500 truncate shrink-0">
-            /berita/
-          </span>
-          <input
-            type="text"
-            value={formData.slug}
-            onChange={(e) => updateField("slug", slugify(e.target.value))}
-            placeholder="slug-judul-berita"
-            className="w-full bg-transparent text-xs text-cyan-300 placeholder:text-slate-500 focus:outline-none font-mono"
-          />
-        </div>
-      </div>
-
       {/* Foto Headline */}
       <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
         <div className="flex items-center gap-2 text-sm font-semibold text-white">
@@ -192,13 +161,13 @@ function AdminBeritaEditorSidebar({
         <div className="mt-4 flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs text-slate-400">
-              Pemenang / Tim
+              Penulis / Tim <span className="text-slate-500">(opsional)</span>
             </label>
             <input
               type="text"
               value={formData.winner}
               onChange={(e) => updateField("winner", e.target.value)}
-              placeholder="Contoh: Tim Elektro Innovate"
+              placeholder="Contoh: Tim Redaksi / Tim Elektro"
               className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/50 focus:outline-none focus:ring-1 focus:ring-cyan-400/20 transition-all"
             />
           </div>
@@ -231,14 +200,27 @@ function AdminBeritaEditorSidebar({
 
       {/* Tags */}
       <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-        <div className="text-sm font-semibold text-white">Tags</div>
+        <div className="flex items-center gap-2 text-sm font-semibold text-white">
+          Tags
+        </div>
 
-        <input
-          type="text"
-          onKeyDown={handleTagAdd}
-          placeholder="Ketik lalu Enter"
-          className="mt-4 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/50 focus:outline-none focus:ring-1 focus:ring-cyan-400/20 transition-all"
-        />
+        <div className="mt-4 flex items-center gap-2">
+          <input
+            type="text"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={handleTagKeyDown}
+            placeholder="Ketik tag lalu Enter atau klik +"
+            className="w-full min-w-0 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/50 focus:outline-none focus:ring-1 focus:ring-cyan-400/20 transition-all"
+          />
+          <button
+            type="button"
+            onClick={addTag}
+            className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-cyan-400/30 bg-cyan-400/10 text-cyan-300 transition-colors hover:bg-cyan-400/20"
+          >
+            <Plus size={16} />
+          </button>
+        </div>
 
         {formData.tags.length === 0 && (
           <p className="mt-2 text-[10px] text-slate-500">
@@ -251,7 +233,7 @@ function AdminBeritaEditorSidebar({
             {formData.tags.map((tag) => (
               <span
                 key={tag}
-                className="flex items-center gap-1 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-1 text-[11px] text-cyan-300"
+                className="flex items-center gap-1.5 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-1 text-[11px] text-cyan-300"
               >
                 {tag}
                 <button

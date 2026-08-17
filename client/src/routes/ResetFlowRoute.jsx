@@ -1,11 +1,12 @@
-import { Navigate, useLocation } from "react-router-dom"
+import { Navigate } from "react-router-dom"
 
 export function ResetFlowRoute({ children, step }) {
   const resetEmail = localStorage.getItem("resetEmail")
   const registerEmail = localStorage.getItem("registerEmail")
+  const profileEmail = localStorage.getItem("profileEmail")
   const isOtpVerified = localStorage.getItem("otpVerified")
 
-  if (step === "verify" && !resetEmail && !registerEmail) {
+  if (step === "verify" && !resetEmail && !registerEmail && !profileEmail) {
     return <Navigate to="/login" replace />
   }
 

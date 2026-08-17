@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, useLocation } from "react-router-dom"
 import DustBackground from "../../ui/DustBackground"
 import GlowBackground from "../../ui/GlowBackground"
 import GlassCard from "../../ui/GlassCard"
@@ -11,10 +11,12 @@ import KaryaProjectGallery from "./detail/KaryaProjectGallery"
 import KaryaProjectHeader from "./detail/KaryaProjectHeader"
 import KaryaProjectContent from "./detail/KaryaProjectContent"
 import KaryaProjectComments from "./detail/KaryaProjectComments"
+import { DetailHeroSkeleton } from "../../ui/Skeleton"
 
 function KaryaProjectDetailSection() {
-  const { slug, projectId } = useParams()
+  const { slug, projectSlug } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const { user } = useAuth()
   const isLoggedIn = user !== null
 
@@ -22,7 +24,6 @@ function KaryaProjectDetailSection() {
   const [loading, setLoading] = useState(true)
 
   const [activeImage, setActiveImage] = useState(0)
-  const [newComment, setNewComment] = useState("")
   const [comments, setComments] = useState([])
   const [isLiked, setIsLiked] = useState(false)
   const [likeCount, setLikeCount] = useState(0)
@@ -31,19 +32,45 @@ function KaryaProjectDetailSection() {
   const [isCopied, setIsCopied] = useState(false)
 
   useEffect(() => {
-    api.get(`/projects/${projectId}`)
+    api.post(`/projects/${projectSlug}/view`)
+      .then(() => {})
+      .catch((err) => {
+        console.error("Failed to record view:", err)
+      })
+
+    api.get(`/projects/${projectSlug}`)
       .then((res) => {
         const p = res.data.data
         setProject(p)
         setLikeCount(p.likesCount || 0)
-        setComments(Array.isArray(p.comments) ? p.comments : [])
-        setLoading(false)
+        setIsLiked(Boolean(p.liked))
+        setIsBookmarked(Boolean(p.bookmarked))
       })
       .catch((err) => {
         console.error("Failed to fetch project detail:", err)
-        setLoading(false)
       })
-  }, [projectId])
+      .finally(() => setLoading(false))
+
+    api.get(`/projects/${projectSlug}/comments`)
+      .then((res) => {
+        setComments(Array.isArray(res.data.data) ? res.data.data : [])
+      })
+      .catch((err) => {
+        console.error("Failed to fetch comments:", err)
+      })
+  }, [projectSlug])
+
+  if (loading) {
+    return (
+      <section className="relative min-h-screen overflow-hidden bg-brand-dark pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-10 sm:pb-12 md:pb-16">
+        <DustBackground />
+        <GlowBackground />
+        <div className="pt-6 sm:pt-8">
+          <DetailHeroSkeleton />
+        </div>
+      </section>
+    )
+  }
 
   if (!project) {
     return (
@@ -61,7 +88,7 @@ function KaryaProjectDetailSection() {
 
   const gallery =
     Array.isArray(project.images) && project.images.length > 0
-      ? project.images.map((img) => img.image_url)
+      ? project.images.map((img) => img.image_url).filter(Boolean)
       : [project.thumbnail]
 
   const formatDate = (dateString) => {
@@ -75,12 +102,33 @@ function KaryaProjectDetailSection() {
   }
 
   function handleLike() {
-    setIsLiked(!isLiked)
-    setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1))
+    if (!isLoggedIn) {
+      navigate("/login", { state: { from: location } })
+      return
+    }
+    api.post(`/projects/${projectSlug}/like`)
+      .then((res) => {
+        const { liked, likesCount } = res.data.data || {}
+        setIsLiked(Boolean(liked))
+        if (typeof likesCount === "number") setLikeCount(likesCount)
+      })
+      .catch((err) => {
+        console.error("Failed to update like:", err)
+      })
   }
 
   function handleBookmark() {
-    setIsBookmarked(!isBookmarked)
+    if (!isLoggedIn) {
+      navigate("/login", { state: { from: location } })
+      return
+    }
+    api.post(`/projects/${projectSlug}/bookmark`)
+      .then((res) => {
+        setIsBookmarked(Boolean(res.data.data?.bookmarked))
+      })
+      .catch((err) => {
+        console.error("Failed to update bookmark:", err)
+      })
   }
 
   function handleShare() {
@@ -104,22 +152,6 @@ function KaryaProjectDetailSection() {
     } catch (err) {
       console.error("Gagal menyalin", err)
     }
-  }
-
-  function handleAddComment(e) {
-    e.preventDefault()
-    if (!newComment.trim()) return
-
-    setComments((prev) => [
-      {
-        id: Date.now(),
-        User: { name: user?.name || "Anonim" },
-        text: newComment,
-        created_at: new Date().toISOString(),
-      },
-      ...prev,
-    ])
-    setNewComment("")
   }
 
   return (
@@ -157,11 +189,11 @@ function KaryaProjectDetailSection() {
 
         <KaryaProjectComments
           comments={comments}
+          setComments={setComments}
+          projectSlug={projectSlug}
           isLoggedIn={isLoggedIn}
-          newComment={newComment}
-          setNewComment={setNewComment}
-          handleAuthRedirect={() => navigate("/login")}
-          handleAddComment={handleAddComment}
+          user={user}
+          handleAuthRedirect={() => navigate("/login", { state: { from: location } })}
           formatDate={formatDate}
         />
       </div>

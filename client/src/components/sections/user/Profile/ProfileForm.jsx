@@ -7,6 +7,7 @@ import ProfileStats from "./ProfileStats"
 import ProfilePassword from "./ProfilePassword"
 import ProfileDangerZone from "./ProfileDangerZone"
 import ProfileAction from "./ProfileAction"
+import ProfileVerification from "./ProfileVerification"
 import GlowBackground from "../../../ui/GlowBackground"
 import DustBackground from "../../../ui/DustBackground"
 
@@ -18,6 +19,7 @@ function ProfileForm({ isAdmin = false }) {
     name: user?.name || "",
     username: user?.username || "",
     email: user?.email || "",
+    nim_nip: user?.nim_nip || "",
   }))
 
   const [passwordData, setPasswordData] = useState({
@@ -28,6 +30,11 @@ function ProfileForm({ isAdmin = false }) {
 
   const [originalAvatarUrl, setOriginalAvatarUrl] = useState(
     user?.avatar || null,
+  )
+
+  const [identitasPhoto, setIdentitasPhoto] = useState(null)
+  const [originalIdentitasUrl, setOriginalIdentitasUrl] = useState(
+    user?.identitas_photo || null,
   )
 
   function updateProfileField(field, value) {
@@ -41,6 +48,16 @@ function ProfileForm({ isAdmin = false }) {
   function handleAvatarRemoved() {
     setProfileData((prev) => ({ ...prev, avatar: null }))
     setOriginalAvatarUrl(null)
+  }
+
+  function handleIdentitasChange(file) {
+    setIdentitasPhoto(file)
+    setOriginalIdentitasUrl(null)
+  }
+
+  function handleIdentitasRemoved() {
+    setIdentitasPhoto(null)
+    setOriginalIdentitasUrl(null)
   }
 
   function resetPasswordData() {
@@ -72,7 +89,14 @@ function ProfileForm({ isAdmin = false }) {
           profileData={profileData}
           updateProfileField={updateProfileField}
           userTipe={user?.tipe}
+          pendingEmail={user?.pending_email}
+          identitasPhoto={identitasPhoto}
+          identitasUrl={originalIdentitasUrl}
+          onIdentitasChange={handleIdentitasChange}
+          onIdentitasRemove={handleIdentitasRemoved}
         />
+
+        <ProfileVerification />
 
         <ProfileAccountInfo />
 
@@ -89,6 +113,7 @@ function ProfileForm({ isAdmin = false }) {
           profileData={profileData}
           passwordData={passwordData}
           onResetPassword={resetPasswordData}
+          identitasPhoto={identitasPhoto}
         />
       </div>
     </section>

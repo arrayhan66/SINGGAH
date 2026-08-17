@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
 import { Trash2, AlertTriangle, Eye, EyeOff, X } from "lucide-react"
 import api from "../../../../services/api"
 import { useAuth } from "../../../../context/AuthContext"
 import GlassCard from "../../../ui/GlassCard"
 
 function ProfileDangerZone() {
-  const navigate = useNavigate()
   const { token, logout } = useAuth()
   const [showModal, setShowModal] = useState(false)
   const [password, setPassword] = useState("")
@@ -53,7 +51,6 @@ function ProfileDangerZone() {
         data: { password },
       })
       logout()
-      navigate("/")
     } catch (err) {
       setError(
         err.response?.data?.message || "Gagal menghapus akun. Silakan coba lagi.",
@@ -92,13 +89,13 @@ function ProfileDangerZone() {
       </GlassCard>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden p-4 animate-[fade-in_0.15s_ease-out]">
           <div
             className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
             onClick={handleClose}
           />
 
-          <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-red-500/20 bg-slate-900 p-6 shadow-2xl">
+          <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-red-500/20 bg-slate-900 p-6 shadow-2xl animate-modal-in">
             <div className="mb-5 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-red-400" />

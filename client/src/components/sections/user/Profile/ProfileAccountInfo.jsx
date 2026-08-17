@@ -9,6 +9,8 @@ import {
   Briefcase,
   Users,
   Crown,
+  CreditCard,
+  Clock,
 } from "lucide-react"
 
 const tipeConfig = {
@@ -34,11 +36,15 @@ function ProfileAccountInfo() {
   const tipe = tipeConfig[user?.tipe] || tipeConfig.umum
   const TipeIcon = tipe.icon
 
+  const pendingLabel = tipeConfig[user?.pending_tipe]?.label
+
   const infoItems = [
     {
       label: "Tipe Akun",
-      value: tipe.label,
-      icon: TipeIcon,
+      value: user?.pending_tipe
+        ? `${tipe.label} (menunggu ${pendingLabel})`
+        : tipe.label,
+      icon: user?.pending_tipe ? Clock : TipeIcon,
       iconColor: "text-cyan-400",
     },
     {
@@ -47,6 +53,16 @@ function ProfileAccountInfo() {
       icon: Shield,
       iconColor: "text-blue-400",
     },
+    ...(user?.tipe === "mahasiswa" || user?.tipe === "dosen"
+      ? [
+          {
+            label: user?.tipe === "dosen" ? "NIP" : "NIM",
+            value: user?.nim_nip || "-",
+            icon: CreditCard,
+            iconColor: "text-cyan-400",
+          },
+        ]
+      : []),
     {
       label: "Status Akun",
       value: user?.status === "active" ? "Aktif" : "Tidak Aktif",

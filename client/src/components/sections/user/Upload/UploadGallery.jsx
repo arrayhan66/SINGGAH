@@ -1,9 +1,11 @@
 import { useRef } from "react"
 import { ImagePlus, X, Image } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
+import { imageUrl } from "../../../../utils/imageUrl"
 
-function UploadGallery({ value, onChange }) {
+function UploadGallery({ value, onChange, existingItems, onRemoveExisting }) {
   const inputRef = useRef(null)
+  const hasExisting = Array.isArray(existingItems) && existingItems.length > 0
 
   function handleFileChange(e) {
     const files = Array.from(e.target.files || [])
@@ -33,13 +35,34 @@ function UploadGallery({ value, onChange }) {
       </div>
 
       <div className="mt-2 min-[280px]:mt-4 grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 gap-2 min-[280px]:gap-3 2xl:gap-4 3xl:gap-5 4xl:gap-6">
+        {hasExisting &&
+          existingItems.map((img, index) => {
+            const src = imageUrl(typeof img === "string" ? img : img.image_url || img.url)
+            return (
+              <div key={`existing-${index}`} className="relative aspect-square">
+                <img
+                  src={src}
+                  alt={`Existing ${index + 1}`}
+                  className="h-full w-full rounded-xl object-cover border border-white/10"
+                />
+                <button
+                  type="button"
+                  onClick={() => onRemoveExisting?.(index)}
+                  className="absolute -right-1.5 -top-1.5 min-[280px]:-right-2 min-[280px]:-top-2 flex h-5 w-5 min-[280px]:h-7 min-[280px]:w-7 cursor-pointer items-center justify-center rounded-full bg-red-500 text-white shadow-lg hover:bg-red-600 transition-colors 2xl:h-8 2xl:w-8 3xl:h-9 3xl:w-9 4xl:h-10 4xl:w-10"
+                >
+                  <X className="h-3 w-3 min-[280px]:h-3.5 min-[280px]:w-3.5 2xl:h-4 2xl:w-4 3xl:h-[18px] 3xl:w-[18px] 4xl:h-5 4xl:w-5" />
+                </button>
+              </div>
+            )
+          })}
+
         {value.map((file, index) => {
           const previewUrl = URL.createObjectURL(file)
           return (
-            <div key={index} className="relative aspect-square">
+            <div key={`new-${index}`} className="relative aspect-square">
               <img
                 src={previewUrl}
-                alt={`Galeri ${index + 1}`}
+                alt={`New ${index + 1}`}
                 className="h-full w-full rounded-xl object-cover border border-white/10"
               />
               <button

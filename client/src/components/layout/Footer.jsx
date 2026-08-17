@@ -26,8 +26,8 @@ function Footer() {
             Beranda
           </NavLink>
 
-          <NavLink to="/categories" className="transition hover:text-cyan-300">
-            Karya Unggulan
+          <NavLink to="/karya" className="transition hover:text-cyan-300">
+            Karya
           </NavLink>
 
           <NavLink to="/about" className="transition hover:text-cyan-300">

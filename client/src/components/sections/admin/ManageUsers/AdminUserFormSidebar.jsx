@@ -1,7 +1,10 @@
 import { useRef, useState } from "react"
 import { Camera, BadgeCheck, BadgeAlert, Eye, EyeOff } from "lucide-react"
 
-const roleOptions = ["Mahasiswa", "Admin"]
+const roleOptions = [
+  { value: "user", label: "User Biasa" },
+  { value: "admin", label: "Administrator" },
+]
 const statusOptions = ["Aktif", "Nonaktif"]
 
 function AdminUserFormSidebar({ formData, updateField, isEditMode }) {
@@ -74,8 +77,8 @@ function AdminUserFormSidebar({ formData, updateField, isEditMode }) {
               className="w-full cursor-pointer rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white transition-colors focus:border-cyan-400/50 focus:outline-none"
             >
               {roleOptions.map((role) => (
-                <option key={role} value={role} className="bg-brand-navy">
-                  {role}
+                <option key={role.value} value={role.value} className="bg-brand-navy">
+                  {role.label}
                 </option>
               ))}
             </select>

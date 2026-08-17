@@ -1,8 +1,9 @@
 import { useAuth } from "../../../../context/AuthContext"
-import { UserCircle, GraduationCap, Briefcase, Users } from "lucide-react"
+import { UserCircle, GraduationCap, Briefcase, Users, CreditCard, Shield } from "lucide-react"
 import AdminHeroBackground from "../../../ui/AdminHeroBackground"
 
 const tipeIcon = {
+  admin: Shield,
   mahasiswa: GraduationCap,
   dosen: Briefcase,
   umum: Users,
@@ -10,7 +11,7 @@ const tipeIcon = {
 
 function ProfileHero({ isAdmin = false }) {
   const { user } = useAuth()
-  const TipeIcon = tipeIcon[user?.tipe] || Users
+  const TipeIcon = user?.role === "admin" ? Shield : tipeIcon[user?.tipe] || Users
 
   const content = (
     <>
@@ -32,13 +33,24 @@ function ProfileHero({ isAdmin = false }) {
         {user?.name || "Profil Saya"}
       </h1>
 
-      <div className="mt-2 flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300 lg:mt-3 lg:text-sm 2xl:mt-4 2xl:text-base">
-        <TipeIcon className="h-3.5 w-3.5 text-cyan-400" />
-        {user?.tipe === "mahasiswa"
-          ? "Mahasiswa"
-          : user?.tipe === "dosen"
-            ? "Dosen"
-            : "Pengguna Umum"}
+      <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+        <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300 lg:mt-0 lg:text-sm">
+          <TipeIcon className="h-3.5 w-3.5 text-cyan-400" />
+          {user?.role === "admin"
+            ? "Administrator"
+            : user?.tipe === "mahasiswa"
+              ? "Mahasiswa"
+              : user?.tipe === "dosen"
+                ? "Dosen"
+                : "Pengguna Umum"}
+        </div>
+        {(user?.tipe === "mahasiswa" || user?.tipe === "dosen") &&
+          user?.nim_nip && (
+            <div className="flex items-center gap-1.5 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-200 lg:text-sm">
+              <CreditCard className="h-3.5 w-3.5" />
+              {user?.tipe === "dosen" ? "NIP" : "NIM"}: {user.nim_nip}
+            </div>
+          )}
       </div>
 
       <p className="mt-3 max-w-xl text-xs min-[350px]:text-sm md:text-base lg:text-lg lg:mt-4 2xl:text-xl 2xl:mt-5 text-slate-300">

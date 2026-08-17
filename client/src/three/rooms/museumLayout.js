@@ -9,6 +9,43 @@ export const DEFAULT_CATEGORIES = [
   { slug: "game-development", title: "Game Development" },
 ]
 
+const T = 0.25
+const H = 14
+
+// The main hall keeps its own (original tall) ceiling height, while the
+// category buildings behind it are taller (H) so each of their two storeys
+// gets generous headroom.
+const HALL_H = 10
+
+// Door / portal sizes
+export const PORTAL_W = 2.8
+export const PORTAL_H = 4.8
+
+const PAINT_W = 2.2
+const PAINT_H = 1.5
+
+// Every category building is as big as the main hall (same width & depth).
+const HALL_W = 36
+const HALL_DEPTH = 54
+const HALL_HALF_X = HALL_W / 2
+const HALL_HALF_Z = HALL_DEPTH / 2
+
+const ROOM_W = HALL_W
+const ROOM_DEPTH = HALL_DEPTH
+
+// ---- Two-storey building geometry (house style) ----
+// Floor 1 (ground): student works. Floor 2 (upper): lecturer works. The upper
+// floor is a full slab covering the whole room footprint (minus the stair void),
+// so floor 2 sits directly above floor 1 like a real house. The overall building
+// height stays tall (H = 10), giving each storey generous headroom.
+export const FLOOR2_Y = 7.0
+const STAIR_DEPTH = 10
+export const STAIR_WIDTH = 2.6
+const STAIR_STEPS = 20
+
+// Where a player spawns inside a category building after crossing a portal.
+const ENTRY_DEPTH = 3
+
 const N = DEFAULT_CATEGORIES.length
 const ROW_X0 = -(N * ROOM_W) / 2
 const ROW_X1 = ROW_X0 + N * ROOM_W
@@ -233,9 +270,6 @@ export function resolveHeight(x, z, level = 0) {
   if (level === 1 && z >= room.z[0] && z <= room.z[1] && x >= room.x[0] && x <= room.x[1]) {
     return { height: FLOOR2_Y, level: 1 }
   }
-  if (z >= STAIR_Z1 && x >= room.x[0] && x <= room.x[1] && z <= room.z[1]) {
-    return { height: FLOOR2_Y, level: 1 }
-  }
   return { height: 0, level: 0 }
 }
 
@@ -288,6 +322,7 @@ for (let i = 0; i < hallPortals.length; i++) {
     to: hp.zc + PORTAL_W / 2,
     target: [cx, roomZ],
     yaw: Math.PI,
+    level: 0,
   })
   portals.push({
     axis: "z",
@@ -296,6 +331,7 @@ for (let i = 0; i < hallPortals.length; i++) {
     to: cx + PORTAL_W / 2,
     target: [returnPoint(hp).x, returnPoint(hp).z],
     yaw: returnPoint(hp).yaw,
+    level: 0,
   })
 }
 

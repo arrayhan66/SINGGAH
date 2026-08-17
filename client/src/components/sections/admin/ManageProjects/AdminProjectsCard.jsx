@@ -1,4 +1,5 @@
-import { Clock, CheckCircle2, XCircle, Eye, Heart, Calendar, Tag } from "lucide-react"
+import { Clock, CheckCircle2, XCircle, Eye, Heart, Calendar, Tag, Globe, Pencil, Trash2 } from "lucide-react"
+import { imageUrl } from "../../../../utils/imageUrl"
 
 const statusConfig = {
   pending: {
@@ -13,6 +14,12 @@ const statusConfig = {
     className: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
     dot: "bg-emerald-400",
   },
+  published: {
+    label: "Dipublikasikan",
+    icon: Globe,
+    className: "border-cyan-400/30 bg-cyan-400/10 text-cyan-300",
+    dot: "bg-cyan-400",
+  },
   rejected: {
     label: "Ditolak",
     icon: XCircle,
@@ -21,9 +28,15 @@ const statusConfig = {
   },
 }
 
-function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickReject }) {
-  const StatusIcon = statusConfig[project.status]?.icon || Clock
-  const status = statusConfig[project.status]
+function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickReject, onEdit, onDelete }) {
+  const status =
+    statusConfig[project.status] || {
+      label: project.status || "Status",
+      icon: Clock,
+      className: "border-slate-400/30 bg-slate-400/10 text-slate-300",
+      dot: "bg-slate-400",
+    }
+  const StatusIcon = status.icon
   const authorInitial = project.User?.name?.charAt(0) || "?"
   const categoryName = project.Category?.name || ""
 
@@ -34,12 +47,39 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
         onClick={() => onViewDetail(project)}
       >
         <img
-          src={project.thumbnail}
+          src={imageUrl(project.thumbnail)}
           alt={project.title}
-          className="h-full w-full object-cover transition-all duration-500 group-hover:scale-110"
+          className="h-full w-full object-cover transition-all duration-500"
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+
+        <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onEdit?.(project)
+            }}
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-black/60 text-slate-300 backdrop-blur-sm transition hover:bg-cyan-400/20 hover:text-cyan-300"
+            title="Edit project"
+            aria-label="Edit project"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onDelete?.(project)
+            }}
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-black/60 text-slate-300 backdrop-blur-sm transition hover:bg-red-500/20 hover:text-red-400"
+            title="Hapus project"
+            aria-label="Hapus project"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
 
         <div className="absolute bottom-3 left-3 right-3 flex items-center gap-2">
           <span
@@ -117,7 +157,7 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation()
-                  onQuickApprove?.(project.id)
+                  onQuickApprove?.(project)
                 }}
                 className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-emerald-600"
               >

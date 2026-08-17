@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import { Clock, ArrowRight, Eye, Inbox } from "lucide-react"
 import { useProjects } from "../../../../context/ProjectContext"
+import { imageUrl } from "../../../../utils/imageUrl"
 
 function DashboardPendingProjects() {
   const navigate = useNavigate()
@@ -46,7 +47,7 @@ function DashboardPendingProjects() {
               style={{ minHeight: 90 }}
             >
               <img
-                src={project.thumbnail}
+                src={imageUrl(project.thumbnail)}
                 alt={project.title}
                 className="h-[72px] w-full shrink-0 rounded-lg object-cover sm:h-[72px] sm:w-[72px]"
               />
@@ -63,7 +64,7 @@ function DashboardPendingProjects() {
                   Pending
                 </span>
                 <button
-                  onClick={() => navigate(`/projects/${project.slug}`)}
+                  onClick={() => navigate(`/projects/edit/${project.slug || project.id}`)}
                   className="flex cursor-pointer items-center gap-1 rounded-md bg-cyan-500/15 px-2.5 py-1.5 text-[11px] font-medium text-cyan-400 transition-all duration-200 hover:bg-cyan-500/25 hover:text-cyan-300"
                 >
                   <Eye size={13} />

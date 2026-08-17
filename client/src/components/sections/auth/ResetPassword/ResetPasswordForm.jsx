@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import logo from "../../../../assets/icons/logo.webp";
+import api from "../../../../services/api";
+import FormAlert from "../../../ui/FormAlert";
 import SuccessPopup from "../../../ui/SuccessPopup";
 
 function ResetPasswordForm() {
@@ -12,28 +14,61 @@ function ResetPasswordForm() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const email = localStorage.getItem("resetEmail") || "";
+  const code = localStorage.getItem("resetCode") || "";
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
+    if (!email || !code) {
+      setError("Sesi reset password tidak valid. Silakan ulangi dari awal.");
+      return;
+    }
 
     if (password !== confirmPassword) {
-      alert("Password tidak sama.");
+      setError("Password tidak sama.");
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("Password minimal 8 karakter.");
+      return;
+    }
+
+    if (!/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+      setError("Password harus mengandung minimal 1 huruf besar dan 1 angka.");
       return;
     }
 
     setLoading(true);
 
-    setTimeout(() => {
+    try {
+      await api.post("/auth/reset-password", {
+        email,
+        code,
+        newPassword: password,
+      });
+
       setLoading(false);
       setShowSuccess(true);
       localStorage.removeItem("resetEmail");
+      localStorage.removeItem("resetCode");
       localStorage.removeItem("otpVerified");
       localStorage.removeItem("verifyType");
 
       setTimeout(() => {
         navigate("/login");
       }, 2500);
-    }, 1500);
+    } catch (err) {
+      setLoading(false);
+      setError(
+        err.response?.data?.message ||
+          "Gagal mereset password. Silakan coba lagi.",
+      );
+    }
   };
 
   return (
@@ -74,6 +109,8 @@ function ResetPasswordForm() {
         </div>
 
         <form onSubmit={handleSubmit} className="my-10 sm:my-14" noValidate>
+          <FormAlert message={error} type="error" />
+
           <div className="mb-4 sm:mb-6">
             <label className="mb-1.5 block text-xs font-medium text-slate-300 min-[350px]:text-sm">
               Password Baru

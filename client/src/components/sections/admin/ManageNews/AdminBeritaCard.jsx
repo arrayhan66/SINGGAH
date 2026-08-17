@@ -1,11 +1,12 @@
 import { Eye, Pencil, Trash2 } from "lucide-react"
+import { imageUrl } from "../../../../utils/imageUrl"
 
 function AdminBeritaCard({ berita, onEdit, onDeleteClick, onPreview }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
       <div className="aspect-video w-full overflow-hidden bg-brand-navy relative">
         <img
-          src={berita.image}
+          src={imageUrl(berita.image)}
           alt={berita.title}
           className="h-full w-full object-cover"
         />

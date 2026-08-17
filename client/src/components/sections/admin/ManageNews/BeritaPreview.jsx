@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import { Newspaper, ArrowRight, BookOpen } from "lucide-react"
 import { useBerita } from "../../../../context/BeritaContext"
+import { imageUrl } from "../../../../utils/imageUrl"
 
 function DashboardLatestNews() {
   const navigate = useNavigate()
@@ -44,7 +45,7 @@ function DashboardLatestNews() {
               style={{ minHeight: 90 }}
             >
               <img
-                src={news.image}
+                src={imageUrl(news.image)}
                 alt={news.title}
                 className="h-[72px] w-full shrink-0 rounded-lg object-cover sm:h-[72px] sm:w-[72px]"
               />

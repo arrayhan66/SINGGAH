@@ -12,6 +12,8 @@ function AdminBeritaList({ search, statusFilter }) {
   const navigate = useNavigate()
   const { beritaList, deleteBerita } = useBerita()
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [deleteSuccess, setDeleteSuccess] = useState(false)
   const [showAll, setShowAll] = useState(false)
 
   const filterKey = `${search}|${statusFilter}`
@@ -25,8 +27,8 @@ function AdminBeritaList({ search, statusFilter }) {
     const keyword = search.toLowerCase()
     return beritaList.filter((b) => {
       const matchSearch =
-        b.title.toLowerCase().includes(keyword) ||
-        b.event.toLowerCase().includes(keyword)
+        (b.title || "").toLowerCase().includes(keyword) ||
+        (b.event || "").toLowerCase().includes(keyword)
       const matchStatus =
         statusFilter === "all" || (b.status || "published") === statusFilter
       return matchSearch && matchStatus
@@ -47,13 +49,23 @@ function AdminBeritaList({ search, statusFilter }) {
     setDeleteTarget(berita)
   }
 
-  function handleConfirmDelete() {
-    deleteBerita(deleteTarget.id)
-    setDeleteTarget(null)
+  async function handleConfirmDelete() {
+    if (deleteLoading) return
+    setDeleteLoading(true)
+    try {
+      await deleteBerita(deleteTarget.id)
+      setDeleteLoading(false)
+      setDeleteSuccess(true)
+    } catch {
+      setDeleteLoading(false)
+      setDeleteTarget(null)
+    }
   }
 
   function handleCancelDelete() {
     setDeleteTarget(null)
+    setDeleteLoading(false)
+    setDeleteSuccess(false)
   }
 
   return (
@@ -99,6 +111,8 @@ function AdminBeritaList({ search, statusFilter }) {
         berita={deleteTarget}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
+        loading={deleteLoading}
+        success={deleteSuccess}
       />
     </div>
   )

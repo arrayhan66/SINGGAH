@@ -6,6 +6,7 @@ import GlowBackground from "../../ui/GlowBackground"
 import useSearchAndExpand from "../../../hooks/useSearchAndExpand"
 import SearchBar from "../../ui/SearchBar"
 import OutlineButton from "../../ui/OutlineButton"
+import Skeleton, { ProjectGridSkeleton, PageHeaderSkeleton } from "../../ui/Skeleton"
 import KaryaProjectCard from "./KaryaProjectCard"
 import api from "../../../services/api"
 
@@ -19,14 +20,24 @@ function KaryaProjectSection() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    Promise.all([
-      api.get("/categories"),
-      api.get(`/projects?category=${slug}`)
-    ])
-      .then(([catRes, projRes]) => {
+    let cancelled = false
+
+    api.get("/categories")
+      .then(async (catRes) => {
         const cats = catRes.data.data.items || catRes.data.data || []
         const found = cats.find((c) => c.slug === slug)
+        if (cancelled) return
         setCategory(found)
+
+        if (!found) {
+          setLoading(false)
+          return
+        }
+
+        const projRes = await api.get(
+          `/projects?category_id=${found.id}&status=published&limit=100`,
+        )
+        if (cancelled) return
         const projs = projRes.data.data.items || projRes.data.data || []
         setProjects(projs)
         setLoading(false)
@@ -35,6 +46,10 @@ function KaryaProjectSection() {
         console.error("Failed to load category projects:", err)
         setLoading(false)
       })
+
+    return () => {
+      cancelled = true
+    }
   }, [slug])
 
   const {
@@ -45,6 +60,24 @@ function KaryaProjectSection() {
     showAll,
     setShowAll,
   } = useSearchAndExpand(projects, initialCount)
+
+  if (loading) {
+    return (
+      <section className="relative min-h-screen overflow-hidden bg-brand-dark pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-8 sm:pb-10 md:pb-12 lg:pb-16">
+        <GlowBackground />
+        <DustBackground />
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-5 md:px-8 lg:px-10 xl:px-12">
+          <Skeleton className="h-10 w-10 rounded-full" />
+          <div className="mt-8">
+            <PageHeaderSkeleton />
+          </div>
+          <div className="mt-10">
+            <ProjectGridSkeleton count={6} />
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   if (!category) {
     return (
@@ -91,11 +124,11 @@ function KaryaProjectSection() {
 
         <div className="text-center">
           <h2 className="text-2xl font-black text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-5xl 3xl:text-6xl 4xl:text-7xl">
-            {category.title}
+            {category.name}
           </h2>
 
           <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-300 sm:max-w-2xl sm:text-base sm:leading-7 md:text-base lg:text-lg xl:text-lg 3xl:mt-5 3xl:max-w-3xl 3xl:text-xl 3xl:leading-8 4xl:mt-6 4xl:max-w-4xl 4xl:text-2xl 4xl:leading-9">
-            {category.desc}
+            {category.description}
           </p>
         </div>
 
@@ -103,7 +136,7 @@ function KaryaProjectSection() {
           <SearchBar
             value={search}
             onChange={handleSearchChange}
-            placeholder={`Cari di kategori ${category.title}...`}
+            placeholder={`Cari di kategori ${category.name}...`}
           />
         </div>
 

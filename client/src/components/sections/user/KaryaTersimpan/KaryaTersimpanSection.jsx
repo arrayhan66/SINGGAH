@@ -6,11 +6,25 @@ import GlowBackground from "../../../ui/GlowBackground"
 import DustBackground from "../../../ui/DustBackground"
 import useSearchAndExpand from "../../../../hooks/useSearchAndExpand"
 import KaryaTersimpanCard from "./KaryaTersimpanCard"
-
-const dummyBookmarks = []
+import { ProjectGridSkeleton } from "../../../ui/Skeleton"
+import api from "../../../../services/api"
 
 function KaryaTersimpanSection() {
   const [initialCount, setInitialCount] = useState(6)
+  const [bookmarks, setBookmarks] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    api.get("/projects/my-bookmarks")
+      .then((res) => {
+        const data = Array.isArray(res.data.data) ? res.data.data : []
+        setBookmarks(data.map((b) => b.Project).filter(Boolean))
+      })
+      .catch((err) => {
+        console.error("Failed to fetch bookmarks:", err)
+      })
+      .finally(() => setLoading(false))
+  }, [])
 
   useEffect(() => {
     const handleResize = () => {
@@ -40,7 +54,7 @@ function KaryaTersimpanSection() {
     filteredData: filteredBookmarks,
     showAll,
     setShowAll,
-  } = useSearchAndExpand(dummyBookmarks, initialCount)
+  } = useSearchAndExpand(bookmarks, initialCount)
 
   return (
     <section className="relative overflow-hidden bg-brand-dark px-4 pt-[calc(var(--navbar-h)+24px)] pb-8 sm:px-5 sm:pt-[calc(var(--navbar-h)+32px)] sm:pb-10 md:px-8 lg:px-10 lg:pb-12 xl:px-12 3xl:px-16 4xl:px-20 4xl:pb-20">
@@ -72,8 +86,12 @@ function KaryaTersimpanSection() {
         </div>
 
         {/* Grid */}
-        <div className="mt-8 grid grid-cols-1 gap-4 sm:mt-10 sm:grid-cols-2 sm:gap-5 md:gap-6 lg:grid-cols-3 lg:gap-7 xl:gap-8 3xl:mt-14 3xl:grid-cols-4 3xl:gap-9 4xl:mt-16 4xl:grid-cols-5 4xl:gap-10">
-          {visibleBookmarks.length > 0 ? (
+        <div className="mt-8 sm:mt-10 3xl:mt-14 4xl:mt-16">
+          {loading ? (
+            <ProjectGridSkeleton count={6} />
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:gap-6 lg:grid-cols-3 lg:gap-7 xl:gap-8 3xl:grid-cols-4 3xl:gap-9 4xl:grid-cols-5 4xl:gap-10">
+              {visibleBookmarks.length > 0 ? (
             visibleBookmarks.map((item) => (
               <KaryaTersimpanCard key={item.id} item={item} />
             ))
@@ -96,8 +114,10 @@ function KaryaTersimpanSection() {
                       </span>
                       . Coba gunakan istilah lain.
                     </>
-                  : "Mulai jelajahi karya dan simpan yang menarik untukmu."}
-              </p>
+                      : "Mulai jelajahi karya dan simpan yang menarik untukmu."}
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>

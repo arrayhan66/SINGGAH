@@ -97,13 +97,17 @@ function LookControls({ bounds, onSelectProject }) {
   }
 
   const teleportTo = (point, yaw) => {
+    const rh = resolveHeight(point.x, point.z, 0)
+    // A portal never leads to a valid floor-2 destination, so an upper-floor
+    // player must never be teleported down to a ground target (that reads as
+    // "tiba-tiba turun ke lantai 1").
+    if (useWalkStore.getState().level === 1 && rh.level === 0) return
     const room = findRoom(point.x, point.z)
     const message =
       room?.id === "hall"
         ? "MEMPERSIAPKAN VIRTUAL HALL"
         : `MEMASUKI ${room.label.split(" — ")[0]}`
     useTransitionStore.getState().start(message)
-    const rh = resolveHeight(point.x, point.z, 0)
     point.y = rh.height
     useWalkStore.setState({ position: point.clone(), yaw, target: null, level: rh.level })
     camYRef.current = point.y + EYE
@@ -112,7 +116,9 @@ function LookControls({ bounds, onSelectProject }) {
   }
 
   const checkPortalCross = (prev, next) => {
+    const playerLevel = useWalkStore.getState().level
     for (const p of portalsRef.current) {
+      if (p.level !== undefined && p.level !== playerLevel) continue
       if (p.axis === "x") {
         if (next.z >= p.from && next.z <= p.to) {
           const a = prev.x - p.at

@@ -8,10 +8,10 @@ import {
 } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
 
-function UploadPreview({ formData }) {
+function UploadPreview({ formData, existingThumbnail }) {
   const thumbnailUrl = formData.thumbnail
     ? URL.createObjectURL(formData.thumbnail)
-    : null
+    : existingThumbnail || null
 
   const filledTeamMembers = formData.members.filter((m) => m.name.trim())
 

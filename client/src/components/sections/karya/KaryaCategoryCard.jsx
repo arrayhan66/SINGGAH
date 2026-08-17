@@ -13,7 +13,7 @@ const ICON_MAP = {
 };
 
 function KaryaCategoryCard({ item, onClick }) {
-  const { icon, title, description, desc, slug, projectCount } = item;
+  const { icon, name, title, description, desc, slug, projectCount } = item;
 
   let IconComponent = Layers;
   if (typeof icon === "function") {
@@ -24,6 +24,7 @@ function KaryaCategoryCard({ item, onClick }) {
     IconComponent = ICON_MAP[slug];
   }
 
+  const cardTitle = title || name || "";
   const cardDesc = description || desc || "";
   const hasProjectCount = typeof projectCount === "number";
 
@@ -47,7 +48,7 @@ function KaryaCategoryCard({ item, onClick }) {
 
       {/* Title & Description */}
       <h3 className="mt-6 text-xl font-bold text-white sm:mt-8 sm:text-2xl 2xl:mt-10 2xl:text-3xl 3xl:mt-12 3xl:text-4xl 4xl:mt-14 4xl:text-5xl">
-        {title}
+        {cardTitle}
       </h3>
 
       <p className="mt-4 leading-7 text-slate-300 2xl:mt-5 2xl:text-lg 2xl:leading-8 3xl:mt-6 3xl:text-xl 3xl:leading-9 4xl:mt-7 4xl:text-2xl 4xl:leading-10">

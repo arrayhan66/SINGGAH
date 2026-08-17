@@ -114,3 +114,19 @@
   pointer-events: none;
   height: 0;
 }
+
+.ProseMirror div[data-type="ad-block"] {
+  margin: 1.5rem 0;
+}
+
+.ProseMirror div[data-type="see-also"] {
+  margin: 1.5rem 0;
+}
+
+.ProseMirror div[data-type="ad-block"] .ProseMirror-nodeview-wrapper {
+  pointer-events: auto;
+}
+
+.ProseMirror div[data-type="see-also"] .ProseMirror-nodeview-wrapper {
+  pointer-events: auto;
+}

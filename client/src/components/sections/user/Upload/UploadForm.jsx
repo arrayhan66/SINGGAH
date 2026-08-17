@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
 import { Image, Info, Layers, ImagePlus, FileText, Eye, Send } from "lucide-react"
 import UploadThumbnail from "./UploadThumbnail"
 import UploadInformation from "./UploadInformation"
@@ -8,9 +7,10 @@ import UploadGallery from "./UploadGallery"
 import UploadDocuments from "./UploadDocuments"
 import UploadPreview from "./UploadPreview"
 import UploadAction from "./UploadAction"
-import api from "../../../../services/api"
+import { useProjects } from "../../../../context/ProjectContext"
 import GlowBackground from "../../../ui/GlowBackground"
 import DustBackground from "../../../ui/DustBackground"
+import SubmitSuccessModal from "../../../ui/SubmitSuccessModal"
 
 const steps = [
   { icon: Image, label: "Thumbnail" },
@@ -59,7 +59,8 @@ function UploadForm() {
   const [formData, setFormData] = useState(initialFormData)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
-  const navigate = useNavigate()
+  const [successOpen, setSuccessOpen] = useState(false)
+  const { addProject } = useProjects()
 
   function updateField(field, value) {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -104,11 +105,9 @@ function UploadForm() {
         fd.append("videos", JSON.stringify([{ video_url: formData.videoUrl.trim() }]))
       }
 
-      await api.post("/projects", fd, {
-        headers: { "Content-Type": "multipart/form-data" },
-      })
+      await addProject(fd)
 
-      navigate("/my-karya")
+      setSuccessOpen(true)
     } catch (err) {
       const msg =
         err.response?.data?.message || "Gagal mengupload karya. Coba lagi."
@@ -162,6 +161,14 @@ function UploadForm() {
           apiError={error}
         />
       </div>
+
+      <SubmitSuccessModal
+        isOpen={successOpen}
+        karyaTitle={formData.title}
+        redirectPath="/my-karya"
+        mode="upload"
+        onClose={() => setSuccessOpen(false)}
+      />
     </section>
   )
 }

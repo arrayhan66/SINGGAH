@@ -1,24 +1,54 @@
 import { createContext, useContext, useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import api from "../services/api"
 
 const AuthContext = createContext(null)
 
+function loadStoredUser() {
+  try {
+    const raw = localStorage.getItem("user")
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+function hasStoredSession() {
+  return Boolean(localStorage.getItem("token") && localStorage.getItem("user"))
+}
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [token, setToken] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const navigate = useNavigate()
+  const [user, setUser] = useState(loadStoredUser)
+  const [token, setToken] = useState(() => localStorage.getItem("token"))
+  const [isLoading, setIsLoading] = useState(() => hasStoredSession())
 
-  // Waktu app pertama kali dibuka, cek localStorage
-  // biar user tetap login walau refresh halaman.
+  // Sinkronkan data user dengan server supaya field
+  // seperti created_at tidak hilang/stale di localStorage.
   useEffect(() => {
-    const savedToken = localStorage.getItem("token")
-    const savedUser = localStorage.getItem("user")
+    if (!hasStoredSession()) return
 
-    if (savedToken && savedUser) {
-      setToken(savedToken)
-      setUser(JSON.parse(savedUser))
-    }
-
-    setIsLoading(false)
+    api
+      .get("/auth/me")
+      .then((res) => {
+        const freshUser = res.data?.data
+        if (freshUser) {
+          setUser(freshUser)
+          localStorage.setItem("user", JSON.stringify(freshUser))
+        }
+      })
+      .catch((err) => {
+        // Token kedaluwarsa/tidak valid -> bersihkan sesi.
+        if (err.response?.status === 401) {
+          setUser(null)
+          setToken(null)
+          localStorage.removeItem("token")
+          localStorage.removeItem("user")
+        } else {
+          console.error("Gagal menyinkronkan data user:", err)
+        }
+      })
+      .finally(() => setIsLoading(false))
   }, [])
 
   const login = (userData, token) => {
@@ -35,6 +65,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("token")
     localStorage.removeItem("user")
     localStorage.removeItem("admin-sidebar-collapsed")
+    navigate("/login")
   }
 
   return (
@@ -44,6 +75,7 @@ export function AuthProvider({ children }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   return useContext(AuthContext)
 }

@@ -2,13 +2,16 @@ import AppRoutes from "./routes/AppRouter"
 import { BeritaProvider } from "./context/BeritaContext"
 import { UserProvider } from "./context/UserContext"
 import { ProjectProvider } from "./context/ProjectContext"
+import MaintenanceGate from "./components/MaintenanceGate"
 
 function App() {
   return (
     <UserProvider>
       <ProjectProvider>
         <BeritaProvider>
-          <AppRoutes />
+          <MaintenanceGate>
+            <AppRoutes />
+          </MaintenanceGate>
         </BeritaProvider>
       </ProjectProvider>
     </UserProvider>

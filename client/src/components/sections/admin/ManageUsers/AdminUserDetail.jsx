@@ -11,6 +11,8 @@ function AdminUserDetail() {
   const navigate = useNavigate()
   const { getUserByUsername, deleteUser } = useUsers()
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [deleteSuccess, setDeleteSuccess] = useState(false)
 
   const user = getUserByUsername(slug)
 
@@ -22,13 +24,24 @@ function AdminUserDetail() {
     setDeleteTarget(target)
   }
 
-  function handleConfirmDelete() {
-    deleteUser(deleteTarget.id)
-    navigate("/users")
+  async function handleConfirmDelete() {
+    if (deleteLoading) return
+    setDeleteLoading(true)
+    try {
+      await deleteUser(deleteTarget.id)
+      setDeleteLoading(false)
+      setDeleteSuccess(true)
+      setTimeout(() => navigate("/users"), 1200)
+    } catch {
+      setDeleteLoading(false)
+      setDeleteTarget(null)
+    }
   }
 
   function handleCancelDelete() {
     setDeleteTarget(null)
+    setDeleteLoading(false)
+    setDeleteSuccess(false)
   }
 
   if (!user) {
@@ -84,6 +97,8 @@ function AdminUserDetail() {
         user={deleteTarget}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
+        loading={deleteLoading}
+        success={deleteSuccess}
       />
     </>
   )

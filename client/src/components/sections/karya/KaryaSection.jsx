@@ -10,14 +10,14 @@ import KaryaCategoryCard from "./KaryaCategoryCard"
 import api from "../../../services/api"
 
 const DEFAULT_CATEGORIES = [
-  { name: "Website", slug: "website", description: "Aplikasi web modern berbasis React, Laravel, MERN dan teknologi terbaru.", color: "#3b82f6" },
-  { name: "Mobile App", slug: "mobile-app", description: "Android dan iOS menggunakan Flutter maupun React Native.", color: "#a78bfa" },
-  { name: "IoT", slug: "iot", description: "Internet of Things, Smart Device, Embedded System dan Automation.", color: "#06b6d4" },
-  { name: "Artificial Intelligence", slug: "artificial-intelligence", description: "Machine Learning, Computer Vision, Deep Learning dan NLP.", color: "#ec4899" },
-  { name: "Data Science", slug: "data-science", description: "Analisis data, dashboard interaktif, visualisasi dan Big Data.", color: "#34d399" },
-  { name: "Cyber Security", slug: "cyber-security", description: "Keamanan jaringan, penetration testing dan digital forensics.", color: "#fbbf24" },
-  { name: "UI/UX Design", slug: "ui-ux-design", description: "Desain antarmuka dan pengalaman pengguna yang fungsional dan estetis.", color: "#fb7185" },
-  { name: "Game Development", slug: "game-development", description: "Pengembangan game 2D/3D, game engine, dan realitas virtual.", color: "#a855f7" },
+  { name: "Website", slug: "website", description: "Situs web modern dan responsif.", color: "#3b82f6" },
+  { name: "Mobile App", slug: "mobile-app", description: "Aplikasi Android & iOS.", color: "#a78bfa" },
+  { name: "IoT", slug: "iot", description: "Perangkat pintar dan sistem otomatis.", color: "#06b6d4" },
+  { name: "Artificial Intelligence", slug: "artificial-intelligence", description: "Kecerdasan buatan untuk solusi nyata.", color: "#ec4899" },
+  { name: "Data Science", slug: "data-science", description: "Analisis data dan visualisasi.", color: "#34d399" },
+  { name: "Cyber Security", slug: "cyber-security", description: "Keamanan jaringan dan sistem.", color: "#fbbf24" },
+  { name: "UI/UX Design", slug: "ui-ux-design", description: "Desain antarmuka dan pengalaman pengguna.", color: "#fb7185" },
+  { name: "Game Development", slug: "game-development", description: "Pengembangan game 2D/3D.", color: "#a855f7" },
 ]
 
 function KaryaSection() {

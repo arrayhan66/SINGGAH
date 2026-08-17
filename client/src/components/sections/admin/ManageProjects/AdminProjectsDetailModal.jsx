@@ -1,10 +1,18 @@
 import { useState, useEffect, useRef } from "react"
 import {
   X, CheckCircle2, XCircle, Clock, Tag, Calendar, Heart, Eye, Layers,
-  FileText, AlertTriangle,
+  FileText, AlertTriangle, Pencil, Trash2, Globe,
 } from "lucide-react"
+import { imageUrl } from "../../../../utils/imageUrl"
 
 const statusConfig = {
+  published: {
+    label: "Dipublikasikan",
+    icon: Globe,
+    chip: "border-cyan-400/30 bg-cyan-400/10 text-cyan-300",
+    softBg: "bg-cyan-500/10",
+    softColor: "text-cyan-400",
+  },
   approved: {
     label: "Disetujui",
     icon: CheckCircle2,
@@ -28,7 +36,7 @@ const statusConfig = {
   },
 }
 
-function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onClose }) {
+function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onClose, onEdit, onDelete }) {
   const [visible, setVisible] = useState(false)
   const [activeImage, setActiveImage] = useState(null)
   const closeButtonRef = useRef(null)
@@ -58,7 +66,7 @@ function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onCl
       ...(Array.isArray(project.images) ? project.images : []).map((img) => img.image_url),
     ]),
   ).filter(Boolean)
-  const currentImage = activeImage || project.thumbnail || ""
+  const currentImage = imageUrl(activeImage || project.thumbnail)
 
   function formatDate(value) {
     if (!value) return "—"
@@ -201,14 +209,14 @@ function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onCl
                         key={i}
                         className="rounded-lg border border-cyan-400/15 bg-cyan-400/5 px-2.5 py-1 text-xs font-medium text-cyan-300/90"
                       >
-                        {tech}
+                        {typeof tech === "string" ? tech : tech?.name || ""}
                       </span>
                     ))}
                   </div>
                 </div>
               )}
 
-              {project.status === "rejected" && project.rejectionReason && (
+              {project.status === "rejected" && project.rejection_reason && (
                 <div className="mt-6 rounded-xl border border-red-500/20 bg-red-500/5 p-4">
                   <div className="flex items-start gap-3">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-500/10">
@@ -217,7 +225,7 @@ function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onCl
                     <div>
                       <h4 className="text-xs font-semibold text-red-400">Alasan Penolakan</h4>
                       <p className="mt-1 text-sm leading-relaxed text-red-200/80">
-                        {project.rejectionReason}
+                        {project.rejection_reason}
                       </p>
                     </div>
                   </div>
@@ -338,6 +346,33 @@ function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onCl
             </aside>
           </div>
         </div>
+
+        <footer className="flex items-center gap-2 border-t border-white/10 bg-brand-navy/90 px-5 py-3 backdrop-blur-md">
+          <button
+            type="button"
+            onClick={() => onEdit?.(project)}
+            className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-2.5 text-sm font-medium text-cyan-300 transition hover:bg-cyan-400/20"
+          >
+            <Pencil size={15} />
+            Edit Project
+          </button>
+          <button
+            type="button"
+            onClick={() => onDelete?.(project)}
+            className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-400 transition hover:bg-red-500/20"
+          >
+            <Trash2 size={15} />
+            Hapus Project
+          </button>
+          <div className="flex-1" />
+          <button
+            type="button"
+            onClick={handleClose}
+            className="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white"
+          >
+            Tutup
+          </button>
+        </footer>
       </div>
     </div>
   )

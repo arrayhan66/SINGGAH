@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Mail, Lock, EyeOff, Eye, ArrowLeft } from "lucide-react";
 import logo from "../../../../assets/icons/logo.webp";
 import api from "../../../../services/api";
 import { useAuth } from "../../../../context/AuthContext";
 import FormAlert from "../../../ui/FormAlert";
+import { getRedirectFrom } from "../../../../utils/redirectFrom";
 
 function LoginForm() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -16,6 +18,8 @@ function LoginForm() {
   const [fieldErrors, setFieldErrors] = useState({ email: "", password: "" });
 
   const { login } = useAuth();
+
+  const backTo = getRedirectFrom(location) || "/";
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -58,8 +62,12 @@ function LoginForm() {
 
       login(user, token);
 
+      const from = getRedirectFrom(location);
+
       if (user.role === "admin") {
         navigate("/admin");
+      } else if (from) {
+        navigate(from, { replace: true });
       } else {
         navigate("/");
       }
@@ -90,7 +98,7 @@ function LoginForm() {
         </div>
 
         <Link
-          to="/"
+          to={backTo}
           aria-label="Kembali"
           className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-300 shadow-sm backdrop-blur-md transition hover:text-cyan-300 sm:h-10 sm:w-10"
         >

@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import { CheckCircle2, ArrowRight, FolderOpen } from "lucide-react"
 import { useProjects } from "../../../../context/ProjectContext"
+import { imageUrl } from "../../../../utils/imageUrl"
 
 function DashboardApprovedProjects() {
   const navigate = useNavigate()
@@ -46,7 +47,7 @@ function DashboardApprovedProjects() {
               style={{ minHeight: 90 }}
             >
               <img
-                src={project.thumbnail}
+                src={imageUrl(project.thumbnail)}
                 alt={project.title}
                 className="h-[72px] w-full shrink-0 rounded-lg object-cover sm:h-[72px] sm:w-[72px]"
               />

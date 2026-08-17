@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { useNavigate, useLocation } from "react-router-dom"
 import {
   X,
   ExternalLink,
@@ -15,9 +15,13 @@ import {
 } from "lucide-react"
 import { useAuth } from "../../context/AuthContext"
 import { saveHallReturn } from "../../three/hooks/useWalk"
+import api from "../../services/api"
+import { toEmbedUrl } from "../../utils/videoUrl"
+import { openDocument } from "../../utils/projectDocument"
 
 function ProjectDetailModal({ project, categoryTitle, onClose }) {
   const navigate = useNavigate()
+  const location = useLocation()
   const { user } = useAuth()
   const isLoggedIn = Boolean(user)
   const isDosen = project.authorType === "dosen"
@@ -35,23 +39,41 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
 
   const [isLiked, setIsLiked] = useState(Boolean(project.isLiked))
   const [likeCount, setLikeCount] = useState(project.likesCount || 0)
+  const [viewsCount, setViewsCount] = useState(project.viewsCount || 0)
+
+  useEffect(() => {
+    if (!project.id) return
+    api.post(`/projects/${project.id}/view`)
+      .then((res) => {
+        const { viewsCount: count } = res.data.data || {}
+        if (typeof count === "number") setViewsCount(count)
+      })
+      .catch((err) => {
+        console.error("Failed to record view:", err)
+      })
+  }, [project.id])
 
   function openDetail() {
     saveHallReturn()
     onClose()
-    navigate(`/karya/${categorySlug}/${project.id}`, { state: { fromHall: true } })
+    navigate(`/karya/${categorySlug}/${project.slug || project.id}`, { state: { fromHall: true } })
   }
 
   function handleLike() {
     if (!isLoggedIn) {
       onClose()
-      navigate("/login")
+      navigate("/login", { state: { from: location } })
       return
     }
-    setIsLiked((prev) => {
-      setLikeCount((c) => c + (prev ? -1 : 1))
-      return !prev
-    })
+    api.post(`/projects/${project.id}/like`)
+      .then((res) => {
+        const { liked, likesCount } = res.data.data || {}
+        setIsLiked(Boolean(liked))
+        if (typeof likesCount === "number") setLikeCount(likesCount)
+      })
+      .catch((err) => {
+        console.error("Failed to update like:", err)
+      })
   }
 
   const statusLabel =
@@ -136,7 +158,7 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
           <div className="flex items-center space-x-4 text-xs text-sky-300/80">
             <span className="flex items-center space-x-1">
               <Eye className="w-4 h-4 text-sky-400" />
-              <span>{project.viewsCount || 0}</span>
+              <span>{viewsCount}</span>
             </span>
             <button
               onClick={handleLike}
@@ -214,16 +236,15 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
             <h4 className="text-sm font-semibold text-sky-300">Dokumen Pendukung</h4>
             <div className="flex flex-wrap gap-2">
               {documents.map((doc, i) => (
-                <a
+                <button
                   key={doc.id || i}
-                  href={doc.file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  type="button"
+                  onClick={() => openDocument(doc)}
                   className="text-xs bg-sky-900/60 border border-sky-700/50 px-3 py-1.5 rounded-lg text-sky-200 hover:bg-sky-800 hover:border-sky-500 flex items-center space-x-1.5 transition-colors cursor-pointer"
                 >
                   <FileText className="w-3.5 h-3.5" />
                   <span>{doc.name}</span>
-                </a>
+                </button>
               ))}
             </div>
           </div>
@@ -235,7 +256,7 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
             {videos.map((vid, i) => (
               <div key={vid.id || i} className="aspect-video w-full overflow-hidden rounded-xl border border-sky-800/60">
                 <iframe
-                  src={vid.video_url}
+                  src={toEmbedUrl(vid.video_url)}
                   title="Video Demo"
                   className="h-full w-full border-0"
                   allowFullScreen

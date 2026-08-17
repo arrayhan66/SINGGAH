@@ -1,16 +1,15 @@
 import { useState, useEffect, useRef } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
-import { Bell, CheckCheck, BellOff, User, LogOut, ChevronDown } from "lucide-react"
+import { Bell, Megaphone, User, LogOut, ChevronDown } from "lucide-react"
 import { useAuth } from "../../context/AuthContext"
 import logo from "../../assets/icons/logo.webp"
 import useNotifications from "../../hooks/useNotifications"
-import {
-  formatRelativeTime,
-  notifIcon,
-  notifBg,
-  notifText,
-} from "../../utils/notificationHelpers"
+import NotificationDropdown from "./NotificationDropdown"
 import LogoutConfirmModal from "../ui/LogoutConfirmModal"
+import DeleteConfirmModal from "../ui/DeleteConfirmModal"
+import NotificationDetailModal from "../ui/NotificationDetailModal"
+import AnnouncementModal from "../ui/AnnouncementModal"
+import { sendAnnouncement } from "../../services/notificationService"
 
 const roleLabels = {
   admin: { label: "Administrator", class: "bg-cyan-400/10 text-cyan-300" },
@@ -22,6 +21,11 @@ function AdminNavbar() {
   const { user, logout } = useAuth()
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [detailNotif, setDetailNotif] = useState(null)
+  const [showAnnouncement, setShowAnnouncement] = useState(false)
+  const [announceError, setAnnounceError] = useState("")
+  const [announceSuccess, setAnnounceSuccess] = useState("")
+  const [isSendingAnnouncement, setIsSendingAnnouncement] = useState(false)
   const profileRef = useRef(null)
   const notifRef = useRef(null)
 
@@ -31,11 +35,24 @@ function AdminNavbar() {
     isOpen: isNotifOpen,
     hasMore,
     isLoadingMore,
+    isSelectionMode,
+    selectedIds,
+    isBulkLoading,
+    confirmDeleteAll,
+    setConfirmDeleteAll,
     togglePanel: toggleNotif,
     closePanel: closeNotif,
     loadMore,
-    handleMarkAsRead,
-    handleMarkAllAsRead,
+    handleMarkAsRead: readNotif,
+    handleMarkAsUnread: unreadNotif,
+    handleMarkAllAsRead: readAllNotif,
+    handleDeleteNotification: deleteNotif,
+    handleDeleteAll: deleteAllNotif,
+    enterSelectionMode,
+    exitSelectionMode,
+    handleToggleSelect,
+    handleSelectAll,
+    handleBulkAction,
   } = useNotifications()
 
   const name = user?.name || "Admin"
@@ -73,11 +90,31 @@ function AdminNavbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [isNotifOpen, closeNotif])
 
-  const handleNotifClick = async (notif) => {
-    if (!notif.is_read) await handleMarkAsRead(notif.id)
-    closeNotif()
-    if (notif.reference_type === "project") navigate("/karya")
-    else if (notif.reference_type === "news") navigate("/berita")
+  const handleNotifClick = (notif) => {
+    readNotif(notif.id)
+    setDetailNotif(notif)
+  }
+
+  const handleNotifNavigate = (path) => {
+    setDetailNotif(null);
+    closeNotif();
+    if (path) navigate(path);
+  }
+
+  const handleSendAnnouncement = async ({ title, message, audience }) => {
+    setAnnounceError("")
+    setAnnounceSuccess("")
+    setIsSendingAnnouncement(true)
+    try {
+      const result = await sendAnnouncement({ title, message, audience })
+      setAnnounceSuccess(
+        `Pengumuman terkirim ke ${result?.affected ?? 0} pengguna`,
+      )
+    } catch (err) {
+      setAnnounceError(err?.response?.data?.message || "Gagal mengirim pengumuman")
+    } finally {
+      setIsSendingAnnouncement(false)
+    }
   }
 
   return (
@@ -93,6 +130,16 @@ function AdminNavbar() {
 
         {/* RIGHT */}
         <div className="flex items-center gap-2 min-[260px]:gap-1.5 5xl:gap-4 6xl:gap-5">
+        {/* ANNOUNCEMENT BUTTON */}
+        <button
+          onClick={() => { setAnnounceError(""); setAnnounceSuccess(""); setShowAnnouncement(true); }}
+          className="flex h-8 min-[360px]:h-9 5xl:h-11 6xl:h-12 cursor-pointer items-center gap-1 rounded-md min-[360px]:rounded-lg 5xl:rounded-xl bg-amber-400/10 px-2 min-[360px]:px-3 5xl:px-4 text-[10px] min-[360px]:text-xs 5xl:text-sm 6xl:text-base font-medium text-amber-300 transition-colors hover:bg-amber-400/20"
+          title="Kirim pengumuman"
+        >
+          <Megaphone size={16} />
+          <span className="hidden min-[500px]:inline">Pengumuman</span>
+        </button>
+
         {/* NOTIFICATION BELL */}
         <div ref={notifRef} className="relative ml-2 min-[400px]:ml-0">
           <button
@@ -110,71 +157,32 @@ function AdminNavbar() {
 
           {/* NOTIFICATION DROPDOWN */}
           <div
-            className={`absolute right-0 top-full mt-2 w-[calc(100vw-1rem)] min-[320px]:w-72 min-[480px]:w-80 sm:w-96 max-w-sm overflow-hidden rounded-lg min-[320px]:rounded-2xl border border-white/10 bg-brand-dark/95 shadow-2xl backdrop-blur-xl sm:w-96 5xl:w-[420px] 6xl:w-[480px] transition-all duration-200 ${
+            className={`fixed left-3 right-3 top-20 z-50 max-h-[75vh] overflow-y-auto rounded-2xl border border-white/10 bg-brand-dark/95 shadow-2xl backdrop-blur-xl transition-all duration-200 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 sm:max-h-none sm:overflow-hidden 5xl:w-[420px] 6xl:w-[480px] ${
               isNotifOpen
                 ? "translate-y-0 opacity-100 pointer-events-auto"
                 : "pointer-events-none -translate-y-2 opacity-0"
             }`}
           >
-            <div className="flex items-center justify-between border-b border-white/10 px-3 min-[360px]:px-4 5xl:px-5 6xl:px-6 py-2 min-[360px]:py-3 5xl:py-4">
-              <h3 className="text-xs min-[360px]:text-sm 5xl:text-base 6xl:text-lg font-semibold text-white">Notifikasi</h3>
-              {unreadCount > 0 && (
-                <button
-                  onClick={handleMarkAllAsRead}
-                  className="flex cursor-pointer items-center gap-1 text-[10px] min-[360px]:text-xs 5xl:text-sm 6xl:text-base text-cyan-400 transition hover:text-cyan-300"
-                >
-                  <CheckCheck size={14} />
-                  Tandai semua dibaca
-                </button>
-              )}
-            </div>
-
-            <div className="max-h-72 min-[360px]:max-h-80 5xl:max-h-96 6xl:max-h-[480px] overflow-y-auto">
-              {notifications.length === 0 ? (
-                <div className="flex flex-col items-center gap-2 py-6 min-[360px]:py-8 5xl:py-10 text-slate-500">
-                  <BellOff size={24} />
-                  <p className="text-xs min-[360px]:text-sm 5xl:text-base 6xl:text-lg">Belum ada notifikasi</p>
-                </div>
-              ) : (
-                notifications.map((notif) => (
-                  <button
-                    key={notif.id}
-                    onClick={() => handleNotifClick(notif)}
-                    className={`flex w-full cursor-pointer gap-2 min-[360px]:gap-3 5xl:gap-4 border-b border-white/5 px-3 min-[360px]:px-4 5xl:px-5 6xl:px-6 py-2 min-[360px]:py-3 5xl:py-4 text-left transition hover:bg-white/5 ${
-                      !notif.is_read ? "bg-cyan-400/5" : ""
-                    }`}
-                  >
-                    <div
-                      className={`flex h-7 min-[360px]:h-9 5xl:h-12 6xl:h-14 w-7 min-[360px]:w-9 5xl:w-12 6xl:w-14 shrink-0 items-center justify-center rounded-full text-xs min-[360px]:text-sm 5xl:text-base 6xl:text-lg ${notifBg(notif.type)}`}
-                    >
-                      <span className={notifText(notif.type)}>
-                        {notifIcon(notif.type)}
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className={`text-[11px] min-[360px]:text-sm 5xl:text-base 6xl:text-lg leading-snug ${!notif.is_read ? "font-medium text-white" : "text-slate-300"}`}>
-                        {notif.title}
-                      </p>
-                      <p className="mt-0.5 text-[10px] min-[360px]:text-xs 5xl:text-sm 6xl:text-base text-slate-500 line-clamp-1">{notif.message}</p>
-                      <p className="mt-1 text-[9px] min-[360px]:text-[10px] 5xl:text-xs 6xl:text-sm text-slate-600">{formatRelativeTime(notif.created_at)}</p>
-                    </div>
-                    {!notif.is_read && <span className="mt-1.5 h-1.5 min-[360px]:h-2 5xl:h-3 6xl:h-4 w-1.5 min-[360px]:w-2 5xl:w-3 6xl:w-4 shrink-0 rounded-full bg-cyan-400" />}
-                  </button>
-                ))
-              )}
-            </div>
-
-            {hasMore && (
-              <div className="border-t border-white/10 px-3 min-[360px]:px-4 5xl:px-5 6xl:px-6 py-2">
-                <button
-                  onClick={loadMore}
-                  disabled={isLoadingMore}
-                  className="w-full cursor-pointer text-center text-[10px] min-[360px]:text-xs 5xl:text-sm 6xl:text-base text-cyan-400 transition hover:text-cyan-300 disabled:opacity-50"
-                >
-                  {isLoadingMore ? "Memuat..." : "Muat lebih banyak"}
-                </button>
-              </div>
-            )}
+            <NotificationDropdown
+              notifications={notifications}
+              unreadCount={unreadCount}
+              hasMore={hasMore}
+              isLoadingMore={isLoadingMore}
+              isSelectionMode={isSelectionMode}
+              selectedIds={selectedIds}
+              isBulkLoading={isBulkLoading}
+              onMarkAllRead={readAllNotif}
+              onLoadMore={loadMore}
+              onClickNotif={handleNotifClick}
+              onDeleteNotif={deleteNotif}
+              onMarkUnread={unreadNotif}
+              onEnterSelection={enterSelectionMode}
+              onExitSelection={exitSelectionMode}
+              onToggleSelect={handleToggleSelect}
+              onSelectAll={handleSelectAll}
+              onBulkAction={handleBulkAction}
+              onRequestDeleteAll={() => setConfirmDeleteAll(true)}
+            />
           </div>
         </div>
 
@@ -191,8 +199,8 @@ function AdminNavbar() {
                 initials
               )}
             </div>
-            <span className="hidden min-[360px]:block text-xs min-[400px]:text-sm 5xl:text-base 6xl:text-lg font-medium text-white">{name}</span>
-            <ChevronDown size={14} className={`hidden min-[360px]:block text-slate-500 transition-transform duration-200 ${isProfileOpen ? "rotate-180" : ""}`} />
+            <span className="hidden min-[400px]:block text-xs min-[400px]:text-sm 5xl:text-base 6xl:text-lg font-medium text-white">{name}</span>
+            <ChevronDown size={14} className={`hidden min-[400px]:block text-slate-500 transition-transform duration-200 ${isProfileOpen ? "rotate-180" : ""}`} />
           </button>
 
           {/* PROFILE DROPDOWN */}
@@ -235,8 +243,37 @@ function AdminNavbar() {
 
       {showLogoutConfirm && (
         <LogoutConfirmModal
-          onConfirm={() => { logout(); navigate("/login", { replace: true }); }}
+          onConfirm={() => { logout(); }}
           onCancel={() => setShowLogoutConfirm(false)}
+        />
+      )}
+
+      {confirmDeleteAll && (
+        <DeleteConfirmModal
+          title="Hapus semua notifikasi?"
+          message="Semua notifikasi akan dihapus permanen dan tidak bisa dikembalikan."
+          confirmLabel="Ya, Hapus Semua"
+          onConfirm={deleteAllNotif}
+          onCancel={() => setConfirmDeleteAll(false)}
+        />
+      )}
+
+      {detailNotif && (
+        <NotificationDetailModal
+          key={detailNotif.id}
+          notif={detailNotif}
+          onClose={() => setDetailNotif(null)}
+          onNavigate={handleNotifNavigate}
+        />
+      )}
+
+      {showAnnouncement && (
+        <AnnouncementModal
+          onSend={handleSendAnnouncement}
+          onClose={() => setShowAnnouncement(false)}
+          isSending={isSendingAnnouncement}
+          error={announceError}
+          success={announceSuccess}
         />
       )}
     </>

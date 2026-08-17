@@ -4,14 +4,20 @@ import { UserSearch } from "lucide-react"
 import { useUsers } from "../../../../context/UserContext"
 import AdminUserCard from "./AdminUserCard"
 import AdminUserDeleteModal from "./AdminUserDeleteModal"
+import AdminUserTipeModal from "./AdminUserTipeModal"
 import ShowMoreButton from "../../../ui/ShowMoreButton"
 
 const INITIAL_VISIBLE = 9
 
 function AdminUserList({ search, statusFilter }) {
   const navigate = useNavigate()
-  const { userList, deleteUser } = useUsers()
+  const { userList, deleteUser, approveTipe, rejectTipe } = useUsers()
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [deleteSuccess, setDeleteSuccess] = useState(false)
+  const [tipeTarget, setTipeTarget] = useState(null)
+  const [tipeDecision, setTipeDecision] = useState(null)
+  const [approving, setApproving] = useState(false)
   const [showAll, setShowAll] = useState(false)
 
   const filterKey = search
@@ -47,13 +53,56 @@ function AdminUserList({ search, statusFilter }) {
     setDeleteTarget(user)
   }
 
-  function handleConfirmDelete() {
-    deleteUser(deleteTarget.id)
-    setDeleteTarget(null)
+  async function handleConfirmDelete() {
+    if (deleteLoading) return
+    setDeleteLoading(true)
+    try {
+      await deleteUser(deleteTarget.id)
+      setDeleteLoading(false)
+      setDeleteSuccess(true)
+    } catch {
+      setDeleteLoading(false)
+      setDeleteTarget(null)
+    }
   }
 
   function handleCancelDelete() {
     setDeleteTarget(null)
+    setDeleteLoading(false)
+    setDeleteSuccess(false)
+  }
+
+  function handleApproveClick(user) {
+    setTipeTarget(user)
+    setTipeDecision("approve")
+  }
+
+  function handleRejectClick(user) {
+    setTipeTarget(user)
+    setTipeDecision("reject")
+  }
+
+  function handleCancelTipe() {
+    setTipeTarget(null)
+    setTipeDecision(null)
+  }
+
+  async function handleConfirmTipe(reason) {
+    if (!tipeTarget) return
+    setApproving(true)
+    try {
+      if (tipeDecision === "approve") {
+        await approveTipe(tipeTarget.id)
+      } else {
+        await rejectTipe(tipeTarget.id, reason)
+      }
+      setTipeTarget(null)
+      setTipeDecision(null)
+    } catch (err) {
+      console.error("Gagal memproses verifikasi tipe:", err)
+    } finally {
+      setApproving(false)
+    }
   }
 
   return (
@@ -86,6 +135,9 @@ function AdminUserList({ search, statusFilter }) {
                   onEdit={handleEditClick}
                   onDelete={handleDeleteClick}
                   onDetail={handleDetailClick}
+                  onApprove={handleApproveClick}
+                  onReject={handleRejectClick}
+                  approving={approving}
                 />
               ))}
             </div>
@@ -106,6 +158,17 @@ function AdminUserList({ search, statusFilter }) {
         user={deleteTarget}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
+        loading={deleteLoading}
+        success={deleteSuccess}
+      />
+
+      <AdminUserTipeModal
+        key={`${tipeTarget?.id}-${tipeDecision}`}
+        user={tipeTarget}
+        decision={tipeDecision}
+        loading={approving}
+        onConfirm={handleConfirmTipe}
+        onCancel={handleCancelTipe}
       />
     </div>
   )

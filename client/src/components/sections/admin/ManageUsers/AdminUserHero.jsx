@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 import { useNavigate } from "react-router-dom"
-import { Users, UserCheck, UserX, Search, Plus, LayoutGrid, ChevronDown, Check } from "lucide-react"
+import { Users, UserCheck, UserX, Search, Plus, LayoutGrid, ChevronDown, Check, Hourglass } from "lucide-react"
 import { useUsers } from "../../../../context/UserContext"
 import AdminHeroBackground from "../../../ui/AdminHeroBackground"
 
@@ -9,6 +9,7 @@ const statsConfig = [
   { key: "total", label: "Total User", icon: Users, color: "cyan" },
   { key: "aktif", label: "Aktif", icon: UserCheck, color: "emerald" },
   { key: "nonaktif", label: "Nonaktif", icon: UserX, color: "red" },
+  { key: "pending", label: "Menunggu Verifikasi", icon: Hourglass, color: "amber" },
 ]
 
 const statusTabs = [
@@ -25,6 +26,7 @@ function AdminUserHero({ search, onSearchChange, statusFilter, onStatusChange })
     total: userList.length,
     aktif: userList.filter((u) => u.status === "Aktif").length,
     nonaktif: userList.filter((u) => u.status === "Nonaktif").length,
+    pending: userList.filter((u) => u.pending_tipe).length,
   }
 
   const statusCounts = {
@@ -37,24 +39,28 @@ function AdminUserHero({ search, onSearchChange, statusFilter, onStatusChange })
     cyan: "bg-cyan-400/15 border-cyan-400/40",
     emerald: "bg-emerald-400/15 border-emerald-400/40",
     red: "bg-red-400/15 border-red-400/40",
+    amber: "bg-amber-400/15 border-amber-400/40",
   }
 
   const textMap = {
     cyan: "text-cyan-300",
     emerald: "text-emerald-300",
     red: "text-red-300",
+    amber: "text-amber-300",
   }
 
   const gradMap = {
     cyan: "from-cyan-500/20 via-cyan-500/[0.06] to-transparent",
     emerald: "from-emerald-500/20 via-emerald-500/[0.06] to-transparent",
     red: "from-red-500/20 via-red-500/[0.06] to-transparent",
+    amber: "from-amber-500/20 via-amber-500/[0.06] to-transparent",
   }
 
   const glowMap = {
     cyan: "shadow-cyan-500/20",
     emerald: "shadow-emerald-500/20",
     red: "shadow-red-500/20",
+    amber: "shadow-amber-500/20",
   }
 
   const [isOpen, setIsOpen] = useState(false)
@@ -100,14 +106,12 @@ function AdminUserHero({ search, onSearchChange, statusFilter, onStatusChange })
     setIsOpen((v) => !v)
   }
 
-  const statsContent = statsConfig.map((s, i) => {
+  const statsContent = statsConfig.map((s) => {
     const Icon = s.icon
     return (
       <div
         key={s.key}
-        className={`group relative min-w-0 overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br ${gradMap[s.color]} px-4 py-4 transition-all duration-300 hover:border-white/20 hover:-translate-y-0.5 ${
-          i === statsConfig.length - 1 ? "min-[600px]:col-span-2 min-[1000px]:col-span-1" : ""
-        }`}
+        className={`group relative min-w-0 overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br ${gradMap[s.color]} px-4 py-4 transition-all duration-300 hover:border-white/20 hover:-translate-y-0.5`}
       >
         <Icon
           className={`absolute -right-2 -top-2 h-20 w-20 rotate-12 ${textMap[s.color]} opacity-[0.07] transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110`}
@@ -152,7 +156,7 @@ function AdminUserHero({ search, onSearchChange, statusFilter, onStatusChange })
             </div>
           </div>
 
-          <div className="mt-6 grid grid-cols-1 gap-3 min-[600px]:grid-cols-2 min-[1000px]:grid-cols-3">
+          <div className="mt-6 grid grid-cols-1 gap-3 min-[600px]:grid-cols-2 min-[1000px]:grid-cols-4">
             {statsContent}
           </div>
         </div>

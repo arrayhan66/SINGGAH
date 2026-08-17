@@ -3,43 +3,17 @@ import api from "../services/api"
 
 const ProjectContext = createContext(null)
 
-function slugify(text) {
-  return String(text || "")
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "")
-}
-
 export function ProjectProvider({ children }) {
-  const [projects, setProjects] = useState([
-    {
-      id: 1,
-      slug: "sistem-informasi-akademik-poliban",
-      title: "Sistem Informasi Akademik Poliban",
-      description: "Platform manajemen akademik kampus berbasis web menggunakan Laravel.",
-      thumbnail: "https://placehold.co/600x400/0f172a/38bdf8?text=Website",
-      images: [{ image_url: "https://placehold.co/600x400/0f172a/38bdf8?text=Website" }],
-      User: { name: "Ahmad Fauzan" },
-      Category: { id: 1, name: "Website", slug: "website" },
-      status: "approved",
-      created_at: "2024-01-10",
-      likesCount: 30,
-      viewsCount: 150,
-    }
-  ])
+  const [projects, setProjects] = useState([])
 
   const fetchProjects = useCallback(async () => {
     try {
       const res = await api.get("/projects")
       const items = res.data.data.items || res.data.data || []
-      if (items.length > 0) {
-        setProjects(items)
-      }
+      setProjects(items)
     } catch (err) {
-      console.error("Failed to fetch projects, keeping fallback:", err)
+      console.error("Failed to fetch projects:", err)
+      setProjects([])
     }
   }, [])
 
@@ -80,7 +54,10 @@ export function ProjectProvider({ children }) {
 
   const approveProject = useCallback(async (id, note = "") => {
     try {
-      await api.post(`/projects/${id}/approve`, { note })
+      await api.patch(`/projects/${id}/status`, {
+        status: "published",
+        reason: note,
+      })
       await fetchProjects()
     } catch (err) {
       console.error("Failed to approve project:", err)
@@ -90,7 +67,10 @@ export function ProjectProvider({ children }) {
 
   const rejectProject = useCallback(async (id, reason = "") => {
     try {
-      await api.post(`/projects/${id}/reject`, { reason })
+      await api.patch(`/projects/${id}/status`, {
+        status: "rejected",
+        reason,
+      })
       await fetchProjects()
     } catch (err) {
       console.error("Failed to reject project:", err)

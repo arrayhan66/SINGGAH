@@ -11,6 +11,8 @@ import TextAlign from "@tiptap/extension-text-align"
 import HorizontalRule from "@tiptap/extension-horizontal-rule"
 import AdminBeritaToolbar from "./AdminBeritaToolbar"
 import FileHandler from "@tiptap/extension-file-handler"
+import AdBlock from "./extensions/AdBlock.jsx"
+import SeeAlso from "./extensions/SeeAlso.jsx"
 
 import {
   Image as ImageIcon,
@@ -103,17 +105,28 @@ const ResizableImage = Image.extend({
   },
 })
 
-function AdminBeritaEditorMain({ formData, updateField }) {
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
+function AdminBeritaEditorMain({ formData, updateField, isEditMode }) {
   const titleRef = useRef(null)
+  const contentRef = useRef(null)
   const [linkPopover, setLinkPopover] = useState(false)
   const [linkUrl, setLinkUrl] = useState("")
   const [selectedImageAttrs, setSelectedImageAttrs] = useState(null)
   const [selectedImagePos, setSelectedImagePos] = useState(null)
   const [imageCaptionInput, setImageCaptionInput] = useState("")
+  const [resizeBarStyle, setResizeBarStyle] = useState(null)
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({ strike: false }),
       Underline,
       ResizableImage.configure({
         inline: false,
@@ -136,9 +149,9 @@ function AdminBeritaEditorMain({ formData, updateField }) {
           "image/webp",
           "image/gif",
         ],
-        onDrop(editor, files, pos) {
-          files.forEach((file) => {
-            const url = URL.createObjectURL(file)
+        async onDrop(editor, files, pos) {
+          for (const file of files) {
+            const url = await fileToBase64(file)
             editor
               .chain()
               .insertContentAt(pos, {
@@ -146,19 +159,21 @@ function AdminBeritaEditorMain({ formData, updateField }) {
                 attrs: { src: url, alt: file.name, width: "100%", caption: "" },
               })
               .run()
-          })
+          }
         },
-        onPaste(editor, files) {
-          files.forEach((file) => {
-            const url = URL.createObjectURL(file)
+        async onPaste(editor, files) {
+          for (const file of files) {
+            const url = await fileToBase64(file)
             editor
               .chain()
               .focus()
               .setImage({ src: url, alt: file.name, width: "100%", caption: "" })
               .run()
-          })
+          }
         },
       }),
+      AdBlock,
+      SeeAlso,
     ],
     content: formData.contentText,
     onUpdate({ editor }) {
@@ -177,10 +192,20 @@ function AdminBeritaEditorMain({ formData, updateField }) {
       setSelectedImageAttrs(attrs)
       setSelectedImagePos(selection.from)
       setImageCaptionInput(attrs.caption || "")
+      const container = contentRef.current
+      const imageEl = ed.view.nodeDOM(selection.from)
+      if (container && imageEl instanceof HTMLElement) {
+        setResizeBarStyle({
+          top: imageEl.offsetTop + imageEl.offsetHeight + 8,
+        })
+      } else {
+        setResizeBarStyle(null)
+      }
     } else {
       setSelectedImageAttrs(null)
       setSelectedImagePos(null)
       setImageCaptionInput("")
+      setResizeBarStyle(null)
     }
   }
 
@@ -195,21 +220,27 @@ function AdminBeritaEditorMain({ formData, updateField }) {
     autoResizeTitle()
   }, [formData.title])
 
+  const lastExternalContent = useRef(formData.contentText)
+
   useEffect(() => {
     if (!editor) return
-    if (editor.getHTML() !== formData.contentText) {
+    if (
+      lastExternalContent.current !== formData.contentText &&
+      editor.getHTML() !== formData.contentText
+    ) {
       editor.commands.setContent(formData.contentText || "", false)
     }
+    lastExternalContent.current = formData.contentText
   }, [formData.contentText, editor])
 
-  function insertImage() {
+  async function insertImage() {
     const input = document.createElement("input")
     input.type = "file"
     input.accept = "image/*"
-    input.onchange = (event) => {
+    input.onchange = async (event) => {
       const file = event.target.files?.[0]
       if (!file) return
-      const imageUrl = URL.createObjectURL(file)
+      const imageUrl = await fileToBase64(file)
       editor
         ?.chain()
         .focus()
@@ -311,7 +342,7 @@ function AdminBeritaEditorMain({ formData, updateField }) {
         onChange={(e) => {
           const title = e.target.value
           updateField("title", title)
-          if (!formData.slug) {
+          if (!isEditMode) {
             const slug = title
               .toLowerCase()
               .trim()
@@ -353,9 +384,13 @@ function AdminBeritaEditorMain({ formData, updateField }) {
           insertLink={insertLink}
         />
 
-        {/* Floating Image Resizer & Caption Bar (Level Dewa NodeSelection when image is clicked) */}
-        {selectedImageAttrs && (
-          <div className="flex flex-col gap-2.5 bg-slate-900 px-4 py-3 border-b border-slate-700 text-xs text-cyan-200">
+        <div ref={contentRef} className="overflow-auto relative min-h-[450px]">
+          {/* Floating Image Resizer & Caption Bar (Level Dewa NodeSelection when image is clicked) */}
+          {selectedImageAttrs && resizeBarStyle && (
+          <div
+            className="absolute left-2 right-2 z-30 flex flex-col gap-2.5 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-xs text-cyan-200 shadow-2xl"
+            style={resizeBarStyle}
+          >
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="font-semibold flex items-center gap-1.5 text-white">
                 <ImageIcon size={14} className="text-cyan-400" />
@@ -450,9 +485,8 @@ function AdminBeritaEditorMain({ formData, updateField }) {
               </button>
             </div>
           </div>
-        )}
+          )}
 
-        <div className="overflow-auto relative min-h-[450px]">
           <EditorContent editor={editor} />
 
           {linkPopover && (

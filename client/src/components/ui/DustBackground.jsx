@@ -20,7 +20,10 @@ function DustBackground({ color = "#7dd3fc", count = 150 }) {
   return (
     <div ref={ref} className="pointer-events-none absolute inset-0">
       {isVisible && (
-        <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
+        <Canvas
+          camera={{ position: [0, 0, 5], fov: 60 }}
+          style={{ pointerEvents: "none" }}
+        >
           <Sparkles
             count={count}
             scale={[12, 8, 6]}

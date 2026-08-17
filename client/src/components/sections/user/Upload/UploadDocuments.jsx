@@ -2,8 +2,9 @@ import { useRef } from "react"
 import { FileUp, X, FileText } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
 
-function UploadDocuments({ value, onChange }) {
+function UploadDocuments({ value, onChange, existingItems, onRemoveExisting }) {
   const inputRef = useRef(null)
+  const hasExisting = Array.isArray(existingItems) && existingItems.length > 0
 
   function handleFileChange(e) {
     const files = Array.from(e.target.files || [])
@@ -20,6 +21,11 @@ function UploadDocuments({ value, onChange }) {
     if (bytes < 1024) return `${bytes} B`
     if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`
     return `${(bytes / 1048576).toFixed(1)} MB`
+  }
+
+  function getDocName(doc, index) {
+    if (typeof doc === "string") return doc.split("/").pop()
+    return doc.name || doc.filename || `Dokumen ${index + 1}`
   }
 
   return (
@@ -39,9 +45,31 @@ function UploadDocuments({ value, onChange }) {
       </div>
 
       <div className="mt-2 min-[280px]:mt-4 flex flex-col gap-2">
+        {hasExisting &&
+          existingItems.map((doc, index) => (
+            <div
+              key={`existing-doc-${index}`}
+              className="flex items-center gap-2 min-[280px]:gap-3 rounded-xl border border-white/10 bg-white/5 px-2.5 py-1.5 min-[280px]:px-4 min-[280px]:py-2.5"
+            >
+              <FileText className="h-4 w-4 min-[280px]:h-[18px] min-[280px]:w-[18px] shrink-0 text-cyan-400" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs min-[280px]:text-sm text-white">
+                  {getDocName(doc, index)}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => onRemoveExisting?.(index)}
+                className="flex h-6 w-6 min-[280px]:h-7 min-[280px]:w-7 cursor-pointer shrink-0 items-center justify-center rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
+
         {value.map((file, index) => (
           <div
-            key={index}
+            key={`new-doc-${index}`}
             className="flex items-center gap-2 min-[280px]:gap-3 rounded-xl border border-white/10 bg-white/5 px-2.5 py-1.5 min-[280px]:px-4 min-[280px]:py-2.5"
           >
             <FileText className="h-4 w-4 min-[280px]:h-[18px] min-[280px]:w-[18px] shrink-0 text-cyan-400" />
@@ -74,7 +102,7 @@ function UploadDocuments({ value, onChange }) {
       <input
         ref={inputRef}
         type="file"
-        accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt"
+        accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip,.rar"
         multiple
         onChange={handleFileChange}
         className="hidden"

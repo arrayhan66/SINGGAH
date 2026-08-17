@@ -1,7 +1,6 @@
+import { useEffect, useState } from "react"
 import { FolderOpen, Newspaper, Users, Clock } from "lucide-react"
-import { useProjects } from "../../../../context/ProjectContext"
-import { useBerita } from "../../../../context/BeritaContext"
-import { useUsers } from "../../../../context/UserContext"
+import api from "../../../../services/api"
 
 const ACCENT = {
   color: "text-cyan-400",
@@ -28,22 +27,43 @@ function Sparkline({ d }) {
 }
 
 function DashboardStats() {
-  const { projects } = useProjects()
-  const { beritaList } = useBerita()
-  const { userList } = useUsers()
+  const [stats, setStats] = useState({
+    totalProject: 0,
+    pendingProject: 0,
+    totalNews: 0,
+    totalUser: 0,
+  })
 
-  const totalProject = projects.length
-  const pendingProject = projects.filter(
-    (p) => p.status === "pending",
-  ).length
-  const totalBerita = beritaList.length
-  const totalUser = userList.length
+  useEffect(() => {
+    let isMounted = true
 
-  const stats = [
-    { label: "Total Project", value: totalProject, icon: FolderOpen },
-    { label: "Total Berita", value: totalBerita, icon: Newspaper },
-    { label: "Total User", value: totalUser, icon: Users },
-    { label: "Menunggu Review", value: pendingProject, icon: Clock },
+    api
+      .get("/dashboard")
+      .then((res) => {
+        const data = res.data?.data?.stats || {}
+        if (isMounted) {
+          setStats({
+            totalProject: data.totalProject || 0,
+            pendingProject: data.pendingProject || 0,
+            totalNews: data.totalNews || 0,
+            totalUser: data.totalUser || 0,
+          })
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch dashboard stats:", err)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  const statItems = [
+    { label: "Total Project", value: stats.totalProject, icon: FolderOpen },
+    { label: "Total Berita", value: stats.totalNews, icon: Newspaper },
+    { label: "Total User", value: stats.totalUser, icon: Users },
+    { label: "Menunggu Review", value: stats.pendingProject, icon: Clock },
   ]
 
   return (
@@ -57,7 +77,7 @@ function DashboardStats() {
         </defs>
       </svg>
       <div className="grid grid-cols-1 min-[640px]:grid-cols-2 min-[1200px]:grid-cols-4 gap-3 md:gap-4">
-        {stats.map((stat) => {
+        {statItems.map((stat) => {
           const Icon = stat.icon
           return (
             <div

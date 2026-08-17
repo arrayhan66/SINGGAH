@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   ArrowRight,
   User as UserIcon,
@@ -11,14 +11,18 @@ import {
 } from "lucide-react";
 import GlassCard from "../../ui/GlassCard";
 import { useAuth } from "../../../context/AuthContext";
+import { imageUrl } from "../../../utils/imageUrl";
+import api from "../../../services/api";
 
 function KaryaProjectCard({ project }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const isLoggedIn = user !== null;
 
   const {
     id,
+    slug,
     Category,
     title,
     description,
@@ -28,14 +32,15 @@ function KaryaProjectCard({ project }) {
     year,
     likesCount: initialLikes,
     viewsCount,
-    comments,
+    commentsCount,
   } = project;
 
   const categorySlug = Category?.slug || "";
+  const projectKey = slug || id;
 
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(Boolean(project.liked));
   const [likesCount, setLikesCount] = useState(initialLikes || 0);
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(Boolean(project.bookmarked));
 
   const coverImage =
     Array.isArray(images) && images.length > 0
@@ -48,21 +53,34 @@ function KaryaProjectCard({ project }) {
     e.preventDefault();
     e.stopPropagation();
     if (!isLoggedIn) {
-      navigate("/login");
+      navigate("/login", { state: { from: location } });
       return;
     }
-    setIsLiked((prev) => !prev);
-    setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1));
+    api.post(`/projects/${id}/like`)
+      .then((res) => {
+        const { liked, likesCount } = res.data.data || {};
+        setIsLiked(Boolean(liked));
+        if (typeof likesCount === "number") setLikesCount(likesCount);
+      })
+      .catch((err) => {
+        console.error("Failed to update like:", err);
+      });
   }
 
   function handleBookmark(e) {
     e.preventDefault();
     e.stopPropagation();
     if (!isLoggedIn) {
-      navigate("/login");
+      navigate("/login", { state: { from: location } });
       return;
     }
-    setIsBookmarked((prev) => !prev);
+    api.post(`/projects/${id}/bookmark`)
+      .then((res) => {
+        setIsBookmarked(Boolean(res.data.data?.bookmarked));
+      })
+      .catch((err) => {
+        console.error("Failed to update bookmark:", err);
+      });
   }
 
   return (
@@ -73,9 +91,9 @@ function KaryaProjectCard({ project }) {
       {/* Cover */}
       <div className="relative overflow-hidden">
         <img
-          src={coverImage}
+          src={imageUrl(coverImage)}
           alt={title}
-          className="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-110 sm:h-48 md:h-52 lg:h-56 xl:h-60 3xl:h-72 4xl:h-80"
+          className="h-40 w-full object-cover transition-all duration-500 sm:h-48 md:h-52 lg:h-56 xl:h-60 3xl:h-72 4xl:h-80"
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-brand-navy via-transparent to-transparent" />
@@ -148,7 +166,7 @@ function KaryaProjectCard({ project }) {
           </button>
 
           <Link
-            to={`/karya/${categorySlug}/${id}`}
+            to={`/karya/${categorySlug}/${projectKey}`}
             onClick={(e) => e.stopPropagation()}
             className="flex cursor-pointer items-center gap-1.5 transition-colors hover:text-cyan-400"
           >
@@ -156,7 +174,7 @@ function KaryaProjectCard({ project }) {
               size={14}
               className="sm:size-[15px] md:size-4 lg:size-[18px] 3xl:size-5 4xl:size-[22px]"
             />
-            <span>{Array.isArray(comments) ? comments.length : 0}</span>
+            <span>{commentsCount || 0}</span>
           </Link>
 
           <span className="ml-auto flex items-center gap-1.5 text-slate-500">
@@ -171,7 +189,7 @@ function KaryaProjectCard({ project }) {
         {/* Button */}
         <div className="mt-auto pt-4 sm:pt-5 md:pt-6 lg:pt-7 3xl:pt-8 4xl:pt-10">
           <Link
-            to={`/karya/${categorySlug}/${id}`}
+            to={`/karya/${categorySlug}/${projectKey}`}
             className="group/btn flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-white py-2.5 text-xs font-semibold text-slate-900 transition-colors duration-300 hover:bg-slate-200 sm:py-3 sm:text-sm md:text-sm lg:py-3.5 lg:text-base 3xl:py-4 3xl:text-base 4xl:py-5 4xl:text-lg"
           >
             Lihat Detail

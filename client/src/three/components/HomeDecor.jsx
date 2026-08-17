@@ -54,6 +54,7 @@ const BOOK_SPINE_MAT_BY_TEX = new Map(
 const _iq = new THREE.Quaternion()
 const _im = new THREE.Matrix4()
 const _iv = new THREE.Vector3()
+const _ip = new THREE.Vector3()
 const _ic = new THREE.Color()
 
 function BookShelfInstances({ books, y }) {
@@ -73,7 +74,7 @@ function BookShelfInstances({ books, y }) {
       const n = books.length
       for (let i = 0; i < n; i++) {
         const b = books[i]
-        _im.compose(_iv.set(b.x, y + b.h / 2, 0), _iq, _iv.set(b.w, b.h, 0.2))
+        _im.compose(_ip.set(b.x, y + b.h / 2, 0), _iq, _iv.set(b.w, b.h, 0.2))
         boxRef.current.setMatrixAt(i, _im)
         boxRef.current.setColorAt(i, _ic.set(b.c))
       }
@@ -85,7 +86,7 @@ function BookShelfInstances({ books, y }) {
       if (!im) return
       im.count = g.bs.length
       g.bs.forEach((b, k) => {
-        _im.compose(_iv.set(b.x, y + b.h / 2, 0.104), _iq, _iv.set(b.w, b.h, 1))
+        _im.compose(_ip.set(b.x, y + b.h / 2, 0.104), _iq, _iv.set(b.w, b.h, 1))
         im.setMatrixAt(k, _im)
       })
       im.instanceMatrix.needsUpdate = true

@@ -1,4 +1,4 @@
-const { Project, Category, User } = require("../models")
+const { Project, Category, User, ProjectView } = require("../models")
 const cache = require("../utils/cache")
 
 const STATS_TTL = 60 * 1000
@@ -8,16 +8,18 @@ exports.getPublicStats = async () => {
   const cached = cache.get(STATS_KEY)
   if (cached) return cached
 
-  const [totalProject, totalCategory, totalUser] = await Promise.all([
+  const [totalProject, totalCategory, totalUser, totalVisitors] = await Promise.all([
     Project.count({ where: { status: "published" } }),
     Category.count(),
     User.count(),
+    ProjectView.count(),
   ])
 
   const stats = {
     totalProject,
     totalCategory,
     totalUser,
+    totalVisitors,
   }
 
   cache.set(STATS_KEY, stats, STATS_TTL)

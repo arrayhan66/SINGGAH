@@ -17,6 +17,14 @@ router.delete(
   ctrl.removeReply,
 )
 
+router.put(
+  "/:id/comments/:commentId/replies/:replyId",
+  authMiddleware,
+  ctrl.updateReply,
+)
+
+router.put("/:id/comments/:commentId", authMiddleware, ctrl.updateComment)
+
 router.delete(
   "/:id/comments/:commentId",
   authMiddleware,

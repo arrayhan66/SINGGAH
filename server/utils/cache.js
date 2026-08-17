@@ -38,3 +38,15 @@ exports.clear = () => {
   store.clear()
   return true
 }
+
+exports.delPrefix = (prefix) => {
+  if (isTest) return CACHE_DISABLED_MSG
+
+  for (const key of store.keys()) {
+    if (key.startsWith(prefix)) {
+      store.delete(key)
+    }
+  }
+
+  return true
+}

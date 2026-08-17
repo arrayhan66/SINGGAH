@@ -14,8 +14,8 @@ exports.createUserValidator = [
     .withMessage("Username wajib diisi")
     .isLength({ min: 3 })
     .withMessage("Username minimal 3 karakter")
-    .matches(/^[a-zA-Z0-9_]+$/)
-    .withMessage("Username hanya boleh huruf, angka, dan underscore"),
+    .matches(/^[a-zA-Z0-9_.-]+$/)
+    .withMessage("Username hanya boleh huruf, angka, titik, underscore, dan strip"),
 
   body("email")
     .trim()
@@ -23,7 +23,7 @@ exports.createUserValidator = [
     .withMessage("Email wajib diisi")
     .isEmail()
     .withMessage("Format email tidak valid")
-    .normalizeEmail(),
+    .normalizeEmail({ gmail_remove_dots: false }),
 
   body("password")
     .notEmpty()
@@ -40,10 +40,10 @@ exports.updateUserValidator = [
     .trim()
     .isLength({ min: 3 })
     .withMessage("Username minimal 3 karakter")
-    .matches(/^[a-zA-Z0-9_]+$/)
-    .withMessage("Username hanya boleh huruf, angka, dan underscore"),
+    .matches(/^[a-zA-Z0-9_.-]+$/)
+    .withMessage("Username hanya boleh huruf, angka, titik, underscore, dan strip"),
 
-  body("email").optional().trim().isEmail().withMessage("Format email tidak valid").normalizeEmail(),
+  body("email").optional().trim().isEmail().withMessage("Format email tidak valid").normalizeEmail({ gmail_remove_dots: false }),
 
   body("password").optional().isLength({ min: 8 }).withMessage("Password minimal 8 karakter"),
 
@@ -58,4 +58,16 @@ exports.updateUserValidator = [
     .optional()
     .isIn(["active", "inactive"])
     .withMessage("Status tidak valid"),
+]
+
+exports.approveTipeValidator = [
+  body("approved")
+    .isBoolean()
+    .withMessage("Approved harus boolean"),
+
+  body("reason")
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage("Alasan maksimal 500 karakter"),
 ]

@@ -18,11 +18,20 @@ const User = sequelize.define(
       allowNull: false,
       unique: true,
     },
+    pending_email: {
+      type: DataTypes.STRING(150),
+      allowNull: true,
+      defaultValue: null,
+    },
     password: {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
     avatar: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    identitas_photo: {
       type: DataTypes.STRING(255),
       allowNull: true,
     },
@@ -40,6 +49,16 @@ const User = sequelize.define(
       type: DataTypes.ENUM("admin", "mahasiswa", "dosen", "umum"),
       allowNull: false,
       defaultValue: "umum",
+    },
+    pending_tipe: {
+      type: DataTypes.ENUM("mahasiswa", "dosen"),
+      allowNull: true,
+      defaultValue: null,
+    },
+    rejection_reason: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      defaultValue: null,
     },
     status: {
       type: DataTypes.ENUM("active", "inactive"),
@@ -59,5 +78,11 @@ const User = sequelize.define(
     updatedAt: "updated_at",
   },
 )
+
+User.beforeValidate((user) => {
+  if (user.username) {
+    user.username = String(user.username).trim().toLowerCase()
+  }
+})
 
 module.exports = User

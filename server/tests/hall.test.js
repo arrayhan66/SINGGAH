@@ -43,9 +43,12 @@ describe("Hall Endpoints", () => {
       email: "studenthall@example.com",
       password: "Password123!",
       tipe: "mahasiswa",
+      nim_nip: "2101010010",
     })
     const studentUser = await User.findOne({ where: { email: "studenthall@example.com" } })
     studentUser.is_verified = true
+    studentUser.tipe = "mahasiswa"
+    studentUser.pending_tipe = null
     await studentUser.save()
     const studentLogin = await request(app).post("/api/auth/login").send({
       email: "studenthall@example.com",

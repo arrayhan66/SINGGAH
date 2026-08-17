@@ -1,15 +1,17 @@
 const { Comment, CommentReply, Project, User, sequelize } = require("../models")
 const AppError = require("../utils/AppError")
+const resolveProjectId = require("../utils/resolveProjectId")
 const { createNotification } = require("./notificationService")
 const { logActivity } = require("./activityLogService")
 
 exports.getComments = async (projectId) => {
+  const id = await resolveProjectId(projectId)
   return await Comment.findAll({
-    where: { project_id: projectId },
+    where: { project_id: id },
     include: [
       {
         model: User,
-        attributes: ["id", "name", "username", "avatar"],
+        attributes: ["id", "name", "username", "avatar", "role"],
       },
       {
         model: CommentReply,
@@ -17,7 +19,7 @@ exports.getComments = async (projectId) => {
         include: [
           {
             model: User,
-            attributes: ["id", "name", "username", "avatar"],
+            attributes: ["id", "name", "username", "avatar", "role"],
           },
         ],
       },
@@ -27,7 +29,8 @@ exports.getComments = async (projectId) => {
 }
 
 exports.addComment = async (projectId, text, user) => {
-  const project = await Project.findByPk(projectId)
+  const id = await resolveProjectId(projectId)
+  const project = await Project.findByPk(id)
   if (!project) throw new AppError("Project tidak ditemukan", 404)
 
   if (!text || !text.trim()) {
@@ -39,7 +42,7 @@ exports.addComment = async (projectId, text, user) => {
       {
         text,
         user_id: user.id,
-        project_id: projectId,
+        project_id: id,
       },
       { transaction: t },
     )
@@ -65,7 +68,7 @@ exports.addComment = async (projectId, text, user) => {
     userId: user.id,
     action: "comment_added",
     targetType: "project",
-    targetId: projectId,
+    targetId: id,
     description: `${user.name} mengomentari project "${project.title}"`,
   })
 
@@ -81,7 +84,7 @@ exports.getReplies = async (commentId) => {
     include: [
       {
         model: User,
-        attributes: ["id", "name", "username", "avatar"],
+        attributes: ["id", "name", "username", "avatar", "role"],
       },
     ],
     order: [["created_at", "ASC"]],
@@ -146,6 +149,40 @@ exports.addReply = async (commentId, text, user) => {
     return created
   })
 
+  return reply
+}
+
+exports.updateComment = async (commentId, text, user) => {
+  const comment = await Comment.findByPk(commentId)
+  if (!comment) throw new AppError("Komentar tidak ditemukan", 404)
+
+  if (user.role !== "admin" && comment.user_id !== user.id) {
+    throw new AppError("Akses ditolak", 403)
+  }
+
+  if (!text || !text.trim()) {
+    throw new AppError("Komentar tidak boleh kosong", 400)
+  }
+
+  comment.text = text
+  await comment.save()
+  return comment
+}
+
+exports.updateReply = async (replyId, text, user) => {
+  const reply = await CommentReply.findByPk(replyId)
+  if (!reply) throw new AppError("Balasan tidak ditemukan", 404)
+
+  if (user.role !== "admin" && reply.user_id !== user.id) {
+    throw new AppError("Akses ditolak", 403)
+  }
+
+  if (!text || !text.trim()) {
+    throw new AppError("Balasan tidak boleh kosong", 400)
+  }
+
+  reply.text = text
+  await reply.save()
   return reply
 }
 

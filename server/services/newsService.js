@@ -18,6 +18,7 @@ const toJSON = (news) => {
   const data = news.toJSON()
   data.tags = parseJson(data.tags)
   data.gallery = parseJson(data.gallery)
+  data.content = parseJson(data.content)
   return data
 }
 
@@ -125,9 +126,11 @@ exports.createNews = async (data, userId) => {
     date,
     source,
     summary,
+    desc,
     tags,
     gallery,
     content,
+    contentHTML,
     status,
   } = data
 
@@ -151,14 +154,17 @@ exports.createNews = async (data, userId) => {
     winner: winner || null,
     date: date || null,
     source: source || null,
-    summary: summary || null,
+    summary: summary || desc || null,
     tags: serialize(tags),
     gallery: serialize(gallery),
     content,
+    contentHTML: contentHTML || null,
     status: status ?? "draft",
     published_at: status === "published" ? new Date() : null,
     author_id: userId,
   })
+
+  cache.delPrefix("news:list:")
 
   return await exports.getNewsById(news.id)
 }
@@ -179,9 +185,11 @@ exports.updateNews = async (id, data) => {
     date,
     source,
     summary,
+    desc,
     tags,
     gallery,
     content,
+    contentHTML,
     status,
   } = data
 
@@ -210,13 +218,16 @@ exports.updateNews = async (id, data) => {
   news.winner = winner ?? news.winner
   news.date = date ?? news.date
   news.source = source ?? news.source
-  news.summary = summary ?? news.summary
+  news.summary = summary || desc || news.summary
   news.tags = tags === undefined ? news.tags : serialize(tags)
   news.gallery = gallery === undefined ? news.gallery : serialize(gallery)
   news.content = content ?? news.content
+  news.contentHTML = contentHTML === undefined ? news.contentHTML : (contentHTML || null)
   news.status = status ?? news.status
 
   await news.save()
+
+  cache.delPrefix("news:list:")
 
   return exports.getNewsById(id)
 }
@@ -225,6 +236,8 @@ exports.deleteNews = async (id) => {
   const news = await exports.getNewsById(id)
 
   await News.destroy({ where: { id } })
+
+  cache.delPrefix("news:list:")
 
   return news
 }

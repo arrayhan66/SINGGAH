@@ -32,12 +32,15 @@ const activityLogRoutes = require("./routes/activityLogRoutes")
 const mediaRoutes = require("./routes/mediaRoutes")
 const reportRoutes = require("./routes/reportRoutes")
 const hallRoutes = require("./routes/hallRoutes")
+const maintenanceMiddleware = require("./middlewares/maintenanceMiddleware")
 
 const swaggerUi = require("swagger-ui-express")
 const loadSwagger = require("./config/swagger")
 
 const app = express()
 const PORT = process.env.PORT || 5000
+
+app.set("trust proxy", 1)
 
 app.use(helmet())
 
@@ -58,6 +61,7 @@ if (process.env.NODE_ENV !== "test") {
   )
 }
 
+app.use("/api", maintenanceMiddleware)
 app.use("/api/auth", authRoutes)
 app.use("/api/users", userRoutes)
 app.use("/api/categories", categoryRoutes)

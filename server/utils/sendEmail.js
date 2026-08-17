@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer")
+const { BRAND_NAME } = require("./emailTemplate")
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -13,7 +14,7 @@ const sendEmail = async ({ to, subject, html }) => {
     return Promise.resolve(true)
   }
   await transporter.sendMail({
-    from: `"PamerIT" <${process.env.EMAIL_USER}>`,
+    from: `"${BRAND_NAME}" <${process.env.EMAIL_USER}>`,
     to,
     subject,
     html,

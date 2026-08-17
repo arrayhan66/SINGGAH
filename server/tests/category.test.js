@@ -37,9 +37,12 @@ describe("Category Endpoints", () => {
       email: "student@example.com",
       password: "Password123!",
       tipe: "mahasiswa",
+      nim_nip: "2101010001",
     })
     const studentUser = await User.findOne({ where: { email: "student@example.com" } })
     studentUser.is_verified = true
+    studentUser.tipe = "mahasiswa"
+    studentUser.pending_tipe = null
     await studentUser.save()
 
     const studentLogin = await request(app).post("/api/auth/login").send({

@@ -211,6 +211,42 @@ addComment:
       "404":
         description: Project tidak ditemukan
 
+updateComment:
+  put:
+    tags:
+      - Project Interactions
+    summary: Perbarui komentar
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - text
+            properties:
+              text:
+                type: string
+                example: Keren, update!
+    responses:
+      "200":
+        description: Komentar diperbarui
+      "403":
+        description: Forbidden
+
 removeComment:
   delete:
     tags:
@@ -749,6 +785,47 @@ addReply:
         description: Balasan ditambahkan
       "401":
         description: Unauthorized
+
+updateReply:
+  put:
+    tags:
+      - Comments & Replies
+    summary: Perbarui balasan komentar
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: replyId
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - text
+            properties:
+              text:
+                type: string
+                example: Terima kasih, update!
+    responses:
+      "200":
+        description: Balasan diperbarui
+      "403":
+        description: Forbidden
 
 removeReply:
   delete:

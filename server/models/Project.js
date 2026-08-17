@@ -30,6 +30,16 @@ const Project = sequelize.define(
       allowNull: false,
       defaultValue: "pending",
     },
+    rejection_reason: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      defaultValue: null,
+    },
+    approve_note: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      defaultValue: null,
+    },
   },
   {
     tableName: "projects",

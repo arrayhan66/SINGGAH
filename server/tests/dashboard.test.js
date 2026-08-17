@@ -37,9 +37,12 @@ describe("Dashboard & Public Stats Endpoints", () => {
       email: "userdashboard@example.com",
       password: "Password123!",
       tipe: "mahasiswa",
+      nim_nip: "2101010002",
     })
     const user = await User.findOne({ where: { email: "userdashboard@example.com" } })
     user.is_verified = true
+    user.tipe = "mahasiswa"
+    user.pending_tipe = null
     await user.save()
     const userLogin = await request(app).post("/api/auth/login").send({
       email: "userdashboard@example.com",

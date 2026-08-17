@@ -45,9 +45,12 @@ describe("Media Endpoints", () => {
       email: "mediauser@example.com",
       password: "Password123!",
       tipe: "mahasiswa",
+      nim_nip: "2101010003",
     })
     const user = await User.findOne({ where: { email: "mediauser@example.com" } })
     user.is_verified = true
+    user.tipe = "mahasiswa"
+    user.pending_tipe = null
     await user.save()
     const userLogin = await request(app).post("/api/auth/login").send({
       email: "mediauser@example.com",
@@ -81,7 +84,7 @@ describe("Media Endpoints", () => {
       cloudinary.search.execute.mockResolvedValueOnce({
         resources: [
           {
-            public_id: "pamerit/media/banner-1",
+            public_id: "singgah/media/banner-1",
             secure_url: "https://res.cloudinary.com/test/image/upload/banner-1.png",
             filename: "banner-1.png",
             format: "png",
@@ -102,7 +105,7 @@ describe("Media Endpoints", () => {
       expect(res.body.success).toBe(true)
       expect(Array.isArray(res.body.data)).toBe(true)
       expect(res.body.data).toHaveLength(1)
-      expect(res.body.data[0]).toHaveProperty("publicId", "pamerit/media/banner-1")
+      expect(res.body.data[0]).toHaveProperty("publicId", "singgah/media/banner-1")
       expect(res.body.data[0]).toHaveProperty("url")
       expect(res.body.data[0]).toHaveProperty("format", "png")
     })
@@ -123,13 +126,13 @@ describe("Media Endpoints", () => {
       expect(res.status).toBe(403)
     })
 
-    it("should reject non-image file", async () => {
+    it("should reject unsupported file type", async () => {
       const res = await request(app)
         .post("/api/media")
         .set("Authorization", `Bearer ${adminToken}`)
         .attach("files", Buffer.from("not an image"), {
-          filename: "note.txt",
-          contentType: "text/plain",
+          filename: "note.bin",
+          contentType: "application/octet-stream",
         })
 
       expect(res.status).toBe(400)

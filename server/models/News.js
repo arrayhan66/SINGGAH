@@ -49,6 +49,10 @@ const News = sequelize.define(
       type: DataTypes.TEXT("long"),
       allowNull: false,
     },
+    contentHTML: {
+      type: DataTypes.TEXT("long"),
+      allowNull: true,
+    },
     status: {
       type: DataTypes.ENUM("draft", "published"),
       allowNull: false,

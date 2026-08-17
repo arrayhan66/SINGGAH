@@ -1,25 +1,28 @@
 const { ProjectLike, Project, User, sequelize } = require("../models")
 const AppError = require("../utils/AppError")
+const resolveProjectId = require("../utils/resolveProjectId")
 const { createNotification } = require("./notificationService")
 const { logActivity } = require("./activityLogService")
 
 exports.toggleLike = async (projectId, user) => {
-  const project = await Project.findByPk(projectId)
+  const id = await resolveProjectId(projectId)
+  const project = await Project.findByPk(id)
   if (!project) throw new AppError("Project tidak ditemukan", 404)
 
   const existing = await ProjectLike.findOne({
-    where: { project_id: projectId, user_id: user.id },
+    where: { project_id: id, user_id: user.id },
   })
 
   if (existing) {
     await existing.destroy()
-    return { liked: false }
+    const likesCount = await ProjectLike.count({ where: { project_id: id } })
+    return { liked: false, likesCount }
   }
 
   await sequelize.transaction(async (t) => {
     await ProjectLike.create(
       {
-        project_id: projectId,
+        project_id: id,
         user_id: user.id,
       },
       { transaction: t },
@@ -44,26 +47,18 @@ exports.toggleLike = async (projectId, user) => {
     userId: user.id,
     action: "project_liked",
     targetType: "project",
-    targetId: projectId,
+    targetId: id,
     description: `${user.name} menyukai project "${project.title}"`,
   })
 
-  if (project.user_id !== user.id) {
-    await createNotification({
-      user_id: project.user_id,
-      type: "like",
-      title: "Disukai",
-      message: `${user.name} menyukai project Anda: "${project.title}"`,
-      reference_type: "project",
-      reference_id: project.id,
-    })
-  }
+  const likesCount = await ProjectLike.count({ where: { project_id: id } })
 
-  return { liked: true }
+  return { liked: true, likesCount }
 }
 
 exports.getLikeCount = async (projectId) => {
-  return await ProjectLike.count({ where: { project_id: projectId } })
+  const id = await resolveProjectId(projectId)
+  return await ProjectLike.count({ where: { project_id: id } })
 }
 
 exports.hasUserLiked = async (projectId, userId) => {

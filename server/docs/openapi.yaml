@@ -76,6 +76,8 @@ paths:
       $ref: './paths/interactions.yaml#/addComment'
 
   /projects/{id}/comments/{commentId}:
+    put:
+      $ref: './paths/interactions.yaml#/updateComment'
     delete:
       $ref: './paths/interactions.yaml#/removeComment'
 
@@ -86,6 +88,8 @@ paths:
       $ref: './paths/interactions.yaml#/addReply'
 
   /projects/{id}/comments/{commentId}/replies/{replyId}:
+    put:
+      $ref: './paths/interactions.yaml#/updateReply'
     delete:
       $ref: './paths/interactions.yaml#/removeReply'
 
@@ -181,9 +185,27 @@ paths:
 
   /notifications/read-all:
     $ref: './paths/notifications.yaml#/markAllRead'
-    
+
+  /notifications/bulk:
+    post:
+      $ref: './paths/notifications.yaml#/bulkUpdate'
+    delete:
+      $ref: './paths/notifications.yaml#/bulkDelete'
+
+  /notifications/all:
+    $ref: './paths/notifications.yaml#/deleteAll'
+
+  /notifications/announcements:
+    $ref: './paths/notifications.yaml#/announcements'
+
+  /notifications/{id}:
+    $ref: './paths/notifications.yaml#/deleteOne'
+
   /notifications/{id}/read:
     $ref: './paths/notifications.yaml#/markOneRead'
+
+  /notifications/{id}/unread:
+    $ref: './paths/notifications.yaml#/markOneUnread'
 
   /activity-logs:
     get:

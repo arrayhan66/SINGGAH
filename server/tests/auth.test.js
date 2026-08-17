@@ -1,6 +1,7 @@
 const request = require("supertest")
+const bcrypt = require("bcryptjs")
 const app = require("../server")
-const { User, VerificationCode } = require("../models")
+const { User, VerificationCode, Notification } = require("../models")
 
 describe("Auth Endpoints", () => {
   let authToken = ""
@@ -10,6 +11,7 @@ describe("Auth Endpoints", () => {
     email: "test@example.com",
     password: "Password123!",
     tipe: "mahasiswa",
+    nim_nip: "1234567890",
   }
 
   beforeAll(async () => {
@@ -19,11 +21,236 @@ describe("Auth Endpoints", () => {
   it("should register a new user successfully", async () => {
     const res = await request(app)
       .post("/api/auth/register")
-      .send(testUser)
+      .field("name", testUser.name)
+      .field("username", testUser.username)
+      .field("email", testUser.email)
+      .field("password", testUser.password)
+      .field("tipe", testUser.tipe)
+      .field("nim_nip", testUser.nim_nip)
+      .attach("identitas_photo", Buffer.from("fake-image-bytes"), {
+        filename: "ktm.jpg",
+        contentType: "image/jpeg",
+      })
 
     expect(res.status).toBe(201)
     expect(res.body.success).toBe(true)
     expect(res.body.data).toHaveProperty("email", testUser.email)
+  })
+
+  it("should register a new user with an avatar photo", async () => {
+    const res = await request(app)
+      .post("/api/auth/register")
+      .field("name", "Avatar User")
+      .field("username", "avataruser")
+      .field("email", "avatar@example.com")
+      .field("password", "Password123!")
+      .field("tipe", "umum")
+      .attach("avatar", Buffer.from("fake-image-bytes"), {
+        filename: "avatar.jpg",
+        contentType: "image/jpeg",
+      })
+
+    expect(res.status).toBe(201)
+    expect(res.body.success).toBe(true)
+
+    const user = await User.findOne({ where: { email: "avatar@example.com" } })
+    expect(user).not.toBeNull()
+    expect(user.avatar).toBe(
+      "https://res.cloudinary.com/test/image/upload/v123456/test.jpg",
+    )
+  })
+
+  it("should register with identitas photo and notify admins", async () => {
+    await User.create({
+      name: "Admin Test",
+      username: "admintest",
+      email: "admintest@example.com",
+      password: "Password123!",
+      role: "admin",
+      tipe: "admin",
+      is_verified: true,
+    })
+
+    const res = await request(app)
+      .post("/api/auth/register")
+      .field("name", "Identitas User")
+      .field("username", "identitasuser")
+      .field("email", "identitas@example.com")
+      .field("password", "Password123!")
+      .field("tipe", "mahasiswa")
+      .field("nim_nip", "9988776655")
+      .attach("identitas_photo", Buffer.from("fake-image-bytes"), {
+        filename: "ktm.jpg",
+        contentType: "image/jpeg",
+      })
+
+    expect(res.status).toBe(201)
+    expect(res.body.success).toBe(true)
+
+    const user = await User.findOne({
+      where: { email: "identitas@example.com" },
+    })
+    expect(user).not.toBeNull()
+    expect(user.identitas_photo).toBe(
+      "https://res.cloudinary.com/test/image/upload/v123456/test.jpg",
+    )
+
+    const admins = await User.findAll({
+      where: { role: "admin" },
+      attributes: ["id"],
+    })
+    const adminNotifs = await Notification.findAll({
+      where: {
+        user_id: admins.map((a) => a.id),
+        type: "user_registered",
+        reference_id: user.id,
+      },
+    })
+    expect(adminNotifs.length).toBeGreaterThan(0)
+  })
+
+  it("should keep tipe as umum with pending_tipe for mahasiswa/dosen registration", async () => {
+    const res = await request(app)
+      .post("/api/auth/register")
+      .field("name", "Pending Dosen")
+      .field("username", "pendingdosen")
+      .field("email", "pendingdosen@example.com")
+      .field("password", "Password123!")
+      .field("tipe", "dosen")
+      .field("nim_nip", "198001012000031001")
+      .attach("identitas_photo", Buffer.from("fake-image-bytes"), {
+        filename: "kartu.jpg",
+        contentType: "image/jpeg",
+      })
+
+    expect(res.status).toBe(201)
+    expect(res.body.data.tipe).toBe("umum")
+    expect(res.body.data.pending_tipe).toBe("dosen")
+  })
+
+  it("should require nim_nip for mahasiswa/dosen registration", async () => {
+    const res = await request(app)
+      .post("/api/auth/register")
+      .send({
+        name: "Tanpa NIM",
+        username: "tanpanim",
+        email: "tanpanim@example.com",
+        password: "Password123!",
+        tipe: "mahasiswa",
+      })
+
+    expect(res.status).toBe(400)
+  })
+
+  it("should apply tipe for a verified umum user", async () => {
+    await User.create({
+      name: "Apply User",
+      username: "applyuser",
+      email: "applyuser@example.com",
+      password: await bcrypt.hash("Password123!", 10),
+      tipe: "umum",
+      nim_nip: "20230501",
+      identitas_photo:
+        "https://res.cloudinary.com/test/image/upload/v123456/test.jpg",
+      is_verified: true,
+    })
+
+    const loginRes = await request(app).post("/api/auth/login").send({
+      email: "applyuser@example.com",
+      password: "Password123!",
+    })
+    const applyToken = loginRes.body.data.token
+
+    const res = await request(app)
+      .post("/api/auth/apply-tipe")
+      .set("Authorization", `Bearer ${applyToken}`)
+      .send({ tipe: "mahasiswa" })
+
+    expect(res.status).toBe(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data).toHaveProperty("tipe", "umum")
+    expect(res.body.data).toHaveProperty("pending_tipe", "mahasiswa")
+    expect(res.body.data).toHaveProperty("rejection_reason", null)
+  })
+
+  it("should reject apply-tipe when already pending", async () => {
+    const loginRes = await request(app).post("/api/auth/login").send({
+      email: "applyuser@example.com",
+      password: "Password123!",
+    })
+    const applyToken = loginRes.body.data.token
+
+    const res = await request(app)
+      .post("/api/auth/apply-tipe")
+      .set("Authorization", `Bearer ${applyToken}`)
+      .send({ tipe: "dosen" })
+
+    expect(res.status).toBe(400)
+  })
+
+  it("should allow re-apply after rejection and clear rejection_reason", async () => {
+    const applyUser = await User.findOne({
+      where: { email: "applyuser@example.com" },
+    })
+
+    const admin = await User.create({
+      name: "Admin Apply",
+      username: "adminapply",
+      email: "adminapply@example.com",
+      password: await bcrypt.hash("Password123!", 10),
+      role: "admin",
+      tipe: "admin",
+      is_verified: true,
+    })
+
+    const adminLogin = await request(app).post("/api/auth/login").send({
+      email: admin.email,
+      password: "Password123!",
+    })
+    const adminToken = adminLogin.body.data.token
+
+    const rejectRes = await request(app)
+      .post(`/api/users/${applyUser.id}/approve-tipe`)
+      .set("Authorization", `Bearer ${adminToken}`)
+      .send({ approved: false, reason: "Foto KTM kurang jelas" })
+
+    expect(rejectRes.status).toBe(200)
+    expect(rejectRes.body.data).toHaveProperty(
+      "rejection_reason",
+      "Foto KTM kurang jelas",
+    )
+
+    const loginRes = await request(app).post("/api/auth/login").send({
+      email: "applyuser@example.com",
+      password: "Password123!",
+    })
+    expect(loginRes.body.data.user).toHaveProperty(
+      "rejection_reason",
+      "Foto KTM kurang jelas",
+    )
+    const applyToken = loginRes.body.data.token
+
+    // User updates profile with new valid NIM and photo before re-applying
+    await request(app)
+      .put("/api/auth/profile")
+      .set("Authorization", `Bearer ${applyToken}`)
+      .field("name", "Apply User")
+      .field("username", "applyuser")
+      .field("email", "applyuser@example.com")
+      .field("nim_nip", "20230501")
+      .attach("identitas_photo", Buffer.from("new-fake-image"), {
+        filename: "ktm_baru.jpg",
+        contentType: "image/jpeg",
+      })
+
+    const res = await request(app)
+      .post("/api/auth/apply-tipe")
+      .set("Authorization", `Bearer ${applyToken}`)
+      .send({ tipe: "mahasiswa" })
+
+    expect(res.status).toBe(200)
+    expect(res.body.data).toHaveProperty("pending_tipe", "mahasiswa")
+    expect(res.body.data).toHaveProperty("rejection_reason", null)
   })
 
   it("should verify email using verification code", async () => {

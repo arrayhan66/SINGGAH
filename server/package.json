@@ -7,7 +7,9 @@
     "dev": "nodemon server.js",
     "start": "node server.js",
     "test": "jest --runInBand",
-    "seed:hall": "node scripts/seedHall.js"
+    "seed:hall": "node scripts/seedHall.js",
+    "lowercase:usernames": "node scripts/lowercaseUsernames.js",
+    "sync:db": "node scripts/syncDb.js"
   },
   "keywords": [],
   "author": "",

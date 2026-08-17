@@ -18,33 +18,46 @@ const MONTHS = [
 
 exports.getReports = async (query = {}) => {
   const year = parseInt(query.year) || new Date().getFullYear()
+  const now = new Date()
+  const actualYear = now.getFullYear()
+  const actualMonth = now.getMonth()
 
   const yearStart = new Date(Date.UTC(year, 0, 1))
   const yearEnd = new Date(Date.UTC(year + 1, 0, 1))
-  const monthStart = new Date(Date.UTC(year, new Date().getMonth(), 1))
+  const actualMonthStart = new Date(Date.UTC(actualYear, actualMonth, 1))
 
-  const projects = await Project.findAll({
-    where: {
-      created_at: { [Op.gte]: yearStart, [Op.lt]: yearEnd },
-    },
-    attributes: [
-      "id",
-      "created_at",
-      [
-        sequelize.literal(
-          "(SELECT COUNT(*) FROM project_likes WHERE project_likes.project_id = Project.id)",
-        ),
-        "likesCount",
+  const [projects, views, usersInYear] = await Promise.all([
+    Project.findAll({
+      where: {
+        created_at: { [Op.gte]: yearStart, [Op.lt]: yearEnd },
+      },
+      attributes: [
+        "id",
+        "created_at",
+        [
+          sequelize.literal(
+            "(SELECT COUNT(*) FROM project_likes WHERE project_likes.project_id = Project.id)",
+          ),
+          "likesCount",
+        ],
       ],
-      [
-        sequelize.literal(
-          "(SELECT COUNT(*) FROM project_views WHERE project_views.project_id = Project.id)",
-        ),
-        "viewsCount",
-      ],
-    ],
-    raw: true,
-  })
+      raw: true,
+    }),
+    ProjectView.findAll({
+      where: {
+        created_at: { [Op.gte]: yearStart, [Op.lt]: yearEnd },
+      },
+      attributes: ["created_at"],
+      raw: true,
+    }),
+    User.findAll({
+      where: {
+        created_at: { [Op.gte]: yearStart, [Op.lt]: yearEnd },
+      },
+      attributes: ["created_at"],
+      raw: true,
+    }),
+  ])
 
   const monthly = Array.from({ length: 12 }, (_, i) => ({
     month: i,
@@ -52,6 +65,7 @@ exports.getReports = async (query = {}) => {
     projects: 0,
     likes: 0,
     visitors: 0,
+    users: 0,
   }))
 
   projects.forEach((project) => {
@@ -60,34 +74,61 @@ exports.getReports = async (query = {}) => {
     if (monthly[monthIndex]) {
       monthly[monthIndex].projects += 1
       monthly[monthIndex].likes += project.likesCount || 0
-      monthly[monthIndex].visitors += project.viewsCount || 0
     }
   })
 
-  const [totalUser, totalProject, totalVisitors, totalLikes, newProjectsThisMonth] =
-    await Promise.all([
-      User.count(),
-      Project.count(),
-      ProjectView.count(),
-      ProjectLike.count(),
-      Project.count({
-        where: { created_at: { [Op.gte]: monthStart } },
-      }),
-    ])
+  views.forEach((view) => {
+    const monthIndex = new Date(view.created_at).getUTCMonth()
+    if (monthly[monthIndex]) {
+      monthly[monthIndex].visitors += 1
+    }
+  })
+
+  usersInYear.forEach((u) => {
+    const monthIndex = new Date(u.created_at).getUTCMonth()
+    if (monthly[monthIndex]) {
+      monthly[monthIndex].users += 1
+    }
+  })
+
+  const monthlyProjectsTotal = monthly.reduce((sum, m) => sum + m.projects, 0)
+  const monthlyVisitorsTotal = monthly.reduce((sum, m) => sum + m.visitors, 0)
+  const monthlyLikesTotal = monthly.reduce((sum, m) => sum + m.likes, 0)
+
+  const [totalUser, newProjectsThisMonth] = await Promise.all([
+    User.count(),
+    Project.count({
+      where: { created_at: { [Op.gte]: actualMonthStart } },
+    }),
+  ])
+
+  const [activeResult] = await sequelize.query(
+    `SELECT COUNT(DISTINCT user_id) AS count FROM (
+       SELECT user_id FROM projects WHERE created_at >= :monthStart AND user_id IS NOT NULL
+       UNION
+       SELECT user_id FROM project_likes WHERE created_at >= :monthStart
+       UNION
+       SELECT user_id FROM project_views WHERE created_at >= :monthStart AND user_id IS NOT NULL
+     ) AS active_users`,
+    { replacements: { monthStart: actualMonthStart }, type: sequelize.QueryTypes.SELECT },
+  )
+  const activeUsers = Number(activeResult?.count) || 0
+
+  const round1 = (v) => Math.round(v * 10) / 10
 
   return {
     year,
     monthly,
     stats: {
       totalUser,
-      totalProject,
-      totalVisitors,
-      totalLikes,
+      totalProject: monthlyProjectsTotal,
+      totalVisitors: monthlyVisitorsTotal,
+      totalLikes: monthlyLikesTotal,
     },
     summary: {
-      avgProjects: Math.round(totalProject / 12),
-      avgVisitors: Math.round(totalVisitors / 12),
-      activeUsers: totalUser,
+      avgProjects: round1(monthlyProjectsTotal / 12),
+      avgVisitors: round1(monthlyVisitorsTotal / 12),
+      activeUsers,
       newProjectsThisMonth,
     },
   }

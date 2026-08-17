@@ -3,10 +3,10 @@ const projectService = require("./projectService")
 
 // Data lengkap untuk hall 3D: daftar kategori aktif (urutan tampil di hall)
 // + seluruh project published dengan relasi yang dipakai komponen hall.
-exports.getHallOverview = async () => {
+exports.getHallOverview = async (userId = null) => {
   const [categories, projects] = await Promise.all([
     categoryService.getActiveCategories(),
-    projectService.getHallProjects(),
+    projectService.getHallProjects(userId),
   ])
 
   return { categories, projects }

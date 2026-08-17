@@ -28,7 +28,7 @@ exports.createNews = asyncHandler(async (req, res) => {
 
   const headlineResult = await uploadImage(
     req.files.headline_image[0].buffer,
-    "pamerit/news",
+    "singgah/news",
   )
 
   req.body.headline_image = headlineResult.secure_url
@@ -58,7 +58,7 @@ exports.updateNews = asyncHandler(async (req, res) => {
 
     const result = await uploadImage(
       req.files.headline_image[0].buffer,
-      "pamerit/news",
+      "singgah/news",
     )
 
     req.body.headline_image = result.secure_url

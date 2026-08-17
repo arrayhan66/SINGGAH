@@ -18,7 +18,7 @@ exports.getMedia = async (query = {}) => {
   const maxResults = Math.min(parseInt(query.limit) || 100, 200)
 
   const result = await cloudinary.search
-    .expression("folder:pamerit/media")
+    .expression("folder:singgah/media")
     .sort_by("created_at", "desc")
     .max_results(maxResults)
     .execute()
@@ -31,7 +31,11 @@ exports.uploadMedia = async (file) => {
     throw new AppError("File wajib diupload", 400)
   }
 
-  const result = await uploadImage(file.buffer, "pamerit/media")
+  const result = await uploadImage(file.buffer, "singgah/media", {
+    resource_type: "auto",
+    filename: file.originalname,
+    use_filename: true,
+  })
 
   return formatResource(result)
 }

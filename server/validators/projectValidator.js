@@ -50,3 +50,17 @@ exports.updateProjectValidator = [
     .isIn(["pending", "published", "rejected"])
     .withMessage("Status tidak valid"),
 ]
+
+exports.updateProjectStatusValidator = [
+  body("status")
+    .notEmpty()
+    .withMessage("Status wajib diisi")
+    .isIn(["pending", "published", "rejected"])
+    .withMessage("Status harus pending, published, atau rejected"),
+
+  body("reason")
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage("Alasan maksimal 500 karakter"),
+]

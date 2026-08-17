@@ -3,6 +3,7 @@ const projectImageController = require("../controllers/projectImageController")
 const authMiddleware = require("../middlewares/authMiddleware")
 const roleMiddleware = require("../middlewares/roleMiddleware")
 const upload = require("../middlewares/uploadMiddleware")
+const { dynamicUploadFields } = require("../middlewares/uploadMiddleware")
 
 router.get("/", projectImageController.getImages)
 
@@ -10,7 +11,7 @@ router.post(
   "/",
   authMiddleware,
   roleMiddleware("admin", "user"),
-  upload.fields([{ name: "image", maxCount: 1 }]),
+  dynamicUploadFields([{ name: "image", maxCount: 1 }]),
   projectImageController.addImage,
 )
 

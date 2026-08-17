@@ -8,13 +8,54 @@ const {
 } = require("../utils/uploadToCloudinary")
 
 exports.register = asyncHandler(async (req, res) => {
-  const user = await authService.register(req.body)
-  success(
-    res,
-    user,
-    "Registrasi berhasil, silakan cek email untuk kode verifikasi",
-    201,
-  )
+  let avatarUrl
+  let identitasUrl
+
+  if (req.files && req.files.avatar && req.files.avatar[0]) {
+    const result = await uploadImage(req.files.avatar[0].buffer, "singgah/avatars")
+    avatarUrl = result.secure_url
+  }
+
+  if (req.files && req.files.identitas_photo && req.files.identitas_photo[0]) {
+    const result = await uploadImage(
+      req.files.identitas_photo[0].buffer,
+      "singgah/identitas",
+    )
+    identitasUrl = result.secure_url
+  }
+
+  try {
+    const user = await authService.register({
+      ...req.body,
+      avatar: avatarUrl,
+      identitas_photo: identitasUrl,
+    })
+
+    success(
+      res,
+      user,
+      "Registrasi berhasil, silakan cek email untuk kode verifikasi",
+      201,
+    )
+  } catch (err) {
+    const publicIds = []
+
+    if (avatarUrl) {
+      const publicId = getPublicIdFromUrl(avatarUrl)
+      if (publicId) publicIds.push(publicId)
+    }
+
+    if (identitasUrl) {
+      const publicId = getPublicIdFromUrl(identitasUrl)
+      if (publicId) publicIds.push(publicId)
+    }
+
+    await Promise.all(
+      publicIds.map((publicId) => deleteImage(publicId).catch(() => {})),
+    )
+
+    throw err
+  }
 })
 
 exports.login = asyncHandler(async (req, res) => {
@@ -23,8 +64,8 @@ exports.login = asyncHandler(async (req, res) => {
 })
 
 exports.verifyEmail = asyncHandler(async (req, res) => {
-  await authService.verifyEmail(req.body)
-  success(res, null, "Email berhasil diverifikasi, silakan login")
+  const user = await authService.verifyEmail(req.body)
+  success(res, user, "Email berhasil diverifikasi, silakan login")
 })
 
 exports.resendVerification = asyncHandler(async (req, res) => {
@@ -68,9 +109,10 @@ exports.getProfileStats = asyncHandler(async (req, res) => {
 
 exports.updateProfile = asyncHandler(async (req, res) => {
   let avatarUrl
+  let identitasUrl
 
-  if (req.file) {
-    const result = await uploadImage(req.file.buffer, "pamerit/avatars")
+  if (req.files && req.files.avatar && req.files.avatar[0]) {
+    const result = await uploadImage(req.files.avatar[0].buffer, "singgah/avatars")
     avatarUrl = result.secure_url
 
     const oldAvatar = req.user.avatar
@@ -84,8 +126,61 @@ exports.updateProfile = asyncHandler(async (req, res) => {
     }
   }
 
-  const user = await authService.updateProfile(req.user.id, req.body, avatarUrl)
+  if (req.files && req.files.identitas_photo && req.files.identitas_photo[0]) {
+    const result = await uploadImage(
+      req.files.identitas_photo[0].buffer,
+      "singgah/identitas",
+    )
+    identitasUrl = result.secure_url
+
+    const oldIdentitas = req.user.identitas_photo
+
+    if (oldIdentitas) {
+      const publicId = getPublicIdFromUrl(oldIdentitas)
+
+      if (publicId) {
+        await deleteImage(publicId).catch(() => {})
+      }
+    }
+  }
+
+  const user = await authService.updateProfile(
+    req.user.id,
+    req.body,
+    avatarUrl,
+    identitasUrl,
+  )
   success(res, user, "Profil berhasil diperbarui")
+})
+
+exports.applyTipe = asyncHandler(async (req, res) => {
+  let identitasUrl
+
+  if (req.files && req.files.identitas_photo && req.files.identitas_photo[0]) {
+    const result = await uploadImage(
+      req.files.identitas_photo[0].buffer,
+      "singgah/identitas",
+    )
+    identitasUrl = result.secure_url
+
+    const oldIdentitas = req.user.identitas_photo
+
+    if (oldIdentitas) {
+      const publicId = getPublicIdFromUrl(oldIdentitas)
+
+      if (publicId) {
+        await deleteImage(publicId).catch(() => {})
+      }
+    }
+  }
+
+  const user = await authService.applyTipe(
+    req.user.id,
+    req.body.tipe,
+    req.body.nim_nip,
+    identitasUrl,
+  )
+  success(res, user, "Pengajuan verifikasi tipe berhasil dikirim ke admin")
 })
 
 exports.deleteAccount = asyncHandler(async (req, res) => {

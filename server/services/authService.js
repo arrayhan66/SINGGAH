@@ -7,9 +7,15 @@ const {
   sequelize,
 } = require("../models")
 const bcrypt = require("bcryptjs")
+const { Op } = require("sequelize")
 const generateToken = require("../utils/generateToken")
 const generateCode = require("../utils/generateCode")
 const sendEmail = require("../utils/sendEmail")
+const {
+  verificationEmail,
+  emailChangeEmail,
+  resetPasswordEmail,
+} = require("../utils/emailTemplate")
 const AppError = require("../utils/AppError")
 const logger = require("../utils/logger")
 const {
@@ -17,6 +23,8 @@ const {
   getPublicIdFromUrl,
 } = require("../utils/uploadToCloudinary")
 const { logActivity } = require("./activityLogService")
+const settingService = require("./settingService")
+const notificationService = require("./notificationService")
 
 const CODE_EXPIRES_MINUTES = 5
 
@@ -78,6 +86,15 @@ exports.login = async (data) => {
     )
   }
 
+  const maintenance = await settingService.getSetting("maintenanceMode")
+
+  if (maintenance && user.role !== "admin") {
+    throw new AppError(
+      "Mode maintenance sedang aktif. Silakan coba lagi nanti.",
+      503,
+    )
+  }
+
   const token = generateToken(user)
 
   await logActivity({
@@ -93,10 +110,14 @@ exports.login = async (data) => {
       name: user.name,
       username: user.username,
       email: user.email,
+      pending_email: user.pending_email,
       role: user.role,
       tipe: user.tipe,
+      pending_tipe: user.pending_tipe,
+      rejection_reason: user.rejection_reason,
       nim_nip: user.nim_nip,
       avatar: user.avatar,
+      identitas_photo: user.identitas_photo,
       status: user.status,
       is_verified: user.is_verified,
       created_at: user.created_at,
@@ -105,50 +126,95 @@ exports.login = async (data) => {
 }
 
 exports.register = async (data) => {
-  const { name, username, email, password } = data
+  const {
+    name,
+    username,
+    email,
+    password,
+    tipe = "umum",
+    nim_nip,
+    avatar,
+    identitas_photo,
+  } = data
+
+  const registrationOpen = await settingService.getSetting("registrationOpen")
+  if (registrationOpen === false) {
+    throw new AppError("Pendaftaran akun baru sedang ditutup. Silakan coba lagi nanti.", 403)
+  }
 
   if (!name || !username || !email || !password) {
     throw new AppError("Semua field wajib diisi", 400)
   }
+
+  const normalizedUsername = String(username).trim().toLowerCase()
 
   const emailExists = await User.findOne({ where: { email } })
   if (emailExists) {
     throw new AppError("Email sudah digunakan", 400)
   }
 
-  const usernameExists = await User.findOne({ where: { username } })
+  const usernameExists = await User.findOne({
+    where: { username: normalizedUsername },
+  })
   if (usernameExists) {
     throw new AppError("Username sudah digunakan", 400)
+  }
+
+  const validTipes = ["mahasiswa", "dosen", "umum"]
+  const userTipe = validTipes.includes(tipe) ? tipe : "umum"
+
+  const needsApproval = userTipe === "mahasiswa" || userTipe === "dosen"
+
+  if (userTipe === "mahasiswa" && !nim_nip) {
+    throw new AppError("NIM wajib diisi untuk pendaftaran mahasiswa", 400)
   }
 
   const hashedPassword = await bcrypt.hash(password, 10)
   const code = generateCode()
   const expiresAt = new Date(Date.now() + CODE_EXPIRES_MINUTES * 60 * 1000)
 
-  const user = await sequelize.transaction(async (t) => {
-    const newUser = await User.create(
-      {
-        name,
-        username,
-        email,
-        password: hashedPassword,
-        tipe: "mahasiswa",
-        is_verified: false,
-      },
-      { transaction: t },
-    )
+  const emailVerification = await settingService.getSetting("emailVerification")
+  const requiresVerification = emailVerification !== false
 
-    await VerificationCode.create(
-      {
-        code,
-        expires_at: expiresAt,
-        user_id: newUser.id,
-      },
-      { transaction: t },
-    )
+  let user
 
-    return newUser
-  })
+  try {
+    user = await sequelize.transaction(async (t) => {
+      const newUser = await User.create(
+        {
+          name,
+          username: normalizedUsername,
+          email,
+          password: hashedPassword,
+          tipe: needsApproval ? "umum" : userTipe,
+          pending_tipe: needsApproval ? userTipe : null,
+          nim_nip: nim_nip || null,
+          avatar: avatar || null,
+          identitas_photo: identitas_photo || null,
+          is_verified: !requiresVerification,
+        },
+        { transaction: t },
+      )
+
+      if (requiresVerification) {
+        await VerificationCode.create(
+          {
+            code,
+            expires_at: expiresAt,
+            user_id: newUser.id,
+          },
+          { transaction: t },
+        )
+      }
+
+      return newUser
+    })
+  } catch (err) {
+    if (err.name === "SequelizeUniqueConstraintError") {
+      throw new AppError("Email atau username sudah digunakan", 400)
+    }
+    throw err
+  }
 
   await logActivity({
     userId: user.id,
@@ -158,19 +224,36 @@ exports.register = async (data) => {
     description: `${user.name} mendaftar akun baru`,
   })
 
-  try {
-    await sendEmail({
-      to: user.email,
-      subject: "Kode Verifikasi Email - PamerIT",
-      html: `
-        <p>Halo ${user.name},</p>
-        <p>Terima kasih sudah mendaftar di PamerIT. Kode verifikasi email Anda:</p>
-        <h2>${code}</h2>
-        <p>Kode berlaku selama ${CODE_EXPIRES_MINUTES} menit.</p>
-      `,
-    })
-  } catch (err) {
-    logger.error("Gagal mengirim email verifikasi:", err.message)
+  if (needsApproval) {
+    try {
+      await notificationService.notifyAdmins({
+        type: "user_registered",
+        title: `Pendaftaran ${userTipe === "mahasiswa" ? "Mahasiswa" : "Dosen"} Baru`,
+        message: `${user.name} (${user.username}) mengajukan verifikasi ${
+          userTipe === "mahasiswa" ? "mahasiswa" : "dosen"
+        } dengan ${userTipe === "mahasiswa" ? "NIM" : "NIP"} ${nim_nip || "-"}.`,
+        reference_type: "user",
+        reference_id: user.id,
+      })
+    } catch (err) {
+      logger.error("Gagal mengirim notifikasi ke admin:", err.message)
+    }
+  }
+
+  if (requiresVerification) {
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: `Kode Verifikasi Email - ${user.name}`,
+        html: verificationEmail({
+          name: user.name,
+          code,
+          minutes: CODE_EXPIRES_MINUTES,
+        }),
+      })
+    } catch (err) {
+      logger.error("Gagal mengirim email verifikasi:", err.message)
+    }
   }
 
   return {
@@ -179,7 +262,88 @@ exports.register = async (data) => {
     username: user.username,
     email: user.email,
     role: user.role,
+    tipe: user.tipe,
+    pending_tipe: user.pending_tipe,
+    nim_nip: user.nim_nip,
+    identitas_photo: user.identitas_photo,
     is_verified: user.is_verified,
+  }
+}
+
+exports.applyTipe = async (userId, tipe, nim_nip, identitasUrl) => {
+  if (!["mahasiswa", "dosen"].includes(tipe)) {
+    throw new AppError("Tipe tidak valid", 400)
+  }
+
+  const user = await User.findByPk(userId)
+
+  if (!user) {
+    throw new AppError("User tidak ditemukan", 404)
+  }
+
+  if (user.tipe !== "umum") {
+    throw new AppError(`Akun Anda sudah memiliki tipe ${user.tipe}`, 400)
+  }
+
+  if (user.pending_tipe) {
+    throw new AppError(
+      "Permintaan verifikasi tipe sedang menunggu persetujuan admin",
+      400,
+    )
+  }
+
+  if (!user.is_verified) {
+    throw new AppError(
+      "Verifikasi email Anda terlebih dahulu sebelum mengajukan tipe",
+      400,
+    )
+  }
+
+  const finalNimNip = nim_nip || user.nim_nip
+
+  if (tipe === "mahasiswa" && !finalNimNip) {
+    throw new AppError("NIM wajib diisi untuk pengajuan mahasiswa", 400)
+  }
+
+  const finalIdentitas = identitasUrl || user.identitas_photo
+
+  if (!finalIdentitas) {
+    throw new AppError(
+      tipe === "mahasiswa"
+        ? "Foto KTM wajib diunggah untuk pengajuan mahasiswa"
+        : "Foto Kartu Identitas wajib diunggah untuk pengajuan dosen",
+      400,
+    )
+  }
+
+  user.nim_nip = finalNimNip
+  user.identitas_photo = finalIdentitas
+  user.pending_tipe = tipe
+  user.rejection_reason = null
+  await user.save()
+
+  try {
+    await notificationService.notifyAdmins({
+      type: "user_registered",
+      title: `Pengajuan ${tipe === "mahasiswa" ? "Mahasiswa" : "Dosen"} Baru`,
+      message: `${user.name} (${user.username}) mengajukan verifikasi ${
+        tipe === "mahasiswa" ? "mahasiswa" : "dosen"
+      } dengan ${tipe === "mahasiswa" ? "NIM" : "NIP"} ${user.nim_nip}.`,
+      reference_type: "user",
+      reference_id: user.id,
+    })
+  } catch (err) {
+    logger.error("Gagal mengirim notifikasi ke admin:", err.message)
+  }
+
+  return {
+    id: user.id,
+    name: user.name,
+    tipe: user.tipe,
+    pending_tipe: user.pending_tipe,
+    rejection_reason: user.rejection_reason,
+    nim_nip: user.nim_nip,
+    identitas_photo: user.identitas_photo,
   }
 }
 
@@ -190,13 +354,26 @@ exports.verifyEmail = async (data) => {
     throw new AppError("Email dan kode wajib diisi", 400)
   }
 
-  const user = await User.findOne({ where: { email } })
+  const normalizedEmail = String(email).trim().toLowerCase()
+
+  const user = await User.findOne({
+    where: {
+      [Op.or]: [
+        { email: normalizedEmail },
+        { pending_email: normalizedEmail },
+      ],
+    },
+  })
 
   if (!user) {
     throw new AppError("Email tidak terdaftar", 404)
   }
 
-  if (user.is_verified) {
+  const hasPending =
+    user.pending_email &&
+    String(user.pending_email).trim().toLowerCase() === normalizedEmail
+
+  if (user.is_verified && !hasPending) {
     throw new AppError("Email sudah terverifikasi", 400)
   }
 
@@ -218,13 +395,33 @@ exports.verifyEmail = async (data) => {
   }
 
   await sequelize.transaction(async (t) => {
+    if (hasPending) {
+      user.email = user.pending_email
+      user.pending_email = null
+    }
     user.is_verified = true
     await user.save({ transaction: t })
 
     await VerificationCode.destroy({ where: { user_id: user.id }, transaction: t })
   })
 
-  return true
+  return {
+    id: user.id,
+    name: user.name,
+    username: user.username,
+    email: user.email,
+    pending_email: user.pending_email,
+    role: user.role,
+    tipe: user.tipe,
+    pending_tipe: user.pending_tipe,
+    rejection_reason: user.rejection_reason,
+    nim_nip: user.nim_nip,
+    avatar: user.avatar,
+    identitas_photo: user.identitas_photo,
+    status: user.status,
+    is_verified: user.is_verified,
+    created_at: user.created_at,
+  }
 }
 
 exports.resendVerification = async (data) => {
@@ -234,21 +431,34 @@ exports.resendVerification = async (data) => {
     throw new AppError("Email wajib diisi", 400)
   }
 
-  const user = await User.findOne({ where: { email } })
+  const normalizedEmail = String(email).trim().toLowerCase()
+
+  const user = await User.findOne({
+    where: {
+      [Op.or]: [
+        { email: normalizedEmail },
+        { pending_email: normalizedEmail },
+      ],
+    },
+  })
 
   if (!user) {
     throw new AppError("Email tidak terdaftar", 404)
   }
 
-  if (user.is_verified) {
+  const hasPending =
+    user.pending_email &&
+    String(user.pending_email).trim().toLowerCase() === normalizedEmail
+
+  if (user.is_verified && !hasPending) {
     throw new AppError("Email sudah terverifikasi", 400)
   }
 
+  const code = generateCode()
+  const expiresAt = new Date(Date.now() + CODE_EXPIRES_MINUTES * 60 * 1000)
+
   await sequelize.transaction(async (t) => {
     await VerificationCode.destroy({ where: { user_id: user.id }, transaction: t })
-
-    const code = generateCode()
-    const expiresAt = new Date(Date.now() + CODE_EXPIRES_MINUTES * 60 * 1000)
 
     await VerificationCode.create(
       {
@@ -260,16 +470,17 @@ exports.resendVerification = async (data) => {
     )
   })
 
+  const targetEmail = hasPending ? user.pending_email : user.email
+
   try {
     await sendEmail({
-      to: user.email,
-      subject: "Kode Verifikasi Email - PamerIT",
-      html: `
-        <p>Halo ${user.name},</p>
-        <p>Kode verifikasi email baru Anda:</p>
-        <h2>${code}</h2>
-        <p>Kode berlaku selama ${CODE_EXPIRES_MINUTES} menit.</p>
-      `,
+      to: targetEmail,
+      subject: `Kode Verifikasi Email - ${user.name}`,
+      html: verificationEmail({
+        name: user.name,
+        code,
+        minutes: CODE_EXPIRES_MINUTES,
+      }),
     })
   } catch (err) {
     logger.error("Gagal mengirim email verifikasi:", err.message)
@@ -291,11 +502,11 @@ exports.forgotPassword = async (data) => {
     throw new AppError("Email tidak terdaftar", 404)
   }
 
+  const code = generateCode()
+  const expiresAt = new Date(Date.now() + CODE_EXPIRES_MINUTES * 60 * 1000)
+
   await sequelize.transaction(async (t) => {
     await PasswordReset.destroy({ where: { user_id: user.id }, transaction: t })
-
-    const code = generateCode()
-    const expiresAt = new Date(Date.now() + CODE_EXPIRES_MINUTES * 60 * 1000)
 
     await PasswordReset.create(
       {
@@ -310,13 +521,12 @@ exports.forgotPassword = async (data) => {
   try {
     await sendEmail({
       to: user.email,
-      subject: "Kode Reset Password - PamerIT",
-      html: `
-        <p>Halo ${user.name},</p>
-        <p>Kode reset password Anda:</p>
-        <h2>${code}</h2>
-        <p>Kode berlaku selama ${CODE_EXPIRES_MINUTES} menit. Abaikan email ini jika Anda tidak meminta reset password.</p>
-      `,
+      subject: `Kode Reset Password - ${user.name}`,
+      html: resetPasswordEmail({
+        name: user.name,
+        code,
+        minutes: CODE_EXPIRES_MINUTES,
+      }),
     })
   } catch (err) {
     logger.error("Gagal mengirim email reset password:", err.message)
@@ -434,7 +644,7 @@ exports.getProfileStats = async (userId) => {
   return { published, pending, rejected, total }
 }
 
-exports.updateProfile = async (userId, data, avatarUrl) => {
+exports.updateProfile = async (userId, data, avatarUrl, identitasUrl) => {
   const user = await User.findByPk(userId)
 
   if (!user) {
@@ -443,44 +653,179 @@ exports.updateProfile = async (userId, data, avatarUrl) => {
 
   const { name, username, email, nim_nip } = data
 
-  if (email && email !== user.email) {
-    const emailExists = await User.findOne({ where: { email } })
+  const finalName = (name && name.trim()) || user.name
 
-    if (emailExists) {
-      throw new AppError("Email sudah digunakan", 400)
+  if (!finalName || finalName.length < 3) {
+    throw new AppError("Nama lengkap wajib diisi (minimal 3 karakter)", 400)
+  }
+
+  const normalizedUsername = username
+    ? String(username).trim().toLowerCase()
+    : String(user.username).trim().toLowerCase()
+
+  if (!normalizedUsername) {
+    throw new AppError("Username wajib diisi", 400)
+  }
+
+  if (!/^[a-zA-Z0-9_.-]+$/.test(normalizedUsername)) {
+    throw new AppError(
+      "Username hanya boleh huruf, angka, titik, underscore, dan strip",
+      400,
+    )
+  }
+
+  const normalizedEmail = email ? email.trim().toLowerCase() : user.email
+
+  if (!normalizedEmail) {
+    throw new AppError("Email wajib diisi", 400)
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    throw new AppError("Format email tidak valid", 400)
+  }
+
+  const currentEmail = String(user.email).trim().toLowerCase()
+  const currentPending = user.pending_email
+    ? String(user.pending_email).trim().toLowerCase()
+    : null
+
+  const isEmailChanged =
+    normalizedEmail !== currentEmail && normalizedEmail !== currentPending
+  const isUsernameChanged =
+    normalizedUsername !== String(user.username).trim().toLowerCase()
+
+  let savedUser
+
+  try {
+    savedUser = await sequelize.transaction(async (t) => {
+      if (isEmailChanged) {
+        const emailExists = await User.findOne({
+          where: {
+            [Op.and]: [
+              {
+                [Op.or]: [
+                  sequelize.where(
+                    sequelize.fn("LOWER", sequelize.col("email")),
+                    normalizedEmail,
+                  ),
+                  sequelize.where(
+                    sequelize.fn("LOWER", sequelize.col("pending_email")),
+                    normalizedEmail,
+                  ),
+                ],
+              },
+              { id: { [Op.ne]: userId } },
+            ],
+          },
+          transaction: t,
+        })
+
+        if (emailExists) {
+          throw new AppError("Email sudah digunakan", 400)
+        }
+      }
+
+      if (isUsernameChanged) {
+        const usernameExists = await User.findOne({
+          where: {
+            [Op.and]: [
+              sequelize.where(
+                sequelize.fn("LOWER", sequelize.col("username")),
+                normalizedUsername,
+              ),
+              { id: { [Op.ne]: userId } },
+            ],
+          },
+          transaction: t,
+        })
+
+        if (usernameExists) {
+          throw new AppError("Username sudah digunakan", 400)
+        }
+      }
+
+      user.name = finalName.trim()
+      user.username = normalizedUsername
+      user.nim_nip = nim_nip ? nim_nip.trim() : user.nim_nip
+
+      if (avatarUrl !== undefined) {
+        user.avatar = avatarUrl
+      }
+
+      if (identitasUrl !== undefined) {
+        user.identitas_photo = identitasUrl
+      }
+
+      if (isEmailChanged) {
+        user.pending_email = normalizedEmail
+
+        const code = generateCode()
+        const expiresAt = new Date(
+          Date.now() + CODE_EXPIRES_MINUTES * 60 * 1000,
+        )
+
+        await VerificationCode.destroy({
+          where: { user_id: userId },
+          transaction: t,
+        })
+
+        await VerificationCode.create(
+          {
+            code,
+            expires_at: expiresAt,
+            user_id: userId,
+          },
+          { transaction: t },
+        )
+      }
+
+      await user.save({ transaction: t })
+
+      return user
+    })
+  } catch (err) {
+    if (err.name === "SequelizeUniqueConstraintError") {
+      throw new AppError("Email atau username sudah digunakan", 400)
+    }
+    throw err
+  }
+
+  if (isEmailChanged) {
+    try {
+      const verificationRecord = await VerificationCode.findOne({
+        where: { user_id: userId },
+        order: [["created_at", "DESC"]],
+      })
+
+      await sendEmail({
+        to: savedUser.pending_email,
+        subject: `Verifikasi Email Baru - ${savedUser.name}`,
+        html: emailChangeEmail({
+          name: savedUser.name,
+          code: verificationRecord?.code || "",
+          minutes: CODE_EXPIRES_MINUTES,
+        }),
+      })
+    } catch (err) {
+      logger.error("Gagal mengirim email verifikasi email baru:", err.message)
     }
   }
-
-  if (username && username !== user.username) {
-    const usernameExists = await User.findOne({ where: { username } })
-
-    if (usernameExists) {
-      throw new AppError("Username sudah digunakan", 400)
-    }
-  }
-
-  user.name = name ?? user.name
-  user.username = username ?? user.username
-  user.email = email ?? user.email
-  user.nim_nip = nim_nip ?? user.nim_nip
-
-  if (avatarUrl !== undefined) {
-    user.avatar = avatarUrl
-  }
-
-  await user.save()
 
   return {
-    id: user.id,
-    name: user.name,
-    username: user.username,
-    email: user.email,
-    role: user.role,
-    tipe: user.tipe,
-    avatar: user.avatar,
-    nim_nip: user.nim_nip,
-    status: user.status,
-    is_verified: user.is_verified,
+    id: savedUser.id,
+    name: savedUser.name,
+    username: savedUser.username,
+    email: savedUser.email,
+    pending_email: savedUser.pending_email,
+    role: savedUser.role,
+    tipe: savedUser.tipe,
+    avatar: savedUser.avatar,
+    identitas_photo: savedUser.identitas_photo,
+    nim_nip: savedUser.nim_nip,
+    status: savedUser.status,
+    is_verified: savedUser.is_verified,
+    created_at: savedUser.created_at,
+    email_changed: isEmailChanged,
   }
 }
 

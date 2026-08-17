@@ -45,7 +45,11 @@ const removeAssets = async (rows, Model, urlField) => {
 }
 
 exports.getProjects = asyncHandler(async (req, res) => {
-  const projects = await projectService.getProjects(req.query)
+  const projects = await projectService.getProjects(
+    req.query,
+    req.user?.id || null,
+    req.user?.role || null,
+  )
 
   success(res, projects)
 })
@@ -78,7 +82,7 @@ exports.createProject = asyncHandler(async (req, res) => {
 
   const thumbnailResult = await uploadImage(
     req.files.thumbnail[0].buffer,
-    "pamerit/thumbnails",
+    "singgah/thumbnails",
   )
 
   req.body.thumbnail = thumbnailResult.secure_url
@@ -88,7 +92,7 @@ exports.createProject = asyncHandler(async (req, res) => {
   if (req.files.images && req.files.images.length > 0) {
     const uploadedImages = await Promise.all(
       req.files.images.map((file) =>
-        uploadImage(file.buffer, "pamerit/projects"),
+        uploadImage(file.buffer, "singgah/projects"),
       ),
     )
 
@@ -100,7 +104,9 @@ exports.createProject = asyncHandler(async (req, res) => {
   if (req.files.documents && req.files.documents.length > 0) {
     const uploadedDocuments = await Promise.all(
       req.files.documents.map((file) =>
-        uploadImage(file.buffer, "pamerit/documents"),
+        uploadImage(file.buffer, "singgah/documents", {
+          resource_type: "raw",
+        }),
       ),
     )
 
@@ -132,6 +138,7 @@ exports.updateProjectStatus = asyncHandler(async (req, res) => {
   const project = await projectService.updateProjectStatus(
     req.params.id,
     req.body.status,
+    req.body.reason,
   )
 
   const actionMap = {
@@ -154,6 +161,10 @@ exports.updateProjectStatus = asyncHandler(async (req, res) => {
 exports.updateProject = asyncHandler(async (req, res) => {
   const existingProject = await projectService.getProjectById(req.params.id)
 
+  if (req.user.role !== "admin" && existingProject.user_id !== req.user.id) {
+    throw new AppError("Akses ditolak", 403)
+  }
+
   if (req.files && req.files.thumbnail) {
     const oldPublicId = getPublicIdFromUrl(existingProject.thumbnail)
 
@@ -163,7 +174,7 @@ exports.updateProject = asyncHandler(async (req, res) => {
 
     const result = await uploadImage(
       req.files.thumbnail[0].buffer,
-      "pamerit/thumbnails",
+      "singgah/thumbnails",
     )
 
     req.body.thumbnail = result.secure_url
@@ -172,14 +183,14 @@ exports.updateProject = asyncHandler(async (req, res) => {
   if (req.files && req.files.images && req.files.images.length > 0) {
     const uploadedImages = await Promise.all(
       req.files.images.map((file) =>
-        uploadImage(file.buffer, "pamerit/projects"),
+        uploadImage(file.buffer, "singgah/projects"),
       ),
     )
 
     await ProjectImage.bulkCreate(
       uploadedImages.map((result) => ({
         image_url: result.secure_url,
-        project_id: req.params.id,
+        project_id: existingProject.id,
       })),
     )
   }
@@ -187,7 +198,9 @@ exports.updateProject = asyncHandler(async (req, res) => {
   if (req.files && req.files.documents && req.files.documents.length > 0) {
     const uploadedDocuments = await Promise.all(
       req.files.documents.map((file) =>
-        uploadImage(file.buffer, "pamerit/documents"),
+        uploadImage(file.buffer, "singgah/documents", {
+          resource_type: "raw",
+        }),
       ),
     )
 
@@ -195,7 +208,7 @@ exports.updateProject = asyncHandler(async (req, res) => {
       uploadedDocuments.map((result, index) => ({
         name: req.files.documents[index].originalname,
         file_url: result.secure_url,
-        project_id: req.params.id,
+        project_id: existingProject.id,
       })),
     )
   }

@@ -2,15 +2,18 @@ const router = require("express").Router()
 
 const projectController = require("../controllers/projectController")
 const authMiddleware = require("../middlewares/authMiddleware")
+const optionalAuthMiddleware = require("../middlewares/optionalAuthMiddleware")
 const roleMiddleware = require("../middlewares/roleMiddleware")
 const upload = require("../middlewares/uploadMiddleware")
+const { dynamicUploadFields } = require("../middlewares/uploadMiddleware")
 const validate = require("../middlewares/validateMiddleware")
 const {
   createProjectValidator,
   updateProjectValidator,
+  updateProjectStatusValidator,
 } = require("../validators/projectValidator")
 
-router.get("/", projectController.getProjects)
+router.get("/", optionalAuthMiddleware, projectController.getProjects)
 
 router.get(
   "/pending",
@@ -21,13 +24,13 @@ router.get(
 
 router.get("/my", authMiddleware, projectController.getMyProjects)
 
-router.get("/:id", projectController.getProjectById)
+router.get("/:id", optionalAuthMiddleware, projectController.getProjectById)
 
 router.post(
   "/",
   authMiddleware,
   roleMiddleware("admin", "user"),
-  upload.fields([
+  dynamicUploadFields([
     { name: "thumbnail", maxCount: 1 },
     { name: "images", maxCount: 10 },
     { name: "documents", maxCount: 10 },
@@ -41,6 +44,8 @@ router.patch(
   "/:id/status",
   authMiddleware,
   roleMiddleware("admin"),
+  updateProjectStatusValidator,
+  validate,
   projectController.updateProjectStatus,
 )
 
@@ -48,7 +53,7 @@ router.put(
   "/:id",
   authMiddleware,
   roleMiddleware("admin", "user"),
-  upload.fields([
+  dynamicUploadFields([
     { name: "thumbnail", maxCount: 1 },
     { name: "images", maxCount: 10 },
     { name: "documents", maxCount: 10 },

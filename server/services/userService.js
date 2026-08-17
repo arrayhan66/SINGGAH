@@ -1,6 +1,12 @@
-const { User, Project, ProjectImage } = require("../models")
+const { User, Project, ProjectImage, sequelize } = require("../models")
+const { Op } = require("sequelize")
 const bcrypt = require("bcryptjs")
 const AppError = require("../utils/AppError")
+const sendEmail = require("../utils/sendEmail")
+const notificationService = require("./notificationService")
+const {
+  tipeApprovalEmail,
+} = require("../utils/emailTemplate")
 const {
   deleteImage,
   getPublicIdFromUrl,
@@ -39,16 +45,27 @@ const deleteUserCloudinaryAssets = async (userId) => {
 }
 
 exports.getUsers = async (query = {}) => {
-  const { page, limit } = query
+  const { page, limit, verification, username } = query
 
   const currentPage = parseInt(page) || 1
   const currentLimit = parseInt(limit) || 10
   const offset = (currentPage - 1) * currentLimit
 
+  const where = {}
+
+  if (verification === "pending") {
+    where.pending_tipe = { [Op.ne]: null }
+  }
+
+  if (username) {
+    where.username = String(username).trim().toLowerCase()
+  }
+
   const { count, rows } = await User.findAndCountAll({
     attributes: {
       exclude: ["password"],
     },
+    where,
     order: [["created_at", "DESC"]],
     limit: currentLimit,
     offset,
@@ -79,6 +96,88 @@ exports.getUserById = async (id) => {
   return user
 }
 
+exports.approveTipe = async (id, approved, reason) => {
+  const user = await User.findByPk(id)
+
+  if (!user) {
+    throw new AppError("User tidak ditemukan", 404)
+  }
+
+  if (!user.pending_tipe) {
+    throw new AppError("Tidak ada permintaan verifikasi tipe untuk user ini", 400)
+  }
+
+  if (!approved && !reason) {
+    throw new AppError("Alasan penolakan wajib diisi", 400)
+  }
+
+  const requestedTipe = user.pending_tipe
+
+  if (approved) {
+    user.tipe = requestedTipe
+    user.pending_tipe = null
+    user.rejection_reason = null
+    await user.save()
+  } else {
+    user.pending_tipe = null
+    user.rejection_reason = reason
+
+    if (user.identitas_photo) {
+      const publicId = getPublicIdFromUrl(user.identitas_photo)
+      if (publicId) {
+        await deleteImage(publicId).catch(() => {})
+      }
+      user.identitas_photo = null
+    }
+
+    user.nim_nip = null
+    await user.save()
+  }
+
+  sendEmail({
+    to: user.email,
+    subject: approved
+      ? `Verifikasi Tipe Disetujui - ${user.name}`
+      : `Verifikasi Tipe Ditolak - ${user.name}`,
+    html: tipeApprovalEmail({
+      name: user.name,
+      approved,
+      tipe: requestedTipe,
+      reason,
+    }),
+  }).catch((err) => {
+    console.error("Gagal mengirim email notifikasi verifikasi tipe:", err.message)
+  })
+
+  try {
+    await notificationService.createNotification({
+      user_id: user.id,
+      type: approved ? "tipe_approved" : "tipe_rejected",
+      title: `Verifikasi Tipe ${approved ? "Disetujui" : "Ditolak"}`,
+      message: approved
+        ? `Tipe akun Anda telah disetujui menjadi ${requestedTipe}.`
+        : `Permintaan verifikasi tipe ${requestedTipe} Anda ditolak: ${reason}`,
+      reference_type: "user",
+      reference_id: user.id,
+    })
+  } catch (err) {
+    console.error("Gagal mengirim notifikasi verifikasi tipe:", err.message)
+  }
+
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    tipe: user.tipe,
+    pending_tipe: user.pending_tipe,
+    requested_tipe: requestedTipe,
+    identitas_photo: user.identitas_photo,
+    nim_nip: user.nim_nip,
+    rejection_reason: user.rejection_reason,
+    approved,
+  }
+}
+
 exports.createUser = async (data) => {
   const {
     name,
@@ -96,9 +195,21 @@ exports.createUser = async (data) => {
     throw new AppError("Nama, username, email, dan password wajib diisi", 400)
   }
 
+  const normalizedUsername = String(username).trim().toLowerCase()
+  const normalizedEmail = String(email).trim().toLowerCase()
+
   const emailExists = await User.findOne({
     where: {
-      email,
+      [Op.or]: [
+        sequelize.where(
+          sequelize.fn("LOWER", sequelize.col("email")),
+          normalizedEmail,
+        ),
+        sequelize.where(
+          sequelize.fn("LOWER", sequelize.col("pending_email")),
+          normalizedEmail,
+        ),
+      ],
     },
   })
 
@@ -108,7 +219,7 @@ exports.createUser = async (data) => {
 
   const usernameExists = await User.findOne({
     where: {
-      username,
+      username: normalizedUsername,
     },
   })
 
@@ -120,8 +231,8 @@ exports.createUser = async (data) => {
 
   const user = await User.create({
     name,
-    username,
-    email,
+    username: normalizedUsername,
+    email: normalizedEmail,
     password: hashedPassword,
     avatar: avatar || null,
     nim_nip: nim_nip || null,
@@ -155,6 +266,7 @@ exports.updateUser = async (id, data) => {
     tipe,
     role,
     status,
+    is_verified,
   } = data
 
   const user = await User.findByPk(id)
@@ -163,40 +275,89 @@ exports.updateUser = async (id, data) => {
     throw new AppError("User tidak ditemukan", 404)
   }
 
-  if (email && email !== user.email) {
-    const emailExists = await User.findOne({
-      where: { email },
-    })
+  const normalizedEmail = email
+    ? String(email).trim().toLowerCase()
+    : String(user.email).trim().toLowerCase()
+  const normalizedUsername = username
+    ? String(username).trim().toLowerCase()
+    : String(user.username).trim().toLowerCase()
 
-    if (emailExists) {
-      throw new AppError("Email sudah digunakan", 400)
+  const isEmailChanged =
+    normalizedEmail !== String(user.email).trim().toLowerCase()
+  const isUsernameChanged =
+    normalizedUsername !== String(user.username).trim().toLowerCase()
+
+  try {
+    if (isEmailChanged) {
+      const emailExists = await User.findOne({
+        where: {
+          [Op.and]: [
+            {
+              [Op.or]: [
+                sequelize.where(
+                  sequelize.fn("LOWER", sequelize.col("email")),
+                  normalizedEmail,
+                ),
+                sequelize.where(
+                  sequelize.fn("LOWER", sequelize.col("pending_email")),
+                  normalizedEmail,
+                ),
+              ],
+            },
+            { id: { [Op.ne]: id } },
+          ],
+        },
+      })
+
+      if (emailExists) {
+        throw new AppError("Email sudah digunakan", 400)
+      }
     }
-  }
 
-  if (username && username !== user.username) {
-    const usernameExists = await User.findOne({
-      where: { username },
-    })
+    if (isUsernameChanged) {
+      const usernameExists = await User.findOne({
+        where: {
+          [Op.and]: [
+            sequelize.where(
+              sequelize.fn("LOWER", sequelize.col("username")),
+              normalizedUsername,
+            ),
+            { id: { [Op.ne]: id } },
+          ],
+        },
+      })
 
-    if (usernameExists) {
-      throw new AppError("Username sudah digunakan", 400)
+      if (usernameExists) {
+        throw new AppError("Username sudah digunakan", 400)
+      }
     }
+
+    user.name = name ?? user.name
+    user.username = normalizedUsername
+    user.role = role ?? user.role
+    user.status = status ?? user.status
+    user.avatar = avatar ?? user.avatar
+    user.nim_nip = nim_nip ?? user.nim_nip
+    user.tipe = tipe ?? user.tipe
+    user.is_verified = is_verified ?? user.is_verified
+
+    if (isEmailChanged) {
+      user.email = normalizedEmail
+      user.pending_email = null
+      user.is_verified = true
+    }
+
+    if (password) {
+      user.password = await bcrypt.hash(password, 10)
+    }
+
+    await user.save()
+  } catch (err) {
+    if (err.name === "SequelizeUniqueConstraintError") {
+      throw new AppError("Email atau username sudah digunakan", 400)
+    }
+    throw err
   }
-
-  user.name = name ?? user.name
-  user.username = username ?? user.username
-  user.email = email ?? user.email
-  user.role = role ?? user.role
-  user.status = status ?? user.status
-  user.avatar = avatar ?? user.avatar
-  user.nim_nip = nim_nip ?? user.nim_nip
-  user.tipe = tipe ?? user.tipe
-
-  if (password) {
-    user.password = await bcrypt.hash(password, 10)
-  }
-
-  await user.save()
 
   return {
     id: user.id,

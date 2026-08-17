@@ -4,6 +4,7 @@ const mediaController = require("../controllers/mediaController")
 const authMiddleware = require("../middlewares/authMiddleware")
 const roleMiddleware = require("../middlewares/roleMiddleware")
 const upload = require("../middlewares/uploadMiddleware")
+const { dynamicUpload } = require("../middlewares/uploadMiddleware")
 
 router.get(
   "/",
@@ -16,12 +17,12 @@ router.post(
   "/",
   authMiddleware,
   roleMiddleware("admin"),
-  upload.array("files", 20),
+  dynamicUpload,
   mediaController.uploadMedia,
 )
 
 router.delete(
-  "/:publicId",
+  "/{*publicId}",
   authMiddleware,
   roleMiddleware("admin"),
   mediaController.deleteMedia,

@@ -1,6 +1,6 @@
 const cloudinary = require("../config/cloudinary")
 
-exports.uploadImage = (fileBuffer, folder) => {
+exports.uploadImage = (fileBuffer, folder, options = {}) => {
   if (process.env.NODE_ENV === "test") {
     return Promise.resolve({
       secure_url: "https://res.cloudinary.com/test/image/upload/v123456/test.jpg",
@@ -12,6 +12,7 @@ exports.uploadImage = (fileBuffer, folder) => {
       .upload_stream(
         {
           folder,
+          ...options,
         },
         (error, result) => {
           if (error) return reject(error)

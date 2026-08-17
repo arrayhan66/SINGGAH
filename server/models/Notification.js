@@ -10,7 +10,13 @@ const Notification = sequelize.define(
         "comment",
         "project_approved",
         "project_rejected",
+        "new_project",
+        "project_updated",
+        "project_deleted",
         "announcement",
+        "user_registered",
+        "tipe_approved",
+        "tipe_rejected",
       ),
       allowNull: false,
     },
@@ -23,7 +29,7 @@ const Notification = sequelize.define(
       allowNull: false,
     },
     reference_type: {
-      type: DataTypes.ENUM("project", "comment", "news"),
+      type: DataTypes.ENUM("project", "comment", "news", "user"),
       allowNull: true,
     },
     reference_id: {

@@ -1,5 +1,6 @@
 const { ProjectVideo, Project } = require("../models")
 const AppError = require("../utils/AppError")
+const { toEmbedUrl } = require("../utils/videoUrl")
 
 exports.getVideos = async (projectId) => {
   return await ProjectVideo.findAll({
@@ -17,7 +18,7 @@ exports.addVideo = async (projectId, data, user) => {
   }
 
   return await ProjectVideo.create({
-    video_url: data.video_url,
+    video_url: toEmbedUrl(data.video_url),
     project_id: projectId,
   })
 }

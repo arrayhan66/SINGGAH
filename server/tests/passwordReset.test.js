@@ -9,6 +9,7 @@ describe("Auth Flow: Verify Email & Reset Password", () => {
     email: "flow@example.com",
     password: "OldPassword123!",
     tipe: "mahasiswa",
+    nim_nip: "2023002",
   }
 
   beforeAll(async () => {

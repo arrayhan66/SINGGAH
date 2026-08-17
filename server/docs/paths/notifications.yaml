@@ -170,3 +170,307 @@ markOneRead:
 
       "404":
         description: Notifikasi tidak ditemukan
+
+markOneUnread:
+  patch:
+    tags:
+      - Notifications
+
+    summary: Tandai satu notifikasi sebagai belum dibaca
+
+    security:
+      - BearerAuth: []
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+
+    responses:
+
+      "200":
+        description: Notifikasi berhasil ditandai belum dibaca
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Notifikasi ditandai belum dibaca
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    is_read:
+                      type: boolean
+                      example: false
+
+      "404":
+        description: Notifikasi tidak ditemukan
+
+deleteOne:
+  delete:
+    tags:
+      - Notifications
+
+    summary: Hapus satu notifikasi
+
+    security:
+      - BearerAuth: []
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+
+    responses:
+
+      "200":
+        description: Notifikasi berhasil dihapus
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Notifikasi dihapus
+                data:
+                  type: object
+                  nullable: true
+                  example: null
+
+      "404":
+        description: Notifikasi tidak ditemukan
+
+deleteAll:
+  delete:
+    tags:
+      - Notifications
+
+    summary: Hapus semua notifikasi milik user yang login
+
+    security:
+      - BearerAuth: []
+
+    responses:
+
+      "200":
+        description: Semua notifikasi berhasil dihapus
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Semua notifikasi dihapus
+                data:
+                  type: object
+                  nullable: true
+                  example: null
+
+bulkUpdate:
+  post:
+    tags:
+      - Notifications
+
+    summary: Perbarui status baca beberapa notifikasi sekaligus
+
+    description: |
+      Mengubah status `is_read` untuk banyak notifikasi sekaligus.
+      `action` dapat bernilai `read` atau `unread`.
+
+    security:
+      - BearerAuth: []
+
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - ids
+              - action
+            properties:
+              ids:
+                type: array
+                items:
+                  type: integer
+                example: [1, 2, 3]
+              action:
+                type: string
+                enum: [read, unread]
+                example: read
+
+    responses:
+
+      "200":
+        description: Notifikasi berhasil diperbarui
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil memperbarui 3 notifikasi
+                data:
+                  type: object
+                  properties:
+                    affected:
+                      type: integer
+                      example: 3
+
+      "400":
+        description: ids kosong atau action tidak valid
+
+bulkDelete:
+  delete:
+    tags:
+      - Notifications
+
+    summary: Hapus beberapa notifikasi sekaligus
+
+    description: |
+      Menghapus notifikasi berdasarkan daftar `ids` milik user yang login.
+
+    security:
+      - BearerAuth: []
+
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - ids
+            properties:
+              ids:
+                type: array
+                items:
+                  type: integer
+                example: [1, 2, 3]
+
+    responses:
+
+      "200":
+        description: Notifikasi berhasil dihapus
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Berhasil menghapus 3 notifikasi
+                data:
+                  type: object
+                  properties:
+                    affected:
+                      type: integer
+                      example: 3
+
+      "400":
+        description: ids kosong
+
+announcements:
+  post:
+    tags:
+      - Notifications
+
+    summary: Kirim pengumuman ke user (khusus admin)
+
+    description: |
+      Mengirim notifikasi tipe `announcement` kepada seluruh user atau
+      berdasarkan kelompok tipe (`all`, `mahasiswa`, `dosen`, `umum`).
+      User mahasiswa/dosen yang masih menunggu persetujuan tipe
+      (`pending_tipe`) juga ikut menerima pengumuman sesuai tipe yang
+      diajukan.
+
+    security:
+      - BearerAuth: []
+
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - title
+              - message
+            properties:
+              title:
+                type: string
+                example: Maintenance Terjadwal
+              message:
+                type: string
+                example: Website akan dilakukan maintenance pada Minggu pukul 22.00 WITA.
+              audience:
+                type: string
+                enum: [all, mahasiswa, dosen, umum]
+                default: all
+                example: all
+              reference_type:
+                type: string
+                nullable: true
+                example: project
+              reference_id:
+                type: integer
+                nullable: true
+                example: 5
+
+    responses:
+
+      "201":
+        description: Pengumuman berhasil dikirim
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Pengumuman berhasil dikirim
+                data:
+                  type: object
+                  properties:
+                    affected:
+                      type: integer
+                      example: 42
+
+      "400":
+        description: Judul/pesan kosong atau audience tidak valid
+
+      "403":
+        description: Hanya admin yang dapat mengirim pengumuman

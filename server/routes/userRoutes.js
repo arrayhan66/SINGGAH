@@ -8,6 +8,7 @@ const userController = require("../controllers/userController")
 const {
   createUserValidator,
   updateUserValidator,
+  approveTipeValidator,
 } = require("../validators/userValidator")
 
 router.get(
@@ -47,6 +48,15 @@ router.delete(
   authMiddleware,
   roleMiddleware("admin"),
   userController.deleteUser,
+)
+
+router.post(
+  "/:id/approve-tipe",
+  authMiddleware,
+  roleMiddleware("admin"),
+  approveTipeValidator,
+  validate,
+  userController.approveTipe,
 )
 
 module.exports = router

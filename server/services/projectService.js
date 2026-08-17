@@ -15,8 +15,9 @@ const {
   sequelize,
 } = require("../models")
 const AppError = require("../utils/AppError")
+const { toEmbedUrl } = require("../utils/videoUrl")
 const { Op } = require("sequelize")
-const { createNotification } = require("./notificationService")
+const { createNotification, notifyAdmins } = require("./notificationService")
 const cache = require("../utils/cache")
 
 // ---- Shape bersama agar response project konsisten dengan kebutuhan hall 3D ----
@@ -41,7 +42,7 @@ const PROJECT_COUNT_ATTRIBUTES = [
   ],
   [
     sequelize.literal(
-      "(SELECT COUNT(*) FROM comments WHERE comments.project_id = Project.id)",
+      "(SELECT COUNT(*) FROM comments WHERE comments.project_id = Project.id) + (SELECT COUNT(*) FROM comment_replies WHERE comment_replies.comment_id IN (SELECT id FROM comments WHERE comments.project_id = Project.id))",
     ),
     "commentsCount",
   ],
@@ -171,10 +172,11 @@ const parseRelationFields = (data) => {
     url: item.url,
   }))
   const videos = parseJsonField(data.videos, "Video").map((item) => ({
-    video_url:
+    video_url: toEmbedUrl(
       typeof item === "string"
         ? item
         : item.video_url || item.url || String(item),
+    ),
   }))
 
   return { technologies, members, links, videos }
@@ -210,7 +212,37 @@ const persistRelations = async (project, relations, options = {}) => {
   )
 }
 
-exports.getProjects = async (query = {}) => {
+// Sisipkan status like/bookmark user ke daftar project (untuk kartu di list,
+// supaya heart/bookmark tetap terisi setelah navigasi bolak-balik).
+async function applyUserFlags(items, userId) {
+  if (!userId || !items.length) {
+    return items.map((item) => ({ ...item, liked: false, bookmarked: false }))
+  }
+
+  const ids = items.map((item) => item.id)
+
+  const [likes, bookmarks] = await Promise.all([
+    ProjectLike.findAll({
+      where: { user_id: userId, project_id: { [Op.in]: ids } },
+      attributes: ["project_id"],
+    }),
+    Bookmark.findAll({
+      where: { user_id: userId, project_id: { [Op.in]: ids } },
+      attributes: ["project_id"],
+    }),
+  ])
+
+  const likedIds = new Set(likes.map((like) => like.project_id))
+  const bookmarkedIds = new Set(bookmarks.map((bookmark) => bookmark.project_id))
+
+  return items.map((item) => ({
+    ...item,
+    liked: likedIds.has(item.id),
+    bookmarked: bookmarkedIds.has(item.id),
+  }))
+}
+
+exports.getProjects = async (query = {}, currentUserId = null, userRole = null) => {
   const { search, category_id, status, year, page, limit } = query
 
   const andConditions = []
@@ -231,6 +263,8 @@ exports.getProjects = async (query = {}) => {
 
   if (status) {
     andConditions.push({ status })
+  } else if (userRole !== "admin") {
+    andConditions.push({ status: "published" })
   }
 
   if (year) {
@@ -261,7 +295,7 @@ exports.getProjects = async (query = {}) => {
   })
 
   return {
-    items: rows.map(toProjectJSON),
+    items: await applyUserFlags(rows.map(toProjectJSON), currentUserId),
     pagination: {
       page: currentPage,
       limit: currentLimit,
@@ -286,8 +320,9 @@ exports.getPendingProjects = async () => {
   })
 }
 
-exports.updateProjectStatus = async (id, status) => {
-  const project = await Project.findByPk(id)
+exports.updateProjectStatus = async (id, status, reason = "") => {
+  const where = /^\d+$/.test(String(id)) ? { id: Number(id) } : { slug: id }
+  const project = await Project.findOne({ where })
 
   if (!project) {
     throw new AppError("Project tidak ditemukan", 404)
@@ -297,8 +332,14 @@ exports.updateProjectStatus = async (id, status) => {
     throw new AppError("Status tidak valid", 400)
   }
 
+  const note = String(reason || "").trim()
+
   await sequelize.transaction(async (t) => {
     project.status = status
+    project.rejection_reason =
+      status === "rejected" ? note || null : null
+    project.approve_note =
+      status === "published" ? note || null : null
     await project.save({ transaction: t })
 
     if (status === "published") {
@@ -307,7 +348,9 @@ exports.updateProjectStatus = async (id, status) => {
           user_id: project.user_id,
           type: "project_approved",
           title: "Project disetujui",
-          message: `Project "${project.title}" telah disetujui dan dipublikasikan.`,
+          message: note
+            ? `Project "${project.title}" telah disetujui dan dipublikasikan. Catatan admin: ${note}`
+            : `Project "${project.title}" telah disetujui dan dipublikasikan.`,
           reference_type: "project",
           reference_id: project.id,
         },
@@ -321,7 +364,9 @@ exports.updateProjectStatus = async (id, status) => {
           user_id: project.user_id,
           type: "project_rejected",
           title: "Project ditolak",
-          message: `Project "${project.title}" ditolak oleh admin.`,
+          message: note
+            ? `Project "${project.title}" ditolak oleh admin. Alasan: ${note}`
+            : `Project "${project.title}" ditolak oleh admin.`,
           reference_type: "project",
           reference_id: project.id,
         },
@@ -336,7 +381,10 @@ exports.updateProjectStatus = async (id, status) => {
 }
 
 exports.getProjectById = async (id, currentUserId = null) => {
-  const project = await Project.findByPk(id, {
+  const where = /^\d+$/.test(id) ? { id: Number(id) } : { slug: id }
+
+  const project = await Project.findOne({
+    where,
     attributes: {
       include: PROJECT_COUNT_ATTRIBUTES,
     },
@@ -455,6 +503,20 @@ exports.createProject = async (data, user, imageUrls = [], documentUrls = []) =>
 
     await persistRelations(created, relations, { transaction: t })
 
+    // Project pending: beri tahu semua admin agar segera di-review.
+    if (projectStatus === "pending") {
+      await notifyAdmins(
+        {
+          type: "new_project",
+          title: "Karya baru menunggu persetujuan",
+          message: `${user.name} mengunggah karya "${created.title}" dan menunggu persetujuan admin.`,
+          reference_type: "project",
+          reference_id: created.id,
+        },
+        { transaction: t },
+      )
+    }
+
     return created
   })
 
@@ -462,7 +524,8 @@ exports.createProject = async (data, user, imageUrls = [], documentUrls = []) =>
 }
 
 exports.updateProject = async (id, data, user) => {
-  const project = await Project.findByPk(id)
+  const where = /^\d+$/.test(String(id)) ? { id: Number(id) } : { slug: id }
+  const project = await Project.findOne({ where })
 
   if (!project) {
     throw new AppError("Project tidak ditemukan", 404)
@@ -514,7 +577,22 @@ exports.updateProject = async (id, data, user) => {
     await persistRelations(project, relations, { transaction: t })
   })
 
-  return await exports.getProjectById(id)
+  // Admin mengubah karya milik user lain -> beri tahu pemilik.
+  if (user.role === "admin" && project.user_id !== user.id) {
+    await createNotification(
+      {
+        user_id: project.user_id,
+        type: "project_updated",
+        title: "Karyamu diperbarui admin",
+        message: `Project "${project.title}" telah diubah oleh admin. Silakan cek kembali karyamu.`,
+        reference_type: "project",
+        reference_id: project.id,
+      },
+      { transaction: null },
+    ).catch(() => {})
+  }
+
+  return await exports.getProjectById(project.id)
 }
 
 exports.deleteProject = async (id, user) => {
@@ -552,6 +630,18 @@ exports.deleteProject = async (id, user) => {
     })
   })
 
+  // Admin menghapus karya milik user lain -> beri tahu pemilik.
+  if (user.role === "admin" && project.user_id !== user.id) {
+    await createNotification({
+      user_id: project.user_id,
+      type: "project_deleted",
+      title: "Karyamu dihapus admin",
+      message: `Project "${project.title}" telah dihapus oleh admin.`,
+      reference_type: "project",
+      reference_id: project.id,
+    }).catch(() => {})
+  }
+
   return project
 }
 
@@ -585,7 +675,7 @@ exports.getMyProjects = async (userId) => {
 
 // ---- Data project untuk hall 3D: seluruh project published dengan semua
 // relasi yang dipakai modal detail hall, dalam satu kali request. ----
-exports.getHallProjects = async () => {
+exports.getHallProjects = async (currentUserId = null) => {
   const projects = await Project.findAll({
     where: { status: "published" },
     attributes: {
@@ -609,5 +699,5 @@ exports.getHallProjects = async () => {
     distinct: true,
   })
 
-  return projects.map(toProjectJSON)
+  return applyUserFlags(projects.map(toProjectJSON), currentUserId)
 }

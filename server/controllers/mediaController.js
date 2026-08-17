@@ -31,14 +31,16 @@ exports.uploadMedia = asyncHandler(async (req, res) => {
 })
 
 exports.deleteMedia = asyncHandler(async (req, res) => {
-  await mediaService.deleteMedia(req.params.publicId)
+  const raw = req.originalUrl.split("/media/").slice(1).join("/media/")
+  const publicId = decodeURIComponent(raw)
+  await mediaService.deleteMedia(publicId)
 
   await logActivity({
     userId: req.user.id,
     action: "media_deleted",
     targetType: "media",
     targetId: null,
-    description: `${req.user.name} menghapus media "${req.params.publicId}"`,
+    description: `${req.user.name} menghapus media "${publicId}"`,
   })
 
   success(res, null, "Media berhasil dihapus")

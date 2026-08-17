@@ -30,6 +30,24 @@ exports.addReply = asyncHandler(async (req, res) => {
   success(res, reply, "Balasan ditambahkan", 201)
 })
 
+exports.updateComment = asyncHandler(async (req, res) => {
+  const comment = await commentService.updateComment(
+    req.params.commentId,
+    req.body.text,
+    req.user,
+  )
+  success(res, comment, "Komentar diperbarui")
+})
+
+exports.updateReply = asyncHandler(async (req, res) => {
+  const reply = await commentService.updateReply(
+    req.params.replyId,
+    req.body.text,
+    req.user,
+  )
+  success(res, reply, "Balasan diperbarui")
+})
+
 exports.removeReply = asyncHandler(async (req, res) => {
   await commentService.removeReply(req.params.replyId, req.user)
   success(res, null, "Balasan dihapus")

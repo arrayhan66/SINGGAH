@@ -43,6 +43,33 @@ exports.updateUser = asyncHandler(async (req, res) => {
   success(res, user, "User berhasil diperbarui")
 })
 
+exports.approveTipe = asyncHandler(async (req, res) => {
+  const approved = req.body.approved === true
+  const result = await userService.approveTipe(
+    req.params.id,
+    approved,
+    req.body.reason,
+  )
+
+  await logActivity({
+    userId: req.user.id,
+    action: approved ? "user_tipe_approved" : "user_tipe_rejected",
+    targetType: "user",
+    targetId: result.id,
+    description: `${req.user.name} ${
+      approved ? "menyetujui" : "menolak"
+    } verifikasi tipe ${result.requested_tipe} untuk "${result.name}"`,
+  })
+
+  success(
+    res,
+    result,
+    approved
+      ? "Verifikasi tipe berhasil disetujui"
+      : "Verifikasi tipe berhasil ditolak",
+  )
+})
+
 exports.deleteUser = asyncHandler(async (req, res) => {
   const user = await userService.getUserById(req.params.id)
 

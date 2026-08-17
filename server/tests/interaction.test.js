@@ -5,6 +5,7 @@ const { User, Category, Project } = require("../models")
 describe("Interaction Endpoints (Bookmark, Like, Comment, Reply)", () => {
   let adminToken = ""
   let studentToken = ""
+  let otherStudentToken = ""
   let projectId = null
   let commentId = null
   let replyId = null
@@ -45,15 +46,38 @@ describe("Interaction Endpoints (Bookmark, Like, Comment, Reply)", () => {
       email: "studentinteract@example.com",
       password: "Password123!",
       tipe: "mahasiswa",
+      nim_nip: "2101010008",
     })
     const studentUser = await User.findOne({ where: { email: "studentinteract@example.com" } })
     studentUser.is_verified = true
+    studentUser.tipe = "mahasiswa"
+    studentUser.pending_tipe = null
     await studentUser.save()
     const studentLogin = await request(app).post("/api/auth/login").send({
       email: "studentinteract@example.com",
       password: "Password123!",
     })
     studentToken = studentLogin.body.data.token
+
+    // Register another student (not the comment owner)
+    await request(app).post("/api/auth/register").send({
+      name: "Other Student",
+      username: "otherstudentinteract",
+      email: "otherstudentinteract@example.com",
+      password: "Password123!",
+      tipe: "mahasiswa",
+      nim_nip: "2101010009",
+    })
+    const otherStudentUser = await User.findOne({ where: { email: "otherstudentinteract@example.com" } })
+    otherStudentUser.is_verified = true
+    otherStudentUser.tipe = "mahasiswa"
+    otherStudentUser.pending_tipe = null
+    await otherStudentUser.save()
+    const otherStudentLogin = await request(app).post("/api/auth/login").send({
+      email: "otherstudentinteract@example.com",
+      password: "Password123!",
+    })
+    otherStudentToken = otherStudentLogin.body.data.token
 
     // Create a published project directly
     const project = await Project.create({
@@ -175,6 +199,45 @@ describe("Interaction Endpoints (Bookmark, Like, Comment, Reply)", () => {
       expect(res.body.success).toBe(true)
       expect(Array.isArray(res.body.data)).toBe(true)
       expect(res.body.data.length).toBeGreaterThan(0)
+    })
+
+    it("should count comments including replies", async () => {
+      const res = await request(app).get(`/api/projects/${projectId}`)
+
+      expect(res.status).toBe(200)
+      expect(res.body.success).toBe(true)
+      expect(res.body.data).toHaveProperty("commentsCount", 2)
+    })
+
+    it("should update a comment", async () => {
+      const res = await request(app)
+        .put(`/api/projects/${projectId}/comments/${commentId}`)
+        .set("Authorization", `Bearer ${studentToken}`)
+        .send({ text: "Keren sekali, updated!" })
+
+      expect(res.status).toBe(200)
+      expect(res.body.success).toBe(true)
+      expect(res.body.data.text).toBe("Keren sekali, updated!")
+    })
+
+    it("should not update another user's comment", async () => {
+      const res = await request(app)
+        .put(`/api/projects/${projectId}/comments/${commentId}`)
+        .set("Authorization", `Bearer ${otherStudentToken}`)
+        .send({ text: "hack" })
+
+      expect(res.status).toBe(403)
+    })
+
+    it("should update a reply", async () => {
+      const res = await request(app)
+        .put(`/api/projects/${projectId}/comments/${commentId}/replies/${replyId}`)
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send({ text: "Terima kasih, updated!" })
+
+      expect(res.status).toBe(200)
+      expect(res.body.success).toBe(true)
+      expect(res.body.data.text).toBe("Terima kasih, updated!")
     })
 
     it("should delete a reply", async () => {

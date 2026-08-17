@@ -38,9 +38,12 @@ describe("Reports & Activity Logs Endpoints", () => {
       email: "userreports@example.com",
       password: "Password123!",
       tipe: "mahasiswa",
+      nim_nip: "2101010005",
     })
     const user = await User.findOne({ where: { email: "userreports@example.com" } })
     user.is_verified = true
+    user.tipe = "mahasiswa"
+    user.pending_tipe = null
     await user.save()
     const userLogin = await request(app).post("/api/auth/login").send({
       email: "userreports@example.com",

@@ -23,7 +23,7 @@ exports.registerValidator = [
     .withMessage("Email wajib diisi")
     .isEmail()
     .withMessage("Format email tidak valid")
-    .normalizeEmail(),
+    .normalizeEmail({ gmail_remove_dots: false }),
 
   body("password")
     .notEmpty()
@@ -43,7 +43,7 @@ exports.loginValidator = [
     .withMessage("Email wajib diisi")
     .isEmail()
     .withMessage("Format email tidak valid")
-    .normalizeEmail(),
+    .normalizeEmail({ gmail_remove_dots: false }),
 
   body("password").notEmpty().withMessage("Password wajib diisi"),
 ]
@@ -55,7 +55,7 @@ exports.forgotPasswordValidator = [
     .withMessage("Email wajib diisi")
     .isEmail()
     .withMessage("Format email tidak valid")
-    .normalizeEmail(),
+    .normalizeEmail({ gmail_remove_dots: false }),
 ]
 
 exports.verifyCodeValidator = [
@@ -65,7 +65,7 @@ exports.verifyCodeValidator = [
     .withMessage("Email wajib diisi")
     .isEmail()
     .withMessage("Format email tidak valid")
-    .normalizeEmail(),
+    .normalizeEmail({ gmail_remove_dots: false }),
 
   body("code")
     .trim()
@@ -84,7 +84,7 @@ exports.resetPasswordValidator = [
     .withMessage("Email wajib diisi")
     .isEmail()
     .withMessage("Format email tidak valid")
-    .normalizeEmail(),
+    .normalizeEmail({ gmail_remove_dots: false }),
 
   body("code")
     .trim()
@@ -106,6 +106,21 @@ exports.resetPasswordValidator = [
     .withMessage("Password harus mengandung minimal 1 angka"),
 ]
 
+exports.applyTipeValidator = [
+  body("tipe")
+    .trim()
+    .notEmpty()
+    .withMessage("Tipe wajib diisi")
+    .isIn(["mahasiswa", "dosen"])
+    .withMessage("Tipe harus mahasiswa atau dosen"),
+
+  body("nim_nip")
+    .optional()
+    .trim()
+    .isLength({ max: 50 })
+    .withMessage("NIM/NIP maksimal 50 karakter"),
+]
+
 exports.changePasswordValidator = [
   body("oldPassword").notEmpty().withMessage("Password lama wajib diisi"),
 
@@ -118,4 +133,31 @@ exports.changePasswordValidator = [
     .withMessage("Password harus mengandung minimal 1 huruf besar")
     .matches(/[0-9]/)
     .withMessage("Password harus mengandung minimal 1 angka"),
+]
+
+exports.deleteAccountValidator = [
+  body("password")
+    .notEmpty()
+    .withMessage("Password wajib diisi untuk menghapus akun"),
+]
+
+exports.updateProfileValidator = [
+  body("name")
+    .optional({ checkFalsy: true })
+    .trim()
+    .isLength({ min: 3 })
+    .withMessage("Nama minimal 3 karakter"),
+
+  body("username")
+    .optional({ checkFalsy: true })
+    .trim()
+    .matches(/^[a-zA-Z0-9_.-]+$/)
+    .withMessage("Username hanya boleh huruf, angka, titik, underscore, dan strip"),
+
+  body("email")
+    .optional({ checkFalsy: true })
+    .trim()
+    .isEmail()
+    .withMessage("Format email tidak valid")
+    .normalizeEmail({ gmail_remove_dots: false }),
 ]

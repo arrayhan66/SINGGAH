@@ -20,7 +20,7 @@ exports.addImage = asyncHandler(async (req, res) => {
 
   const result = await uploadImage(
     req.files.image[0].buffer,
-    "pamerit/projects",
+    "singgah/projects",
   )
 
   const image = await projectImageService.addImage(

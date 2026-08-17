@@ -12,10 +12,13 @@ describe("Rate Limiting", () => {
       email: "limiter@example.com",
       password: "Password123!",
       tipe: "mahasiswa",
+      nim_nip: "2101010007",
     })
 
     const user = await User.findOne({ where: { email: "limiter@example.com" } })
     user.is_verified = true
+    user.tipe = "mahasiswa"
+    user.pending_tipe = null
     await user.save()
   })
 

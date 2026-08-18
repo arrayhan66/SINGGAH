@@ -146,7 +146,7 @@ function AdminUserProfileCard({ user, onEdit, onDelete }) {
                   <div className="min-w-0">
                     <p className="text-[11px] text-slate-500">
                       {user.tipe === "dosen" || user.pending_tipe === "dosen"
-                        ? "NIP"
+                        ? "Kartu Identitas"
                         : "NIM"}
                     </p>
                     <p className="truncate font-mono text-sm text-slate-200">

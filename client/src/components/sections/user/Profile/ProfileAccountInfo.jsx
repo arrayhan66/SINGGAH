@@ -56,7 +56,7 @@ function ProfileAccountInfo() {
     ...(user?.tipe === "mahasiswa" || user?.tipe === "dosen"
       ? [
           {
-            label: user?.tipe === "dosen" ? "NIP" : "NIM",
+            label: user?.tipe === "dosen" ? "Kartu Identitas" : "NIM",
             value: user?.nim_nip || "-",
             icon: CreditCard,
             iconColor: "text-cyan-400",

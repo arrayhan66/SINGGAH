@@ -387,12 +387,12 @@ function RoomDecorGround({ room, projects }) {
 
   return (
     <group key={`decor-ground-${room.id}`}>
-      <FloorLabel position={[cx, 0.06, 29]} text="LANTAI 1 · KARYA MAHASISWA" />
+      <FloorLabel position={[cx + 1.3, 0.06, 36]} text="LANTAI 1 · KARYA MAHASISWA" />
 
-      <Plant position={[x1 - 2.5, 0, 29]} variant="flower" flowerColor="#60a5fa" />
+      <Plant position={[x1 - 2.5, 0, 36]} variant="flower" flowerColor="#60a5fa" />
       <Plant position={[x0 + STAIR_WIDTH + 1.2, 0, STAIR_Z0 - 3.4]} variant="flower" flowerColor="#f8fafc" />
-      <Plant position={[cx - 6.6, 0, 29]} variant="tall" />
-      <Plant position={[cx + 6.6, 0, 29]} variant="tall" />
+      <Plant position={[cx + 1.3 - 6.6, 0, 36]} variant="tall" />
+      <Plant position={[cx + 1.3 + 6.6, 0, 36]} variant="tall" />
 
       <InstancedOttoman items={ottLeft} />
       <InstancedOttoman items={ottRight} />
@@ -614,12 +614,12 @@ function RoomDecorUpper({ room, projects }) {
         <PKKMPoster position={[cx, Y + 3, ROW_Z0 + 0.42]} rotationY={0} />
       </Suspense>
 
-      <FloorLabel position={[cx, Y + 0.06, 30]} text="LANTAI 2 · KARYA DOSEN" />
+      <FloorLabel position={[cx + 1.3, Y + 0.06, 42]} text="LANTAI 2 · KARYA DOSEN" />
 
-      <Plant position={[x1 - 2.5, Y, 30]} variant="flower" flowerColor="#60a5fa" />
-      <Plant position={[x0 + 4.5, Y, 30]} variant="flower" flowerColor="#f8fafc" />
-      <Plant position={[cx - 6.6, Y, 30]} variant="tall" />
-      <Plant position={[cx + 6.6, Y, 30]} variant="tall" />
+      <Plant position={[x1 - 2.5, Y, 42]} variant="flower" flowerColor="#60a5fa" />
+      <Plant position={[x0 + 4.5, Y, 42]} variant="flower" flowerColor="#f8fafc" />
+      <Plant position={[cx + 1.3 - 6.6, Y, 42]} variant="tall" />
+      <Plant position={[cx + 1.3 + 6.6, Y, 42]} variant="tall" />
 
       <group position={[0, Y, 0]}>
         <InstancedOttoman items={ottLeft} />

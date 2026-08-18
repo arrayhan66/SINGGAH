@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { lazy, Suspense, useMemo } from "react"
 import { Text } from "@react-three/drei"
 import * as THREE from "three"
 import { useQualityStore } from "../hooks/useQuality"
@@ -40,7 +40,7 @@ import {
   HALL_PILLARS,
   LAYOUT,
 } from "./museumLayout"
-import { KaryaRooms } from "./KaryaRooms"
+const KaryaRooms = lazy(() => import("./KaryaRooms").then((m) => ({ default: m.KaryaRooms })))
 import { enrichProjects, getCategoryStats } from "../../utils/hallHelpers"
 
 const H = MUSEUM.height
@@ -193,7 +193,9 @@ function Museum({ hallData }) {
       ))}
 
       {/* Category Rooms (separated in KaryaRooms.jsx) */}
-      <KaryaRooms groups={groups} marbleMap={marbleMap} archways={archways} />
+      <Suspense fallback={null}>
+        <KaryaRooms groups={groups} marbleMap={marbleMap} archways={archways} />
+      </Suspense>
 
       {/* Hall decor */}
       <group>

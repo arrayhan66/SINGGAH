@@ -381,7 +381,7 @@ function wallDef(axis, at, from, to, face, y = 2.75, dir = 1, endPad = 0) {
 }
 
 // Bare stretch left empty around the exit portal so frames don't hug the door.
-const PORTAL_MARGIN = 1.8
+const PORTAL_MARGIN = 3.0
 
 // Carve the front wall around the portal into two segments that each pack from
 // the room's outer corner toward the door, both reserving PORTAL_MARGIN beside
@@ -503,54 +503,26 @@ const FRAME_GAP = 0.9
 const FRAME_EDGE_PAD = 0.5
 
 export function layoutPaintings(roomId, projects, level = "ground") {
-  // Combine the work walls with the extra gallery rails so EVERY rail stretch
-  // in the room carries framed works ("fullkan semua space rel").
-  const wallsDef = [...(paintingWalls[roomId]?.[level] || []), ...(roomRails[roomId]?.[level] || [])]
+  const wallsDef = paintingWalls[roomId]?.[level] || []
   const list = projects || []
   if (!list.length) return []
-  const caps = wallsDef.map((wd) => {
-    const len = wd.to - wd.from
-    const usable = len - wd.endPad
-    return Math.max(
-      0,
-      Math.floor((usable - FRAME_EDGE_PAD * 2 + FRAME_GAP) / (PAINT_W + FRAME_GAP)),
-    )
-  })
-  const total = caps.reduce((s, c) => s + c, 0)
 
-  // Pass 1: fill every wall to its full capacity, cycling through the available
-  // works so no rail space is left empty. Walls are filled one after another so
-  // the frames gather in neat rows per wall before spilling to the next.
-  const counts = caps.map(() => 0)
-  let wi = 0
-  for (let i = 0; i < total; i++) {
-    while (wi < caps.length && counts[wi] >= caps[wi]) wi++
-    if (wi >= caps.length) break
-    counts[wi]++
-  }
-
-  // Pass 2: place each wall's works as a single row spread EVENLY across the
-  // full wall — first frame at the wall's start edge, last frame at the far
-  // end, equal gaps in between. This absorbs the leftover space so no wall
-  // ends with an empty hole ("rapikan jarak antar rel").
   const placed = []
   let pi = 0
-  for (let wi = 0; wi < caps.length; wi++) {
-    const n = counts[wi]
-    if (!n) continue
+  for (let wi = 0; wi < wallsDef.length; wi++) {
     const wd = wallsDef[wi]
-    const start = wd.from + FRAME_EDGE_PAD
-    const end = wd.to - wd.endPad - FRAME_EDGE_PAD
-    const span = Math.max(0, end - start)
-    const step = n > 1 ? (span - n * PAINT_W) / (n - 1) : 0
-    for (let k = 0; k < n; k++) {
-      const c = start + PAINT_W / 2 + k * (PAINT_W + step)
-      // dir=-1 walls order the works from the `to` edge (corner) toward
-      // `from`; dir=1 order from `from` toward `to`. A lone frame centers
-      // itself on the wall instead of hugging one end.
-      const t =
-        n === 1 ? start + span / 2 : wd.dir === -1 ? end + start - c : c
-      const p = list[pi % list.length]
+    const edgePad = wd.endPad + FRAME_EDGE_PAD
+
+    let cursor = wd.dir === -1
+      ? wd.to - edgePad
+      : wd.from + edgePad
+
+    while (pi < list.length) {
+      const p = list[pi]
+      const halfW = PAINT_W / 2
+      const t = cursor + (wd.dir === -1 ? -halfW : halfW)
+      if (t < wd.from + edgePad || t > wd.to - edgePad) break
+
       let fx, fz
       if (wd.axis === "x") {
         fx = wd.at + faceOffset(wd.face)
@@ -569,7 +541,9 @@ export function layoutPaintings(roomId, projects, level = "ground") {
         key: `${pi}-${p.id}`,
       })
       pi++
+      cursor += (wd.dir === -1 ? -1 : 1) * (PAINT_W + FRAME_GAP)
     }
+    if (pi >= list.length) break
   }
   return placed
 }

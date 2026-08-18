@@ -9,7 +9,7 @@ const pendingTipeInfo = {
   },
   dosen: {
     label: "Dosen",
-    hint: "NIP kamu akan dicek oleh admin",
+    hint: "Kartu identitas kamu akan dicek oleh admin",
   },
 };
 

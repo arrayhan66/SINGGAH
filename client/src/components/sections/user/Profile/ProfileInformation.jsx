@@ -135,7 +135,7 @@ function ProfileInformation({
         {isSpecial && (
           <div className="flex flex-col gap-1.5">
             <label className="text-xs md:text-sm font-medium text-slate-300">
-              {userTipe === "dosen" ? "NIP" : "NIM"}
+              {userTipe === "dosen" ? "Kartu Identitas" : "NIM"}
             </label>
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
@@ -146,7 +146,7 @@ function ProfileInformation({
                 value={profileData.nim_nip || ""}
                 onChange={(e) => updateProfileField("nim_nip", e.target.value)}
                 placeholder={
-                  userTipe === "dosen" ? "Masukkan NIP" : "Masukkan NIM"
+                  userTipe === "dosen" ? "Masukkan Kartu Identitas" : "Masukkan NIM"
                 }
                 className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/50 focus:outline-none transition-colors"
               />

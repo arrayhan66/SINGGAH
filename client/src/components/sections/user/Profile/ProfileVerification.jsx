@@ -167,7 +167,7 @@ function ProfileVerification() {
               placeholder={
                 targetTipe === "mahasiswa"
                   ? "Masukkan NIM kamu"
-                  : "Masukkan NIP / NIDN (Opsional)"
+                  : "Masukkan Kartu Identitas (Opsional)"
               }
               className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/50 focus:outline-none transition-colors"
             />
@@ -244,7 +244,7 @@ function ProfileVerification() {
                 {rejectedReason}
               </p>
               <p className="mt-2 text-[11px] text-red-300/70">
-                Silakan ajukan ulang dengan NIM/NIP dan foto KTM / kartu identitas yang valid.
+                Silakan ajukan ulang dengan NIM/Kartu Identitas dan foto KTM yang valid.
               </p>
             </div>
           )}

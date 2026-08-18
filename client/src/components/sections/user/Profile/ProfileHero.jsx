@@ -48,7 +48,7 @@ function ProfileHero({ isAdmin = false }) {
           user?.nim_nip && (
             <div className="flex items-center gap-1.5 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-200 lg:text-sm">
               <CreditCard className="h-3.5 w-3.5" />
-              {user?.tipe === "dosen" ? "NIP" : "NIM"}: {user.nim_nip}
+              {user?.tipe === "dosen" ? "Kartu Identitas" : "NIM"}: {user.nim_nip}
             </div>
           )}
       </div>

@@ -118,7 +118,7 @@ function AdminUserTipeModal({ user, decision, onConfirm, onCancel, loading }) {
             {user.nim_nip && (
               <div className="mt-1.5 flex items-center justify-between text-xs">
                 <span className="text-slate-400">
-                  {user.pending_tipe === "dosen" ? "NIP" : "NIM"}
+                  {user.pending_tipe === "dosen" ? "Kartu Identitas" : "NIM"}
                 </span>
                 <span className="font-mono text-slate-200">{user.nim_nip}</span>
               </div>

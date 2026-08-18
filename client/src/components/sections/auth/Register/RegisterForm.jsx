@@ -231,7 +231,9 @@ function RegisterForm() {
             {step === 2 && "Gunakan email aktif untuk keperluan verifikasi."}
             {step === 3 &&
               (formData.role === "mahasiswa" || formData.role === "dosen"
-                ? "Lengkapi identitas Anda. NIM/NIP dan Foto KTM wajib diunggah."
+                ? formData.role === "dosen"
+                  ? "Lengkapi identitas Anda. Kartu Identitas dan Foto KTM wajib diunggah."
+                  : "Lengkapi identitas Anda. NIM dan Foto KTM wajib diunggah."
                 : "Lengkapi identitas akun Anda. Foto bersifat opsional.")}
             {step === 4 && "Buat kata sandi yang kuat dan mudah diingat."}
           </p>
@@ -382,7 +384,7 @@ function RegisterForm() {
                       placeholder={
                         formData.role === "mahasiswa"
                           ? "Masukkan NIM"
-                          : "Masukkan NIP / NIDN (Opsional)"
+                          : "Masukkan Kartu Identitas (Opsional)"
                       }
                       className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 sm:py-3 pl-9 sm:pl-11 pr-4 text-sm text-slate-900 shadow-sm focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-cyan-500/20 [&:-webkit-autofill]:[-webkit-text-fill-color:#0f172a] [&:-webkit-autofill]:shadow-[0_0_0_1000px_#f8fafc_inset] [&:-webkit-autofill]:transition-none focus:[&:-webkit-autofill]:shadow-[0_0_0_1000px_#fff_inset]"
                     />

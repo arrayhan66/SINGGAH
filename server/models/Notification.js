@@ -33,7 +33,7 @@ const Notification = sequelize.define(
       allowNull: true,
     },
     reference_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       allowNull: true,
     },
     is_read: {

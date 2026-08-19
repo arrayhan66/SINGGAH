@@ -9,7 +9,7 @@ const ActivityLog = sequelize.define(
       allowNull: false,
     },
     user_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       allowNull: true,
       references: { model: "users", key: "id", onDelete: "SET NULL", onUpdate: "CASCADE" },
     },
@@ -18,7 +18,7 @@ const ActivityLog = sequelize.define(
       allowNull: true,
     },
     target_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       allowNull: true,
     },
     description: {

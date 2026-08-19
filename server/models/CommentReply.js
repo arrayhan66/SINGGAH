@@ -9,7 +9,7 @@ const CommentReply = sequelize.define(
       allowNull: false,
     },
     user_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       allowNull: false,
       references: { model: "users", key: "id" },
     },

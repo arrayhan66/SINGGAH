@@ -9,7 +9,7 @@ const ProjectVideo = sequelize.define(
       allowNull: false,
     },
     project_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       allowNull: false,
       references: { model: "projects", key: "id" },
     },

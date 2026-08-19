@@ -17,6 +17,12 @@ const sequelize = isTest
         port: parseInt(process.env.DB_PORT) || 3306,
         dialect: "mysql",
         logging: false,
+        dialectOptions: {
+          ssl: {
+            require: true,
+            rejectUnauthorized: true,
+          },
+        },
       },
     )
 

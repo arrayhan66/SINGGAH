@@ -5,12 +5,12 @@ const ProjectView = sequelize.define(
   "ProjectView",
   {
     project_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       allowNull: false,
       references: { model: "projects", key: "id" },
     },
     user_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       allowNull: true,
       references: { model: "users", key: "id" },
     },

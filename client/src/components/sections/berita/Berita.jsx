@@ -108,9 +108,7 @@ function Berita() {
                       {item.title}
                     </h3>
 
-                    <div className="inline-block px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-400 text-[10px] font-semibold tracking-wide border border-cyan-500/20 sm:px-2.5 sm:py-1 sm:text-xs md:text-xs 3xl:text-sm 4xl:px-3 4xl:py-1.5 4xl:text-base">
-                      {item.event}
-                    </div>
+
 
                     <p className="text-xs leading-relaxed text-slate-300/90 line-clamp-3 sm:text-sm md:text-sm lg:text-base 3xl:text-base 4xl:text-lg">
                       {item.desc}

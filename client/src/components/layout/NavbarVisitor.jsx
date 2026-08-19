@@ -91,9 +91,9 @@ function NavbarVisitor() {
           <NavLink
             to="/login"
             onClick={closeMenu}
-            className="group relative flex shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-2.5 py-1.5 text-[10px] font-bold tracking-wide text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 active:scale-95 min-[350px]:px-3 min-[350px]:py-2 sm:px-4 sm:py-2 sm:text-xs md:px-5 md:py-2.5 md:text-sm lg:px-6 lg:py-2.5 lg:text-base 2xl:px-8 2xl:py-3 2xl:text-lg min-[2000px]:px-10 min-[2000px]:py-4 min-[2000px]:text-xl"
+            className="group relative flex shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-2.5 py-1.5 text-[10px] font-semibold tracking-wide text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 active:scale-95 min-[350px]:px-3 min-[350px]:py-2 sm:px-4 sm:py-2 sm:text-xs md:px-5 md:py-2.5 md:text-sm lg:px-6 lg:py-2.5 lg:text-base 2xl:px-8 2xl:py-3 2xl:text-lg min-[2000px]:px-10 min-[2000px]:py-4 min-[2000px]:text-xl"
           >
-            LOGIN
+            Login
           </NavLink>
 
           <button

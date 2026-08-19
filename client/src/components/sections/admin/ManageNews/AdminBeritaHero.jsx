@@ -43,7 +43,7 @@ function AdminBeritaHero({ search, onSearchChange, statusFilter, onStatusChange 
               type="text"
               value={search}
               onChange={onSearchChange}
-              placeholder="Cari judul atau event..."
+              placeholder="Cari judul berita..."
               className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none shadow-sm focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
             />
           </div>

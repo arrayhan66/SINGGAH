@@ -93,6 +93,9 @@ function LookControls({ bounds, onSelectProject }) {
       onSelectProject(action.project)
     } else if (action.type === "teleport") {
       teleportTo(action.point, action.yaw)
+    } else if (action.type === "sit") {
+      if (!withinRange(point, INTERACT_RANGE)) return
+      useWalkStore.setState({ isSitting: true, position: point.clone(), target: null })
     }
   }
 
@@ -325,6 +328,9 @@ function LookControls({ bounds, onSelectProject }) {
       const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0))
 
       if (forwardPressed || backPressed || rightPressed || leftPressed) {
+        if (store.isSitting) {
+          useWalkStore.setState({ isSitting: false })
+        }
         if (store.target) useWalkStore.setState({ target: null })
         const move = new THREE.Vector3()
         if (forwardPressed) move.addScaledVector(forward, SPEED * dt)
@@ -337,6 +343,9 @@ function LookControls({ bounds, onSelectProject }) {
         resolved.z = THREE.MathUtils.clamp(resolved.z, bounds.minZ, bounds.maxZ)
         useWalkStore.setState({ position: resolved })
       } else if (store.target) {
+        if (store.isSitting) {
+          useWalkStore.setState({ isSitting: false })
+        }
         const dir = new THREE.Vector3().subVectors(store.target, store.position)
         dir.y = 0
         const dist = dir.length()
@@ -385,7 +394,7 @@ function LookControls({ bounds, onSelectProject }) {
     }
 
     const cur = useWalkStore.getState()
-    const targetY = cur.position.y + EYE
+    const targetY = cur.position.y + (cur.isSitting ? 1.05 : EYE)
 
     // Ease the camera height toward the height field so stair climbs glide
     // instead of snapping (the field itself is already eased per-tread).

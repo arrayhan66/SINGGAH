@@ -35,7 +35,7 @@ function AdminBeritaCard({ berita, onEdit, onDeleteClick, onPreview }) {
           {berita.title}
         </h3>
 
-        <p className="truncate text-xs text-cyan-300">{berita.event}</p>
+
 
         <p className="truncate text-xs text-slate-400">{berita.date}</p>
 

@@ -15,46 +15,7 @@ const TRIM = "#7dd3fc"
 const TRIM_EMISSIVE = "#38bdf8"
 const INNER_INSET = 0.55
 
-function TrimRings({ position, rings, y = 0, low }) {
-  return (
-    <group position={position}>
-      {rings.map((r, i) => (
-        <mesh key={i} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[r.r, r.t, 12, low ? 32 : 48]} />
-          <meshStandardMaterial
-            color={TRIM}
-            emissive={TRIM_EMISSIVE}
-            emissiveIntensity={0.6}
-            metalness={0.5}
-            roughness={0.3}
-          />
-        </mesh>
-      ))}
-    </group>
-  )
-}
-
-function SoftGlow({ position, radius = 2.2, low }) {
-  return (
-    <mesh rotation={[Math.PI / 2, 0, 0]} position={position}>
-      <circleGeometry args={[radius, low ? 32 : 48]} />
-      <meshBasicMaterial
-        color="#bfe3ff"
-        transparent
-        opacity={0.14}
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-      />
-    </mesh>
-  )
-}
-
-// Roof of each two-storey building (seen from lantai 2): a dense coffered beam
-// grid with a recessed plaster panel inside every coffer, a centre medallion
-// with glow and rosettes above the chandeliers — the same refined language as
-// the main hall so the whole museum reads as one place.
 function TopCeiling({ room, height }) {
-  const low = useLow()
   const x0 = room.x[0]
   const x1 = room.x[1]
   const z0 = room.z[0]
@@ -69,9 +30,6 @@ function TopCeiling({ room, height }) {
   const nz = Math.max(2, Math.round(d / COFFER))
   const xs = Array.from({ length: nx + 1 }, (_, i) => x0 + (w * i) / nx)
   const zs = Array.from({ length: nz + 1 }, (_, i) => z0 + (d * i) / nz)
-
-  // Chandelier spots on lantai 2 (two lounge bays), matching the decor.
-  const chandelierZ = [z0 + 18.75, z0 + 34.75]
 
   return (
     <group>

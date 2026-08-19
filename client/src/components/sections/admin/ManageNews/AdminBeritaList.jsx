@@ -27,8 +27,7 @@ function AdminBeritaList({ search, statusFilter }) {
     const keyword = search.toLowerCase()
     return beritaList.filter((b) => {
       const matchSearch =
-        (b.title || "").toLowerCase().includes(keyword) ||
-        (b.event || "").toLowerCase().includes(keyword)
+        (b.title || "").toLowerCase().includes(keyword)
       const matchStatus =
         statusFilter === "all" || (b.status || "published") === statusFilter
       return matchSearch && matchStatus

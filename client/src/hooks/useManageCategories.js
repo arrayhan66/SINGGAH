@@ -15,6 +15,7 @@ export default function useManageCategories() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [stateFilter, setStateFilter] = useState("all")
+  const [view, setView] = useState("grid")
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState(null)
   const [formName, setFormName] = useState("")
@@ -174,6 +175,8 @@ export default function useManageCategories() {
     setSearch,
     stateFilter,
     setStateFilter,
+    view,
+    setView,
     showForm,
     setShowForm,
     editing,

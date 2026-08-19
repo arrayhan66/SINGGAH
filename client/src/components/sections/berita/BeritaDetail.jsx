@@ -472,11 +472,7 @@ function BeritaDetail() {
                       alt={news.title}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute top-2 min-[350px]:top-3 left-2 min-[350px]:left-3">
-                      <span className="rounded-md bg-slate-950/80 backdrop-blur-md px-2 min-[350px]:px-2.5 py-0.5 min-[350px]:py-1 text-[9px] min-[350px]:text-[10px] font-bold tracking-wider text-cyan-300 uppercase border border-cyan-400/30">
-                        {news.event}
-                      </span>
-                    </div>
+
                   </div>
                   <div className="p-4 min-[350px]:p-5 space-y-2 min-[350px]:space-y-2.5">
                     <div className="flex items-center gap-1.5 min-[350px]:gap-2 text-[10px] min-[350px]:text-[11px] text-slate-400">

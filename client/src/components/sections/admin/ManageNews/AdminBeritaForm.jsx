@@ -9,7 +9,6 @@ import Toast from "../../../ui/Toast"
 
 const emptyForm = {
   title: "",
-  event: "",
   winner: "",
   date: "",
   source: "",
@@ -72,7 +71,6 @@ function AdminBeritaForm() {
       if (existing) {
         setFormData({
           title: existing.title || "",
-          event: existing.event || "",
           winner: existing.winner || "",
           date: existing.date || "",
           source: existing.source || "",
@@ -93,7 +91,6 @@ function AdminBeritaForm() {
     } else if (!isEditMode && tempPreviewData) {
       setFormData({
         title: tempPreviewData.title || "",
-        event: tempPreviewData.event || "",
         winner: tempPreviewData.winner || "",
         date: tempPreviewData.date || "",
         source: tempPreviewData.source || "",
@@ -125,8 +122,8 @@ function AdminBeritaForm() {
   }
 
   async function handlePublish() {
-    if (!formData.title.trim() || !formData.event.trim()) {
-      showNotification("Judul dan nama event wajib diisi", "error")
+    if (!formData.title.trim()) {
+      showNotification("Judul berita wajib diisi", "error")
       return
     }
     if (!formData.contentText || stripHtml(formData.contentText).trim().length === 0) {
@@ -145,7 +142,6 @@ function AdminBeritaForm() {
 
     const payload = {
       title: formData.title,
-      event: formData.event,
       winner: formData.winner,
       date: formData.date,
       source: formData.source,

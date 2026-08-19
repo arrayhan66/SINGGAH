@@ -4,6 +4,8 @@ import {
   Plus,
   Search,
   LayoutGrid,
+  Grid3X3,
+  List,
   FolderOpen,
   PackageOpen,
   ChevronDown,
@@ -23,6 +25,8 @@ export default function CategoryHero({
   stateFilter,
   onStateFilterChange,
   stateCounts,
+  view,
+  onViewChange,
   onAddClick,
   isOpen,
   dropdownPos,
@@ -66,17 +70,55 @@ export default function CategoryHero({
               className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
             />
           </div>
-          <button
-            type="button"
-            onClick={onAddClick}
-            className="group flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
-          >
-            <Plus
-              size={16}
-              className="transition-transform duration-300 group-hover:rotate-90"
-            />
-            <span>Tambah Kategori</span>
-          </button>
+          <div className="flex items-center gap-3 shrink-0">
+            {onViewChange && (
+              <div
+                className="flex items-center rounded-xl border border-white/10 bg-white/5 p-1"
+                role="group"
+                aria-label="Tampilan kategori"
+              >
+                <button
+                  type="button"
+                  onClick={() => onViewChange("list")}
+                  className={`cursor-pointer rounded-lg p-2 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/40 focus-visible:outline-none ${
+                    view === "list"
+                      ? "bg-cyan-500/20 text-cyan-300"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                  title="Tampilan daftar (tabel)"
+                  aria-label="Tampilan daftar"
+                  aria-pressed={view === "list"}
+                >
+                  <List size={16} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onViewChange("grid")}
+                  className={`cursor-pointer rounded-lg p-2 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/40 focus-visible:outline-none ${
+                    view === "grid"
+                      ? "bg-cyan-500/20 text-cyan-300"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                  title="Tampilan grid"
+                  aria-label="Tampilan grid"
+                  aria-pressed={view === "grid"}
+                >
+                  <Grid3X3 size={16} />
+                </button>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={onAddClick}
+              className="group flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
+            >
+              <Plus
+                size={16}
+                className="transition-transform duration-300 group-hover:rotate-90"
+              />
+              <span>Tambah Kategori</span>
+            </button>
+          </div>
         </div>
 
         <div className="mt-4">

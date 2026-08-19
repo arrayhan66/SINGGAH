@@ -20,9 +20,14 @@ export const useWalkStore = create((set, get) => ({
   pendingClick: null,
   level: 0,
   locked: false,
+  isSitting: false,
 
   setLocked(value) {
     set({ locked: Boolean(value) })
+  },
+
+  setSitting(value) {
+    set({ isSitting: Boolean(value) })
   },
 
   look(dx, dy, sensitivity = 0.0035) {
@@ -59,6 +64,7 @@ export const useWalkStore = create((set, get) => ({
       pendingClick: null,
       level: 0,
       locked: false,
+      isSitting: false,
     })
   },
 }))

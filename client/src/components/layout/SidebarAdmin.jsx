@@ -106,8 +106,8 @@ function SidebarAdmin({ collapsed, onToggle, mobileOpen, onMobileToggle }) {
                   className="group"
                 >
                   {({ isActive }) => (
-                    <span
-                      className={`relative flex min-h-[44px] w-full items-center text-[clamp(11px,1.8vw,13px)] font-semibold uppercase tracking-[0.8px] cursor-pointer transition-all duration-300 ease-out active:scale-[0.98] active:duration-100 ${itemAlign} ${itemPad} ${
+                      <span
+                        className={`relative flex min-h-[44px] w-full items-center text-[clamp(12px,1.9vw,14px)] font-medium tracking-normal cursor-pointer transition-all duration-300 ease-out active:scale-[0.98] active:duration-100 ${itemAlign} ${itemPad} ${
                         isActive
                           ? "text-white"
                           : "text-slate-300 hover:translate-x-0.5 hover:bg-white/[0.04] hover:text-white"

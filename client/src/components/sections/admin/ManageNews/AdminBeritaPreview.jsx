@@ -406,11 +406,7 @@ function AdminBeritaPreview() {
                       alt={news.title}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute top-2 sm:top-3 left-2 sm:left-3">
-                      <span className="rounded-md bg-slate-950/80 backdrop-blur-md px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] font-bold tracking-wider text-cyan-300 uppercase border border-cyan-400/30">
-                        {news.event}
-                      </span>
-                    </div>
+
                   </div>
                   <div className="p-4 sm:p-5 space-y-2 sm:space-y-2.5">
                     <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] text-slate-400">

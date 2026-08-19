@@ -366,25 +366,6 @@ function RoomDecorGround({ room, projects }) {
   const cx = (x0 + x1) / 2
   const rugMap = useMemo(() => textures.roundRug(), [])
 
-  const ottLeft = useMemo(
-    () =>
-      [44, 56, 68].flatMap((z) => [
-        { x: x0 + 3.2, z: z - 0.4, rotY: 0.3 },
-        { x: x0 + 4.6, z: z - 0.2, rotY: -0.3 },
-        { x: x0 + 4.0, z: z + 0.5, rotY: Math.PI },
-      ]),
-    [x0],
-  )
-  const ottRight = useMemo(
-    () =>
-      [44, 56, 68].flatMap((z) => [
-        { x: x1 - 3.2, z: z - 0.4, rotY: -0.3 },
-        { x: x1 - 4.6, z: z - 0.2, rotY: 0.3 },
-        { x: x1 - 4.0, z: z + 0.5, rotY: Math.PI },
-      ]),
-    [x1],
-  )
-
   return (
     <group key={`decor-ground-${room.id}`}>
       <FloorLabel position={[cx + 1.3, 0.06, 36]} text="LANTAI 1 · KARYA MAHASISWA" />
@@ -394,26 +375,11 @@ function RoomDecorGround({ room, projects }) {
       <Plant position={[cx + 1.3 - 6.6, 0, 36]} variant="tall" />
       <Plant position={[cx + 1.3 + 6.6, 0, 36]} variant="tall" />
 
-      <InstancedOttoman items={ottLeft} />
-      <InstancedOttoman items={ottRight} />
       {[44, 56, 68].map((z, i) => (
         <group key={`ott-l-${i}`}>
           <FloorLamp position={[x0 + 4.0, 0, z + 1.6]} rotationY={0.8} />
           <RoundRug position={[x0 + 4.0, 0.015, z]} radius={1.6} map={rugMap} />
           <Bookcase position={[x0 + 5.8, 0, z]} rotationY={-Math.PI / 2} variant={i % 3} low />
-          <LesehanTable
-            position={[x0 + 11.0, 0, z]}
-            rotationY={i * 0.3}
-            radius={1.0}
-            cushionCount={4}
-            rugRadius={1.5}
-            books={[
-              { cover: i === 0 ? "laskar" : i === 1 ? "sherlock" : "python", x: -0.35, z: 0.4, rot: 0.2, w: 0.15 },
-              { cover: i === 0 ? "gahzi" : i === 1 ? "eragon" : "bintang", x: 0.15, z: 0.5, rot: 0.5, w: 0.15 },
-              { cover: i === 0 ? "atomic" : i === 1 ? "python" : "gadisjalanan", x: 0.5, z: 0.15, rot: 0.8, w: 0.15 },
-            ]}
-            drink={{ type: i === 0 ? "greenTea" : i === 1 ? "mixue" : "icedTea", x: 0.4, z: -0.3 }}
-          />
           <Bookcase position={[x0 + 13.5, 0, z]} rotationY={-Math.PI / 2} variant={i % 3} />
         </group>
       ))}
@@ -423,63 +389,9 @@ function RoomDecorGround({ room, projects }) {
           <FloorLamp position={[x1 - 4.0, 0, z + 1.6]} rotationY={-0.8} />
           <RoundRug position={[x1 - 4.0, 0.015, z]} radius={1.6} map={rugMap} />
           <Bookcase position={[x1 - 5.8, 0, z]} rotationY={Math.PI / 2} variant={i % 3} low />
-          <LesehanTable
-            position={[x1 - 11.0, 0, z]}
-            rotationY={i * 0.3}
-            radius={1.0}
-            cushionCount={4}
-            rugRadius={1.5}
-            books={[
-              { cover: i === 0 ? "eragon" : i === 1 ? "bintang" : "gahzi", x: -0.35, z: 0.4, rot: -0.2, w: 0.15 },
-              { cover: i === 0 ? "tanahjawa" : i === 1 ? "laskar" : "putusin", x: 0.15, z: 0.5, rot: -0.5, w: 0.15 },
-              { cover: i === 0 ? "teras" : i === 1 ? "makanyamikir" : "ananda", x: 0.5, z: 0.15, rot: -0.8, w: 0.15 },
-            ]}
-            drink={{ type: i === 0 ? "coffee" : i === 1 ? "mixue" : "icedTea", x: 0.4, z: 0.3 }}
-          />
           <Bookcase position={[x1 - 13.5, 0, z]} rotationY={Math.PI / 2} variant={i % 3} />
         </group>
       ))}
-
-      <LesehanTable
-        position={[cx, 0, 52]}
-        rotationY={0.2}
-        radius={1.6}
-        cushionCount={8}
-        rugRadius={2.4}
-        books={[
-          { cover: "laskar", x: -0.5, z: 0.45, rot: 0.2, w: 0.18 },
-          { cover: "gahzi", x: -0.18, z: 0.55, rot: 0.65, w: 0.15 },
-          { cover: "einstein", x: 0.35, z: 0.6, rot: 1.1, w: 0.18 },
-          { cover: "teras", x: 0.6, z: 0.1, rot: 1.4, w: 0.15 },
-        ]}
-        drink={{ type: "coffee", x: 0.55, z: -0.4 }}
-      />
-      <LesehanTable
-        position={[cx, 0, 62]}
-        rotationY={-0.2}
-        radius={1.6}
-        cushionCount={8}
-        rugRadius={2.4}
-        books={[
-          { cover: "eragon", x: -0.5, z: 0.45, rot: -0.2, w: 0.18 },
-          { cover: "bintang", x: -0.18, z: 0.55, rot: -0.65, w: 0.15 },
-          { cover: "sherlock", x: 0.35, z: 0.6, rot: -1.1, w: 0.18 },
-          { cover: "python", x: 0.6, z: 0.1, rot: -1.4, w: 0.15 },
-        ]}
-        drink={{ type: "mixue", x: 0.55, z: 0.4 }}
-      />
-      <Text
-        position={[cx, 0.05, 57]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        fontSize={0.14}
-        letterSpacing={0.05}
-        color="#7dd3fc"
-        anchorX="center"
-        anchorY="middle"
-        raycast={() => null}
-      >
-        KARYA ROOM
-      </Text>
 
       <Plant position={[cx - 8.0, 0, 52]} variant="topiary" />
       <Plant position={[cx + 8.0, 0, 52]} variant="topiary" />
@@ -536,25 +448,6 @@ function RoomDecorUpper({ room, projects }) {
   const Y = FLOOR2_Y
   const rugMap = useMemo(() => textures.roundRug(), [])
   const wallPlaster = useMemo(() => textures.wallPlaster(), [])
-
-  const ottLeft = useMemo(
-    () =>
-      [54, 66, 78].flatMap((z) => [
-        { x: x0 + 3.2, z: z - 0.4, rotY: 0.3 },
-        { x: x0 + 4.6, z: z - 0.2, rotY: -0.3 },
-        { x: x0 + 4.0, z: z + 0.5, rotY: Math.PI },
-      ]),
-    [x0],
-  )
-  const ottRight = useMemo(
-    () =>
-      [54, 66, 78].flatMap((z) => [
-        { x: x1 - 3.2, z: z - 0.4, rotY: -0.3 },
-        { x: x1 - 4.6, z: z - 0.2, rotY: 0.3 },
-        { x: x1 - 4.0, z: z + 0.5, rotY: Math.PI },
-      ]),
-    [x1],
-  )
 
   return (
     <group key={`decor-upper-${room.id}`}>
@@ -621,26 +514,11 @@ function RoomDecorUpper({ room, projects }) {
       <Plant position={[cx + 1.3 - 6.6, Y, 42]} variant="tall" />
       <Plant position={[cx + 1.3 + 6.6, Y, 42]} variant="tall" />
 
-      <group position={[0, Y, 0]}>
-        <InstancedOttoman items={ottLeft} />
-        <InstancedOttoman items={ottRight} />
-      </group>
       {[54, 66, 78].map((z, i) => (
         <group key={`ott-l-${i}`}>
           <FloorLamp position={[x0 + 4.0, Y, z + 1.6]} rotationY={0.8} />
           <RoundRug position={[x0 + 4.0, Y + 0.015, z]} radius={1.6} map={rugMap} />
           <Bookcase position={[x0 + 5.8, Y, z]} rotationY={-Math.PI / 2} variant={i % 3} low />
-          <LesehanTable
-            position={[x0 + 11.0, Y, z]}
-            rotationY={i * 0.3}
-            radius={1.0}
-            cushionCount={4}
-            rugRadius={1.5}
-            books={[
-              { cover: i === 0 ? "laskar" : i === 1 ? "sherlock" : "python", x: -0.4, z: 0.35, rot: 0.2, w: 0.15 },
-            ]}
-            drink={{ type: i === 0 ? "greenTea" : i === 1 ? "mixue" : "icedTea", x: 0.4, z: -0.3 }}
-          />
           <Bookcase position={[x0 + 13.5, Y, z]} rotationY={-Math.PI / 2} variant={i % 3} />
         </group>
       ))}
@@ -650,61 +528,9 @@ function RoomDecorUpper({ room, projects }) {
           <FloorLamp position={[x1 - 4.0, Y, z + 1.6]} rotationY={-0.8} />
           <RoundRug position={[x1 - 4.0, Y + 0.015, z]} radius={1.6} map={rugMap} />
           <Bookcase position={[x1 - 5.8, Y, z]} rotationY={Math.PI / 2} variant={i % 3} low />
-          <LesehanTable
-            position={[x1 - 11.0, Y, z]}
-            rotationY={i * 0.3}
-            radius={1.0}
-            cushionCount={4}
-            rugRadius={1.5}
-            books={[
-              { cover: i === 0 ? "eragon" : i === 1 ? "bintang" : "gahzi", x: -0.4, z: 0.35, rot: -0.2, w: 0.15 },
-            ]}
-            drink={{ type: i === 0 ? "coffee" : "greenTea", x: 0.4, z: 0.3 }}
-          />
           <Bookcase position={[x1 - 13.5, Y, z]} rotationY={Math.PI / 2} variant={i % 3} />
         </group>
       ))}
-
-      <LesehanTable
-        position={[cx, Y, 60]}
-        rotationY={0.2}
-        radius={1.8}
-        cushionCount={8}
-        rugRadius={2.4}
-        books={[
-          { cover: "laskar", x: -0.5, z: 0.45, rot: 0.2, w: 0.18 },
-          { cover: "gahzi", x: -0.18, z: 0.55, rot: 0.65, w: 0.15 },
-          { cover: "einstein", x: 0.35, z: 0.6, rot: 1.1, w: 0.18 },
-          { cover: "teras", x: 0.6, z: 0.1, rot: 1.4, w: 0.15 },
-        ]}
-        drink={{ type: "coffee", x: 0.55, z: -0.4 }}
-      />
-      <LesehanTable
-        position={[cx, Y, 72]}
-        rotationY={-0.2}
-        radius={1.6}
-        cushionCount={8}
-        rugRadius={2.4}
-        books={[
-          { cover: "eragon", x: -0.5, z: 0.45, rot: -0.2, w: 0.18 },
-          { cover: "bintang", x: -0.18, z: 0.55, rot: -0.65, w: 0.15 },
-          { cover: "sherlock", x: 0.35, z: 0.6, rot: -1.1, w: 0.18 },
-          { cover: "python", x: 0.6, z: 0.1, rot: -1.4, w: 0.15 },
-        ]}
-        drink={{ type: "mixue", x: 0.55, z: 0.4 }}
-      />
-      <Text
-        position={[cx, Y + 0.05, 66]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        fontSize={0.14}
-        letterSpacing={0.05}
-        color="#7dd3fc"
-        anchorX="center"
-        anchorY="middle"
-        raycast={() => null}
-      >
-        KARYA ROOM
-      </Text>
 
       <Plant position={[cx - 8.0, Y, 60]} variant="topiary" />
       <Plant position={[cx + 8.0, Y, 60]} variant="topiary" />

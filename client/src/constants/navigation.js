@@ -1,6 +1,6 @@
 export const visitorMenu = [
-  { to: "/", label: "BERANDA" },
-  { to: "/karya", label: "KARYA" },
-  { to: "/about", label: "TENTANG" },
-  { to: "/berita", label: "BERITA" },
+  { to: "/", label: "Beranda" },
+  { to: "/karya", label: "Karya" },
+  { to: "/about", label: "Tentang" },
+  { to: "/berita", label: "Berita" },
 ]

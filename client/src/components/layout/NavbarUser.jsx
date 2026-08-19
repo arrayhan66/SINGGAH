@@ -20,11 +20,11 @@ function NavbarUser() {
   const tipe = user?.tipe || "umum";
 
   const menuItems = [
-    { to: "/", label: "BERANDA" },
-    { to: "/karya", label: "KARYA" },
-    ...(tipe !== "umum" ? [{ to: "/upload", label: "UPLOAD KARYA" }] : []),
-    { to: "/about", label: "TENTANG" },
-    { to: "/berita", label: "BERITA" },
+    { to: "/", label: "Beranda" },
+    { to: "/karya", label: "Karya" },
+    ...(tipe !== "umum" ? [{ to: "/upload", label: "Upload Karya" }] : []),
+    { to: "/about", label: "Tentang" },
+    { to: "/berita", label: "Berita" },
   ];
 
   const profileMenuItems = [

@@ -80,7 +80,7 @@ function Table({ lamp = false }) {
 
 function Chair({ position, rotation }) {
   return (
-    <group position={position} rotation={rotation}>
+    <group position={position} rotation={rotation} userData={{ action: { type: "sit" } }}>
       {[
         [-0.33, 0, -0.28],
         [0.33, 0, -0.28],

@@ -151,7 +151,8 @@ function ReplyItem({
   onReply,
 }) {
   const author = reply.User || {}
-  const canModify = isAdmin || reply.user_id === currentUserId
+  const canEdit = reply.user_id === currentUserId
+  const canDelete = isAdmin || reply.user_id === currentUserId
 
   const [editing, setEditing] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -228,7 +229,7 @@ function ReplyItem({
               <CornerDownRight size={11} />
               Balas
             </button>
-            {canModify && (
+            {canEdit && (
               <button
                 onClick={() => setEditing(true)}
                 className="inline-flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-medium text-slate-400 transition hover:bg-white/5 hover:text-cyan-300"
@@ -237,7 +238,7 @@ function ReplyItem({
                 Edit
               </button>
             )}
-            {canModify && (
+            {canDelete && (
               <button
                 onClick={() => setConfirmDelete(true)}
                 className="inline-flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-medium text-slate-400 transition hover:bg-rose-500/10 hover:text-rose-400"
@@ -321,7 +322,8 @@ function CommentItem({
 }) {
   const author = comment.User || {}
   const replies = Array.isArray(comment.replies) ? comment.replies : []
-  const canModify = isAdmin || comment.user_id === currentUserId
+  const canEdit = comment.user_id === currentUserId
+  const canDelete = isAdmin || comment.user_id === currentUserId
 
   const [showReply, setShowReply] = useState(false)
   const [replyingToIndex, setReplyingToIndex] = useState(null)
@@ -459,7 +461,7 @@ function CommentItem({
                 <CornerDownRight size={12} />
                 Balas
               </button>
-              {canModify && (
+              {canEdit && (
                 <button
                   onClick={() => setEditing(true)}
                   className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-medium text-slate-400 transition hover:bg-white/5 hover:text-cyan-300"
@@ -468,7 +470,7 @@ function CommentItem({
                   Edit
                 </button>
               )}
-              {canModify && (
+              {canDelete && (
                 <button
                   onClick={() => setConfirmDelete(true)}
                   className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-medium text-slate-400 transition hover:bg-rose-500/10 hover:text-rose-400"

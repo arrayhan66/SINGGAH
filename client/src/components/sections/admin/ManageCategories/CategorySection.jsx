@@ -12,6 +12,8 @@ export default function CategorySection() {
     setSearch,
     stateFilter,
     setStateFilter,
+    view,
+    setView,
     showForm,
     editing,
     formName,
@@ -54,6 +56,8 @@ export default function CategorySection() {
         stateFilter={stateFilter}
         onStateFilterChange={setStateFilter}
         stateCounts={stateCounts}
+        view={view}
+        onViewChange={setView}
         onAddClick={handleOpenAdd}
         isOpen={isOpen}
         dropdownPos={dropdownPos}
@@ -85,6 +89,7 @@ export default function CategorySection() {
           search={search}
           showAll={showAll}
           onShowAllToggle={() => setShowAll((prev) => !prev)}
+          view={view}
           onEdit={handleOpenEdit}
           onDelete={(cat) => setDeleteTarget(cat)}
         />

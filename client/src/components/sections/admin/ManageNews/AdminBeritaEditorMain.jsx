@@ -358,14 +358,7 @@ function AdminBeritaEditorMain({ formData, updateField, isEditMode }) {
         className="w-full resize-none overflow-hidden bg-transparent text-2xl md:text-3xl font-bold text-white placeholder:text-slate-600 focus:outline-none"
       />
 
-      {/* Event Name */}
-      <input
-        type="text"
-        value={formData.event}
-        onChange={(e) => updateField("event", e.target.value)}
-        placeholder="Nama event / kegiatan (Contoh: Lomba Inovasi Mahasiswa)"
-        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-cyan-300 placeholder:text-slate-500 focus:border-cyan-400/50 focus:outline-none"
-      />
+
 
       {/* Short Description */}
       <textarea

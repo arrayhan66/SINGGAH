@@ -229,6 +229,15 @@ describe("Interaction Endpoints (Bookmark, Like, Comment, Reply)", () => {
       expect(res.status).toBe(403)
     })
 
+    it("should not allow admin to update a student's comment", async () => {
+      const res = await request(app)
+        .put(`/api/projects/${projectId}/comments/${commentId}`)
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send({ text: "admin edit" })
+
+      expect(res.status).toBe(403)
+    })
+
     it("should update a reply", async () => {
       const res = await request(app)
         .put(`/api/projects/${projectId}/comments/${commentId}/replies/${replyId}`)

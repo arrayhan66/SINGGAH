@@ -17,10 +17,7 @@ const News = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    event: {
-      type: DataTypes.STRING(200),
-      allowNull: true,
-    },
+
     winner: {
       type: DataTypes.STRING(200),
       allowNull: true,

@@ -156,7 +156,7 @@ exports.updateComment = async (commentId, text, user) => {
   const comment = await Comment.findByPk(commentId)
   if (!comment) throw new AppError("Komentar tidak ditemukan", 404)
 
-  if (user.role !== "admin" && comment.user_id !== user.id) {
+  if (comment.user_id !== user.id) {
     throw new AppError("Akses ditolak", 403)
   }
 
@@ -173,7 +173,7 @@ exports.updateReply = async (replyId, text, user) => {
   const reply = await CommentReply.findByPk(replyId)
   if (!reply) throw new AppError("Balasan tidak ditemukan", 404)
 
-  if (user.role !== "admin" && reply.user_id !== user.id) {
+  if (reply.user_id !== user.id) {
     throw new AppError("Akses ditolak", 403)
   }
 

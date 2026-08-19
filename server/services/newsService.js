@@ -121,7 +121,6 @@ exports.createNews = async (data, userId) => {
     title,
     slug,
     headline_image,
-    event,
     winner,
     date,
     source,
@@ -150,7 +149,6 @@ exports.createNews = async (data, userId) => {
     title,
     slug,
     headline_image,
-    event: event || null,
     winner: winner || null,
     date: date || null,
     source: source || null,
@@ -180,7 +178,6 @@ exports.updateNews = async (id, data) => {
     title,
     slug,
     headline_image,
-    event,
     winner,
     date,
     source,
@@ -214,7 +211,6 @@ exports.updateNews = async (id, data) => {
   news.title = title ?? news.title
   news.slug = slug ?? news.slug
   news.headline_image = headline_image ?? news.headline_image
-  news.event = event ?? news.event
   news.winner = winner ?? news.winner
   news.date = date ?? news.date
   news.source = source ?? news.source

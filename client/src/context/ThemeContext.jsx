@@ -4,17 +4,17 @@ const ThemeContext = createContext()
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("theme") || "light"
+    return localStorage.getItem("singgah-theme") || "dark"
   })
 
   useEffect(() => {
     const root = document.documentElement
-    if (theme === "dark") {
-      root.classList.add("dark")
+    if (theme === "light") {
+      root.classList.add("light")
     } else {
-      root.classList.remove("dark")
+      root.classList.remove("light")
     }
-    localStorage.setItem("theme", theme)
+    localStorage.setItem("singgah-theme", theme)
   }, [theme])
 
   const toggleTheme = () => {

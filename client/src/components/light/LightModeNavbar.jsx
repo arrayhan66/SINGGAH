@@ -1,10 +1,11 @@
+// LIGHT MODE - versi pembanding skripsi, terpisah dari dark mode
 import { useState, useRef, useEffect } from "react"
 import { NavLink } from "react-router-dom"
 import logo from "../../assets/icons/logo.webp"
 import { visitorMenu } from "../../constants/navigation"
-import ThemeToggle from "../ui/ThemeToggle"
+import { Moon } from "lucide-react"
 
-function NavbarVisitor() {
+function LightModeNavbar() {
   const [isOpen, setIsOpen] = useState(false)
   const navRef = useRef(null)
   const headerRef = useRef(null)
@@ -12,8 +13,8 @@ function NavbarVisitor() {
   const navLinkClass = ({ isActive }) =>
     `relative rounded-full px-5 py-2 text-sm font-medium transition-all duration-300 ${
       isActive
-        ? "bg-cyan-400/10 text-cyan-300 shadow-[0_0_18px_rgba(34,211,238,.15)]"
-        : "text-slate-300 hover:bg-white/5 hover:text-cyan-300 hover:-translate-y-0.5"
+        ? "bg-blue-600/10 text-blue-600 shadow-sm font-semibold"
+        : "text-[#6B7280] hover:bg-slate-100 hover:text-blue-600"
     }`
 
   const closeMenu = () => setIsOpen(false)
@@ -24,32 +25,13 @@ function NavbarVisitor() {
         setIsOpen(false)
       }
     }
-
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside)
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
   }, [isOpen])
-
-  useEffect(() => {
-    const el = headerRef.current
-    if (!el) return
-
-    const setVar = () => {
-      document.documentElement.style.setProperty(
-        "--navbar-h",
-        `${el.offsetHeight}px`,
-      )
-    }
-
-    setVar()
-    const observer = new ResizeObserver(setVar)
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
 
   return (
     <header
@@ -59,23 +41,23 @@ function NavbarVisitor() {
       }}
       className="fixed left-0 top-0 z-50 w-full px-3 min-[350px]:px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16"
     >
-      <div className="mx-auto mt-3 flex w-full max-w-[1700px] items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-2.5 py-2.5 backdrop-blur-xl min-[350px]:mt-5 min-[350px]:px-4 min-[350px]:py-3 sm:mt-6 sm:px-6 sm:py-4 md:mt-7 md:px-8 2xl:mt-8 2xl:px-10">
+      <div className="mx-auto mt-3 flex w-full max-w-[1700px] items-center justify-between rounded-2xl border-2 border-slate-300 bg-white px-3 py-3 shadow-xl shadow-slate-300/60 min-[350px]:mt-5 min-[350px]:px-4 min-[350px]:py-3.5 sm:mt-6 sm:px-6 sm:py-4 md:mt-7 md:px-8 2xl:mt-8 2xl:px-10">
         <NavLink
-          to="/"
+          to="/light-mode"
           onClick={closeMenu}
           className="flex items-center gap-1.5 min-[350px]:gap-2 sm:gap-3"
         >
           <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-xl min-[350px]:h-9 min-[350px]:w-9 sm:h-10 sm:w-10 md:h-11 md:w-11">
             <img
               src={logo}
-              alt="PamerIT Logo"
+              alt="SINGGAH Logo"
               className="h-full w-full object-contain"
             />
           </div>
 
           <div>
-            <h1 className="text-sm font-bold text-white min-[350px]:text-base sm:text-lg">
-              SINGGAH
+            <h1 className="text-sm font-bold text-[#1B2A4A] min-[350px]:text-base sm:text-lg">
+              SINGGAH <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 ml-1">Light Mode</span>
             </h1>
           </div>
         </NavLink>
@@ -89,11 +71,18 @@ function NavbarVisitor() {
         </nav>
 
         <div className="flex items-center gap-1.5 min-[350px]:gap-2 sm:gap-4">
-          <ThemeToggle />
+          <NavLink
+            to="/"
+            title="Pindah ke Dark Mode (Original)"
+            className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-300 bg-slate-100 text-slate-700 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-all"
+          >
+            <Moon size={16} />
+          </NavLink>
+
           <NavLink
             to="/login"
             onClick={closeMenu}
-            className="group relative flex shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-2.5 py-1.5 text-[10px] font-semibold tracking-wide text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 active:scale-95 min-[350px]:px-3 min-[350px]:py-2 sm:px-4 sm:py-2 sm:text-xs md:px-5 md:py-2.5 md:text-sm lg:px-6 lg:py-2.5 lg:text-base 2xl:px-8 2xl:py-3 2xl:text-lg min-[2000px]:px-10 min-[2000px]:py-4 min-[2000px]:text-xl"
+            className="group relative flex shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold tracking-wide text-white shadow-md shadow-blue-500/30 transition-all hover:bg-blue-700 active:scale-95 sm:px-4 sm:py-2 sm:text-sm md:px-5 md:py-2.5 lg:px-6"
           >
             Login
           </NavLink>
@@ -104,19 +93,19 @@ function NavbarVisitor() {
             aria-label="Toggle menu"
           >
             <span
-              className={`absolute h-[2px] w-5 rounded-full bg-white transition-all duration-300 min-[350px]:w-6 ${
+              className={`absolute h-[2px] w-5 rounded-full bg-[#1B2A4A] transition-all duration-300 min-[350px]:w-6 ${
                 isOpen
                   ? "rotate-45"
                   : "-translate-y-1.5 min-[350px]:-translate-y-2"
               }`}
             />
             <span
-              className={`absolute h-[2px] w-5 rounded-full bg-cyan-300 transition-all duration-300 min-[350px]:w-6 ${
+              className={`absolute h-[2px] w-5 rounded-full bg-blue-600 transition-all duration-300 min-[350px]:w-6 ${
                 isOpen ? "opacity-0" : "opacity-100"
               }`}
             />
             <span
-              className={`absolute h-[2px] w-5 rounded-full bg-white transition-all duration-300 min-[350px]:w-6 ${
+              className={`absolute h-[2px] w-5 rounded-full bg-[#1B2A4A] transition-all duration-300 min-[350px]:w-6 ${
                 isOpen
                   ? "-rotate-45"
                   : "translate-y-1.5 min-[350px]:translate-y-2"
@@ -133,18 +122,7 @@ function NavbarVisitor() {
             : "opacity-0 invisible -translate-y-2"
         }`}
       >
-        <div className="mx-auto max-w-[1700px] overflow-hidden rounded-2xl border border-white/10 bg-brand-dark/95 backdrop-blur-xl">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-10"
-            style={{
-              backgroundImage: `
-                linear-gradient(rgba(73,126,174,.3) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(73,126,174,.3) 1px, transparent 1px)
-              `,
-              backgroundSize: "24px 24px",
-            }}
-          />
-
+        <div className="mx-auto max-w-[1700px] overflow-hidden rounded-2xl border-2 border-slate-300 bg-white shadow-xl">
           <nav className="relative flex flex-col p-3">
             {visitorMenu.map((item, index) => (
               <NavLink
@@ -161,12 +139,12 @@ function NavbarVisitor() {
                       : "-translate-x-4 opacity-0"
                   } ${
                     isActive
-                      ? "bg-cyan-400/10 text-cyan-300 font-semibold"
-                      : "text-slate-300 hover:bg-white/5 hover:text-cyan-300"
+                      ? "bg-blue-600/10 text-blue-600 font-semibold"
+                      : "text-[#6B7280] hover:bg-slate-100 hover:text-blue-600"
                   }`
                 }
               >
-                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400/40 transition-all duration-300 group-hover:w-4 group-hover:bg-cyan-400" />
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600/40 transition-all duration-300 group-hover:w-4 group-hover:bg-blue-600" />
                 {item.label}
               </NavLink>
             ))}
@@ -177,4 +155,4 @@ function NavbarVisitor() {
   )
 }
 
-export default NavbarVisitor
+export default LightModeNavbar

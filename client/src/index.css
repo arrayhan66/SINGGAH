@@ -216,8 +216,17 @@ body {
   overflow-x: hidden;
 }
 
+html.light body {
+  background: #f3f5f8 !important;
+  color: #1b2a4a !important;
+}
+
 :root {
   color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
 }
 
 /* 3D hall: give the canvas sole ownership of touch gestures so drag-to-look

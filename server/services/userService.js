@@ -64,6 +64,14 @@ exports.getUsers = async (query = {}) => {
   const { count, rows } = await User.findAndCountAll({
     attributes: {
       exclude: ["password"],
+      include: [
+        [
+          sequelize.literal(
+            "(SELECT COUNT(*) FROM projects WHERE projects.user_id = User.id)",
+          ),
+          "projectCount",
+        ],
+      ],
     },
     where,
     order: [["created_at", "DESC"]],
@@ -86,6 +94,14 @@ exports.getUserById = async (id) => {
   const user = await User.findByPk(id, {
     attributes: {
       exclude: ["password"],
+      include: [
+        [
+          sequelize.literal(
+            "(SELECT COUNT(*) FROM projects WHERE projects.user_id = User.id)",
+          ),
+          "projectCount",
+        ],
+      ],
     },
   })
 

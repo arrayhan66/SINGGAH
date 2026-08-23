@@ -1,0 +1,266 @@
+/*
+  KARYA LIGHT MODE — WHITE PRIMARY + BLUE SECONDARY
+  Scope ketat: html.light + wrapper .karya-page (route /karya saja).
+  Dark mode tidak tersentuh; layout/JSX tidak diubah.
+  Efek: glow biru, dust/sparkles, grid kotak-kotak (via ::before,
+  karena section karya tidak punya komponen PCB di dark mode).
+*/
+@import "./light-shared.css";
+
+/* ===== SECTION BG ===== */
+html.light .karya-page #karya.bg-brand-dark {
+  background: linear-gradient(180deg, #f7fafd 0%, #edf3fa 55%, #e6edf7 100%);
+}
+
+/* Grid kotak-kotak lembut & buram (pengganti PCBBackground).
+   TANPA bercak/aura biru apapun. */
+html.light .karya-page #karya::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(37, 99, 235, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.09) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.7;
+  filter: blur(0.6px);
+}
+
+/* Komponen PCBBackground (grid dark mode) disembunyikan di light mode
+   supaya tidak dobel dengan grid CSS di atas */
+html.light .karya-page #karya > .pointer-events-none.opacity-20 {
+  display: none;
+}
+
+/* ===== HEADER SECTION ===== */
+/* Judul "Karya": hitam keabu #404040 PERSIS seperti tulisan
+   "SINGGAH SEJENAK" di beranda */
+html.light .karya-page #karya h2.text-white {
+  color: #404040;
+}
+
+/* Icon box header (Library): LIGHT MODE disamakan dengan icon kotak
+   kategori = gradasi cyan -> biru + ikon putih */
+html.light .karya-page #karya .rounded-2xl.border-cyan-400\/30.bg-cyan-400\/10 {
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: 0 10px 24px -8px rgba(37, 99, 235, 0.45);
+}
+html.light
+  .karya-page
+  #karya
+  .rounded-2xl.border-cyan-400\/30.bg-cyan-400\/10
+  svg {
+  color: #ffffff;
+}
+
+/* "SinggaH" highlight: teks gradient biru -> sky */
+html.light .karya-page #karya h2 span.text-cyan-300 {
+  background-image: linear-gradient(90deg, #2563eb, #0ea5e9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ===== CATEGORY CARD ===== */
+/* Badge jumlah karya */
+html.light .karya-page #karya span.rounded-full.border-cyan-400\/30.bg-cyan-400\/10 {
+  background-color: #eff6ff;
+}
+
+/* Nama kategori: hitamnya dilunakkan -> #404040 (senada judul),
+   tidak terlalu pekat seperti #0f172a */
+html.light .karya-page #karya h3.text-white {
+  color: #404040;
+}
+
+/* ===== CATEGORY CARD 3D (LIGHT MODE) =====
+   Versi PEKAT biar efek 3D-nya jelas terlihat:
+   slab bawah biru sedang (bukan biru muda nyaru bg), bayangan dalam,
+   hover terangkat jauh + slab menebal, klik menekan */
+html.light
+  .karya-page
+  #karya
+  div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl {
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%);
+  border-color: #c7dcfc;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    0 7px 0 #7fb1f5,
+    0 12px 26px -10px rgba(30, 64, 175, 0.35),
+    0 22px 44px -18px rgba(37, 99, 235, 0.28);
+}
+html.light
+  .karya-page
+  #karya
+  div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl:hover {
+  transform: translateY(-0.25rem);
+  border-color: #9ec7fa;
+  background-color: #ffffff;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    0 8px 0 #5b96ee,
+    0 14px 26px -12px rgba(30, 64, 175, 0.4),
+    0 20px 40px -20px rgba(37, 99, 235, 0.32);
+}
+html.light
+  .karya-page
+  #karya
+  div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    0 3px 0 #7fb1f5,
+    0 8px 16px -10px rgba(30, 64, 175, 0.35);
+}
+
+/* ===== CATEGORY CARD 3D (DARK MODE) =====
+   Geometri 3D yang sama TANPA mengubah warna desain dark:
+   kaca gelap tetap translusen, slab bawah pakai night-deep (#02111f)
+   biar kesan "berdiri di atas balok gelap", bayangan netral */
+.karya-page
+  #karya
+  div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 7px 0 #02111f,
+    0 14px 28px -12px rgba(0, 0, 0, 0.55);
+}
+.karya-page
+  #karya
+  div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl:hover {
+  transform: translateY(-0.25rem);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 8px 0 #02111f,
+    0 18px 34px -16px rgba(0, 0, 0, 0.55);
+}
+.karya-page
+  #karya
+  div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 3px 0 #02111f,
+    0 10px 18px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Icon kotak kategori: disamakan PERSIS dengan dark mode.
+   global-light.css me-recolor semua from-cyan-400 jadi biru di light mode,
+   jadi di sini gradasinya dipulihkan manual ke cyan -> blue asli */
+html.light
+  .karya-page
+  #karya
+  .rounded-3xl.bg-gradient-to-br.from-cyan-400.to-blue-600 {
+  background-image: linear-gradient(
+    to bottom right,
+    #22d3ee,
+    #2563eb
+  );
+  color: #ffffff;
+}
+
+/* Tombol "Lihat Karya": gradasi cyan -> biru, senada dengan
+   kotak icon kategori yang juga cyan -> biru.
+   Hover dibuat SMOOTH: gradasi hover di-crossfade lewat ::before
+   (background-image tidak bisa di-transition langsung), plus
+   terangkat tipis + bayangan dengan easing lembut */
+html.light .karya-page button.bg-white.text-slate-900 {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  color: #ffffff;
+  transition:
+    transform 0.3s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.3s ease;
+}
+html.light .karya-page button.bg-white.text-slate-900::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(to bottom right, #06b6d4, #1d4ed8);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+html.light .karya-page button.hover\:bg-slate-200:hover {
+  background-color: transparent;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -10px rgba(29, 78, 216, 0.6);
+}
+html.light .karya-page button.hover\:bg-slate-200:hover::before {
+  opacity: 1;
+}
+html.light .karya-page button.hover\:bg-slate-200:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px -8px rgba(29, 78, 216, 0.5);
+}
+
+/* ===== SEARCH BAR ===== */
+/* Natural putih; saat fokus: border biru muda + glow biru di bawah
+   (biru aktif menu #2563eb) */
+html.light .karya-page .border-white\/60.bg-white\/90 {
+  background-color: #fbfcfe;
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 16px -8px rgba(15, 23, 42, 0.12);
+}
+html.light .karya-page .focus-within\:border-cyan-400:focus-within {
+  border-color: #93c5fd;
+}
+html.light .karya-page .focus-within\:shadow-cyan-400\/30:focus-within {
+  box-shadow:
+    0 14px 28px -10px rgba(37, 99, 235, 0.38),
+    0 6px 12px -6px rgba(37, 99, 235, 0.22);
+}
+
+/* Tombol "Lihat Lebih Banyak": border biru senada teksnya + nuansa 3D
+   (muka gradasi, sisi bawah biru tebal, hover terangkat, klik menekan) */
+html.light .karya-page button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10 {
+  border-color: #2563eb;
+  background-image: linear-gradient(180deg, #ffffff 0%, #dbeafe 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 4px 0 #1d4ed8,
+    0 9px 18px -6px rgba(37, 99, 235, 0.35);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.3s;
+}
+html.light .karya-page button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 6px 0 #1d4ed8,
+    0 14px 24px -8px rgba(37, 99, 235, 0.42);
+}
+html.light .karya-page button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10:active {
+  transform: translateY(3px);
+  box-shadow:
+    inset 0 2px 4px rgba(29, 78, 216, 0.25),
+    0 1px 0 #1d4ed8,
+    0 4px 10px -6px rgba(37, 99, 235, 0.3);
+}
+
+/* ===== EMPTY STATE ===== */
+html.light .karya-page .border-dashed.border-slate-700\/60.bg-slate-800\/20 {
+  background-color: #f8fafc;
+  border-color: #c7d6ee;
+}
+html.light .karya-page .bg-slate-800\/50.ring-slate-700\/50 {
+  background-color: #fbfcfe;
+  --tw-ring-color: #dbeafe;
+}
+html.light .karya-page h3.text-slate-200 {
+  color: #1e3a8a;
+}
+html.light .karya-page .font-semibold.text-slate-300 {
+  color: #2563eb;
+}

@@ -141,6 +141,7 @@ function CategoryCenterpiece({ category, position = [0, 0, 0] }) {
         anchorX="center"
         anchorY="middle"
         raycast={() => null}
+        font="/fonts/Poppins-SemiBold.ttf"
       >
         {title.toUpperCase()}
       </Text>

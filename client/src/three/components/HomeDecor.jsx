@@ -1,9 +1,10 @@
-import { Component, Suspense, useLayoutEffect, useMemo, useRef } from "react"
+import { Component, Suspense, useEffect, useLayoutEffect, useMemo, useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
 import InstancedMeshes from "../utils/InstancedMeshes"
 import { textures } from "../utils/textures"
 import { useDownscaledTexture } from "../utils/useDownscaledTexture"
+import { markTvReady, resetTvReady } from "../hooks/useTvReady"
 import { BOOK_COVER_FILES, DEFAULT_COVER_KEY } from "../utils/bookCovers"
 import logo from "../../assets/icons/logo.webp"
 
@@ -469,7 +470,7 @@ function Console({ position, rotationY = 0, scale = 1 }) {
 
 function Armchair({ position, rotationY = 0 }) {
   return (
-    <group position={position} rotation={[0, rotationY, 0]}>
+    <group position={position} rotation={[0, rotationY, 0]} userData={{ action: { type: "sit" } }}>
       {[
         [-0.42, -0.4],
         [0.42, -0.4],
@@ -786,8 +787,8 @@ function SideTable({ position, rotationY = 0, drink = "coffee", book1 = "atomic"
   )
 }
 
-function RoundTable({ position, rotationY = 0, radius = 0.9, books = true }) {
-  const top = 0.76
+function RoundTable({ position, rotationY = 0, radius = 0.9, height = 0.76, books = true }) {
+  const top = height
   const topY = top + 0.03
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
@@ -1054,7 +1055,36 @@ function Television({ position, rotationY = 0, scale = 1, width = 3.2, height = 
   const legH = 0.32
   const legW = 0.24
   const footD = 0.42
-  const tvMap = useMemo(() => textures.tvScreen(), [])
+  const screenMatRef = useRef(null)
+
+  useEffect(() => {
+    const s = textures.tvScreenVideo({ onReady: markTvReady })
+    let active = true
+
+    const applyMap = (map, intensity) => {
+      const mat = screenMatRef.current
+      if (!mat) return
+      mat.map = map
+      mat.emissiveMap = map
+      mat.emissiveIntensity = intensity
+      mat.needsUpdate = true
+    }
+
+    // Show the static artwork immediately; swap to the video once it plays.
+    applyMap(s.fallback, 0)
+    const onPlaying = () => {
+      if (!active) return
+      applyMap(s.texture, 0.5)
+    }
+    s.video.addEventListener("playing", onPlaying)
+    return () => {
+      active = false
+      s.video.removeEventListener("playing", onPlaying)
+      s.dispose()
+      applyMap(null, 0)
+      resetTvReady()
+    }
+  }, [])
   return (
     <group position={position} rotation={[0, rotationY, 0]} scale={scale}>
       {[-w / 2 + 0.55, w / 2 - 0.55].map((x, i) => (
@@ -1076,10 +1106,10 @@ function Television({ position, rotationY = 0, scale = 1, width = 3.2, height = 
       <mesh position={[0, legH + h / 2, t / 2 + 0.004]}>
         <planeGeometry args={[w - 0.12, h - 0.09]} />
         <meshStandardMaterial
-          map={tvMap}
+          ref={screenMatRef}
+          color="#ffffff"
           emissive="#ffffff"
-          emissiveIntensity={0.5}
-          emissiveMap={tvMap}
+          emissiveIntensity={0}
           roughness={0.2}
           metalness={0.15}
         />

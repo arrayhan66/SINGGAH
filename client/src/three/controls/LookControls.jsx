@@ -21,6 +21,15 @@ function findAction(object) {
   return null
 }
 
+function findActionNode(object) {
+  let node = object
+  while (node) {
+    if (node.userData?.action) return node
+    node = node.parent
+  }
+  return null
+}
+
 function withinRange(point, range) {
   const from = useWalkStore.getState().position
   const dx = point.x - from.x
@@ -84,7 +93,7 @@ function LookControls({ bounds, onSelectProject }) {
   const bobAmpRef = useRef(0)
   const lastPosRef = useRef(new THREE.Vector3())
 
-  const handleAction = (action, point) => {
+  const handleAction = (action, point, object) => {
     if (action.type === "floor") {
       useWalkStore.getState().setTarget(point)
     } else if (action.type === "walk") {
@@ -95,7 +104,32 @@ function LookControls({ bounds, onSelectProject }) {
       teleportTo(action.point, action.yaw)
     } else if (action.type === "sit") {
       if (!withinRange(point, INTERACT_RANGE)) return
-      useWalkStore.setState({ isSitting: true, position: point.clone(), target: null })
+      const setState = { isSitting: true, target: null }
+      // Snap onto the seat centre and face the seat's own forward direction so
+      // the player immediately sits facing the table in front of the chair.
+      const node = findActionNode(object)
+      const p = point.clone()
+      if (node) {
+        const wp = new THREE.Vector3()
+        node.getWorldPosition(wp)
+        // Keep the seat height relative to the storey the player is on so
+        // floor-2 seats don't pull the player down to ground level.
+        const baseY = useWalkStore.getState().level === 1 ? FLOOR2_Y : 0
+        // The raycast keeps going past slabs/walls (they carry no action), so a
+        // player could hit a seat on the OTHER storey — never sit through a
+        // floor: reject seats whose base doesn't match the player's storey.
+        if (Math.abs(wp.y - baseY) > 2) return
+        p.x = wp.x
+        p.z = wp.z
+        p.y = THREE.MathUtils.clamp(p.y, baseY, baseY + 0.75)
+        const dir = new THREE.Vector3(0, 0, 1).applyQuaternion(
+          node.getWorldQuaternion(new THREE.Quaternion()),
+        )
+        setState.yaw = Math.atan2(-dir.x, -dir.z)
+        setState.pitch = 0
+      }
+      setState.position = p
+      useWalkStore.setState(setState)
     }
   }
 
@@ -253,7 +287,7 @@ function LookControls({ bounds, onSelectProject }) {
       const action = findAction(hit.object)
       if (action.type === "project" && !withinRange(hit.point, INTERACT_RANGE)) return
       if (action.type === "teleport" && !withinRange(hit.point, TELEPORT_RANGE)) return
-      handleAction(action, hit.point)
+      handleAction(action, hit.point, hit.object)
     }
 
     const onPointerCancel = () => {

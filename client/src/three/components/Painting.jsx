@@ -477,7 +477,7 @@ function Painting({
         maxWidth={FRAME_W - 0.12}
         lineHeight={1.15}
         raycast={() => null}
-        font="/fonts/PlusJakartaSans.ttf"
+        font="/fonts/Poppins-SemiBold.ttf"
       >
         {title}
       </Text>
@@ -489,7 +489,7 @@ function Painting({
         anchorY="middle"
         maxWidth={FRAME_W - 0.12}
         raycast={() => null}
-        font="/fonts/PlusJakartaSans.ttf"
+        font="/fonts/Poppins-Medium.ttf"
       >
         {authorName}
       </Text>
@@ -502,7 +502,7 @@ function Painting({
           anchorX="center"
           anchorY="middle"
           raycast={() => null}
-          font="/fonts/PlusJakartaSans.ttf"
+          font="/fonts/Poppins-SemiBold.ttf"
         >
           KLIK UNTUK LIHAT DETAIL
         </Text>

@@ -16,7 +16,7 @@ function LightModeFooter() {
             />
           </div>
 
-          <h2 className="text-base font-bold text-[#1B2A4A] sm:text-lg md:text-xl 2xl:text-2xl">
+          <h2 className="text-base font-bold text-neutral-900 sm:text-lg md:text-xl 2xl:text-2xl">
             SINGGAH <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 ml-1">Light Mode</span>
           </h2>
         </NavLink>

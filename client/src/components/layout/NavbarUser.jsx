@@ -10,6 +10,7 @@ import MobileMenu from "./MobileMenu";
 import LogoutConfirmModal from "../ui/LogoutConfirmModal";
 import DeleteConfirmModal from "../ui/DeleteConfirmModal";
 import NotificationDetailModal from "../ui/NotificationDetailModal";
+import ThemeToggle from "../ui/ThemeToggle";
 
 function NavbarUser() {
   const { user, logout } = useAuth();
@@ -224,6 +225,8 @@ function NavbarUser() {
 
         {/* RIGHT */}
         <div className="flex items-center gap-1.5 min-[350px]:gap-2 sm:gap-4">
+          <ThemeToggle />
+
           <NotificationBell
             ref={notifRef}
             isOpen={isNotifOpen}

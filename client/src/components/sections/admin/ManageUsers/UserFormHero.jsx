@@ -27,7 +27,7 @@ export default function UserFormHero({ isEditMode, onBack }) {
           <div className="min-w-0">
             <h1 className="text-[clamp(1.25rem,0.9375rem+1.5vw,1.5rem)] font-black text-white sm:text-3xl">
               {isEditMode ? "Edit " : "Tambah "}
-              <span className="text-cyan-300">User</span>
+              <span className="text-slate-100">User</span>
             </h1>
             <p className="mt-1 max-w-xl text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400">
               {isEditMode

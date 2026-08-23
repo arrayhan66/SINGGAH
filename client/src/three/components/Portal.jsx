@@ -1,5 +1,5 @@
 import { Text, useTexture } from "@react-three/drei"
-import { useMemo } from "react"
+import { useCallback, useMemo, useState } from "react"
 import * as THREE from "three"
 import { useDownscaledTexture } from "../utils/useDownscaledTexture"
 import logo from "../../assets/icons/logo.webp"
@@ -68,6 +68,7 @@ function ExitIcon() {
         outlineWidth={0.01}
         outlineColor="#b91c1c"
         raycast={() => null}
+        font="/fonts/Poppins-SemiBold.ttf"
       >
         KELUAR
       </Text>
@@ -102,6 +103,7 @@ function ExitSign({ width }) {
         anchorY="middle"
         maxWidth={width + 0.1}
         raycast={() => null}
+        font="/fonts/Poppins-SemiBold.ttf"
       >
         EXIT
       </Text>
@@ -121,6 +123,37 @@ const glowMat = (intensity = 1.1) => (
 const exitGlowMat = (intensity = 1.1) => (
   <meshStandardMaterial color={EXIT_RED} emissive={EXIT_RED} emissiveIntensity={intensity} />
 )
+
+// Poppins is wider than the previous default font, so long category names
+// wrapped onto two lines on the nameplate. Measure the laid-out text and
+// shrink the font until the title fits the plate on a single line — short
+// names keep the full size, long ones shrink just enough.
+function BoardTitle({ position, width, children }) {
+  const [size, setSize] = useState(0.3)
+  const handleSync = useCallback(
+    (mesh) => {
+      const b = mesh.textRenderInfo?.blockBounds
+      if (!b) return
+      const w = b[2] - b[0]
+      if (w > width && size > 0.14) setSize(size * (width / w) * 0.97)
+    },
+    [width, size],
+  )
+  return (
+    <Text
+      position={position}
+      fontSize={size}
+      color={TEXT}
+      anchorX="center"
+      anchorY="middle"
+      raycast={() => null}
+      font="/fonts/Poppins-SemiBold.ttf"
+      onSync={handleSync}
+    >
+      {children}
+    </Text>
+  )
+}
 
 function Portal({ position, rotationY, width, title, action }) {
   const hw = width / 2
@@ -161,6 +194,7 @@ function Portal({ position, rotationY, width, title, action }) {
             anchorY="middle"
             letterSpacing={0.08}
             raycast={() => null}
+            font="/fonts/Poppins-SemiBold.ttf"
           >
             SINGGAH DISINI
           </Text>
@@ -231,17 +265,9 @@ function Portal({ position, rotationY, width, title, action }) {
             <boxGeometry args={[width + 0.2, 0.03, 0.04]} />
             {glowMat(1.2)}
           </mesh>
-          <Text
-            position={[0, RIFT_H + FRAME_T + 0.31, 0.25]}
-            fontSize={0.3}
-            color={TEXT}
-            anchorX="center"
-            anchorY="middle"
-            maxWidth={width + 0.1}
-            raycast={() => null}
-          >
+          <BoardTitle position={[0, RIFT_H + FRAME_T + 0.31, 0.25]} width={width + 0.1}>
             {title}
-          </Text>
+          </BoardTitle>
         </>
       ) : (
         <ExitSign width={width} />

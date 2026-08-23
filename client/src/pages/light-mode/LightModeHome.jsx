@@ -5,7 +5,7 @@ import LightModeFooter from "../../components/light/LightModeFooter"
 
 function LightModeHome() {
   return (
-    <div className="min-h-screen bg-[#F3F5F8] flex flex-col">
+    <div className="min-h-screen bg-paper flex flex-col">
       <LightModeNavbar />
       <main className="flex-grow">
         <LightModeHero />

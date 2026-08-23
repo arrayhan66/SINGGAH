@@ -2,6 +2,7 @@ import { FolderKanban, Clock, CheckCircle2, XCircle, LayoutGrid, Search, Plus } 
 import { useNavigate } from "react-router-dom"
 import AdminHeroBackground from "../../../ui/AdminHeroBackground"
 import AdminProjectsFilter from "./AdminProjectsFilter"
+import AdminProjectsCategoryFilter from "./AdminProjectsCategoryFilter"
 
 const statCards = [
   {
@@ -34,7 +35,16 @@ const statCards = [
   },
 ]
 
-function AdminProjectsHero({ stats, search, onSearchChange, statusFilter, onStatusChange }) {
+function AdminProjectsHero({
+  stats,
+  search,
+  onSearchChange,
+  statusFilter,
+  onStatusChange,
+  categories,
+  categoryFilter,
+  onCategoryChange,
+}) {
   const navigate = useNavigate()
 
   return (
@@ -46,7 +56,7 @@ function AdminProjectsHero({ stats, search, onSearchChange, statusFilter, onStat
           </div>
           <div className="min-w-0">
             <h1 className="text-[clamp(1.25rem,0.9375rem+1.5vw,1.5rem)] font-black text-white sm:text-3xl">
-              Kelola <span className="text-cyan-300">Project</span>
+              Kelola <span className="text-slate-100">Project</span>
             </h1>
             <p className="mt-1.5 max-w-xl text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-300/90">
               Tinjau, setujui, atau tolak project yang diunggah mahasiswa.
@@ -106,12 +116,19 @@ function AdminProjectsHero({ stats, search, onSearchChange, statusFilter, onStat
           </button>
         </div>
 
-        <div className="mt-4 md:mt-5">
+        <div className="mt-4 flex flex-col gap-2.5 md:mt-5">
           <AdminProjectsFilter
             statusFilter={statusFilter}
             onStatusChange={onStatusChange}
             counts={{ all: stats?.total ?? 0, ...stats }}
           />
+          {categories?.items?.length > 0 && (
+            <AdminProjectsCategoryFilter
+              categories={categories}
+              categoryFilter={categoryFilter}
+              onCategoryChange={onCategoryChange}
+            />
+          )}
         </div>
       </div>
     </AdminHeroBackground>

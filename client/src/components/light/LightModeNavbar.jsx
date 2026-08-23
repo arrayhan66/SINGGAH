@@ -56,7 +56,7 @@ function LightModeNavbar() {
           </div>
 
           <div>
-            <h1 className="text-sm font-bold text-[#1B2A4A] min-[350px]:text-base sm:text-lg">
+            <h1 className="text-sm font-bold text-neutral-900 min-[350px]:text-base sm:text-lg">
               SINGGAH <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 ml-1">Light Mode</span>
             </h1>
           </div>

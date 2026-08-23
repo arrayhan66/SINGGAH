@@ -1,0 +1,327 @@
+/*
+  BERANDA LIGHT MODE — WHITE PRIMARY + BLUE SECONDARY (layered surfaces)
+  Scope ketat: hanya aktif saat <html> punya class "light" (ThemeContext)
+  DAN elemen berada di dalam wrapper .beranda-page (halaman Beranda).
+  Dark mode tidak tersentuh sama sekali (semua rule ter-gate di belakang html.light).
+  Layout/struktur DOM tidak diubah — hanya warna/visual theme.
+
+  SISTEM PERMUKAAN (biar tidak "nyaru" semua putih):
+    Page bg      : #F5F8FC  (biru sangat muda)
+    Hero         : gradasi #FFFFFF -> #EBF2FC + glow biru
+    FAQ band     : #E9F0FA  (pita biru abu, jelas beda dari hero)
+    Navbar       : putih translucent + blur + shadow biru
+    Card         : #FFFFFF + border biru #D6E4FB + shadow biru
+    Inner box    : #EFF6FF (soft blue) + ring #DBEAFE
+    Footer       : navy gradient #122A5E -> #0B1C42 (nuansa biru kuat)
+*/
+
+/* ===== GLOBAL SCOPE ===== */
+html.light .beranda-page {
+  background-color: #f5f8fc;
+}
+
+/* ===== NAVBAR ===== */
+/* Putih kebiruan translucent + shadow biru: jelas terpisah dari hero */
+html.light .beranda-page header .border-white\/10.bg-white\/5 {
+  background: linear-gradient(
+    135deg,
+    rgba(234, 243, 255, 0.95) 0%,
+    rgba(250, 252, 254, 0.88) 100%
+  );
+  border-color: #cbdcf6;
+  box-shadow: 0 10px 30px -12px rgba(37, 99, 235, 0.28);
+}
+
+html.light .beranda-page header h1.text-white {
+  color: #404040;
+}
+
+/* ===== LOGO ===== */
+/* Latar biru pekat + ring: biar putih & border di file logo jelas terpisah */
+html.light .beranda-page header div.rounded-xl.overflow-hidden,
+html.light .beranda-page footer div.rounded-xl.overflow-hidden {
+  background-color: #cfe2fd;
+  box-shadow:
+    0 0 0 1px #9ec3f7,
+    0 2px 8px -2px rgba(37, 99, 235, 0.25);
+}
+
+/* Menu aktif: biru + background biru muda */
+html.light .beranda-page .bg-cyan-400\/10 {
+  background-color: #eff6ff;
+}
+html.light .beranda-page .text-cyan-300 {
+  color: #2563eb;
+}
+/* Menu AKTIF navbar: pill biru solid + teks putih -> jelas terlihat */
+html.light .beranda-page header nav .bg-cyan-400\/10.text-cyan-300 {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+html.light .beranda-page header [class*="shadow-[0_0_18px"] {
+  box-shadow: 0 4px 16px -2px rgba(37, 99, 235, 0.45);
+}
+
+/* Menu tidak aktif */
+html.light .beranda-page header .text-slate-300 {
+  color: #64748b;
+}
+html.light .beranda-page header .hover\:bg-white\/5:hover {
+  background-color: #dbeafe;
+}
+html.light .beranda-page .hover\:text-cyan-300:hover {
+  color: #2563eb;
+}
+
+/* Tombol Login (header): gradient biru primer -> sekunder.
+   Di-scope ke header supaya tombol "Mulai Eksplorasi" di #hero tetap
+   pakai gradient animasi bawaan dark mode (slide saat hover). */
+html.light .beranda-page header .bg-gradient-to-r.from-blue-600.via-cyan-500.to-blue-600 {
+  background-image: linear-gradient(90deg, #2563eb, #0ea5e9, #2563eb);
+}
+html.light .beranda-page header .shadow-cyan-500\/20 {
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.22),
+    0 4px 6px -4px rgba(37, 99, 235, 0.14);
+}
+html.light .beranda-page header .hover\:shadow-cyan-400\/40:hover {
+  box-shadow: 0 14px 24px -6px rgba(37, 99, 235, 0.35),
+    0 4px 8px -4px rgba(37, 99, 235, 0.22);
+}
+
+/* Hamburger */
+html.light .beranda-page header button span.bg-white {
+  background-color: #0f172a;
+}
+html.light .beranda-page header button span.bg-cyan-300 {
+  background-color: #2563eb;
+}
+
+/* Panel menu mobile */
+html.light .beranda-page header .bg-brand-dark\/95 {
+  background: linear-gradient(165deg, #e9f1fc 0%, #f6faff 48%, #e6eefb 100%);
+  border-color: #cdddf5;
+  box-shadow: 0 16px 40px -16px rgba(37, 99, 235, 0.25);
+}
+html.light .beranda-page header .bg-brand-dark\/95 > .pointer-events-none.opacity-10 {
+  background-image: linear-gradient(rgba(37, 99, 235, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.07) 1px, transparent 1px) !important;
+  opacity: 1;
+}
+html.light .beranda-page header nav .text-slate-300 {
+  color: #64748b;
+}
+html.light .beranda-page header nav .hover\:bg-white\/5:hover {
+  background-color: #dbeafe;
+}
+
+/* ===== HERO ===== */
+/* Gradasi off-white -> biru muda (bukan putih terang) */
+html.light .beranda-page #hero.bg-brand-dark {
+  background: linear-gradient(180deg, #f7fafd 0%, #edf3fa 55%, #e6edf7 100%);
+}
+
+/* Glow biru kuat agar terlihat jelas di atas permukaan terang */
+html.light .beranda-page #hero .bg-cyan-500\/10 {
+  background-color: rgba(37, 99, 235, 0.22);
+}
+html.light .beranda-page #hero .bg-blue-500\/10 {
+  background-color: rgba(14, 165, 233, 0.25);
+}
+/* Blob cyan tengah-atas (di belakang heading) -> redam biar tak mencolok */
+html.light
+  .beranda-page
+  #hero
+  > .pointer-events-none.-top-32.left-1\/2.rounded-full.bg-cyan-500\/10 {
+  background-color: rgba(37, 99, 235, 0.07);
+}
+
+/* Blur di bawah kaki karakter 3D: cyan -> biru primer #2563eb
+   (senada dengan warna aktif navbar/tombol di light mode).
+   blur-3xl nyebarin warna jadi tipis, jadi opasitasnya dibikin tinggi */
+html.light .beranda-page #hero .bg-cyan-400\/25.blur-3xl {
+  background-color: rgba(37, 99, 235, 0.5);
+}
+/* Dust/sparkles: partikel #7dd3fc terlalu muda di bg putih ->
+   digelapkan & disaturasi lewat filter CSS (canvas tidak diubah) */
+html.light .beranda-page #hero > .pointer-events-none.inset-0:not(.opacity-20):not(:last-child) canvas,
+html.light .beranda-page #faq > .pointer-events-none.inset-0:not(.opacity-20) canvas {
+  filter: brightness(0.48) saturate(3) contrast(1.15);
+}
+
+/* Grid PCB: garis biru lembut & sedikit buram.
+   Elemen aslinya punya class opacity-20 -> dikontrol di sini */
+html.light .beranda-page #hero > .pointer-events-none.opacity-20,
+html.light .beranda-page #faq > .pointer-events-none.opacity-20 {
+  background-image: linear-gradient(rgba(37, 99, 235, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.09) 1px, transparent 1px) !important;
+  opacity: 0.7;
+  filter: blur(0.6px);
+}
+
+/* Vignette gelap -> aura biru di atas + tepi biru muda memberi kedalaman */
+html.light .beranda-page #hero > .pointer-events-none.absolute.inset-0:last-child {
+  background:
+    radial-gradient(
+      620px circle at 50% 0%,
+      rgba(37, 99, 235, 0.1),
+      transparent 65%
+    ),
+    radial-gradient(
+      circle at center,
+      transparent 0%,
+      rgba(219, 234, 254, 0.45) 55%,
+      rgba(238, 244, 253, 0.92) 100%
+    ) !important;
+}
+
+/* Badge Poliban di hero: latar biru lebih pekat biar putih & border di file logo keliatan */
+html.light .beranda-page #hero div.rounded-full.border-cyan-400\/30.bg-cyan-400\/10 {
+  background-color: #cfe2fd;
+  border-color: #9ec3f7;
+  box-shadow: 0 2px 10px -2px rgba(37, 99, 235, 0.28);
+}
+
+/* Heading */
+html.light .beranda-page #hero h1.text-white {
+  color: #404040;
+}
+
+/* "DISINI" + "Sering Diajukan": teks gradient biru -> sky */
+html.light .beranda-page #hero h1 span.text-cyan-300,
+html.light .beranda-page #faq h2 span.text-cyan-300 {
+  background-image: linear-gradient(90deg, #2563eb, #0ea5e9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Angka statistik hero (Proyek/Kategori/Pengunjung): biru primer SOLID,
+   tanpa gradasi cyan */
+html.light .beranda-page #hero h2.text-cyan-300 {
+  color: #2563eb;
+}
+
+/* Garis aksen */
+html.light .beranda-page #hero .from-cyan-400.to-blue-600 {
+  background-image: linear-gradient(to bottom, #2563eb, #0ea5e9);
+}
+
+/* Deskripsi */
+html.light .beranda-page #hero p.text-slate-300,
+html.light .beranda-page .text-slate-300 {
+  color: #64748b;
+}
+
+/* Tombol "Mulai Eksplorasi" (#hero): tidak di-override lagi ->
+   gradient animasi + hover slide + glow cyan sama persis dengan dark mode */
+
+/* ===== CARD (stat card, faq card, stats mobile) ===== */
+/* Card putih solid + border biru + shadow biru */
+html.light .beranda-page .border-white\/10.bg-white\/5 {
+  background-color: #fbfcfe;
+  border-color: #d6e4fb;
+  box-shadow: 0 4px 16px -6px rgba(37, 99, 235, 0.12);
+}
+html.light .beranda-page .hover\:bg-white\/10:hover {
+  background-color: #f8fafc;
+}
+html.light .beranda-page .hover\:border-cyan-400\/40:hover {
+  border-color: #93c5fd;
+}
+
+/* Stat card mobile */
+html.light .beranda-page #hero p.font-bold.text-white {
+  color: #1e3a8a;
+}
+html.light .beranda-page .text-slate-400 {
+  color: #64748b;
+}
+html.light .beranda-page #hero .bg-white\/20,
+html.light .beranda-page #hero .bg-white\/10 {
+  background-color: #cbd9ee;
+}
+
+/* Icon box dalam stat mobile: soft blue + ring biru */
+html.light .beranda-page #hero .rounded-xl.bg-cyan-400\/10 {
+  background-color: #eff6ff;
+  box-shadow: inset 0 0 0 1px #dbeafe;
+}
+
+/* ===== STAT CONTAINER: WARNA GAYA BADGE POLIBAN ===== */
+/* BENTUK & ANIMASI TETAP SAMA PERSIS DENGAN DARK MODE.
+   Hanya warna kontainer stats yang mengikuti badge logo Poliban:
+   latar biru muda #cfe2fd + border #9ec3f7 + shadow lembut */
+
+/* Kartu statistik desktop (GlassCard) — bentuk rounded tetap bawaan */
+html.light
+  .beranda-page
+  #hero
+  div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl {
+  background-color: #cfe2fd;
+  border-color: #9ec3f7;
+  box-shadow: 0 2px 10px -2px rgba(37, 99, 235, 0.28);
+}
+
+/* Hover kartu desktop: animasi terbang tetap jalan, hanya warna yang menguat */
+html.light
+  .beranda-page
+  #hero
+  div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl:hover {
+  background-color: #c0dafd;
+  border-color: #82b1f3;
+}
+
+/* Wrapper statistik versi mobile — bentuk tetap rounded-2xl bawaan */
+html.light
+  .beranda-page
+  #hero
+  div.rounded-2xl.border-white\/10.bg-white\/5.backdrop-blur-xl {
+  background-color: #cfe2fd;
+  border-color: #9ec3f7;
+  box-shadow: 0 2px 10px -2px rgba(37, 99, 235, 0.28);
+}
+
+/* Garis pemisah antar item stats mobile biar keliatan di atas latar biru */
+html.light .beranda-page #hero div.backdrop-blur-xl .bg-white\/20,
+html.light .beranda-page #hero div.backdrop-blur-xl .bg-white\/10 {
+  background-color: #9ec3f7;
+}
+
+/* Skeleton loader stats desktop ikut nuansa biru badge */
+html.light .beranda-page #hero div.bg-white\/\[0\.04\].border-white\/10 {
+  background-color: #e2edfd;
+  border-color: #cfe0fa;
+}
+
+/* ===== FAQ ===== */
+/* Pita biru-abu: pemisah jelas antara section */
+html.light .beranda-page #faq.bg-brand-dark {
+  background-color: #e7eef7;
+  box-shadow: inset 0 1px 0 #d8e4f5;
+}
+html.light .beranda-page #faq h2.text-white {
+  color: #404040;
+}
+html.light .beranda-page #faq button span.text-white {
+  color: #404040;
+}
+
+/* ===== FOOTER ===== */
+/* Light theme: gradasi putih -> biru sangat muda */
+html.light .beranda-page footer.bg-\[\#02111f\] {
+  background: linear-gradient(180deg, #f7fafd 0%, #eaf1f9 100%);
+  border-color: #dbe6f5;
+}
+html.light .beranda-page footer h2.text-white {
+  color: #404040;
+}
+html.light .beranda-page footer .text-slate-300 {
+  color: #64748b;
+}
+html.light .beranda-page footer .text-slate-500 {
+  color: #475569;
+}
+
+html.light .beranda-page footer .hover\:text-cyan-300:hover {
+  color: #2563eb;
+}

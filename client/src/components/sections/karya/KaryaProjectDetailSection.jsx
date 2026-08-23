@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
 import DustBackground from "../../ui/DustBackground"
 import GlowBackground from "../../ui/GlowBackground"
+import PCBBackground from "../../ui/PCBBackground"
 import GlassCard from "../../ui/GlassCard"
 import { X, MessageCircle, Copy, Check, Send } from "lucide-react"
 import { useAuth } from "../../../context/AuthContext"
@@ -160,6 +161,7 @@ function KaryaProjectDetailSection() {
       className="relative min-h-screen overflow-hidden bg-brand-dark pb-16 2xl:pb-24"
     >
       <GlowBackground />
+      <PCBBackground />
       <DustBackground />
 
       <div className="relative mx-auto max-w-5xl px-2 min-[280px]:px-3 sm:px-5 pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)]">
@@ -221,7 +223,7 @@ function KaryaProjectDetailSection() {
                 onClick={shareToWhatsApp}
                 className="group flex flex-col items-center gap-2"
               >
-                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-[#25D366]/10 text-[#25D366] transition group-hover:bg-[#25D366] group-hover:text-white">
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-social-whatsapp/10 text-social-whatsapp transition group-hover:bg-social-whatsapp group-hover:text-white">
                   <MessageCircle size={24} />
                 </div>
                 <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">
@@ -257,7 +259,7 @@ function KaryaProjectDetailSection() {
                 }
                 className="group flex flex-col items-center gap-2"
               >
-                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-[#1877F2]/10 text-[#1877F2] transition group-hover:bg-[#1877F2] group-hover:text-white">
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-social-facebook/10 text-social-facebook transition group-hover:bg-social-facebook group-hover:text-white">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
                   </svg>
@@ -276,7 +278,7 @@ function KaryaProjectDetailSection() {
                 }
                 className="group flex flex-col items-center gap-2"
               >
-                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-[#0088cc]/10 text-[#0088cc] transition group-hover:bg-[#0088cc] group-hover:text-white">
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-social-telegram/10 text-social-telegram transition group-hover:bg-social-telegram group-hover:text-white">
                   <Send size={24} />
                 </div>
                 <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">

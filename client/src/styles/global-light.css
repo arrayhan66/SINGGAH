@@ -1,0 +1,570 @@
+/* ============================================================
+   GLOBAL LIGHT MODE — berlaku untuk SEMUA halaman (visitor,
+   auth, user, admin dashboard) saat ThemeContext = light.
+   Tema: off-white + biru tua (#2563EB). Semua aksen cyan
+   diganti biru tua primer. Dark mode tidak tersentuh.
+   ============================================================ */
+
+html.light body {
+  background-color: #f2f6fb;
+}
+
+/* ===== SECTION / LAYOUT BACKGROUND ===== */
+html.light .bg-brand-dark {
+  background: linear-gradient(180deg, #f7fafd 0%, #edf3fa 100%);
+}
+html.light .bg-brand-dark\/90,
+html.light .bg-brand-dark\/95 {
+  background-color: rgba(247, 250, 253, 0.92);
+}
+html.light .bg-brand-dark\/80,
+html.light .bg-brand-dark\/85 {
+  background-color: rgba(244, 248, 253, 0.94);
+}
+html.light .bg-brand-navy {
+  background-color: #eef3fa;
+}
+html.light .bg-\[\#02111f\] {
+  background-color: #eef3fa;
+}
+
+/* ===== TEKS PUTIH DI ATAS ELEMEN BERWARNA TETAP PUTIH ===== */
+/* Exception dari token .text-white di atas: tombol primer, avatar,
+   badge angka, dsb yang duduk di atas background biru/merah/hijau solid
+   atau gradasi biru-cyan tidak boleh ikut menjadi gelap */
+html.light [class*="bg-blue-600"] .text-white,
+html.light [class*="bg-blue-500"] .text-white,
+html.light [class*="bg-cyan-600"] .text-white,
+html.light [class*="bg-cyan-500"] .text-white,
+html.light [class*="bg-red-500"] .text-white,
+html.light [class*="bg-emerald-600"] .text-white,
+html.light [class*="bg-emerald-500"] .text-white,
+html.light [class*="from-blue-600"] .text-white,
+html.light [class*="from-cyan-400"] .text-white,
+html.light [class*="from-cyan-500"] .text-white,
+html.light [class*="to-blue-600"] .text-white {
+  color: #ffffff;
+}
+html.light [class*="bg-blue-600"][class*="text-white"],
+html.light [class*="bg-blue-500"][class*="text-white"],
+html.light [class*="bg-cyan-600"][class*="text-white"],
+html.light [class*="bg-cyan-500"][class*="text-white"],
+html.light [class*="bg-red-500"][class*="text-white"],
+html.light [class*="bg-emerald-600"][class*="text-white"],
+html.light [class*="bg-emerald-500"][class*="text-white"],
+html.light [class*="from-blue-600"][class*="text-white"],
+html.light [class*="from-cyan-400"][class*="text-white"],
+html.light [class*="from-cyan-500"][class*="text-white"],
+html.light [class*="to-blue-600"][class*="text-white"] {
+  color: #ffffff;
+}
+
+/* ===== TEKS DASAR ===== */
+html.light .text-white {
+  color: #0f172a;
+}
+html.light .text-white\/90 {
+  color: #0f172a;
+}
+html.light .text-white\/80 {
+  color: #1e293b;
+}
+html.light .text-white\/70 {
+  color: #334155;
+}
+html.light .text-white\/60 {
+  color: #475569;
+}
+html.light .text-white\/50,
+html.light .text-white\/40 {
+  color: #64748b;
+}
+html.light .text-slate-100 {
+  color: #1e293b;
+}
+html.light .text-slate-200 {
+  color: #334155;
+}
+html.light .text-slate-300 {
+  color: #475569;
+}
+html.light .text-slate-400,
+html.light .text-slate-500 {
+  color: #64748b;
+}
+
+/* ===== JUDUL & HEADING -> BIRU TUA ===== */
+/* Semua heading yang tadinya putih jadi biru tua (bukan hitam),
+   berlaku global termasuk halaman admin */
+html.light h1.text-white,
+html.light h2.text-white,
+html.light h3.text-white,
+html.light h4.text-white,
+html.light h5.text-white,
+html.light h6.text-white,
+html.light h3.text-white\/90,
+html.light h4.text-white\/90 {
+  color: #1e3a8a;
+}
+
+/* ===== CYAN -> BIRU TUA (teks) ===== */
+html.light .text-cyan-200,
+html.light .text-cyan-300,
+html.light .text-cyan-400,
+html.light .text-cyan-500 {
+  color: #2563eb;
+}
+html.light .text-cyan-600 {
+  color: #1d4ed8;
+}
+html.light .text-blue-400 {
+  color: #2563eb;
+}
+html.light .text-blue-700 {
+  color: #1d4ed8;
+}
+
+/* ===== CYAN -> BIRU TUA (background solid) ===== */
+html.light .bg-cyan-400,
+html.light .bg-cyan-500,
+html.light .bg-cyan-600 {
+  background-color: #2563eb;
+}
+
+/* ===== CYAN -> BIRU TUA (box/chip translucent) ===== */
+html.light .bg-cyan-400\/10,
+html.light .bg-cyan-500\/10,
+html.light .bg-blue-500\/10,
+html.light .bg-cyan-50,
+html.light .bg-blue-50 {
+  background-color: #eff6ff;
+}
+html.light .bg-cyan-400\/20,
+html.light .bg-cyan-500\/20 {
+  background-color: #dbeafe;
+}
+html.light .hover\:bg-cyan-400\/10:hover,
+html.light .hover\:bg-cyan-500\/10:hover,
+html.light .hover\:bg-cyan-400\/20:hover {
+  background-color: #dbeafe;
+}
+
+/* ===== CYAN -> BIRU TUA (border) ===== */
+html.light .border-cyan-400\/20,
+html.light .border-cyan-400\/30,
+html.light .border-cyan-500\/20,
+html.light .border-cyan-500\/30 {
+  border-color: #bfdbfe;
+}
+html.light .border-cyan-400\/40,
+html.light .border-cyan-400\/50,
+html.light .border-cyan-400 {
+  border-color: #93c5fd;
+}
+html.light .hover\:border-cyan-400\/40:hover,
+html.light .hover\:border-cyan-400\/50:hover {
+  border-color: #60a5fa;
+}
+
+/* ===== CYAN -> BIRU TUA (focus input/ring) ===== */
+html.light .focus\:border-cyan-400:focus,
+html.light .focus\:border-cyan-500:focus {
+  border-color: #2563eb;
+}
+html.light .focus\:ring-cyan-400:focus,
+html.light .focus\:ring-cyan-500:focus {
+  --tw-ring-color: rgba(37, 99, 235, 0.25);
+}
+html.light .ring-cyan-400\/30,
+html.light .ring-cyan-400\/40 {
+  --tw-ring-color: rgba(37, 99, 235, 0.2);
+}
+
+/* ===== GRADASI CYAN -> BIRU TUA (tombol/aksen gradient) ===== */
+html.light .from-cyan-400,
+html.light .from-cyan-500 {
+  --tw-gradient-from: #2563eb;
+}
+html.light .to-cyan-400,
+html.light .to-cyan-500 {
+  --tw-gradient-to: #1d4ed8;
+}
+
+/* ===== TINT STATUS (toast, badge, alert) ===== */
+html.light .bg-emerald-500\/10 {
+  background-color: #ecfdf5;
+}
+html.light .bg-emerald-500\/20 {
+  background-color: #d1fae5;
+}
+html.light .bg-red-500\/10 {
+  background-color: #fef2f2;
+}
+html.light .bg-red-500\/20 {
+  background-color: #fee2e2;
+}
+html.light .text-emerald-300,
+html.light .text-emerald-400 {
+  color: #047857;
+}
+html.light .border-emerald-500\/30 {
+  border-color: #a7f3d0;
+}
+/* Tombol pengumuman (admin) */
+html.light .bg-amber-400\/10 {
+  background-color: #fffbeb;
+}
+html.light .hover\:bg-amber-400\/20:hover {
+  background-color: #fef3c7;
+}
+html.light .text-amber-300 {
+  color: #b45309;
+}
+
+/* ===== PERMUKAAN TRANSLUCENT -> OFF-WHITE ===== */
+html.light .bg-white\/5 {
+  background-color: #fbfcfe;
+}
+html.light .bg-white\/10 {
+  background-color: #f4f8fd;
+}
+html.light .bg-white\/\[0\.02\],
+html.light .bg-white\/\[0\.03\],
+html.light .bg-white\/\[0\.04\],
+html.light .bg-white\/\[0\.05\],
+html.light .bg-white\/\[0\.06\],
+html.light .bg-white\/\[0\.07\],
+html.light .bg-white\/\[0\.08\],
+html.light .bg-white\/\[0\.09\] {
+  background-color: #f8fafc;
+}
+html.light .bg-white\/\[0\.1\] {
+  background-color: #f4f8fd;
+}
+html.light .focus\:bg-white\/\[0\.07\]:focus {
+  background-color: #ffffff;
+}
+html.light .hover\:bg-white\/\[0\.02\]:hover,
+html.light .hover\:bg-white\/\[0\.04\]:hover,
+html.light .hover\:bg-white\/\[0\.06\]:hover,
+html.light .hover\:bg-white\/\[0\.1\]:hover,
+html.light .hover\:bg-white\/5:hover {
+  background-color: #edf3fb;
+}
+html.light .hover\:bg-white\/10:hover {
+  background-color: #e7eff9;
+}
+html.light .bg-slate-800\/50,
+html.light .bg-slate-800\/60,
+html.light .bg-slate-800\/80 {
+  background-color: #fbfcfe;
+}
+html.light .bg-slate-900\/50,
+html.light .bg-slate-900\/60,
+html.light .bg-slate-900\/80,
+html.light .bg-black\/20,
+html.light .bg-black\/30 {
+  background-color: #f1f5fa;
+}
+
+/* ===== BORDER NETRAL ===== */
+html.light .border-white\/10 {
+  border-color: #e2e8f0;
+}
+html.light .border-white\/15,
+html.light .border-white\/20 {
+  border-color: #dce5f1;
+}
+html.light .border-white\/25,
+html.light .border-white\/30 {
+  border-color: #d6e0ef;
+}
+html.light .divide-white\/10 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #e9eff8;
+}
+
+/* ===== GRADASI BRAND COLOR STOP (maintenance, modal sukses, dll) ===== */
+html.light .from-brand-dark {
+  --tw-gradient-from: #f7fafd;
+}
+html.light .to-brand-dark {
+  --tw-gradient-to: #edf3fa;
+}
+html.light .from-brand-navy {
+  --tw-gradient-from: #eef3fa;
+}
+html.light .to-brand-navy {
+  --tw-gradient-to: #e6edf7;
+}
+html.light .bg-slate-900 {
+  background-color: #fbfcfe;
+}
+
+/* ===== HEADING GRADASI -> NAVY + AKSEN BIRU TUA ===== */
+/* Login/Register: "Inovasi Digital Kampus" */
+html.light .bg-gradient-to-r.from-blue-600.via-cyan-600.to-teal-500.bg-clip-text {
+  background-image: none;
+  color: #2563eb;
+  -webkit-text-fill-color: #2563eb;
+  filter: none;
+}
+/* Halaman 404: angka raksasa */
+html.light .bg-gradient-to-b.from-cyan-300.to-blue-600.bg-clip-text {
+  background-image: none;
+  color: #2563eb;
+  -webkit-text-fill-color: #2563eb;
+  filter: none;
+}
+/* Edit Karya: judul gradasi cyan-blue-purple */
+html.light
+  .bg-gradient-to-r.from-cyan-300.via-blue-400.to-purple-400.bg-clip-text {
+  background-image: none;
+  color: #2563eb;
+  -webkit-text-fill-color: #2563eb;
+  filter: none;
+}
+/* Glow blur di belakang judul edit karya diredam */
+html.light .bg-gradient-to-r.from-cyan-400\/20.via-blue-500\/20.to-purple-500\/20 {
+  opacity: 0.3;
+}
+
+/* ===== SKELETON LOADING (versi terang) ===== */
+/* Wireframe tint biru primer senada tema terang: blok biru muda +
+   shimmer biru yang jelas kelihatan di atas permukaan off-white
+   (shimmer putih tidak kontras). Dark mode tetap pakai utilitas dasar. */
+html.light .skeleton {
+  background-color: rgba(37, 99, 235, 0.08);
+  background-image: linear-gradient(
+    90deg,
+    rgba(37, 99, 235, 0) 0%,
+    rgba(37, 99, 235, 0.16) 50%,
+    rgba(37, 99, 235, 0) 100%
+  );
+}
+
+/* ===== WIREFRAME LOADING ADMIN (animate-pulse) ===== */
+/* Baris skeleton Aktivitas Terbaru & Media Library memakai
+   bg-white/[0.04] yang di light mode nyatu dengan kartu ->
+   diberi tint biru supaya status loading-nya terlihat jelas. */
+html.light .animate-pulse.border-white\/\[0\.06\].bg-white\/\[0\.04\] {
+  background-color: rgba(37, 99, 235, 0.07);
+  border-color: rgba(37, 99, 235, 0.16);
+}
+
+/* ===== PLACEHOLDER INPUT ===== */
+html.light ::placeholder {
+  color: #94a3b8;
+  opacity: 1;
+}
+
+/* ============================================================
+   PATCH KONTRAS LIGHT MODE (finishing)
+   Menutup kelas-kelas yang belum ke-override sehingga masih
+   memakai nilai dark di atas permukaan terang -> elemen nyatu.
+   ============================================================ */
+
+/* ===== BORDER PUTIH SANGAT TIPIS -> BORDER TERLIHAT ===== */
+html.light .border-white\/5 {
+  border-color: #e6edf6;
+}
+html.light .border-white\/\[0\.04\],
+html.light .border-white\/\[0\.06\] {
+  border-color: #e0e8f3;
+}
+html.light .border-white\/\[0\.07\],
+html.light .border-white\/\[0\.08\] {
+  border-color: #dbe4f1;
+}
+html.light .border-white\/\[0\.1\],
+html.light .border-white\/\[0\.12\],
+html.light .border-white\/\[0\.14\] {
+  border-color: #c9d8ec;
+}
+html.light .hover\:border-white\/\[0\.12\]:hover,
+html.light .hover\:border-cyan-400\/50:hover {
+  border-color: #60a5fa;
+}
+
+/* ===== RING ===== */
+html.light .ring-white\/10,
+html.light .ring-white\/15 {
+  --tw-ring-color: rgba(37, 99, 235, 0.18);
+}
+html.light .ring-slate-700\/30 {
+  --tw-ring-color: rgba(37, 99, 235, 0.14);
+}
+
+/* ===== GARIS DIVIDER (h-px bg-white/20..30) ===== */
+html.light .bg-white\/20,
+html.light .bg-white\/30 {
+  background-color: #cfdaea;
+}
+
+/* ===== PERMUKAAN & BORDER SLATE GELAP TERSISA ===== */
+html.light .bg-slate-800\/40 {
+  background-color: #fbfcfe;
+}
+html.light .bg-slate-950\/40,
+html.light .bg-slate-950\/60 {
+  background-color: #f1f5fa;
+}
+html.light .bg-slate-950\/80 {
+  background-color: rgba(15, 23, 42, 0.45);
+}
+html.light .border-slate-700\/30,
+html.light .border-slate-700\/50,
+html.light .border-slate-800 {
+  border-color: #b9cbe4;
+}
+
+/* ===== TEKS STATUS TERANG -> VERSI GELAP BIAR KEBACA ===== */
+html.light .text-red-200 {
+  color: #991b1b;
+}
+html.light .text-red-300 {
+  color: #b91c1c;
+}
+html.light .text-red-400 {
+  color: #dc2626;
+}
+html.light .hover\:text-red-400:hover,
+html.light .group-hover\:text-red-400:hover,
+html.light .hover\:text-red-300:hover {
+  color: #dc2626;
+}
+/* Kecuali ikon aksi di atas chip gelap penutup foto -> tetap merah terang */
+html.light .bg-black\/50 .hover\:text-red-400:hover,
+html.light .bg-black\/60 .hover\:text-red-400:hover {
+  color: #fca5a5;
+}
+
+html.light .bg-red-500\/30 {
+  background-color: #fee2e2;
+}
+html.light .hover\:bg-red-500\/10:hover {
+  background-color: #fef2f2;
+}
+html.light .hover\:bg-red-500\/20:hover {
+  background-color: #fee2e2;
+}
+html.light .border-red-500\/30 {
+  border-color: #fecaca;
+}
+
+html.light .text-emerald-200 {
+  color: #065f46;
+}
+html.light .text-amber-200 {
+  color: #92400e;
+}
+html.light .text-amber-400 {
+  color: #d97706;
+}
+html.light .text-yellow-300 {
+  color: #a16207;
+}
+html.light .text-purple-300 {
+  color: #7c3aed;
+}
+html.light .text-purple-400 {
+  color: #6d28d9;
+}
+html.light .text-orange-300,
+html.light .text-orange-400 {
+  color: #c2410c;
+}
+html.light .text-green-400 {
+  color: #059669;
+}
+html.light .text-cyan-100 {
+  color: #1e40af;
+}
+
+/* ===== CYAN FRAKSI YANG BELUM KE-COVER ===== */
+html.light .bg-cyan-500\/15 {
+  background-color: #eaf3ff;
+}
+html.light .bg-cyan-400\/25,
+html.light .bg-cyan-500\/25 {
+  background-color: #dbeafe;
+}
+
+/* ===== TOKEN NIGHT DI HALAMAN THEME (dashboard admin & auth) ===== */
+/* Kartu analitik dashboard */
+html.light .bg-night-elevated {
+  background-color: #ffffff;
+  box-shadow:
+    inset 0 0 0 1px #dde7f4,
+    0 12px 28px rgba(37, 99, 235, 0.08);
+}
+/* Tile quick action + kotak icon di dalamnya */
+html.light .hover\:bg-night-raised:hover {
+  background-color: #f0f6ff;
+}
+html.light .bg-night-raised {
+  background-color: #eff6ff;
+  box-shadow: inset 0 0 0 1px #dbeafe;
+}
+html.light .group-hover\:bg-night-focus:hover {
+  background-color: #dbeafe;
+}
+/* Chip branding halaman auth */
+html.light .bg-night-shade {
+  background-color: #e9f1fe;
+  border-color: #93c5fd;
+  box-shadow: 0 6px 18px -6px rgba(37, 99, 235, 0.35);
+}
+html.light .shadow-cyan-950\/20 {
+  box-shadow: 0 6px 18px -6px rgba(37, 99, 235, 0.35);
+}
+html.light .hover\:bg-night-shade-hover:hover {
+  background-color: #dbeafe;
+}
+html.light .bg-night-shade.hover\:text-white:hover {
+  color: #1e3a8a;
+}
+
+/* ===== GRADIENT KARTU PUTIH TRANSPARAN -> KARTU PUTIH SOLID ===== */
+/* CategoryCard, kartu dashboard, chart, empty state, dsb */
+html.light .bg-gradient-to-b.from-white\/\[0\.03\],
+html.light .bg-gradient-to-b.from-white\/\[0\.06\].to-white\/\[0\.02\],
+html.light .bg-gradient-to-b.from-white\/\[0\.08\].to-white\/\[0\.02\],
+html.light .bg-gradient-to-b.from-white\/\[0\.09\].to-white\/\[0\.04\],
+html.light .bg-gradient-to-b.from-white\/\[0\.09\].to-white\/\[0\.05\],
+html.light .bg-gradient-to-br.from-white\/\[0\.04\].to-white\/\[0\.01\],
+html.light .bg-gradient-to-br.from-white\/\[0\.06\].to-white\/\[0\.02\],
+html.light .bg-gradient-to-br.from-white\/\[0\.07\].to-white\/\[0\.02\],
+html.light .bg-gradient-to-b.from-white\/10.to-white\/5 {
+  background-image: linear-gradient(180deg, #ffffff 0%, #f5f8fc 100%);
+}
+
+/* ===== HALL 3D SELALU GELAP ===== */
+/* Scene three.js tidak ikut tema terang: kunci kembali teks di
+   dalam permukaan night agar tidak jadi gelap di atas gelap.
+   Footer dikecualikan supaya ikut tema terang (lihat FOOTER). */
+html.light .bg-night:not(footer) .text-white,
+html.light .bg-night.text-white,
+html.light .bg-night-deep:not(footer) .text-white {
+  color: #ffffff;
+}
+
+/* ===== FOOTER ===== */
+/* Footer memakai token bg-night-deep; di light mode jadi permukaan
+   off-white gradasi senada halaman. File ini di-import di main.jsx
+   sehingga berlaku di semua layout (visitor, auth, admin). */
+html.light footer.bg-night-deep {
+  background: linear-gradient(180deg, #f7fafd 0%, #eaf1f9 100%);
+  border-color: #dbe6f5;
+}
+html.light footer.bg-night-deep h2.text-white {
+  color: #1e3a8a;
+}
+html.light footer .text-slate-300 {
+  color: #64748b;
+}
+html.light footer .text-slate-500 {
+  color: #94a3b8;
+}
+html.light footer .hover\:text-cyan-300:hover {
+  color: #2563eb;
+}

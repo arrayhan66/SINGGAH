@@ -10,6 +10,7 @@ import {
 } from "lucide-react"
 import DustBackground from "../ui/DustBackground"
 import GlowBackground from "../ui/GlowBackground"
+import PCBBackground from "../ui/PCBBackground"
 import GlassCard from "../ui/GlassCard"
 import api from "../../services/api"
 
@@ -50,6 +51,7 @@ function About() {
       className="relative overflow-hidden bg-brand-dark pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-12 lg:pb-16 2xl:pb-32 3xl:pb-24 4xl:pb-32"
     >
       <GlowBackground />
+      <PCBBackground />
       <DustBackground />
 
       <div className="mx-auto w-full max-w-7xl px-4 min-[280px]:px-5 min-[350px]:px-6 sm:px-8 lg:px-12 2xl:max-w-7xl 2xl:px-16 3xl:max-w-[1600px] 3xl:px-20 4xl:max-w-[2000px] 4xl:px-24">

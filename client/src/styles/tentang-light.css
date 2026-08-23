@@ -1,0 +1,141 @@
+/*
+  TENTANG LIGHT MODE — WHITE PRIMARY + BLUE SECONDARY
+  Scope ketat: html.light + wrapper .tentang-page (route /about saja).
+  Dark mode tidak tersentuh; layout/JSX tidak diubah.
+  Efek: glow biru, dust/sparkles, grid kotak-kotak (via ::before,
+  karena section about tidak punya komponen PCB di dark mode).
+*/
+@import "./light-shared.css";
+
+/* ===== GLOBAL SCOPE ===== */
+html.light .tentang-page {
+  background-color: #f5f8fc;
+}
+
+/* ===== SECTION BG ===== */
+html.light .tentang-page #about.bg-brand-dark {
+  background: linear-gradient(180deg, #f7fafd 0%, #edf3fa 55%, #e6edf7 100%);
+}
+
+/* Grid kotak-kotak lembut & buram (pengganti PCBBackground) */
+html.light .tentang-page #about::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(37, 99, 235, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.09) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.7;
+  filter: blur(0.6px);
+}
+
+/* Komponen PCBBackground (grid dark mode) disembunyikan di light mode
+   supaya tidak dobel dengan grid CSS di atas */
+html.light .tentang-page #about > .pointer-events-none.opacity-20 {
+  display: none;
+}
+
+/* Aura biru halus di puncak section */
+html.light .tentang-page #about::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    620px circle at 50% 0%,
+    rgba(37, 99, 235, 0.09),
+    transparent 65%
+  );
+}
+
+/* ===== HEADING UTAMA ===== */
+html.light .tentang-page #about h2.text-white {
+  color: #1e3a8a;
+}
+
+/* "Inovasi" highlight: teks gradient biru -> sky */
+html.light .tentang-page #about h2 span.text-cyan-300 {
+  background-image: linear-gradient(90deg, #2563eb, #0ea5e9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ===== JUDUL CARD ===== */
+html.light .tentang-page #about h3.text-white {
+  color: #1e3a8a;
+}
+
+/* ===== HOVER CARD (hubungi kami + kartu kecil + statistik) ===== */
+html.light .tentang-page .hover\:border-cyan-500\/50:hover,
+html.light .tentang-page .hover\:border-cyan-500\/40:hover {
+  border-color: #93c5fd;
+  box-shadow: 0 14px 30px -10px rgba(37, 99, 235, 0.2);
+}
+html.light .tentang-page .hover\:bg-slate-900\/30:hover,
+html.light .tentang-page .hover\:bg-white\/\[0\.02\]:hover {
+  background-color: #f8fafc;
+}
+html.light .tentang-page #about .group:hover .group-hover\:text-cyan-200 {
+  color: #2563eb;
+}
+html.light .tentang-page #about .group:hover .group-hover\:text-slate-200 {
+  color: #334155;
+}
+
+/* ===== LABEL KONTAK (Email / Telepon / Alamat) ===== */
+/* Base: heading kontak terlihat di card putih */
+html.light .tentang-page #about h4.text-white\/90 {
+  color: #1e3a8a;
+}
+
+/* ===== ICON BOX KONTAK (mail & telepon: biru primer) ===== */
+html.light .tentang-page #about .rounded-xl.bg-cyan-500\/10.border-cyan-500\/20 {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+}
+html.light .tentang-page #about .text-cyan-400 {
+  color: #2563eb;
+}
+
+/* ===== ICON BOX ALAMAT (disamakan dengan email & telepon: biru primer) ===== */
+html.light .tentang-page #about .rounded-xl.bg-teal-500\/10.border-teal-500\/20 {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+}
+html.light .tentang-page #about .text-teal-400 {
+  color: #2563eb;
+}
+
+/* ===== HOVER BARIS KONTAK ===== */
+/* Semua icon box (email/telepon/alamat) hover seragam */
+html.light .tentang-page #about .group\/item:hover > div:first-child {
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+}
+/* Label email/telepon/alamat: hover seragam biru primary */
+html.light .tentang-page #about .group\/item:hover .text-white\/90 {
+  color: #2563eb;
+}
+
+/* Icon kartu kecil menggelap saat card di-hover */
+html.light .tentang-page #about .group:hover .text-cyan-400 {
+  color: #1d4ed8;
+}
+
+/* ===== STATISTIK ===== */
+/* Angka: teks gradient biru -> sky */
+html.light .tentang-page #about h2.text-cyan-300 {
+  background-image: linear-gradient(90deg, #2563eb, #0ea5e9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+html.light .tentang-page #about .group:hover .group-hover\:text-cyan-300 {
+  color: #2563eb;
+}
+/* Angka statistik saat card di-hover: biru lebih tua */
+html.light .tentang-page #about .group:hover .group-hover\:text-white {
+  color: #1d4ed8;
+}

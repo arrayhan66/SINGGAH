@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import { NavLink } from "react-router-dom"
+import { ArrowUpRight } from "lucide-react"
 import logo from "../../assets/icons/logo.webp"
 import { visitorMenu } from "../../constants/navigation"
 import ThemeToggle from "../ui/ThemeToggle"
@@ -127,13 +128,25 @@ function NavbarVisitor() {
       </div>
 
       <div
-        className={`absolute left-0 top-full z-50 w-full px-3 min-[350px]:px-5 md:px-8 lg:hidden transition-all duration-300 ${
+        className={`absolute left-0 top-full z-50 w-full px-3 min-[350px]:px-5 md:px-8 lg:hidden transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           isOpen
-            ? "mt-2 opacity-100 visible translate-y-0"
-            : "opacity-0 invisible -translate-y-2"
+            ? "mt-2 translate-y-0 opacity-100 visible"
+            : "-translate-y-3 opacity-0 invisible"
         }`}
       >
-        <div className="mx-auto max-w-[1700px] overflow-hidden rounded-2xl border border-white/10 bg-brand-dark/95 backdrop-blur-xl">
+        <div
+          className={`relative mx-auto max-w-[1700px] overflow-hidden rounded-2xl border border-white/10 bg-brand-dark/95 shadow-[0_32px_80px_-24px_rgba(1,8,20,0.9)] backdrop-blur-2xl transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            isOpen ? "scale-100" : "scale-95"
+          }`}
+        >
+          <span
+            aria-hidden="true"
+            className="menu-hairline pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-cyan-400/70 to-transparent"
+          />
+          <span
+            aria-hidden="true"
+            className="menu-glow pointer-events-none absolute -top-24 -right-14 h-52 w-52 rounded-full bg-cyan-400/10 blur-3xl"
+          />
           <div
             className="pointer-events-none absolute inset-0 opacity-10"
             style={{
@@ -145,29 +158,35 @@ function NavbarVisitor() {
             }}
           />
 
-          <nav className="relative flex flex-col p-3">
+          <nav className="relative flex flex-col gap-1 p-3">
             {visitorMenu.map((item, index) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 onClick={closeMenu}
                 style={{
-                  transitionDelay: isOpen ? `${index * 60}ms` : "0ms",
+                  transitionDelay: isOpen ? `${index * 70}ms` : "0ms",
                 }}
                 className={({ isActive }) =>
-                  `group flex items-center gap-3 rounded-xl px-4 py-3.5 text-base transition-all duration-300 ${
+                  `group flex items-center gap-4 rounded-xl px-4 py-3.5 text-base transition-all duration-300 ${
                     isOpen
                       ? "translate-x-0 opacity-100"
                       : "-translate-x-4 opacity-0"
                   } ${
                     isActive
-                      ? "bg-cyan-400/10 text-cyan-300 font-semibold"
+                      ? "bg-cyan-400/10 font-semibold text-cyan-300"
                       : "text-slate-300 hover:bg-white/5 hover:text-cyan-300"
                   }`
                 }
               >
-                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400/40 transition-all duration-300 group-hover:w-4 group-hover:bg-cyan-400" />
-                {item.label}
+                <span className="flex w-6 shrink-0">
+                  <span className="h-1.5 w-1.5 rounded-full bg-cyan-400/40 transition-all duration-300 group-hover:w-4 group-hover:bg-cyan-400" />
+                </span>
+                <span className="flex-1">{item.label}</span>
+                <ArrowUpRight
+                  size={18}
+                  className="shrink-0 opacity-30 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
+                />
               </NavLink>
             ))}
           </nav>

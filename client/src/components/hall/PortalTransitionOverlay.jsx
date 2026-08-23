@@ -38,16 +38,16 @@ function PortalTransitionOverlay() {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-[#0b1220] ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-night ${
         hidden ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
-      <div className="text-3xl md:text-4xl font-extrabold tracking-wide text-[#7dd3fc]">
+      <div className="text-3xl md:text-4xl font-extrabold tracking-wide text-sky-300">
         SINGGAH
       </div>
-      <div className="text-xs md:text-sm text-[#93b4d4] tracking-[0.3em]">{message}</div>
+      <div className="text-xs md:text-sm text-night-muted tracking-[0.3em]">{message}</div>
       <div className="h-8 w-8 animate-spin rounded-full border-2 border-transparent border-t-cyan-400 border-r-cyan-400/50" />
-      <div className="text-xs md:text-sm tabular-nums text-[#5b7ba0]">{pct}%</div>
+      <div className="text-xs md:text-sm tabular-nums text-night-dim">{pct}%</div>
     </div>
   )
 }

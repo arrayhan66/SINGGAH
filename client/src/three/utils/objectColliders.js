@@ -1,5 +1,16 @@
 import { HALL_PILLARS, rooms } from "../rooms/museumLayout"
 import {
+  ROOM_CENTER_Z,
+  BOOKCASE_RING,
+  PLANT_RING,
+  PLANT_RING_JITTER,
+  LAMP_ACCENT_ANGLES,
+  LAMP_ACCENT_RADIUS,
+  OTTOMAN_CIRCLE,
+  ringAngle,
+  ringPosition,
+} from "../rooms/museumLayout"
+import {
   LOUNGE_LAYOUT,
   LOUNGE_RADIUS,
   LOUNGE_TOPIARIES,
@@ -11,13 +22,6 @@ import {
 
 // Positions must stay in sync with the decor rendered in Museum.jsx.
 const PLATFORM_RADIUS = 4.0
-
-// Category-room furniture (must stay in sync with RoomDecorGround/RoomDecorUpper).
-// The thin tabletops of LesehanTable/SideTable are filtered out of the AABB
-// pass (FLAT_THRESHOLD), so they need explicit circular colliders. Each has a
-// level so the mezzanine furniture only blocks mezzanine players.
-const LESEHAN_RADIUS = 1.15
-const LESEHAN_BIG_RADIUS = 1.8
 
 // Barrier geometry must stay in sync with MuseumBarrier.jsx (posts + entrance gap).
 const BARRIER_RADIUS = 6.05
@@ -123,73 +127,47 @@ function roomFurnitureColliders() {
   for (const room of rooms) {
     if (room.id === "hall") continue
     const cx = (room.x[0] + room.x[1]) / 2
-    const x0 = room.x[0]
-    const x1 = room.x[1]
 
-    // 2 big round tables in the middle, arranged vertically (z = 52, 62)
-    out.push({ x: cx, z: 52, radius: LESEHAN_BIG_RADIUS, level: 0 })
-    out.push({ x: cx, z: 62, radius: LESEHAN_BIG_RADIUS, level: 0 })
+    for (const level of [0, 1]) {
+      // Central circular bookcase ring around the reading carpet
+      for (let i = 0; i < BOOKCASE_RING.count; i++) {
+        const a = ringAngle(i, BOOKCASE_RING.count, BOOKCASE_RING.phase)
+        const [x, z] = ringPosition(cx, BOOKCASE_RING.radius, a)
+        out.push({ x, z, radius: 0.95, level })
+      }
 
-    // Ottoman seating + small round table + small & big bookcases, 3 pairs per wall (z = 44, 56, 68)
-    for (const z of [44, 56, 68]) {
-      // Per-ottoman colliders matching the actual instanced cluster (one big
-      // circle used to block the gap between them, which looked like a wall).
-      // Slightly smaller than the seat's max extent so the gap between the two
-      // front ottomans stays walkable for a player radius of 0.35.
-      out.push({ x: x0 + 3.2, z: z - 0.4, radius: 0.32, level: 0 })
-      out.push({ x: x0 + 4.6, z: z - 0.2, radius: 0.32, level: 0 })
-      out.push({ x: x0 + 4.0, z: z + 0.5, radius: 0.32, level: 0 })
-      out.push({ x: x0 + 5.8, z, radius: 0.5, level: 0 })
-      out.push({ x: x0 + 11.0, z, radius: LESEHAN_RADIUS, level: 0 })
-      out.push({ x: x0 + 13.5, z, radius: 0.5, level: 0 })
-      out.push({ x: x0 + 4.0, z: z + 1.6, radius: 0.35, level: 0 })
-      out.push({ x: x1 - 3.2, z: z - 0.4, radius: 0.32, level: 0 })
-      out.push({ x: x1 - 4.6, z: z - 0.2, radius: 0.32, level: 0 })
-      out.push({ x: x1 - 4.0, z: z + 0.5, radius: 0.32, level: 0 })
-      out.push({ x: x1 - 5.8, z, radius: 0.5, level: 0 })
-      out.push({ x: x1 - 11.0, z, radius: LESEHAN_RADIUS, level: 0 })
-      out.push({ x: x1 - 13.5, z, radius: 0.5, level: 0 })
-      out.push({ x: x1 - 4.0, z: z + 1.6, radius: 0.35, level: 0 })
+      // Greenery ring outside the bookcases
+      for (let i = 0; i < PLANT_RING.count; i++) {
+        const a =
+          ringAngle(i, PLANT_RING.count, PLANT_RING.phase) + PLANT_RING_JITTER.angle[i]
+        const [x, z] = ringPosition(cx, PLANT_RING.radius + PLANT_RING_JITTER.radius[i], a)
+        out.push({ x, z, radius: 0.45, level })
+      }
+
+      // Floor-lamp accents outside the plants
+      for (const a of LAMP_ACCENT_ANGLES) {
+        const [x, z] = ringPosition(cx, LAMP_ACCENT_RADIUS, a)
+        out.push({ x, z, radius: 0.35, level })
+      }
+
+      // Ottoman seats gathered on the carpet at the centre
+      for (let i = 0; i < OTTOMAN_CIRCLE.count; i++) {
+        const a =
+          (i / OTTOMAN_CIRCLE.count) * Math.PI * 2 + Math.PI / OTTOMAN_CIRCLE.count
+        out.push({
+          x: cx + Math.cos(a) * OTTOMAN_CIRCLE.radius,
+          z: ROOM_CENTER_Z + Math.sin(a) * OTTOMAN_CIRCLE.radius,
+          radius: 0.42,
+          level,
+        })
+      }
+
+      // Round table at the centre of the carpet
+      out.push({ x: cx, z: ROOM_CENTER_Z, radius: 1.65, level })
+
+      // Featured work podium on right side
+      out.push({ x: cx + 9.5, z: 32, radius: 2.8, level })
     }
-
-    // Plants / topiary
-    out.push({ x: cx - 8, z: 52, radius: 0.45, level: 0 })
-    out.push({ x: cx + 8, z: 52, radius: 0.45, level: 0 })
-    out.push({ x: cx - 9.5, z: 48, radius: 0.5, level: 0 })
-    out.push({ x: cx + 9.5, z: 48, radius: 0.5, level: 0 })
-
-    // Featured work podium on right side
-    out.push({ x: cx + 9.5, z: 32, radius: 2.8, level: 0 })
-
-    // Upper floor (level 1): same layout as the ground storey, mirrored
-    out.push({ x: cx, z: 60, radius: LESEHAN_BIG_RADIUS, level: 1 })
-    out.push({ x: cx, z: 72, radius: LESEHAN_BIG_RADIUS, level: 1 })
-
-    for (const z of [54, 66, 78]) {
-      out.push({ x: x0 + 3.2, z: z - 0.4, radius: 0.32, level: 1 })
-      out.push({ x: x0 + 4.6, z: z - 0.2, radius: 0.32, level: 1 })
-      out.push({ x: x0 + 4.0, z: z + 0.5, radius: 0.32, level: 1 })
-      out.push({ x: x0 + 5.8, z, radius: 0.5, level: 1 })
-      out.push({ x: x0 + 11.0, z, radius: LESEHAN_RADIUS, level: 1 })
-      out.push({ x: x0 + 13.5, z, radius: 0.5, level: 1 })
-      out.push({ x: x0 + 4.0, z: z + 1.6, radius: 0.35, level: 1 })
-      out.push({ x: x1 - 3.2, z: z - 0.4, radius: 0.32, level: 1 })
-      out.push({ x: x1 - 4.6, z: z - 0.2, radius: 0.32, level: 1 })
-      out.push({ x: x1 - 4.0, z: z + 0.5, radius: 0.32, level: 1 })
-      out.push({ x: x1 - 5.8, z, radius: 0.5, level: 1 })
-      out.push({ x: x1 - 11.0, z, radius: LESEHAN_RADIUS, level: 1 })
-      out.push({ x: x1 - 13.5, z, radius: 0.5, level: 1 })
-      out.push({ x: x1 - 4.0, z: z + 1.6, radius: 0.35, level: 1 })
-    }
-
-    // Plants / topiary (level 1)
-    out.push({ x: cx - 8, z: 60, radius: 0.45, level: 1 })
-    out.push({ x: cx + 8, z: 60, radius: 0.45, level: 1 })
-    out.push({ x: cx - 9.5, z: 60, radius: 0.5, level: 1 })
-    out.push({ x: cx + 9.5, z: 60, radius: 0.5, level: 1 })
-
-    // Featured lecturer works podium on right side (level 1)
-    out.push({ x: cx + 9.5, z: 32, radius: 2.8, level: 1 })
 
     // Wall cover over middle portal space on floor 2
     out.push({ x: cx, z: 27.25, radius: 2.0, level: 1 })

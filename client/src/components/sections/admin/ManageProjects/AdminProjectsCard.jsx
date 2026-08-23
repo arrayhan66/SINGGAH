@@ -1,4 +1,5 @@
-import { Clock, CheckCircle2, XCircle, Eye, Heart, Calendar, Tag, Globe, Pencil, Trash2 } from "lucide-react"
+import { useState } from "react"
+import { Clock, CheckCircle2, XCircle, Eye, Heart, Calendar, Tag, Globe, Pencil, Trash2, Star, Crown } from "lucide-react"
 import { imageUrl } from "../../../../utils/imageUrl"
 
 const statusConfig = {
@@ -28,7 +29,8 @@ const statusConfig = {
   },
 }
 
-function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickReject, onEdit, onDelete }) {
+function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickReject, onEdit, onDelete, onSetFeatured }) {
+  const [featuredMenuOpen, setFeaturedMenuOpen] = useState(false)
   const status =
     statusConfig[project.status] || {
       label: project.status || "Status",
@@ -54,18 +56,93 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
 
+        {project.featured_slot && (
+          <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 rounded-full border border-amber-300/50 bg-gradient-to-r from-amber-500/90 to-yellow-400/90 px-2 py-1 text-[10px] font-bold text-amber-950 shadow-md backdrop-blur-sm">
+            <Crown size={11} />
+            Unggulan #{project.featured_slot}
+          </span>
+        )}
+
         <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5">
+          {project.status === "published" && (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setFeaturedMenuOpen((v) => !v)
+                }}
+                className={`flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border backdrop-blur-md transition-all shadow-lg ${
+                  project.featured_slot
+                    ? "border-amber-400 bg-amber-500 text-amber-950 font-bold hover:bg-amber-400"
+                    : "border-blue-400/40 bg-blue-950/90 text-white hover:bg-blue-900 hover:border-blue-300"
+                }`}
+                title="Karya Unggulan (podium hall 3D)"
+                aria-label="Atur karya unggulan"
+              >
+                <Star className={`h-4 w-4 ${project.featured_slot ? "fill-current" : ""}`} />
+              </button>
+
+              {featuredMenuOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setFeaturedMenuOpen(false)
+                    }}
+                  />
+                  <div className="absolute right-0 z-20 mt-1.5 w-48 overflow-hidden rounded-xl border border-blue-500/30 bg-blue-950 py-1.5 shadow-2xl shadow-black/60 backdrop-blur-xl">
+                    <p className="px-3 pt-1 pb-1 text-[10px] font-bold uppercase tracking-wider text-blue-300">
+                      Slot Karya Unggulan
+                    </p>
+                    {[1, 2].map((slot) => (
+                      <button
+                        key={slot}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setFeaturedMenuOpen(false)
+                          onSetFeatured?.(project, slot)
+                        }}
+                        className={`flex w-full cursor-pointer items-center justify-between px-3.5 py-2 text-xs font-semibold transition-colors hover:bg-blue-900/60 ${
+                          project.featured_slot === slot ? "text-amber-300 font-bold" : "text-white"
+                        }`}
+                      >
+                        Slot {slot}
+                        {project.featured_slot === slot && <Crown size={13} className="text-amber-300" />}
+                      </button>
+                    ))}
+                    {project.featured_slot && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setFeaturedMenuOpen(false)
+                          onSetFeatured?.(project, null)
+                        }}
+                        className="flex w-full cursor-pointer items-center gap-1.5 border-t border-blue-500/30 px-3.5 py-2 text-xs font-semibold text-red-300 transition-colors hover:bg-red-500/20"
+                      >
+                        <XCircle size={13} />
+                        Lepas dari Unggulan
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation()
               onEdit?.(project)
             }}
-            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-black/60 text-slate-300 backdrop-blur-sm transition hover:bg-cyan-400/20 hover:text-cyan-300"
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border border-blue-400/40 bg-blue-950/90 text-white backdrop-blur-md transition-all shadow-lg hover:bg-blue-900 hover:border-blue-300"
             title="Edit project"
             aria-label="Edit project"
           >
-            <Pencil className="h-3.5 w-3.5" />
+            <Pencil className="h-4 w-4" />
           </button>
           <button
             type="button"
@@ -73,11 +150,11 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
               e.stopPropagation()
               onDelete?.(project)
             }}
-            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-black/60 text-slate-300 backdrop-blur-sm transition hover:bg-red-500/20 hover:text-red-400"
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border border-red-500/40 bg-red-950/90 text-white backdrop-blur-md transition-all shadow-lg hover:bg-red-900 hover:border-red-400"
             title="Hapus project"
             aria-label="Hapus project"
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <Trash2 className="h-4 w-4" />
           </button>
         </div>
 

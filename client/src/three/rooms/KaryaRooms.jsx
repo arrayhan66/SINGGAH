@@ -14,9 +14,9 @@ import {
   FloorLamp,
   WallClock,
   WallFrames,
-  LesehanTable,
   PresidentPortrait,
   RoundRug,
+  RoundTable,
   HangingPlant,
   RectRug,
 } from "../components/HomeDecor"
@@ -44,10 +44,37 @@ import {
   STAIR_STEPS_COUNT,
   ROW_Z0,
   PORTAL_W,
+  ROOM_CENTER_Z,
+  BOOKCASE_RING,
+  PLANT_RING,
+  PLANT_RING_JITTER,
+  LAMP_ACCENT_ANGLES,
+  LAMP_ACCENT_RADIUS,
+  OTTOMAN_CIRCLE,
+  ringAngle,
+  ringPosition,
+  ringRotationY,
 } from "./museumLayout"
 
 const H = MUSEUM.height
 const FEATURED_ON_PODIUM = 2
+
+// Pilih karya unggulan untuk podium: prioritas project yang ditandai admin
+// lewat featured_slot (1 & 2). Kalau belum ada yang ditandai, fallback ke
+// perilaku lama (2 project terakhir).
+const pickFeatured = (list) => {
+  const flagged = list
+    .filter((p) => p.featured_slot === 1 || p.featured_slot === 2)
+    .sort((a, b) => a.featured_slot - b.featured_slot)
+  if (flagged.length > 0) return flagged.slice(0, FEATURED_ON_PODIUM)
+  return list.slice(-FEATURED_ON_PODIUM)
+}
+
+// Project untuk dinding: buang yang sedang dipajang di podium.
+const withoutFeatured = (list) => {
+  const ids = new Set(pickFeatured(list).map((p) => p.id))
+  return list.filter((p) => !ids.has(p.id))
+}
 
 // ---- Shared geometry & materials for the decorated staircase ----
 const STAIR_RUNNER_W = STAIR_WIDTH - 0.14
@@ -65,44 +92,124 @@ const STAIR_NOSING_MAT = new THREE.MeshStandardMaterial({ color: "#c9a35e", meta
 const STAIR_CARPET_MAT = new THREE.MeshStandardMaterial({ color: "#16304f", roughness: 0.95 })
 const STAIR_TRIM_MAT = new THREE.MeshStandardMaterial({ color: "#c9a35e", metalness: 0.6, roughness: 0.35 })
 
-// Shared geometry/material for the ring of reading ottomans, instanced per room.
-const OTTOMAN_LEG_GEO = new THREE.BoxGeometry(0.06, 0.32, 0.06)
-const OTTOMAN_SEAT_GEO = new THREE.BoxGeometry(0.62, 0.24, 0.42)
-const OTTOMAN_TOP_GEO = new THREE.BoxGeometry(0.54, 0.08, 0.36)
-const OTTOMAN_LEG_MAT = new THREE.MeshStandardMaterial({ color: "#1f2f4e", roughness: 0.55 })
-const OTTOMAN_SEAT_MAT = new THREE.MeshStandardMaterial({ color: "#3f5a7f", roughness: 0.9 })
-const OTTOMAN_TOP_MAT = new THREE.MeshStandardMaterial({ color: "#e9eef6", roughness: 0.95 })
-const OTTOMAN_LEG_OFFSETS = [
-  [-0.2, -0.12],
-  [0.2, -0.12],
-  [-0.2, 0.12],
-  [0.2, 0.12],
-]
+// Round pouf ottoman for the reading circle. Clicking it sits the player on
+// the pouf facing the centre table (sit action = snap to node + face local +z).
+const POUF_FABRICS = ["#3f5a7f", "#c9a35e", "#3a6a5a", "#e9eef6", "#f3ecd9", "#7dd3fc"]
 
-function InstancedOttoman({ items }) {
-  const data = useMemo(() => {
-    const legs = []
-    const seats = []
-    const tops = []
-    for (const o of items) {
-      const c = Math.cos(o.rotY)
-      const s = Math.sin(o.rotY)
-      for (const [lx, lz] of OTTOMAN_LEG_OFFSETS) {
-        legs.push({
-          position: [o.x + c * lx - s * lz, 0.16, o.z + s * lx + c * lz],
-          rotation: [0, o.rotY, 0],
-        })
-      }
-      seats.push({ position: [o.x, 0.34, o.z], rotation: [0, o.rotY, 0] })
-      tops.push({ position: [o.x, 0.5, o.z], rotation: [0, o.rotY, 0] })
-    }
-    return { legs, seats, tops }
-  }, [items])
+function PoufOttoman({ position, rotationY = 0, fabric = POUF_FABRICS[0] }) {
   return (
-    <group userData={{ noCollide: true }}>
-      <InstancedMeshes geometry={OTTOMAN_LEG_GEO} material={OTTOMAN_LEG_MAT} transforms={data.legs} count={data.legs.length} castShadow />
-      <InstancedMeshes geometry={OTTOMAN_SEAT_GEO} material={OTTOMAN_SEAT_MAT} transforms={data.seats} count={data.seats.length} castShadow />
-      <InstancedMeshes geometry={OTTOMAN_TOP_GEO} material={OTTOMAN_TOP_MAT} transforms={data.tops} count={data.tops.length} />
+    <group position={position} rotation={[0, rotationY, 0]} userData={{ action: { type: "sit" } }}>
+      {/* Weighted base */}
+      <mesh position={[0, 0.07, 0]} castShadow>
+        <cylinderGeometry args={[0.36, 0.31, 0.14, 24]} />
+        <meshStandardMaterial color="#1f2f4e" roughness={0.85} />
+      </mesh>
+      {/* Main cushion */}
+      <mesh position={[0, 0.24, 0]} castShadow>
+        <cylinderGeometry args={[0.4, 0.35, 0.22, 24]} />
+        <meshStandardMaterial color={fabric} roughness={0.95} />
+      </mesh>
+      {/* Piping seam */}
+      <mesh position={[0, 0.35, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.385, 0.016, 10, 32]} />
+        <meshStandardMaterial color="#f3ecd9" roughness={0.9} />
+      </mesh>
+      {/* Soft domed top */}
+      <mesh position={[0, 0.35, 0]} scale={[1, 0.4, 1]} castShadow>
+        <sphereGeometry args={[0.39, 24, 16]} />
+        <meshStandardMaterial color={fabric} roughness={0.95} />
+      </mesh>
+      {/* Tufting button */}
+      <mesh position={[0, 0.505, 0]}>
+        <sphereGeometry args={[0.032, 10, 8]} />
+        <meshStandardMaterial color="#c9a35e" metalness={0.6} roughness={0.4} />
+      </mesh>
+    </group>
+  )
+}
+
+// Central reading circle shared by both storeys: a ring of low bookcases
+// facing radially outward around one grand round carpet, with a round table
+// at the centre and sittable pouf ottomans gathered around it, plus a
+// greenery ring outside the bookcases and warm floor-lamp accents beyond.
+// Positions come from museumLayout so the collision circles in
+// objectColliders.js always match the visuals.
+function ReadingRing({ room, y = 0 }) {
+  const cx = (room.x[0] + room.x[1]) / 2
+  const rugMap = useMemo(() => textures.roundRug(), [])
+
+  const bookcases = useMemo(
+    () =>
+      Array.from({ length: BOOKCASE_RING.count }, (_, i) => {
+        const a = ringAngle(i, BOOKCASE_RING.count, BOOKCASE_RING.phase)
+        const [x, z] = ringPosition(cx, BOOKCASE_RING.radius, a)
+        return { key: i, x, z, rotY: ringRotationY(a), variant: i % 3 }
+      }),
+    [cx],
+  )
+
+  const plants = useMemo(
+    () =>
+      Array.from({ length: PLANT_RING.count }, (_, i) => {
+        const a =
+          ringAngle(i, PLANT_RING.count, PLANT_RING.phase) + PLANT_RING_JITTER.angle[i]
+        const [x, z] = ringPosition(cx, PLANT_RING.radius + PLANT_RING_JITTER.radius[i], a)
+        return { key: i, x, z, variant: ["tall", "topiary", "flower"][i % 3] }
+      }),
+    [cx],
+  )
+
+  const lamps = useMemo(
+    () =>
+      LAMP_ACCENT_ANGLES.map((a, i) => {
+        const [x, z] = ringPosition(cx, LAMP_ACCENT_RADIUS, a)
+        return { key: i, x, z }
+      }),
+    [cx],
+  )
+
+  const poufs = useMemo(() => {
+    const items = []
+    for (let i = 0; i < OTTOMAN_CIRCLE.count; i++) {
+      const a = (i / OTTOMAN_CIRCLE.count) * Math.PI * 2 + Math.PI / OTTOMAN_CIRCLE.count
+      items.push({
+        key: i,
+        x: cx + Math.cos(a) * OTTOMAN_CIRCLE.radius,
+        z: ROOM_CENTER_Z + Math.sin(a) * OTTOMAN_CIRCLE.radius,
+        rotY: -(a + Math.PI / 2),
+        fabric: POUF_FABRICS[i % POUF_FABRICS.length],
+      })
+    }
+    return items
+  }, [cx])
+
+  return (
+    <group>
+      {/* Grand circular carpet filling the bookcase ring */}
+      <RoundRug position={[cx, y + 0.015, ROOM_CENTER_Z]} radius={6.9} map={rugMap} />
+
+      {/* Circular wall of low bookcases */}
+      {bookcases.map((b) => (
+        <Bookcase key={b.key} position={[b.x, y, b.z]} rotationY={b.rotY} variant={b.variant} low />
+      ))}
+
+      {/* Greenery ring just outside the bookcases */}
+      {plants.map((p) => (
+        <Plant key={p.key} position={[p.x, y, p.z]} variant={p.variant} flowerColor="#7dd3fc" />
+      ))}
+
+      {/* Warm floor-lamp accents outside the plants */}
+      {lamps.map((l) => (
+        <FloorLamp key={l.key} position={[l.x, y, l.z]} rotationY={0.6} />
+      ))}
+
+      {/* Round table at the centre of the carpet */}
+      <RoundTable position={[cx, y, ROOM_CENTER_Z]} rotationY={0.4} radius={1.5} height={0.42} />
+
+      {/* Sittable poufs around the table, each facing the centre */}
+      {poufs.map((p) => (
+        <PoufOttoman key={p.key} position={[p.x, y, p.z]} rotationY={p.rotY} fabric={p.fabric} />
+      ))}
     </group>
   )
 }
@@ -167,6 +274,7 @@ function FloorLabel({ position, text }) {
         anchorY="middle"
         letterSpacing={0.03}
         raycast={() => null}
+        font="/fonts/Poppins-Medium.ttf"
       >
         {text}
       </Text>
@@ -301,6 +409,7 @@ function DosenStairSign({ room, y = 3.2 }) {
         outlineWidth={0.02}
         outlineColor="#0b1220"
         raycast={() => null}
+        font="/fonts/Poppins-SemiBold.ttf"
       >
         KARYA DOSEN
       </Text>
@@ -364,7 +473,6 @@ function RoomDecorGround({ room, projects }) {
   const x0 = room.x[0]
   const x1 = room.x[1]
   const cx = (x0 + x1) / 2
-  const rugMap = useMemo(() => textures.roundRug(), [])
 
   return (
     <group key={`decor-ground-${room.id}`}>
@@ -372,33 +480,10 @@ function RoomDecorGround({ room, projects }) {
 
       <Plant position={[x1 - 2.5, 0, 36]} variant="flower" flowerColor="#60a5fa" />
       <Plant position={[x0 + STAIR_WIDTH + 1.2, 0, STAIR_Z0 - 3.4]} variant="flower" flowerColor="#f8fafc" />
-      <Plant position={[cx + 1.3 - 6.6, 0, 36]} variant="tall" />
-      <Plant position={[cx + 1.3 + 6.6, 0, 36]} variant="tall" />
 
-      {[44, 56, 68].map((z, i) => (
-        <group key={`ott-l-${i}`}>
-          <FloorLamp position={[x0 + 4.0, 0, z + 1.6]} rotationY={0.8} />
-          <RoundRug position={[x0 + 4.0, 0.015, z]} radius={1.6} map={rugMap} />
-          <Bookcase position={[x0 + 5.8, 0, z]} rotationY={-Math.PI / 2} variant={i % 3} low />
-          <Bookcase position={[x0 + 13.5, 0, z]} rotationY={-Math.PI / 2} variant={i % 3} />
-        </group>
-      ))}
+      <ReadingRing room={room} y={0} />
 
-      {[44, 56, 68].map((z, i) => (
-        <group key={`ott-r-${i}`}>
-          <FloorLamp position={[x1 - 4.0, 0, z + 1.6]} rotationY={-0.8} />
-          <RoundRug position={[x1 - 4.0, 0.015, z]} radius={1.6} map={rugMap} />
-          <Bookcase position={[x1 - 5.8, 0, z]} rotationY={Math.PI / 2} variant={i % 3} low />
-          <Bookcase position={[x1 - 13.5, 0, z]} rotationY={Math.PI / 2} variant={i % 3} />
-        </group>
-      ))}
-
-      <Plant position={[cx - 8.0, 0, 52]} variant="topiary" />
-      <Plant position={[cx + 8.0, 0, 52]} variant="topiary" />
-      <Plant position={[cx - 9.5, 0, 48]} variant="tall" scale={1.5} potColor="#f1f5f9" />
-      <Plant position={[cx + 9.5, 0, 48]} variant="tall" scale={1.5} potColor="#f1f5f9" />
-
-      <FeaturedWork position={[cx + 9.5, 0, 32]} rotationY={-0.46} projects={projects.slice(-FEATURED_ON_PODIUM)} />
+      <FeaturedWork position={[cx + 9.5, 0, 32]} rotationY={-0.46} projects={pickFeatured(projects)} />
 
       <WallClock position={[cx, 5.6, room.z[1] - 0.45]} rotationY={Math.PI} scale={1.3} />
       <PresidentPortrait position={[cx + 2.0, 5.5, room.z[1] - 0.45]} rotationY={Math.PI} image={prabowoImg} />
@@ -446,7 +531,6 @@ function RoomDecorUpper({ room, projects }) {
   const x1 = room.x[1]
   const cx = (x0 + x1) / 2
   const Y = FLOOR2_Y
-  const rugMap = useMemo(() => textures.roundRug(), [])
   const wallPlaster = useMemo(() => textures.wallPlaster(), [])
 
   return (
@@ -511,34 +595,11 @@ function RoomDecorUpper({ room, projects }) {
 
       <Plant position={[x1 - 2.5, Y, 42]} variant="flower" flowerColor="#60a5fa" />
       <Plant position={[x0 + 4.5, Y, 42]} variant="flower" flowerColor="#f8fafc" />
-      <Plant position={[cx + 1.3 - 6.6, Y, 42]} variant="tall" />
-      <Plant position={[cx + 1.3 + 6.6, Y, 42]} variant="tall" />
 
-      {[54, 66, 78].map((z, i) => (
-        <group key={`ott-l-${i}`}>
-          <FloorLamp position={[x0 + 4.0, Y, z + 1.6]} rotationY={0.8} />
-          <RoundRug position={[x0 + 4.0, Y + 0.015, z]} radius={1.6} map={rugMap} />
-          <Bookcase position={[x0 + 5.8, Y, z]} rotationY={-Math.PI / 2} variant={i % 3} low />
-          <Bookcase position={[x0 + 13.5, Y, z]} rotationY={-Math.PI / 2} variant={i % 3} />
-        </group>
-      ))}
-
-      {[54, 66, 78].map((z, i) => (
-        <group key={`ott-r-${i}`}>
-          <FloorLamp position={[x1 - 4.0, Y, z + 1.6]} rotationY={-0.8} />
-          <RoundRug position={[x1 - 4.0, Y + 0.015, z]} radius={1.6} map={rugMap} />
-          <Bookcase position={[x1 - 5.8, Y, z]} rotationY={Math.PI / 2} variant={i % 3} low />
-          <Bookcase position={[x1 - 13.5, Y, z]} rotationY={Math.PI / 2} variant={i % 3} />
-        </group>
-      ))}
-
-      <Plant position={[cx - 8.0, Y, 60]} variant="topiary" />
-      <Plant position={[cx + 8.0, Y, 60]} variant="topiary" />
-      <Plant position={[cx - 9.5, Y, 60]} variant="tall" scale={1.5} potColor="#f1f5f9" />
-      <Plant position={[cx + 9.5, Y, 60]} variant="tall" scale={1.5} potColor="#f1f5f9" />
+      <ReadingRing room={room} y={Y} />
 
       {projects.length > 0 && (
-        <FeaturedWork position={[cx + 9.5, Y, 32]} rotationY={-0.46} projects={projects.slice(-FEATURED_ON_PODIUM)} />
+        <FeaturedWork position={[cx + 9.5, Y, 32]} rotationY={-0.46} projects={pickFeatured(projects)} />
       )}
 
       <WallClock position={[cx, Y + 5.6, room.z[1] - 0.45]} rotationY={Math.PI} scale={1.3} />
@@ -646,8 +707,8 @@ export function KaryaRooms({ groups, marbleMap, archways }) {
               const dosenAll = groups.dosen[cat] || []
               const list =
                 level === "ground"
-                  ? mhsAll.slice(0, mhsAll.length - FEATURED_ON_PODIUM)
-                  : dosenAll.slice(0, dosenAll.length - FEATURED_ON_PODIUM)
+                  ? withoutFeatured(mhsAll)
+                  : withoutFeatured(dosenAll)
               const wallDefs = paintingWalls[room.id]?.[level] || []
               const extraRails = roomRails[room.id]?.[level] || []
               const placed = layoutPaintings(room.id, list, level)

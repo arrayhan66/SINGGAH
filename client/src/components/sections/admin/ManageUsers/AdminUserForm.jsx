@@ -5,6 +5,7 @@ import AdminLayout from "../../../../layouts/AdminLayout"
 import { useUsers } from "../../../../context/UserContext"
 import AdminUserFormMain from "../../../../components/sections/admin/ManageUsers/AdminUserFormMain"
 import AdminUserFormSidebar from "../../../../components/sections/admin/ManageUsers/AdminUserFormSidebar"
+import Toast from "../../../../components/ui/Toast"
 
 const emptyForm = {
   name: "",
@@ -59,10 +60,15 @@ function AdminUserForm() {
   }
 
   const [saving, setSaving] = useState(false)
+  const [notification, setNotification] = useState(null)
+
+  function notifyError(message) {
+    setNotification({ type: "error", message })
+  }
 
   async function handlePublish() {
     if (!formData.name.trim() || !formData.email.trim()) {
-      alert("Nama dan email wajib diisi")
+      notifyError("Nama dan email wajib diisi")
       return
     }
 
@@ -72,7 +78,7 @@ function AdminUserForm() {
       if (isEditMode) {
         const existing = getUserByUsername(slug)
         if (!existing) {
-          alert("User tidak ditemukan di daftar. Muat ulang halaman lalu coba lagi.")
+          notifyError("User tidak ditemukan di daftar. Muat ulang halaman lalu coba lagi.")
           setSaving(false)
           return
         }
@@ -91,7 +97,7 @@ function AdminUserForm() {
       navigate("/users")
     } catch (err) {
       setSaving(false)
-      alert(
+      notifyError(
         err.response?.data?.message ||
           "Gagal menyimpan user. Silakan coba lagi.",
       )
@@ -100,6 +106,13 @@ function AdminUserForm() {
 
   return (
     <AdminLayout>
+      {notification && (
+        <Toast
+          message={notification.message}
+          type={notification.type}
+          onDone={() => setNotification(null)}
+        />
+      )}
       <div className="px-6 pt-6 pb-10 md:px-10 md:pt-8">
         <button
           onClick={() => navigate("/users")}

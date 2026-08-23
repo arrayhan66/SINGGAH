@@ -99,6 +99,7 @@ function Hologram({ title = "SINGGAH" }) {
         anchorX="center"
         anchorY="middle"
         raycast={() => null}
+        font="/fonts/Poppins-SemiBold.ttf"
       >
         {title}
       </Text>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import api from "../services/api"
 import { useAuth } from "../context/AuthContext"
+import { useTheme } from "../context/ThemeContext"
 import Maintenance from "../pages/Maintenance/Maintenance"
 
 const AUTH_PATHS = [
@@ -17,6 +18,8 @@ function isAuthPath() {
 
 function MaintenanceGate({ children }) {
   const { user } = useAuth()
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
   const [state, setState] = useState({ loading: true, maintenance: false })
 
   useEffect(() => {
@@ -63,8 +66,16 @@ function MaintenanceGate({ children }) {
 
   if (state.loading) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-[#0b1220]">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#38bdf8] border-t-transparent" />
+      <div
+        className={`flex h-screen w-screen items-center justify-center ${
+          isDark ? "bg-night" : "bg-paper"
+        }`}
+      >
+        <div
+          className={`h-8 w-8 animate-spin rounded-full border-2 border-t-transparent ${
+            isDark ? "border-sky-400" : "border-sky-600"
+          }`}
+        />
       </div>
     )
   }

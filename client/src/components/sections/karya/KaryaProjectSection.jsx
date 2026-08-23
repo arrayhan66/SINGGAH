@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from "react-router-dom"
 import { ArrowLeft } from "lucide-react"
 import DustBackground from "../../ui/DustBackground"
 import GlowBackground from "../../ui/GlowBackground"
+import PCBBackground from "../../ui/PCBBackground"
 import useSearchAndExpand from "../../../hooks/useSearchAndExpand"
 import SearchBar from "../../ui/SearchBar"
 import OutlineButton from "../../ui/OutlineButton"
@@ -103,6 +104,7 @@ function KaryaProjectSection() {
       className="relative min-h-screen overflow-hidden bg-brand-dark pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-8 sm:pb-10 md:pb-12 lg:pb-16 xl:pb-18 3xl:pb-20 4xl:pb-24"
     >
       <GlowBackground />
+      <PCBBackground />
       <DustBackground />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-5 md:px-8 lg:px-10 xl:px-12 relative xl:max-w-[1280px] 3xl:max-w-[1600px] 3xl:px-14 4xl:max-w-[2000px] 4xl:px-16">

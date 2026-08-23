@@ -78,6 +78,16 @@ export function ProjectProvider({ children }) {
     }
   }, [fetchProjects])
 
+  const setFeaturedSlot = useCallback(async (id, slot) => {
+    try {
+      await api.patch(`/projects/${id}/featured`, { slot })
+      await fetchProjects()
+    } catch (err) {
+      console.error("Failed to set featured slot:", err)
+      throw err
+    }
+  }, [fetchProjects])
+
   const getProjectById = useCallback((id) => {
     return projects.find((p) => String(p.id) === String(id))
   }, [projects])
@@ -93,6 +103,7 @@ export function ProjectProvider({ children }) {
     deleteProject,
     approveProject,
     rejectProject,
+    setFeaturedSlot,
     getProjectById,
     getProjectBySlug,
   }

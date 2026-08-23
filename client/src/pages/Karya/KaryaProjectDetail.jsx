@@ -1,11 +1,14 @@
 import MainLayout from "../../layouts/MainLayout"
 import KaryaProjectDetailSection from "../../components/sections/karya/KaryaProjectDetailSection"
+import "../../styles/detail-light.css"
 
 function KaryaProjectDetail() {
   return (
-    <MainLayout>
-      <KaryaProjectDetailSection />
-    </MainLayout>
+    <div className="karya-projectdetail-page light-page detail-page">
+      <MainLayout>
+        <KaryaProjectDetailSection />
+      </MainLayout>
+    </div>
   )
 }
 

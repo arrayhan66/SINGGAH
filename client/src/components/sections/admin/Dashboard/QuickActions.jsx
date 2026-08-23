@@ -19,9 +19,9 @@ function QuickActions() {
           <button
             key={action.to}
             onClick={() => navigate(action.to)}
-            className="group flex cursor-pointer flex-col items-center gap-2.5 rounded-[18px] border border-white/[0.06] bg-[#0E2745] p-5 shadow-[0_12px_28px_rgba(0,0,0,.18)] transition-all duration-250 hover:-translate-y-[3px] hover:border-white/[0.12] hover:bg-[#123255] hover:shadow-[0_12px_30px_rgba(0,0,0,.25)]"
+            className="group flex cursor-pointer flex-col items-center gap-2.5 rounded-[18px] border border-white/[0.06] bg-night-elevated p-5 shadow-[0_12px_28px_rgba(0,0,0,.18)] transition-all duration-250 hover:-translate-y-[3px] hover:border-white/[0.12] hover:bg-night-raised hover:shadow-[0_12px_30px_rgba(0,0,0,.25)]"
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#123255] transition-colors group-hover:bg-[#163B61]">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-night-raised transition-colors group-hover:bg-night-focus">
               <Icon size={22} className={`${action.color} transition-transform duration-200 group-hover:scale-110`} />
             </div>
             <span className="flex items-center gap-1.5 text-xs font-medium text-slate-300 md:text-sm">

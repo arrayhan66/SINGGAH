@@ -1,0 +1,253 @@
+/* ============================================================
+   LIGHT MODE - HALAMAN DETAIL (Berita Detail, Karya Detail,
+   Karya Project Detail). Tema off-white + biru, konsisten
+   dengan halaman utama. Dark mode tidak tersentuh.
+   ============================================================ */
+@import "./light-shared.css";
+
+/* ===== SECTION BACKGROUND ===== */
+/* Grid kotak-kotak lembut & buram — senada dengan halaman Karya.
+   Berlaku utk: Karya Detail (#karya-detail), Project Detail
+   (#karya-project-detail), dan semua state section di Berita Detail */
+html.light .karya-detail-page #karya-detail.bg-brand-dark,
+html.light .karya-projectdetail-page #karya-project-detail.bg-brand-dark,
+html.light .berita-detail-page section.bg-brand-dark {
+  background-color: #edf3fa;
+  background-image: linear-gradient(rgba(37, 99, 235, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.09) 1px, transparent 1px),
+    linear-gradient(180deg, #f7fafd 0%, #edf3fa 55%, #e6edf7 100%);
+  background-size: 40px 40px, 40px 40px, auto;
+}
+
+/* Komponen PCBBackground (grid dark mode) disembunyikan di light mode
+   supaya tidak dobel dengan grid CSS di atas */
+html.light .karya-detail-page #karya-detail > .pointer-events-none.opacity-20,
+html.light
+  .karya-projectdetail-page
+  #karya-project-detail
+  > .pointer-events-none.opacity-20,
+html.light
+  .berita-detail-page
+  section.bg-brand-dark
+  > .pointer-events-none.opacity-20 {
+  display: none;
+}
+
+/* ===== TEKS ===== */
+html.light .detail-page h1.text-white,
+html.light .detail-page h2.text-white,
+html.light .detail-page h3.text-white {
+  color: #1e3a8a;
+}
+html.light .detail-page .text-slate-300 {
+  color: #475569;
+}
+html.light .detail-page .text-slate-400 {
+  color: #64748b;
+}
+html.light .detail-page .text-cyan-300 {
+  color: #2563eb;
+}
+
+/* ===== HEADER HALAMAN ===== */
+/* Judul nama kategori: tipografi 3D — muka gradasi biru dengan kilap
+   di atas, ekstrusi gelap bertingkat ke bawah + bayangan ambien lembut,
+   supaya tetap tegas di atas bg putih */
+html.light .karya-detail-page #karya-detail h2.text-white {
+  letter-spacing: -0.02em;
+  background-image: linear-gradient(
+    180deg,
+    #93c5fd 0%,
+    #3b82f6 38%,
+    #2563eb 62%,
+    #1e40af 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter:
+    drop-shadow(0 1px 0 #1e40af)
+    drop-shadow(0 2px 0 #1d4ed8)
+    drop-shadow(0 4px 1px rgba(29, 78, 216, 0.5))
+    drop-shadow(0 14px 26px rgba(30, 64, 175, 0.32));
+}
+
+/* Garis aksen kecil di bawah judul: pil gradasi cyan -> biru */
+html.light .karya-detail-page #karya-detail h2.text-white::after {
+  content: "";
+  display: block;
+  width: 88px;
+  height: 5px;
+  margin: 16px auto 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #22d3ee, #2563eb);
+  box-shadow: 0 6px 14px -4px rgba(37, 99, 235, 0.55);
+}
+
+/* ===== PERMUKAAN & BORDER ===== */
+html.light .detail-page .bg-white\/5 {
+  background-color: #fbfcfe;
+}
+html.light .detail-page .bg-white\/10 {
+  background-color: #f4f8fd;
+}
+html.light .detail-page .border-white\/10 {
+  border-color: #e2e8f0;
+}
+html.light .detail-page .border-white\/20 {
+  border-color: #dbe4f2;
+}
+html.light .detail-page .divide-white\/10 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #e9eff8;
+}
+
+/* ===== BADGE / CHIP IKON ===== */
+html.light .detail-page .bg-cyan-400\/10.border-cyan-400\/30 {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+}
+html.light .detail-page .bg-cyan-400\/10.border-cyan-400\/30 svg {
+  color: #2563eb;
+}
+
+/* ===== SEARCH BAR ===== */
+/* Disamakan PERSIS dengan search bar halaman Karya:
+   permukaan putih natural + fokus border biru muda & glow biru */
+html.light .karya-detail-page .border-white\/60.bg-white\/90 {
+  background-color: #fbfcfe;
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 16px -8px rgba(15, 23, 42, 0.12);
+}
+html.light .karya-detail-page .focus-within\:border-cyan-400:focus-within {
+  border-color: #93c5fd;
+}
+html.light .karya-detail-page .focus-within\:shadow-cyan-400\/30:focus-within {
+  box-shadow:
+    0 14px 28px -10px rgba(37, 99, 235, 0.38),
+    0 6px 12px -6px rgba(37, 99, 235, 0.22);
+}
+
+/* ===== TOMBOL KEMBALI / AKSI ===== */
+html.light .detail-page button svg {
+  color: inherit;
+}
+
+/* Tombol kembali (pill kiri atas): LIGHT MODE jadi gradasi cyan -> biru
+   senada badge kategori & tombol "Lihat Detail"; teks/ikon putih,
+   lingkaran ikon putih transparan, hover menggelap + terangkat */
+html.light
+  .karya-detail-page
+  a.rounded-full.border-white\/10.bg-white\/5 {
+  border-color: rgba(255, 255, 255, 0.35);
+  background-color: #2563eb;
+  background-image: linear-gradient(135deg, #22d3ee 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 6px 16px -6px rgba(37, 99, 235, 0.55);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+html.light
+  .karya-detail-page
+  a.rounded-full.border-white\/10.bg-white\/5
+  span.rounded-full.bg-white\/10 {
+  background-color: rgba(255, 255, 255, 0.22);
+}
+html.light
+  .karya-detail-page
+  a.rounded-full.border-white\/10.bg-white\/5:hover {
+  border-color: rgba(255, 255, 255, 0.75);
+  background-color: #1d4ed8;
+  background-image: linear-gradient(135deg, #06b6d4 0%, #1d4ed8 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 10px 22px -8px rgba(37, 99, 235, 0.65);
+  transform: translateY(-1px);
+}
+html.light
+  .karya-detail-page
+  a.rounded-full.border-white\/10.bg-white\/5.hover\:text-cyan-300:hover {
+  color: #ffffff;
+}
+
+/* Tombol "Kembali ke Daftar Kategori" (state kategori tidak ditemukan):
+   gradasi cyan -> biru yang sama agar konsisten */
+html.light
+  .karya-detail-page
+  button.rounded-xl.border-slate-200.bg-white.text-slate-700 {
+  border-color: transparent;
+  background-color: #2563eb;
+  background-image: linear-gradient(135deg, #22d3ee 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 6px 16px -6px rgba(37, 99, 235, 0.55);
+}
+html.light
+  .karya-detail-page
+  button.rounded-xl.border-slate-200.hover\:bg-slate-50:hover {
+  background-color: #1d4ed8;
+  background-image: linear-gradient(135deg, #06b6d4 0%, #1d4ed8 100%);
+  color: #ffffff;
+}
+
+/* ===== CARD KARYA (KaryaProjectCard) ===== */
+/* Aksen mengikuti tombol "Lihat Karya" di section Karya:
+   gradasi cyan -> biru (#22d3ee -> #2563eb) + teks putih. */
+
+/* Badge kategori di atas gambar: gradasi cyan -> biru + teks putih,
+   senada tombol "Lihat Karya" */
+html.light .karya-detail-page span.rounded-full.bg-brand-navy\/80.text-cyan-300 {
+  background-color: #2563eb;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+}
+
+/* Tombol bookmark di atas gambar: gradasi sama + ikon putih */
+html.light .karya-detail-page button.rounded-full.bg-brand-navy\/80.text-slate-200 {
+  background-color: #2563eb;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+}
+/* Hover bookmark jelas terlihat: gradasi meredup, terangkat + glow biru */
+html.light .karya-detail-page button.rounded-full.bg-brand-navy\/80.hover\:border-cyan-400\/30:hover {
+  border-color: rgba(255, 255, 255, 0.85);
+  background-color: #1d4ed8;
+  background-image: linear-gradient(to bottom right, #06b6d4, #1d4ed8);
+  box-shadow: 0 8px 18px -6px rgba(37, 99, 235, 0.6);
+  transform: translateY(-1px) scale(1.07);
+}
+html.light .karya-detail-page button.rounded-full.bg-brand-navy\/80.hover\:text-cyan-300:hover {
+  color: #ffffff;
+}
+/* State tersimpan: ikon putih penuh biar jelas di atas gradasi */
+html.light .karya-detail-page button.rounded-full.bg-brand-navy\/80 svg.text-cyan-400 {
+  color: #ffffff;
+  fill: #ffffff;
+}
+
+/* Nama project di card: hitam lembut #404040 persis judul
+   "SINGGAH SEJENAK" & nama kategori di menu Karya.
+   Ditaruh setelah rule h3.text-white .detail-page agar menang. */
+html.light .karya-detail-page h3.text-white {
+  background-image: none;
+  color: #404040;
+}
+
+/* Tombol "Lihat Detail": gradasi cyan -> biru persis tombol
+   "Lihat Karya", hover meredup ke biru tua */
+html.light .karya-detail-page a.bg-white.text-slate-900 {
+  background-color: #2563eb;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  color: #ffffff;
+}
+html.light .karya-detail-page a.hover\:bg-slate-200:hover {
+  background-color: #1d4ed8;
+  background-image: linear-gradient(to bottom right, #06b6d4, #1d4ed8);
+  color: #ffffff;
+}

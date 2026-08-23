@@ -23,7 +23,7 @@ function AuthBranding({ backTo = "/" }) {
       <div className="relative z-20 flex items-center justify-between w-full">
         <Link
           to={backTo}
-          className="select-none group flex items-center gap-2 rounded-xl border border-cyan-500/30 bg-[#0B2F4A] px-4 py-2.5 text-xs font-semibold text-cyan-100 shadow-lg shadow-cyan-950/20 backdrop-blur-xl transition-all duration-300 hover:-translate-x-1 hover:border-cyan-400 hover:bg-[#103b5e] hover:text-white"
+          className="select-none group flex items-center gap-2 rounded-xl border border-cyan-500/30 bg-night-shade px-4 py-2.5 text-xs font-semibold text-cyan-100 shadow-lg shadow-cyan-950/20 backdrop-blur-xl transition-all duration-300 hover:-translate-x-1 hover:border-cyan-400 hover:bg-night-shade-hover hover:text-white"
         >
           <ArrowLeft
             size={16}

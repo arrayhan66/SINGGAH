@@ -233,7 +233,7 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
           anchorX="center"
           anchorY="middle"
           raycast={() => null}
-          font="/fonts/PlusJakartaSans.ttf"
+          font="/fonts/Poppins-SemiBold.ttf"
         >
           KARYA UNGGULAN
         </Text>
@@ -268,6 +268,7 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
         anchorX="center"
         anchorY="middle"
         raycast={() => null}
+        font="/fonts/Poppins-SemiBold.ttf"
       >
         KARYA UNGGULAN
       </Text>

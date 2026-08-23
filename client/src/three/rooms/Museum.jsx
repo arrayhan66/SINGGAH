@@ -222,6 +222,7 @@ function Museum({ hallData }) {
           outlineWidth={0.04}
           outlineColor="#0b1220"
           raycast={() => null}
+          font="/fonts/Poppins-SemiBold.ttf"
         >
           SINGGAH — VIRTUAL EXHIBITION
         </Text>
@@ -232,6 +233,7 @@ function Museum({ hallData }) {
           anchorX="center"
           anchorY="middle"
           raycast={() => null}
+          font="/fonts/Poppins-Medium.ttf"
         >
           Pameran Karya Dosen & Mahasiswa Jurusan Teknologi Informasi
         </Text>

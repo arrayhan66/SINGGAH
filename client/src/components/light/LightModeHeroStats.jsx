@@ -36,7 +36,7 @@ function LightModeHeroStats({ variant = "card" }) {
 
   if (variant === "mobile") {
     return (
-      <div className="flex flex-col min-[400px]:flex-row items-center justify-between gap-6 min-[400px]:gap-0 rounded-2xl border border-[#E5E9EF] bg-white px-4 md:px-6 py-5 min-[400px]:py-4 shadow-sm backdrop-blur-xl">
+      <div className="flex flex-col min-[400px]:flex-row items-center justify-between gap-6 min-[400px]:gap-0 rounded-2xl border border-paper-border bg-white px-4 md:px-6 py-5 min-[400px]:py-4 shadow-sm backdrop-blur-xl">
         {loading
           ? Array.from({ length: 3 }).map((_, index) => (
               <div key={index} className="flex w-full min-[400px]:w-auto flex-1 items-center justify-start min-[400px]:justify-center gap-4">
@@ -59,10 +59,10 @@ function LightModeHeroStats({ variant = "card" }) {
                   </div>
 
                   <div className="text-left">
-                    <p className="text-base min-[400px]:text-sm md:text-lg font-bold text-[#1B2A4A] leading-none">
+                    <p className="text-base min-[400px]:text-sm md:text-lg font-bold text-navy-ink leading-none">
                       {stat.value}
                     </p>
-                    <p className="mt-1 text-[11px] md:text-sm text-[#6B7280] leading-none">
+                    <p className="mt-1 text-[11px] md:text-sm text-gray-500 leading-none">
                       {stat.label}
                     </p>
                   </div>
@@ -88,7 +88,7 @@ function LightModeHeroStats({ variant = "card" }) {
           ? Array.from({ length: 3 }).map((_, index) => (
               <div
                 key={index}
-                className="flex-1 flex flex-col items-center justify-center gap-2 rounded-2xl border border-[#E5E9EF] bg-white px-8 py-5 2xl:px-10 2xl:py-6 text-center shadow-sm"
+                className="flex-1 flex flex-col items-center justify-center gap-2 rounded-2xl border border-paper-border bg-white px-8 py-5 2xl:px-10 2xl:py-6 text-center shadow-sm"
               >
                 <Skeleton className="h-8 w-12 2xl:h-9 bg-slate-200" />
                 <Skeleton className="h-4 w-20 bg-slate-200" />
@@ -97,13 +97,13 @@ function LightModeHeroStats({ variant = "card" }) {
           : statsData.map((stat) => (
               <div
                 key={stat.label}
-                className="flex-1 flex flex-col items-center justify-center gap-1 rounded-2xl border border-[#E5E9EF] bg-white px-8 py-5 2xl:px-10 2xl:py-6 text-center shadow-sm hover:shadow-md transition-all"
+                className="flex-1 flex flex-col items-center justify-center gap-1 rounded-2xl border border-paper-border bg-white px-8 py-5 2xl:px-10 2xl:py-6 text-center shadow-sm hover:shadow-md transition-all"
               >
                 <h2 className="text-3xl 2xl:text-4xl font-bold text-blue-600">
                   {stat.value}
                 </h2>
 
-                <p className="text-[#6B7280] 2xl:text-lg">{stat.label}</p>
+                <p className="text-gray-500 2xl:text-lg">{stat.label}</p>
               </div>
             ))}
       </div>

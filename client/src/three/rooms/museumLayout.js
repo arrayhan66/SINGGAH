@@ -192,6 +192,39 @@ export function getWalls() {
   return walls
 }
 
+// ---- Central circular bookcase ring + surrounding plant ring ----
+// Shared by KaryaRooms.jsx (visuals) and objectColliders.js (collision) so the
+// two can never drift apart. A ring item at angle `a` sits at
+// (cx + cos(a)*radius, ROOM_CENTER_Z + sin(a)*radius); bookcases face radially
+// outward with rotationY = PI/2 - a so their book spines (+z local) point away
+// from the room centre.
+export const ROOM_CENTER_Z = (ROW_Z0 + ROW_Z1) / 2
+export const BOOKCASE_RING = { radius: 7.5, count: 12, phase: Math.PI / 12 }
+export const PLANT_RING = { radius: 10.75, count: 10, phase: 0.31 }
+// Deterministic per-slot jitter so the plant ring reads natural, not procedural.
+export const PLANT_RING_JITTER = {
+  angle: [0.1, -0.07, 0.05, 0.12, -0.1, 0.06, -0.05, 0.09, -0.08, 0.04],
+  radius: [0, 0.5, -0.4, 0.3, -0.5, 0.45, -0.3, 0.35, -0.45, 0.25],
+}
+// Reading-nook accents (floor lamp + round rug) just outside the plant ring.
+export const LAMP_ACCENT_ANGLES = [Math.PI / 4, (Math.PI * 3) / 4, (-Math.PI * 3) / 4, -Math.PI / 4]
+export const LAMP_ACCENT_RADIUS = 12.3
+// Ottoman seats gathered on the carpet at the centre of the bookcase ring,
+// each one facing the middle of the circle.
+export const OTTOMAN_CIRCLE = { radius: 2.2, count: 6 }
+
+export function ringAngle(i, count, phase) {
+  return phase + (i * Math.PI * 2) / count
+}
+
+export function ringPosition(cx, radius, angle) {
+  return [cx + Math.cos(angle) * radius, ROOM_CENTER_Z + Math.sin(angle) * radius]
+}
+
+export function ringRotationY(angle) {
+  return Math.PI / 2 - angle
+}
+
 // ---- Rooms (floors + ceilings + area labels) ----
 export const rooms = [
   {

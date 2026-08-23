@@ -48,11 +48,11 @@ function LightModeHero() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F3F5F8] text-[#1B2A4A] overflow-x-hidden selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-paper text-navy-ink overflow-x-hidden selection:bg-blue-600 selection:text-white">
       {/* HERO SECTION */}
       <section
         id="hero"
-        className="relative min-h-[100dvh] overflow-hidden bg-[#F3F5F8]"
+        className="relative min-h-[100dvh] overflow-hidden bg-paper"
       >
         {/* Soft light decorative background pattern */}
         <div
@@ -76,7 +76,7 @@ function LightModeHero() {
               </span>
             </div>
 
-            <h1 className="mt-4 text-3xl min-[350px]:text-4xl md:text-5xl lg:text-6xl 2xl:text-7xl font-black leading-tight text-[#1B2A4A]">
+            <h1 className="mt-4 text-3xl min-[350px]:text-4xl md:text-5xl lg:text-6xl 2xl:text-7xl font-black leading-tight text-neutral-900">
               SINGGAH
               <br />
               SEJENAK <span className="text-blue-600">DISINI</span>
@@ -84,7 +84,7 @@ function LightModeHero() {
 
             <div className="mt-5 flex flex-col md:flex-row items-center lg:items-start gap-3">
               <div className="hidden lg:block mt-2 h-13 w-[3px] shrink-0 rounded-full bg-gradient-to-b from-blue-600 to-cyan-400" />
-              <p className="text-xs min-[350px]:text-sm md:text-base lg:text-lg 2xl:text-xl leading-relaxed text-[#6B7280] max-w-md md:max-w-xl 2xl:max-w-2xl">
+              <p className="text-xs min-[350px]:text-sm md:text-base lg:text-lg 2xl:text-xl leading-relaxed text-gray-500 max-w-md md:max-w-xl 2xl:max-w-2xl">
                 Sebuah Karya Ciptaan Civitas Akademika{" "}
                 <span className="font-semibold text-blue-600">
                   #ElektroPoliban
@@ -148,10 +148,10 @@ function LightModeHero() {
       {/* FAQ SECTION */}
       <section
         id="faq"
-        className="relative overflow-hidden bg-[#F3F5F8] pt-6 pb-10 sm:pt-16 sm:pb-16 md:pt-20 md:pb-20 lg:pb-24 3xl:pt-24 3xl:pb-28 4xl:pt-28 4xl:pb-32 border-t border-[#E5E9EF]"
+        className="relative overflow-hidden bg-paper pt-6 pb-10 sm:pt-16 sm:pb-16 md:pt-20 md:pb-20 lg:pb-24 3xl:pt-24 3xl:pb-28 4xl:pt-28 4xl:pb-32 border-t border-paper-border"
       >
         <div className="mx-auto max-w-4xl px-4 sm:max-w-5xl sm:px-5 md:px-8 lg:max-w-6xl xl:max-w-6xl 3xl:max-w-7xl 3xl:px-12 4xl:max-w-[1400px] 4xl:px-16">
-          <h2 className="text-center text-xl font-black text-[#1B2A4A] sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl 3xl:text-5xl 4xl:text-6xl">
+          <h2 className="text-center text-xl font-black text-navy-ink sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl 3xl:text-5xl 4xl:text-6xl">
             Pertanyaan yang <span className="text-blue-600">Sering Diajukan</span>
           </h2>
 
@@ -162,13 +162,13 @@ function LightModeHero() {
               return (
                 <div
                   key={index}
-                  className="rounded-xl border border-[#E5E9EF] bg-white shadow-sm transition hover:border-blue-300 sm:rounded-2xl"
+                  className="rounded-xl border border-paper-border bg-white shadow-sm transition hover:border-blue-300 sm:rounded-2xl"
                 >
                   <button
                     onClick={() => toggleFAQ(index)}
                     className="flex w-full cursor-pointer items-center justify-between gap-3 p-3.5 text-left sm:p-5 md:p-6 lg:p-7 xl:p-8 3xl:p-9 4xl:p-10"
                   >
-                    <span className="text-sm font-semibold text-[#1B2A4A] sm:text-base md:text-lg lg:text-lg xl:text-xl 3xl:text-2xl 4xl:text-3xl">
+                    <span className="text-sm font-semibold text-navy-ink sm:text-base md:text-lg lg:text-lg xl:text-xl 3xl:text-2xl 4xl:text-3xl">
                       {item.question}
                     </span>
 
@@ -188,7 +188,7 @@ function LightModeHero() {
                     }`}
                   >
                     <div className="overflow-hidden">
-                      <p className="px-3.5 pb-3.5 text-justify text-sm leading-6 text-[#6B7280] sm:px-5 sm:pb-5 sm:text-sm sm:leading-7 md:px-6 md:pb-6 md:text-base lg:text-base lg:leading-8 3xl:px-8 3xl:pb-8 3xl:text-lg 3xl:leading-9 4xl:text-xl 4xl:leading-10">
+                      <p className="px-3.5 pb-3.5 text-justify text-sm leading-6 text-gray-500 sm:px-5 sm:pb-5 sm:text-sm sm:leading-7 md:px-6 md:pb-6 md:text-base lg:text-base lg:leading-8 3xl:px-8 3xl:pb-8 3xl:text-lg 3xl:leading-9 4xl:text-xl 4xl:leading-10">
                         {item.answer}
                       </p>
                     </div>

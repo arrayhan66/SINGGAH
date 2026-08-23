@@ -17,14 +17,14 @@ class CanvasErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-[#0b1220] text-white">
-          <div className="text-2xl font-bold text-[#7dd3fc]">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-night text-white">
+          <div className="text-2xl font-bold text-sky-300">
             Maaf, terjadi kendala
           </div>
-          <p className="text-sm text-[#93b4d4]">Scene 3D gagal dimuat.</p>
+          <p className="text-sm text-night-muted">Scene 3D gagal dimuat.</p>
           <button
             onClick={() => window.location.reload()}
-            className="cursor-pointer rounded-xl border border-[#223047] bg-black/50 px-4 py-2 text-sm font-semibold text-[#38bdf8] transition-colors hover:bg-cyan-400/10"
+            className="cursor-pointer rounded-xl border border-night-border bg-black/50 px-4 py-2 text-sm font-semibold text-sky-400 transition-colors hover:bg-cyan-400/10"
           >
             Muat Ulang
           </button>

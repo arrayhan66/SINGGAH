@@ -31,7 +31,7 @@ function AdminHero() {
               {greeting}
               <span className="hidden min-[400px]:inline">, </span>
               <br className="min-[400px]:hidden" />
-              <span className="text-cyan-300">{name}</span>
+              <span className="text-slate-100">{name}</span>
             </h1>
             <p className="mt-1 text-sm text-slate-400 max-w-xl">
               Kelola project, berita, dan aktivitas SINGGAH dari sini.

@@ -110,7 +110,7 @@ function DashboardAnalytics() {
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-7">
-      <div className="rounded-[18px] border border-white/[0.06] bg-[#0E2745] p-5 shadow-[0_12px_28px_rgba(0,0,0,.18)] md:p-6">
+      <div className="rounded-[18px] border border-white/[0.06] bg-night-elevated p-5 shadow-[0_12px_28px_rgba(0,0,0,.18)] md:p-6">
         <div className="mb-3 flex items-center gap-2">
           <BarChart3 className="h-4 w-4 text-slate-400" />
           <h2 className="text-[17px] font-semibold text-white md:text-[18px]">
@@ -119,7 +119,7 @@ function DashboardAnalytics() {
         </div>
         <BarChart data={barData} />
       </div>
-      <div className="rounded-[18px] border border-white/[0.06] bg-[#0E2745] p-5 shadow-[0_12px_28px_rgba(0,0,0,.18)] md:p-6">
+      <div className="rounded-[18px] border border-white/[0.06] bg-night-elevated p-5 shadow-[0_12px_28px_rgba(0,0,0,.18)] md:p-6">
         <div className="mb-3 flex items-center gap-2">
           <PieChart className="h-4 w-4 text-slate-400" />
           <h2 className="text-[17px] font-semibold text-white md:text-[18px]">

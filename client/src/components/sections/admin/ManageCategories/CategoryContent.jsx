@@ -1,5 +1,5 @@
 import { createElement } from "react"
-import { Tag, FolderOpen, PackageOpen, Pencil, Trash2 } from "lucide-react"
+import { Tag, Pencil, Trash2 } from "lucide-react"
 import ShowMoreButton from "../../../../components/ui/ShowMoreButton"
 import CategoryCard from "./CategoryCard"
 import { getCategoryIcon } from "../../../../utils/categoryHelpers"
@@ -44,9 +44,6 @@ export default function CategoryContent({
       </div>
     )
   }
-
-  const activeCats = visibleCategories.filter((c) => (c.projectCount || 0) > 0)
-  const emptyCats = visibleCategories.filter((c) => (c.projectCount || 0) === 0)
 
   return (
     <div className="flex flex-col gap-8">
@@ -122,52 +119,15 @@ export default function CategoryContent({
           </div>
         </div>
       ) : (
-        <div className="flex flex-col gap-8">
-          {activeCats.length > 0 && (
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400">
-                  <FolderOpen size={15} />
-                </div>
-                <h3 className="text-sm font-bold text-white tracking-wide uppercase">
-                  Kategori Berisi Project ({activeCats.length})
-                </h3>
-              </div>
-              <div className="grid grid-cols-1 min-[750px]:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-                {activeCats.map((cat) => (
-                  <CategoryCard
-                    key={cat.id}
-                    cat={cat}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {emptyCats.length > 0 && (
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-500/10 text-slate-400">
-                  <PackageOpen size={15} />
-                </div>
-                <h3 className="text-sm font-bold text-white tracking-wide uppercase">
-                  Kategori Kosong / Belum Ada Project ({emptyCats.length})
-                </h3>
-              </div>
-              <div className="grid grid-cols-1 min-[750px]:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-                {emptyCats.map((cat) => (
-                  <CategoryCard
-                    key={cat.id}
-                    cat={cat}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+        <div className="grid grid-cols-1 min-[750px]:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+          {visibleCategories.map((cat) => (
+            <CategoryCard
+              key={cat.id}
+              cat={cat}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          ))}
         </div>
       )}
 

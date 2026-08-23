@@ -177,6 +177,7 @@ function Centerpiece({ title = "HALL UTAMA" }) {
         anchorX="center"
         anchorY="middle"
         raycast={() => null}
+        font="/fonts/Poppins-SemiBold.ttf"
       >
         {title}
       </Text>

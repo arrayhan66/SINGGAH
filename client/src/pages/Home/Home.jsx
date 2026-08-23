@@ -1,13 +1,16 @@
 import MainLayout from "../../layouts/MainLayout"
 import Hero from "../../components/sections/Hero/Hero"
 import FAQ from "../../components/sections/FAQ"
+import "../../styles/beranda-light.css"
 
 function Home() {
   return (
-    <MainLayout>
-      <Hero />
-      <FAQ />
-    </MainLayout>
+    <div className="beranda-page">
+      <MainLayout>
+        <Hero />
+        <FAQ />
+      </MainLayout>
+    </div>
   )
 }
 

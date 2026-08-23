@@ -91,7 +91,7 @@ export default function MediaLibraryHero({
           </div>
           <div className="min-w-0">
             <h1 className="text-[clamp(1.25rem,0.9375rem+1.5vw,1.5rem)] sm:text-3xl font-black text-white">
-              Media <span className="text-cyan-300">Library</span>
+              Media <span className="text-slate-100">Library</span>
             </h1>
             <p className="mt-1 text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400 max-w-xl">
               Kelola semua file dan gambar yang diupload.

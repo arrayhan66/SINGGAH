@@ -9,6 +9,7 @@ import LogoutConfirmModal from "../ui/LogoutConfirmModal"
 import DeleteConfirmModal from "../ui/DeleteConfirmModal"
 import NotificationDetailModal from "../ui/NotificationDetailModal"
 import AnnouncementModal from "../ui/AnnouncementModal"
+import ThemeToggle from "../ui/ThemeToggle"
 import { sendAnnouncement } from "../../services/notificationService"
 
 const roleLabels = {
@@ -130,6 +131,9 @@ function AdminNavbar() {
 
         {/* RIGHT */}
         <div className="flex items-center gap-2 min-[260px]:gap-1.5 5xl:gap-4 6xl:gap-5">
+        {/* THEME TOGGLE */}
+        <ThemeToggle />
+
         {/* ANNOUNCEMENT BUTTON */}
         <button
           onClick={() => { setAnnounceError(""); setAnnounceSuccess(""); setShowAnnouncement(true); }}

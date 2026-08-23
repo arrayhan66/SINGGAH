@@ -1,0 +1,186 @@
+/*
+  LIGHT SHARED — komponen umum antar halaman (navbar, footer,
+  glow, dust, glass card, tombol outline) untuk Light Mode.
+  Scope: aktif saat <html> punya class "light" (ThemeContext),
+  berlaku GLOBAL di semua halaman (visitor, auth, admin).
+  Dark mode tidak tersentuh sama sekali.
+  Di-import oleh CSS tema tiap halaman (karya-light.css, dll).
+
+  SISTEM PERMUKAAN:
+    Page bg   : #F5F8FC | Hero gradasi #FFFFFF -> #EBF2FC
+    Card      : #FFFFFF + border #D6E4FB + shadow biru
+    Inner box : #EFF6FF + ring #DBEAFE
+    Heading   : #0F172A | Text: #64748B
+    Primary   : #2563EB | Secondary: #0EA5E9 | Soft: #EFF6FF
+*/
+
+/* ===== LOGO ===== */
+/* Beri latar off-white + ring tipis supaya bentuk logo terlihat,
+   tidak melebur ke background terang */
+html.light header div.rounded-xl.overflow-hidden,
+html.light footer div.rounded-xl.overflow-hidden {
+  background-color: #fbfcfe;
+  box-shadow:
+    0 0 0 1px #d7e2f2,
+    0 2px 8px -2px rgba(37, 99, 235, 0.18);
+}
+
+/* ===== GLOW BACKGROUND ===== */
+/* Blob glow cyan/biru hanya tampil di Beranda.
+   Hanya blob asli GlowBackground yang disembunyikan (punya blur-[180px]
+   & rounded-full, direct child section) -> icon box kontak di Tentang
+   yang kebetulan satu class warna TIDAK ikut tersembunyi. */
+html.light section > .pointer-events-none.absolute.rounded-full[class*="blur-[180px"] {
+  display: none;
+}
+
+/* ===== DUST / SPARKLES =====
+   Partikel #7dd3fc terlalu muda di bg terang -> digelapkan via filter
+   (canvas & animasi tidak diubah). Hanya canvas pada background layer:
+   bukan grid (opacity-20) dan bukan elemen overlay terakhir (vignette). */
+html.light section > .pointer-events-none.inset-0:not(.opacity-20):not(:last-child) canvas {
+  filter: brightness(0.48) saturate(3) contrast(1.15);
+}
+
+/* ===== NAVBAR ===== */
+html.light header .border-white\/10.bg-white\/5 {
+  background: linear-gradient(
+    135deg,
+    rgba(234, 243, 255, 0.95) 0%,
+    rgba(250, 252, 254, 0.88) 100%
+  );
+  border-color: #cbdcf6;
+  box-shadow: 0 10px 30px -12px rgba(37, 99, 235, 0.28);
+}
+html.light header h1.text-white {
+  color: #404040;
+}
+html.light .bg-cyan-400\/10 {
+  background-color: #eff6ff;
+}
+html.light .text-cyan-300 {
+  color: #2563eb;
+}
+/* Menu AKTIF: pill biru solid + teks putih -> jelas terlihat
+   (desktop & mobile, elemen punya combo bg-cyan-400/10 + text-cyan-300) */
+html.light header nav .bg-cyan-400\/10.text-cyan-300 {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+html.light header [class*="shadow-[0_0_18px"] {
+  box-shadow: 0 4px 16px -2px rgba(37, 99, 235, 0.45);
+}
+/* Menu tidak aktif saat hover: soft blue jelas di atas navbar */
+html.light header .text-slate-300 {
+  color: #64748b;
+}
+html.light header .hover\:bg-white\/5:hover {
+  background-color: #dbeafe;
+}
+html.light .hover\:text-cyan-300:hover {
+  color: #2563eb;
+}
+html.light .shadow-cyan-500\/20 {
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.22),
+    0 4px 6px -4px rgba(37, 99, 235, 0.14);
+}
+html.light header button span.bg-white {
+  background-color: #0f172a;
+}
+html.light header button span.bg-cyan-300 {
+  background-color: #2563eb;
+}
+html.light header .bg-brand-dark\/95 {
+  background: linear-gradient(
+    165deg,
+    #e9f1fc 0%,
+    #f6faff 48%,
+    #e6eefb 100%
+  );
+  border-color: #cdddf5;
+  box-shadow: 0 16px 40px -16px rgba(37, 99, 235, 0.25);
+}
+html.light header .bg-brand-dark\/95 > .pointer-events-none.opacity-10 {
+  background-image: linear-gradient(rgba(37, 99, 235, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.07) 1px, transparent 1px) !important;
+  opacity: 1;
+}
+html.light header nav .text-slate-300 {
+  color: #64748b;
+}
+html.light header nav .hover\:bg-white\/5:hover {
+  background-color: #dbeafe;
+}
+/* Dropdown mobile: titik menu */
+html.light header nav .bg-cyan-400\/40 {
+  background-color: rgba(37, 99, 235, 0.45);
+}
+html.light header nav .group:hover .group-hover\:bg-cyan-400 {
+  background-color: #2563eb;
+}
+/* Titik di dalam item AKTIF: pill biru solid -> titik putih agar terlihat */
+html.light header nav .bg-cyan-400\/10.text-cyan-300 .bg-cyan-400\/40,
+html.light header nav .bg-cyan-400\/10.text-cyan-300 .group:hover .group-hover\:bg-cyan-400 {
+  background-color: #ffffff;
+}
+/* Garis aksen & glow dekoratif dropdown -> selaras tema terang */
+html.light header .menu-hairline {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(37, 99, 235, 0.55),
+    transparent
+  );
+}
+html.light header .menu-glow {
+  background-color: rgba(37, 99, 235, 0.08);
+}
+
+/* ===== GLASS CARD / SURFACE PUTIH ===== */
+/* Card putih solid + border biru + shadow biru */
+html.light .border-white\/10.bg-white\/5 {
+  background-color: #fbfcfe;
+  border-color: #d6e4fb;
+  box-shadow: 0 4px 16px -6px rgba(37, 99, 235, 0.12);
+}
+html.light .hover\:bg-white\/10:hover {
+  background-color: #f8fafc;
+}
+html.light .hover\:border-cyan-400\/40:hover {
+  border-color: #93c5fd;
+}
+
+/* ===== OUTLINE BUTTON ===== */
+html.light .border-cyan-400\/30 {
+  border-color: #bfdbfe;
+}
+html.light .hover\:bg-cyan-400\/20:hover {
+  background-color: #dbeafe;
+}
+
+/* ===== TEKS TOKEN ===== */
+html.light .text-slate-300 {
+  color: #64748b;
+}
+html.light .text-slate-400 {
+  color: #64748b;
+}
+
+/* ===== FOOTER ===== */
+html.light footer.bg-night-deep,
+html.light footer.bg-\[\#02111f\] {
+  background: linear-gradient(180deg, #f7fafd 0%, #eaf1f9 100%);
+  border-color: #dbe6f5;
+}
+html.light footer h2.text-white {
+  color: #404040;
+}
+html.light footer .text-slate-300 {
+  color: #64748b;
+}
+html.light footer .text-slate-500 {
+  color: #94a3b8;
+}
+html.light footer .hover\:text-cyan-300:hover {
+  color: #2563eb;
+}

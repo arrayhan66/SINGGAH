@@ -26,7 +26,7 @@ function AdminBeritaHero({ search, onSearchChange, statusFilter, onStatusChange 
           </div>
           <div className="min-w-0">
             <h1 className="text-[clamp(1.25rem,0.9375rem+1.5vw,1.5rem)] sm:text-3xl font-black text-white">
-              Kelola <span className="text-cyan-300">Berita</span>
+              Kelola <span className="text-slate-100">Berita</span>
             </h1>
             <p className="mt-1 text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400 max-w-xl">
               Tambah, ubah, atau hapus berita dan pencapaian SINGGAH.

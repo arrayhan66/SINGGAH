@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react"
 import { Routes, Route } from "react-router-dom"
+import { useTheme } from "../context/ThemeContext"
 import { ProtectedRoute } from "./ProtectedRoute"
 import { GuestRoute } from "./GuestRoute"
 import { ResetFlowRoute } from "./ResetFlowRoute"
@@ -49,6 +50,22 @@ import Reports from "../pages/admin/Reports/Reports"
 import Settings from "../pages/admin/Settings/Settings"
 
 function AppRouter() {
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
+  const hallFallback = (
+    <div
+      className={`flex h-screen w-screen items-center justify-center ${
+        isDark ? "bg-night" : "bg-paper"
+      }`}
+    >
+      <div
+        className={`h-8 w-8 animate-spin rounded-full border-2 border-t-transparent ${
+          isDark ? "border-sky-400" : "border-sky-600"
+        }`}
+      />
+    </div>
+  )
+
   return (
     <>
       <ScrollToTop />
@@ -65,13 +82,7 @@ function AppRouter() {
         <Route
           path="/hall"
           element={
-            <Suspense
-              fallback={
-                <div className="flex h-screen w-screen items-center justify-center bg-[#0b1220]">
-                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#38bdf8] border-t-transparent" />
-                </div>
-              }
-            >
+            <Suspense fallback={hallFallback}>
               <Hall />
             </Suspense>
           }
@@ -79,13 +90,7 @@ function AppRouter() {
         <Route
           path="/hall/:categorySlug"
           element={
-            <Suspense
-              fallback={
-                <div className="flex h-screen w-screen items-center justify-center bg-[#0b1220]">
-                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#38bdf8] border-t-transparent" />
-                </div>
-              }
-            >
+            <Suspense fallback={hallFallback}>
               <Hall />
             </Suspense>
           }

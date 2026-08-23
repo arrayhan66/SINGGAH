@@ -1,11 +1,14 @@
 import MainLayout from "../../layouts/MainLayout"
 import BeritaDetail from "../../components/sections/berita/BeritaDetail"
+import "../../styles/detail-light.css"
 
 function NewsDetail() {
   return (
-    <MainLayout>
-      <BeritaDetail />
-    </MainLayout>
+    <div className="berita-detail-page light-page detail-page">
+      <MainLayout>
+        <BeritaDetail />
+      </MainLayout>
+    </div>
   )
 }
 

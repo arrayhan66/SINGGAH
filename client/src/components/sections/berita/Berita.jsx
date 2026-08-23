@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { Calendar, User, Newspaper, ArrowRight, Megaphone } from "lucide-react"
 import DustBackground from "../../ui/DustBackground"
 import GlowBackground from "../../ui/GlowBackground"
+import PCBBackground from "../../ui/PCBBackground"
 import useSearchAndExpand from "../../../hooks/useSearchAndExpand"
 import GlassCard from "../../ui/GlassCard"
 import SearchBar from "../../ui/SearchBar"
@@ -30,6 +31,7 @@ function Berita() {
       className="relative overflow-hidden bg-brand-dark min-h-screen pt-[calc(var(--navbar-h)+24px)] sm:pt-[calc(var(--navbar-h)+32px)] pb-6 sm:pb-10 lg:pb-12 3xl:pb-16 4xl:pb-20"
     >
       <GlowBackground />
+      <PCBBackground />
       <DustBackground />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-5 md:px-8 lg:px-10 xl:px-12 relative xl:max-w-[1280px] 3xl:max-w-[1600px] 3xl:px-14 4xl:max-w-[2000px] 4xl:px-16">
@@ -66,7 +68,7 @@ function Berita() {
                 className="group overflow-hidden flex flex-col justify-between transition duration-300 hover:-translate-y-3 hover:border-cyan-400/40 hover:bg-white/10"
               >
                 {/* Gambar Berita */}
-                <div className="relative h-40 w-full overflow-hidden bg-gradient-to-br from-[#0a2472]/40 to-brand-navy/60 flex-shrink-0 sm:h-48 md:h-52 lg:h-56 3xl:h-64 4xl:h-72">
+                <div className="relative h-40 w-full overflow-hidden bg-gradient-to-br from-royal/40 to-brand-navy/60 flex-shrink-0 sm:h-48 md:h-52 lg:h-56 3xl:h-64 4xl:h-72">
                   {item.image ? (
                     <img
                       src={imageUrl(item.image)}

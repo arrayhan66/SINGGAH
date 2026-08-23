@@ -6,6 +6,31 @@
   --color-brand-navy: #06294d;
   --color-brand-blue: #497eae;
 
+  /* Tema gelap (hall / virtual tour) */
+  --color-night: #0b1220;
+  --color-night-deep: #02111f;
+  --color-night-panel: #0f2036;
+  --color-night-elevated: #0e2745;
+  --color-night-raised: #123255;
+  --color-night-border: #223047;
+  --color-night-dim: #5b7ba0;
+  --color-night-muted: #93b4d4;
+  --color-night-text: #eaf2fc;
+  --color-night-focus: #163b61;
+  --color-night-shade: #0b2f4a;
+  --color-night-shade-hover: #103b5e;
+  --color-royal: #0a2472;
+
+  /* Tema terang (halaman publik) */
+  --color-paper: #f3f5f8;
+  --color-paper-border: #e5e9ef;
+  --color-navy-ink: #1b2a4a;
+
+  /* Warna media sosial */
+  --color-social-whatsapp: #25d366;
+  --color-social-facebook: #1877f2;
+  --color-social-telegram: #0088cc;
+
   --breakpoint-xs: 450px;
   --breakpoint-3xl: 1920px;
   --breakpoint-4xl: 2560px;
@@ -211,7 +236,7 @@ html {
 }
 
 body {
-  font-family: "Outfit", "Inter", "Plus Jakarta Sans", sans-serif;
+  font-family: "Poppins", sans-serif;
   background: #041d38;
   overflow-x: hidden;
 }

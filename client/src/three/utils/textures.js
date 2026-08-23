@@ -1067,6 +1067,98 @@ function premiumMarbleTexture() {
   return toTexture(ctx.canvas, 1, 1)
 }
 
+// Video texture for the main-hall TV. Falls back to the static canvas
+// artwork until the video file is actually playing (e.g. missing file).
+// Autoplay must start muted; the sound is switched on at the first user
+// gesture. dispose() fully stops audio and frees everything, so call it
+// when the TV unmounts to guarantee silence outside the 3D hall page.
+function tvScreenVideoTexture({ onReady } = {}) {
+  const fallback = tvScreenTexture()
+
+  const video = document.createElement("video")
+  video.src = "/videos/hall-tv.mp4"
+  video.loop = true
+  video.muted = true
+  video.defaultMuted = true
+  video.playsInline = true
+  video.preload = "auto"
+  video.setAttribute("playsinline", "")
+
+  const texture = new THREE.VideoTexture(video)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.anisotropy = getAnisotropy()
+
+  let disposed = false
+  let readySent = false
+  const sendReady = () => {
+    if (readySent || disposed) return
+    readySent = true
+    onReady?.()
+  }
+
+  const tryPlay = () => {
+    if (disposed || !video.src) return
+    video.play().catch(() => {})
+  }
+  const enableSound = () => {
+    if (disposed || !video.src) return
+    video.muted = false
+    video.volume = 0.65
+    video.play().catch(() => {})
+    window.removeEventListener("pointerdown", enableSound)
+    window.removeEventListener("keydown", enableSound)
+  }
+  const onPlaying = () => {
+    window.removeEventListener("pointerdown", tryPlay)
+    window.removeEventListener("keydown", tryPlay)
+    sendReady()
+  }
+
+  // Muted autoplay is usually allowed, but retry on first interaction just in case.
+  window.addEventListener("pointerdown", tryPlay)
+  window.addEventListener("keydown", tryPlay)
+  window.addEventListener("pointerdown", enableSound)
+  window.addEventListener("keydown", enableSound)
+  video.addEventListener("playing", onPlaying)
+  // Even if autoplay gets blocked by the browser, buffered data alone means
+  // the TV is as ready as it can be, so stop waiting. A missing/broken file
+  // must not block the hall either (the fallback artwork takes over).
+  video.addEventListener("canplaythrough", sendReady)
+  video.addEventListener("error", sendReady)
+
+  // Stop decoding while the tab is hidden, resume when it is visible again.
+  const onVisibility = () => {
+    if (disposed || !video.src) return
+    if (document.hidden) video.pause()
+    else tryPlay()
+  }
+  document.addEventListener("visibilitychange", onVisibility)
+
+  video.load()
+  tryPlay()
+
+  const dispose = () => {
+    if (disposed) return
+    disposed = true
+    window.removeEventListener("pointerdown", tryPlay)
+    window.removeEventListener("keydown", tryPlay)
+    window.removeEventListener("pointerdown", enableSound)
+    window.removeEventListener("keydown", enableSound)
+    document.removeEventListener("visibilitychange", onVisibility)
+    video.removeEventListener("playing", onPlaying)
+    video.removeEventListener("canplaythrough", sendReady)
+    video.removeEventListener("error", sendReady)
+    video.pause()
+    video.muted = true
+    video.removeAttribute("src")
+    video.load()
+    texture.dispose()
+    fallback.dispose()
+  }
+
+  return { video, texture, fallback, dispose }
+}
+
 export const textures = {
   woodFloor: woodFloorTexture,
   marbleFloor: marbleFloorTexture,
@@ -1082,6 +1174,7 @@ export const textures = {
   frameArt: frameArtTexture,
   globe: globeTexture,
   tvScreen: tvScreenTexture,
+  tvScreenVideo: tvScreenVideoTexture,
   bookSpines: bookSpineSet,
   bookPages: bookPagesTexture,
   bookCover: bookCoverTexture,

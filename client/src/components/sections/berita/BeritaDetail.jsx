@@ -15,6 +15,7 @@ import {
 } from "lucide-react"
 import { useBerita } from "../../../context/BeritaContext"
 import DustBackground from "../../ui/DustBackground"
+import PCBBackground from "../../ui/PCBBackground"
 import { DetailHeroSkeleton } from "../../ui/Skeleton"
 import { imageUrl } from "../../../utils/imageUrl"
 import { processContentHtml } from "../../../utils/processContentHtml"
@@ -308,6 +309,7 @@ function BeritaDetail() {
 
   return (
     <section className="relative overflow-hidden bg-brand-dark min-h-screen pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-16 sm:pb-20 lg:pb-24">
+      <PCBBackground />
       <DustBackground />
 
       <div className="relative z-10 mx-auto max-w-4xl px-3 min-[350px]:px-5 sm:px-8 2xl:max-w-5xl">
@@ -518,7 +520,7 @@ function BeritaDetail() {
                 rel="noopener noreferrer"
                 className="group flex flex-col items-center gap-2"
               >
-                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-[#25D366]/10 text-[#25D366] transition group-hover:bg-[#25D366] group-hover:text-white">
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-social-whatsapp/10 text-social-whatsapp transition group-hover:bg-social-whatsapp group-hover:text-white">
                   <MessageCircle size={24} />
                 </div>
                 <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">
@@ -548,7 +550,7 @@ function BeritaDetail() {
                 rel="noopener noreferrer"
                 className="group flex flex-col items-center gap-2"
               >
-                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-[#1877F2]/10 text-[#1877F2] transition group-hover:bg-[#1877F2] group-hover:text-white">
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-social-facebook/10 text-social-facebook transition group-hover:bg-social-facebook group-hover:text-white">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
                   </svg>
@@ -564,7 +566,7 @@ function BeritaDetail() {
                 rel="noopener noreferrer"
                 className="group flex flex-col items-center gap-2"
               >
-                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-[#0088cc]/10 text-[#0088cc] transition group-hover:bg-[#0088cc] group-hover:text-white">
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-social-telegram/10 text-social-telegram transition group-hover:bg-social-telegram group-hover:text-white">
                   <Send size={24} />
                 </div>
                 <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">

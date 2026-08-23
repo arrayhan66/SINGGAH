@@ -3,7 +3,7 @@ import logo from "../../assets/icons/logo.webp";
 
 function Footer() {
   return (
-    <footer className="mt-auto border-t border-white/10 bg-[#02111f] w-full">
+    <footer className="mt-auto border-t border-white/10 bg-night-deep w-full">
       <div className="w-full flex flex-col items-center justify-between gap-5 px-6 py-8 sm:px-8 md:px-12 lg:flex-row lg:py-10 2xl:px-16 3xl:px-20">
         {/* LOGO */}
         <NavLink to="/" className="flex items-center gap-2.5 sm:gap-3">

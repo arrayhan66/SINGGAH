@@ -380,6 +380,52 @@ exports.updateProjectStatus = async (id, status, reason = "") => {
   return project
 }
 
+// Set / hapus slot karya unggulan (1 atau 2) sebuah project.
+// Satu slot hanya boleh ditempati satu project: kalau slot sudah diambil
+// project lain, project lain tersebut otomatis dilepas dari slot itu.
+exports.setProjectFeatured = async (id, slot = null) => {
+  const where = /^\d+$/.test(String(id)) ? { id: Number(id) } : { slug: id }
+  const project = await Project.findOne({ where })
+
+  if (!project) {
+    throw new AppError("Project tidak ditemukan", 404)
+  }
+
+  if (slot !== null && project.status !== "published") {
+    throw new AppError(
+      "Hanya project yang sudah dipublikasikan yang bisa menjadi karya unggulan",
+      400,
+    )
+  }
+
+  const normalizedSlot =
+    slot === null || slot === undefined || slot === "" ? null : Number(slot)
+
+  if (normalizedSlot !== null && ![1, 2].includes(normalizedSlot)) {
+    throw new AppError("Slot unggulan harus 1 atau 2", 400)
+  }
+
+  await sequelize.transaction(async (t) => {
+    if (normalizedSlot !== null) {
+      await Project.update(
+        { featured_slot: null },
+        {
+          where: {
+            featured_slot: normalizedSlot,
+            id: { [Op.ne]: project.id },
+          },
+          transaction: t,
+        },
+      )
+    }
+
+    project.featured_slot = normalizedSlot
+    await project.save({ transaction: t })
+  })
+
+  return project
+}
+
 exports.getProjectById = async (id, currentUserId = null) => {
   const where = /^\d+$/.test(id) ? { id: Number(id) } : { slug: id }
 

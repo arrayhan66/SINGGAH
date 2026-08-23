@@ -158,6 +158,28 @@ exports.updateProjectStatus = asyncHandler(async (req, res) => {
   success(res, project, "Status project berhasil diperbarui")
 })
 
+exports.setProjectFeatured = asyncHandler(async (req, res) => {
+  const project = await projectService.setProjectFeatured(
+    req.params.id,
+    req.body.slot ?? null,
+  )
+
+  const description =
+    req.body.slot === null || req.body.slot === undefined
+      ? `${req.user.name} melepas project "${project.title}" dari karya unggulan`
+      : `${req.user.name} menetapkan project "${project.title}" sebagai karya unggulan slot ${req.body.slot}`
+
+  await logActivity({
+    userId: req.user.id,
+    action: "project_featured_updated",
+    targetType: "project",
+    targetId: project.id,
+    description,
+  })
+
+  success(res, project, "Slot karya unggulan berhasil diperbarui")
+})
+
 exports.updateProject = asyncHandler(async (req, res) => {
   const existingProject = await projectService.getProjectById(req.params.id)
 

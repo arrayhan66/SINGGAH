@@ -49,6 +49,13 @@ router.patch(
   projectController.updateProjectStatus,
 )
 
+router.patch(
+  "/:id/featured",
+  authMiddleware,
+  roleMiddleware("admin"),
+  projectController.setProjectFeatured,
+)
+
 router.put(
   "/:id",
   authMiddleware,

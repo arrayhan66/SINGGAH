@@ -40,6 +40,16 @@ const Project = sequelize.define(
       allowNull: true,
       defaultValue: null,
     },
+    // Karya unggulan di podium hall 3D. Hanya ada 2 slot (1 & 2),
+    // null berarti project tidak menjadi karya unggulan.
+    featured_slot: {
+      type: DataTypes.TINYINT.UNSIGNED,
+      allowNull: true,
+      defaultValue: null,
+      validate: {
+        isIn: [[1, 2]],
+      },
+    },
   },
   {
     tableName: "projects",

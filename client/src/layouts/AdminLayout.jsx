@@ -3,6 +3,7 @@ import { ChevronDown } from "lucide-react"
 import SidebarAdmin from "../components/layout/SidebarAdmin"
 import AdminNavbar from "../components/layout/AdminNavbar"
 import Footer from "../components/layout/Footer"
+import "../styles/admin-light.css"
 
 function AdminLayout({ children }) {
   const [collapsed, setCollapsed] = useState(() => {
@@ -25,7 +26,7 @@ function AdminLayout({ children }) {
     : "pl-0 min-[700px]:pl-20 min-[1400px]:pl-64"
 
   return (
-    <div className="min-h-screen w-full min-w-0 overflow-x-hidden bg-brand-dark">
+    <div className="admin-page min-h-screen w-full min-w-0 overflow-x-hidden bg-brand-dark">
       <AdminNavbar />
       <SidebarAdmin
         collapsed={collapsed}

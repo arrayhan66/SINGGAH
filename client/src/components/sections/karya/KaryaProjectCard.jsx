@@ -42,10 +42,11 @@ function KaryaProjectCard({ project }) {
   const [likesCount, setLikesCount] = useState(initialLikes || 0);
   const [isBookmarked, setIsBookmarked] = useState(Boolean(project.bookmarked));
 
-  const coverImage =
+  const firstAdditionalImage =
     Array.isArray(images) && images.length > 0
       ? images[0]?.image_url || images[0]
-      : thumbnail;
+      : null;
+  const coverImage = thumbnail || firstAdditionalImage;
 
   const authorLabel = authorUser?.name || "";
 

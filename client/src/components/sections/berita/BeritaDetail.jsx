@@ -14,6 +14,7 @@ import {
   Megaphone,
 } from "lucide-react"
 import { useBerita } from "../../../context/BeritaContext"
+import { useTheme } from "../../../context/ThemeContext"
 import DustBackground from "../../ui/DustBackground"
 import PCBBackground from "../../ui/PCBBackground"
 import { DetailHeroSkeleton } from "../../ui/Skeleton"
@@ -125,6 +126,8 @@ function AdBlockRender({ htmlAttributes }) {
 }
 
 function NewsContent({ item }) {
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
   const hasHTML =
     item.contentHTML &&
     typeof item.contentHTML === "string" &&
@@ -169,7 +172,7 @@ function NewsContent({ item }) {
             return (
               <div
                 key={index}
-                className="prose prose-slate prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-a:text-cyan-600 prose-img:rounded-xl prose-img:mx-auto prose-p:leading-relaxed prose-p:my-4 prose-img:my-6"
+                className={`prose prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-img:rounded-xl prose-img:mx-auto prose-p:leading-relaxed prose-p:my-4 prose-img:my-6 ${isDark ? "prose-invert prose-slate" : "prose-slate"}`}
                 dangerouslySetInnerHTML={{ __html: processContentHtml(part) }}
               />
             )
@@ -183,7 +186,7 @@ function NewsContent({ item }) {
   if (hasHTML) {
     return (
       <div
-        className="prose prose-slate prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-a:text-cyan-600 prose-img:rounded-xl prose-img:mx-auto prose-p:leading-relaxed prose-p:my-4 prose-img:my-6"
+        className={`prose prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-img:rounded-xl prose-img:mx-auto prose-p:leading-relaxed prose-p:my-4 prose-img:my-6 ${isDark ? "prose-invert prose-slate" : "prose-slate"}`}
         dangerouslySetInnerHTML={{ __html: processContentHtml(item.contentHTML) }}
       />
     )
@@ -199,15 +202,15 @@ function NewsContent({ item }) {
 
         return (
           <div key={index} className="space-y-6 min-[350px]:space-y-8">
-            <p className="text-base min-[350px]:text-lg sm:text-xl leading-relaxed text-slate-800 font-normal">
-              <span className="float-left text-4xl min-[350px]:text-5xl sm:text-6xl font-black text-cyan-600 mr-2.5 min-[350px]:mr-3.5 leading-none pt-1">
+            <p className={`text-base min-[350px]:text-lg sm:text-xl leading-relaxed font-normal ${isDark ? "text-slate-200" : "text-slate-800"}`}>
+              <span className={`float-left text-4xl min-[350px]:text-5xl sm:text-6xl font-black mr-2.5 min-[350px]:mr-3.5 leading-none pt-1 ${isDark ? "text-cyan-400" : "text-cyan-600"}`}>
                 {firstLetter}
               </span>
               {restOfParagraph}
             </p>
             {correspondingPhoto && (
-              <figure className="my-4 min-[350px]:my-5 rounded-xl overflow-hidden">
-                <div className="w-full max-h-[500px] overflow-hidden bg-slate-100">
+              <figure className="relative my-4 min-[350px]:my-5 rounded-xl overflow-hidden">
+                <div className={`w-full max-h-[500px] overflow-hidden ${isDark ? "bg-slate-800" : "bg-slate-100"}`}>
                   <img
                     src={imageUrl(correspondingPhoto.url)}
                     alt={correspondingPhoto.caption}
@@ -215,7 +218,9 @@ function NewsContent({ item }) {
                   />
                 </div>
                 {correspondingPhoto.caption && (
-                  <figcaption className="text-center text-[10px] min-[350px]:text-[11px] sm:text-xs text-slate-500 italic pt-2">{correspondingPhoto.caption}</figcaption>
+                  <figcaption className={`border-l-[3px] pl-3 sm:pl-4 py-1 ${isDark ? "border-cyan-400 text-slate-300" : "border-cyan-600 text-slate-600"} text-sm min-[350px]:text-[15px] sm:text-base italic leading-relaxed`}>
+                    {correspondingPhoto.caption}
+                  </figcaption>
                 )}
               </figure>
             )}
@@ -225,10 +230,10 @@ function NewsContent({ item }) {
 
       return (
         <div key={index} className="space-y-6 min-[350px]:space-y-8">
-          <p className="leading-relaxed text-slate-700">{paragraph}</p>
+          <p className={`leading-relaxed ${isDark ? "text-slate-300" : "text-slate-700"}`}>{paragraph}</p>
           {correspondingPhoto && (
             <figure className="my-4 min-[350px]:my-5 rounded-xl overflow-hidden">
-              <div className="w-full max-h-[500px] overflow-hidden bg-slate-100">
+              <div className={`w-full max-h-[500px] overflow-hidden ${isDark ? "bg-slate-800" : "bg-slate-100"}`}>
                 <img
                   src={correspondingPhoto.url}
                   alt={correspondingPhoto.caption}
@@ -236,7 +241,9 @@ function NewsContent({ item }) {
                 />
               </div>
               {correspondingPhoto.caption && (
-                <figcaption className="text-center text-[10px] min-[350px]:text-[11px] sm:text-xs text-slate-500 italic pt-2">{correspondingPhoto.caption}</figcaption>
+                <figcaption className={`border-l-[3px] pl-3 sm:pl-4 py-1 ${isDark ? "border-cyan-400 text-slate-300" : "border-cyan-600 text-slate-600"} text-sm min-[350px]:text-[15px] sm:text-base italic leading-relaxed`}>
+                  {correspondingPhoto.caption}
+                </figcaption>
               )}
             </figure>
           )}
@@ -246,7 +253,7 @@ function NewsContent({ item }) {
   }
 
   return (
-    <p className="text-base min-[350px]:text-lg sm:text-xl leading-relaxed text-slate-800 font-normal whitespace-pre-line">
+    <p className={`text-base min-[350px]:text-lg sm:text-xl leading-relaxed font-normal whitespace-pre-line ${isDark ? "text-slate-200" : "text-slate-800"}`}>
       {typeof item.content === "string"
         ? item.content
         : item.description || "Tidak ada konten"}
@@ -258,6 +265,8 @@ function BeritaDetail() {
   const { slug } = useParams()
   const navigate = useNavigate()
   const { beritaList, loading } = useBerita()
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
 
   const [isShareModalOpen, setIsShareModalOpen] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -320,7 +329,7 @@ function BeritaDetail() {
               <Link
                 to="/berita"
                 aria-label="Kembali"
-                className="group inline-flex items-center gap-1.5 min-[350px]:gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 min-[350px]:p-2.5 sm:py-2 sm:pl-3 sm:pr-4 text-xs min-[350px]:text-sm text-slate-300 transition-all duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 shadow-sm"
+                className={`group inline-flex items-center gap-1.5 min-[350px]:gap-2 rounded-full px-3 py-1.5 min-[350px]:p-2.5 sm:py-2 sm:pl-3 sm:pr-4 text-xs min-[350px]:text-sm transition-all duration-300 shadow-sm ${isDark ? "border border-white/10 bg-white/5 text-slate-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300" : "border border-cyan-400/40 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/20 hover:border-cyan-400/60 hover:shadow-lg hover:shadow-cyan-400/10"}`}
               >
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 shrink-0">
                   <ArrowLeft
@@ -328,16 +337,13 @@ function BeritaDetail() {
                     className="transition-transform duration-300 group-hover:-translate-x-0.5"
                   />
                 </span>
-                <span className="font-semibold">
-                  Kembali{" "}
-                  <span className="hidden sm:inline">ke Indeks Berita</span>
-                </span>
+                <span className="font-semibold">Kembali</span>
               </Link>
 
               <button
                 onClick={() => setIsShareModalOpen(true)}
                 aria-label="Bagikan Artikel"
-                className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 transition-all duration-300 shadow-sm cursor-pointer"
+                className={`group inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm transition-all duration-300 shadow-sm cursor-pointer ${isDark ? "border border-white/10 bg-white/5 text-slate-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300" : "border border-cyan-400/40 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/20 hover:border-cyan-400/60 hover:shadow-lg hover:shadow-cyan-400/10"}`}
               >
                 <Share2
                   size={13}
@@ -347,7 +353,7 @@ function BeritaDetail() {
               </button>
             </div>
 
-            <div className="mt-4 min-[350px]:mt-5 sm:mt-6 space-y-3 min-[350px]:space-y-4">
+            <div className="mt-4 min-[350px]:mt-5 sm:mt-6 space-y-2 min-[350px]:space-y-3">
               {item.tags?.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 min-[350px]:gap-2">
                   {item.tags.map((tag) => (
@@ -365,27 +371,27 @@ function BeritaDetail() {
                 {item.title}
               </h1>
 
-              <div className="flex flex-col min-[350px]:flex-row flex-wrap items-start min-[350px]:items-center justify-between gap-3 min-[350px]:gap-4 pt-3 border-t border-slate-800/80 text-xs sm:text-sm text-slate-400">
+              <div className={`flex flex-col min-[350px]:flex-row flex-wrap items-start min-[350px]:items-center justify-between gap-3 min-[350px]:gap-4 pt-3 border-t text-xs sm:text-sm ${isDark ? "border-slate-700 text-slate-400" : "border-slate-800/80 text-slate-400"}`}>
                 <div className="flex items-center gap-2.5 min-[350px]:gap-3">
-                  <div className="h-7 w-7 min-[350px]:h-9 min-[350px]:w-9 rounded-full bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center text-cyan-300 font-bold text-[10px] min-[350px]:text-xs shrink-0">
+                  <div className={`h-7 w-7 min-[350px]:h-9 min-[350px]:w-9 rounded-full flex items-center justify-center font-bold text-[10px] min-[350px]:text-xs shrink-0 ${isDark ? "bg-cyan-500/20 border border-cyan-400/30 text-cyan-300" : "bg-cyan-100 border border-cyan-200 text-cyan-700"}`}>
                     {(item.winner || item.source || "A")[0].toUpperCase()}
                   </div>
                   <div>
-                    <p className="font-bold text-slate-200 text-[11px] min-[350px]:text-xs sm:text-sm leading-tight min-[350px]:leading-normal">
+                    <p className={`font-bold text-[11px] min-[350px]:text-xs sm:text-sm leading-tight min-[350px]:leading-normal ${isDark ? "text-slate-200" : "text-slate-800"}`}>
                       {item.winner || item.source || "Tim Redaksi SINGGAH"}
                     </p>
-                    <p className="text-[9px] min-[350px]:text-[11px] text-cyan-400 font-medium leading-tight min-[350px]:leading-normal">
+                    <p className={`text-[9px] min-[350px]:text-[11px] font-medium leading-tight min-[350px]:leading-normal ${isDark ? "text-cyan-400" : "text-cyan-600"}`}>
                       Divisi Publikasi & Media Akademik
                     </p>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 min-[350px]:gap-4 text-[10px] min-[350px]:text-xs sm:text-sm text-slate-400">
+                <div className={`flex flex-wrap items-center gap-3 min-[350px]:gap-4 text-[10px] min-[350px]:text-xs sm:text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                   {item.date && (
                     <div className="flex items-center gap-1 min-[350px]:gap-1.5 font-medium">
                       <Calendar
                         size={12}
-                        className="min-[350px]:w-3.5 min-[350px]:h-3.5 text-cyan-400"
+                        className={`min-[350px]:w-3.5 min-[350px]:h-3.5 ${isDark ? "text-cyan-400" : "text-cyan-600"}`}
                       />
                       <span>{item.date}</span>
                     </div>
@@ -395,30 +401,31 @@ function BeritaDetail() {
             </div>
           </div>
 
-          <div className="relative h-48 min-[350px]:h-64 sm:h-88 lg:h-[420px] w-full overflow-hidden bg-slate-950 border-b border-slate-800">
+          <div className="relative h-48 min-[350px]:h-64 sm:h-88 lg:h-[420px] w-full overflow-hidden bg-slate-950">
             <img
               src={imageUrl(item.image)}
               alt={item.title}
               className="h-full w-full object-cover transition-transform duration-700 hover:scale-102"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-60" />
-            <div className="absolute bottom-2 min-[350px]:bottom-3 left-3 min-[350px]:left-4 right-3 min-[350px]:right-4 sm:left-6 sm:right-6 text-right">
-              <span className="text-[9px] min-[350px]:text-[11px] sm:text-xs text-slate-200 bg-slate-950/80 px-2 min-[350px]:px-3 py-0.5 min-[350px]:py-1 rounded-md backdrop-blur-md border border-slate-700/50 italic font-medium">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+            <div className="absolute bottom-3 min-[350px]:bottom-4 left-3 min-[350px]:left-4 right-3 min-[350px]:right-4 sm:left-6 sm:right-6 flex justify-end">
+              <span className="inline-flex items-center gap-1.5 text-[9px] min-[350px]:text-[11px] sm:text-xs text-white/95 bg-gradient-to-r from-black/60 to-black/40 backdrop-blur-lg px-3 min-[350px]:px-4 py-1.5 min-[350px]:py-2 rounded-full border border-white/15 font-semibold tracking-wide shadow-lg shadow-black/20">
+                <Newspaper size={11} className="min-[350px]:w-3 min-[350px]:h-3 shrink-0 opacity-80" />
                 Dokumentasi Resmi SINGGAH
               </span>
             </div>
           </div>
 
-          <div className="p-4 min-[350px]:p-6 sm:p-10 lg:p-14 pt-6 min-[350px]:pt-8 space-y-6 min-[350px]:space-y-8 bg-white text-slate-900">
-            <div className="flex flex-col gap-6 min-[350px]:gap-8 text-sm min-[350px]:text-base sm:text-lg leading-relaxed text-slate-700 font-normal">
+          <div className={`p-4 min-[350px]:p-6 sm:p-10 lg:p-14 pt-4 min-[350px]:pt-5 space-y-4 min-[350px]:space-y-6 ${isDark ? "bg-brand-navy text-white" : "bg-white text-slate-900"}`}>
+            <div className={`flex flex-col gap-4 min-[350px]:gap-6 text-sm min-[350px]:text-base sm:text-lg leading-relaxed font-normal ${isDark ? "text-slate-300" : "text-slate-700"}`}>
               <NewsContent item={item} />
             </div>
 
-            <div className="pt-6 min-[350px]:pt-8 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 min-[350px]:gap-4">
+            <div className={`pt-6 min-[350px]:pt-8 border-t flex flex-wrap items-center justify-between gap-3 min-[350px]:gap-4 ${isDark ? "border-slate-700" : "border-slate-200"}`}>
               <div className="flex items-center gap-2 min-[350px]:gap-3">
                 <button
                   onClick={() => setIsShareModalOpen(true)}
-                  className="px-3 min-[350px]:px-4 py-1.5 min-[350px]:py-2 rounded-lg min-[350px]:rounded-xl bg-cyan-50 border border-cyan-200 text-cyan-700 text-[11px] min-[350px]:text-xs font-bold hover:bg-cyan-600 hover:text-white transition-all shadow-xs cursor-pointer flex items-center gap-1.5 min-[350px]:gap-2"
+                  className={`inline-flex items-center gap-1.5 min-[350px]:gap-2 px-3 min-[350px]:px-4 py-1.5 min-[350px]:py-2 rounded-lg min-[350px]:rounded-xl text-[11px] min-[350px]:text-xs font-bold transition-all shadow-xs cursor-pointer ${isDark ? "bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 hover:border-cyan-400/40 hover:bg-cyan-400/10" : "bg-cyan-400/10 border border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/20 hover:border-cyan-400/60 hover:shadow-lg hover:shadow-cyan-400/10"}`}
                 >
                   <Share2
                     size={12}
@@ -429,14 +436,14 @@ function BeritaDetail() {
               </div>
 
               {item.source && (
-                <div className="text-[10px] min-[350px]:text-xs text-slate-600 flex items-center gap-1 min-[350px]:gap-1.5 bg-slate-50 px-2.5 min-[350px]:px-3.5 py-1.5 min-[350px]:py-2 rounded-lg min-[350px]:rounded-xl border border-slate-200">
+                <div className={`text-[10px] min-[350px]:text-xs flex items-center gap-1 min-[350px]:gap-1.5 px-2.5 min-[350px]:px-3.5 py-1.5 min-[350px]:py-2 rounded-lg min-[350px]:rounded-xl ${isDark ? "text-slate-400 bg-white/5 border border-white/10" : "text-slate-600 bg-slate-50 border border-slate-200"}`}>
                   <Newspaper
                     size={12}
                     className="min-[350px]:w-3.5 min-[350px]:h-3.5 text-cyan-600 shrink-0"
                   />
                   <span>
                     Sumber:{" "}
-                    <strong className="text-slate-900 font-bold">
+                    <strong className={`font-bold ${isDark ? "text-white" : "text-slate-900"}`}>
                       {item.source}
                     </strong>
                   </span>
@@ -449,13 +456,13 @@ function BeritaDetail() {
         {relatedNews.length > 0 && (
           <div className="mt-10 min-[350px]:mt-16">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-4 min-[350px]:mb-6">
-              <h2 className="text-lg min-[350px]:text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-                <span className="w-1.5 min-[350px]:w-2 h-5 min-[350px]:h-6 bg-cyan-400 rounded-full inline-block"></span>
+              <h2 className={`text-lg min-[350px]:text-xl sm:text-2xl font-black tracking-tight flex items-center gap-2 ${isDark ? "text-white" : "text-slate-800"}`}>
+                <span className={`w-1.5 min-[350px]:w-2 h-5 min-[350px]:h-6 rounded-full inline-block ${isDark ? "bg-cyan-400" : "bg-cyan-600"}`}></span>
                 Berita & Kegiatan Terkait
               </h2>
               <Link
                 to="/berita"
-                className="text-[11px] min-[350px]:text-xs sm:text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
+                className={`text-[11px] min-[350px]:text-xs sm:text-sm font-semibold transition-all ${isDark ? "text-cyan-400 hover:text-cyan-300 hover:underline hover:underline-offset-4" : "text-cyan-600 hover:text-cyan-700 hover:underline hover:underline-offset-4"}`}
               >
                 Lihat Semua &rarr;
               </Link>
@@ -466,9 +473,9 @@ function BeritaDetail() {
                 <div
                   key={news.id}
                   onClick={() => navigate(`/berita/${news.slug}`)}
-                  className="group cursor-pointer overflow-hidden border border-slate-700/50 bg-slate-900/40 backdrop-blur-xl rounded-xl min-[350px]:rounded-2xl transition-all duration-300 hover:-translate-y-1.5 hover:border-cyan-400/50 shadow-xl"
+                  className={`group cursor-pointer overflow-hidden rounded-xl min-[350px]:rounded-2xl transition-all duration-300 hover:-translate-y-1.5 shadow-xl ${isDark ? "border border-slate-700/50 bg-brand-navy hover:border-cyan-400/50" : "border border-slate-200 bg-white hover:border-cyan-400/50"}`}
                 >
-                  <div className="h-40 min-[350px]:h-44 w-full overflow-hidden bg-slate-950 relative">
+                  <div className={`h-40 min-[350px]:h-44 w-full overflow-hidden relative ${isDark ? "bg-slate-950" : "bg-slate-100"}`}>
                     <img
                       src={imageUrl(news.image)}
                       alt={news.title}
@@ -477,14 +484,14 @@ function BeritaDetail() {
 
                   </div>
                   <div className="p-4 min-[350px]:p-5 space-y-2 min-[350px]:space-y-2.5">
-                    <div className="flex items-center gap-1.5 min-[350px]:gap-2 text-[10px] min-[350px]:text-[11px] text-slate-400">
+                    <div className={`flex items-center gap-1.5 min-[350px]:gap-2 text-[10px] min-[350px]:text-[11px] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                       <Calendar
                         size={10}
-                        className="min-[350px]:w-3 min-[350px]:h-3 text-cyan-400"
+                        className={`min-[350px]:w-3 min-[350px]:h-3 ${isDark ? "text-cyan-400" : "text-cyan-600"}`}
                       />
                       <span>{news.date || "Terbaru"}</span>
                     </div>
-                    <h3 className="text-xs min-[350px]:text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition-colors line-clamp-2 leading-snug">
+                    <h3 className={`text-xs min-[350px]:text-sm sm:text-base font-bold line-clamp-2 leading-snug ${isDark ? "text-white" : "text-slate-800"}`}>
                       {news.title}
                     </h3>
                   </div>

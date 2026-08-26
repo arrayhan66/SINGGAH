@@ -150,10 +150,14 @@ function AdminProjectDetailSection() {
   const config = statusConfig[project.status] || statusConfig.pending
   const StatusIcon = config.icon
 
-  const gallery =
-    Array.isArray(project.images) && project.images.length > 0
-      ? project.images.map((img) => img.image_url).filter(Boolean)
-      : [project.thumbnail]
+  const gallery = Array.from(
+    new Set([
+      project.thumbnail,
+      ...(Array.isArray(project.images) ? project.images : []).map(
+        (img) => img.image_url,
+      ),
+    ]),
+  ).filter(Boolean)
 
   return (
     <section

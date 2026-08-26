@@ -9,10 +9,11 @@ function KaryaTersimpanCard({ item }) {
   const categoryName = item.Category?.name || "Karya"
   const authorName = item.User?.name || "—"
   const year = item.year || ""
-  const coverImage =
+  const firstAdditionalImage =
     Array.isArray(item.images) && item.images.length > 0
       ? item.images[0]?.image_url || item.images[0]
-      : item.thumbnail
+      : null;
+  const coverImage = item.thumbnail || firstAdditionalImage
 
   function handleOpen(e) {
     e.preventDefault()

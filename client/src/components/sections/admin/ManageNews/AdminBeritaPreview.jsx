@@ -202,7 +202,7 @@ function AdminBeritaPreview() {
                       />
                     </div>
                     {correspondingPhoto.caption && (
-                      <figcaption className="text-center text-[11px] sm:text-xs text-slate-500 italic pt-2">{correspondingPhoto.caption}</figcaption>
+                      <figcaption className="border-l-[3px] border-cyan-600 pl-3 sm:pl-4 py-1 text-slate-600 text-sm sm:text-[15px] sm:text-base italic leading-relaxed">{correspondingPhoto.caption}</figcaption>
                     )}
                   </figure>
                 )}
@@ -224,7 +224,7 @@ function AdminBeritaPreview() {
                     />
                   </div>
                   {correspondingPhoto.caption && (
-                    <figcaption className="text-center text-[11px] sm:text-xs text-slate-500 italic pt-2">{correspondingPhoto.caption}</figcaption>
+                    <figcaption className="border-l-[3px] border-cyan-600 pl-3 sm:pl-4 py-1 text-slate-600 text-sm sm:text-[15px] sm:text-base italic leading-relaxed">{correspondingPhoto.caption}</figcaption>
                   )}
                 </figure>
               )}
@@ -249,7 +249,7 @@ function AdminBeritaPreview() {
                   />
                 </div>
                 {photo.caption && (
-                  <figcaption className="text-center text-[11px] sm:text-xs text-slate-500 italic pt-2">{photo.caption}</figcaption>
+                  <figcaption className="border-l-[3px] border-cyan-600 pl-3 sm:pl-4 py-1 text-slate-600 text-sm sm:text-[15px] sm:text-base italic leading-relaxed">{photo.caption}</figcaption>
                 )}
               </figure>
             ))}

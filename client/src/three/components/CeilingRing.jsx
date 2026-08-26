@@ -1,4 +1,5 @@
 import * as THREE from "three"
+import { useQualityStore } from "../hooks/useQuality"
 
 function CeilingRing({
   position,
@@ -9,6 +10,7 @@ function CeilingRing({
   lightColor = "#cfe9ff",
   warm = false,
 }) {
+  const highTier = useQualityStore((s) => s.tier) === "tinggi"
   const ringColor = warm ? "#ffe8c8" : color
   const ringEmissive = warm ? "#ffd9a0" : emissive
   const discColor = warm ? "#ffddb0" : "#bfe3ff"
@@ -34,7 +36,9 @@ function CeilingRing({
         <cylinderGeometry args={[0.09, 0.12, 0.14, 16]} />
         <meshStandardMaterial color={coreColor} emissive={coreEmissive} emissiveIntensity={2.6} />
       </mesh>
-      {light && <pointLight position={[0, -0.45, 0]} intensity={22} distance={26} color={lightColor} />}
+      {light && highTier && (
+        <pointLight position={[0, -0.45, 0]} intensity={22} distance={26} color={lightColor} />
+      )}
     </group>
   )
 }

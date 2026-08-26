@@ -59,7 +59,7 @@ function LightModeHeroStats({ variant = "card" }) {
                   </div>
 
                   <div className="text-left">
-                    <p className="text-base min-[400px]:text-sm md:text-lg font-bold text-navy-ink leading-none">
+                    <p className="text-base min-[400px]:text-sm md:text-lg font-bold text-[#404040] leading-none">
                       {stat.value}
                     </p>
                     <p className="mt-1 text-[11px] md:text-sm text-gray-500 leading-none">
@@ -99,7 +99,7 @@ function LightModeHeroStats({ variant = "card" }) {
                 key={stat.label}
                 className="flex-1 flex flex-col items-center justify-center gap-1 rounded-2xl border border-paper-border bg-white px-8 py-5 2xl:px-10 2xl:py-6 text-center shadow-sm hover:shadow-md transition-all"
               >
-                <h2 className="text-3xl 2xl:text-4xl font-bold text-blue-600">
+                <h2 className="text-3xl 2xl:text-4xl font-bold text-[#404040]">
                   {stat.value}
                 </h2>
 

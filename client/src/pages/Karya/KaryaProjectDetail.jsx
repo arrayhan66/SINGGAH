@@ -2,7 +2,7 @@ import MainLayout from "../../layouts/MainLayout"
 import KaryaProjectDetailSection from "../../components/sections/karya/KaryaProjectDetailSection"
 import "../../styles/detail-light.css"
 
-function KaryaProjectDetail() {
+export default function KaryaProjectDetail() {
   return (
     <div className="karya-projectdetail-page light-page detail-page">
       <MainLayout>
@@ -11,5 +11,3 @@ function KaryaProjectDetail() {
     </div>
   )
 }
-
-export default KaryaProjectDetail

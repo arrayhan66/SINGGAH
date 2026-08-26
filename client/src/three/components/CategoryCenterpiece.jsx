@@ -2,6 +2,7 @@ import { useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import { Text } from "@react-three/drei"
 import * as THREE from "three"
+import { useQualityStore } from "../hooks/useQuality"
 
 const GOLD = "#c9a35e"
 
@@ -10,6 +11,7 @@ function CategoryCenterpiece({ category, position = [0, 0, 0] }) {
   const ringA = useRef()
   const ringB = useRef()
   const glow = useRef()
+  const highTier = useQualityStore((s) => s.tier) === "tinggi"
 
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime
@@ -146,7 +148,11 @@ function CategoryCenterpiece({ category, position = [0, 0, 0] }) {
         {title.toUpperCase()}
       </Text>
 
-      <pointLight position={[0, 2.3, 0]} intensity={5} distance={12} color={accentColor} />
+      {/* Lampu aksen hanya di tier tinggi: tumpang tindih dengan
+          pointLight ruangan -> menggandakan biaya per-piksel */}
+      {highTier && (
+        <pointLight position={[0, 2.3, 0]} intensity={5} distance={12} color={accentColor} />
+      )}
     </group>
   )
 }

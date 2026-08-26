@@ -57,10 +57,11 @@ function MyKaryaCard({ karya, onDeleteClick, isDosen = false }) {
     .map((tech) => (typeof tech === "string" ? tech : tech?.name || ""))
     .filter(Boolean);
   const projectSlug = karya.slug || karya.id;
-  const coverImage =
+  const firstAdditionalImage =
     Array.isArray(karya.images) && karya.images.length > 0
       ? karya.images[0]?.image_url || karya.images[0]
-      : karya.thumbnail;
+      : null;
+  const coverImage = karya.thumbnail || firstAdditionalImage;
 
   function handleDetail(e) {
     if (e) e.stopPropagation();

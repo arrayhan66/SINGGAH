@@ -131,7 +131,7 @@ function LightModeHero() {
                   <span className="text-base tracking-wide">
                     Mulai Eksplorasi
                   </span>
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition-transform duration-300 group-hover:translate-x-1">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/20 transition-transform duration-300 group-hover:translate-x-1">
                     <ArrowRight size={18} />
                   </span>
                 </span>

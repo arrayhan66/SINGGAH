@@ -1,10 +1,11 @@
 import { Component, Suspense, useMemo, useState } from "react"
-import { Text, useTexture } from "@react-three/drei"
+import { Text } from "@react-three/drei"
 import * as THREE from "three"
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js"
 import { textures } from "../utils/textures"
 import { getAnisotropy, useQualityStore } from "../hooks/useQuality"
 import { useWalkStore, INTERACT_RANGE } from "../hooks/useWalk"
+import { useDownscaledTexture } from "../utils/useDownscaledTexture"
 import { PAINTING_SIZE } from "../rooms/museumLayout"
 import { CATEGORY_COLORS } from "../../utils/hallHelpers"
 
@@ -125,7 +126,10 @@ function coverParams(tex) {
 }
 
 function PaintingImage({ url }) {
-  const tex = useTexture(url)
+  // Downscale ke 1024px saat decode: tetap tajam untuk close-up (HD)
+  // tapi VRAM jauh lebih kecil daripada foto asli yang bisa 3000-4000px.
+  // Tanpa ini, puluhan lukisan memakan ratusan MB VRAM di HP -> lag.
+  const tex = useDownscaledTexture(url, 1024)
   const img = useMemo(() => {
     const t = tex.clone()
     const p = coverParams(tex)

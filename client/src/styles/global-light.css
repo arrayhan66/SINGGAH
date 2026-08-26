@@ -24,8 +24,21 @@ html.light .bg-brand-dark\/85 {
 html.light .bg-brand-navy {
   background-color: #eef3fa;
 }
+html.light .bg-brand-navy\/80,
+html.light .bg-brand-navy\/90,
+html.light .bg-brand-navy\/95 {
+  background-color: #eef3fa;
+}
 html.light .bg-\[\#02111f\] {
   background-color: #eef3fa;
+}
+
+/* ===== DROPDOWN MENU HAMBURGER ===== */
+/* Permukaan abu senada footer light mode (khusus wadah hamburger,
+   bukan dropdown profil/notifikasi) */
+html.light .max-w-\[1700px\].bg-brand-dark\/95 {
+  background: linear-gradient(180deg, #eaedf2 0%, #e0e4ea 100%);
+  border-color: #d6dbe2;
 }
 
 /* ===== TEKS PUTIH DI ATAS ELEMEN BERWARNA TETAP PUTIH ===== */
@@ -93,9 +106,9 @@ html.light .text-slate-500 {
   color: #64748b;
 }
 
-/* ===== JUDUL & HEADING -> BIRU TUA ===== */
-/* Semua heading yang tadinya putih jadi biru tua (bukan hitam),
-   berlaku global termasuk halaman admin */
+/* ===== JUDUL & HEADING -> HITAM ===== */
+/* Semua heading yang tadinya putih jadi hitam keabu #404040
+   (persis tulisan "SINGGAH"), berlaku global termasuk admin */
 html.light h1.text-white,
 html.light h2.text-white,
 html.light h3.text-white,
@@ -104,7 +117,7 @@ html.light h5.text-white,
 html.light h6.text-white,
 html.light h3.text-white\/90,
 html.light h4.text-white\/90 {
-  color: #1e3a8a;
+  color: #404040;
 }
 
 /* ===== CYAN -> BIRU TUA (teks) ===== */
@@ -171,6 +184,11 @@ html.light .focus\:border-cyan-400:focus,
 html.light .focus\:border-cyan-500:focus {
   border-color: #2563eb;
 }
+html.light .focus\:border-cyan-400\/50:focus,
+html.light .focus\:border-cyan-400\/60:focus,
+html.light .focus\:border-cyan-400\/70:focus {
+  border-color: #2563eb;
+}
 html.light .focus\:ring-cyan-400:focus,
 html.light .focus\:ring-cyan-500:focus {
   --tw-ring-color: rgba(37, 99, 235, 0.25);
@@ -219,6 +237,33 @@ html.light .hover\:bg-amber-400\/20:hover {
 }
 html.light .text-amber-300 {
   color: #b45309;
+}
+/* Fraksi amber/emerald/red lain (banner, tombol aksi admin, chip) */
+html.light .bg-amber-500\/10 {
+  background-color: #fffbeb;
+}
+html.light .bg-amber-500\/20 {
+  background-color: #fef3c7;
+}
+html.light .hover\:bg-amber-500\/30:hover {
+  background-color: #fde68a;
+}
+html.light .text-amber-100 {
+  color: #92400e;
+}
+html.light .bg-emerald-500\/5,
+html.light .bg-emerald-500\/\[0\.06\] {
+  background-color: #ecfdf5;
+}
+html.light .bg-emerald-500\/15 {
+  background-color: #d1fae5;
+}
+html.light .bg-red-500\/5,
+html.light .bg-red-500\/\[0\.06\] {
+  background-color: #fef2f2;
+}
+html.light .bg-red-500\/15 {
+  background-color: #fee2e2;
 }
 
 /* ===== PERMUKAAN TRANSLUCENT -> OFF-WHITE ===== */
@@ -298,6 +343,15 @@ html.light .to-brand-navy {
 }
 html.light .bg-slate-900 {
   background-color: #fbfcfe;
+}
+html.light .bg-slate-900\/95 {
+  background-color: #fbfcfe;
+}
+html.light .bg-slate-800\/20 {
+  background-color: #f8fafc;
+}
+html.light .border-slate-700\/60 {
+  border-color: #b9cbe4;
 }
 
 /* ===== HEADING GRADASI -> NAVY + AKSEN BIRU TUA ===== */
@@ -450,6 +504,21 @@ html.light .hover\:bg-red-500\/20:hover {
 html.light .border-red-500\/30 {
   border-color: #fecaca;
 }
+html.light .border-red-500\/20,
+html.light .border-red-500\/25,
+html.light .border-red-400\/20,
+html.light .border-red-400\/30 {
+  border-color: #fecaca;
+}
+html.light .border-emerald-400\/20,
+html.light .border-emerald-400\/30 {
+  border-color: #a7f3d0;
+}
+html.light .border-amber-400\/20,
+html.light .border-amber-400\/30,
+html.light .border-amber-500\/30 {
+  border-color: #fde68a;
+}
 
 html.light .text-emerald-200 {
   color: #065f46;
@@ -521,7 +590,7 @@ html.light .hover\:bg-night-shade-hover:hover {
   background-color: #dbeafe;
 }
 html.light .bg-night-shade.hover\:text-white:hover {
-  color: #1e3a8a;
+  color: #404040;
 }
 
 /* ===== GRADIENT KARTU PUTIH TRANSPARAN -> KARTU PUTIH SOLID ===== */
@@ -553,17 +622,17 @@ html.light .bg-night-deep:not(footer) .text-white {
    off-white gradasi senada halaman. File ini di-import di main.jsx
    sehingga berlaku di semua layout (visitor, auth, admin). */
 html.light footer.bg-night-deep {
-  background: linear-gradient(180deg, #f7fafd 0%, #eaf1f9 100%);
-  border-color: #dbe6f5;
+  background: linear-gradient(180deg, #eaedf2 0%, #e0e4ea 100%);
+  border-color: #d6dbe2;
 }
 html.light footer.bg-night-deep h2.text-white {
-  color: #1e3a8a;
+  color: #404040;
 }
 html.light footer .text-slate-300 {
-  color: #64748b;
+  color: #404040;
 }
 html.light footer .text-slate-500 {
-  color: #94a3b8;
+  color: #404040;
 }
 html.light footer .hover\:text-cyan-300:hover {
   color: #2563eb;

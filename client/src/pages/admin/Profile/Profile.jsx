@@ -2,7 +2,7 @@ import AdminLayout from "../../../layouts/AdminLayout"
 import ProfileHero from "../../../components/sections/user/Profile/ProfileHero"
 import ProfileForm from "../../../components/sections/user/Profile/ProfileForm"
 
-function AdminProfile() {
+export default function AdminProfile() {
   return (
     <AdminLayout>
       <ProfileHero isAdmin />
@@ -10,5 +10,3 @@ function AdminProfile() {
     </AdminLayout>
   )
 }
-
-export default AdminProfile

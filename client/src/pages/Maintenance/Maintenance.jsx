@@ -1,7 +1,5 @@
 import MaintenanceSection from "../../components/sections/Maintenance/MaintenanceSection"
 
-function Maintenance() {
+export default function Maintenance() {
   return <MaintenanceSection />
 }
-
-export default Maintenance

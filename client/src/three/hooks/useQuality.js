@@ -13,9 +13,12 @@ function detectTier() {
   const cores = nav.hardwareConcurrency || (isMobile ? 4 : 8)
   const mem = nav.deviceMemory || (isMobile ? 4 : 8)
   if (cores <= 2 || mem <= 2) return "rendah"
-  if (isMobile && (cores <= 4 || mem <= 4)) return "rendah"
-  if (isMobile) return "sedang"
-  if (cores <= 4 || mem <= 4) return "sedang"
+  // HP/tablet flagship: GPU kuat, prioritas resolusi tajam
+  if (isMobile) return cores >= 8 && mem >= 6 ? "tinggi" : "sedang"
+  // Laptop/desktop: hanya mesin besar yang naik tier (lampu ekstra +
+  // shadow pass itu mahal); mayoritas laptop tetap "sedang" tapi kini
+  // lebih ringan karena lampu dekoratif dipangkas di tier ini
+  if (cores >= 12 && mem >= 8) return "tinggi"
   return "sedang"
 }
 
@@ -29,29 +32,37 @@ function detectMobile() {
 }
 
 // Cap device pixel ratio against a screen-pixel budget so hi-res monitors
-// don't multiply the fill-rate, while never rendering below native resolution
-// (below native = blurry). On DPR-1 desktop monitors the budget keeps DPR at
-// exactly 1.0 = native = sharp; only hi-DPI screens get a slight cap.
-function dprCapFor(max) {
+// don't multiply the fill-rate. The budget is set HIGH enough that phones
+// render near their native DPR (tajam / tidak burik) while huge desktop
+// monitors still get capped so fill-rate stays affordable.
+function dprCapFor(max, budget) {
   if (typeof window === "undefined") return max
   const native = Math.max(1, window.devicePixelRatio || 1)
   const cssPx = Math.max(1, window.innerWidth * window.innerHeight)
-  const budget = 2_600_000
   const capped = Math.min(native, max, Math.sqrt(budget / cssPx))
-  return Math.max(1, capped)
+  // Jangan pernah turun di bawah 1.25 — di bawah itu terlihat burik
+  return Math.max(1.25, capped)
 }
 
 export const useQualityStore = create(() => ({
   tier: detectTier(),
 }))
 
+// Budget piksel (css-px^2): layar kecil dapat DPR mendekati native,
+// monitor raksasa tetap dibatasi. Min 1.25 agar selalu tajam.
+const BUDGET_TINGGI = 3_200_000
+const BUDGET_SEDANG = 2_400_000
+const BUDGET_RENDAH = 1_600_000
+
 export const DPR_FOR = {
-  rendah: [1, 1],
-  sedang: [1, 1],
-  tinggi: [1, dprCapFor(1.25)],
+  rendah: [1.25, dprCapFor(1.5, BUDGET_RENDAH)],
+  sedang: [1.25, dprCapFor(2, BUDGET_SEDANG)],
+  tinggi: [1.25, dprCapFor(2.5, BUDGET_TINGGI)],
 }
 export const SHADOW_FOR = { rendah: 512, sedang: 512, tinggi: 1024 }
-export const ANISO_FOR = { rendah: 2, sedang: 4, tinggi: 4 }
+// Anisotropy tinggi = lantai marmer & dinding tetap tajam dilihat dari
+// sudut rendah (khas museum) — murah di GPU modern, hasilnya jelas terlihat
+export const ANISO_FOR = { rendah: 2, sedang: 8, tinggi: 16 }
 
 export function getAnisotropy() {
   return ANISO_FOR[useQualityStore.getState().tier]

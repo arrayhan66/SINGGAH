@@ -1,9 +1,8 @@
-// LIGHT MODE - versi pembanding skripsi, terpisah dari dark mode
 import LightModeNavbar from "../../components/light/LightModeNavbar"
 import LightModeHero from "../../components/light/LightModeHero"
 import LightModeFooter from "../../components/light/LightModeFooter"
 
-function LightModeHome() {
+export default function LightModeHome() {
   return (
     <div className="min-h-screen bg-paper flex flex-col">
       <LightModeNavbar />
@@ -14,5 +13,3 @@ function LightModeHome() {
     </div>
   )
 }
-
-export default LightModeHome

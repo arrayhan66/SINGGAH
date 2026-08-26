@@ -1,0 +1,80 @@
+/* ============================================================
+   LIGHT MODE - HALAMAN USER (Upload Karya, Edit Karya, Profil,
+   Karya Saya, Karya Tersimpan). Tema putih + biru senada
+   halaman utama. Dark mode tidak tersentuh.
+   ============================================================ */
+@import "./light-shared.css";
+
+/* ===== HERO & SECTION ===== */
+/* Root bg-brand-dark sudah diganti gradasi terang oleh
+   global-light.css; GlowBackground disembunyikan light-shared */
+
+/* ===== KARTU (GlassCard varian dark) ===== */
+/* Permukaan kartu sudah ditangani light-shared; di sini diberi
+   bayangan biru sedikit lebih jelas agar terpisah dari background */
+html.light .user-page .rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl {
+  box-shadow:
+    0 4px 16px -6px rgba(37, 99, 235, 0.12),
+    0 14px 34px -18px rgba(30, 64, 175, 0.16);
+}
+
+/* ===== UPLOAD PREVIEW: area thumbnail ===== */
+html.light .user-page .aspect-video.bg-brand-navy {
+  background-color: #eef3fa;
+}
+html.light .user-page .overflow-hidden.rounded-xl.border-white\/10.bg-white\/5 {
+  border-color: #dbe7f7;
+}
+
+/* ===== CHIP STATUS MyKarya (Menunggu/Disetujui/Ditolak) ===== */
+/* Latar navy -> soft blue; warna teks status digelapkan global */
+html.light .user-page span.rounded-full.bg-brand-navy\/80 {
+  background-color: #eff6ff;
+}
+
+/* Chip teknologi di kartu */
+html.light .user-page .rounded-md.border-slate-700\/50.bg-slate-800\/50 {
+  border-color: #dbe7f7;
+  background-color: #f8fafc;
+}
+
+/* Tombol "Edit" putih di atas kartu putih: beri tepi biru tipis */
+html.light .user-page button.rounded-xl.bg-white.text-slate-900 {
+  background-color: #ffffff;
+  box-shadow:
+    inset 0 0 0 1px #bfdbfe,
+    0 1px 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ===== DROPDOWN STATUS FILTER ===== */
+html.light .user-page .rounded-xl.border-2.border-white\/10.bg-slate-900\/95 {
+  border-color: #e2e8f0;
+}
+
+/* ===== BANNER EMAIL PENDING (PROFIL) ===== */
+html.light .user-page .border-amber-500\/30.bg-amber-500\/10 {
+  background-color: #fffbeb;
+}
+html.light .user-page button.border-amber-500\/40.bg-amber-500\/20 {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+html.light .user-page button.hover\:bg-amber-500\/30:hover {
+  color: #78350f;
+}
+
+/* ===== DOT STATUS ONLINE NAVBAR USER ===== */
+/* Ring dot memakai border-brand-dark -> putih agar menyatu pill */
+html.light .user-page .border-brand-dark {
+  border-color: #ffffff;
+}
+
+/* ===== AVATAR FALLBACK ===== */
+html.light .user-page .rounded-full.bg-cyan-400\/10.border-cyan-400\/30 {
+  background-color: #eff6ff;
+}
+
+/* ===== MODAL SUKSES / KONFIRMASI ===== */
+html.light .user-page .bg-emerald-500.hover\:bg-emerald-600:hover {
+  background-color: #059669;
+}

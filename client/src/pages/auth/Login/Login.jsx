@@ -1,13 +1,12 @@
 import LoginSection from "../../../components/sections/auth/Login/LoginSection"
 import Footer from "../../../components/layout/Footer"
+import "../../../styles/auth-light.css"
 
-function Login() {
+export default function Login() {
   return (
-    <main>
+    <main className="auth-page">
       <LoginSection />
       <Footer />
     </main>
   )
 }
-
-export default Login

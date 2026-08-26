@@ -1,7 +1,5 @@
 import HallSection from "../../components/hall/HallSection"
 
-function Hall() {
+export default function Hall() {
   return <HallSection />
 }
-
-export default Hall

@@ -1,7 +1,9 @@
 import { Text } from "@react-three/drei"
 import * as THREE from "three"
+import { useQualityStore } from "../hooks/useQuality"
 
 function Hologram({ title = "SINGGAH" }) {
+  const highTier = useQualityStore((s) => s.tier) === "tinggi"
   return (
     <group>
       {/* Light beam */}
@@ -104,7 +106,9 @@ function Hologram({ title = "SINGGAH" }) {
         {title}
       </Text>
 
-      <pointLight position={[0, 2.3, 0]} intensity={5} distance={16} color="#7dd3fc" />
+      {highTier && (
+        <pointLight position={[0, 2.3, 0]} intensity={5} distance={16} color="#7dd3fc" />
+      )}
     </group>
   )
 }

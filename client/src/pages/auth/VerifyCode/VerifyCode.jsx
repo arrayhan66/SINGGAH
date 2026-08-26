@@ -1,13 +1,12 @@
 import VerifyCodeSection from "../../../components/sections/auth/VerifyCode/VerifyCodeSection"
 import Footer from "../../../components/layout/Footer"
+import "../../../styles/auth-light.css"
 
-function VerifyCode() {
+export default function VerifyCode() {
   return (
-    <main>
+    <main className="auth-page">
       <VerifyCodeSection />
       <Footer />
     </main>
   )
 }
-
-export default VerifyCode

@@ -3,15 +3,8 @@ import useUserForm from "../../../hooks/useUserForm"
 import UserFormHero from "../../../components/sections/admin/ManageUsers/UserFormHero"
 import UserFormSection from "../../../components/sections/admin/ManageUsers/UserFormSection"
 
-function UserForm() {
-  const {
-    formData,
-    updateField,
-    handlePublish,
-    isEditMode,
-    saving,
-    goBack,
-  } = useUserForm()
+export default function UserForm() {
+  const { formData, updateField, handlePublish, isEditMode, saving, goBack } = useUserForm()
 
   return (
     <AdminLayout>
@@ -26,5 +19,3 @@ function UserForm() {
     </AdminLayout>
   )
 }
-
-export default UserForm

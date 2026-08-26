@@ -4,8 +4,8 @@ import logo from "../../assets/icons/logo.webp";
 
 function LightModeFooter() {
   return (
-    <footer className="mt-auto border-t border-[#E5E9EF] bg-white w-full shadow-sm">
-      <div className="w-full flex flex-col items-center justify-between gap-5 px-6 py-8 sm:px-8 md:px-12 lg:flex-row lg:py-10 2xl:px-16 3xl:px-20">
+    <footer className="mt-auto border-t border-neutral-400 bg-white w-full shadow-sm">
+      <div className="w-full flex flex-col items-center justify-between gap-5 px-6 py-6 sm:px-8 md:px-12 lg:flex-row lg:py-8 2xl:px-16 3xl:px-20">
         {/* LOGO */}
         <NavLink to="/light-mode" className="flex items-center gap-2.5 sm:gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:h-10 sm:w-10 md:h-11 md:w-11 2xl:h-14 2xl:w-14">

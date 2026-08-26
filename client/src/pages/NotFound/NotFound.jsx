@@ -1,12 +1,10 @@
 import MainLayout from "../../layouts/MainLayout"
 import NotFoundContent from "../../components/sections/NotFoundContent"
 
-function NotFound() {
+export default function NotFound() {
   return (
     <MainLayout>
       <NotFoundContent />
     </MainLayout>
   )
 }
-
-export default NotFound

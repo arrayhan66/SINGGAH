@@ -1,0 +1,121 @@
+/* ============================================================
+   LIGHT MODE - SELURUH AREA ADMIN (Dashboard, Projects, Berita,
+   Users, Kategori, Media Library, Laporan, Pengaturan, Profil).
+   Tema putih + biru senada halaman publik. Dark mode tidak
+   tersentuh. Di-import sekali oleh AdminLayout.
+   ============================================================ */
+@import "./light-shared.css";
+
+/* ===== SIDEBAR ===== */
+html.light .admin-page aside.bg-brand-dark {
+  background: linear-gradient(180deg, #f7fafd 0%, #eef4fb 100%);
+}
+/* Glow ambient & gradasi dekoratif di dalam sidebar disembunyikan */
+html.light .admin-page aside .bg-cyan-500\/\[0\.07\] {
+  display: none;
+}
+html.light
+  .admin-page
+  aside
+  .bg-gradient-to-b.from-white\/\[0\.03\].via-transparent.to-black\/30 {
+  background-image: none;
+}
+
+/* Item menu AKTIF: pill soft blue + garis aksen biru (ikon biru
+   & teks gelap sudah ditangani aturan global) */
+html.light .admin-page span.rounded-xl.bg-white\/\[0\.05\] {
+  background-color: #eff6ff;
+  box-shadow: inset 0 0 0 1px #dbeafe;
+}
+
+/* ===== NAVBAR ADMIN ===== */
+html.light .admin-page header.bg-brand-dark\/90 {
+  background-color: rgba(247, 250, 253, 0.95);
+  border-color: #e2e8f0;
+}
+
+/* Dropdown notifikasi & profil: panel putih solid */
+html.light .admin-page .bg-brand-dark\/95 {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 24px 48px -16px rgba(30, 64, 175, 0.18);
+}
+
+/* Tombol menu mobile melayang: lingkaran putih + ikon biru */
+html.light
+  .admin-page
+  button.h-12.w-12.rounded-full.border-white\/15.bg-brand-dark\/90 {
+  border-color: #bfdbfe;
+  background-color: #ffffff;
+  color: #2563eb;
+}
+html.light
+  .admin-page
+  button.h-12.w-12.rounded-full.hover\:text-white:hover {
+  color: #1d4ed8;
+}
+
+/* Bayangan hitam berat (sidebar/navbar/tombol) -> bayangan biru */
+html.light .admin-page .shadow-black\/40 {
+  box-shadow: 0 14px 30px -14px rgba(37, 99, 235, 0.35);
+}
+
+/* ===== HERO DASHBOARD: KARTU STATISTIK GRADASI TINT ===== */
+/* Gradasi warna-500/20 -> tint pastel per status */
+html.light
+  .admin-page
+  .from-cyan-500\/20.via-cyan-500\/\[0\.06\].to-transparent {
+  background-image: linear-gradient(135deg, #eff6ff 0%, #ffffff 75%);
+}
+html.light
+  .admin-page
+  .from-emerald-500\/20.via-emerald-500\/\[0\.06\].to-transparent {
+  background-image: linear-gradient(135deg, #ecfdf5 0%, #ffffff 75%);
+}
+html.light
+  .admin-page
+  .from-red-500\/20.via-red-500\/\[0\.06\].to-transparent {
+  background-image: linear-gradient(135deg, #fef2f2 0%, #ffffff 75%);
+}
+html.light
+  .admin-page
+  .from-amber-500\/20.via-amber-500\/\[0\.06\].to-transparent {
+  background-image: linear-gradient(135deg, #fffbeb 0%, #ffffff 75%);
+}
+
+/* ===== QUICK ACTION TILE (dashboard) ===== */
+html.light .admin-page .hover\:from-cyan-500\/\[0\.12\]:hover {
+  background-image: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+}
+
+/* ===== FILTER TAB AKTIF (Users/Berita) ===== */
+/* Tab aktif gradasi translusen -> pill biru solid teks putih */
+html.light .admin-page .from-cyan-500\/25.to-blue-500\/25 {
+  background-image: none;
+  background-color: #2563eb;
+  color: #ffffff;
+}
+html.light .admin-page .bg-cyan-500\/25 {
+  background-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+/* ===== MODAL DENGAN HEADER/FOOTER brand-navy ===== */
+html.light .admin-page .bg-brand-navy\/90 {
+  background-color: #f3f7fc;
+}
+/* Panel modal gradasi navy/dark/slate (media & kategori) */
+html.light .admin-page [class*="from-brand-navy/95"] {
+  background-image: linear-gradient(
+    160deg,
+    #f8fbff 0%,
+    #eef3fa 55%,
+    #e9effa 100%
+  );
+}
+
+/* ===== BADGE TIPE USER DI KARTU (cyan/blue/purple) ===== */
+html.light .admin-page .border-purple-400\/20.bg-purple-400\/10,
+html.light .admin-page .border-blue-400\/20.bg-blue-400\/10 {
+  background-color: #eff6ff;
+}

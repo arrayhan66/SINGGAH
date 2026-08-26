@@ -87,10 +87,14 @@ function KaryaProjectDetailSection() {
     )
   }
 
-  const gallery =
-    Array.isArray(project.images) && project.images.length > 0
-      ? project.images.map((img) => img.image_url).filter(Boolean)
-      : [project.thumbnail]
+  const gallery = Array.from(
+    new Set([
+      project.thumbnail,
+      ...(Array.isArray(project.images) ? project.images : []).map(
+        (img) => img.image_url,
+      ),
+    ]),
+  ).filter(Boolean)
 
   const formatDate = (dateString) => {
     if (!dateString) return ""

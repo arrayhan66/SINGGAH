@@ -3,7 +3,7 @@ import Hero from "../../components/sections/Hero/Hero"
 import FAQ from "../../components/sections/FAQ"
 import "../../styles/beranda-light.css"
 
-function Home() {
+export default function Home() {
   return (
     <div className="beranda-page">
       <MainLayout>
@@ -13,5 +13,3 @@ function Home() {
     </div>
   )
 }
-
-export default Home

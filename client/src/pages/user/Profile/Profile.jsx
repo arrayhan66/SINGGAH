@@ -2,7 +2,7 @@ import UserLayout from "../../../layouts/UserLayout"
 import ProfileHero from "../../../components/sections/user/Profile/ProfileHero"
 import ProfileForm from "../../../components/sections/user/Profile/ProfileForm"
 
-function Profile() {
+export default function Profile() {
   return (
     <UserLayout>
       <ProfileHero />
@@ -10,5 +10,3 @@ function Profile() {
     </UserLayout>
   )
 }
-
-export default Profile

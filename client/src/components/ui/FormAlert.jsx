@@ -1,10 +1,8 @@
-// File: src/ui/FormAlert.jsx (Sesuaikan letak foldernya)
 import { AlertCircle } from "lucide-react"
 
 export default function FormAlert({ message, type = "error" }) {
   if (!message) return null
 
-  // Kita kasih opsi warna kalau mau nampilin sukses (hijau) atau error (merah)
   const isError = type === "error"
 
   return (

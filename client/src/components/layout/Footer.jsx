@@ -1,10 +1,14 @@
 import { NavLink } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext";
 import logo from "../../assets/icons/logo.webp";
 
 function Footer() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   return (
-    <footer className="mt-auto border-t border-white/10 bg-night-deep w-full">
-      <div className="w-full flex flex-col items-center justify-between gap-5 px-6 py-8 sm:px-8 md:px-12 lg:flex-row lg:py-10 2xl:px-16 3xl:px-20">
+    <footer className={`mt-auto w-full ${isDark ? "border-t border-white/10 bg-night-deep" : "border-t border-neutral-400 bg-white shadow-sm"}`}>
+      <div className="w-full flex flex-col items-center justify-between gap-5 px-6 py-6 sm:px-8 md:px-12 lg:flex-row lg:py-8 2xl:px-16 3xl:px-20">
         {/* LOGO */}
         <NavLink to="/" className="flex items-center gap-2.5 sm:gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:h-10 sm:w-10 md:h-11 md:w-11 2xl:h-14 2xl:w-14">
@@ -15,32 +19,32 @@ function Footer() {
             />
           </div>
 
-          <h2 className="text-base font-bold text-white sm:text-lg md:text-xl 2xl:text-2xl">
+          <h2 className={`text-base font-bold sm:text-lg md:text-xl 2xl:text-2xl ${isDark ? "text-white" : "text-neutral-900"}`}>
             SINGGAH
           </h2>
         </NavLink>
 
         {/* MENU */}
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-slate-300 sm:text-sm md:text-base lg:gap-x-10 2xl:text-lg">
-          <NavLink to="/" className="transition hover:text-cyan-300">
+        <div className={`flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs sm:text-sm md:text-base lg:gap-x-10 2xl:text-lg ${isDark ? "text-slate-300" : "text-[#6B7280]"}`}>
+          <NavLink to="/" className={`transition ${isDark ? "hover:text-cyan-300" : "hover:text-blue-600"}`}>
             Beranda
           </NavLink>
 
-          <NavLink to="/karya" className="transition hover:text-cyan-300">
+          <NavLink to="/karya" className={`transition ${isDark ? "hover:text-cyan-300" : "hover:text-blue-600"}`}>
             Karya
           </NavLink>
 
-          <NavLink to="/about" className="transition hover:text-cyan-300">
+          <NavLink to="/about" className={`transition ${isDark ? "hover:text-cyan-300" : "hover:text-blue-600"}`}>
             Tentang
           </NavLink>
 
-          <NavLink to="/berita" className="transition hover:text-cyan-300">
+          <NavLink to="/berita" className={`transition ${isDark ? "hover:text-cyan-300" : "hover:text-blue-600"}`}>
             Berita
           </NavLink>
         </div>
 
         {/* COPYRIGHT */}
-        <p className="text-center text-[10px] text-slate-500 sm:text-xs md:text-sm 2xl:text-base">
+        <p className={`text-center text-[10px] sm:text-xs md:text-sm 2xl:text-base ${isDark ? "text-slate-500" : "text-[#6B7280]"}`}>
           Copyright © 2026 SINGGAH — Dibuat ElektroPoliban
         </p>
       </div>

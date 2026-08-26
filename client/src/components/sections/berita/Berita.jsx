@@ -8,12 +8,15 @@ import GlassCard from "../../ui/GlassCard"
 import SearchBar from "../../ui/SearchBar"
 import OutlineButton from "../../ui/OutlineButton"
 import { useBerita } from "../../../context/BeritaContext"
+import { useTheme } from "../../../context/ThemeContext"
 import { NewsGridSkeleton } from "../../ui/Skeleton"
 import { imageUrl } from "../../../utils/imageUrl"
 
 function Berita() {
   const navigate = useNavigate()
   const { beritaList, loading } = useBerita()
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
   const initialCount = 6
 
   const {
@@ -81,7 +84,7 @@ function Berita() {
                     </div>
                   )}
 
-                  <div className="absolute top-3 left-3 px-2.5 py-0.5 rounded-lg bg-brand-navy/80 backdrop-blur-md text-cyan-300 text-[10px] font-semibold border border-cyan-500/30 shadow-md sm:top-4 sm:left-4 sm:px-3 sm:py-1 sm:text-xs md:text-xs 3xl:text-sm 4xl:px-4 4xl:py-1.5 4xl:text-base">
+                  <div className={`absolute top-3 left-3 px-2.5 py-0.5 rounded-lg text-[10px] font-semibold shadow-md sm:top-4 sm:left-4 sm:px-3 sm:py-1 sm:text-xs md:text-xs 3xl:text-sm 4xl:px-4 4xl:py-1.5 4xl:text-base ${isDark ? "bg-white text-slate-900" : "bg-brand-navy/80 backdrop-blur-md text-cyan-300 border border-cyan-500/30"}`}>
                     {item.tags?.[0] || "Berita"}
                   </div>
                 </div>
@@ -106,7 +109,7 @@ function Berita() {
                       </div>
                     </div>
 
-                    <h3 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors line-clamp-2 leading-snug sm:text-lg md:text-xl lg:text-xl 3xl:text-2xl 4xl:text-3xl">
+                    <h3 className="text-base font-bold text-white line-clamp-2 leading-snug sm:text-lg md:text-xl lg:text-xl 3xl:text-2xl 4xl:text-3xl">
                       {item.title}
                     </h3>
 
@@ -147,7 +150,7 @@ function Berita() {
               </GlassCard>
             ))
           ) : (
-            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 py-12 sm:py-16 md:py-20 lg:py-24 3xl:py-28 4xl:py-32">
+            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 px-4 py-12 text-center sm:px-6 sm:py-16 md:py-20 lg:py-24 3xl:py-28 4xl:py-32">
               <div className="mb-4 rounded-full bg-slate-800/50 p-3 ring-1 ring-slate-700/50 backdrop-blur-sm sm:mb-5 sm:p-4 3xl:p-5 4xl:p-6">
                 <svg
                   className="h-8 w-8 text-slate-400 sm:h-9 sm:w-9 md:h-10 md:w-10 lg:h-11 lg:w-11 3xl:h-12 3xl:w-12 4xl:h-14 4xl:w-14"
@@ -163,7 +166,7 @@ function Berita() {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-slate-200 sm:text-xl 3xl:text-2xl 4xl:text-3xl">
+              <h3 className="text-center text-lg font-bold text-slate-200 sm:text-xl 3xl:text-2xl 4xl:text-3xl">
                 Berita tidak ditemukan
               </h3>
               <p className="mt-2 max-w-sm text-center text-xs text-slate-400 sm:max-w-md sm:text-sm md:text-base lg:text-base 3xl:mt-3 3xl:text-lg 4xl:text-xl">

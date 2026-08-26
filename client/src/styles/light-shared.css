@@ -169,17 +169,17 @@ html.light .text-slate-400 {
 /* ===== FOOTER ===== */
 html.light footer.bg-night-deep,
 html.light footer.bg-\[\#02111f\] {
-  background: linear-gradient(180deg, #f7fafd 0%, #eaf1f9 100%);
-  border-color: #dbe6f5;
+  background: linear-gradient(180deg, #eaedf2 0%, #e0e4ea 100%);
+  border-color: #d6dbe2;
 }
 html.light footer h2.text-white {
   color: #404040;
 }
 html.light footer .text-slate-300 {
-  color: #64748b;
+  color: #404040;
 }
 html.light footer .text-slate-500 {
-  color: #94a3b8;
+  color: #404040;
 }
 html.light footer .hover\:text-cyan-300:hover {
   color: #2563eb;

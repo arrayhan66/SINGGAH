@@ -51,7 +51,7 @@ html.light .tentang-page #about::after {
 
 /* ===== HEADING UTAMA ===== */
 html.light .tentang-page #about h2.text-white {
-  color: #1e3a8a;
+  color: #404040;
 }
 
 /* "Inovasi" highlight: teks gradient biru -> sky */
@@ -64,7 +64,7 @@ html.light .tentang-page #about h2 span.text-cyan-300 {
 
 /* ===== JUDUL CARD ===== */
 html.light .tentang-page #about h3.text-white {
-  color: #1e3a8a;
+  color: #404040;
 }
 
 /* ===== HOVER CARD (hubungi kami + kartu kecil + statistik) ===== */
@@ -87,7 +87,7 @@ html.light .tentang-page #about .group:hover .group-hover\:text-slate-200 {
 /* ===== LABEL KONTAK (Email / Telepon / Alamat) ===== */
 /* Base: heading kontak terlihat di card putih */
 html.light .tentang-page #about h4.text-white\/90 {
-  color: #1e3a8a;
+  color: #404040;
 }
 
 /* ===== ICON BOX KONTAK (mail & telepon: biru primer) ===== */
@@ -138,4 +138,18 @@ html.light .tentang-page #about .group:hover .group-hover\:text-cyan-300 {
 /* Angka statistik saat card di-hover: biru lebih tua */
 html.light .tentang-page #about .group:hover .group-hover\:text-white {
   color: #1d4ed8;
+}
+
+/* ===== JUDUL & LABEL HITAM SINGGAH (#404040) ===== */
+/* Heading utama "Wadah Inovasi Mahasiswa" */
+html.light .tentang-page #about h2.font-black.text-white {
+  color: #404040;
+}
+/* Judul "Hubungi Kami" & judul kartu (Edukasi/Inovasi/Kolaborasi/Prestasi) */
+html.light .tentang-page #about h3.text-white {
+  color: #404040;
+}
+/* Label Email / Telepon / Alamat */
+html.light .tentang-page #about h4.font-semibold.text-white\/90 {
+  color: #404040;
 }

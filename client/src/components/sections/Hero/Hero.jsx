@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { Suspense, lazy } from "react";
 import DustBackground from "../../ui/DustBackground";
+import { useTheme } from "../../../context/ThemeContext";
 import GlowBackground from "../../ui/GlowBackground";
 import PCBBackground from "../../ui/PCBBackground";
 import logoPoliban from "../../../assets/icons/Logo_Poliban.png";
@@ -13,6 +14,8 @@ const HERO_MODEL_BOX =
 
 function Hero() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   return (
     <section
@@ -21,7 +24,9 @@ function Hero() {
     >
       <GlowBackground />
       <PCBBackground />
-      <DustBackground />
+      {/* Partikel melayang: biru langit di dark mode, biru primer
+          di light mode biar elegan di atas bg putih */}
+      <DustBackground color={isDark ? "#7dd3fc" : "#2563eb"} />
 
       {/* Class lg:items-start dihapus, jadi items-center berlaku untuk desktop juga biar sejajar */}
       <div className="relative z-10 mx-auto flex min-h-screen max-w-[1700px] flex-col lg:flex-row items-center justify-between px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-[calc(var(--navbar-h)+24px)] pb-12">

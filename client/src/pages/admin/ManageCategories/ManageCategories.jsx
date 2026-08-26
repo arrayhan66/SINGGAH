@@ -1,12 +1,10 @@
 import AdminLayout from "../../../layouts/AdminLayout"
 import CategorySection from "../../../components/sections/admin/ManageCategories/CategorySection"
 
-function ManageCategories() {
+export default function ManageCategories() {
   return (
     <AdminLayout>
       <CategorySection />
     </AdminLayout>
   )
 }
-
-export default ManageCategories

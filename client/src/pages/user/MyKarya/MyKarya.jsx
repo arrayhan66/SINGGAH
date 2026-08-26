@@ -1,12 +1,13 @@
 import MainLayout from "../../../layouts/MainLayout"
 import MyKaryaSection from "../../../components/sections/user/MyKarya/MyKaryaSection"
+import "../../../styles/user-light.css"
 
-function MyKarya() {
+export default function MyKarya() {
   return (
-    <MainLayout>
-      <MyKaryaSection />
-    </MainLayout>
+    <div className="user-page">
+      <MainLayout>
+        <MyKaryaSection />
+      </MainLayout>
+    </div>
   )
 }
-
-export default MyKarya

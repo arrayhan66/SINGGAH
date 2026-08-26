@@ -112,12 +112,12 @@ function KaryaProjectSection() {
           <Link
             to="/karya"
             aria-label="Kembali"
-            className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 p-2 sm:py-2 sm:pl-3 sm:pr-4 text-xs text-slate-300 backdrop-blur-sm transition-colors duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 sm:text-sm md:py-2.5 md:pl-3.5 md:pr-4.5 lg:py-3 lg:pl-4 lg:pr-5 lg:text-base 3xl:text-base 4xl:py-3.5 4xl:pl-5 4xl:pr-6 4xl:text-lg"
+            className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 py-[7px] pl-[15px] pr-[17px] text-xs text-slate-300 backdrop-blur-sm transition-colors duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 cursor-pointer"
           >
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 transition-colors duration-300 group-hover:bg-cyan-400/20 sm:h-6 sm:w-6 md:h-7 md:w-7 lg:h-8 lg:w-8 3xl:h-9 3xl:w-9 4xl:h-10 4xl:w-10">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-colors duration-300 group-hover:bg-cyan-400/20 sm:h-7 sm:w-7">
               <ArrowLeft
                 size={12}
-                className="transition-transform duration-300 group-hover:-translate-x-0.5 sm:size-[13px] md:size-3.5 lg:size-4 3xl:size-[18px] 4xl:size-5"
+                className="size-4 transition-transform duration-300 group-hover:-translate-x-0.5 sm:size-[13px]"
               />
             </span>
             <span className="hidden sm:inline">Kembali</span>
@@ -138,7 +138,7 @@ function KaryaProjectSection() {
           <SearchBar
             value={search}
             onChange={handleSearchChange}
-            placeholder={`Cari di kategori ${category.name}...`}
+            placeholder={`Cari karya di ${category.name}...`}
           />
         </div>
 
@@ -148,7 +148,7 @@ function KaryaProjectSection() {
               <KaryaProjectCard key={project.id} project={project} />
             ))
           ) : (
-            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 py-12 sm:py-16 md:py-20 lg:py-24 3xl:py-28 4xl:py-32">
+            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 px-4 py-12 text-center sm:px-6 sm:py-16 md:py-20 lg:py-24 3xl:py-28 4xl:py-32">
               <div className="mb-4 rounded-full bg-slate-800/50 p-3 ring-1 ring-slate-700/50 backdrop-blur-sm sm:mb-5 sm:p-4 3xl:p-5 4xl:p-6">
                 <svg
                   className="h-8 w-8 text-slate-400 sm:h-9 sm:w-9 md:h-10 md:w-10 lg:h-11 lg:w-11 3xl:h-12 3xl:w-12 4xl:h-14 4xl:w-14"
@@ -164,7 +164,7 @@ function KaryaProjectSection() {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-slate-200 sm:text-xl 3xl:text-2xl 4xl:text-3xl">
+              <h3 className="text-center text-lg font-bold text-slate-200 sm:text-xl 3xl:text-2xl 4xl:text-3xl">
                 Karya tidak ditemukan
               </h3>
               <p className="mt-2 max-w-sm text-center text-xs text-slate-400 sm:max-w-md sm:text-sm md:text-base lg:text-base 3xl:mt-3 3xl:text-lg 4xl:text-xl">

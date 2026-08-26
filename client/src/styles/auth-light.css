@@ -1,0 +1,44 @@
+/* ============================================================
+   LIGHT MODE - HALAMAN AUTH (Login, Register, Forgot Password,
+   Verify Code, Reset Password). Tema putih + biru senada
+   halaman utama. Dark mode tidak tersentuh.
+   ============================================================ */
+@import "./light-shared.css";
+
+/* ===== KARTU UTAMA AUTH ===== */
+/* Panel kaca gelap -> kartu putih solid dengan border & bayangan
+   biru lembut */
+html.light .auth-page .rounded-3xl.border-cyan-400\/40.bg-white\/5 {
+  background-color: #ffffff;
+  border-color: #bfdbfe;
+  box-shadow: 0 30px 60px -20px rgba(30, 64, 175, 0.22);
+}
+
+/* ===== PANEL BRANDING (kiri) ===== */
+/* Root panel slate-950 sudah tertutup overlay putihnya; netralkan
+   sisa dasarnya agar tepi panel ikut terang */
+html.light .auth-page .bg-slate-950 {
+  background-color: #f6f9fe;
+}
+
+/* ===== MODAL VERIFIKASI PENDING ===== */
+/* Kotak ikon gradasi cyan/blue translusen -> pastel biru solid */
+html.light .auth-page .from-cyan-500\/30.to-blue-600\/30 {
+  background-image: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+html.light .auth-page .shadow-cyan-900\/40 {
+  box-shadow: 0 30px 60px -20px rgba(30, 64, 175, 0.2);
+}
+
+/* ===== TOMBOL KEMBALI (chip night-shade) ===== */
+/* Warna dasar ditangani global (bg-night-shade -> soft blue);
+   teks default-nya dibuat biru tua biar kontras di chip terang */
+html.light .auth-page .bg-night-shade.text-cyan-100 {
+  color: #1d4ed8;
+}
+
+/* ===== INPUT AUTOFILL ===== */
+html.light .auth-page input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #f8fafc inset;
+  -webkit-text-fill-color: #0f172a;
+}

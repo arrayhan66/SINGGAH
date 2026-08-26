@@ -2,7 +2,7 @@ import UserLayout from "../../../layouts/UserLayout"
 import UploadHero from "../../../components/sections/user/Upload/UploadHero"
 import UploadForm from "../../../components/sections/user/Upload/UploadForm"
 
-function Upload() {
+export default function Upload() {
   return (
     <UserLayout>
       <UploadHero />
@@ -10,5 +10,3 @@ function Upload() {
     </UserLayout>
   )
 }
-
-export default Upload

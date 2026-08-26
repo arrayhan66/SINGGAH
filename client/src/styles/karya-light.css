@@ -220,47 +220,110 @@ html.light .karya-page .focus-within\:shadow-cyan-400\/30:focus-within {
     0 6px 12px -6px rgba(37, 99, 235, 0.22);
 }
 
-/* Tombol "Lihat Lebih Banyak": border biru senada teksnya + nuansa 3D
-   (muka gradasi, sisi bawah biru tebal, hover terangkat, klik menekan) */
+/* Tombol "Lihat Lebih Banyak": muka gradasi cyan -> biru PERSIS
+   tombol "Lihat Karya", teks putih + nuansa 3D yang sama
+   (sisi bawah biru tebal, hover terangkat, klik menekan).
+   Animasi hover disamakan dengan versi dark: easing lembut
+   + crossfade muka via ::before */
 html.light .karya-page button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10 {
-  border-color: #2563eb;
-  background-image: linear-gradient(180deg, #ffffff 0%, #dbeafe 100%);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: transparent;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  color: #ffffff;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 4px 0 #1d4ed8,
-    0 9px 18px -6px rgba(37, 99, 235, 0.35);
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 5px 0 #1d4ed8,
+    0 12px 24px -10px rgba(37, 99, 235, 0.35);
   transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    background-color 0.3s;
+    transform 0.35s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.35s cubic-bezier(0.33, 1, 0.68, 1);
+}
+html.light .karya-page button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(to bottom right, #06b6d4, #1d4ed8);
+  opacity: 0;
+  transition: opacity 0.35s ease;
 }
 html.light .karya-page button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10:hover {
   transform: translateY(-2px);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    0 6px 0 #1d4ed8,
-    0 14px 24px -8px rgba(37, 99, 235, 0.42);
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 7px 0 #1d4ed8,
+    0 18px 32px -14px rgba(37, 99, 235, 0.42);
+}
+html.light .karya-page button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10:hover::before {
+  opacity: 1;
 }
 html.light .karya-page button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10:active {
   transform: translateY(3px);
+  transition-duration: 0.15s;
   box-shadow:
-    inset 0 2px 4px rgba(29, 78, 216, 0.25),
+    inset 0 2px 4px rgba(29, 78, 216, 0.35),
     0 1px 0 #1d4ed8,
-    0 4px 10px -6px rgba(37, 99, 235, 0.3);
+    0 6px 14px -8px rgba(37, 99, 235, 0.3);
+}
+
+/* Tombol "Lihat Lebih Banyak" (DARK MODE): muka PUTIH senada tombol
+   "Lihat Karya" di dark mode (teks gelap), slab bawah #02111f PERSIS
+   card kategori 3D dark mode. Animasi hover di-smooth-kan dengan
+   easing lembut + crossfade muka via ::before.
+   Desain dark & light lainnya tidak tersentuh */
+.karya-page button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10 {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: transparent;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+  background-color: transparent;
+  color: #0f172a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 5px 0 #02111f,
+    0 12px 24px -10px rgba(2, 8, 23, 0.55);
+  transition:
+    transform 0.35s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.35s cubic-bezier(0.33, 1, 0.68, 1);
+}
+.karya-page button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(180deg, #f1f5f9 0%, #cbd5e1 100%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.karya-page button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 7px 0 #02111f,
+    0 18px 32px -14px rgba(2, 8, 23, 0.6);
+}
+.karya-page button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10:hover::before {
+  opacity: 1;
+}
+.karya-page button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10:active {
+  transform: translateY(3px);
+  transition-duration: 0.15s;
+  box-shadow:
+    inset 0 2px 4px rgba(2, 8, 23, 0.45),
+    0 1px 0 #02111f,
+    0 6px 14px -8px rgba(2, 8, 23, 0.5);
 }
 
 /* ===== EMPTY STATE ===== */
-html.light .karya-page .border-dashed.border-slate-700\/60.bg-slate-800\/20 {
-  background-color: #f8fafc;
-  border-color: #c7d6ee;
+/* Kata kunci pencarian (dalam tanda kutip): warna biru menu aktif */
+.karya-page div.col-span-full span.font-semibold.text-slate-300 {
+  color: #67e8f9;
 }
-html.light .karya-page .bg-slate-800\/50.ring-slate-700\/50 {
-  background-color: #fbfcfe;
-  --tw-ring-color: #dbeafe;
-}
-html.light .karya-page h3.text-slate-200 {
-  color: #1e3a8a;
-}
-html.light .karya-page .font-semibold.text-slate-300 {
+html.light .karya-page div.col-span-full span.font-semibold.text-slate-300 {
   color: #2563eb;
 }

@@ -1,13 +1,12 @@
 import ForgotPasswordSection from "../../../components/sections/auth/ForgotPassword/ForgotPasswordSection"
 import Footer from "../../../components/layout/Footer"
+import "../../../styles/auth-light.css"
 
-function ForgotPassword() {
+export default function ForgotPassword() {
   return (
-    <main>
+    <main className="auth-page">
       <ForgotPasswordSection />
       <Footer />
     </main>
   )
 }
-
-export default ForgotPassword

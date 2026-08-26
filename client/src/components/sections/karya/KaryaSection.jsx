@@ -92,10 +92,10 @@ function KaryaSection() {
               />
             ))
           ) : (
-            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 py-16 sm:py-24 2xl:py-32 3xl:py-40 4xl:py-48">
-              <div className="mb-5 rounded-full bg-slate-800/50 p-4 ring-1 ring-slate-700/50 backdrop-blur-sm 3xl:p-6 4xl:p-8">
+            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 px-4 py-12 text-center sm:px-6 sm:py-16 md:py-20 lg:py-24 3xl:py-28 4xl:py-32">
+              <div className="mb-4 rounded-full bg-slate-800/50 p-3 ring-1 ring-slate-700/50 backdrop-blur-sm sm:mb-5 sm:p-4 3xl:p-5 4xl:p-6">
                 <svg
-                  className="h-10 w-10 text-slate-400 2xl:h-12 2xl:w-12 3xl:h-14 3xl:w-14 4xl:h-16 4xl:w-16"
+                  className="h-8 w-8 text-slate-400 sm:h-9 sm:w-9 md:h-10 md:w-10 lg:h-11 lg:w-11 3xl:h-12 3xl:w-12 4xl:h-14 4xl:w-14"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -108,10 +108,10 @@ function KaryaSection() {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-slate-200 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl">
+              <h3 className="text-center text-lg font-bold text-slate-200 sm:text-xl 3xl:text-2xl 4xl:text-3xl">
                 Kategori tidak ditemukan
               </h3>
-              <p className="mt-2 max-w-md text-center text-sm text-slate-400 sm:text-base 2xl:mt-3 2xl:text-lg 3xl:text-xl 4xl:text-2xl">
+              <p className="mt-2 max-w-sm text-center text-xs text-slate-400 sm:max-w-md sm:text-sm md:text-base lg:text-base 3xl:mt-3 3xl:text-lg 4xl:text-xl">
                 Maaf, kami tidak menemukan kategori yang cocok dengan kata kunci{" "}
                 <span className="font-semibold text-slate-300">&quot;{search}&quot;</span>
                 . Coba gunakan istilah lain.

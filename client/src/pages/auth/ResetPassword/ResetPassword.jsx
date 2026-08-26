@@ -1,13 +1,12 @@
 import ResetPasswordSection from "../../../components/sections/auth/ResetPassword/ResetPasswordSection"
 import Footer from "../../../components/layout/Footer"
+import "../../../styles/auth-light.css"
 
-function ResetPassword() {
+export default function ResetPassword() {
   return (
-    <main>
+    <main className="auth-page">
       <ResetPasswordSection />
       <Footer />
     </main>
   )
 }
-
-export default ResetPassword

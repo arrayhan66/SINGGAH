@@ -1,9 +1,10 @@
 import NavbarUser from "../components/layout/NavbarUser"
 import Footer from "../components/layout/Footer"
+import "../styles/user-light.css"
 
 function UserLayout({ children }) {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="user-page flex min-h-screen flex-col">
       <NavbarUser />
       <main className="flex-1">{children}</main>
       <Footer />

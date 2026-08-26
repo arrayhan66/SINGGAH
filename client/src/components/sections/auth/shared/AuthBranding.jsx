@@ -1,4 +1,3 @@
-// File: src/components/auth/LoginBranding.jsx
 import { Link } from "react-router-dom";
 import { ArrowLeft, ShieldCheck, Cpu } from "lucide-react";
 import logo from "../../../../assets/icons/logo.webp";
@@ -70,14 +69,12 @@ function AuthBranding({ backTo = "/" }) {
             </span>
           </h1>
 
-          {/* Description */}
           <p className="text-sm font-medium leading-relaxed text-slate-600 mb-6">
             Pusat kendali terpadu untuk mengelola project riset, memantau
             analitik performa, dan berkolaborasi secara real-time di lingkungan
             Jurusan Teknik Elektro Poliban.
           </p>
 
-          {/* Highlights */}
           <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-200/80">
             <div className="flex items-center gap-2.5 rounded-xl bg-cyan-50/70 p-2.5 border border-cyan-100/60">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-600 text-white shadow-sm">
@@ -110,7 +107,6 @@ function AuthBranding({ backTo = "/" }) {
         </div>
       </div>
 
-      {/* FOOTER INFO */}
       <div className="relative z-20 flex items-center justify-between text-xs font-medium text-slate-500 pt-2">
         <span>© {new Date().getFullYear()} Jurusan Teknik Elektro</span>
         <span className="flex items-center gap-1.5 text-cyan-700 font-semibold">

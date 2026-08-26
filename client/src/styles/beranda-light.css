@@ -148,6 +148,17 @@ html.light .beranda-page #faq > .pointer-events-none.inset-0:not(.opacity-20) ca
   filter: brightness(0.48) saturate(3) contrast(1.15);
 }
 
+/* Partikel HERO light mode: warna sudah di-set biru primer #2563eb
+   langsung dari JS -> filter penggelap di atas tidak berlaku di sini,
+   supaya partikel tampil apa adanya (elegan, tidak terlalu gelap) */
+html.light
+  .beranda-page
+  #hero
+  > .pointer-events-none.inset-0:not(.opacity-20):not(:last-child)
+  canvas {
+  filter: none;
+}
+
 /* Grid PCB: garis biru lembut & sedikit buram.
    Elemen aslinya punya class opacity-20 -> dikontrol di sini */
 html.light .beranda-page #hero > .pointer-events-none.opacity-20,
@@ -195,10 +206,15 @@ html.light .beranda-page #faq h2 span.text-cyan-300 {
   color: transparent;
 }
 
-/* Angka statistik hero (Proyek/Kategori/Pengunjung): biru primer SOLID,
-   tanpa gradasi cyan */
+/* Angka statistik hero (Proyek/Kategori/Pengunjung): hitam keabu
+   PERSIS tulisan "SINGGAH SEJENAK" */
 html.light .beranda-page #hero h2.text-cyan-300 {
-  color: #2563eb;
+  color: #404040;
+}
+
+/* Badge "Politeknik Negeri Banjarmasin": teks hitam keabu senada */
+html.light .beranda-page #hero span.font-medium.text-cyan-300 {
+  color: #404040;
 }
 
 /* Garis aksen */
@@ -215,6 +231,13 @@ html.light .beranda-page .text-slate-300 {
 /* Tombol "Mulai Eksplorasi" (#hero): tidak di-override lagi ->
    gradient animasi + hover slide + glow cyan sama persis dengan dark mode */
 
+/* Lingkaran panah di tombol "Mulai Eksplorasi" mobile:
+   putih solid supaya kontras jelas dengan gradient biru tombol */
+html.light .beranda-page #hero button span.rounded-full.bg-white\/20 {
+  background-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
 /* ===== CARD (stat card, faq card, stats mobile) ===== */
 /* Card putih solid + border biru + shadow biru */
 html.light .beranda-page .border-white\/10.bg-white\/5 {
@@ -229,9 +252,9 @@ html.light .beranda-page .hover\:border-cyan-400\/40:hover {
   border-color: #93c5fd;
 }
 
-/* Stat card mobile */
+/* Stat card mobile: angka ikut hitam keabu "SINGGAH SEJENAK" */
 html.light .beranda-page #hero p.font-bold.text-white {
-  color: #1e3a8a;
+  color: #404040;
 }
 html.light .beranda-page .text-slate-400 {
   color: #64748b;
@@ -307,19 +330,19 @@ html.light .beranda-page #faq button span.text-white {
 }
 
 /* ===== FOOTER ===== */
-/* Light theme: gradasi putih -> biru sangat muda */
+/* Light theme: gradasi abu #e5e8ed senada eksperimen */
 html.light .beranda-page footer.bg-\[\#02111f\] {
-  background: linear-gradient(180deg, #f7fafd 0%, #eaf1f9 100%);
-  border-color: #dbe6f5;
+  background: linear-gradient(180deg, #eaedf2 0%, #e0e4ea 100%);
+  border-color: #d6dbe2;
 }
 html.light .beranda-page footer h2.text-white {
   color: #404040;
 }
 html.light .beranda-page footer .text-slate-300 {
-  color: #64748b;
+  color: #404040;
 }
 html.light .beranda-page footer .text-slate-500 {
-  color: #475569;
+  color: #404040;
 }
 
 html.light .beranda-page footer .hover\:text-cyan-300:hover {

@@ -403,7 +403,6 @@ html.light
 html.light
   .karya-projectdetail-page
   button.rounded-full.border-white\/20.bg-brand-dark\/90.backdrop-blur-md {
-  position: relative;
   isolation: isolate;
   overflow: hidden;
   border-color: rgba(255, 255, 255, 0.35);
@@ -661,17 +660,21 @@ html.light
     0 4px 10px -6px rgba(29, 78, 216, 0.4);
 }
 
-/* ===== SHARE MODAL (PROJECT DETAIL) ===== */
-/* Lingkaran ikon Twitter saat hover: soft blue + ikon biru
-   (defaultnya teks putih -> tak terlihat di permukaan terang) */
-html.light .karya-projectdetail-page .group:hover .group-hover\:bg-slate-800 {
-  background-color: #dbeafe;
+/* ===== SHARE MODAL (PROJECT DETAIL + BERITA DETAIL) ===== */
+/* Lingkaran ikon X: default bg-white/10 text-slate-200 -> light mode lebih kontras */
+html.light .karya-projectdetail-page .rounded-full.bg-white\/10.text-slate-200,
+html.light .berita-detail-page .rounded-full.bg-white\/10.text-slate-200 {
+  background-color: #e2e8f0;
+  color: #334155;
 }
-html.light .karya-projectdetail-page .group:hover .group-hover\:text-white {
-  color: #2563eb;
+html.light .karya-projectdetail-page .group:hover .group-hover\:bg-black,
+html.light .berita-detail-page .group:hover .group-hover\:bg-black {
+  background-color: #0f172a;
+  color: #ffffff;
 }
 /* Bayangan modal gelap kebiruan -> bayangan biru lembut senada tema */
-html.light .karya-projectdetail-page .shadow-cyan-900\/20 {
+html.light .karya-projectdetail-page .shadow-cyan-900\/20,
+html.light .berita-detail-page .shadow-cyan-900\/20 {
   box-shadow: 0 24px 48px -16px rgba(30, 64, 175, 0.25);
 }
 

@@ -22,6 +22,7 @@ html.light .beranda-page {
 
 /* ===== NAVBAR ===== */
 /* Putih kebiruan translucent + shadow biru: jelas terpisah dari hero */
+html.light .beranda-page header .border-white\/10.bg-\[\#132d4d\],
 html.light .beranda-page header .border-white\/10.bg-white\/5 {
   background: linear-gradient(
     135deg,

@@ -43,6 +43,7 @@ html.light section > .pointer-events-none.inset-0:not(.opacity-20):not(:last-chi
 }
 
 /* ===== NAVBAR ===== */
+html.light header .border-white\/10.bg-\[\#132d4d\],
 html.light header .border-white\/10.bg-white\/5 {
   background: linear-gradient(
     135deg,

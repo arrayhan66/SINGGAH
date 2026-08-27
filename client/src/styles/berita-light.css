@@ -210,3 +210,8 @@ html.light .berita-page h3.text-slate-200 {
 html.light .berita-page .font-semibold.text-slate-300 {
   color: #2563eb;
 }
+
+/* Figcaption foto dalam artikel */
+html.light .figcaption-caption {
+  color: #000000 !important;
+}

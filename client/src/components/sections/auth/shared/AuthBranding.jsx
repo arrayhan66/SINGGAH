@@ -1,20 +1,25 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft, ShieldCheck, Cpu } from "lucide-react";
 import logo from "../../../../assets/icons/logo.webp";
-import bglogin from "../../../../assets/images/bg-login.webp";
+import bgloginDark from "../../../../assets/images/bg-login.webp";
+import bgloginLight from "../../../../assets/images/bg-login-lightmode.jpg";
 import logoPoliban from "../../../../assets/icons/Logo_Poliban.png";
+import { useTheme } from "../../../../context/ThemeContext";
 
 function AuthBranding({ backTo = "/" }) {
+  const { theme } = useTheme();
+  const isLight = theme === "light";
+  const bglogin = isLight ? bgloginLight : bgloginDark;
   return (
     <div className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-slate-950 p-10 lg:p-14 2xl:p-16 lg:flex border-r border-cyan-500/20">
       <img
         src={bglogin}
         loading="lazy"
         alt="Background"
-        className="absolute inset-0 h-full w-full object-cover opacity-35 mix-blend-luminosity scale-105 transition-transform duration-1000"
+        className={`absolute inset-0 h-full w-full object-cover scale-105 transition-transform duration-1000 ${isLight ? "opacity-90" : "opacity-35 mix-blend-luminosity"}`}
       />
 
-      <div className="absolute inset-0 bg-gradient-to-tr from-white/95 via-white/80 to-cyan-50/70 backdrop-blur-[2px]" />
+      <div className={`absolute inset-0 backdrop-blur-[2px] ${isLight ? "bg-gradient-to-tr from-white/40 via-white/20 to-cyan-50/30" : "bg-gradient-to-tr from-white/95 via-white/80 to-cyan-50/70"}`} />
 
       <div className="absolute -left-24 top-1/4 h-80 w-80 rounded-full bg-cyan-400/30 blur-[90px] pointer-events-none" />
       <div className="absolute right-10 bottom-10 h-72 w-72 rounded-full bg-blue-500/20 blur-[100px] pointer-events-none" />

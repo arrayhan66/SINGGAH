@@ -19,10 +19,10 @@ function KaryaProjectContent({ project }) {
         href={link.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-slate-900 sm:w-auto 2xl:px-5 2xl:py-3 2xl:text-base"
+        className="flex w-full cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-slate-900 min-[350px]:px-4 min-[350px]:py-2.5 min-[350px]:text-sm sm:w-auto 2xl:px-5 2xl:py-3 2xl:text-base"
       >
-        <ExternalLink size={14} className="2xl:size-4" />
-        {link.label}
+        <ExternalLink size={14} className="shrink-0 2xl:size-4" />
+        <span className="truncate">{link.label}</span>
       </a>
     );
   }
@@ -33,10 +33,10 @@ function KaryaProjectContent({ project }) {
         key={doc.id || doc.file_url}
         type="button"
         onClick={() => openDocument(doc)}
-        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-600 shadow-sm transition hover:bg-slate-50 hover:text-slate-800 sm:w-auto sm:justify-start 2xl:px-5 2xl:py-3 2xl:text-base"
+        className="flex w-full cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 shadow-sm transition hover:bg-slate-50 hover:text-slate-800 min-[350px]:px-4 min-[350px]:py-2.5 min-[350px]:text-sm sm:w-auto sm:justify-start 2xl:px-5 2xl:py-3 2xl:text-base"
       >
-        <FileText size={14} className="2xl:size-4" />
-        {doc.name}
+        <FileText size={14} className="shrink-0 2xl:size-4" />
+        <span className="truncate">{doc.name}</span>
       </button>
     );
   }

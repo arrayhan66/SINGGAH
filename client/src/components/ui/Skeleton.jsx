@@ -39,16 +39,22 @@ export function ProjectGridSkeleton({ count = 6 }) {
 
 export function NewsCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-      <ImageSkeleton className="rounded-xl" />
-      <div className="mt-4 space-y-2.5">
-        <Skeleton className="h-4 w-24" />
-        <TextSkeleton className="h-5 w-11/12" />
-        <TextSkeleton className="h-3 w-full" />
-        <TextSkeleton className="h-3 w-3/4" />
-        <div className="flex items-center gap-3 pt-2">
-          <Skeleton className="h-7 w-7 rounded-full" />
-          <Skeleton className="h-3.5 w-28" />
+    <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
+      <Skeleton className="h-40 w-full rounded-none sm:h-48 md:h-52 lg:h-56 3xl:h-64 4xl:h-72" />
+      <div className="p-4 sm:p-5 md:p-6 lg:p-7 space-y-3">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-3 w-20 sm:h-3.5 sm:w-24" />
+          <Skeleton className="h-3 w-16 sm:h-3.5 sm:w-20" />
+        </div>
+        <Skeleton className="h-5 w-11/12 sm:h-6 md:h-7" />
+        <div className="space-y-1.5">
+          <Skeleton className="h-3 w-full sm:h-3.5" />
+          <Skeleton className="h-3 w-full sm:h-3.5" />
+          <Skeleton className="h-3 w-3/4 sm:h-3.5" />
+        </div>
+        <div className="flex items-center justify-between pt-3 border-t border-white/10 sm:pt-4">
+          <Skeleton className="h-3 w-20 sm:h-3.5 sm:w-24" />
+          <Skeleton className="h-7 w-16 rounded-xl sm:h-8 sm:w-20 md:h-9 lg:h-10 lg:w-24" />
         </div>
       </div>
     </div>
@@ -57,11 +63,11 @@ export function NewsCardSkeleton() {
 
 export function NewsGridSkeleton({ count = 6 }) {
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 md:gap-7 lg:grid-cols-3 lg:gap-8 xl:gap-9">
+    <>
       {Array.from({ length: count }, (_, i) => (
         <NewsCardSkeleton key={i} />
       ))}
-    </div>
+    </>
   )
 }
 

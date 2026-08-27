@@ -9,15 +9,19 @@ export function processContentHtml(html) {
     if (!caption) return
 
     const figure = doc.createElement("figure")
-    figure.className = "my-4 sm:my-5 rounded-xl overflow-hidden"
+    figure.className = "my-2 min-[350px]:my-4 sm:my-5 rounded-xl overflow-hidden"
 
     const imgClone = img.cloneNode(true)
     imgClone.removeAttribute("data-caption")
     imgClone.removeAttribute("title")
-    imgClone.className = "w-full h-auto object-cover block"
+    imgClone.removeAttribute("width")
+    imgClone.removeAttribute("height")
+    imgClone.removeAttribute("style")
+    imgClone.removeAttribute("class")
+    imgClone.className = "block h-auto w-full max-w-full"
 
     const figcaption = doc.createElement("figcaption")
-    figcaption.className = "relative border-l-[4px] border-cyan-400 dark:border-cyan-400 pl-4 sm:pl-5 py-2.5 bg-gradient-to-r from-cyan-500/10 to-transparent dark:from-cyan-400/10 text-slate-700 dark:text-slate-200 text-sm sm:text-[15px] sm:text-base italic leading-relaxed rounded-r-lg"
+    figcaption.className = "relative border-l-[4px] border-cyan-400 pl-4 sm:pl-5 py-2.5 bg-gradient-to-r from-cyan-500/10 to-transparent text-white text-sm sm:text-[15px] sm:text-base italic leading-relaxed rounded-r-lg figcaption-caption"
     figcaption.textContent = caption
 
     const wrapper = doc.createElement("div")

@@ -172,7 +172,7 @@ function NewsContent({ item }) {
             return (
               <div
                 key={index}
-                className={`prose prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-img:rounded-xl prose-img:mx-auto prose-p:leading-relaxed prose-p:my-4 prose-img:my-6 ${isDark ? "prose-invert prose-slate" : "prose-slate"}`}
+                className={`prose prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-img:rounded-none prose-img:mx-auto prose-p:leading-relaxed prose-p:my-4 prose-img:my-0 prose-figure:my-0 ${isDark ? "prose-invert prose-slate" : "prose-slate"}`}
                 dangerouslySetInnerHTML={{ __html: processContentHtml(part) }}
               />
             )
@@ -186,7 +186,7 @@ function NewsContent({ item }) {
   if (hasHTML) {
     return (
       <div
-        className={`prose prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-img:rounded-xl prose-img:mx-auto prose-p:leading-relaxed prose-p:my-4 prose-img:my-6 ${isDark ? "prose-invert prose-slate" : "prose-slate"}`}
+        className={`prose prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-img:rounded-none prose-img:mx-auto prose-p:leading-relaxed prose-p:my-4 prose-img:my-0 prose-figure:my-0 ${isDark ? "prose-invert prose-slate" : "prose-slate"}`}
         dangerouslySetInnerHTML={{ __html: processContentHtml(item.contentHTML) }}
       />
     )
@@ -209,7 +209,7 @@ function NewsContent({ item }) {
               {restOfParagraph}
             </p>
             {correspondingPhoto && (
-              <figure className="relative my-2 min-[350px]:my-5 rounded-xl overflow-hidden">
+              <figure className="relative my-2 min-[350px]:my-5 rounded-none overflow-hidden">
                 <div className={`w-full max-h-[500px] overflow-hidden ${isDark ? "bg-slate-800" : "bg-slate-100"}`}>
                   <img
                     src={imageUrl(correspondingPhoto.url)}
@@ -234,7 +234,7 @@ function NewsContent({ item }) {
         <div key={index} className="space-y-3 min-[350px]:space-y-8">
           <p className={`leading-relaxed ${isDark ? "text-slate-300" : "text-slate-700"}`}>{paragraph}</p>
           {correspondingPhoto && (
-            <figure className="my-2 min-[350px]:my-5 rounded-xl overflow-hidden">
+            <figure className="my-2 min-[350px]:my-5 rounded-none overflow-hidden">
               <div className={`w-full max-h-[500px] overflow-hidden ${isDark ? "bg-slate-800" : "bg-slate-100"}`}>
                 <img
                   src={correspondingPhoto.url}

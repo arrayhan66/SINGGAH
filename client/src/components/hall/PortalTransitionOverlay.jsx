@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react"
 import { useTransitionStore } from "../../three/hooks/useTransition"
+import { useTheme } from "../../context/ThemeContext"
 
 const NOMINAL_MS = 750
 const MAX_WAIT = 8000
 
 function PortalTransitionOverlay() {
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
   const active = useTransitionStore((s) => s.active)
   const message = useTransitionStore((s) => s.message)
   const runId = useTransitionStore((s) => s.runId)
@@ -38,16 +41,42 @@ function PortalTransitionOverlay() {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-night ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 ${
+        isDark
+          ? "bg-night"
+          : "bg-gradient-to-b from-[#f7fafd] to-[#edf3fa]"
+      } ${
         hidden ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
-      <div className="text-3xl md:text-4xl font-extrabold tracking-wide text-sky-300">
+      <div
+        className={`text-3xl md:text-4xl font-extrabold tracking-wide ${
+          isDark ? "text-sky-300" : "text-[#1e3a8a]"
+        }`}
+      >
         SINGGAH
       </div>
-      <div className="text-xs md:text-sm text-night-muted tracking-[0.3em]">{message}</div>
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-transparent border-t-cyan-400 border-r-cyan-400/50" />
-      <div className="text-xs md:text-sm tabular-nums text-night-dim">{pct}%</div>
+      <div
+        className={`text-xs md:text-sm tracking-[0.3em] ${
+          isDark ? "text-night-muted" : "text-[#64748b]"
+        }`}
+      >
+        {message}
+      </div>
+      <div
+        className={`h-8 w-8 animate-spin rounded-full border-2 border-transparent ${
+          isDark
+            ? "border-t-cyan-400 border-r-cyan-400/50"
+            : "border-t-[#2563eb] border-r-[#2563eb]/50"
+        }`}
+      />
+      <div
+        className={`text-xs md:text-sm tabular-nums ${
+          isDark ? "text-night-dim" : "text-[#64748b]"
+        }`}
+      >
+        {pct}%
+      </div>
     </div>
   )
 }

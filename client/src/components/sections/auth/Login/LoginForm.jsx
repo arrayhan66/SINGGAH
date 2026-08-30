@@ -159,7 +159,7 @@ function LoginForm() {
             </label>
             <Link
               to="/forgot-password"
-              className="text-xs font-bold text-cyan-400 transition-colors hover:text-cyan-300 min-[350px]:text-sm"
+              className="text-xs font-bold text-cyan-400 transition-colors hover:text-cyan-300 hover:underline min-[350px]:text-sm"
             >
               Lupa sandi?
             </Link>
@@ -216,7 +216,7 @@ function LoginForm() {
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white min-[350px]:h-5 min-[350px]:w-5 sm:h-5 sm:w-5" />
             ) : (
               <span className="text-sm tracking-wide sm:text-base">
-                Masuk Sekarang
+                Masuk
               </span>
             )}
           </span>
@@ -227,7 +227,7 @@ function LoginForm() {
         Belum memiliki akun?
         <Link
           to="/register"
-          className="ml-1.5 font-bold text-cyan-400 transition-colors hover:text-cyan-300"
+          className="ml-1.5 font-bold text-cyan-400 transition-colors hover:text-cyan-300 hover:underline"
         >
           Daftar
         </Link>

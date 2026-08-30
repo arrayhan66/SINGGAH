@@ -185,3 +185,24 @@ html.light footer .text-slate-500 {
 html.light footer .hover\:text-cyan-300:hover {
   color: #2563eb;
 }
+
+/* ============================================================
+   PATCH KONTRAS LIGHT MODE SHARED (finishing)
+   Komponen yang dipakai lintas halaman.
+   ============================================================ */
+
+/* ===== EMOJI PICKER / dropdown panel slate gelap ===== */
+html.light .bg-slate-900\/95 {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 24px 48px -16px rgba(30, 64, 175, 0.18);
+}
+html.light .bg-slate-900\/95 .hover\:bg-white\/5:hover {
+  background-color: #eff6ff;
+}
+html.light .bg-slate-900\/95 .hover\:text-white:hover {
+  color: #0f172a;
+}
+html.light .scrollbar-thumb-white\/10 {
+  background-color: #bfdbfe;
+}

@@ -2,24 +2,23 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, ShieldCheck, Cpu } from "lucide-react";
 import logo from "../../../../assets/icons/logo.webp";
 import bgloginDark from "../../../../assets/images/bg-login.webp";
-import bgloginLight from "../../../../assets/images/bg-login-lightmode.jpg";
 import logoPoliban from "../../../../assets/icons/Logo_Poliban.png";
 import { useTheme } from "../../../../context/ThemeContext";
 
 function AuthBranding({ backTo = "/" }) {
   const { theme } = useTheme();
   const isLight = theme === "light";
-  const bglogin = isLight ? bgloginLight : bgloginDark;
+  const bglogin = bgloginDark;
   return (
     <div className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-slate-950 p-10 lg:p-14 2xl:p-16 lg:flex border-r border-cyan-500/20">
       <img
         src={bglogin}
         loading="lazy"
         alt="Background"
-        className={`absolute inset-0 h-full w-full object-cover scale-105 transition-transform duration-1000 ${isLight ? "opacity-90" : "opacity-35 mix-blend-luminosity"}`}
+        className="absolute inset-0 h-full w-full object-cover scale-105 transition-transform duration-1000 opacity-35 mix-blend-luminosity"
       />
 
-      <div className={`absolute inset-0 backdrop-blur-[2px] ${isLight ? "bg-gradient-to-tr from-white/40 via-white/20 to-cyan-50/30" : "bg-gradient-to-tr from-white/95 via-white/80 to-cyan-50/70"}`} />
+      <div className="absolute inset-0 backdrop-blur-[2px] bg-gradient-to-tr from-slate-950/95 via-night-deep/90 to-night/80" />
 
       <div className="absolute -left-24 top-1/4 h-80 w-80 rounded-full bg-cyan-400/30 blur-[90px] pointer-events-none" />
       <div className="absolute right-10 bottom-10 h-72 w-72 rounded-full bg-blue-500/20 blur-[100px] pointer-events-none" />
@@ -49,7 +48,7 @@ function AuthBranding({ backTo = "/" }) {
       </div>
 
       <div className="relative z-10 my-auto py-6">
-        <div className="relative overflow-hidden rounded-3xl border border-white/80 bg-white/75 p-8 shadow-2xl shadow-cyan-900/10 backdrop-blur-2xl">
+        <div className="relative overflow-hidden rounded-3xl border border-slate-300/60 bg-white/90 p-8 shadow-2xl shadow-cyan-900/20 ring-1 ring-black/[0.06] backdrop-blur-2xl">
           <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-gradient-to-br from-cyan-400/20 to-blue-500/0 blur-xl pointer-events-none" />
 
           <div className="flex items-center gap-3.5 mb-6">
@@ -112,9 +111,9 @@ function AuthBranding({ backTo = "/" }) {
         </div>
       </div>
 
-      <div className="relative z-20 flex items-center justify-between text-xs font-medium text-slate-500 pt-2">
+      <div className={`relative z-20 flex items-center justify-between pt-2 text-xs font-medium ${isLight ? "text-slate-500" : "text-slate-400"}`}>
         <span>© {new Date().getFullYear()} Jurusan Teknik Elektro</span>
-        <span className="flex items-center gap-1.5 text-cyan-700 font-semibold">
+        <span className={`flex items-center gap-1.5 font-semibold ${isLight ? "text-cyan-700" : "text-cyan-300"}`}>
           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
           System Operational
         </span>

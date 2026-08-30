@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { useProgress } from "@react-three/drei"
 import { useTransitionStore } from "../../three/hooks/useTransition"
 import useTvReady from "../../three/hooks/useTvReady"
+import { useTheme } from "../../context/ThemeContext"
 
 const NOMINAL_MS = 5000
 const CAP_LOADING = 98
@@ -9,6 +10,8 @@ const MIN_VISIBLE = 800
 const MAX_WAIT = 15000
 
 function LoadingOverlay({ ready = false }) {
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
   const { active, loaded, total } = useProgress()
   // The hall TV video is loaded outside the drei loader, so it counts as one
   // extra asset: the overlay only opens when every asset AND the TV are done.
@@ -76,18 +79,42 @@ function LoadingOverlay({ ready = false }) {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-night transition-opacity duration-300 ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 transition-opacity duration-300 ${
+        isDark
+          ? "bg-night"
+          : "bg-gradient-to-b from-[#f7fafd] to-[#edf3fa]"
+      } ${
         hidden ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
-      <div className="text-3xl md:text-4xl font-extrabold tracking-wide text-sky-300">
+      <div
+        className={`text-3xl md:text-4xl font-extrabold tracking-wide ${
+          isDark ? "text-sky-300" : "text-[#1e3a8a]"
+        }`}
+      >
         SINGGAH
       </div>
-      <div className="text-xs md:text-sm text-night-muted tracking-[0.3em]">
+      <div
+        className={`text-xs md:text-sm tracking-[0.3em] ${
+          isDark ? "text-night-muted" : "text-[#64748b]"
+        }`}
+      >
         MEMPERSIAPKAN VIRTUAL HALL
       </div>
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-transparent border-t-cyan-400 border-r-cyan-400/50" />
-      <div className="text-xs md:text-sm tabular-nums text-night-dim">{pct}%</div>
+      <div
+        className={`h-8 w-8 animate-spin rounded-full border-2 border-transparent ${
+          isDark
+            ? "border-t-cyan-400 border-r-cyan-400/50"
+            : "border-t-[#2563eb] border-r-[#2563eb]/50"
+        }`}
+      />
+      <div
+        className={`text-xs md:text-sm tabular-nums ${
+          isDark ? "text-night-dim" : "text-[#64748b]"
+        }`}
+      >
+        {pct}%
+      </div>
     </div>
   )
 }

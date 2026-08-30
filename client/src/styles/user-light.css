@@ -78,3 +78,70 @@ html.light .user-page .rounded-full.bg-cyan-400\/10.border-cyan-400\/30 {
 html.light .user-page .bg-emerald-500.hover\:bg-emerald-600:hover {
   background-color: #059669;
 }
+
+/* ============================================================
+   PATCH KONTRAS LIGHT MODE USER (finishing)
+   Menutup kelas yang masih memakai warna dark di atas permukaan
+   terang agar elemen konsisten dengan halaman user lain.
+   ============================================================ */
+
+/* ===== DROPDOWN & EMOJI PICKER (permukaan slate gelap) ===== */
+html.light .user-page .bg-slate-900\/95 {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 24px 48px -16px rgba(30, 64, 175, 0.18);
+}
+/* Opsi dropdown saat di-hover: soft blue jelas di atas panel putih */
+html.light .user-page .bg-slate-900\/95 .hover\:bg-white\/5:hover {
+  background-color: #eff6ff;
+}
+html.light .user-page .bg-slate-900\/95 .hover\:text-white:hover {
+  color: #0f172a;
+}
+/* Emoji picker: thumbnail scrollbar putih -> biru muda */
+html.light .user-page .scrollbar-thumb-white\/10 {
+  background-color: #bfdbfe;
+}
+
+/* ===== BADGE "OPSIONAL" (solid slate gelap) ===== */
+html.light .user-page .border-slate-600.bg-slate-800 {
+  border-color: #dbe7f7;
+  background-color: #eff6ff;
+  color: #475569;
+}
+
+/* ===== EMPTY STATE DASHED ===== */
+html.light .user-page .border-dashed.border-slate-700\/60.bg-slate-800\/20 {
+  background-color: #f8fafc;
+  border-color: #c7d6ee;
+}
+html.light .user-page .ring-slate-700\/50 {
+  --tw-ring-color: #dbeafe;
+}
+
+/* ===== STATUS EMAIL PENDING (amber-100 -> gelap) ===== */
+html.light .user-page .text-amber-100 {
+  color: #92400e;
+}
+/* Tombol "Verifikasi Email Baru" */
+html.light .user-page button.border-amber-500\/40.bg-amber-500\/20:hover {
+  background-color: #fde68a;
+}
+
+/* ===== AJUKAN SEBAGAI DOSEN (biru muda -> blue theme) ===== */
+html.light
+  .user-page
+  .border-blue-400\/30.bg-blue-400\/10.text-blue-200 {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+html.light .user-page .border-blue-400\/30.bg-blue-400\/10.text-blue-200:hover {
+  background-color: #dbeafe;
+}
+
+/* ===== HOVER ICON EYE GELAP -> TIDAK HILANG ===== */
+html.light .user-page .hover\:text-slate-200:hover,
+html.light .user-page .group-hover\:text-slate-200:hover {
+  color: #334155;
+}

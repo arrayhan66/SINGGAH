@@ -7,7 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:journey": "playwright test e2e/journey.spec.js --workers=1",
+    "test:journey:headed": "playwright test e2e/journey.spec.js --headed --workers=1"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
@@ -25,13 +30,14 @@
     "@tiptap/react": "^3.27.3",
     "@tiptap/starter-kit": "^3.27.3",
     "axios": "^1.18.1",
+    "dompurify": "^3.4.14",
     "framer-motion": "^12.42.2",
     "leva": "^0.10.1",
     "lucide-react": "^1.22.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-intersection-observer": "^10.0.3",
-    "react-router-dom": "^7.18.1",
+    "react-router-dom": "^7.18.3",
     "tailwindcss": "^4.3.2",
     "three": "^0.185.1",
     "zustand": "^5.0.14"
@@ -39,10 +45,12 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@gltf-transform/cli": "^4.4.2",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/typography": "^0.5.20",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
+    "dotenv": "^17.4.2",
     "eslint": "^10.5.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",

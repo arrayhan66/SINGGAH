@@ -128,4 +128,31 @@ export function StatsRowSkeleton({ count = 3 }) {
   )
 }
 
+export function CategoryCardSkeleton() {
+  return (
+    <div className="flex h-full flex-col rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl sm:p-8 2xl:p-10 3xl:p-12 4xl:p-14">
+      <div className="flex items-start justify-between">
+        <Skeleton className="h-16 w-16 rounded-3xl sm:h-20 sm:w-20 2xl:h-24 2xl:w-24 3xl:h-28 3xl:w-28 4xl:h-32 4xl:w-32" />
+        <Skeleton className="h-6 w-20 rounded-full sm:h-7 sm:w-24 3xl:h-8 3xl:w-28 4xl:h-9 4xl:w-32" />
+      </div>
+      <Skeleton className="mt-6 h-6 w-2/3 sm:mt-8 sm:h-7 2xl:mt-10 2xl:h-8 3xl:mt-12 3xl:h-9 4xl:mt-14 4xl:h-10" />
+      <Skeleton className="mt-4 h-4 w-full sm:mt-5 2xl:mt-6 3xl:mt-7 4xl:mt-8" />
+      <Skeleton className="mt-2 h-4 w-4/5 2xl:mt-2.5 3xl:mt-3 4xl:mt-3.5" />
+      <div className="mt-auto pt-8 2xl:pt-10 3xl:pt-12 4xl:pt-14">
+        <Skeleton className="h-10 w-full rounded-xl sm:h-11 2xl:h-12 3xl:h-14 4xl:h-16" />
+      </div>
+    </div>
+  )
+}
+
+export function CategoryGridSkeleton({ count = 6 }) {
+  return (
+    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 2xl:gap-10 3xl:gap-12 4xl:gap-14">
+      {Array.from({ length: count }, (_, i) => (
+        <CategoryCardSkeleton key={i} />
+      ))}
+    </div>
+  )
+}
+
 export default Skeleton

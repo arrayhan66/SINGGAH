@@ -154,7 +154,6 @@ function Museum({ hallData }) {
   const rugMap = useMemo(() => textures.roundRug(), [])
   const rugRectMap = useMemo(() => textures.rugRect(), [])
   const tier = useQualityStore((s) => s.tier)
-  const low = tier === "rendah"
 
   const categories = hallData?.categories || []
   const projects = hallData?.projects || []

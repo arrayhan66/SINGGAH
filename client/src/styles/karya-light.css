@@ -327,3 +327,14 @@ html.light .karya-page button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10:act
 html.light .karya-page div.col-span-full span.font-semibold.text-slate-300 {
   color: #2563eb;
 }
+
+/* ===== SKELETON CATEGORY CARD (WIREFRAME LOADING) ===== */
+/* Kartu skeleton meniru bentuk KaryaCategoryCard: border biru muda di
+   atas surface off-white supaya wireframe terlihat jelas di light mode */
+html.light .karya-page #karya .rounded-3xl.border-white\/10.bg-white\/5 {
+  background-color: #ffffff;
+  border-color: #d6e4fa;
+}
+html.light .karya-page #karya .rounded-3xl.border-white\/10.bg-white\/5 .skeleton {
+  background-color: rgba(37, 99, 235, 0.09);
+}

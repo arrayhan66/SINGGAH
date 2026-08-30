@@ -211,6 +211,7 @@ function RegisterForm() {
                   </div>
                   {i < 4 && (
                     <div
+                      data-step-connector
                       className={`mx-1 sm:mx-2 md:mx-3 h-1 flex-1 rounded-full transition-all duration-300 ${
                         step > i ? "bg-cyan-500" : "bg-white/90"
                       }`}
@@ -256,6 +257,7 @@ function RegisterForm() {
               ].map((item) => (
                 <label
                   key={item.id}
+                  data-role-card
                   className={`relative flex min-h-24 sm:min-h-28 md:min-h-36 cursor-pointer flex-col items-center justify-center gap-2 sm:gap-3 md:gap-4 rounded-xl sm:rounded-2xl border-2 p-3 sm:p-4 text-center transition-all ${
                     formData.role === item.id
                       ? "border-cyan-400 bg-cyan-500/10 text-cyan-300"
@@ -403,9 +405,9 @@ function RegisterForm() {
                   <label className="mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium text-slate-300">
                     Foto Profil
                   </label>
-                  <label className="flex w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 py-4 sm:py-6 shadow-sm transition-all hover:border-cyan-500 hover:bg-white">
+                  <label className="flex w-full h-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 py-4 sm:py-6 shadow-sm transition-all hover:border-cyan-500 hover:bg-white">
                     <ImagePlus className="mb-1.5 sm:mb-2 text-cyan-500" size={20} />
-                    <span className="px-2 text-center text-[10px] sm:text-xs text-slate-600">
+                    <span className="max-w-full break-all px-2 text-center text-[10px] sm:text-xs text-slate-600">
                       {fotoProfil ? fotoProfil.name : "Unggah Pas Foto"}
                     </span>
                     <input
@@ -427,10 +429,10 @@ function RegisterForm() {
                       <span className="ml-1 text-red-500">*</span>
                     </label>
 
-                    <label className="flex w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 py-4 sm:py-6 shadow-sm transition-all hover:border-cyan-500 hover:bg-white">
+                    <label className="flex w-full h-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 py-4 sm:py-6 shadow-sm transition-all hover:border-cyan-500 hover:bg-white">
                       <ImagePlus className="mb-1.5 sm:mb-2 text-cyan-500" size={20} />
 
-                      <span className="px-2 text-center text-[10px] sm:text-xs text-slate-600">
+                      <span className="max-w-full break-all px-2 text-center text-[10px] sm:text-xs text-slate-600">
                         {fotoIdentitas
                           ? fotoIdentitas.name
                           : formData.role === "mahasiswa"
@@ -527,7 +529,8 @@ function RegisterForm() {
               <button
                 type="button"
                 onClick={nextStep}
-                className="group flex w-full sm:flex-1 items-center justify-center gap-2 rounded-xl bg-cyan-600 px-4 py-2.5 sm:py-3 text-xs sm:text-sm cursor-pointer"
+                data-next-button
+                className="group flex w-full sm:flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 cursor-pointer"
               >
                 Selanjutnya
                 <ChevronRight
@@ -557,7 +560,7 @@ function RegisterForm() {
           Sudah memiliki akun?
           <Link
             to="/login"
-            className="ml-1.5 font-bold text-cyan-400 transition-colors hover:text-cyan-300"
+            className="ml-1.5 font-bold text-cyan-400 transition-colors hover:text-cyan-300 hover:underline"
           >
             Masuk
           </Link>

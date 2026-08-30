@@ -1042,4 +1042,33 @@ html.light .karya-detail-page div.col-span-full span.font-semibold.text-slate-30
     0 10px 18px -12px rgba(0, 0, 0, 0.5);
 }
 
+/* ===== FIX GAP ATAS GAMBAR ARTIKEL (Berita Detail) — SEMUA VIEWPORT =====
+   Setiap sumber ruang vertikal di atas gambar di dalam .prose dinihilkan
+   di SEMUA ukuran layar (img margin, figure margin, wrapper, dan <p> kosong
+   sisa penggantian img->figure oleh processContentHtml).
+   Ukuran/lebar gambar tidak diubah. */
+.berita-detail-page .prose figure,
+.berita-detail-page .prose figure > div,
+.berita-detail-page .prose figure > div > img,
+.berita-detail-page .prose p:empty {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+.berita-detail-page .prose p:empty {
+  height: 0 !important;
+  line-height: 0 !important;
+  font-size: 0 !important;
+}
+
+/* ===== FIX RADIUS GAMBAR ARTIKEL (Berita Detail) — SEMUA VIEWPORT =====
+   Gambar artikel dibuat kotak penuh tanpa sudut membulat (figure, wrapper,
+   img). Figcaption tetap punya radius kecil tersendiri. */
+.berita-detail-page .prose figure,
+.berita-detail-page .prose figure > div,
+.berita-detail-page .prose figure > div > img {
+  border-radius: 0 !important;
+}
+
 

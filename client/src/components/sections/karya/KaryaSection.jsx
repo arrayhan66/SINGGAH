@@ -7,6 +7,7 @@ import PCBBackground from "../../ui/PCBBackground"
 import useSearchAndExpand from "../../../hooks/useSearchAndExpand"
 import SearchBar from "../../ui/SearchBar"
 import OutlineButton from "../../ui/OutlineButton"
+import { CategoryGridSkeleton } from "../../ui/Skeleton"
 import KaryaCategoryCard from "./KaryaCategoryCard"
 import api from "../../../services/api"
 
@@ -25,6 +26,7 @@ function KaryaSection() {
   const navigate = useNavigate()
   const initialCount = 6
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     api.get("/categories")
@@ -35,6 +37,7 @@ function KaryaSection() {
       .catch((err) => {
         console.error("Failed to fetch categories, using fallback:", err)
       })
+      .finally(() => setLoading(false))
   }, [])
 
   const {
@@ -74,25 +77,31 @@ function KaryaSection() {
           </p>
         </div>
 
-        <div className="mt-8 2xl:mt-12 3xl:mt-14 4xl:mt-16">
-          <SearchBar
-            value={search}
-            onChange={handleSearchChange}
-            placeholder="Cari kategori..."
-          />
-        </div>
+        {!loading && (
+          <div className="mt-8 2xl:mt-12 3xl:mt-14 4xl:mt-16">
+            <SearchBar
+              value={search}
+              onChange={handleSearchChange}
+              placeholder="Cari kategori..."
+            />
+          </div>
+        )}
 
-        <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-3 2xl:mt-20 2xl:gap-10 3xl:mt-24 3xl:gap-12 4xl:mt-28 4xl:gap-14">
-          {visibleCategories.length > 0 ? (
-            visibleCategories.map((item) => (
-              <KaryaCategoryCard
-                key={item.slug}
-                item={item}
-                onClick={() => handleCategoryClick(item.slug)}
-              />
-            ))
+        <div className="mt-14 2xl:mt-20 3xl:mt-24 4xl:mt-28">
+          {loading ? (
+            <CategoryGridSkeleton count={6} />
+          ) : visibleCategories.length > 0 ? (
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 2xl:gap-10 3xl:gap-12 4xl:gap-14">
+              {visibleCategories.map((item) => (
+                <KaryaCategoryCard
+                  key={item.slug}
+                  item={item}
+                  onClick={() => handleCategoryClick(item.slug)}
+                />
+              ))}
+            </div>
           ) : (
-            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 px-4 py-12 text-center sm:px-6 sm:py-16 md:py-20 lg:py-24 3xl:py-28 4xl:py-32">
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 px-4 py-12 text-center sm:px-6 sm:py-16 md:py-20 lg:py-24 3xl:py-28 4xl:py-32">
               <div className="mb-4 rounded-full bg-slate-800/50 p-3 ring-1 ring-slate-700/50 backdrop-blur-sm sm:mb-5 sm:p-4 3xl:p-5 4xl:p-6">
                 <svg
                   className="h-8 w-8 text-slate-400 sm:h-9 sm:w-9 md:h-10 md:w-10 lg:h-11 lg:w-11 3xl:h-12 3xl:w-12 4xl:h-14 4xl:w-14"
@@ -120,7 +129,7 @@ function KaryaSection() {
           )}
         </div>
 
-        {!showAll && filteredCategories.length > initialCount && (
+        {!loading && !showAll && filteredCategories.length > initialCount && (
           <div className="mt-6 flex justify-center sm:mt-8 2xl:mt-12 3xl:mt-16 4xl:mt-20">
             <OutlineButton onClick={() => setShowAll(true)}>
               Lihat Lebih Banyak

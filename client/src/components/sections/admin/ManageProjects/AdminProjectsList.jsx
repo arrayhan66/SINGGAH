@@ -1,38 +1,26 @@
 import { useState, useMemo, useCallback } from "react"
-import { FolderX, Tag, FolderOpen } from "lucide-react"
+import { FolderX, FolderOpen } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useProjects } from "../../../../context/ProjectContext"
 import AdminProjectsCard from "./AdminProjectsCard"
 import AdminProjectApproveModal from "./AdminProjectApproveModal"
 import AdminProjectRejectModal from "./AdminProjectRejectModal"
 import DeleteConfirmModal from "../../../ui/DeleteConfirmModal"
-import ShowMoreButton from "../../../ui/ShowMoreButton"
-import api from "../../../../services/api"
-import { useEffect } from "react"
 
 function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
   const navigate = useNavigate()
   const { projects, approveProject, rejectProject, deleteProject, setFeaturedSlot } = useProjects()
 
-  const [categories, setCategories] = useState([])
   const [approveModalProject, setApproveModalProject] = useState(null)
   const [rejectModalProject, setRejectModalProject] = useState(null)
   const [deleteProjectTarget, setDeleteProjectTarget] = useState(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deleteSuccess, setDeleteSuccess] = useState(false)
-  const [showAll, setShowAll] = useState(false)
-
-  useEffect(() => {
-    api.get("/categories").then((res) => {
-      setCategories(res.data.data.items || res.data.data || [])
-    }).catch(() => {})
-  }, [])
 
   const filterKey = `${search}|${statusFilter}|${categoryFilter}`
   const [activeFilter, setActiveFilter] = useState(filterKey)
   if (filterKey !== activeFilter) {
     setActiveFilter(filterKey)
-    setShowAll(false)
   }
 
   const filteredProjects = useMemo(() => {

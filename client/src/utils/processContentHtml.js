@@ -1,3 +1,5 @@
+import DOMPurify from "dompurify"
+
 export function processContentHtml(html) {
   if (!html || typeof html !== "string") return html
 
@@ -9,7 +11,7 @@ export function processContentHtml(html) {
     if (!caption) return
 
     const figure = doc.createElement("figure")
-    figure.className = "my-2 min-[350px]:my-4 sm:my-5 rounded-xl overflow-hidden"
+    figure.className = "my-2 min-[350px]:my-4 sm:my-5 rounded-none overflow-hidden"
 
     const imgClone = img.cloneNode(true)
     imgClone.removeAttribute("data-caption")
@@ -34,5 +36,9 @@ export function processContentHtml(html) {
     img.parentNode.replaceChild(figure, img)
   })
 
-  return doc.body.innerHTML
+  return DOMPurify.sanitize(doc.body.innerHTML, {
+    USE_PROFILES: { html: true },
+    ADD_TAGS: ["figure", "figcaption"],
+    ADD_ATTR: ["target"],
+  })
 }

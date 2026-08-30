@@ -1,5 +1,3 @@
-import * as THREE from "three"
-import { useLow } from "../hooks/useQuality"
 import { FLOOR2_Y, upperSlabPieces } from "../rooms/museumLayout"
 
 const COFFER = 6
@@ -11,8 +9,6 @@ const PLASTER = "#dce8f6"
 const PANEL = "#c9d8ee"
 const GROUND_PLASTER = "#dbe6f2"
 const MOLD = "#c7d5ea"
-const TRIM = "#7dd3fc"
-const TRIM_EMISSIVE = "#38bdf8"
 const INNER_INSET = 0.55
 
 function TopCeiling({ room, height }) {

@@ -198,7 +198,7 @@ function ResetPasswordForm() {
           Kembali ke halaman
           <Link
             to="/login"
-            className="ml-1.5 font-bold text-cyan-400 transition-colors hover:text-cyan-300"
+            className="ml-1.5 font-bold text-cyan-400 transition-colors hover:text-cyan-300 hover:underline"
           >
             Login
           </Link>

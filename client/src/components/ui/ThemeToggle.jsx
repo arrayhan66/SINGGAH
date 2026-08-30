@@ -11,7 +11,7 @@ export default function ThemeToggle() {
       onClick={toggleTheme}
       aria-label={isDark ? "Aktifkan mode terang" : "Aktifkan mode gelap"}
       title={isDark ? "Mode Terang" : "Mode Gelap"}
-      className={`relative hidden h-6 w-[44px] shrink-0 cursor-pointer items-center overflow-hidden rounded-full border border-white/10 p-0.5 transition-[border-color,box-shadow] duration-500 active:scale-95 min-[300px]:inline-flex min-[350px]:h-7 min-[350px]:w-[52px] sm:h-8 sm:w-[58px] md:h-9 md:w-[68px] lg:h-10 lg:w-[76px] 2xl:h-11 2xl:w-[84px] min-[2000px]:h-12 min-[2000px]:w-[92px] focus-visible:outline-none ${
+      className={`relative hidden h-[22px] w-[42px] shrink-0 cursor-pointer items-center overflow-hidden rounded-full border border-white/10 p-0.5 transition-[border-color,box-shadow] duration-500 active:scale-95 min-[300px]:inline-flex min-[350px]:h-[26px] min-[350px]:w-[50px] sm:h-[28px] sm:w-[56px] md:h-[32px] md:w-[64px] lg:h-[34px] lg:w-[72px] 2xl:h-[38px] 2xl:w-[80px] min-[2000px]:h-[42px] min-[2000px]:w-[88px] focus-visible:outline-none ${
         isDark
           ? "border-white/10 shadow-[0_4px_12px_rgba(2,6,23,.5)] focus-visible:ring-2 focus-visible:ring-cyan-400/60"
           : "border-white/60 shadow-[0_4px_12px_rgba(2,132,199,.25)] focus-visible:ring-2 focus-visible:ring-amber-400/80"
@@ -57,8 +57,10 @@ export default function ThemeToggle() {
       </span>
 
       <span
-        className={`relative z-10 block h-5 w-5 rounded-full transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] min-[350px]:h-6 min-[350px]:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 2xl:h-10 2xl:w-10 min-[2000px]:h-11 min-[2000px]:w-11 ${
-          isDark ? "translate-x-full" : "translate-x-0"
+        className={`relative z-10 block h-4 w-4 rounded-full transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] min-[350px]:h-5 min-[350px]:w-5 sm:h-[22px] sm:w-[22px] md:h-[26px] md:w-[26px] lg:h-7 lg:w-7 2xl:h-8 2xl:w-8 min-[2000px]:h-9 min-[2000px]:w-9 ${
+          isDark
+            ? "translate-x-[20px] min-[350px]:translate-x-[24px] sm:translate-x-[28px] md:translate-x-[32px] lg:translate-x-[38px] 2xl:translate-x-[42px] min-[2000px]:translate-x-[46px]"
+            : "translate-x-0"
         }`}
       >
         <span

@@ -1,0 +1,15 @@
+node_modules
+dist
+playwright-report
+test-results
+npm-debug.log*
+.env
+.env.*
+!.env.test
+!.env.example
+e2e
+*.log
+.git
+.gitignore
+Dockerfile
+.dockerignore

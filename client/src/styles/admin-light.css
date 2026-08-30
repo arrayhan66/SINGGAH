@@ -119,3 +119,87 @@ html.light .admin-page .border-purple-400\/20.bg-purple-400\/10,
 html.light .admin-page .border-blue-400\/20.bg-blue-400\/10 {
   background-color: #eff6ff;
 }
+
+/* ============================================================
+   PATCH KONTRAS LIGHT MODE ADMIN (finishing)
+   Menutup panel/dropdown/empty-state slate gelap yang tersisa
+   agar teksnya (yang sudah jadi ink gelap di light mode) terbaca.
+   ============================================================ */
+
+/* ===== DROPDOWN & OVERLAY PANEL (slate 900/95, /90) ===== */
+html.light .admin-page .bg-slate-900\/95,
+html.light .admin-page .bg-slate-900\/90 {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 24px 48px -16px rgba(30, 64, 175, 0.18);
+}
+html.light
+  .admin-page
+  .bg-slate-900\/95
+  .hover\:bg-white\/5:hover {
+  background-color: #eff6ff;
+}
+html.light .admin-page .bg-slate-900\/95 .hover\:text-white:hover {
+  color: #0f172a;
+}
+/* Filter tab dengan teks slate-400 di atas panel putih -> teks gelap */
+html.light .admin-page .bg-slate-900\/95 .text-slate-400 {
+  color: #475569;
+}
+
+/* ===== EDITOR BERTA: panel toolbar slate solid ===== */
+html.light .admin-page .border-slate-700.bg-slate-900 {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+}
+html.light .admin-page .bg-slate-800.text-slate-300 {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+html.light .admin-page .border-slate-700.bg-slate-800 {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+}
+html.light .admin-page .bg-slate-800\/50,
+html.light .admin-page .bg-slate-800\/40,
+html.light .admin-page .bg-slate-800\/30,
+html.light .admin-page .bg-slate-800\/20 {
+  background-color: #f8fafc;
+}
+html.light .admin-page .border-slate-700\/60,
+html.light .admin-page .border-slate-700\/50,
+html.light .admin-page .border-slate-700\/40,
+html.light .admin-page .border-slate-700 {
+  border-color: #c7d6ee;
+}
+
+/* ===== EMPTY STATE DASHED ADMIN ===== */
+html.light .admin-page .border-dashed.border-slate-700\/60.bg-slate-800\/20,
+html.light .admin-page .border-dashed.border-slate-700\/50.bg-white\/\[0\.02\] {
+  background-color: #f8fafc;
+  border-color: #c7d6ee;
+}
+html.light .admin-page .ring-slate-700\/50 {
+  --tw-ring-color: #dbeafe;
+}
+html.light .admin-page .bg-slate-900\/40 {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+/* ===== MEDIA LIBRARY: overlay drag & drop ===== */
+html.light .admin-page .bg-cyan-900\/20 {
+  background-color: rgba(239, 246, 255, 0.85);
+}
+html.light .admin-page .bg-cyan-900\/20 .bg-slate-900\/90 {
+  background-color: #ffffff;
+}
+
+/* ===== INPUT RANGE (editor berita) ===== */
+html.light .admin-page .accent-cyan-400 {
+  accent-color: #2563eb;
+}
+html.light .admin-page .bg-slate-800.rounded-lg {
+  background-color: #eef3fa;
+}

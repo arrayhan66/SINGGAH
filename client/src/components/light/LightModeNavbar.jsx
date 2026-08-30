@@ -74,15 +74,15 @@ function LightModeNavbar() {
           <NavLink
             to="/"
             title="Pindah ke Dark Mode (Original)"
-            className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-300 bg-slate-100 text-slate-700 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-all"
+            className="flex h-[22px] w-[22px] shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-300 bg-slate-100 text-slate-700 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-all min-[350px]:h-[26px] min-[350px]:w-[26px] sm:h-[28px] sm:w-[28px] md:h-[32px] md:w-[32px] lg:h-[34px] lg:w-[34px] 2xl:h-[38px] 2xl:w-[38px] min-[2000px]:h-[42px] min-[2000px]:w-[42px]"
           >
-            <Moon size={16} />
+            <Moon size={16} className="h-2.5 w-2.5 min-[350px]:h-3 min-[350px]:w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-[18px] lg:w-[18px] 2xl:h-5 2xl:w-5 min-[2000px]:h-[22px] min-[2000px]:w-[22px]" />
           </NavLink>
 
           <NavLink
             to="/login"
             onClick={closeMenu}
-            className="group relative flex shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold tracking-wide text-white shadow-md shadow-blue-500/30 transition-all hover:bg-blue-700 active:scale-95 sm:px-4 sm:py-2 sm:text-sm md:px-5 md:py-2.5 lg:px-6"
+            className="group relative flex shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-blue-600 px-2 py-1 text-[10px] font-semibold tracking-wide text-white shadow-md shadow-blue-500/30 transition-all hover:bg-blue-700 active:scale-95 min-[350px]:px-3 min-[350px]:py-1.5 min-[350px]:text-[11px] sm:px-3.5 sm:py-2 sm:text-xs md:px-4 md:py-2 md:text-sm lg:px-5 lg:py-2 lg:text-sm 2xl:px-6 2xl:py-2.5 2xl:text-base min-[2000px]:px-7 min-[2000px]:py-3 min-[2000px]:text-lg"
           >
             Login
           </NavLink>

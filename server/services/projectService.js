@@ -375,7 +375,7 @@ exports.updateProjectStatus = async (id, status, reason = "") => {
     }
   })
 
-  cache.del("categories:list")
+  await cache.del("categories:list")
 
   return project
 }

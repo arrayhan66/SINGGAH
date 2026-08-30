@@ -42,12 +42,19 @@ const PORT = process.env.PORT || 5000
 
 app.set("trust proxy", 1)
 
-app.use(helmet())
+app.use(
+  helmet({
+    referrerPolicy: { policy: "same-origin" },
+    crossOriginOpenerPolicy: { policy: "same-origin" },
+  }),
+)
 
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 )
 
@@ -106,7 +113,11 @@ const startServer = async () => {
     }
 
     const swaggerDocument = await loadSwagger()
-    app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+
+    // Dokumentasi API hanya untuk non-production (hindari bocor skema endpoint).
+    if (process.env.NODE_ENV !== "production") {
+      app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+    }
 
     // 404 Handler — taruh di sini, SETELAH semua route termasuk docs
     app.use((req, res) => {
@@ -132,16 +143,15 @@ const startServer = async () => {
 if (process.env.NODE_ENV !== "test") {
   startServer()
 } else {
-  loadSwagger().then((swaggerDocument) => {
-    app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
-    app.use((req, res) => {
-      res.status(404).json({
-        success: false,
-        message: "Endpoint tidak ditemukan",
-      })
+  // Saat test, skip loadSwagger (swagger-parser lambat) supaya startup
+  // cepat & deterministik; docs API tidak dipakai di test.
+  app.use((req, res) => {
+    res.status(404).json({
+      success: false,
+      message: "Endpoint tidak ditemukan",
     })
-    app.use(errorMiddleware)
   })
+  app.use(errorMiddleware)
 }
 
 module.exports = app

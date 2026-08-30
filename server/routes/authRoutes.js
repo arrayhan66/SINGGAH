@@ -10,6 +10,7 @@ const {
   registerLimiter,
   forgotPasswordLimiter,
   resendCodeLimiter,
+  verifyCodeLimiter,
 } = require("../middlewares/rateLimiter")
 const {
   registerValidator,
@@ -43,6 +44,7 @@ router.post(
 )
 router.post(
   "/verify-email",
+  verifyCodeLimiter,
   verifyCodeValidator,
   validate,
   authController.verifyEmail,
@@ -63,6 +65,7 @@ router.post(
 )
 router.post(
   "/verify-reset-code",
+  verifyCodeLimiter,
   verifyCodeValidator,
   validate,
   authController.verifyResetCode,

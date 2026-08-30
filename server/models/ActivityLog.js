@@ -31,7 +31,11 @@ const ActivityLog = sequelize.define(
     timestamps: true,
     createdAt: "created_at",
     updatedAt: false,
-    indexes: [{ fields: ["user_id"] }, { fields: ["action"] }],
+    indexes: [
+      { name: "activity_logs_user_id", fields: ["user_id"] },
+      { name: "activity_logs_action", fields: ["action"] },
+      { name: "activity_logs_target", fields: ["target_type", "target_id"] },
+    ],
   },
 )
 

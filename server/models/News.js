@@ -65,6 +65,10 @@ const News = sequelize.define(
     timestamps: true,
     createdAt: "created_at",
     updatedAt: "updated_at",
+    indexes: [
+      { name: "news_status", fields: ["status"] },
+      { name: "news_published_at", fields: ["published_at"] },
+    ],
   },
 )
 

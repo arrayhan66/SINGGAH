@@ -1,6 +1,7 @@
 const { Sequelize } = require("sequelize")
 
 const isTest = process.env.NODE_ENV === "test"
+const useSsl = process.env.DB_SSL !== "false" && process.env.DB_SSL !== "0"
 
 const sequelize = isTest
   ? new Sequelize({
@@ -17,12 +18,14 @@ const sequelize = isTest
         port: parseInt(process.env.DB_PORT) || 3306,
         dialect: "mysql",
         logging: false,
-        dialectOptions: {
-          ssl: {
-            require: true,
-            rejectUnauthorized: true,
-          },
-        },
+        dialectOptions: useSsl
+          ? {
+              ssl: {
+                require: true,
+                rejectUnauthorized: true,
+              },
+            }
+          : undefined,
       },
     )
 

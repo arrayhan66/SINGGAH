@@ -59,7 +59,7 @@ exports.getNews = async (query = {}) => {
 
   if (isUnfiltered) {
     const cacheKey = `news:list:${currentPage}:${currentLimit}`
-    const cached = cache.get(cacheKey)
+    const cached = await cache.get(cacheKey)
     if (cached) return cached
   }
 
@@ -88,7 +88,7 @@ exports.getNews = async (query = {}) => {
   }
 
   if (isUnfiltered) {
-    cache.set(`news:list:${currentPage}:${currentLimit}`, result, NEWS_LIST_TTL)
+    await cache.set(`news:list:${currentPage}:${currentLimit}`, result, NEWS_LIST_TTL)
   }
 
   return result
@@ -162,7 +162,7 @@ exports.createNews = async (data, userId) => {
     author_id: userId,
   })
 
-  cache.delPrefix("news:list:")
+  await cache.delPrefix("news:list:")
 
   return await exports.getNewsById(news.id)
 }
@@ -223,7 +223,7 @@ exports.updateNews = async (id, data) => {
 
   await news.save()
 
-  cache.delPrefix("news:list:")
+  await cache.delPrefix("news:list:")
 
   return exports.getNewsById(id)
 }
@@ -233,7 +233,7 @@ exports.deleteNews = async (id) => {
 
   await News.destroy({ where: { id } })
 
-  cache.delPrefix("news:list:")
+  await cache.delPrefix("news:list:")
 
   return news
 }

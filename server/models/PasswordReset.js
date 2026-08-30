@@ -18,6 +18,10 @@ const PasswordReset = sequelize.define(
     timestamps: true,
     createdAt: "created_at",
     updatedAt: false,
+    indexes: [
+      { name: "password_resets_user_id", fields: ["user_id"] },
+      { name: "password_resets_code", fields: ["code"] },
+    ],
   },
 )
 

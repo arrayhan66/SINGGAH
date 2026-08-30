@@ -18,6 +18,10 @@ const VerificationCode = sequelize.define(
     timestamps: true,
     createdAt: "created_at",
     updatedAt: false,
+    indexes: [
+      { name: "verification_codes_user_id", fields: ["user_id"] },
+      { name: "verification_codes_code", fields: ["code"] },
+    ],
   },
 )
 

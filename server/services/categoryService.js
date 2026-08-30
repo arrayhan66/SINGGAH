@@ -6,7 +6,7 @@ const CATEGORIES_TTL = 60 * 1000
 const CATEGORIES_KEY = "categories:list"
 
 exports.getCategories = async () => {
-  const cached = cache.get(CATEGORIES_KEY)
+  const cached = await cache.get(CATEGORIES_KEY)
   if (cached) return cached
 
   const categories = await Category.findAll({
@@ -26,7 +26,7 @@ exports.getCategories = async () => {
     ],
   })
 
-  cache.set(CATEGORIES_KEY, categories, CATEGORIES_TTL)
+  await cache.set(CATEGORIES_KEY, categories, CATEGORIES_TTL)
 
   return categories
 }
@@ -95,7 +95,7 @@ exports.createCategory = async (data) => {
     is_active: is_active ?? true,
   })
 
-  cache.del(CATEGORIES_KEY)
+  await cache.del(CATEGORIES_KEY)
 
   return category
 }
@@ -147,7 +147,7 @@ exports.updateCategory = async (id, data) => {
 
   await category.save()
 
-  cache.del(CATEGORIES_KEY)
+  await cache.del(CATEGORIES_KEY)
 
   return category
 }
@@ -161,7 +161,7 @@ exports.deleteCategory = async (id) => {
 
   try {
     await category.destroy()
-    cache.del(CATEGORIES_KEY)
+    await cache.del(CATEGORIES_KEY)
   } catch (error) {
     if (error.name === "SequelizeForeignKeyConstraintError") {
       throw new AppError("Kategori masih digunakan oleh project", 400)

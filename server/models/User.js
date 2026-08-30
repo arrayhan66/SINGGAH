@@ -76,6 +76,10 @@ const User = sequelize.define(
     timestamps: true,
     createdAt: "created_at",
     updatedAt: "updated_at",
+    indexes: [
+      { name: "users_status", fields: ["status"] },
+      { name: "users_pending_email", fields: ["pending_email"] },
+    ],
   },
 )
 

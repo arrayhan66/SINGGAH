@@ -24,7 +24,11 @@ const Comment = sequelize.define(
     timestamps: true,
     createdAt: "created_at",
     updatedAt: "updated_at",
-    indexes: [{ fields: ["project_id"] }, { fields: ["user_id"] }],
+    indexes: [
+      { name: "comments_project_id", fields: ["project_id"] },
+      { name: "comments_user_id", fields: ["user_id"] },
+      { name: "comments_project_created", fields: ["project_id", "created_at"] },
+    ],
   },
 )
 

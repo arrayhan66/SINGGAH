@@ -56,6 +56,11 @@ const Project = sequelize.define(
     timestamps: true,
     createdAt: "created_at",
     updatedAt: "updated_at",
+    indexes: [
+      { name: "projects_user_id", fields: ["user_id"] },
+      { name: "projects_category_id", fields: ["category_id"] },
+      { name: "projects_status", fields: ["status"] },
+    ],
   },
 )
 

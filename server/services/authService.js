@@ -442,8 +442,9 @@ exports.resendVerification = async (data) => {
     },
   })
 
+  // Anti-enumeration: balas sukses generik walau email tidak terdaftar.
   if (!user) {
-    throw new AppError("Email tidak terdaftar", 404)
+    return true
   }
 
   const hasPending =
@@ -498,8 +499,9 @@ exports.forgotPassword = async (data) => {
 
   const user = await User.findOne({ where: { email } })
 
+  // Anti-enumeration: balas sukses generik walau email tidak terdaftar.
   if (!user) {
-    throw new AppError("Email tidak terdaftar", 404)
+    return true
   }
 
   const code = generateCode()
@@ -544,8 +546,9 @@ exports.verifyResetCode = async (data) => {
 
   const user = await User.findOne({ where: { email } })
 
+  // Anti-enumeration: jangan ungkap status pendaftaran email.
   if (!user) {
-    throw new AppError("Email tidak terdaftar", 404)
+    throw new AppError("Kode tidak valid atau sudah kadaluarsa", 400)
   }
 
   const resetRecord = await PasswordReset.findOne({
@@ -577,8 +580,9 @@ exports.resetPassword = async (data) => {
 
   const user = await User.findOne({ where: { email } })
 
+  // Anti-enumeration: jangan ungkap status pendaftaran email.
   if (!user) {
-    throw new AppError("Email tidak terdaftar", 404)
+    throw new AppError("Kode tidak valid atau sudah kadaluarsa", 400)
   }
 
   const resetRecord = await PasswordReset.findOne({

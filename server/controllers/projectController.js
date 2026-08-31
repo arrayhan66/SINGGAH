@@ -26,21 +26,28 @@ const parseRemoved = (value, label) => {
   throw new AppError(`${label} tidak valid`, 400)
 }
 
-const removeAssets = async (rows, Model, urlField) => {
+const removeAssets = async (rows, Model, urlField, projectId) => {
   for (const item of rows) {
     const url = typeof item === "string" ? item : item[urlField]
     const id = typeof item === "string" ? null : item.id
 
-    if (url) {
-      const publicId = getPublicIdFromUrl(url)
-      if (publicId) {
-        await deleteImage(publicId).catch(() => {})
-      }
+    let asset = null
+    if (id) {
+      asset = await Model.findOne({ where: { id, project_id: projectId } })
+    } else if (url) {
+      asset = await Model.findOne({
+        where: { [urlField]: url, project_id: projectId },
+      })
     }
 
-    if (id) {
-      await Model.destroy({ where: { id } })
+    if (!asset) continue
+
+    const publicId = getPublicIdFromUrl(asset[urlField] || url)
+    if (publicId) {
+      await deleteImage(publicId).catch(() => {})
     }
+
+    await asset.destroy()
   }
 }
 
@@ -70,6 +77,7 @@ exports.getProjectById = asyncHandler(async (req, res) => {
   const project = await projectService.getProjectById(
     req.params.id,
     req.user?.id || null,
+    req.user?.role || null,
   )
 
   success(res, project)
@@ -181,7 +189,11 @@ exports.setProjectFeatured = asyncHandler(async (req, res) => {
 })
 
 exports.updateProject = asyncHandler(async (req, res) => {
-  const existingProject = await projectService.getProjectById(req.params.id)
+  const existingProject = await projectService.getProjectById(
+    req.params.id,
+    req.user.id,
+    req.user.role,
+  )
 
   if (req.user.role !== "admin" && existingProject.user_id !== req.user.id) {
     throw new AppError("Akses ditolak", 403)
@@ -238,7 +250,12 @@ exports.updateProject = asyncHandler(async (req, res) => {
   const removedImages = parseRemoved(req.body.removedImages, "Gambar")
 
   if (removedImages.length > 0) {
-    await removeAssets(removedImages, ProjectImage, "image_url")
+    await removeAssets(
+      removedImages,
+      ProjectImage,
+      "image_url",
+      existingProject.id,
+    )
   }
 
   const removedDocuments = parseRemoved(
@@ -247,7 +264,12 @@ exports.updateProject = asyncHandler(async (req, res) => {
   )
 
   if (removedDocuments.length > 0) {
-    await removeAssets(removedDocuments, ProjectDocument, "file_url")
+    await removeAssets(
+      removedDocuments,
+      ProjectDocument,
+      "file_url",
+      existingProject.id,
+    )
   }
 
   const project = await projectService.updateProject(

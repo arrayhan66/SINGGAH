@@ -23,18 +23,25 @@ exports.addImage = asyncHandler(async (req, res) => {
     "singgah/projects",
   )
 
-  const image = await projectImageService.addImage(
-    req.params.id,
-    result.secure_url,
-  )
-
-  success(res, image, "Gambar berhasil ditambahkan", 201)
+  try {
+    const image = await projectImageService.addImage(
+      req.params.id,
+      result.secure_url,
+      req.user,
+    )
+    success(res, image, "Gambar berhasil ditambahkan", 201)
+  } catch (err) {
+    const publicId = getPublicIdFromUrl(result.secure_url)
+    if (publicId) await deleteImage(publicId).catch(() => {})
+    throw err
+  }
 })
 
 exports.removeImage = asyncHandler(async (req, res) => {
   const image = await projectImageService.removeImage(
     req.params.id,
     req.params.imageId,
+    req.user,
   )
 
   const publicId = getPublicIdFromUrl(image.image_url)

@@ -298,6 +298,7 @@ exports.updateUser = async (id, data) => {
     throw new AppError("User tidak ditemukan", 404)
   }
 
+  const wasAdmin = user.role === "admin"
   const normalizedEmail = email
     ? String(email).trim().toLowerCase()
     : String(user.email).trim().toLowerCase()
@@ -372,6 +373,19 @@ exports.updateUser = async (id, data) => {
 
     if (password) {
       user.password = await bcrypt.hash(password, 10)
+    }
+
+    const demotingSelfOrLastAdmin =
+      wasAdmin && (user.role !== "admin" || user.status === "inactive")
+
+    if (demotingSelfOrLastAdmin) {
+      const adminCount = await User.count({ where: { role: "admin" } })
+      if (adminCount <= 1) {
+        throw new AppError(
+          "Tidak dapat menonaktifkan atau menurunkan admin terakhir",
+          400,
+        )
+      }
     }
 
     await user.save()

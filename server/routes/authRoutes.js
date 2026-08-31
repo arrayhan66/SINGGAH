@@ -8,6 +8,7 @@ const { dynamicUploadFields } = require("../middlewares/uploadMiddleware")
 const {
   loginLimiter,
   registerLimiter,
+  googleLimiter,
   forgotPasswordLimiter,
   resendCodeLimiter,
   verifyCodeLimiter,
@@ -42,6 +43,11 @@ router.post(
   loginValidator,
   validate,
   authController.login,
+)
+router.post(
+  "/google",
+  googleLimiter,
+  authController.googleLogin,
 )
 router.post(
   "/check-email",

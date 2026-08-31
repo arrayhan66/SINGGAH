@@ -145,6 +145,19 @@ exports.registerLimiter = rateLimit({
   },
 })
 
+exports.googleLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => isRateLimitDisabled,
+  store: createStore("google"),
+  message: {
+    success: false,
+    message: "Terlalu banyak permintaan. Coba lagi dalam 10 menit.",
+  },
+})
+
 exports.forgotPasswordLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 3,

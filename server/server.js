@@ -33,6 +33,7 @@ const mediaRoutes = require("./routes/mediaRoutes")
 const reportRoutes = require("./routes/reportRoutes")
 const hallRoutes = require("./routes/hallRoutes")
 const maintenanceMiddleware = require("./middlewares/maintenanceMiddleware")
+const ensureGoogleIdColumn = require("./scripts/ensureGoogleIdColumn")
 
 const swaggerUi = require("swagger-ui-express")
 const loadSwagger = require("./config/swagger")
@@ -45,7 +46,7 @@ app.set("trust proxy", 1)
 app.use(
   helmet({
     referrerPolicy: { policy: "same-origin" },
-    crossOriginOpenerPolicy: { policy: "same-origin" },
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
   }),
 )
 
@@ -109,6 +110,7 @@ const startServer = async () => {
 
     // Buat tabel yang belum ada (tanpa mengubah tabel lama)
     if (process.env.NODE_ENV !== "test") {
+      await ensureGoogleIdColumn()
       await sequelize.sync()
     }
 

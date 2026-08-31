@@ -7,6 +7,7 @@ const {
   sequelize,
 } = require("../models")
 const bcrypt = require("bcryptjs")
+const dns = require("dns").promises
 const { Op } = require("sequelize")
 const generateToken = require("../utils/generateToken")
 const generateCode = require("../utils/generateCode")
@@ -26,6 +27,7 @@ const {
 const { logActivity } = require("./activityLogService")
 const settingService = require("./settingService")
 const notificationService = require("./notificationService")
+const { verifyGoogleToken } = require("./googleAuthService")
 
 const CODE_EXPIRES_MINUTES = 5
 
@@ -203,6 +205,7 @@ exports.login = async (data) => {
       username: user.username,
       email: user.email,
       pending_email: user.pending_email,
+      google_id: user.google_id,
       role: user.role,
       tipe: user.tipe,
       pending_tipe: user.pending_tipe,
@@ -214,6 +217,20 @@ exports.login = async (data) => {
       is_verified: user.is_verified,
       created_at: user.created_at,
     },
+  }
+}
+
+const resolveMxWithTimeout = async (domain, ms = 4000) => {
+  try {
+    const records = await Promise.race([
+      dns.resolveMx(domain),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("mx timeout")), ms),
+      ),
+    ])
+    return Array.isArray(records) && records.length > 0
+  } catch {
+    return null
   }
 }
 
@@ -232,6 +249,8 @@ exports.checkEmail = async (data) => {
     verified: false,
     tipe: null,
     suggestion: null,
+    domain: null,
+    domainValid: null,
   }
 
   const user = await User.findOne({
@@ -249,6 +268,16 @@ exports.checkEmail = async (data) => {
   }
 
   result.suggestion = await findEmailSuggestion(email)
+
+  const domain = email.slice(email.indexOf("@") + 1)
+  if (KNOWN_EMAIL_DOMAINS.includes(domain)) {
+    result.domain = domain
+    result.domainValid = true
+  } else {
+    const hasMx = await resolveMxWithTimeout(domain)
+    result.domain = domain
+    result.domainValid = hasMx === true
+  }
 
   return result
 }
@@ -986,4 +1015,192 @@ exports.deleteAccount = async (userId, password) => {
   await user.destroy()
 
   return true
+}
+
+const buildAuthPayload = (user) => ({
+  token: generateToken(user),
+  user: {
+    id: user.id,
+    name: user.name,
+    username: user.username,
+    email: user.email,
+    pending_email: user.pending_email,
+    google_id: user.google_id,
+    role: user.role,
+    tipe: user.tipe,
+    pending_tipe: user.pending_tipe,
+    rejection_reason: user.rejection_reason,
+    nim_nip: user.nim_nip,
+    avatar: user.avatar,
+    identitas_photo: user.identitas_photo,
+    status: user.status,
+    is_verified: user.is_verified,
+    created_at: user.created_at,
+  },
+})
+
+exports.googleLogin = async (data) => {
+  const idToken = String(data.idToken || "").trim()
+
+  if (!idToken) {
+    throw new AppError("Token Google tidak ditemukan", 400)
+  }
+
+  let payload
+  try {
+    payload = await verifyGoogleToken(idToken)
+  } catch (err) {
+    throw new AppError("Token Google tidak valid atau kedaluwarsa", 401)
+  }
+
+  if (!payload.email) {
+    throw new AppError("Google tidak memberikan alamat email", 400)
+  }
+
+  const email = String(payload.email).toLowerCase()
+  const googleId = String(payload.sub)
+
+  const registrationOpen = await settingService.getSetting("registrationOpen")
+  if (registrationOpen === false) {
+    throw new AppError(
+      "Pendaftaran akun baru sedang ditutup. Silakan coba lagi nanti.",
+      403,
+    )
+  }
+
+  const maintenance = await settingService.getSetting("maintenanceMode")
+  if (maintenance) {
+    throw new AppError("Mode maintenance sedang aktif. Silakan coba lagi nanti.", 503)
+  }
+
+  let user = await User.findOne({ where: { google_id: googleId } })
+
+  if (!user) {
+    user = await User.findOne({ where: { email } })
+  }
+
+  const isNewUser = !user
+
+  if (!user) {
+    const baseUsername = String(payload.name || "user")
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, "")
+      .slice(0, 20) || "user"
+
+    let username = baseUsername
+    const suffix = googleId.slice(-5).replace(/\D/g, "") || Date.now().toString().slice(-5)
+    let attempt = 0
+    let exists = await User.findOne({ where: { username } })
+    while (exists && attempt < 10) {
+      attempt += 1
+      username = `${baseUsername}${suffix}${attempt}`.slice(0, 50)
+      exists = await User.findOne({ where: { username } })
+    }
+
+    const needsApproval = false
+    const userTipe = "umum"
+
+    try {
+      user = await sequelize.transaction(async (t) => {
+        const created = await User.create(
+          {
+            name: String(payload.name || "Pengguna").slice(0, 100),
+            username,
+            email,
+            google_id: googleId,
+            password: require("bcryptjs").hashSync(
+              `google_${googleId}_${Date.now()}`,
+              10,
+            ),
+            avatar: payload.picture || null,
+            tipe: userTipe,
+            pending_tipe: needsApproval ? userTipe : null,
+            nim_nip: null,
+            status: "active",
+            is_verified: true,
+          },
+          { transaction: t },
+        )
+        return created
+      })
+    } catch (err) {
+      // Race: username/email/google_id diambil proses lain di antara check & create.
+      if (err.name === "SequelizeUniqueConstraintError") {
+        const fallbackUsername = `${baseUsername}${Date.now().toString().slice(-6)}`.slice(0, 50)
+        try {
+          user = await sequelize.transaction(async (t) => {
+            const created = await User.create(
+              {
+                name: String(payload.name || "Pengguna").slice(0, 100),
+                username: fallbackUsername,
+                email,
+                google_id: googleId,
+                password: require("bcryptjs").hashSync(
+                  `google_${googleId}_${Date.now()}`,
+                  10,
+                ),
+                avatar: payload.picture || null,
+                tipe: userTipe,
+                pending_tipe: null,
+                nim_nip: null,
+                status: "active",
+                is_verified: true,
+              },
+              { transaction: t },
+            )
+            return created
+          })
+        } catch (err2) {
+          throw new AppError(
+            "Gagal membuat akun, silakan coba lagi",
+            err2.name === "SequelizeUniqueConstraintError" ? 409 : 500,
+          )
+        }
+      } else {
+        throw err
+      }
+    }
+
+    await logActivity({
+      userId: user.id,
+      action: "user_registered",
+      targetType: "user",
+      targetId: user.id,
+      description: `${user.name} mendaftar (Google)`,
+    })
+  } else {
+    if (user.status !== "active") {
+      throw new AppError(
+        "Akun Anda dinonaktifkan. Silakan hubungi admin.",
+        403,
+      )
+    }
+
+    if (!user.google_id) {
+      user.google_id = googleId
+      await user.save().catch(() => {})
+    }
+  }
+
+  if (isNewUser) {
+    try {
+      await notificationService.notifyAdmins({
+        type: "user_registered",
+        title: "Pendaftaran Baru (Google)",
+        message: `${user.name} (${user.username}) mendaftar melalui Google.`,
+        reference_type: "user",
+        reference_id: user.id,
+      })
+    } catch (err) {
+      logger.error("Gagal kirim notifikasi admin:", err.message)
+    }
+  }
+
+  await logActivity({
+    userId: user.id,
+    action: "user_login",
+    description: `${user.name} login melalui Google`,
+  })
+
+  return buildAuthPayload(user)
 }

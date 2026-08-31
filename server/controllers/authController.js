@@ -62,6 +62,11 @@ exports.login = asyncHandler(async (req, res) => {
   success(res, result, "Login berhasil")
 })
 
+exports.googleLogin = asyncHandler(async (req, res) => {
+  const result = await authService.googleLogin(req.body)
+  success(res, result, "Login Google berhasil")
+})
+
 exports.checkEmail = asyncHandler(async (req, res) => {
   const result = await authService.checkEmail(req.body)
   success(res, result, "Pengecekan email berhasil")
@@ -119,16 +124,6 @@ exports.updateProfile = asyncHandler(async (req, res) => {
     if (req.files && req.files.avatar && req.files.avatar[0]) {
       const result = await uploadImage(req.files.avatar[0].buffer, "singgah/avatars")
       avatarUrl = result.secure_url
-
-      const oldAvatar = req.user.avatar
-
-      if (oldAvatar) {
-        const publicId = getPublicIdFromUrl(oldAvatar)
-
-        if (publicId) {
-          await deleteImage(publicId).catch(() => {})
-        }
-      }
     }
 
     if (req.files && req.files.identitas_photo && req.files.identitas_photo[0]) {
@@ -137,16 +132,6 @@ exports.updateProfile = asyncHandler(async (req, res) => {
         "singgah/identitas",
       )
       identitasUrl = result.secure_url
-
-      const oldIdentitas = req.user.identitas_photo
-
-      if (oldIdentitas) {
-        const publicId = getPublicIdFromUrl(oldIdentitas)
-
-        if (publicId) {
-          await deleteImage(publicId).catch(() => {})
-        }
-      }
     }
 
     const user = await authService.updateProfile(
@@ -155,6 +140,18 @@ exports.updateProfile = asyncHandler(async (req, res) => {
       avatarUrl,
       identitasUrl,
     )
+
+    // Hapus file lama HANYA setelah update DB/validasi sukses, supaya
+    // kalau service throw (mis. email sudah dipakai) file lama tidak hilang.
+    if (avatarUrl && req.user.avatar) {
+      const publicId = getPublicIdFromUrl(req.user.avatar)
+      if (publicId) await deleteImage(publicId).catch(() => {})
+    }
+    if (identitasUrl && req.user.identitas_photo) {
+      const publicId = getPublicIdFromUrl(req.user.identitas_photo)
+      if (publicId) await deleteImage(publicId).catch(() => {})
+    }
+
     success(res, user, "Profil berhasil diperbarui")
   } catch (err) {
     const publicIds = []
@@ -187,16 +184,6 @@ exports.applyTipe = asyncHandler(async (req, res) => {
         "singgah/identitas",
       )
       identitasUrl = result.secure_url
-
-      const oldIdentitas = req.user.identitas_photo
-
-      if (oldIdentitas) {
-        const publicId = getPublicIdFromUrl(oldIdentitas)
-
-        if (publicId) {
-          await deleteImage(publicId).catch(() => {})
-        }
-      }
     }
 
     const user = await authService.applyTipe(
@@ -205,6 +192,13 @@ exports.applyTipe = asyncHandler(async (req, res) => {
       req.body.nim_nip,
       identitasUrl,
     )
+
+    // Hapus file identitas lama HANYA setelah service sukses (validasi lulus).
+    if (identitasUrl && req.user.identitas_photo) {
+      const publicId = getPublicIdFromUrl(req.user.identitas_photo)
+      if (publicId) await deleteImage(publicId).catch(() => {})
+    }
+
     success(res, user, "Pengajuan verifikasi tipe berhasil dikirim ke admin")
   } catch (err) {
     if (identitasUrl) {

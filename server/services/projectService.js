@@ -426,7 +426,7 @@ exports.setProjectFeatured = async (id, slot = null) => {
   return project
 }
 
-exports.getProjectById = async (id, currentUserId = null) => {
+exports.getProjectById = async (id, currentUserId = null, currentUserRole = null) => {
   const where = /^\d+$/.test(id) ? { id: Number(id) } : { slug: id }
 
   const project = await Project.findOne({
@@ -447,6 +447,13 @@ exports.getProjectById = async (id, currentUserId = null) => {
   })
 
   if (!project) {
+    throw new AppError("Project tidak ditemukan", 404)
+  }
+
+  const isOwner = currentUserId && project.user_id === currentUserId
+  const isAdmin = currentUserRole === "admin"
+
+  if (project.status !== "published" && !isOwner && !isAdmin) {
     throw new AppError("Project tidak ditemukan", 404)
   }
 
@@ -566,7 +573,7 @@ exports.createProject = async (data, user, imageUrls = [], documentUrls = []) =>
     return created
   })
 
-  return await exports.getProjectById(project.id)
+  return await exports.getProjectById(project.id, user.id, user.role)
 }
 
 exports.updateProject = async (id, data, user) => {
@@ -638,11 +645,11 @@ exports.updateProject = async (id, data, user) => {
     ).catch(() => {})
   }
 
-  return await exports.getProjectById(project.id)
+  return await exports.getProjectById(project.id, user.id, user.role)
 }
 
 exports.deleteProject = async (id, user) => {
-  const project = await exports.getProjectById(id)
+  const project = await exports.getProjectById(id, user.id, user.role)
 
   // Admin boleh menghapus semua project.
   // User hanya boleh menghapus project miliknya sendiri.

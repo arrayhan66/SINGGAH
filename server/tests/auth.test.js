@@ -1,7 +1,17 @@
 const request = require("supertest")
 const bcrypt = require("bcryptjs")
+jest.mock("dns", () => ({
+  promises: {
+    resolveMx: jest.fn(),
+  },
+}))
+jest.mock("../services/googleAuthService", () => ({
+  verifyGoogleToken: jest.fn(),
+}))
 const app = require("../server")
 const { User, VerificationCode, Notification } = require("../models")
+const { resolveMx } = require("dns").promises
+const { verifyGoogleToken } = require("../services/googleAuthService")
 
 describe("Auth Endpoints", () => {
   let authToken = ""
@@ -16,6 +26,11 @@ describe("Auth Endpoints", () => {
 
   beforeAll(async () => {
     await User.destroy({ where: {} })
+  })
+
+  beforeEach(() => {
+    resolveMx.mockReset()
+    resolveMx.mockResolvedValue([{ exchange: "mx.example.com" }])
   })
 
   it("should register a new user successfully", async () => {
@@ -305,6 +320,25 @@ describe("Auth Endpoints", () => {
     expect(res.body.data.exists).toBe(false)
     expect(res.body.data.verified).toBe(false)
     expect(res.body.data.suggestion).toBe("test@gmail.com")
+    expect(res.body.data.domain).toBe("gmaill.com")
+    expect(res.body.data.domainValid).toBe(true)
+  })
+
+  it("should flag a domain with no mail server as invalid", async () => {
+    resolveMx.mockReset()
+    resolveMx.mockResolvedValue([])
+
+    const res = await request(app)
+      .post("/api/auth/check-email")
+      .send({ email: "someone@nodomainhere.zzz" })
+
+    expect(res.status).toBe(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data.exists).toBe(false)
+    expect(res.body.data.domain).toBe("nodomainhere.zzz")
+    expect(res.body.data.domainValid).toBe(false)
+
+    resolveMx.mockResolvedValue([{ exchange: "mx.example.com" }])
   })
 
   it("should report an existing verified email as registered & verified", async () => {
@@ -350,5 +384,73 @@ describe("Auth Endpoints", () => {
     expect(res.body.success).toBe(true)
     expect(res.body.data.exists).toBe(false)
     expect(res.body.data.suggestion).toBe("avatar@example.com")
+  })
+})
+
+describe("Google Login", () => {
+  beforeEach(() => {
+    verifyGoogleToken.mockReset()
+  })
+
+  it("should reject request without token", async () => {
+    const res = await request(app).post("/api/auth/google").send({})
+
+    expect(res.status).toBe(400)
+  })
+
+  it("should create a new umum user on first google login", async () => {
+    verifyGoogleToken.mockResolvedValue({
+      email: "google.newuser@gmail.com",
+      name: "Google New User",
+      sub: "google-sub-12345",
+      picture: "https://example.com/pic.png",
+    })
+
+    const res = await request(app)
+      .post("/api/auth/google")
+      .send({ idToken: "fake-id-token" })
+
+    expect(res.status).toBe(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data.token).toBeDefined()
+    expect(res.body.data.user.email).toBe("google.newuser@gmail.com")
+    expect(res.body.data.user.tipe).toBe("umum")
+    expect(res.body.data.user.is_verified).toBe(true)
+    expect(res.body.data.user.google_id).toBe("google-sub-12345")
+
+    const user = await User.findOne({ where: { email: "google.newuser@gmail.com" } })
+    expect(user).not.toBeNull()
+    expect(user.google_id).toBe("google-sub-12345")
+  })
+
+  it("should login existing google user and not duplicate", async () => {
+    verifyGoogleToken.mockResolvedValue({
+      email: "google.newuser@gmail.com",
+      name: "Google New User",
+      sub: "google-sub-12345",
+    })
+
+    const countBefore = await User.count({
+      where: { email: "google.newuser@gmail.com" },
+    })
+    expect(countBefore).toBe(1)
+
+    const res = await request(app)
+      .post("/api/auth/google")
+      .send({ idToken: "fake-id-token-2" })
+
+    expect(res.status).toBe(200)
+    const countAfter = await User.count({
+      where: { email: "google.newuser@gmail.com" },
+    })
+    expect(countAfter).toBe(1)
+  })
+
+  it("should reject an invalid google token", async () => {
+    verifyGoogleToken.mockRejectedValue(new Error("invalid token"))
+    const res = await request(app)
+      .post("/api/auth/google")
+      .send({ idToken: "bad-token" })
+    expect(res.status).toBe(401)
   })
 })

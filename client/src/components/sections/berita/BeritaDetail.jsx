@@ -326,14 +326,14 @@ function BeritaDetail() {
       <DustBackground />
 
       <div className="relative z-10 mx-auto max-w-4xl px-3 min-[350px]:px-5 sm:px-8 2xl:max-w-5xl">
-        <div className="overflow-hidden border border-slate-700/60 shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-2xl min-[350px]:rounded-3xl bg-brand-navy">
+        <div className="berita-article-card overflow-hidden border border-slate-700/60 rounded-2xl min-[350px]:rounded-3xl bg-brand-navy">
           <div className="p-4 min-[350px]:p-5 sm:p-8 lg:p-10 pb-6 min-[350px]:pb-8 sm:pb-12 lg:pb-14 bg-brand-navy border-b border-slate-800/80">
             {/* Dibikin flex-wrap biar di 260px tombolnya nggak maksa nyamping */}
             <div className="flex flex-wrap items-center justify-between gap-3 pb-0">
               <Link
                 to="/berita"
                 aria-label="Kembali"
-                className={`group inline-flex items-center gap-1.5 min-[350px]:gap-2 rounded-full px-3 py-1.5 min-[350px]:p-2.5 sm:py-2 sm:pl-3 sm:pr-4 text-xs min-[350px]:text-sm transition-all duration-300 shadow-sm ${isDark ? "border border-white/10 bg-white/5 text-slate-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300" : "border border-cyan-400/40 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/20 hover:border-cyan-400/60 hover:shadow-lg hover:shadow-cyan-400/10"}`}
+                className={`group inline-flex items-center gap-1.5 min-[350px]:gap-2 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-xs min-[350px]:text-sm transition-all duration-300 shadow-sm cursor-pointer ${isDark ? "border border-white/10 bg-white/5 text-slate-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300" : "border border-cyan-400/40 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/20 hover:border-cyan-400/60 hover:shadow-lg hover:shadow-cyan-400/10"}`}
               >
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 shrink-0">
                   <ArrowLeft
@@ -347,12 +347,14 @@ function BeritaDetail() {
               <button
                 onClick={() => setIsShareModalOpen(true)}
                 aria-label="Bagikan Artikel"
-                className={`group inline-flex items-center gap-1.5 min-[350px]:gap-2 rounded-full px-3 py-1.5 min-[350px]:px-4 min-[350px]:py-2 sm:text-sm text-xs transition-all duration-300 shadow-sm cursor-pointer ${isDark ? "border border-white/10 bg-white/5 text-slate-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300" : "border border-cyan-400/40 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/20 hover:border-cyan-400/60 hover:shadow-lg hover:shadow-cyan-400/10"}`}
+                className={`group inline-flex items-center gap-1.5 min-[350px]:gap-2 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-xs min-[350px]:text-sm transition-all duration-300 shadow-sm cursor-pointer ${isDark ? "border border-white/10 bg-white/5 text-slate-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300" : "border border-cyan-400/40 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/20 hover:border-cyan-400/60 hover:shadow-lg hover:shadow-cyan-400/10"}`}
               >
-                <Share2
-                  size={12}
-                  className="min-[350px]:w-3.5 min-[350px]:h-3.5 text-cyan-400 shrink-0"
-                />
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 shrink-0">
+                  <Share2
+                    size={14}
+                    className="text-cyan-400 shrink-0"
+                  />
+                </span>
                 <span className="font-semibold">Bagikan</span>
               </button>
             </div>
@@ -477,7 +479,7 @@ function BeritaDetail() {
                 <div
                   key={news.id}
                   onClick={() => navigate(`/berita/${news.slug}`)}
-                  className={`group cursor-pointer overflow-hidden rounded-xl min-[350px]:rounded-2xl transition-all duration-300 hover:-translate-y-1.5 shadow-xl ${isDark ? "border border-slate-700/50 bg-brand-navy hover:border-cyan-400/50" : "border border-slate-200 bg-white hover:border-cyan-400/50"}`}
+                  className={`berita-related-card group cursor-pointer overflow-hidden rounded-xl min-[350px]:rounded-2xl transition-all duration-300 hover:-translate-y-1.5 ${isDark ? "border border-slate-700/50 bg-brand-navy hover:border-cyan-400/50" : "border border-slate-200 bg-white hover:border-cyan-400/50"}`}
                 >
                   <div className={`h-40 min-[350px]:h-44 w-full overflow-hidden relative ${isDark ? "bg-slate-950" : "bg-slate-100"}`}>
                     <img

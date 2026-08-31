@@ -1,62 +1,41 @@
-import { X, AlertTriangle } from "lucide-react"
+import { AlertTriangle } from "lucide-react"
+import PopupToast from "../../../../components/ui/PopupToast"
 
 export default function ConfirmDeleteModal({ item, onConfirm, onCancel }) {
   if (!item) return null
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4"
-      onClick={onCancel}
-    >
-      <div
-        className="animate-modal-in w-full max-w-sm rounded-3xl border border-white/[0.06] bg-gradient-to-br from-brand-navy/95 via-brand-dark/95 to-slate-900/95 p-6 shadow-2xl shadow-black/50 backdrop-blur-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500/20 to-rose-600/20 border border-red-500/30">
-            <div className="absolute inset-0 rounded-2xl bg-red-500/10 animate-pulse" />
-            <AlertTriangle className="relative h-5 w-5 text-red-400" />
+    <PopupToast show={!!item} variant="danger" onClose={onCancel}>
+      <div className="px-4 py-3.5">
+        <div className="flex items-start gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-500/20 border border-red-500/30">
+            <AlertTriangle className="h-4.5 w-4.5 text-red-400" />
           </div>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-white/5 hover:text-white"
-            aria-label="Batal hapus"
-          >
-            <X size={16} />
-          </button>
+          <div className="min-w-0 flex-1">
+            <h3 className="pt-1 text-sm font-semibold text-white">Hapus File</h3>
+            <p className="mt-0.5 text-xs text-slate-400 min-w-0 break-words">
+              Hapus file <span className="font-semibold text-cyan-300">&quot;{item.name}&quot;</span>?
+              Tindakan ini tidak bisa dibatalkan.
+            </p>
+          </div>
         </div>
-
-        <h3 className="mt-5 text-lg font-bold text-white">Hapus File</h3>
-        <p className="mt-2 text-sm leading-relaxed text-slate-400 min-w-0 break-words">
-          Kamu akan menghapus file{" "}
-          <span className="font-semibold text-cyan-300">
-            &quot;{item.name}&quot;
-          </span>
-          . File yang sudah dihapus tidak akan tersedia lagi untuk project atau
-          berita.
-        </p>
-        <p className="mt-2 text-xs font-medium text-red-400/80">
-          Tindakan ini tidak bisa dibatalkan.
-        </p>
-
-        <div className="mt-6 flex gap-3">
+        <div className="mt-3 flex gap-2">
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 cursor-pointer rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-300 transition-all hover:bg-white/10 hover:text-white"
+            className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300 hover:bg-white/10 cursor-pointer"
           >
             Batal
           </button>
           <button
             type="button"
             onClick={() => onConfirm(item.id)}
-            className="flex-1 cursor-pointer rounded-2xl bg-gradient-to-r from-red-500 to-rose-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-red-500/30 transition-all hover:from-red-600 hover:to-rose-700 hover:shadow-red-500/50 hover:-translate-y-0.5 active:translate-y-0"
+            className="flex-1 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-red-500/30 hover:from-red-600 hover:to-rose-700 cursor-pointer"
           >
             Ya, Hapus
           </button>
         </div>
       </div>
-    </div>
+    </PopupToast>
   )
 }

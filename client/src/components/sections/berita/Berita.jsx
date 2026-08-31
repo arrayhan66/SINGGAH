@@ -61,7 +61,7 @@ function Berita() {
         </div>
 
         {/* Grid Card Berita */}
-        <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 sm:mt-12 md:gap-7 lg:grid-cols-3 lg:gap-8 xl:gap-9 3xl:mt-16 3xl:grid-cols-4 3xl:gap-10 4xl:mt-20 4xl:grid-cols-5 4xl:gap-12">
+        <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 sm:mt-12 md:gap-7 lg:gap-8 min-[75rem]:grid-cols-3 xl:gap-9 3xl:mt-16 3xl:gap-10 4xl:mt-20 4xl:gap-12">
           {loading ? (
             <NewsGridSkeleton count={6} />
           ) : visibleBerita.length > 0 ? (
@@ -139,7 +139,8 @@ function Berita() {
                       }}
                       className="flex cursor-pointer items-center gap-1.5 px-4 py-2 rounded-xl bg-white text-slate-900 text-xs font-semibold hover:bg-slate-200 transition-colors duration-300 sm:px-5 sm:py-2.5 sm:text-sm md:text-sm lg:text-base 3xl:text-base 4xl:px-6 4xl:py-3 4xl:text-lg"
                     >
-                      <span>Baca</span>
+                      <span className="inline min-[18.75rem]:hidden">Baca</span>
+                      <span className="hidden min-[18.75rem]:inline">Baca Berita</span>
                       <ArrowRight
                         size={14}
                         className="transition-transform group-hover:translate-x-0.5 sm:size-[15px] md:size-4 lg:size-[18px] 3xl:size-5 4xl:size-6"

@@ -1071,4 +1071,347 @@ html.light .karya-detail-page div.col-span-full span.font-semibold.text-slate-30
   border-radius: 0 !important;
 }
 
+/* =================================================================
+   CARD 3D — BERITA DETAIL (BeritaDetail)
+   Nuansa fisik "slab bawah" PERSIS card karya: card terangkat dari
+   body background (tidak nyatu) dengan slab bawah + bayangan.
+   Berlaku utk card utama artikel DAN card berita terkait.
+   ================================================================= */
+
+/* ── DARK MODE — geometri 3D (slab night-deep #02111f) ── */
+.berita-detail-page .berita-article-card {
+  border-color: rgba(51, 65, 85, 0.7);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 9px 0 #02111f,
+    0 20px 44px -16px rgba(0, 0, 0, 0.6);
+}
+
+.berita-detail-page .berita-related-card {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 7px 0 #02111f,
+    0 14px 28px -12px rgba(0, 0, 0, 0.55);
+}
+.berita-detail-page .berita-related-card:hover {
+  transform: translateY(-0.25rem);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 8px 0 #02111f,
+    0 18px 34px -16px rgba(0, 0, 0, 0.55);
+}
+.berita-detail-page .berita-related-card:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 3px 0 #02111f,
+    0 10px 18px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* ── LIGHT MODE — muka putih pekat + slab biru + bayangan ── */
+html.light .berita-detail-page .berita-article-card {
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%);
+  border-color: #c7dcfc;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    0 9px 0 #7fb1f5,
+    0 16px 32px -14px rgba(30, 64, 175, 0.4),
+    0 26px 50px -20px rgba(37, 99, 235, 0.3);
+}
+
+html.light .berita-detail-page .berita-related-card {
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%);
+  border-color: #c7dcfc;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    0 7px 0 #7fb1f5,
+    0 12px 26px -10px rgba(30, 64, 175, 0.35),
+    0 22px 44px -18px rgba(37, 99, 235, 0.28);
+}
+html.light .berita-detail-page .berita-related-card:hover {
+  transform: translateY(-0.25rem);
+  border-color: #9ec7fa;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    0 8px 0 #5b96ee,
+    0 14px 26px -12px rgba(30, 64, 175, 0.4),
+    0 20px 40px -20px rgba(37, 99, 235, 0.32);
+}
+html.light .berita-detail-page .berita-related-card:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    0 3px 0 #7fb1f5,
+    0 8px 16px -10px rgba(30, 64, 175, 0.35);
+}
+
+/* =================================================================
+   CARD 3D — PROJECT DETAIL (KaryaProjectDetailSection)
+   Nuansa fisik "slab bawah" PERSIS card karya di menu Karya:
+   card diangkat dari body background (tidak nyatu), dengan slab
+   bawah + bayangan arah-cahaya. Berlaku utk card utama (gallery +
+   deskripsi) DAN card komentar supaya bahasa 3D konsisten.
+   ================================================================= */
+
+/* ── DARK MODE — geometri 3D (slab night-deep #02111f) ── */
+.karya-projectdetail-page
+  #karya-project-detail
+  div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 7px 0 #02111f,
+    0 16px 32px -14px rgba(0, 0, 0, 0.6);
+}
+
+/* ── LIGHT MODE — muka putih + slab biru muda pekat + bayangan ── */
+html.light
+  .karya-projectdetail-page
+  #karya-project-detail
+  div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl {
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%);
+  border-color: #c7dcfc;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    0 7px 0 #7fb1f5,
+    0 12px 26px -10px rgba(30, 64, 175, 0.35),
+    0 22px 44px -18px rgba(37, 99, 235, 0.28);
+}
+
+/* =================================================================
+   SHARE MODAL — PROJECT DETAIL
+   Popup "Bagikan" didesain ulang agar lebih menarik: preview kartu
+   karya (thumbnail + judul), tombol sosial, dan baris salin link.
+   DARK MODE sebagai base, LIGHT MODE sebagai override html.light.
+   Semua selector di-scope ke .karya-projectdetail-page.
+   ================================================================= */
+
+/* ── Backdrop ── */
+.karya-projectdetail-page .share-modal-backdrop {
+  background: rgba(2, 8, 23, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+html.light .karya-projectdetail-page .share-modal-backdrop {
+  background: rgba(15, 23, 42, 0.42);
+}
+
+/* ── Shell modal ── */
+.karya-projectdetail-page .share-modal {
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background:
+    radial-gradient(
+      120% 90% at 100% 0%,
+      rgba(34, 211, 238, 0.1) 0%,
+      transparent 45%
+    ),
+    radial-gradient(
+      120% 90% at 0% 100%,
+      rgba(37, 99, 235, 0.14) 0%,
+      transparent 50%
+    ),
+    linear-gradient(180deg, #0d1f3a 0%, #08172e 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 30px 60px -18px rgba(0, 0, 0, 0.7);
+}
+html.light .karya-projectdetail-page .share-modal {
+  border-color: #d3e2f8;
+  background:
+    radial-gradient(
+      120% 90% at 100% 0%,
+      rgba(34, 211, 238, 0.12) 0%,
+      transparent 45%
+    ),
+    radial-gradient(
+      120% 90% at 0% 100%,
+      rgba(37, 99, 235, 0.1) 0%,
+      transparent 50%
+    ),
+    linear-gradient(180deg, #ffffff 0%, #f4f9ff 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    0 0 0 1px rgba(37, 99, 235, 0.08),
+    0 30px 60px -18px rgba(30, 64, 175, 0.35);
+}
+
+/* ── Header ── */
+.karya-projectdetail-page .share-modal-badge {
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  color: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 8px 18px -8px rgba(34, 211, 238, 0.55);
+}
+.karya-projectdetail-page .share-modal-title {
+  color: #f8fafc;
+}
+html.light .karya-projectdetail-page .share-modal-title {
+  color: #404040;
+}
+.karya-projectdetail-page .share-modal-sub {
+  color: #94a3b8;
+}
+html.light .karya-projectdetail-page .share-modal-sub {
+  color: #64748b;
+}
+.karya-projectdetail-page .share-modal-close {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+}
+.karya-projectdetail-page .share-modal-close:hover {
+  background-color: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+html.light .karya-projectdetail-page .share-modal-close {
+  background-color: #eef3fa;
+  border-color: #d3e2f8;
+  color: #475569;
+}
+html.light .karya-projectdetail-page .share-modal-close:hover {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* ── Preview kartu karya ── */
+.karya-projectdetail-page .share-preview {
+  border-radius: 1.25rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.55);
+}
+html.light .karya-projectdetail-page .share-preview {
+  border-color: #d6e4fb;
+  background: #ffffff;
+  box-shadow: 0 14px 30px -14px rgba(37, 99, 235, 0.3);
+}
+.karya-projectdetail-page .share-preview-media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background-color: #0a1628;
+}
+html.light .karya-projectdetail-page .share-preview-media {
+  background-color: #dfe5ed;
+}
+.karya-projectdetail-page .share-preview-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.karya-projectdetail-page .share-preview-tag {
+  border-radius: 9999px;
+  padding: 0.3rem 0.75rem;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(2, 8, 23, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+html.light .karya-projectdetail-page .share-preview-tag {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(37, 99, 235, 0.25);
+  color: #2563eb;
+}
+.karya-projectdetail-page .share-preview-body {
+  padding: 0.9rem 1.1rem 1.1rem;
+}
+.karya-projectdetail-page .share-preview-title {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #f1f5f9;
+}
+html.light .karya-projectdetail-page .share-preview-title {
+  color: #404040;
+}
+.karya-projectdetail-page .share-preview-meta {
+  margin-top: 0.2rem;
+  font-size: 12px;
+  color: #94a3b8;
+}
+html.light .karya-projectdetail-page .share-preview-meta {
+  color: #64748b;
+}
+
+/* ── Tombol sosial ── */
+.karya-projectdetail-page .share-modal .share-soc > div {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.45);
+}
+html.light .karya-projectdetail-page .share-modal .share-soc > div {
+  border-color: rgba(148, 163, 184, 0.35);
+  box-shadow: 0 8px 18px -10px rgba(30, 64, 175, 0.2);
+}
+.karya-projectdetail-page .share-modal .share-soc {
+  transition: transform 0.25s ease;
+}
+.karya-projectdetail-page .share-modal .share-soc:hover {
+  transform: translateY(-2px);
+}
+.karya-projectdetail-page .share-soc-label {
+  color: #94a3b8;
+}
+.karya-projectdetail-page .share-soc:hover .share-soc-label {
+  color: #e2e8f0;
+}
+html.light .karya-projectdetail-page .share-soc-label {
+  color: #64748b;
+}
+html.light .karya-projectdetail-page .share-soc:hover .share-soc-label {
+  color: #1d4ed8;
+}
+
+/* ── Baris salin link ── */
+.karya-projectdetail-page .share-copylink {
+  border-radius: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(2, 8, 23, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+html.light .karya-projectdetail-page .share-copylink {
+  border-color: #d6e4fb;
+  background: #f6f9fe;
+}
+.karya-projectdetail-page .share-copylink-url {
+  color: #94a3b8;
+}
+html.light .karya-projectdetail-page .share-copylink-url {
+  color: #64748b;
+}
+.karya-projectdetail-page .share-copylink-btn {
+  background-color: #2563eb;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  color: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 5px 12px -6px rgba(34, 211, 238, 0.5);
+}
+.karya-projectdetail-page .share-copylink-btn:hover {
+  background-image: linear-gradient(to bottom right, #06b6d4, #1d4ed8);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 8px 16px -8px rgba(29, 78, 216, 0.6);
+}
+html.light .karya-projectdetail-page .share-copylink-btn {
+  background: #ffffff;
+  border: 1px solid #d3e2f8;
+  color: #1d4ed8;
+  box-shadow: 0 4px 12px -6px rgba(37, 99, 235, 0.25);
+}
+html.light .karya-projectdetail-page .share-copylink-btn:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
 

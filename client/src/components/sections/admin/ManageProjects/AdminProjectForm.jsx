@@ -12,6 +12,7 @@ import {
 import AdminHeroBackground from "../../../ui/AdminHeroBackground"
 import EditKaryaSection from "../../user/EditKarya/EditKaryaSection"
 import Toast from "../../../ui/Toast"
+import PopupToast from "../../../ui/PopupToast"
 import { useProjects } from "../../../../context/ProjectContext"
 
 const predefinedReasons = [
@@ -343,29 +344,33 @@ function AdminProjectForm() {
       </div>
 
       {actionSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 animate-[fade-in_0.15s_ease-out]">
-          <div className="w-full max-w-[calc(100vw-2rem)] sm:max-w-sm rounded-2xl border border-white/10 bg-brand-navy p-4 sm:p-6 shadow-2xl animate-modal-in">
-            <div className="flex items-start justify-between gap-3">
-              <div className={`flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl ${
+        <PopupToast
+          show
+          variant={actionSuccess.type === "approve" ? "success" : "danger"}
+          onClose={() => {}}
+        >
+          <div className="px-4 py-3.5">
+            <div className="flex items-start gap-3">
+              <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${
                 actionSuccess.type === "approve"
-                  ? "bg-emerald-500/10 border border-emerald-500/30"
-                  : "bg-red-500/10 border border-red-500/30"
+                  ? "bg-emerald-500/20 border-emerald-500/30"
+                  : "bg-red-500/20 border-red-500/30"
               }`}>
                 {actionSuccess.type === "approve"
-                  ? <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-400" />
-                  : <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-400" />
+                  ? <CheckCircle2 className="h-4.5 w-4.5 text-emerald-400" />
+                  : <XCircle className="h-4.5 w-4.5 text-red-400" />
                 }
               </div>
+              <div className="min-w-0 flex-1">
+                <h3 className={`pt-1 text-sm font-semibold ${actionSuccess.type === "approve" ? "text-emerald-300" : "text-red-300"}`}>
+                  {actionSuccess.type === "approve" ? "Berhasil Disetujui!" : "Berhasil Ditolak"}
+                </h3>
+                <p className="mt-0.5 text-xs text-slate-400">{actionSuccess.message}</p>
+                <p className="mt-0.5 text-[11px] text-slate-500">Mengalihkan ke halaman projects...</p>
+              </div>
             </div>
-            <h3 className="mt-3 text-sm sm:text-base md:text-lg font-semibold text-white sm:mt-4">
-              {actionSuccess.type === "approve" ? "Berhasil Disetujui!" : "Berhasil Ditolak"}
-            </h3>
-            <p className="mt-1.5 text-xs sm:text-sm text-slate-400 sm:mt-2">
-              {actionSuccess.message}
-            </p>
-            <p className="mt-1 text-[11px] text-slate-500">Mengalihkan ke halaman projects...</p>
           </div>
-        </div>
+        </PopupToast>
       )}
     </>
   )

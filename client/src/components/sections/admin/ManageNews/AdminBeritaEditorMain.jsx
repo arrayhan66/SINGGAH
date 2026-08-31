@@ -126,7 +126,12 @@ function AdminBeritaEditorMain({ formData, updateField, isEditMode }) {
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ strike: false }),
+      StarterKit.configure({
+        strike: false,
+        link: false,
+        underline: false,
+        horizontalRule: false,
+      }),
       Underline,
       ResizableImage.configure({
         inline: false,

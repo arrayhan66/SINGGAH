@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Clock } from "lucide-react";
+import { ArrowLeft, Pencil } from "lucide-react";
 import logo from "../../../../assets/icons/logo.webp";
 import FormAlert from "../../../ui/FormAlert";
 import SuccessPopup from "../../../ui/SuccessPopup";
@@ -141,6 +141,44 @@ function VerifyCodeForm() {
         ? "/register"
         : "/forgot-password";
 
+  useEffect(() => {
+    if (verifyType !== "register" || !currentEmail) return;
+
+    const checkEmail = async () => {
+      try {
+        const status = (
+          await api.post("/auth/check-email", { email: currentEmail })
+        ).data.data;
+        if (!status) return;
+
+        if (!status.exists) {
+          setAlert({
+            message:
+              "Email ini tidak terdaftar di sistem — kemungkinan terjadi salah ketik saat mendaftar. Klik 'Ganti Email' untuk memperbaikinya.",
+            type: "error",
+          });
+        } else if (status.verified) {
+          setAlert({
+            message:
+              "Email ini sudah terverifikasi. Silakan langsung masuk ke akun kamu.",
+            type: "error",
+          });
+        }
+      } catch {
+        // abaikan bila pemeriksaan gagal
+      }
+    };
+
+    checkEmail();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleChangeEmail = () => {
+    localStorage.removeItem("registerEmail");
+    localStorage.removeItem("verifyType");
+    navigate("/register");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setAlert({ message: "", type: "" });
@@ -240,10 +278,34 @@ function VerifyCodeForm() {
     setAlert({ message: "", type: "" });
 
     try {
-      if (verifyType === "register" || verifyType === "profile") {
-        await api.post("/auth/resend-verification", {
-          email: currentEmail,
-        });
+      if (verifyType === "register") {
+        const status = (
+          await api.post("/auth/check-email", { email: currentEmail })
+        ).data.data;
+
+        if (status?.exists && status.verified) {
+          setIsResending(false);
+          setAlert({
+            message:
+              "Email ini sudah terverifikasi. Silakan langsung masuk ke akun kamu.",
+            type: "error",
+          });
+          return;
+        }
+
+        if (!status?.exists) {
+          setIsResending(false);
+          setAlert({
+            message:
+              "Email ini tidak terdaftar di sistem — kemungkinan terjadi salah ketik saat mendaftar. Klik 'Ganti Email' untuk memperbaikinya.",
+            type: "error",
+          });
+          return;
+        }
+
+        await api.post("/auth/resend-verification", { email: currentEmail });
+      } else if (verifyType === "profile") {
+        await api.post("/auth/resend-verification", { email: currentEmail });
       } else {
         await api.post("/auth/forgot-password", { email: currentEmail });
       }
@@ -274,7 +336,7 @@ function VerifyCodeForm() {
         }
       />
 
-      <div className="flex w-full flex-col justify-center overflow-y-auto px-4 py-5 sm:p-10 lg:w-1/2 lg:px-16 lg:py-12 2xl:px-20">
+      <div className="flex w-full flex-col justify-center px-4 py-5 sm:p-10 lg:w-1/2 lg:px-16 lg:py-12 2xl:px-20">
       <div className="mb-8 flex items-center justify-between sm:mb-12 lg:hidden">
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-100/30 bg-white/10 p-3 shadow-md backdrop-blur-md sm:h-16 sm:w-16 sm:p-3.5">
@@ -307,7 +369,6 @@ function VerifyCodeForm() {
         </p>
 
         <div className="mx-auto mt-3 flex w-fit items-center gap-1.5 rounded-md border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-xs text-amber-400/90 shadow-sm sm:px-3 sm:py-1.5 sm:text-sm">
-          <Clock className="h-3.5 w-3.5 min-[350px]:h-4 min-[350px]:w-4" />
           <span>Kode ini hanya berlaku selama 5 menit.</span>
         </div>
       </div>
@@ -384,6 +445,19 @@ function VerifyCodeForm() {
           )}
         </button>
       </div>
+
+      {verifyType === "register" && (
+        <div className="mt-3 flex items-center justify-center">
+          <button
+            type="button"
+            onClick={handleChangeEmail}
+            className="inline-flex cursor-pointer items-center gap-1 text-xs font-semibold text-cyan-400 transition-colors hover:text-cyan-300 hover:underline hover:underline-offset-2 sm:text-sm"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+            Ganti Email
+          </button>
+        </div>
+      )}
 
       {showPending && (
         <VerificationPendingModal

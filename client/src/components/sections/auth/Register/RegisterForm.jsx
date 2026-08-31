@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, Fragment, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   User,
@@ -9,6 +9,7 @@ import {
   Eye,
   CreditCard,
   ImagePlus,
+  Camera,
   Briefcase,
   GraduationCap,
   Users,
@@ -52,6 +53,60 @@ function RegisterForm() {
 
   const [fotoProfil, setFotoProfil] = useState(null);
   const [fotoIdentitas, setFotoIdentitas] = useState(null);
+  const [fotoProfilPreview, setFotoProfilPreview] = useState(null);
+  const [fotoIdentitasPreview, setFotoIdentitasPreview] = useState(null);
+
+  const [emailCheck, setEmailCheck] = useState(null);
+  const lastCheckedRef = useRef(null);
+
+  useEffect(() => {
+    if (step !== 2) {
+      setEmailCheck(null);
+      return;
+    }
+
+    const email = formData.email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailCheck(null);
+      return;
+    }
+
+    if (
+      lastCheckedRef.current &&
+      lastCheckedRef.current.email === email &&
+      !lastCheckedRef.current.loading
+    ) {
+      setEmailCheck(lastCheckedRef.current.result);
+      return;
+    }
+
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      lastCheckedRef.current = { email, loading: true };
+      setEmailCheck({ checking: true });
+      try {
+        const res = await api.post("/auth/check-email", { email });
+        if (cancelled) return;
+        lastCheckedRef.current = { email, loading: false, result: res.data.data };
+        setEmailCheck(res.data.data);
+      } catch {
+        if (cancelled) return;
+        lastCheckedRef.current = null;
+        setEmailCheck(null);
+      }
+    }, 600);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [formData.email, step]);
+
+  const useEmailSuggestion = () => {
+    if (!emailCheck?.suggestion) return;
+    lastCheckedRef.current = null;
+    setFormData((prev) => ({ ...prev, email: emailCheck.suggestion }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -62,9 +117,11 @@ function RegisterForm() {
     }));
   };
 
-  const handleFileChange = (e, setFileState) => {
+  const handleFileChange = (e, setFileState, setPreview) => {
     if (e.target.files && e.target.files[0]) {
-      setFileState(e.target.files[0]);
+      const file = e.target.files[0];
+      setFileState(file);
+      setPreview(URL.createObjectURL(file));
     }
   };
 
@@ -96,10 +153,12 @@ function RegisterForm() {
       }
     }
     setStep((prev) => prev + 1);
+    window.scrollTo(0, 0);
   };
 
   const prevStep = () => {
     setStep((prev) => prev - 1);
+    window.scrollTo(0, 0);
   };
 
   const handleRegister = async (e) => {
@@ -175,7 +234,7 @@ function RegisterForm() {
   };
 
   return (
-    <div className="custom-scrollbar flex w-full flex-col justify-center overflow-y-auto px-3 py-6 sm:px-6 sm:py-8 md:px-12 md:py-12 lg:w-1/2 lg:px-20 2xl:px-24">
+    <div className="flex w-full flex-col justify-center px-3 py-6 sm:px-6 sm:py-8 md:px-12 md:py-12 lg:w-1/2 lg:px-20 2xl:px-24">
       <div className="w-full">
         {registrationClosed ? (
           <div className="flex flex-col items-center text-center">
@@ -195,8 +254,8 @@ function RegisterForm() {
           </div>
         ) : (
         <>
-        <div className="mb-4 sm:mb-8 md:mb-12">
-          <div className="mb-4 sm:mb-6 md:mb-8 w-full">
+        <div className="mb-6 sm:mb-8 md:mb-12">
+          <div className="mb-6 sm:mb-6 md:mb-8 w-full">
             <div className="flex w-full items-center px-0.5 sm:px-1 md:px-2">
               {[1, 2, 3, 4].map((i) => (
                 <Fragment key={i}>
@@ -221,13 +280,13 @@ function RegisterForm() {
               ))}
             </div>
           </div>
-          <h2 className="text-xl font-bold text-white sm:text-2xl md:text-3xl lg:text-4xl">
+          <h2 className="text-3xl font-bold text-white sm:text-2xl md:text-3xl lg:text-4xl">
             {step === 1 && "Daftar Sebagai"}
             {step === 2 && "Informasi Dasar"}
             {step === 3 && "Lengkapi Identitas"}
             {step === 4 && "Keamanan Akun"}
           </h2>
-          <p className="mt-1.5 text-xs leading-5 text-slate-400 sm:mt-2 sm:text-sm sm:leading-6 md:text-base">
+          <p className="mt-2 text-xs leading-5 text-slate-400 sm:mt-2 sm:text-sm sm:leading-6 md:text-base">
             {step === 1 && "Pilih jenis akun yang ingin Anda daftarkan."}
             {step === 2 && "Gunakan email aktif untuk keperluan verifikasi."}
             {step === 3 &&
@@ -258,10 +317,10 @@ function RegisterForm() {
                 <label
                   key={item.id}
                   data-role-card
-                  className={`relative flex min-h-24 sm:min-h-28 md:min-h-36 cursor-pointer flex-col items-center justify-center gap-2 sm:gap-3 md:gap-4 rounded-xl sm:rounded-2xl border-2 p-3 sm:p-4 text-center transition-all ${
+                  className={`group relative flex min-h-24 sm:min-h-28 md:min-h-36 cursor-pointer flex-col items-center justify-center gap-2 sm:gap-3 md:gap-4 overflow-hidden rounded-xl sm:rounded-2xl border-2 p-3 sm:p-4 text-center transition-all duration-300 ease-out hover:-translate-y-1.5 active:scale-[0.97] ${
                     formData.role === item.id
-                      ? "border-cyan-400 bg-cyan-500/10 text-cyan-300"
-                      : "border-white bg-white text-slate-800 shadow-sm hover:bg-slate-50"
+                      ? "border-cyan-400 bg-cyan-500/10 text-cyan-300 shadow-lg shadow-cyan-500/25 ring-2 ring-cyan-400/40 ring-offset-2 ring-offset-slate-950"
+                      : "border-white bg-white text-slate-800 shadow-sm hover:border-cyan-400 hover:bg-cyan-50 hover:text-cyan-700 hover:shadow-xl hover:shadow-cyan-400/15"
                   }`}
                 >
                   <input
@@ -272,15 +331,22 @@ function RegisterForm() {
                     onChange={handleChange}
                     className="hidden"
                   />
-                  <item.icon
-                    size={28}
-                    className={`w-6 h-6 sm:w-7 sm:h-7 md:w-9 md:h-9 ${
+                  <span
+                    className={`pointer-events-none absolute -bottom-8 left-1/2 h-20 w-20 -translate-x-1/2 rounded-full bg-cyan-400 blur-2xl transition-opacity duration-300 ${
                       formData.role === item.id
-                        ? "text-cyan-300"
-                        : "text-cyan-500"
+                        ? "opacity-40"
+                        : "opacity-0 group-hover:opacity-15"
                     }`}
                   />
-                  <span className="text-sm sm:text-base font-semibold leading-none">
+                  <item.icon
+                    size={28}
+                    className={`relative w-6 h-6 sm:w-7 sm:h-7 md:w-9 md:h-9 transition-transform duration-300 ease-out ${
+                      formData.role === item.id
+                        ? "scale-110 text-cyan-300"
+                        : "text-cyan-500 group-hover:scale-110 group-hover:-rotate-6 group-hover:text-cyan-600"
+                    }`}
+                  />
+                  <span className="relative text-sm sm:text-base font-semibold leading-none">
                     {item.label}
                   </span>
                 </label>
@@ -289,7 +355,7 @@ function RegisterForm() {
           )}
 
           {step === 2 && (
-            <div className="flex flex-col gap-4 sm:gap-5">
+            <div className="flex flex-col gap-6">
               <div>
                 <label className="mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium text-slate-300">
                   Nama Lengkap
@@ -321,6 +387,9 @@ function RegisterForm() {
                     type="text"
                     name="username"
                     required
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck="false"
                     value={formData.username}
                     onChange={handleChange}
                     placeholder="Masukkan username"
@@ -340,21 +409,83 @@ function RegisterForm() {
                     type="email"
                     name="email"
                     required
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck="false"
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Masukkan Email"
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 sm:py-3 pl-9 sm:pl-11 pr-4 text-sm text-slate-900 shadow-sm focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-cyan-500/20 [&:-webkit-autofill]:[-webkit-text-fill-color:#0f172a] [&:-webkit-autofill]:shadow-[0_0_0_1000px_#f8fafc_inset] [&:-webkit-autofill]:transition-none focus:[&:-webkit-autofill]:shadow-[0_0_0_1000px_#fff_inset]"
                   />
                 </div>
+
+                {emailCheck?.checking && (
+                  <p className="mt-1.5 flex items-center gap-1.5 text-[11px] sm:text-xs text-slate-500">
+                    <span className="h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-cyan-500" />
+                    Memeriksa ketersediaan email...
+                  </p>
+                )}
+
+                {emailCheck?.exists && !emailCheck.checking && (
+                  <div className="mt-2 flex items-start gap-2 rounded-xl border px-3 py-2.5 text-[11px] sm:text-xs bg-amber-500/10 border-amber-500/30 text-amber-200">
+                    <AlertCircle size={14} className="mt-0.5 shrink-0" />
+                    <span>
+                      {emailCheck.verified ? (
+                        <>
+                          Email{" "}
+                          <strong className="font-semibold text-white">
+                            {formData.email}
+                          </strong>{" "}
+                          sudah terdaftar dan aktif.{" "}
+                          <Link
+                            to="/login"
+                            className="font-bold text-cyan-300 underline underline-offset-2 hover:text-cyan-200"
+                          >
+                            Masuk
+                          </Link>{" "}
+                          jika ini memang akun kamu.
+                        </>
+                      ) : (
+                        <>
+                          Email{" "}
+                          <strong className="font-semibold text-white">
+                            {formData.email}
+                          </strong>{" "}
+                          sudah pernah didaftarkan (belum terverifikasi). Gunakan
+                          email lain, atau cek kotak masuk email tersebut untuk
+                          kode verifikasi yang pernah dikirim.
+                        </>
+                      )}
+                    </span>
+                  </div>
+                )}
+
+                {emailCheck?.suggestion && !emailCheck.checking && (
+                  <div className="mt-2 flex items-center justify-between gap-2 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-3 py-2.5 text-[11px] sm:text-xs text-cyan-200">
+                    <span>
+                      Mungkin maksud kamu:{" "}
+                      <strong className="font-semibold break-all text-cyan-100">
+                        {emailCheck.suggestion}
+                      </strong>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={useEmailSuggestion}
+                      className="shrink-0 cursor-pointer rounded-lg bg-cyan-500/20 px-2.5 py-1 text-[11px] font-bold text-cyan-100 transition-colors hover:bg-cyan-500/30"
+                    >
+                      Gunakan
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
 
           {step === 3 && (
-            <div className="flex flex-col gap-4 sm:gap-5">
+            <div className="flex flex-col gap-6">
               {(formData.role === "mahasiswa" || formData.role === "dosen") && (
-                <div className="flex items-start gap-2.5 rounded-xl border border-amber-400/25 bg-amber-400/10 p-3 text-xs sm:text-sm text-amber-200">
-                  <Hourglass size={16} className="mt-0.5 shrink-0" />
+                <div className="flex items-center gap-2.5 rounded-xl border border-amber-400/25 bg-amber-400/10 p-3 text-xs sm:text-sm text-amber-200">
+                  <Hourglass size={16} className="shrink-0" />
                   <span>
                     Pendaftaran sebagai{" "}
                     <strong className="text-amber-100">
@@ -395,25 +526,47 @@ function RegisterForm() {
               )}
 
               <div
-                className={`grid gap-3 sm:gap-5 ${
+                className={`grid gap-10 sm:gap-5 ${
                   formData.role === "umum"
                     ? "grid-cols-1"
                     : "grid-cols-1 sm:grid-cols-2"
                 }`}
               >
-                <div>
+                <div className="min-w-0">
                   <label className="mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium text-slate-300">
                     Foto Profil
                   </label>
                   <label className="flex w-full h-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 py-4 sm:py-6 shadow-sm transition-all hover:border-cyan-500 hover:bg-white">
-                    <ImagePlus className="mb-1.5 sm:mb-2 text-cyan-500" size={20} />
-                    <span className="max-w-full break-all px-2 text-center text-[10px] sm:text-xs text-slate-600">
-                      {fotoProfil ? fotoProfil.name : "Unggah Pas Foto"}
+                    {fotoProfilPreview ? (
+                      <div className="relative">
+                        <div className="absolute -inset-1.5 rounded-full bg-gradient-to-br from-cyan-400/60 via-blue-500/30 to-blue-400/50 blur-[6px]" />
+                        <div className="relative h-28 w-28 overflow-hidden rounded-full border-2 border-white/90 shadow-lg shadow-cyan-500/20">
+                          <img
+                            src={fotoProfilPreview}
+                            alt="Preview Foto Profil"
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-md transition-transform group-hover:scale-110">
+                          <Camera size={14} />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mb-1.5 flex h-20 w-20 items-center justify-center rounded-full border-2 border-dashed border-slate-300 bg-white/60 shadow-inner">
+                        <ImagePlus className="h-8 w-8 text-cyan-500" size={20} />
+                      </div>
+                    )}
+                    <span className={`max-w-full break-all px-2 text-center text-[10px] sm:text-xs text-slate-600 ${
+                        fotoProfil ? "mt-3" : "mt-1.5"
+                      }`}>
+                      {fotoProfil ? "Ganti Foto" : "Unggah Pas Foto"}
                     </span>
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => handleFileChange(e, setFotoProfil)}
+                      onChange={(e) =>
+                        handleFileChange(e, setFotoProfil, setFotoProfilPreview)
+                      }
                       className="hidden"
                     />
                   </label>
@@ -421,7 +574,7 @@ function RegisterForm() {
 
                 {(formData.role === "mahasiswa" ||
                   formData.role === "dosen") && (
-                  <div>
+                  <div className="min-w-0">
                     <label className="mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium text-slate-300">
                       {formData.role === "mahasiswa"
                         ? "Foto KTM"
@@ -429,12 +582,34 @@ function RegisterForm() {
                       <span className="ml-1 text-red-500">*</span>
                     </label>
 
-                    <label className="flex w-full h-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 py-4 sm:py-6 shadow-sm transition-all hover:border-cyan-500 hover:bg-white">
-                      <ImagePlus className="mb-1.5 sm:mb-2 text-cyan-500" size={20} />
+                    <label className="flex w-full h-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 px-3 py-5 sm:px-5 sm:py-7 shadow-sm transition-all hover:border-cyan-500 hover:bg-white">
+                      {fotoIdentitasPreview ? (
+                        <div className="relative w-full">
+                          <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-cyan-400/60 via-blue-500/30 to-blue-400/50 blur-[6px]" />
+                          <div className="relative mx-auto flex w-full max-w-[15rem] items-center justify-center rounded-2xl p-2">
+                            <img
+                              src={fotoIdentitasPreview}
+                              alt="Preview Foto Identitas"
+                              className="max-h-40 w-auto max-w-full object-contain"
+                            />
+                          </div>
+                          <div className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-md">
+                            <Camera size={14} />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mb-2 flex h-24 w-36 items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-white/60 shadow-inner">
+                          <ImagePlus className="h-8 w-8 text-cyan-500" size={20} />
+                        </div>
+                      )}
 
-                      <span className="max-w-full break-all px-2 text-center text-[10px] sm:text-xs text-slate-600">
+                      <span
+                        className={`max-w-full break-all px-2 text-center text-[10px] sm:text-xs text-slate-600 ${
+                          fotoIdentitas ? "mt-4" : "mt-2"
+                        }`}
+                      >
                         {fotoIdentitas
-                          ? fotoIdentitas.name
+                          ? "Ganti Foto"
                           : formData.role === "mahasiswa"
                             ? "Unggah Foto KTM (wajib)"
                             : "Unggah Kartu Identitas Dosen (wajib)"}
@@ -443,7 +618,13 @@ function RegisterForm() {
                       <input
                         type="file"
                         accept="image/*"
-                        onChange={(e) => handleFileChange(e, setFotoIdentitas)}
+                        onChange={(e) =>
+                          handleFileChange(
+                            e,
+                            setFotoIdentitas,
+                            setFotoIdentitasPreview,
+                          )
+                        }
                         className="hidden"
                       />
                     </label>
@@ -454,7 +635,7 @@ function RegisterForm() {
           )}
 
           {step === 4 && (
-            <div className="flex flex-col gap-4 sm:gap-5">
+            <div className="flex flex-col gap-6">
               <div>
                 <label className="mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium text-slate-300">
                   Kata Sandi
@@ -514,7 +695,7 @@ function RegisterForm() {
             </div>
           )}
 
-          <div className="mt-2 sm:mt-4 flex flex-col gap-2 sm:gap-3 md:flex-row">
+          <div className="mt-6 sm:mt-4 flex flex-col gap-2 sm:gap-3 md:flex-row">
             {step > 1 && (
               <button
                 type="button"
@@ -530,7 +711,7 @@ function RegisterForm() {
                 type="button"
                 onClick={nextStep}
                 data-next-button
-                className="group flex w-full sm:flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 cursor-pointer"
+                className="group flex w-full sm:flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-[background-position] duration-500 hover:bg-[position:100%_0] cursor-pointer"
               >
                 Selanjutnya
                 <ChevronRight
@@ -542,13 +723,16 @@ function RegisterForm() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative flex-1 overflow-hidden cursor-pointer rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] py-3 sm:py-3.5 font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 disabled:opacity-70"
+                className="group relative flex-1 overflow-hidden cursor-pointer rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] py-3 sm:py-3.5 font-semibold text-white shadow-lg shadow-cyan-500/20 transition-[background-position] duration-500 hover:bg-[position:100%_0] disabled:opacity-80"
               >
                 <span className="flex items-center justify-center gap-2">
                   {isLoading ? (
-                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    <span className="flex items-center gap-2 text-sm sm:text-base">
+                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                      Mendaftar...
+                    </span>
                   ) : (
-                    <span className="text-xs sm:text-sm">Selesaikan Pendaftaran</span>
+                    <span className="text-sm sm:text-base">Selesaikan Pendaftaran</span>
                   )}
                 </span>
               </button>

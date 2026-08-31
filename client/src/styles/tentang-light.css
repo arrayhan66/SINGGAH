@@ -17,17 +17,31 @@ html.light .tentang-page #about.bg-brand-dark {
   background: linear-gradient(180deg, #f7fafd 0%, #edf3fa 55%, #e6edf7 100%);
 }
 
+/* Sembunyikan blob glow GlowBackground di halaman tentang (light mode)
+   supaya tidak ada bayangan/buram yang menutupi judul atau teks */
+html.light .tentang-page section > .pointer-events-none.absolute.rounded-full {
+  display: none;
+}
+
 /* Grid kotak-kotak lembut & buram (pengganti PCBBackground) */
 html.light .tentang-page #about::before {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 0;
   pointer-events: none;
   background-image: linear-gradient(rgba(37, 99, 235, 0.09) 1px, transparent 1px),
     linear-gradient(90deg, rgba(37, 99, 235, 0.09) 1px, transparent 1px);
   background-size: 40px 40px;
   opacity: 0.7;
   filter: blur(0.6px);
+}
+
+/* Konten section di atas grid & aura sehingga tidak ada lapisan
+   buram/grid yang menimpa judul atau teks di light mode */
+html.light .tentang-page #about > .mx-auto {
+  position: relative;
+  z-index: 1;
 }
 
 /* Komponen PCBBackground (grid dark mode) disembunyikan di light mode
@@ -41,6 +55,7 @@ html.light .tentang-page #about::after {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 0;
   pointer-events: none;
   background: radial-gradient(
     620px circle at 50% 0%,

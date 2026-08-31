@@ -72,6 +72,11 @@ function AdminUserForm() {
       return
     }
 
+    if (!isEditMode && String(formData.password || "").length < 8) {
+      notifyError("Password minimal 8 karakter")
+      return
+    }
+
     setSaving(true)
 
     try {

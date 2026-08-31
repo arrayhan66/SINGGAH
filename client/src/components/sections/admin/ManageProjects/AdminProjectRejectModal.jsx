@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react"
-import { XCircle, X } from "lucide-react"
+import { useState } from "react"
+import { XCircle } from "lucide-react"
+import PopupToast from "../../../ui/PopupToast"
 
 const predefinedReasons = [
   "Dokumentasi tidak lengkap",
@@ -12,13 +13,6 @@ const predefinedReasons = [
 
 function AdminProjectRejectModal({ project, onConfirm, onCancel }) {
   const [rejectionReason, setRejectionReason] = useState("")
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden"
-    return () => {
-      document.body.style.overflow = "unset"
-    }
-  }, [])
 
   if (!project) return null
 
@@ -33,29 +27,21 @@ function AdminProjectRejectModal({ project, onConfirm, onCancel }) {
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 animate-[fade-in_0.15s_ease-out]">
-      <div className="w-full max-w-md rounded-2xl border border-red-500/20 bg-gradient-to-br from-brand-navy to-brand-dark p-6 shadow-2xl backdrop-blur-xl animate-modal-in max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-500/10 border border-red-500/30">
-            <XCircle className="h-5 w-5 text-red-400" />
+    <PopupToast show={!!project} variant="danger" onClose={onCancel}>
+      <div className="px-4 py-3.5 max-h-[80vh] overflow-y-auto custom-scrollbar">
+        <div className="flex items-start gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-500/20 border border-red-500/30">
+            <XCircle className="h-4.5 w-4.5 text-red-400" />
           </div>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="cursor-pointer text-slate-400 transition-colors hover:text-white"
-          >
-            <X size={18} />
-          </button>
+          <div className="min-w-0 flex-1">
+            <h3 className="pt-1 text-sm font-semibold text-white">Tolak Project?</h3>
+            <p className="mt-0.5 text-xs text-slate-400 min-w-0 break-words">
+              Project <span className="font-medium text-slate-200">"{project.title}"</span> akan ditolak.
+            </p>
+          </div>
         </div>
 
-        <h3 className="mt-4 text-base font-semibold text-white md:text-lg">
-          Tolak Project?
-        </h3>
-        <p className="mt-2 text-xs text-slate-400 min-w-0 break-words md:text-sm">
-          Project <span className="font-medium text-slate-200">"{project.title}"</span> akan ditolak. Pilih alasan atau tulis secara manual.
-        </p>
-
-        <div className="mt-4 flex flex-wrap gap-1.5">
+        <div className="mt-2.5 flex flex-wrap gap-1">
           {predefinedReasons.map((reason) => {
             const selected = rejectionReason.includes(reason)
             return (
@@ -63,10 +49,10 @@ function AdminProjectRejectModal({ project, onConfirm, onCancel }) {
                 key={reason}
                 type="button"
                 onClick={() => handlePredefinedReason(reason)}
-                className={`cursor-pointer rounded-lg border px-2.5 py-1 text-xs font-medium transition-all ${
+                className={`cursor-pointer rounded-lg border px-2 py-0.5 text-[10px] font-medium transition-all ${
                   selected
                     ? "border-red-400/50 bg-red-500/20 text-red-300"
-                    : "border-white/10 bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-300"
+                    : "border-white/10 bg-white/5 text-slate-400 hover:bg-white/10"
                 }`}
               >
                 {reason}
@@ -75,21 +61,21 @@ function AdminProjectRejectModal({ project, onConfirm, onCancel }) {
           })}
         </div>
 
-        <div className="mt-4">
+        <div className="mt-2">
           <textarea
             value={rejectionReason}
             onChange={(e) => setRejectionReason(e.target.value)}
-            rows={3}
-            placeholder="Atau tulis alasan penolakan secara manual..."
-            className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:border-red-400/50 focus:outline-none transition-colors"
+            rows={2}
+            placeholder="Alasan penolakan..."
+            className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-red-400/50 focus:outline-none"
           />
         </div>
 
-        <div className="mt-6 flex gap-3">
+        <div className="mt-3 flex gap-2">
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-slate-300 transition-colors hover:bg-white/10"
+            className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300 hover:bg-white/10 cursor-pointer"
           >
             Batal
           </button>
@@ -97,13 +83,13 @@ function AdminProjectRejectModal({ project, onConfirm, onCancel }) {
             type="button"
             onClick={() => onConfirm(project.id, rejectionReason)}
             disabled={!rejectionReason.trim()}
-            className="flex-1 cursor-pointer rounded-xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-500/30 transition-all hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex-1 rounded-xl bg-red-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-red-500/30 hover:bg-red-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
           >
             Kirim Penolakan
           </button>
         </div>
       </div>
-    </div>
+    </PopupToast>
   )
 }
 

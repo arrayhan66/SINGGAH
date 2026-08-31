@@ -4,9 +4,10 @@ import DustBackground from "../../ui/DustBackground"
 import GlowBackground from "../../ui/GlowBackground"
 import PCBBackground from "../../ui/PCBBackground"
 import GlassCard from "../../ui/GlassCard"
-import { X, MessageCircle, Copy, Check, Send } from "lucide-react"
+import { X, MessageCircle, Check, Send, Share2, Link2 } from "lucide-react"
 import { useAuth } from "../../../context/AuthContext"
 import api from "../../../services/api"
+import { imageUrl } from "../../../utils/imageUrl"
 
 import KaryaProjectGallery from "./detail/KaryaProjectGallery"
 import KaryaProjectHeader from "./detail/KaryaProjectHeader"
@@ -105,6 +106,8 @@ function KaryaProjectDetailSection() {
       return dateString
     }
   }
+
+  const shareImage = imageUrl(gallery[0] || project.thumbnail)
 
   function handleLike() {
     if (!isLoggedIn) {
@@ -207,30 +210,64 @@ function KaryaProjectDetailSection() {
       {showShareModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-0">
           <div
-            className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+            className="share-modal-backdrop absolute inset-0"
             onClick={() => setShowShareModal(false)}
           ></div>
 
-          <div className="relative w-full max-w-md transform overflow-hidden rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl shadow-cyan-900/20 transition-all sm:p-8">
-            <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-white">Bagikan ke...</h3>
+          <div className="share-modal relative w-full max-w-md overflow-hidden p-6 sm:p-8">
+            <div className="mb-5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="share-modal-badge flex h-10 w-10 items-center justify-center rounded-2xl">
+                  <Share2 size={18} />
+                </span>
+                <div>
+                  <h3 className="share-modal-title text-xl font-bold leading-tight">
+                    Bagikan Karya
+                  </h3>
+                  <p className="share-modal-sub mt-0.5 text-xs">
+                    Sebarkan karya ini ke temanmu
+                  </p>
+                </div>
+              </div>
               <button
                 onClick={() => setShowShareModal(false)}
-                className="cursor-pointer rounded-full bg-white/80 p-2 text-slate-500 transition hover:bg-white hover:text-slate-800"
+                className="share-modal-close flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors duration-200"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
-            <div className="mb-8 grid grid-cols-4 gap-4">
+            {/* Preview kartu karya */}
+            <div className="share-preview mb-6">
+              <div className="share-preview-media">
+                <img
+                  src={shareImage}
+                  alt={project.title}
+                  className="h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+                <span className="share-preview-tag absolute left-3 top-3">
+                  {project.Category?.name || "Karya"}
+                </span>
+              </div>
+              <div className="share-preview-body">
+                <p className="share-preview-title truncate">{project.title}</p>
+                <p className="share-preview-meta">
+                  Karya SinggaH{project.year ? ` · ${project.year}` : ""}
+                </p>
+              </div>
+            </div>
+
+            {/* Aksi bagikan */}
+            <div className="mb-6 grid grid-cols-4 gap-3 sm:gap-4">
               <button
                 onClick={shareToWhatsApp}
-                className="group flex flex-col items-center gap-2"
+                className="share-soc group flex cursor-pointer flex-col items-center gap-2"
               >
-                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-social-whatsapp/10 text-social-whatsapp transition group-hover:bg-social-whatsapp group-hover:text-white">
+                <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-social-whatsapp/10 text-social-whatsapp transition group-hover:bg-social-whatsapp group-hover:text-white sm:h-14 sm:w-14">
                   <MessageCircle size={24} />
                 </div>
-                <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">
+                <span className="share-soc-label text-xs font-medium">
                   WhatsApp
                 </span>
               </button>
@@ -242,14 +279,14 @@ function KaryaProjectDetailSection() {
                     "_blank",
                   )
                 }
-                className="group flex flex-col items-center gap-2"
+                className="share-soc group flex cursor-pointer flex-col items-center gap-2"
               >
-                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-white/10 text-slate-200 transition group-hover:bg-black group-hover:text-white">
+                <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white/10 text-slate-200 transition group-hover:bg-black group-hover:text-white sm:h-14 sm:w-14">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                   </svg>
                 </div>
-                <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">
+                <span className="share-soc-label text-xs font-medium">
                   X
                 </span>
               </button>
@@ -261,14 +298,14 @@ function KaryaProjectDetailSection() {
                     "_blank",
                   )
                 }
-                className="group flex flex-col items-center gap-2"
+                className="share-soc group flex cursor-pointer flex-col items-center gap-2"
               >
-                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-social-facebook/10 text-social-facebook transition group-hover:bg-social-facebook group-hover:text-white">
+                <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-social-facebook/10 text-social-facebook transition group-hover:bg-social-facebook group-hover:text-white sm:h-14 sm:w-14">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
                   </svg>
                 </div>
-                <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">
+                <span className="share-soc-label text-xs font-medium">
                   Facebook
                 </span>
               </button>
@@ -280,26 +317,27 @@ function KaryaProjectDetailSection() {
                     "_blank",
                   )
                 }
-                className="group flex flex-col items-center gap-2"
+                className="share-soc group flex cursor-pointer flex-col items-center gap-2"
               >
-                <div className="flex h-12 w-12 sm:h-14 sm:w-14 cursor-pointer items-center justify-center rounded-full bg-social-telegram/10 text-social-telegram transition group-hover:bg-social-telegram group-hover:text-white">
+                <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-social-telegram/10 text-social-telegram transition group-hover:bg-social-telegram group-hover:text-white sm:h-14 sm:w-14">
                   <Send size={24} />
                 </div>
-                <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">
+                <span className="share-soc-label text-xs font-medium">
                   Telegram
                 </span>
               </button>
             </div>
 
-            <div className="flex items-center justify-between rounded-xl border border-white/10 bg-black/30 p-1.5 pl-4">
-              <div className="mr-4 overflow-hidden text-ellipsis whitespace-nowrap text-sm text-slate-400">
+            {/* Salin link */}
+            <div className="share-copylink flex items-center justify-between p-1.5 pl-4">
+              <div className="share-copylink-url mr-3 overflow-hidden text-ellipsis whitespace-nowrap text-sm">
                 {window.location.href}
               </div>
               <button
                 onClick={copyToClipboard}
-                className="flex shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 border border-slate-200"
+                className="share-copylink-btn flex shrink-0 cursor-pointer items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors duration-300"
               >
-                {isCopied ? <Check size={16} /> : <Copy size={16} />}
+                {isCopied ? <Check size={16} /> : <Link2 size={16} />}
                 {isCopied ? "Tersalin!" : "Salin"}
               </button>
             </div>

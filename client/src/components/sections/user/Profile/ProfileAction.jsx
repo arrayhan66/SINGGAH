@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { Save, X, AlertCircle, CheckCircle } from "lucide-react"
 import api from "../../../../services/api"
 import { useAuth } from "../../../../context/AuthContext"
+import PopupToast from "../../../ui/PopupToast"
 
 function ProfileAction({ profileData, passwordData, onResetPassword, identitasPhoto }) {
   const navigate = useNavigate()
@@ -13,24 +14,14 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
   const [emailChanged, setEmailChanged] = useState(false)
 
   useEffect(() => {
-    if (!showSuccess) return
-    const t = setTimeout(() => {
-      setShowSuccess(false)
-      if (emailChanged) {
+    if (showSuccess && emailChanged) {
+      const t = setTimeout(() => {
+        setShowSuccess(false)
         navigate("/verify-code")
-      }
-    }, emailChanged ? 2500 : 3000)
-    return () => clearTimeout(t)
-  }, [showSuccess, emailChanged, navigate])
-
-  useEffect(() => {
-    if (showSuccess) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = ""
+      }, 2500)
+      return () => clearTimeout(t)
     }
-    return () => { document.body.style.overflow = "" }
-  }, [showSuccess])
+  }, [showSuccess, emailChanged, navigate])
 
   const isChangingPassword =
     passwordData.currentPassword ||
@@ -135,41 +126,29 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
 
   return (
     <div className="relative flex flex-col gap-3">
-      {/* Success Modal */}
-      <div
-        className={`fixed inset-0 z-[100] flex items-center justify-center overflow-hidden p-4 transition-all duration-500 ease-out ${
-          showSuccess
-            ? "visible bg-black/60 opacity-100 backdrop-blur-sm"
-            : "invisible bg-black/0 opacity-0 backdrop-blur-none"
-        }`}
-      >
-        <div
-          className={`relative flex w-full max-w-sm transform flex-col items-center overflow-hidden rounded-3xl border border-cyan-400/30 bg-slate-900 p-8 text-center shadow-2xl shadow-cyan-900/50 transition-all duration-500 ease-out ${
-            showSuccess
-              ? "translate-y-0 scale-100 opacity-100 delay-100"
-              : "translate-y-10 scale-90 opacity-0"
-          }`}
-        >
-          <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-green-500/20">
-            <CheckCircle className="h-10 w-10 text-green-400" />
+      {/* Success Toast */}
+      <PopupToast show={showSuccess} variant="success" onClose={() => {}}>
+        <div className="px-4 py-3.5 text-center">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 border border-emerald-500/30">
+              <CheckCircle className="h-4.5 w-4.5 text-emerald-400" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="pt-1 text-sm font-semibold text-emerald-300">
+                {emailChanged ? "Periksa Email Baru!" : "Berhasil!"}
+              </h3>
+              <p className="mt-0.5 text-xs text-emerald-300/80">
+                {emailChanged ? "Kode verifikasi telah dikirim ke email baru." : "Profil berhasil diperbarui."}
+              </p>
+            </div>
           </div>
-
-          <h3 className="mb-2 text-2xl font-bold text-white">
-            {emailChanged ? "Periksa Email Baru!" : "Berhasil!"}
-          </h3>
-          <p className="text-sm text-slate-300">
-            {emailChanged
-              ? "Kami mengirim kode verifikasi ke email baru kamu. Email aktif baru berubah setelah kode berhasil diverifikasi."
-              : "Profil kamu berhasil diperbarui."}
-          </p>
-
-          <div className="mt-6 flex items-center justify-center gap-1.5">
-            <div className="h-2 w-2 animate-bounce rounded-full bg-cyan-400 [animation-delay:-0.3s]" />
-            <div className="h-2 w-2 animate-bounce rounded-full bg-cyan-400 [animation-delay:-0.15s]" />
-            <div className="h-2 w-2 animate-bounce rounded-full bg-cyan-400" />
+          <div className="mt-3 flex justify-center gap-1.5">
+            <div className="h-1.5 w-1.5 animate-bounce rounded-full bg-emerald-400 [animation-delay:-0.3s]" />
+            <div className="h-1.5 w-1.5 animate-bounce rounded-full bg-emerald-400 [animation-delay:-0.15s]" />
+            <div className="h-1.5 w-1.5 animate-bounce rounded-full bg-emerald-400" />
           </div>
         </div>
-      </div>
+      </PopupToast>
 
       {errors.length > 0 && (
         <div className="flex flex-col gap-1.5 rounded-xl border border-red-500/30 bg-red-500/10 p-4">

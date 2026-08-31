@@ -11,20 +11,19 @@ exports.register = asyncHandler(async (req, res) => {
   let avatarUrl
   let identitasUrl
 
-  if (req.files && req.files.avatar && req.files.avatar[0]) {
-    const result = await uploadImage(req.files.avatar[0].buffer, "singgah/avatars")
-    avatarUrl = result.secure_url
-  }
-
-  if (req.files && req.files.identitas_photo && req.files.identitas_photo[0]) {
-    const result = await uploadImage(
-      req.files.identitas_photo[0].buffer,
-      "singgah/identitas",
-    )
-    identitasUrl = result.secure_url
-  }
-
   try {
+    if (req.files && req.files.avatar && req.files.avatar[0]) {
+      const result = await uploadImage(req.files.avatar[0].buffer, "singgah/avatars")
+      avatarUrl = result.secure_url
+    }
+
+    if (req.files && req.files.identitas_photo && req.files.identitas_photo[0]) {
+      const result = await uploadImage(
+        req.files.identitas_photo[0].buffer,
+        "singgah/identitas",
+      )
+      identitasUrl = result.secure_url
+    }
     const user = await authService.register({
       ...req.body,
       avatar: avatarUrl,
@@ -61,6 +60,11 @@ exports.register = asyncHandler(async (req, res) => {
 exports.login = asyncHandler(async (req, res) => {
   const result = await authService.login(req.body)
   success(res, result, "Login berhasil")
+})
+
+exports.checkEmail = asyncHandler(async (req, res) => {
+  const result = await authService.checkEmail(req.body)
+  success(res, result, "Pengecekan email berhasil")
 })
 
 exports.verifyEmail = asyncHandler(async (req, res) => {
@@ -111,76 +115,104 @@ exports.updateProfile = asyncHandler(async (req, res) => {
   let avatarUrl
   let identitasUrl
 
-  if (req.files && req.files.avatar && req.files.avatar[0]) {
-    const result = await uploadImage(req.files.avatar[0].buffer, "singgah/avatars")
-    avatarUrl = result.secure_url
+  try {
+    if (req.files && req.files.avatar && req.files.avatar[0]) {
+      const result = await uploadImage(req.files.avatar[0].buffer, "singgah/avatars")
+      avatarUrl = result.secure_url
 
-    const oldAvatar = req.user.avatar
+      const oldAvatar = req.user.avatar
 
-    if (oldAvatar) {
-      const publicId = getPublicIdFromUrl(oldAvatar)
+      if (oldAvatar) {
+        const publicId = getPublicIdFromUrl(oldAvatar)
 
-      if (publicId) {
-        await deleteImage(publicId).catch(() => {})
+        if (publicId) {
+          await deleteImage(publicId).catch(() => {})
+        }
       }
     }
-  }
 
-  if (req.files && req.files.identitas_photo && req.files.identitas_photo[0]) {
-    const result = await uploadImage(
-      req.files.identitas_photo[0].buffer,
-      "singgah/identitas",
+    if (req.files && req.files.identitas_photo && req.files.identitas_photo[0]) {
+      const result = await uploadImage(
+        req.files.identitas_photo[0].buffer,
+        "singgah/identitas",
+      )
+      identitasUrl = result.secure_url
+
+      const oldIdentitas = req.user.identitas_photo
+
+      if (oldIdentitas) {
+        const publicId = getPublicIdFromUrl(oldIdentitas)
+
+        if (publicId) {
+          await deleteImage(publicId).catch(() => {})
+        }
+      }
+    }
+
+    const user = await authService.updateProfile(
+      req.user.id,
+      req.body,
+      avatarUrl,
+      identitasUrl,
     )
-    identitasUrl = result.secure_url
+    success(res, user, "Profil berhasil diperbarui")
+  } catch (err) {
+    const publicIds = []
 
-    const oldIdentitas = req.user.identitas_photo
-
-    if (oldIdentitas) {
-      const publicId = getPublicIdFromUrl(oldIdentitas)
-
-      if (publicId) {
-        await deleteImage(publicId).catch(() => {})
-      }
+    if (avatarUrl) {
+      const publicId = getPublicIdFromUrl(avatarUrl)
+      if (publicId) publicIds.push(publicId)
     }
-  }
 
-  const user = await authService.updateProfile(
-    req.user.id,
-    req.body,
-    avatarUrl,
-    identitasUrl,
-  )
-  success(res, user, "Profil berhasil diperbarui")
+    if (identitasUrl) {
+      const publicId = getPublicIdFromUrl(identitasUrl)
+      if (publicId) publicIds.push(publicId)
+    }
+
+    await Promise.all(
+      publicIds.map((publicId) => deleteImage(publicId).catch(() => {})),
+    )
+
+    throw err
+  }
 })
 
 exports.applyTipe = asyncHandler(async (req, res) => {
   let identitasUrl
 
-  if (req.files && req.files.identitas_photo && req.files.identitas_photo[0]) {
-    const result = await uploadImage(
-      req.files.identitas_photo[0].buffer,
-      "singgah/identitas",
-    )
-    identitasUrl = result.secure_url
+  try {
+    if (req.files && req.files.identitas_photo && req.files.identitas_photo[0]) {
+      const result = await uploadImage(
+        req.files.identitas_photo[0].buffer,
+        "singgah/identitas",
+      )
+      identitasUrl = result.secure_url
 
-    const oldIdentitas = req.user.identitas_photo
+      const oldIdentitas = req.user.identitas_photo
 
-    if (oldIdentitas) {
-      const publicId = getPublicIdFromUrl(oldIdentitas)
+      if (oldIdentitas) {
+        const publicId = getPublicIdFromUrl(oldIdentitas)
 
-      if (publicId) {
-        await deleteImage(publicId).catch(() => {})
+        if (publicId) {
+          await deleteImage(publicId).catch(() => {})
+        }
       }
     }
-  }
 
-  const user = await authService.applyTipe(
-    req.user.id,
-    req.body.tipe,
-    req.body.nim_nip,
-    identitasUrl,
-  )
-  success(res, user, "Pengajuan verifikasi tipe berhasil dikirim ke admin")
+    const user = await authService.applyTipe(
+      req.user.id,
+      req.body.tipe,
+      req.body.nim_nip,
+      identitasUrl,
+    )
+    success(res, user, "Pengajuan verifikasi tipe berhasil dikirim ke admin")
+  } catch (err) {
+    if (identitasUrl) {
+      const publicId = getPublicIdFromUrl(identitasUrl)
+      if (publicId) await deleteImage(publicId).catch(() => {})
+    }
+    throw err
+  }
 })
 
 exports.deleteAccount = asyncHandler(async (req, res) => {

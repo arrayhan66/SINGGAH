@@ -2,15 +2,16 @@ const { User, Project, ProjectImage, sequelize } = require("../models")
 const { Op } = require("sequelize")
 const bcrypt = require("bcryptjs")
 const AppError = require("../utils/AppError")
-const sendEmail = require("../utils/sendEmail")
+const { sendEmailAsync } = require("../utils/sendEmail")
 const notificationService = require("./notificationService")
 const {
   tipeApprovalEmail,
 } = require("../utils/emailTemplate")
-const {
-  deleteImage,
-  getPublicIdFromUrl,
-} = require("../utils/uploadToCloudinary")
+const { deleteImage, getPublicIdFromUrl } = require("../utils/uploadToCloudinary")
+
+const VALID_ROLES = ["admin", "user"]
+const VALID_TIPES = ["admin", "mahasiswa", "dosen", "umum"]
+const VALID_STATUSES = ["active", "inactive"]
 
 const deleteUserCloudinaryAssets = async (userId) => {
   const projects = await Project.findAll({
@@ -150,19 +151,17 @@ exports.approveTipe = async (id, approved, reason) => {
     await user.save()
   }
 
-  sendEmail({
+  sendEmailAsync({
     to: user.email,
     subject: approved
       ? `Verifikasi Tipe Disetujui - ${user.name}`
       : `Verifikasi Tipe Ditolak - ${user.name}`,
-    html: tipeApprovalEmail({
+    ...tipeApprovalEmail({
       name: user.name,
       approved,
       tipe: requestedTipe,
       reason,
     }),
-  }).catch((err) => {
-    console.error("Gagal mengirim email notifikasi verifikasi tipe:", err.message)
   })
 
   try {
@@ -211,6 +210,14 @@ exports.createUser = async (data) => {
     throw new AppError("Nama, username, email, dan password wajib diisi", 400)
   }
 
+  if (String(password).length < 8) {
+    throw new AppError("Password minimal 8 karakter", 400)
+  }
+
+  const normalizedRole = VALID_ROLES.includes(role) ? role : "user"
+  const normalizedTipe = VALID_TIPES.includes(tipe) ? tipe : "umum"
+  const normalizedStatus = VALID_STATUSES.includes(status) ? status : "active"
+
   const normalizedUsername = String(username).trim().toLowerCase()
   const normalizedEmail = String(email).trim().toLowerCase()
 
@@ -252,9 +259,9 @@ exports.createUser = async (data) => {
     password: hashedPassword,
     avatar: avatar || null,
     nim_nip: nim_nip || null,
-    tipe: tipe || "umum",
-    role: role || "user",
-    status: status || "active",
+    tipe: normalizedTipe,
+    role: normalizedRole,
+    status: normalizedStatus,
     is_verified: true,
   })
 
@@ -350,11 +357,11 @@ exports.updateUser = async (id, data) => {
 
     user.name = name ?? user.name
     user.username = normalizedUsername
-    user.role = role ?? user.role
-    user.status = status ?? user.status
+    user.role = VALID_ROLES.includes(role) ? role : user.role
+    user.status = VALID_STATUSES.includes(status) ? status : user.status
     user.avatar = avatar ?? user.avatar
     user.nim_nip = nim_nip ?? user.nim_nip
-    user.tipe = tipe ?? user.tipe
+    user.tipe = VALID_TIPES.includes(tipe) ? tipe : user.tipe
     user.is_verified = is_verified ?? user.is_verified
 
     if (isEmailChanged) {

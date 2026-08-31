@@ -294,4 +294,61 @@ describe("Auth Endpoints", () => {
     expect(res.body.success).toBe(true)
     expect(res.body.data).toHaveProperty("email", testUser.email)
   })
+
+  it("should report email as not registered and suggest domain typo fix", async () => {
+    const res = await request(app)
+      .post("/api/auth/check-email")
+      .send({ email: "test@gmaill.com" })
+
+    expect(res.status).toBe(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data.exists).toBe(false)
+    expect(res.body.data.verified).toBe(false)
+    expect(res.body.data.suggestion).toBe("test@gmail.com")
+  })
+
+  it("should report an existing verified email as registered & verified", async () => {
+    const res = await request(app)
+      .post("/api/auth/check-email")
+      .send({ email: "TEST@EXAMPLE.COM" })
+
+    expect(res.status).toBe(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data.exists).toBe(true)
+    expect(res.body.data.verified).toBe(true)
+    expect(res.body.data.tipe).toBe("umum")
+  })
+
+  it("should report existing unverified email as registered but not verified", async () => {
+    const res = await request(app)
+      .post("/api/auth/check-email")
+      .send({ email: "avatar@example.com" })
+
+    expect(res.status).toBe(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data.exists).toBe(true)
+    expect(res.body.data.verified).toBe(false)
+  })
+
+  it("should not suggest a different provider for a valid known email", async () => {
+    const res = await request(app)
+      .post("/api/auth/check-email")
+      .send({ email: "singgah.poliban@gmail.com" })
+
+    expect(res.status).toBe(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data.exists).toBe(false)
+    expect(res.body.data.suggestion).toBeNull()
+  })
+
+  it("should suggest a similar registered email for a typo", async () => {
+    const res = await request(app)
+      .post("/api/auth/check-email")
+      .send({ email: "avtar@example.com" })
+
+    expect(res.status).toBe(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data.exists).toBe(false)
+    expect(res.body.data.suggestion).toBe("avatar@example.com")
+  })
 })

@@ -119,6 +119,19 @@ exports.verifyCodeLimiter = rateLimit({
   },
 })
 
+exports.checkEmailLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => isRateLimitDisabled,
+  store: createStore("check-email"),
+  message: {
+    success: false,
+    message: "Terlalu banyak permintaan. Coba lagi dalam 10 menit.",
+  },
+})
+
 exports.registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 5,

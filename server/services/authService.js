@@ -10,11 +10,12 @@ const bcrypt = require("bcryptjs")
 const { Op } = require("sequelize")
 const generateToken = require("../utils/generateToken")
 const generateCode = require("../utils/generateCode")
-const sendEmail = require("../utils/sendEmail")
+const { sendEmailAsync } = require("../utils/sendEmail")
 const {
   verificationEmail,
   emailChangeEmail,
   resetPasswordEmail,
+  welcomeEmail,
 } = require("../utils/emailTemplate")
 const AppError = require("../utils/AppError")
 const logger = require("../utils/logger")
@@ -27,6 +28,97 @@ const settingService = require("./settingService")
 const notificationService = require("./notificationService")
 
 const CODE_EXPIRES_MINUTES = 5
+
+const KNOWN_EMAIL_DOMAINS = [
+  "gmail.com",
+  "yahoo.com",
+  "yahoo.co.id",
+  "outlook.com",
+  "hotmail.com",
+  "icloud.com",
+  "me.com",
+  "aol.com",
+  "gmx.com",
+  "protonmail.com",
+  "ymail.com",
+  "live.com",
+  "mail.com",
+]
+
+function levenshtein(a, b) {
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j)
+  for (let i = 1; i <= a.length; i++) {
+    const curr = [i]
+    for (let j = 1; j <= b.length; j++) {
+      curr[j] = Math.min(
+        prev[j] + 1,
+        curr[j - 1] + 1,
+        prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
+      )
+    }
+    prev = curr
+  }
+  return prev[b.length]
+}
+
+function escapeLike(value) {
+  return value.replace(/[\\%_]/g, (m) => `\\${m}`)
+}
+
+async function findEmailSuggestion(email) {
+  const parts = String(email).split("@")
+  const local = parts[0] || ""
+  const domain = parts[1] || ""
+
+  if (!domain) return null
+
+  let best = null
+  let bestDist = 2
+
+  const typedDomainIsKnown = KNOWN_EMAIL_DOMAINS.includes(domain)
+
+  if (!typedDomainIsKnown) {
+    let matched = null
+    let matchedDist = 2
+
+    for (const known of KNOWN_EMAIL_DOMAINS) {
+      if (known === domain) continue
+      const d = levenshtein(domain, known)
+      if (d < matchedDist) {
+        matchedDist = d
+        matched = known
+      }
+    }
+
+    if (matchedDist <= 1) {
+      return `${local}@${matched}`
+    }
+  }
+
+  if (typedDomainIsKnown) return null
+
+  const candidates = await User.findAll({
+    where: {
+      email: { [Op.like]: `%@${escapeLike(domain)}` },
+    },
+    attributes: ["email"],
+    order: [["updated_at", "DESC"]],
+    limit: 100,
+    raw: true,
+  })
+
+  for (const c of candidates) {
+    const ce = String(c.email).toLowerCase()
+    if (ce === email) continue
+    const d = levenshtein(email, ce)
+    if (d <= 1 && d < bestDist) {
+      bestDist = d
+      best = ce
+    }
+  }
+
+  return best
+}
 
 const deleteUserCloudinaryAssets = async (userId) => {
   const projects = await Project.findAll({
@@ -123,6 +215,42 @@ exports.login = async (data) => {
       created_at: user.created_at,
     },
   }
+}
+
+exports.checkEmail = async (data) => {
+  const rawEmail = String(data.email || "").trim()
+  const email = rawEmail.toLowerCase()
+
+  if (!email) throw new AppError("Email wajib diisi", 400)
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new AppError("Format email tidak valid", 400)
+  }
+
+  const result = {
+    exists: false,
+    verified: false,
+    tipe: null,
+    suggestion: null,
+  }
+
+  const user = await User.findOne({
+    where: {
+      [Op.or]: [{ email }, { pending_email: email }],
+    },
+  })
+
+  if (user) {
+    result.exists = true
+    result.verified =
+      user.is_verified && String(user.email).trim().toLowerCase() === email
+    result.tipe = result.verified ? user.tipe : null
+    return result
+  }
+
+  result.suggestion = await findEmailSuggestion(email)
+
+  return result
 }
 
 exports.register = async (data) => {
@@ -241,19 +369,15 @@ exports.register = async (data) => {
   }
 
   if (requiresVerification) {
-    try {
-      await sendEmail({
-        to: user.email,
-        subject: `Kode Verifikasi Email - ${user.name}`,
-        html: verificationEmail({
-          name: user.name,
-          code,
-          minutes: CODE_EXPIRES_MINUTES,
-        }),
-      })
-    } catch (err) {
-      logger.error("Gagal mengirim email verifikasi:", err.message)
-    }
+    sendEmailAsync({
+      to: user.email,
+      subject: `Kode Verifikasi Email - ${user.name}`,
+      ...verificationEmail({
+        name: user.name,
+        code,
+        minutes: CODE_EXPIRES_MINUTES,
+      }),
+    })
   }
 
   return {
@@ -405,6 +529,18 @@ exports.verifyEmail = async (data) => {
     await VerificationCode.destroy({ where: { user_id: user.id }, transaction: t })
   })
 
+  if (!hasPending) {
+    sendEmailAsync({
+      to: user.email,
+      subject: `Selamat Bergabung di SINGGAH - ${user.name}`,
+      ...welcomeEmail({
+        name: user.name,
+        username: user.username,
+        tipe: user.pending_tipe || user.tipe,
+      }),
+    })
+  }
+
   return {
     id: user.id,
     name: user.name,
@@ -473,19 +609,15 @@ exports.resendVerification = async (data) => {
 
   const targetEmail = hasPending ? user.pending_email : user.email
 
-  try {
-    await sendEmail({
-      to: targetEmail,
-      subject: `Kode Verifikasi Email - ${user.name}`,
-      html: verificationEmail({
-        name: user.name,
-        code,
-        minutes: CODE_EXPIRES_MINUTES,
-      }),
-    })
-  } catch (err) {
-    logger.error("Gagal mengirim email verifikasi:", err.message)
-  }
+  sendEmailAsync({
+    to: targetEmail,
+    subject: `Kode Verifikasi Email - ${user.name}`,
+    ...verificationEmail({
+      name: user.name,
+      code,
+      minutes: CODE_EXPIRES_MINUTES,
+    }),
+  })
 
   return true
 }
@@ -520,19 +652,15 @@ exports.forgotPassword = async (data) => {
     )
   })
 
-  try {
-    await sendEmail({
+  sendEmailAsync({
       to: user.email,
       subject: `Kode Reset Password - ${user.name}`,
-      html: resetPasswordEmail({
+      ...resetPasswordEmail({
         name: user.name,
         code,
         minutes: CODE_EXPIRES_MINUTES,
       }),
     })
-  } catch (err) {
-    logger.error("Gagal mengirim email reset password:", err.message)
-  }
 
   return true
 }
@@ -801,10 +929,10 @@ exports.updateProfile = async (userId, data, avatarUrl, identitasUrl) => {
         order: [["created_at", "DESC"]],
       })
 
-      await sendEmail({
+      sendEmailAsync({
         to: savedUser.pending_email,
         subject: `Verifikasi Email Baru - ${savedUser.name}`,
-        html: emailChangeEmail({
+        ...emailChangeEmail({
           name: savedUser.name,
           code: verificationRecord?.code || "",
           minutes: CODE_EXPIRES_MINUTES,

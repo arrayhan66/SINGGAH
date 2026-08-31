@@ -31,7 +31,7 @@ function AdminUserList({ search, statusFilter }) {
   const [approving, setApproving] = useState(false)
   const [showAll, setShowAll] = useState(false)
 
-  const filterKey = search
+  const filterKey = `${search}|${statusFilter}`
   const [activeFilter, setActiveFilter] = useState(filterKey)
   if (filterKey !== activeFilter) {
     setActiveFilter(filterKey)

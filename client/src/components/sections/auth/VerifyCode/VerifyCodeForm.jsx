@@ -375,7 +375,11 @@ function VerifyCodeForm() {
 
       <form onSubmit={handleSubmit} className="my-10 sm:my-14" noValidate>
         {alert.message && (
-          <FormAlert message={alert.message} type={alert.type} />
+          <FormAlert
+            message={alert.message}
+            type={alert.type}
+            onClose={() => setAlert({ message: "", type: "" })}
+          />
         )}
 
         <div
@@ -421,7 +425,7 @@ function VerifyCodeForm() {
         </button>
       </form>
 
-      <div className="-mt-6 sm:-mt-8 lg:-mt-10 flex items-center justify-center gap-1.5 text-xs text-slate-400 min-[350px]:text-sm sm:mt-8">
+      <div className="-mt-6 sm:-mt-8 lg:-mt-10 flex items-center justify-center gap-1.5 text-xs text-slate-400 min-[350px]:text-sm">
         <span>Belum menerima kode?</span>
         <button
           type="button"

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ShieldCheck, ShieldX, UserRound, AtSign, Mail, IdCard, CalendarClock, ImageOff, MessageSquareWarning } from "lucide-react"
+import { ShieldCheck, ShieldX, UserRound, AtSign, Mail, IdCard, CalendarClock, MessageSquareWarning } from "lucide-react"
 import { formatFullDate } from "../../../../utils/notificationHelpers"
 import PopupToast from "../../../ui/PopupToast"
 
@@ -22,7 +22,7 @@ function AdminUserTipeModal({ user, decision, onConfirm, onCancel, loading }) {
   }
 
   return (
-    <PopupToast show={!!(user && decision)} variant={isApprove ? "default" : "danger"} onClose={onCancel}>
+    <PopupToast show={!!(user && decision)} variant={isApprove ? "default" : "danger"} onClose={onCancel} position="center">
       <div className="px-4 py-3.5 max-h-[80vh] overflow-y-auto custom-scrollbar">
         <div className="flex items-start gap-3">
           <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${

@@ -1,3 +1,5 @@
+import toast from "./toast"
+
 const MIME_BY_EXT = {
   pdf: "application/pdf",
   doc: "application/msword",
@@ -52,7 +54,7 @@ export async function openDocument(doc) {
 
     setTimeout(() => URL.revokeObjectURL(url), 60000)
   } catch {
-    window.alert(
+    toast.error(
       "Dokumen tidak dapat diakses. Silakan coba lagi atau unggah ulang melalui Edit Karya.",
     )
   }

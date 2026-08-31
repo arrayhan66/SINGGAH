@@ -3,6 +3,7 @@ import { BeritaProvider } from "./context/BeritaContext"
 import { UserProvider } from "./context/UserContext"
 import { ProjectProvider } from "./context/ProjectContext"
 import MaintenanceGate from "./components/MaintenanceGate"
+import ToastHost from "./components/ui/ToastHost"
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           </MaintenanceGate>
         </BeritaProvider>
       </ProjectProvider>
+      <ToastHost />
     </UserProvider>
   )
 }

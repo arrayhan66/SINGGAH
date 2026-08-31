@@ -1,8 +1,9 @@
-import { Save, Check } from "lucide-react"
+import { Save } from "lucide-react"
 import SettingsGeneral from "./SettingsGeneral"
 import SettingsContact from "./SettingsContact"
 import SettingsSocial from "./SettingsSocial"
 import SettingsSecurity from "./SettingsSecurity"
+import FormAlert from "../../../ui/FormAlert"
 
 const tabPanels = {
   general: SettingsGeneral,
@@ -74,17 +75,18 @@ export default function SettingsForm({
           </button>
           <div className="flex flex-col items-stretch gap-2 sm:items-end">
             {saveError && (
-              <span className="flex animate-fade-in items-center gap-2 rounded-xl border border-rose-400/20 bg-rose-400/10 px-3.5 py-1.5 text-sm font-semibold text-rose-300">
-                {saveError}
-              </span>
+              <FormAlert
+                message={saveError}
+                type="error"
+                onClose={() => {}}
+              />
             )}
             {saved && (
-              <span className="flex min-w-0 animate-fade-in items-center gap-2 rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3.5 py-1.5 text-sm font-semibold text-emerald-300">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400/20">
-                  <Check size={12} className="text-emerald-300" />
-                </span>
-                Pengaturan berhasil disimpan!
-              </span>
+              <FormAlert
+                message="Pengaturan berhasil disimpan!"
+                type="success"
+                onClose={() => {}}
+              />
             )}
           </div>
         </div>

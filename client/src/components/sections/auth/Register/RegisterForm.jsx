@@ -19,6 +19,8 @@ import {
   Hourglass,
 } from "lucide-react";
 import api from "../../../../services/api";
+import GoogleLogin from "../../../ui/GoogleLoginButton";
+import PopupToast from "../../../ui/PopupToast";
 
 function RegisterForm() {
   const navigate = useNavigate();
@@ -127,7 +129,14 @@ function RegisterForm() {
 
   const nextStep = () => {
     if (step === 2) {
-      if (!formData.nama || !formData.username || !formData.email) return;
+      if (!formData.nama || !formData.username || !formData.email) {
+        setError("Nama, username, dan email wajib diisi.");
+        return;
+      }
+      if (formData.nama.trim().length < 3) {
+        setError("Nama minimal 3 karakter.");
+        return;
+      }
       if (!/^[a-zA-Z0-9_]{3,}$/.test(formData.username)) {
         setError(
           "Username minimal 3 karakter dan hanya boleh huruf, angka, dan underscore.",
@@ -164,6 +173,11 @@ function RegisterForm() {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (formData.nama.trim().length < 3) {
+      setError("Nama minimal 3 karakter.");
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       setError("Kata sandi tidak cocok!");
@@ -299,12 +313,48 @@ function RegisterForm() {
           </p>
         </div>
 
-        <form onSubmit={handleRegister} className="flex flex-col gap-5 sm:gap-6 md:gap-8">
-          {error && (
-            <div className="flex items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs sm:text-sm text-red-300">
-              <AlertCircle size={16} className="mt-0.5 shrink-0" />
-              <span>{error}</span>
+        {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
+          <div className="mb-6 sm:mb-7">
+            <GoogleLogin onError={setError} />
+            <p className="mt-2 text-center text-[11px] leading-4 text-slate-400 sm:text-xs">
+              Daftar 1-klik dengan Google. Akun baru otomatis menjadi tipe{" "}
+              <strong className="text-slate-300">Umum</strong> — kamu bisa
+              upgrade ke Mahasiswa/Dosen nanti lewat halaman profil.
+            </p>
+            <div className="mt-4 flex items-center gap-3">
+              <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/15 to-white/5" />
+              <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-slate-500 min-[350px]:text-xs">
+                <span className="h-1 w-1 rounded-full bg-cyan-400/70" />
+                atau daftar manual
+                <span className="h-1 w-1 rounded-full bg-cyan-400/70" />
+              </span>
+              <span className="h-px flex-1 bg-gradient-to-l from-transparent via-white/15 to-white/5" />
             </div>
+          </div>
+        )}
+
+        <form onSubmit={handleRegister} noValidate className="flex flex-col gap-5 sm:gap-6 md:gap-8">
+          {error && (
+            <PopupToast
+              show
+              variant="danger"
+              position="top-right"
+              onClose={() => setError("")}
+            >
+              <div className="px-4 py-3.5">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-red-500/30 bg-red-500/20">
+                    <AlertCircle className="h-4.5 w-4.5 text-red-400" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="pt-1 text-sm font-semibold text-white">
+                      Gagal
+                    </h3>
+                    <p className="mt-0.5 text-xs text-slate-400 leading-relaxed">{error}</p>
+                  </div>
+                </div>
+              </div>
+            </PopupToast>
           )}
 
           {step === 1 && (
@@ -423,6 +473,28 @@ function RegisterForm() {
                   <p className="mt-1.5 flex items-center gap-1.5 text-[11px] sm:text-xs text-slate-500">
                     <span className="h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-cyan-500" />
                     Memeriksa ketersediaan email...
+                  </p>
+                )}
+
+                {emailCheck?.domainValid === false && !emailCheck.checking && (
+                  <div className="mt-2 flex items-start gap-2 rounded-xl border px-3 py-2.5 text-[11px] sm:text-xs bg-red-500/10 border-red-500/30 text-red-200">
+                    <AlertCircle size={14} className="mt-0.5 shrink-0" />
+                    <span>
+                      Domain{" "}
+                      <strong className="font-semibold text-white">
+                        @{emailCheck.domain}
+                      </strong>{" "}
+                      tidak memiliki server email yang terdaftar. Pastikan kamu
+                      mengetik alamat email aktif yang benar.
+                    </span>
+                  </div>
+                )}
+
+                {emailCheck?.domainValid === true && !emailCheck.checking && (
+                  <p className="mt-1.5 text-[11px] sm:text-xs text-slate-400">
+                    Kode verifikasi akan dikirim. Email palsu atau tidak terdaftar
+                    (mis. gmail yang tidak ada) tidak akan menerima kodenya,
+                    sehingga tidak bisa menyelesaikan pendaftaran.
                   </p>
                 )}
 
@@ -584,9 +656,9 @@ function RegisterForm() {
 
                     <label className="flex w-full h-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 px-3 py-5 sm:px-5 sm:py-7 shadow-sm transition-all hover:border-cyan-500 hover:bg-white">
                       {fotoIdentitasPreview ? (
-                        <div className="relative w-full">
-                          <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-cyan-400/60 via-blue-500/30 to-blue-400/50 blur-[6px]" />
-                          <div className="relative mx-auto flex w-full max-w-[15rem] items-center justify-center rounded-2xl p-2">
+                        <div className="relative mx-auto w-fit max-w-full">
+                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-400/60 via-blue-500/30 to-blue-400/50 blur-[6px]" />
+                          <div className="relative flex items-center justify-center rounded-2xl p-2">
                             <img
                               src={fotoIdentitasPreview}
                               alt="Preview Foto Identitas"

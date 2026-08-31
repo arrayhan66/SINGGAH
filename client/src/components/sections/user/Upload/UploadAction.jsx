@@ -1,5 +1,6 @@
-import { useState } from "react"
-import { Send, AlertCircle } from "lucide-react"
+import { useEffect } from "react"
+import { Send } from "lucide-react"
+import toast from "../../../../utils/toast"
 
 function validateForm(formData, isEdit = false) {
   const errors = []
@@ -19,46 +20,25 @@ function validateForm(formData, isEdit = false) {
 }
 
 function UploadAction({ formData, onSubmit, submitting, apiError, isEdit = false, submitLabel }) {
-  const [validationErrors, setValidationErrors] = useState([])
+  useEffect(() => {
+    if (typeof apiError === "string" && apiError) {
+      toast.error(apiError)
+    }
+  }, [apiError])
 
   function handleSubmit() {
     const errors = validateForm(formData, isEdit)
 
     if (errors.length > 0) {
-      setValidationErrors(errors)
+      toast.error(errors.join(", "))
       return
     }
 
-    setValidationErrors([])
     onSubmit()
   }
 
-  const showValidationErrors = validationErrors.length > 0
-  const showApiError = typeof apiError === "string" && apiError
-
   return (
     <div className="flex flex-col gap-3 min-[280px]:gap-4 2xl:gap-5 3xl:gap-6 4xl:gap-7">
-      {showValidationErrors && (
-        <div className="flex flex-col gap-1 rounded-xl border border-red-500/30 bg-red-50 p-3 min-[280px]:p-4 2xl:p-5 3xl:p-6 4xl:p-7">
-          <div className="flex items-center gap-2 text-xs min-[280px]:text-sm font-medium text-red-600 2xl:text-base 3xl:text-lg 4xl:text-xl">
-            <AlertCircle className="h-5 w-5 shrink-0 2xl:h-6 2xl:w-6 3xl:h-7 3xl:w-7 4xl:h-8 4xl:w-8" />
-            Lengkapi form berikut sebelum submit:
-          </div>
-          <ul className="ml-5 min-[280px]:ml-6 list-disc text-xs min-[280px]:text-sm text-red-500 2xl:text-base 3xl:text-lg 4xl:text-xl">
-            {validationErrors.map((err) => (
-              <li key={err}>{err}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {showApiError && (
-        <div className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-50 p-3 min-[280px]:p-4 text-xs min-[280px]:text-sm text-red-600 2xl:text-base">
-          <AlertCircle className="h-5 w-5 shrink-0" />
-          {apiError}
-        </div>
-      )}
-
       <button
         type="button"
         onClick={handleSubmit}

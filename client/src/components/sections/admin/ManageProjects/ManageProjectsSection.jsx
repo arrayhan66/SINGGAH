@@ -5,7 +5,7 @@ import AdminProjectsList from "./AdminProjectsList"
 import { useProjects } from "../../../../context/ProjectContext"
 import api from "../../../../services/api"
 
-const VALID_STATUSES = ["all", "pending", "approved", "rejected"]
+const VALID_STATUSES = ["all", "pending", "published", "rejected"]
 
 export default function ManageProjectsSection() {
   const { projects } = useProjects()
@@ -75,9 +75,9 @@ export default function ManageProjectsSection() {
   const stats = useMemo(() => {
     const total = projects.length
     const pending = projects.filter((p) => p.status === "pending").length
-    const approved = projects.filter((p) => p.status === "approved").length
+    const published = projects.filter((p) => p.status === "published").length
     const rejected = projects.filter((p) => p.status === "rejected").length
-    return { total, pending, approved, rejected }
+    return { total, pending, published, rejected }
   }, [projects])
 
   return (

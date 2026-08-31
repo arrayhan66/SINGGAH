@@ -20,7 +20,7 @@ const statCards = [
     iconColor: "text-amber-400",
   },
   {
-    key: "approved",
+    key: "published",
     label: "Disetujui",
     icon: CheckCircle2,
     iconBg: "bg-emerald-500/10",

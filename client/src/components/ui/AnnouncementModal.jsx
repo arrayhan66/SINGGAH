@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Megaphone, Send, Users, Check } from "lucide-react"
+import { Megaphone, Send, Check } from "lucide-react"
 import PopupToast from "./PopupToast"
 
 const audienceOptions = [
@@ -42,7 +42,7 @@ function AnnouncementModal({ onSend, onClose, isSending, error, success }) {
 
   if (showSuccess && success) {
     return (
-      <PopupToast show variant="success" onClose={handleClose}>
+      <PopupToast show variant="success" onClose={handleClose} position="center">
         <div className="px-4 py-3.5">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-400/20 border border-amber-400/30">
@@ -64,7 +64,7 @@ function AnnouncementModal({ onSend, onClose, isSending, error, success }) {
   }
 
   return (
-    <PopupToast show variant="default" onClose={handleClose}>
+    <PopupToast show variant="default" onClose={handleClose} position="center">
       <form onSubmit={handleSubmit} className="px-4 py-3.5 max-h-[80vh] overflow-y-auto custom-scrollbar">
         <div className="flex items-start gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 border border-amber-500/30">

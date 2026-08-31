@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { Save, X, AlertCircle, CheckCircle } from "lucide-react"
+import { Save, X, CheckCircle } from "lucide-react"
 import api from "../../../../services/api"
 import { useAuth } from "../../../../context/AuthContext"
 import PopupToast from "../../../ui/PopupToast"
+import toast from "../../../../utils/toast"
 
 function ProfileAction({ profileData, passwordData, onResetPassword, identitasPhoto }) {
   const navigate = useNavigate()
@@ -14,19 +15,32 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
   const [emailChanged, setEmailChanged] = useState(false)
 
   useEffect(() => {
-    if (showSuccess && emailChanged) {
+    if (!showSuccess) return
+
+    if (emailChanged) {
       const t = setTimeout(() => {
         setShowSuccess(false)
         navigate("/verify-code")
       }, 2500)
       return () => clearTimeout(t)
     }
+
+    const t = setTimeout(() => {
+      setShowSuccess(false)
+    }, 2500)
+    return () => clearTimeout(t)
   }, [showSuccess, emailChanged, navigate])
 
   const isChangingPassword =
     passwordData.currentPassword ||
     passwordData.newPassword ||
     passwordData.confirmPassword
+
+  useEffect(() => {
+    if (errors.length > 0) {
+      toast.error(errors.join(", "))
+    }
+  }, [errors])
 
   function validate() {
     const errs = []
@@ -149,20 +163,6 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
           </div>
         </div>
       </PopupToast>
-
-      {errors.length > 0 && (
-        <div className="flex flex-col gap-1.5 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
-          <div className="flex items-center gap-2 text-sm font-medium text-red-400">
-            <AlertCircle size={16} className="shrink-0" />
-            Periksa kembali form berikut:
-          </div>
-          <ul className="ml-6 list-disc text-xs md:text-sm text-red-300">
-            {errors.map((err) => (
-              <li key={err}>{err}</li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       <div className="flex flex-col min-[400px]:flex-row gap-3">
         <button

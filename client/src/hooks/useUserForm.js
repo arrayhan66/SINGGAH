@@ -7,9 +7,9 @@ const emptyForm = {
   username: "",
   email: "",
   avatar: "",
-  role: "Mahasiswa",
+  role: "user",
   status: "Aktif",
-  tipe: "mahasiswa",
+  tipe: "umum",
   nim_nip: "",
   identitas_photo: "",
   is_verified: false,
@@ -22,9 +22,9 @@ function toForm(found) {
     username: found.username || "",
     email: found.email || "",
     avatar: found.avatar || "",
-    role: found.role || "Mahasiswa",
+    role: found.role === "admin" ? "admin" : "user",
     status: found.status || "Aktif",
-    tipe: found.tipe || "mahasiswa",
+    tipe: found.tipe || "umum",
     nim_nip: found.nim_nip || "",
     identitas_photo: found.identitas_photo || "",
     is_verified: found.is_verified ?? false,
@@ -46,6 +46,8 @@ export default function useUserForm() {
   })
 
   const [saving, setSaving] = useState(false)
+  const [loadedUser, setLoadedUser] = useState(null)
+  const [error, setError] = useState("")
   const initedFor = useRef(null)
 
   useEffect(() => {
@@ -57,6 +59,7 @@ export default function useUserForm() {
       const key = String(found.id)
       if (initedFor.current === key) return
       initedFor.current = key
+      setLoadedUser(found)
       setFormData(toForm(found))
     }
 
@@ -69,6 +72,8 @@ export default function useUserForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditMode, slug, existing])
 
+  const editTarget = existing ? { id: existing.id } : loadedUser
+
   function updateField(field, value) {
     setFormData((prev) => {
       const next = { ...prev, [field]: value }
@@ -80,21 +85,23 @@ export default function useUserForm() {
   }
 
   async function handlePublish() {
+    setError("")
+
     if (!formData.name.trim() || !formData.email.trim()) {
-      alert("Nama dan email wajib diisi")
+      setError("Nama dan email wajib diisi")
       return
     }
 
     if (!isEditMode && !formData.username.trim()) {
-      alert("Username wajib diisi")
+      setError("Username wajib diisi")
       return
     }
 
     setSaving(true)
 
     try {
-      if (isEditMode && existing) {
-        await updateUser(existing.id, formData)
+      if (isEditMode && editTarget) {
+        await updateUser(editTarget.id, formData)
       } else if (!isEditMode) {
         await addUser({
           ...formData,
@@ -103,13 +110,13 @@ export default function useUserForm() {
         })
       } else {
         setSaving(false)
-        alert("User tidak ditemukan di daftar. Muat ulang halaman lalu coba lagi.")
+        setError("User tidak ditemukan di daftar. Muat ulang halaman lalu coba lagi.")
         return
       }
       navigate("/users")
     } catch (err) {
       setSaving(false)
-      alert(err.response?.data?.message || "Gagal menyimpan user. Silakan coba lagi.")
+      setError(err.response?.data?.message || "Gagal menyimpan user. Silakan coba lagi.")
     }
   }
 
@@ -124,6 +131,8 @@ export default function useUserForm() {
     handlePublish,
     isEditMode,
     saving,
+    error,
+    clearError: () => setError(""),
     goBack,
   }
 }

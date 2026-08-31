@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import {
   ArrowLeft,
@@ -68,6 +68,12 @@ function AdminProjectForm() {
   const [savingStatus, setSavingStatus] = useState(false)
   const [actionSuccess, setActionSuccess] = useState(null)
   const [notification, setNotification] = useState(null)
+
+  useEffect(() => {
+    if (!actionSuccess) return
+    const timer = setTimeout(() => setActionSuccess(null), 2500)
+    return () => clearTimeout(timer)
+  }, [actionSuccess])
 
   function showNotification(message, type = "success") {
     setNotification({ message, type })
@@ -347,7 +353,7 @@ function AdminProjectForm() {
         <PopupToast
           show
           variant={actionSuccess.type === "approve" ? "success" : "danger"}
-          onClose={() => {}}
+          onClose={() => setActionSuccess(null)}
         >
           <div className="px-4 py-3.5">
             <div className="flex items-start gap-3">

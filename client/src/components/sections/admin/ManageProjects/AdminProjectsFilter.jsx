@@ -5,7 +5,7 @@ import { Clock, CheckCircle2, XCircle, LayoutGrid, ChevronDown, Check } from "lu
 const tabs = [
   { value: "all", label: "Semua", icon: LayoutGrid },
   { value: "pending", label: "Menunggu", icon: Clock },
-  { value: "approved", label: "Disetujui", icon: CheckCircle2 },
+  { value: "published", label: "Disetujui", icon: CheckCircle2 },
   { value: "rejected", label: "Ditolak", icon: XCircle },
 ]
 

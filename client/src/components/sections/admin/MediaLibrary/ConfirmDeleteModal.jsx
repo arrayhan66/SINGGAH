@@ -5,7 +5,7 @@ export default function ConfirmDeleteModal({ item, onConfirm, onCancel }) {
   if (!item) return null
 
   return (
-    <PopupToast show={!!item} variant="danger" onClose={onCancel}>
+    <PopupToast show={!!item} variant="danger" onClose={onCancel} position="center">
       <div className="px-4 py-3.5">
         <div className="flex items-start gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-500/20 border border-red-500/30">

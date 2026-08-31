@@ -5,13 +5,12 @@ import {
   Briefcase,
   Clock,
   XCircle,
-  AlertCircle,
-  CheckCircle,
   IdCard,
   ImageOff,
   X,
 } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
+import FormAlert from "../../../ui/FormAlert"
 import api from "../../../../services/api"
 import { useAuth } from "../../../../context/AuthContext"
 
@@ -278,20 +277,11 @@ function ProfileVerification() {
       )}
 
       {message.text && (
-        <div
-          className={`mt-5 flex items-center gap-2 rounded-xl border px-4 py-3 text-xs md:text-sm ${
-            message.type === "success"
-              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
-              : "border-red-500/30 bg-red-500/10 text-red-200"
-          }`}
-        >
-          {message.type === "success" ? (
-            <CheckCircle size={16} className="shrink-0" />
-          ) : (
-            <AlertCircle size={16} className="shrink-0" />
-          )}
-          {message.text}
-        </div>
+        <FormAlert
+          message={message.text}
+          type={message.type === "success" ? "success" : "error"}
+          onClose={clearMessage}
+        />
       )}
     </GlassCard>
   )

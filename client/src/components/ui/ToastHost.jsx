@@ -1,35 +1,36 @@
 import { useEffect, useState } from "react"
 import { AlertCircle, CheckCircle2 } from "lucide-react"
 import PopupToast from "./PopupToast"
+import toast from "../../utils/toast"
 
-const AUTO_DISMISS_MS = 4500
-
-export default function FormAlert({ message, type = "error", onClose }) {
-  const [dismissed, setDismissed] = useState(false)
+function ToastHost() {
+  const [item, setItem] = useState(null)
+  const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    if (!message) return
-    setDismissed(false)
-    const timer = setTimeout(() => {
-      setDismissed(true)
-      onClose?.()
-    }, AUTO_DISMISS_MS)
-    return () => clearTimeout(timer)
-  }, [message, onClose])
+    toast.setListener((next) => {
+      setItem(next)
+      setVisible(true)
+    })
+    return () => toast.setListener(null)
+  }, [])
 
-  if (!message || dismissed) return null
+  useEffect(() => {
+    if (!visible) return
+    const t = setTimeout(() => setVisible(false), 4500)
+    return () => clearTimeout(t)
+  }, [visible, item])
 
-  const isError = type === "error"
+  if (!item) return null
+
+  const isError = item.type !== "success"
 
   return (
     <PopupToast
-      show
+      show={visible}
       variant={isError ? "danger" : "success"}
       position="top-right"
-      onClose={() => {
-        setDismissed(true)
-        onClose?.()
-      }}
+      onClose={() => setVisible(false)}
     >
       <div className="px-4 py-3.5">
         <div className="flex items-start gap-3">
@@ -55,7 +56,7 @@ export default function FormAlert({ message, type = "error", onClose }) {
               {isError ? "Terjadi Kesalahan" : "Berhasil"}
             </h3>
             <p className="mt-0.5 text-xs text-slate-400 leading-relaxed">
-              {message}
+              {item.message}
             </p>
           </div>
         </div>
@@ -63,3 +64,5 @@ export default function FormAlert({ message, type = "error", onClose }) {
     </PopupToast>
   )
 }
+
+export default ToastHost

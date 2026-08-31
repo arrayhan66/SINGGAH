@@ -32,6 +32,7 @@ function AdminUserDeleteModal({ user, onConfirm, onCancel, loading = false, succ
       show={!!user}
       variant={success ? "success" : "danger"}
       onClose={handleClose}
+      position={success ? "top-right" : "center"}
     >
       <div className={`transition-all duration-300 ${visible && !closing ? "opacity-100" : "opacity-0"}`}>
         <div className="px-4 py-3.5">

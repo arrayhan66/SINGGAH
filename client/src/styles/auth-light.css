@@ -430,3 +430,16 @@ html:not(.light) .auth-page .bg-slate-800 {
 html:not(.light) .auth-page .bg-slate-800:hover {
   background-color: #334155;
 }
+/* ============================================================
+   LIGHT MODE - garis pemisah "atau" (Google divider) biar kelihatan.
+   Warna putih semisal via-white/15 nyaris tak terlihat di kartu putih.
+   ============================================================ */
+html.light .auth-page .h-px.bg-gradient-to-r,
+html.light .auth-page .h-px.bg-gradient-to-l {
+  background-image: linear-gradient(
+    to right,
+    transparent,
+    #cbd5e1,
+    transparent
+  );
+}

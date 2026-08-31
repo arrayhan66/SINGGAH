@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { ArrowLeft, UserRound } from "lucide-react"
 import { useUsers } from "../../../../context/UserContext"
@@ -9,12 +9,28 @@ import AdminUserDeleteModal from "../../../../components/sections/admin/ManageUs
 function AdminUserDetail() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const { getUserByUsername, deleteUser } = useUsers()
+  const { getUserByUsername, fetchUserByUsername, deleteUser } = useUsers()
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deleteSuccess, setDeleteSuccess] = useState(false)
+  const [loading, setLoading] = useState(Boolean(slug) && !getUserByUsername(slug))
 
   const user = getUserByUsername(slug)
+
+  useEffect(() => {
+    let cancelled = false
+    if (!slug || user) return
+
+    setLoading(true)
+    fetchUserByUsername(slug).finally(() => {
+      if (!cancelled) setLoading(false)
+    })
+
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug, user])
 
   function handleEdit(target) {
     navigate(`/users/edit/${target.username}`)
@@ -42,6 +58,14 @@ function AdminUserDetail() {
     setDeleteTarget(null)
     setDeleteLoading(false)
     setDeleteSuccess(false)
+  }
+
+  if (loading) {
+    return (
+      <div className="px-6 py-10 md:px-10 text-center text-slate-400">
+        Memuat user...
+      </div>
+    )
   }
 
   if (!user) {

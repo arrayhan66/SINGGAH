@@ -9,12 +9,6 @@ const statusConfig = {
     className: "border-amber-400/30 bg-amber-400/10 text-amber-300",
     dot: "bg-amber-400",
   },
-  approved: {
-    label: "Disetujui",
-    icon: CheckCircle2,
-    className: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
-    dot: "bg-emerald-400",
-  },
   published: {
     label: "Dipublikasikan",
     icon: Globe,

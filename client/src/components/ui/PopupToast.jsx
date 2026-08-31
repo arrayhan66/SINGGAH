@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 
 function PopupToast({
   children,
@@ -6,6 +6,7 @@ function PopupToast({
   variant = "default",
   onClose,
   closeOnEscape = true,
+  position = "top-right",
 }) {
   const [visible, setVisible] = useState(false)
   const [closing, setClosing] = useState(false)
@@ -27,6 +28,12 @@ function PopupToast({
 
   const config = variantConfig[variant] || variantConfig.default
 
+  const handleClose = useCallback(() => {
+    if (closing) return
+    setClosing(true)
+    setTimeout(() => onClose?.(), 250)
+  }, [closing, onClose])
+
   useEffect(() => {
     if (!show) return
     setClosing(false)
@@ -38,25 +45,34 @@ function PopupToast({
     }
     document.addEventListener("keydown", onKey)
     return () => document.removeEventListener("keydown", onKey)
-  }, [show, closeOnEscape])
-
-  function handleClose() {
-    if (closing) return
-    setClosing(true)
-    setTimeout(() => onClose?.(), 250)
-  }
+  }, [show, closeOnEscape, handleClose])
 
   if (!show) return null
 
+  const isCentered = position === "center"
+  const shown = visible && !closing
+
+  const wrapperClass = isCentered
+    ? "items-center justify-center"
+    : "items-start justify-center sm:justify-end"
+
+  const innerAnim = shown
+    ? "translate-x-0 translate-y-0 opacity-100"
+    : isCentered
+      ? "translate-y-4 opacity-0"
+      : "-translate-y-4 opacity-0"
+
   return (
-    <div className="pointer-events-none fixed inset-0 z-[100] flex items-start justify-end p-4 sm:p-6">
-      <div className="pointer-events-auto w-full max-w-sm">
+    <div
+      className={`pointer-events-none fixed inset-0 z-[100] flex p-4 pt-12 sm:p-6 ${wrapperClass}`}
+    >
+      <div
+        className={`pointer-events-auto w-full ${
+          isCentered ? "max-w-lg" : "max-w-sm sm:max-w-md"
+        }`}
+      >
         <div
-          className={`relative overflow-hidden rounded-2xl border ${config.border} bg-brand-dark/95 shadow-2xl backdrop-blur-xl transition-all duration-300 ${
-            visible && !closing
-              ? "translate-x-0 opacity-100"
-              : "translate-x-8 opacity-0"
-          }`}
+          className={`relative overflow-hidden rounded-2xl border ${config.border} bg-brand-dark/95 shadow-2xl backdrop-blur-xl transition-all duration-300 ${innerAnim}`}
         >
           <div className={`h-0.5 w-full ${config.bar} opacity-60`} />
           {children}

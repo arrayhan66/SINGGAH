@@ -28,7 +28,7 @@ function AdminBeritaDeleteModal({ berita, onConfirm, onCancel, loading = false, 
   if (!berita) return null
 
   return (
-    <PopupToast show={!!berita} variant={success ? "success" : "danger"} onClose={handleClose}>
+    <PopupToast show={!!berita} variant={success ? "success" : "danger"} onClose={handleClose} position={success ? "top-right" : "center"}>
       <div className={`px-4 py-3.5 transition-all duration-300 ${visible && !closing ? "opacity-100" : "opacity-0"}`}>
         <div className="flex items-start gap-3">
           <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${

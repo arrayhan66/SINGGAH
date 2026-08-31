@@ -5,6 +5,7 @@ import logo from "../../../../assets/icons/logo.webp";
 import api from "../../../../services/api";
 import { useAuth } from "../../../../context/AuthContext";
 import FormAlert from "../../../ui/FormAlert";
+import GoogleLogin from "../../../ui/GoogleLoginButton";
 import { getRedirectFrom } from "../../../../utils/redirectFrom";
 
 function LoginForm() {
@@ -83,7 +84,7 @@ function LoginForm() {
 
   return (
     <div className="flex w-full flex-col justify-center px-4 py-5 sm:p-10 lg:w-1/2 lg:px-16 lg:py-12 2xl:px-20">
-      <div className="mb-8 flex items-center justify-between sm:mb-12 lg:hidden">
+      <div className="mb-7 flex items-center justify-between sm:mb-12 lg:hidden">
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-100/30 bg-white/10 p-3 shadow-md backdrop-blur-md sm:h-16 sm:w-16 sm:p-3.5">
             <img
@@ -110,13 +111,13 @@ function LoginForm() {
         <h2 className="text-2xl font-bold leading-tight text-white sm:text-4xl">
           Selamat <span className="text-cyan-300">Datang</span>
         </h2>
-        <p className="mt-1.5 text-xs text-slate-400 min-[350px]:text-sm sm:mt-2 sm:text-base">
-          Silakan masuk ke akun Anda.
+        <p className="mt-1.5 text-xs leading-5 text-slate-400 min-[350px]:text-sm sm:mt-2 sm:text-base sm:leading-6">
+          Silakan masuk untuk melanjutkan.
         </p>
       </div>
 
-      <form onSubmit={handleLogin} className="my-10 sm:my-14" noValidate>
-        <FormAlert message={generalError} type="error" />
+      <form onSubmit={handleLogin} className="my-8 sm:my-14" noValidate>
+        <FormAlert message={generalError} type="error" onClose={() => setGeneralError("")} />
 
         <div className="mb-4 sm:mb-6">
           <label className="mb-1.5 block text-xs font-medium text-slate-300 min-[350px]:text-sm">
@@ -209,9 +210,9 @@ function LoginForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="group relative w-full cursor-pointer overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] py-3 font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 disabled:cursor-not-allowed disabled:opacity-70 min-[350px]:py-3.5 sm:py-4"
+          className="group relative w-full cursor-pointer overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] py-3 font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 min-[350px]:py-3.5 sm:py-4"
         >
-          <span className="flex items-center justify-center gap-2">
+          <span className="flex items-center justify-center gap-2.5">
             {isLoading ? (
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white min-[350px]:h-5 min-[350px]:w-5 sm:h-5 sm:w-5" />
             ) : (
@@ -221,17 +222,32 @@ function LoginForm() {
             )}
           </span>
         </button>
+
+        <p className="mt-5 text-center text-xs text-slate-400 min-[350px]:text-sm sm:mt-6">
+          Belum memiliki akun?
+          <Link
+            to="/register"
+            className="ml-1.5 font-bold text-cyan-400 transition-colors hover:text-cyan-300 hover:underline"
+          >
+            Daftar Sekarang
+          </Link>
+        </p>
       </form>
 
-      <p className="-mt-6 sm:-mt-8 lg:-mt-10 text-center text-xs text-slate-400 min-[350px]:text-sm">
-        Belum memiliki akun?
-        <Link
-          to="/register"
-          className="ml-1.5 font-bold text-cyan-400 transition-colors hover:text-cyan-300 hover:underline"
-        >
-          Daftar
-        </Link>
-      </p>
+      {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
+        <div className="-mt-6 sm:-mt-7">
+          <div className="mb-3 flex items-center gap-3">
+            <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/15 to-white/5" />
+            <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-slate-500 min-[350px]:text-xs">
+              <span className="h-1 w-1 rounded-full bg-cyan-400/70" />
+              atau
+              <span className="h-1 w-1 rounded-full bg-cyan-400/70" />
+            </span>
+            <span className="h-px flex-1 bg-gradient-to-l from-transparent via-white/15 to-white/5" />
+          </div>
+          <GoogleLogin label="Login dengan Google" onError={setGeneralError} />
+        </div>
+      )}
     </div>
   );
 }

@@ -83,7 +83,7 @@ function ForgotPasswordForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="my-10 sm:my-14" noValidate>
-        <FormAlert message={generalError} type="error" />
+        <FormAlert message={generalError} type="error" onClose={() => setGeneralError("")} />
 
         <div className="mb-4 sm:mb-6">
           <label className="mb-1.5 block text-xs font-medium text-slate-300 min-[350px]:text-sm">

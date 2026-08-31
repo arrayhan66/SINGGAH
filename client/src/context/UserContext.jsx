@@ -62,6 +62,24 @@ const toApi = (payload) => {
   return cleaned
 }
 
+const fetchAllUsers = async () => {
+  const perPage = 100
+  let page = 1
+  let all = []
+
+  while (true) {
+    const res = await api.get("/users", { params: { page, limit: perPage } })
+    const { items = [], pagination } = res.data.data || {}
+    const rows = items || []
+    all = all.concat(rows)
+    const totalPages = pagination?.totalPages || 1
+    if (page >= totalPages) break
+    page += 1
+  }
+
+  return all
+}
+
 export function UserProvider({ children }) {
   const { user } = useAuth()
   const [userList, setUserList] = useState([])
@@ -73,9 +91,8 @@ export function UserProvider({ children }) {
     if (!isAdmin) return
     setLoading(true)
     try {
-      const res = await api.get("/users", { params: { limit: 100 } })
-      const items = res.data.data.items || res.data.data || []
-      setUserList(items.map(toDisplay))
+      const all = await fetchAllUsers()
+      setUserList(all.map(toDisplay))
     } catch (err) {
       console.error("Failed to fetch users:", err)
       setUserList([])
@@ -86,11 +103,8 @@ export function UserProvider({ children }) {
 
   useEffect(() => {
     if (!isAdmin) return
-    api.get("/users", { params: { limit: 100 } })
-      .then((res) => {
-        const items = res.data.data.items || res.data.data || []
-        setUserList(items.map(toDisplay))
-      })
+    fetchAllUsers()
+      .then((all) => setUserList(all.map(toDisplay)))
       .catch((err) => {
         console.error("Failed to fetch users:", err)
         setUserList([])

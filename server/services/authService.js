@@ -1039,6 +1039,30 @@ const buildAuthPayload = (user) => ({
   },
 })
 
+const STUDENT_EMAIL_DOMAINS = ["mahasiswa.poliban.ac.id"]
+const STAFF_EMAIL_DOMAINS = ["dosen.poliban.ac.id", "poliban.ac.id"]
+
+const inferTipeFromEmail = (email) => {
+  const lower = String(email || "").trim().toLowerCase()
+  const at = lower.lastIndexOf("@")
+  if (at <= 0) return { userTipe: "umum", nimNip: null }
+
+  const local = lower.slice(0, at)
+  const domain = lower.slice(at + 1)
+
+  if (STUDENT_EMAIL_DOMAINS.includes(domain)) {
+    const nim = local.replace(/[^a-zA-Z0-9]/g, "").slice(0, 20)
+    return { userTipe: "mahasiswa", nimNip: nim || null }
+  }
+
+  if (STAFF_EMAIL_DOMAINS.includes(domain)) {
+    const nip = local.replace(/[^a-zA-Z0-9]/g, "").slice(0, 20)
+    return { userTipe: "dosen", nimNip: nip || null }
+  }
+
+  return { userTipe: "umum", nimNip: null }
+}
+
 exports.googleLogin = async (data) => {
   const idToken = String(data.idToken || "").trim()
 
@@ -1097,8 +1121,8 @@ exports.googleLogin = async (data) => {
       exists = await User.findOne({ where: { username } })
     }
 
+    const { userTipe, nimNip } = inferTipeFromEmail(email)
     const needsApproval = false
-    const userTipe = "umum"
 
     try {
       user = await sequelize.transaction(async (t) => {
@@ -1115,7 +1139,7 @@ exports.googleLogin = async (data) => {
             avatar: payload.picture || null,
             tipe: userTipe,
             pending_tipe: needsApproval ? userTipe : null,
-            nim_nip: null,
+            nim_nip: nimNip,
             status: "active",
             is_verified: true,
           },
@@ -1142,7 +1166,7 @@ exports.googleLogin = async (data) => {
                 avatar: payload.picture || null,
                 tipe: userTipe,
                 pending_tipe: null,
-                nim_nip: null,
+                nim_nip: nimNip,
                 status: "active",
                 is_verified: true,
               },

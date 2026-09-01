@@ -354,6 +354,7 @@ function AdminProjectForm() {
           show
           variant={actionSuccess.type === "approve" ? "success" : "danger"}
           onClose={() => setActionSuccess(null)}
+          duration={2500}
         >
           <div className="px-4 py-3.5">
             <div className="flex items-start gap-3">

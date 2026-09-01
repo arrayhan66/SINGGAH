@@ -1,9 +1,12 @@
 import { useRef } from "react"
 import { Camera, X } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
+import UserAvatar from "../../../ui/UserAvatar"
+import { useAuth } from "../../../../context/AuthContext"
 
 function ProfileAvatar({ value, existingUrl, onChange, onRemove }) {
   const inputRef = useRef(null)
+  const { user } = useAuth()
 
   const previewUrl = value ? URL.createObjectURL(value) : null
   const displayUrl = previewUrl || existingUrl
@@ -30,19 +33,14 @@ function ProfileAvatar({ value, existingUrl, onChange, onRemove }) {
 
       <div className="mt-4 flex items-center gap-5">
         <div className="relative">
-          <div className="flex h-20 w-20 md:h-24 md:w-24 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-gradient-to-br from-cyan-500 to-blue-700">
-            {displayUrl ? (
-              <img
-                src={displayUrl}
-                alt="Preview avatar"
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <span className="text-2xl md:text-3xl font-bold text-white">
-                ?
-              </span>
-            )}
-          </div>
+          <UserAvatar
+            name={user?.name}
+            avatar={displayUrl}
+            imgSizeClass="h-20 w-20 md:h-24 md:w-24 border border-white/10"
+            fallbackSizeClass="h-20 w-20 md:h-24 md:w-24"
+            fallbackClass="bg-gradient-to-br from-cyan-500 to-blue-700 font-bold text-white border border-white/10"
+            textClass="text-2xl md:text-3xl"
+          />
 
           <button
             type="button"

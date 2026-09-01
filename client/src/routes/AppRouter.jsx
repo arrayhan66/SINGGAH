@@ -7,47 +7,47 @@ import { ResetFlowRoute } from "./ResetFlowRoute"
 import RoleSplit from "./RoleSplit"
 
 const Hall = lazy(() => import("../pages/Hall/Hall"))
-import Home from "../pages/Home/Home"
-import News from "../pages/News/News"
-import NewsDetail from "../pages/News/NewsDetail"
-import About from "../pages/About/About"
-import NotFound from "../pages/NotFound/NotFound"
+const Home = lazy(() => import("../pages/Home/Home"))
+const News = lazy(() => import("../pages/News/News"))
+const NewsDetail = lazy(() => import("../pages/News/NewsDetail"))
+const About = lazy(() => import("../pages/About/About"))
+const NotFound = lazy(() => import("../pages/NotFound/NotFound"))
 import ScrollToTop from "../components/layout/ScrolltoTop"
-import Karya from "../pages/Karya/Karya"
-import KaryaDetail from "../pages/Karya/KaryaDetail"
-import KaryaProjectDetail from "../pages/Karya/KaryaProjectDetail"
+const Karya = lazy(() => import("../pages/Karya/Karya"))
+const KaryaDetail = lazy(() => import("../pages/Karya/KaryaDetail"))
+const KaryaProjectDetail = lazy(() => import("../pages/Karya/KaryaProjectDetail"))
 
 /* === LOGIN IMPORT === */
-import Login from "../pages/auth/Login/Login"
-import ForgotPassword from "../pages/auth/ForgotPassword/ForgotPassword"
-import Register from "../pages/auth/Register/Register"
-import VerifyCode from "../pages/auth/VerifyCode/VerifyCode"
-import ResetPassword from "../pages/auth/ResetPassword/ResetPassword"
+const Login = lazy(() => import("../pages/auth/Login/Login"))
+const ForgotPassword = lazy(() => import("../pages/auth/ForgotPassword/ForgotPassword"))
+const Register = lazy(() => import("../pages/auth/Register/Register"))
+const VerifyCode = lazy(() => import("../pages/auth/VerifyCode/VerifyCode"))
+const ResetPassword = lazy(() => import("../pages/auth/ResetPassword/ResetPassword"))
 
 /* === USER IMPORT === */
-import UserUpload from "../pages/user/Upload/Upload"
-import UserEditKarya from "../pages/user/EditKarya/EditKarya"
-import UserMyKarya from "../pages/user/MyKarya/MyKarya"
-import UserProfile from "../pages/user/Profile/Profile"
-import UserKaryaTersimpan from "../pages/user/KaryaTersimpan/KaryaTersimpan"
+const UserUpload = lazy(() => import("../pages/user/Upload/Upload"))
+const UserEditKarya = lazy(() => import("../pages/user/EditKarya/EditKarya"))
+const UserMyKarya = lazy(() => import("../pages/user/MyKarya/MyKarya"))
+const UserProfile = lazy(() => import("../pages/user/Profile/Profile"))
+const UserKaryaTersimpan = lazy(() => import("../pages/user/KaryaTersimpan/KaryaTersimpan"))
 
 /* === ADMIN IMPORT === */
-import AdminHome from "../pages/admin/Home/Home"
-import AdminProjects from "../pages/admin/ManageProjects/Projects"
-import AdminProjectDetail from "../pages/admin/ManageProjects/AdminProjectDetail"
-import ProjectForm from "../pages/admin/ManageProjects/ProjectForm"
-import AdminAddProjectView from "../components/sections/admin/ManageProjects/AdminAddProjectView"
-import ManageNews from "../pages/admin/ManageNews/Berita"
-import BeritaForm from "../pages/admin/ManageNews/BeritaForm"
-import BeritaPreview from "../pages/admin/ManageNews/BeritaPreview"
-import AdminProfile from "../pages/admin/Profile/Profile"
-import ManageUsers from "../pages/admin/ManageUsers/Users"
-import UserForm from "../pages/admin/ManageUsers/UserForm"
-import UserDetail from "../pages/admin/ManageUsers/UserDetail"
-import ManageCategories from "../pages/admin/ManageCategories/ManageCategories"
-import MediaLibrary from "../pages/admin/MediaLibrary/MediaLibrary"
-import Reports from "../pages/admin/Reports/Reports"
-import Settings from "../pages/admin/Settings/Settings"
+const AdminHome = lazy(() => import("../pages/admin/Home/Home"))
+const AdminProjects = lazy(() => import("../pages/admin/ManageProjects/Projects"))
+const AdminProjectDetail = lazy(() => import("../pages/admin/ManageProjects/AdminProjectDetail"))
+const ProjectForm = lazy(() => import("../pages/admin/ManageProjects/ProjectForm"))
+const AdminAddProjectView = lazy(() => import("../components/sections/admin/ManageProjects/AdminAddProjectView"))
+const ManageNews = lazy(() => import("../pages/admin/ManageNews/Berita"))
+const BeritaForm = lazy(() => import("../pages/admin/ManageNews/BeritaForm"))
+const BeritaPreview = lazy(() => import("../pages/admin/ManageNews/BeritaPreview"))
+const AdminProfile = lazy(() => import("../pages/admin/Profile/Profile"))
+const ManageUsers = lazy(() => import("../pages/admin/ManageUsers/Users"))
+const UserForm = lazy(() => import("../pages/admin/ManageUsers/UserForm"))
+const UserDetail = lazy(() => import("../pages/admin/ManageUsers/UserDetail"))
+const ManageCategories = lazy(() => import("../pages/admin/ManageCategories/ManageCategories"))
+const MediaLibrary = lazy(() => import("../pages/admin/MediaLibrary/MediaLibrary"))
+const Reports = lazy(() => import("../pages/admin/Reports/Reports"))
+const Settings = lazy(() => import("../pages/admin/Settings/Settings"))
 
 function AppRouter() {
   const { theme } = useTheme()
@@ -69,7 +69,8 @@ function AppRouter() {
   return (
     <>
       <ScrollToTop />
-      <Routes>
+      <Suspense fallback={hallFallback}>
+        <Routes>
         {/* === VISITOR ROUTES === */}
         <Route path="/" element={<Home />} />
         <Route path="/karya" element={<Karya />} />
@@ -301,7 +302,8 @@ function AppRouter() {
         />
         {/* === NOT FOUND === */}
         <Route path="*" element={<NotFound />} />
-      </Routes>
+        </Routes>
+      </Suspense>
     </>
   )
 }

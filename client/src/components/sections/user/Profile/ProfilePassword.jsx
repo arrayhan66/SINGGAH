@@ -56,7 +56,7 @@ function ProfilePassword({ passwordData, updatePasswordField }) {
             label="Password Baru"
             value={passwordData.newPassword}
             onChange={(val) => updatePasswordField("newPassword", val)}
-            placeholder="Minimal 8 karakter"
+            placeholder="Masukkan password baru"
           />
 
           <PasswordInput

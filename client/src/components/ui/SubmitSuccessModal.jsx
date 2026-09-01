@@ -28,7 +28,7 @@ function SubmitSuccessModal({
   const headline = mode === "upload" ? "Karya Berhasil Diunggah" : "Karya Berhasil Diperbarui"
 
   return (
-    <PopupToast show={isOpen} variant="success" onClose={onClose}>
+    <PopupToast show={isOpen} variant="success" onClose={onClose} duration={5000}>
       <div className="px-4 py-3.5">
         <div className="flex items-start gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-400/20 border border-cyan-400/30">

@@ -182,19 +182,18 @@ function ResetPasswordForm() {
             disabled={loading}
             className="group relative w-full cursor-pointer overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] py-3 font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/40 disabled:cursor-not-allowed disabled:opacity-70 min-[350px]:py-3.5 sm:py-4"
           >
-            <span className="flex items-center justify-center gap-2">
-              {loading ? (
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white min-[350px]:h-5 min-[350px]:w-5 sm:h-5 sm:w-5" />
-              ) : (
-                <span className="text-sm tracking-wide sm:text-base">
-                  Simpan Password
-                </span>
-              )}
-            </span>
-          </button>
-        </form>
+          <span className="flex items-center justify-center gap-2">
+            {loading ? (
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white min-[350px]:h-5 min-[350px]:w-5 sm:h-5 sm:w-5" />
+            ) : (
+              <span className="text-sm tracking-wide sm:text-base">
+                Simpan Password
+              </span>
+            )}
+          </span>
+        </button>
 
-        <p className="-mt-6 sm:-mt-8 lg:-mt-10 text-center text-xs text-slate-400 min-[350px]:text-sm">
+        <p className="mt-3 text-center text-[11px] text-slate-400 min-[350px]:text-xs sm:mt-3">
           Kembali ke halaman
           <Link
             to="/login"
@@ -203,6 +202,7 @@ function ResetPasswordForm() {
             Login
           </Link>
         </p>
+        </form>
       </div>
     </>
   );

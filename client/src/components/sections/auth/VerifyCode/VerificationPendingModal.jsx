@@ -30,16 +30,16 @@ function VerificationPendingModal({ tipe, onClose }) {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="animate-fade-in-up relative w-full max-w-md overflow-hidden rounded-3xl border border-cyan-400/20 bg-gradient-to-br from-brand-navy to-brand-dark shadow-2xl shadow-cyan-500/10"
+        className="animate-fade-in-up relative my-auto w-full max-w-md overflow-hidden rounded-3xl border border-cyan-400/20 bg-gradient-to-br from-brand-navy to-brand-dark shadow-2xl shadow-cyan-500/10"
       >
         <div className="pointer-events-none absolute -top-24 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-cyan-500/20 blur-3xl" />
 
-        <div className="relative p-8 sm:p-10">
+        <div className="relative max-h-[90dvh] overflow-y-auto p-6 sm:p-10">
           <div className="flex flex-col items-center text-center">
             <div className="relative">
               <div className="absolute inset-0 animate-ping rounded-2xl bg-cyan-400/20" />

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react"
 import { Camera, BadgeCheck, BadgeAlert, Eye, EyeOff } from "lucide-react"
+import UserAvatar from "../../../ui/UserAvatar"
 
 const roleOptions = [
   { value: "user", label: "User Biasa" },
@@ -29,17 +30,15 @@ function AdminUserFormSidebar({ formData, updateField, isEditMode }) {
 
         <div className="mt-4 flex items-center gap-4">
           <div className="relative">
-            <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-cyan-500 to-blue-700 shadow-lg">
-              {formData.avatar ? (
-                <img
-                  src={formData.avatar}
-                  alt="Preview avatar"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span className="text-2xl font-bold text-white">?</span>
-              )}
-            </div>
+            <UserAvatar
+              name={formData.name}
+              avatar={formData.avatar}
+              imgSizeClass="h-20 w-20 border border-white/10"
+              imgClass="rounded-xl"
+              fallbackSizeClass="h-20 w-20"
+              fallbackClass="bg-gradient-to-br from-cyan-500 to-blue-700 font-bold text-white border border-white/10"
+              textClass="text-2xl"
+            />
 
             <button
               type="button"

@@ -11,6 +11,7 @@ import LogoutConfirmModal from "../ui/LogoutConfirmModal";
 import DeleteConfirmModal from "../ui/DeleteConfirmModal";
 import NotificationDetailModal from "../ui/NotificationDetailModal";
 import ThemeToggle from "../ui/ThemeToggle";
+import UserAvatar from "../ui/UserAvatar";
 
 function NavbarUser() {
   const { user, logout } = useAuth();
@@ -79,13 +80,6 @@ function NavbarUser() {
         : tipe === "mahasiswa"
           ? "Mahasiswa"
           : "Umum";
-
-  const initials = name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
 
   const roleBadgeClass =
     tipe === "dosen"
@@ -245,17 +239,14 @@ function NavbarUser() {
               className="group relative flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 text-xs font-semibold text-white transition-all duration-300 ring-2 ring-white/10 hover:ring-cyan-400/30 hover:shadow-[0_0_20px_rgba(34,211,238,.15)] xl:hidden"
               aria-label="Menu akun"
             >
-              <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full">
-                {user?.avatar ? (
-                  <img
-                    src={user.avatar}
-                    alt={user.name}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  initials
-                )}
-              </div>
+              <UserAvatar
+                name={user?.name}
+                avatar={user?.avatar}
+                className="h-full w-full"
+                imgSizeClass="h-full w-full"
+                fallbackSizeClass="h-full w-full"
+                textClass="text-xs font-semibold"
+              />
               <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-[1.5px] border-brand-dark bg-emerald-400" />
             </button>
 
@@ -268,17 +259,14 @@ function NavbarUser() {
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
               >
                 <div className="group relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 text-xs font-semibold text-white transition-all duration-300 ring-2 ring-white/10 hover:ring-cyan-400/30 hover:shadow-[0_0_20px_rgba(34,211,238,.15)]">
-                  <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full">
-                    {user?.avatar ? (
-                      <img
-                        src={user.avatar}
-                        alt={user.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      initials
-                    )}
-                  </div>
+                  <UserAvatar
+                    name={user?.name}
+                    avatar={user?.avatar}
+                    className="h-full w-full"
+                    imgSizeClass="h-full w-full"
+                    fallbackSizeClass="h-full w-full"
+                    textClass="text-xs font-semibold"
+                  />
                   <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-[1.5px] border-brand-dark bg-emerald-400" />
                 </div>
 
@@ -376,7 +364,6 @@ function NavbarUser() {
       <MobileMenu
         isOpen={isOpen}
         user={user}
-        initials={initials}
         name={name}
         roleLabel={roleLabel}
         roleBadgeClass={roleBadgeClass}

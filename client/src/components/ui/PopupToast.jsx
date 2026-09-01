@@ -7,9 +7,12 @@ function PopupToast({
   onClose,
   closeOnEscape = true,
   position = "top-right",
+  autoDismiss = true,
+  duration = 3000,
 }) {
   const [visible, setVisible] = useState(false)
   const [closing, setClosing] = useState(false)
+  const [progress, setProgress] = useState(100)
 
   const variantConfig = {
     default: {
@@ -38,6 +41,7 @@ function PopupToast({
     if (!show) return
     setClosing(false)
     setVisible(false)
+    setProgress(100)
     requestAnimationFrame(() => setVisible(true))
 
     const onKey = (e) => {
@@ -47,10 +51,27 @@ function PopupToast({
     return () => document.removeEventListener("keydown", onKey)
   }, [show, closeOnEscape, handleClose])
 
+  useEffect(() => {
+    if (!show || position === "center" || !autoDismiss) return
+    const start = Date.now()
+    setProgress(100)
+    const tick = setInterval(() => {
+      const elapsed = Date.now() - start
+      const remaining = Math.max(0, 100 - (elapsed / duration) * 100)
+      setProgress(remaining)
+      if (remaining <= 0) {
+        clearInterval(tick)
+        handleClose()
+      }
+    }, 30)
+    return () => clearInterval(tick)
+  }, [show, position, autoDismiss, duration, handleClose])
+
   if (!show) return null
 
   const isCentered = position === "center"
   const shown = visible && !closing
+  const isTopRight = position !== "center"
 
   const wrapperClass = isCentered
     ? "items-center justify-center"
@@ -76,6 +97,14 @@ function PopupToast({
         >
           <div className={`h-0.5 w-full ${config.bar} opacity-60`} />
           {children}
+          {isTopRight && autoDismiss && (
+            <div className="h-0.5 w-full bg-white/5">
+              <div
+                className={`h-full transition-none ${config.bar} opacity-40`}
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,7 +1,8 @@
 import { useState } from "react"
-import { ShieldCheck, ShieldX, UserRound, AtSign, Mail, IdCard, CalendarClock, MessageSquareWarning } from "lucide-react"
+import { ShieldCheck, ShieldX, AtSign, Mail, IdCard, CalendarClock, MessageSquareWarning } from "lucide-react"
 import { formatFullDate } from "../../../../utils/notificationHelpers"
 import PopupToast from "../../../ui/PopupToast"
+import UserAvatar from "../../../ui/UserAvatar"
 
 const tipeLabel = { mahasiswa: "Mahasiswa", dosen: "Dosen" }
 
@@ -42,8 +43,16 @@ function AdminUserTipeModal({ user, decision, onConfirm, onCancel, loading }) {
 
         <div className="mt-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-3">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-cyan-400/10 border border-cyan-400/30">
-              {user.avatar ? <img src={user.avatar} alt="" className="h-full w-full object-cover" /> : <UserRound className="h-4 w-4 text-cyan-300" />}
+            <div className="shrink-0">
+              <UserAvatar
+                name={user.name}
+                avatar={user.avatar}
+                imgSizeClass="h-10 w-10"
+                imgClass="rounded-xl"
+                fallbackSizeClass="h-10 w-10"
+                fallbackClass="bg-gradient-to-br from-cyan-500 to-blue-700 text-cyan-100"
+                textClass="text-xs"
+              />
             </div>
             <div className="min-w-0">
               <p className="truncate text-xs font-semibold text-white">{user.name}</p>

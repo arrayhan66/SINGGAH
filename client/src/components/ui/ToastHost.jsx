@@ -30,6 +30,7 @@ function ToastHost() {
       show={visible}
       variant={isError ? "danger" : "success"}
       position="top-right"
+      duration={4500}
       onClose={() => setVisible(false)}
     >
       <div className="px-4 py-3.5">

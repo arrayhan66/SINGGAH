@@ -1,39 +1,6 @@
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Float } from "@react-three/drei";
-import { Suspense, useRef, useState, useEffect } from "react";
-import Mahasiswa from "../../../three/models/Mahasiswa";
-import Loader from "../../ui/Loader";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 
-function AnimatedModel() {
-  const groupRef = useRef();
-  const [progress, setProgress] = useState(0);
-
-  useFrame((state, delta) => {
-    if (progress < 1 && groupRef.current) {
-      const next = Math.min(progress + delta * 1.5, 1);
-      setProgress(next);
-
-      const eased = 1 - Math.pow(1 - next, 3);
-
-      groupRef.current.scale.setScalar(eased * 1.6);
-
-      groupRef.current.traverse((child) => {
-        if (child.isMesh && child.material) {
-          child.material.transparent = true;
-          child.material.opacity = eased;
-        }
-      });
-    }
-  });
-
-  return (
-    <group ref={groupRef} scale={0}>
-      <Float speed={1} rotationIntensity={0.05} floatIntensity={0.12}>
-        <Mahasiswa scale={1} position={[0, 0, 0]} rotation={[0, Math.PI, 0]} />
-      </Float>
-    </group>
-  );
-}
+const HeroModel3DCanvas = lazy(() => import("./HeroModel3DCanvas"));
 
 function HeroModel3D() {
   const wrapRef = useRef(null);
@@ -75,26 +42,9 @@ function HeroModel3D() {
       className="relative h-[400px] w-full lg:h-[680px] lg:w-[520px] xl:h-[760px] xl:w-[620px] 2xl:h-[900px] 2xl:w-[860px]"
     >
       {ready && (
-        <Canvas shadows camera={{ position: [0, 1.3, 3.5], fov: 32 }}>
-          <ambientLight intensity={2} />
-          <directionalLight position={[5, 8, 5]} intensity={3} castShadow />
-
-          <Suspense fallback={<Loader />}>
-            <AnimatedModel />
-          </Suspense>
-
-          <OrbitControls
-            enableZoom={false}
-            enablePan={false}
-            autoRotate={false}
-            enableDamping
-            dampingFactor={0.08}
-            minPolarAngle={Math.PI / 2}
-            maxPolarAngle={Math.PI / 2}
-            rotateSpeed={0.8}
-            makeDefault
-          />
-        </Canvas>
+        <Suspense fallback={null}>
+          <HeroModel3DCanvas />
+        </Suspense>
       )}
 
       <div className="absolute bottom-16 left-1/2 h-28 w-80 -translate-x-1/2 rounded-full bg-cyan-400/25 blur-3xl" />

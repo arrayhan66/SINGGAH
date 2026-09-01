@@ -73,10 +73,29 @@ function LoginForm() {
         navigate("/");
       }
     } catch (err) {
-      setGeneralError(
+      const status = err.response?.status
+      const message =
         err.response?.data?.message ||
-          "Terjadi kesalahan sistem. Silakan coba lagi.",
-      );
+        "Terjadi kesalahan sistem. Silakan coba lagi."
+
+      if (
+        status === 403 &&
+        /belum diverifikasi|belum dioverifikasi/i.test(message)
+      ) {
+        localStorage.setItem("verifyType", "register")
+        localStorage.setItem("registerEmail", email.trim().toLowerCase())
+        sessionStorage.setItem(
+          "verifyPendingLogin",
+          JSON.stringify({
+            email: email.trim().toLowerCase(),
+            password,
+          }),
+        )
+        navigate("/verify-code", { replace: true })
+        return
+      }
+
+      setGeneralError(message)
     } finally {
       setIsLoading(false);
     }
@@ -160,7 +179,7 @@ function LoginForm() {
             </label>
             <Link
               to="/forgot-password"
-              className="text-xs font-bold text-cyan-400 transition-colors hover:text-cyan-300 hover:underline min-[350px]:text-sm"
+              className="text-[10px] font-bold text-cyan-400 transition-colors hover:text-cyan-300 hover:underline min-[350px]:text-xs"
             >
               Lupa sandi?
             </Link>
@@ -223,7 +242,7 @@ function LoginForm() {
           </span>
         </button>
 
-        <p className="mt-5 text-center text-xs text-slate-400 min-[350px]:text-sm sm:mt-6">
+        <p className="mt-3 text-center text-[11px] text-slate-400 min-[350px]:text-xs sm:mt-3">
           Belum memiliki akun?
           <Link
             to="/register"
@@ -235,15 +254,15 @@ function LoginForm() {
       </form>
 
       {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
-        <div className="-mt-6 sm:-mt-7">
-          <div className="mb-3 flex items-center gap-3">
-            <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/15 to-white/5" />
-            <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-slate-500 min-[350px]:text-xs">
+        <div className="-mt-5">
+          <div className="mb-4 flex items-center gap-3 sm:mb-5">
+            <span className="auth-divider-line h-px flex-1 bg-gradient-to-r from-transparent via-white/30 to-white/15" />
+            <span className="auth-divider-label flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-slate-400 min-[350px]:text-xs">
               <span className="h-1 w-1 rounded-full bg-cyan-400/70" />
               atau
               <span className="h-1 w-1 rounded-full bg-cyan-400/70" />
             </span>
-            <span className="h-px flex-1 bg-gradient-to-l from-transparent via-white/15 to-white/5" />
+            <span className="auth-divider-line h-px flex-1 bg-gradient-to-l from-transparent via-white/30 to-white/15" />
           </div>
           <GoogleLogin label="Login dengan Google" onError={setGeneralError} />
         </div>

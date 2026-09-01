@@ -1,4 +1,5 @@
 import { Pencil, Trash2, BadgeCheck, FolderKanban, ShieldCheck, ShieldX, Hourglass } from "lucide-react"
+import UserAvatar from "../../../ui/UserAvatar"
 
 const tipeConfig = {
   mahasiswa: { label: "Mahasiswa", color: "cyan" },
@@ -40,19 +41,15 @@ function AdminUserCard({ user, onEdit, onDelete, onDetail, onApprove, onReject, 
       >
         <div className="flex flex-col items-center text-center gap-4 min-[420px]:flex-row min-[420px]:items-start min-[420px]:text-left">
           <div className="relative shrink-0">
-            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-cyan-500 to-blue-700 shadow-lg">
-              {user.avatar ? (
-                <img
-                  src={user.avatar}
-                  alt={user.name}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span className="text-lg font-bold text-white">
-                  {user.name?.charAt(0)?.toUpperCase() || "?"}
-                </span>
-              )}
-            </div>
+            <UserAvatar
+              name={user.name}
+              avatar={user.avatar}
+              imgSizeClass="h-16 w-16 border border-white/10"
+              imgClass="rounded-xl"
+              fallbackSizeClass="h-16 w-16"
+              fallbackClass="bg-gradient-to-br from-cyan-500 to-blue-700 font-bold text-white border border-white/10"
+              textClass="text-lg"
+            />
             {isPending ? (
               <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 shadow-md">
                 <Hourglass className="h-3 w-3 text-white" />

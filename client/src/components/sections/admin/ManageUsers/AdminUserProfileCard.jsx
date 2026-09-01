@@ -16,6 +16,7 @@ import {
   ImageOff,
   IdCard,
 } from "lucide-react"
+import UserAvatar from "../../../ui/UserAvatar"
 
 const tipeConfig = {
   mahasiswa: { label: "Mahasiswa", icon: GraduationCap, color: "cyan" },
@@ -48,19 +49,15 @@ function AdminUserProfileCard({ user, onEdit, onDelete }) {
         <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-cyan-400/20 blur-[80px]" />
         <div className="relative z-10 flex flex-col items-center gap-5 sm:flex-row sm:text-left">
           <div className="relative shrink-0">
-            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border-2 border-white/20 bg-gradient-to-br from-cyan-500 to-blue-700 shadow-2xl shadow-cyan-500/20">
-              {user.avatar ? (
-                <img
-                  src={user.avatar}
-                  alt={user.name}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span className="text-3xl font-bold text-white">
-                  {user.name?.charAt(0)?.toUpperCase() || "?"}
-                </span>
-              )}
-            </div>
+            <UserAvatar
+              name={user.name}
+              avatar={user.avatar}
+              imgSizeClass="h-24 w-24 border-2 border-white/20"
+              imgClass="rounded-2xl"
+              fallbackSizeClass="h-24 w-24"
+              fallbackClass="bg-gradient-to-br from-cyan-500 to-blue-700 font-bold text-white border-2 border-white/20"
+              textClass="text-3xl"
+            />
             {user.is_verified && (
               <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/30">
                 <BadgeCheck className="h-4 w-4 text-white" />

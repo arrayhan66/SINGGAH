@@ -59,6 +59,7 @@ function RegisterForm() {
   const [fotoIdentitasPreview, setFotoIdentitasPreview] = useState(null);
 
   const [emailCheck, setEmailCheck] = useState(null);
+  const [pwAttempted, setPwAttempted] = useState(false);
   const lastCheckedRef = useRef(null);
 
   useEffect(() => {
@@ -119,6 +120,10 @@ function RegisterForm() {
     }));
   };
 
+  const preventEnterSubmit = (e) => {
+    if (e.key === "Enter") e.preventDefault();
+  };
+
   const handleFileChange = (e, setFileState, setPreview) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -128,6 +133,7 @@ function RegisterForm() {
   };
 
   const nextStep = () => {
+    setError("");
     if (step === 2) {
       if (!formData.nama || !formData.username || !formData.email) {
         setError("Nama, username, dan email wajib diisi.");
@@ -166,6 +172,8 @@ function RegisterForm() {
   };
 
   const prevStep = () => {
+    setError("");
+    setPwAttempted(false);
     setStep((prev) => prev - 1);
     window.scrollTo(0, 0);
   };
@@ -179,11 +187,6 @@ function RegisterForm() {
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Kata sandi tidak cocok!");
-      return;
-    }
-
     if (!/^[a-zA-Z0-9_]{3,}$/.test(formData.username)) {
       setError(
         "Username minimal 3 karakter dan hanya boleh huruf, angka, dan underscore.",
@@ -191,13 +194,13 @@ function RegisterForm() {
       return;
     }
 
-    if (formData.password.length < 8) {
-      setError("Password minimal 8 karakter.");
-      return;
-    }
-
-    if (!/[A-Z]/.test(formData.password) || !/[0-9]/.test(formData.password)) {
-      setError("Password harus mengandung minimal 1 huruf besar dan 1 angka.");
+    if (
+      formData.password !== formData.confirmPassword ||
+      formData.password.length < 8 ||
+      !/[A-Z]/.test(formData.password) ||
+      !/[0-9]/.test(formData.password)
+    ) {
+      setPwAttempted(true);
       return;
     }
 
@@ -239,10 +242,21 @@ function RegisterForm() {
         navigate("/login");
       }
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          "Gagal mendaftar. Silakan coba lagi.",
-      );
+      const msg =
+        err.response?.data?.message || "Gagal mendaftar. Silakan coba lagi."
+
+      if (
+        /email sudah digunakan|sudah digunakan/i.test(msg) &&
+        emailCheck?.exists &&
+        !emailCheck?.verified
+      ) {
+        localStorage.setItem("registerEmail", formData.email.trim().toLowerCase());
+        localStorage.setItem("verifyType", "register");
+        navigate("/verify-code");
+        return
+      }
+
+      setError(msg)
       setIsLoading(false);
     }
   };
@@ -313,26 +327,6 @@ function RegisterForm() {
           </p>
         </div>
 
-        {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
-          <div className="mb-6 sm:mb-7">
-            <GoogleLogin onError={setError} />
-            <p className="mt-2 text-center text-[11px] leading-4 text-slate-400 sm:text-xs">
-              Daftar 1-klik dengan Google. Akun baru otomatis menjadi tipe{" "}
-              <strong className="text-slate-300">Umum</strong> — kamu bisa
-              upgrade ke Mahasiswa/Dosen nanti lewat halaman profil.
-            </p>
-            <div className="mt-4 flex items-center gap-3">
-              <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/15 to-white/5" />
-              <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-slate-500 min-[350px]:text-xs">
-                <span className="h-1 w-1 rounded-full bg-cyan-400/70" />
-                atau daftar manual
-                <span className="h-1 w-1 rounded-full bg-cyan-400/70" />
-              </span>
-              <span className="h-px flex-1 bg-gradient-to-l from-transparent via-white/15 to-white/5" />
-            </div>
-          </div>
-        )}
-
         <form onSubmit={handleRegister} noValidate className="flex flex-col gap-5 sm:gap-6 md:gap-8">
           {error && (
             <PopupToast
@@ -358,6 +352,7 @@ function RegisterForm() {
           )}
 
           {step === 1 && (
+            <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-3">
               {[
                 { id: "umum", label: "Umum", icon: Users },
@@ -402,6 +397,29 @@ function RegisterForm() {
                 </label>
               ))}
             </div>
+
+            {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
+              <div className="mt-0">
+                <div className="flex items-center gap-3">
+                  <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/15 to-white/5" />
+                  <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-slate-500 min-[350px]:text-xs">
+                    <span className="h-1 w-1 rounded-full bg-cyan-400/70" />
+                    atau daftar dengan
+                    <span className="h-1 w-1 rounded-full bg-cyan-400/70" />
+                  </span>
+                  <span className="h-px flex-1 bg-gradient-to-l from-transparent via-white/15 to-white/5" />
+                </div>
+                <div className="mt-6 sm:mt-7 md:mt-8">
+                  <GoogleLogin onError={setError} />
+                  <p className="mt-2 text-center text-[11px] leading-4 text-slate-400 sm:text-xs">
+                    Daftar 1-klik dengan Google. Akun baru otomatis menjadi tipe{" "}
+                    <strong className="text-slate-300">Umum</strong> — kamu bisa
+                    upgrade ke Mahasiswa/Dosen nanti lewat halaman profil.
+                  </p>
+                </div>
+              </div>
+            )}
+            </>
           )}
 
           {step === 2 && (
@@ -492,9 +510,7 @@ function RegisterForm() {
 
                 {emailCheck?.domainValid === true && !emailCheck.checking && (
                   <p className="mt-1.5 text-[11px] sm:text-xs text-slate-400">
-                    Kode verifikasi akan dikirim. Email palsu atau tidak terdaftar
-                    (mis. gmail yang tidak ada) tidak akan menerima kodenya,
-                    sehingga tidak bisa menyelesaikan pendaftaran.
+                    Kode verifikasi akan dikirim ke email tersebut.
                   </p>
                 )}
 
@@ -523,9 +539,18 @@ function RegisterForm() {
                           <strong className="font-semibold text-white">
                             {formData.email}
                           </strong>{" "}
-                          sudah pernah didaftarkan (belum terverifikasi). Gunakan
-                          email lain, atau cek kotak masuk email tersebut untuk
-                          kode verifikasi yang pernah dikirim.
+                          sudah pernah didaftarkan (belum terverifikasi).
+                          <button
+                            type="button"
+                            onClick={() => {
+                              localStorage.setItem("registerEmail", formData.email.trim().toLowerCase());
+                              localStorage.setItem("verifyType", "register");
+                              navigate("/verify-code");
+                            }}
+                            className="mt-1 block cursor-pointer rounded-lg bg-cyan-500/20 px-2.5 py-1 text-[11px] font-bold text-cyan-100 transition-colors hover:bg-cyan-500/30"
+                          >
+                            Verifikasi Sekarang
+                          </button>
                         </>
                       )}
                     </span>
@@ -722,7 +747,8 @@ function RegisterForm() {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    placeholder="Minimal 8 karakter"
+                    onKeyDown={preventEnterSubmit}
+                    placeholder="Masukkan kata sandi"
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 sm:py-3 pl-9 sm:pl-11 pr-10 sm:pr-12 text-sm text-slate-900 shadow-sm focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-cyan-500/20"
                   />
                   <button
@@ -733,6 +759,15 @@ function RegisterForm() {
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
+                {pwAttempted &&
+                  formData.password.length > 0 &&
+                  (formData.password.length < 8 ||
+                    !/[A-Z]/.test(formData.password) ||
+                    !/[0-9]/.test(formData.password)) && (
+                    <p className="mt-1.5 text-[11px] text-red-400">
+                      Minimal 8 karakter, 1 huruf besar & 1 angka.
+                    </p>
+                  )}
               </div>
               <div>
                 <label className="mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium text-slate-300">
@@ -748,6 +783,7 @@ function RegisterForm() {
                     required
                     value={formData.confirmPassword}
                     onChange={handleChange}
+                    onKeyDown={preventEnterSubmit}
                     placeholder="Ulangi kata sandi"
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 sm:py-3 pl-9 sm:pl-11 pr-10 sm:pr-12 text-sm text-slate-900 shadow-sm focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-cyan-500/20"
                   />
@@ -763,6 +799,9 @@ function RegisterForm() {
                     )}
                   </button>
                 </div>
+                {pwAttempted && formData.confirmPassword.length > 0 && formData.confirmPassword !== formData.password && (
+                  <p className="mt-1.5 text-[11px] text-red-400">Kata sandi tidak cocok.</p>
+                )}
               </div>
             </div>
           )}
@@ -812,7 +851,7 @@ function RegisterForm() {
           </div>
         </form>
 
-        <p className="mt-4 sm:mt-6 text-center text-xs sm:text-sm text-slate-400">
+        <p className="mt-3 text-center text-[11px] text-slate-400 min-[350px]:text-xs sm:mt-3 sm:text-xs">
           Sudah memiliki akun?
           <Link
             to="/login"

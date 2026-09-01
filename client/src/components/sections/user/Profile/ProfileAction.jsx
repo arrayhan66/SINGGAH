@@ -141,7 +141,7 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
   return (
     <div className="relative flex flex-col gap-3">
       {/* Success Toast */}
-      <PopupToast show={showSuccess} variant="success" onClose={() => {}}>
+      <PopupToast show={showSuccess} variant="success" onClose={() => {}} duration={2500}>
         <div className="px-4 py-3.5 text-center">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 border border-emerald-500/30">

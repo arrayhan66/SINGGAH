@@ -1,6 +1,7 @@
 import { useAuth } from "../../../../context/AuthContext"
-import { UserCircle, GraduationCap, Briefcase, Users, CreditCard, Shield } from "lucide-react"
+import { GraduationCap, Briefcase, Users, CreditCard, Shield } from "lucide-react"
 import AdminHeroBackground from "../../../ui/AdminHeroBackground"
+import UserAvatar from "../../../ui/UserAvatar"
 
 const tipeIcon = {
   admin: Shield,
@@ -9,6 +10,9 @@ const tipeIcon = {
   umum: Users,
 }
 
+const heroSize =
+  "h-16 w-16 min-[350px]:h-20 min-[350px]:w-20 md:h-28 md:w-28 lg:h-32 lg:w-32 2xl:h-36 2xl:w-36"
+
 function ProfileHero({ isAdmin = false }) {
   const { user } = useAuth()
   const TipeIcon = user?.role === "admin" ? Shield : tipeIcon[user?.tipe] || Users
@@ -16,17 +20,14 @@ function ProfileHero({ isAdmin = false }) {
   const content = (
     <>
       <div className="relative">
-        {user?.avatar ? (
-          <img
-            src={user.avatar}
-            alt={user.name}
-            className="h-20 w-20 min-[350px]:h-24 min-[350px]:w-24 md:h-[120px] md:w-[120px] lg:h-36 lg:w-36 2xl:h-40 2xl:w-40 rounded-full border-2 border-white/10 object-cover"
-          />
-        ) : (
-          <div className="flex h-16 w-16 min-[350px]:h-20 min-[350px]:w-20 md:h-28 md:w-28 lg:h-32 lg:w-32 2xl:h-36 2xl:w-36 items-center justify-center rounded-full bg-cyan-400/10 border border-cyan-400/30">
-            <UserCircle className="h-8 w-8 min-[350px]:h-10 min-[350px]:w-10 md:h-14 md:w-14 lg:h-16 lg:w-16 2xl:h-[72px] 2xl:w-[72px] text-cyan-300" />
-          </div>
-        )}
+        <UserAvatar
+          name={user?.name}
+          avatar={user?.avatar}
+          imgSizeClass={`${heroSize} border-2 border-white/10`}
+          fallbackSizeClass={heroSize}
+          fallbackClass="bg-gradient-to-br from-cyan-400 to-blue-600 font-bold text-white border border-cyan-400/30"
+          textClass="text-xl min-[350px]:text-2xl md:text-4xl lg:text-5xl 2xl:text-6xl"
+        />
       </div>
 
       <h1 className="mt-3 min-[350px]:mt-4 md:mt-4 text-xl min-[350px]:text-2xl md:text-3xl lg:text-4xl 2xl:text-5xl font-black text-white lg:mt-5 2xl:mt-6">

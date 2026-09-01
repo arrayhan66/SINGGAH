@@ -7,7 +7,7 @@ function SuccessPopup({
   message = "Password akun Anda telah berhasil diubah.",
 }) {
   return (
-    <PopupToast show={isOpen} variant="success" onClose={() => {}}>
+    <PopupToast show={isOpen} variant="success" onClose={() => {}} duration={2500}>
       <div className="px-4 py-3.5">
         <div className="flex items-start gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 border border-emerald-500/30">

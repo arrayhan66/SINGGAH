@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Pencil } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import logo from "../../../../assets/icons/logo.webp";
 import FormAlert from "../../../ui/FormAlert";
 import SuccessPopup from "../../../ui/SuccessPopup";
@@ -154,7 +154,7 @@ function VerifyCodeForm() {
         if (!status.exists) {
           setAlert({
             message:
-              "Email ini tidak terdaftar di sistem — kemungkinan terjadi salah ketik saat mendaftar. Klik 'Ganti Email' untuk memperbaikinya.",
+              "Email ini tidak terdaftar di sistem — pastikan jika kamu baru mendaftar, email yang kamu pakai sama dengan yang di verifikasi.",
             type: "error",
           });
         } else if (status.verified) {
@@ -172,12 +172,6 @@ function VerifyCodeForm() {
     checkEmail();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleChangeEmail = () => {
-    localStorage.removeItem("registerEmail");
-    localStorage.removeItem("verifyType");
-    navigate("/register");
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -222,6 +216,40 @@ function VerifyCodeForm() {
         }
 
         setShowSuccess(true);
+
+        let pendingLogin = null
+        try {
+          pendingLogin = JSON.parse(
+            sessionStorage.getItem("verifyPendingLogin") || "null",
+          )
+        } catch {
+          pendingLogin = null
+        }
+
+        if (pendingLogin?.email && pendingLogin?.password) {
+          try {
+            const lr = await api.post("/auth/login", {
+              email: pendingLogin.email,
+              password: pendingLogin.password,
+            })
+            const { token: lrToken, user: lrUser } = lr.data.data
+            sessionStorage.removeItem("verifyPendingLogin")
+            login(lrUser, lrToken)
+            setTimeout(() => {
+              navigate(lrUser.role === "admin" ? "/admin" : "/", {
+                replace: true,
+              })
+            }, 2500)
+            return
+          } catch {
+            sessionStorage.removeItem("verifyPendingLogin")
+            setTimeout(() => {
+              navigate("/login")
+            }, 2500)
+            return
+          }
+        }
+
         setTimeout(() => {
           navigate("/login");
         }, 2500);
@@ -297,7 +325,7 @@ function VerifyCodeForm() {
           setIsResending(false);
           setAlert({
             message:
-              "Email ini tidak terdaftar di sistem — kemungkinan terjadi salah ketik saat mendaftar. Klik 'Ganti Email' untuk memperbaikinya.",
+              "Email ini tidak terdaftar di sistem — pastikan jika kamu baru mendaftar, email yang kamu pakai sama dengan yang di verifikasi.",
             type: "error",
           });
           return;
@@ -336,7 +364,7 @@ function VerifyCodeForm() {
         }
       />
 
-      <div className="flex w-full flex-col justify-center px-4 py-5 sm:p-10 lg:w-1/2 lg:px-16 lg:py-12 2xl:px-20">
+      <div className="flex w-full min-h-full flex-col items-center justify-center px-4 py-5 sm:px-10 sm:pt-12 sm:pb-6 lg:w-1/2 lg:px-16 lg:pt-14 lg:pb-6 2xl:px-20">
       <div className="mb-8 flex items-center justify-between sm:mb-12 lg:hidden">
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-100/30 bg-white/10 p-3 shadow-md backdrop-blur-md sm:h-16 sm:w-16 sm:p-3.5">
@@ -423,45 +451,32 @@ function VerifyCodeForm() {
             )}
           </span>
         </button>
-      </form>
 
-      <div className="-mt-6 sm:-mt-8 lg:-mt-10 flex items-center justify-center gap-1.5 text-xs text-slate-400 min-[350px]:text-sm">
-        <span>Belum menerima kode?</span>
-        <button
-          type="button"
-          onClick={handleResend}
-          disabled={countdown > 0 || isResending}
-          className={`inline-flex items-center gap-1.5 font-bold transition-all duration-300 ${
-            countdown > 0 || isResending
-              ? "cursor-not-allowed text-slate-500"
-              : "cursor-pointer text-cyan-400 hover:scale-105 hover:text-cyan-300 hover:underline hover:underline-offset-2 active:scale-95"
-          }`}
-        >
-          {isResending ? (
-            <>
-              <span className="h-3 w-3 animate-spin rounded-full border-2 border-slate-500/30 border-t-slate-500" />
-              <span>Mengirim...</span>
-            </>
-          ) : countdown > 0 ? (
-            `Tunggu ${countdown}s`
-          ) : (
-            "Kirim ulang"
-          )}
-        </button>
-      </div>
-
-      {verifyType === "register" && (
-        <div className="mt-3 flex items-center justify-center">
+        <div className="mt-3 flex items-center justify-center gap-1.5 text-[11px] text-slate-400 min-[350px]:text-xs sm:mt-3">
+          <span>Belum menerima kode?</span>
           <button
             type="button"
-            onClick={handleChangeEmail}
-            className="inline-flex cursor-pointer items-center gap-1 text-xs font-semibold text-cyan-400 transition-colors hover:text-cyan-300 hover:underline hover:underline-offset-2 sm:text-sm"
+            onClick={handleResend}
+            disabled={countdown > 0 || isResending}
+            className={`inline-flex items-center gap-1.5 font-bold transition-all duration-300 ${
+              countdown > 0 || isResending
+                ? "cursor-not-allowed text-slate-500"
+                : "cursor-pointer text-cyan-400 hover:scale-105 hover:text-cyan-300 hover:underline hover:underline-offset-2 active:scale-95"
+            }`}
           >
-            <Pencil className="h-3.5 w-3.5" />
-            Ganti Email
+            {isResending ? (
+              <>
+                <span className="h-3 w-3 animate-spin rounded-full border-2 border-slate-500/30 border-t-slate-500" />
+                <span>Mengirim...</span>
+              </>
+            ) : countdown > 0 ? (
+              `Tunggu ${countdown}s`
+            ) : (
+              "Kirim ulang"
+            )}
           </button>
         </div>
-      )}
+      </form>
 
       {showPending && (
         <VerificationPendingModal

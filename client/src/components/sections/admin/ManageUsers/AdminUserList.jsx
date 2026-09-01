@@ -5,6 +5,7 @@ import { useUsers } from "../../../../context/UserContext"
 import AdminUserDeleteModal from "./AdminUserDeleteModal"
 import AdminUserTipeModal from "./AdminUserTipeModal"
 import ShowMoreButton from "../../../ui/ShowMoreButton"
+import UserAvatar from "../../../ui/UserAvatar"
 
 const INITIAL_VISIBLE = 10
 
@@ -165,19 +166,15 @@ function AdminUserList({ search, statusFilter }) {
                           <td className="px-4 py-3.5">
                             <div className="flex items-center gap-3">
                               <div className="relative shrink-0">
-                                <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-cyan-500 to-blue-700 shadow-md">
-                                  {user.avatar ? (
-                                    <img
-                                      src={user.avatar}
-                                      alt={user.name}
-                                      className="h-full w-full object-cover"
-                                    />
-                                  ) : (
-                                    <span className="text-sm font-bold text-white">
-                                      {user.name?.charAt(0)?.toUpperCase() || "?"}
-                                    </span>
-                                  )}
-                                </div>
+                                <UserAvatar
+                                  name={user.name}
+                                  avatar={user.avatar}
+                                  imgSizeClass="h-11 w-11 border border-white/10"
+                                  imgClass="rounded-xl"
+                                  fallbackSizeClass="h-11 w-11"
+                                  fallbackClass="bg-gradient-to-br from-cyan-500 to-blue-700 font-bold text-white border border-white/10"
+                                  textClass="text-sm"
+                                />
                                 {isPending ? (
                                   <div className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 shadow">
                                     <Hourglass className="h-2.5 w-2.5 text-white" />

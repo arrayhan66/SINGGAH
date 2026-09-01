@@ -1,10 +1,10 @@
 import { NavLink } from "react-router-dom";
 import { ArrowUpRight, LogOut } from "lucide-react";
+import UserAvatar from "../ui/UserAvatar";
 
 export default function MobileMenu({
   isOpen,
   user,
-  initials,
   name,
   roleLabel,
   roleBadgeClass,
@@ -47,17 +47,14 @@ export default function MobileMenu({
 
         <div className="relative flex items-center gap-3 border-b border-white/10 p-4">
           <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 text-sm font-bold text-white">
-            <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full">
-              {user?.avatar ? (
-                <img
-                  src={user.avatar}
-                  alt={user.name}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                initials
-              )}
-            </div>
+            <UserAvatar
+              name={user?.name}
+              avatar={user?.avatar}
+              className="h-full w-full"
+              imgSizeClass="h-full w-full"
+              fallbackSizeClass="h-full w-full"
+              textClass="text-sm font-bold"
+            />
             <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-[1.5px] border-brand-dark bg-emerald-400" />
           </div>
           <div>

@@ -135,17 +135,17 @@ function ForgotPasswordForm() {
             )}
           </span>
         </button>
-      </form>
 
-      <p className="-mt-6 sm:-mt-8 lg:-mt-10 text-center text-xs text-slate-400 min-[350px]:text-sm">
-        Ingat password?
-        <Link
-          to="/login"
-          className="ml-1.5 font-bold text-cyan-400 transition-colors hover:text-cyan-300 hover:underline"
-        >
-          Masuk
-        </Link>
-      </p>
+        <p className="mt-3 text-center text-[11px] text-slate-400 min-[350px]:text-xs sm:mt-3">
+          Ingat password?
+          <Link
+            to="/login"
+            className="ml-1.5 font-bold text-cyan-400 transition-colors hover:text-cyan-300 hover:underline"
+          >
+            Masuk
+          </Link>
+        </p>
+      </form>
     </div>
   );
 }

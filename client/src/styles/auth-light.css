@@ -443,3 +443,15 @@ html.light .auth-page .h-px.bg-gradient-to-l {
     transparent
   );
 }
+/* "atau" label divider -> abu gelap agar terlihat di kartu putih */
+html.light .auth-page .auth-divider-label {
+  color: #64748b;
+}
+html.light .auth-page .auth-divider-line {
+  background-image: linear-gradient(
+    to right,
+    transparent,
+    #94a3b8,
+    transparent
+  ) !important;
+}

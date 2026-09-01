@@ -10,6 +10,7 @@ import DeleteConfirmModal from "../ui/DeleteConfirmModal"
 import NotificationDetailModal from "../ui/NotificationDetailModal"
 import AnnouncementModal from "../ui/AnnouncementModal"
 import ThemeToggle from "../ui/ThemeToggle"
+import UserAvatar from "../ui/UserAvatar"
 import { sendAnnouncement } from "../../services/notificationService"
 
 const roleLabels = {
@@ -59,13 +60,6 @@ function AdminNavbar() {
   const name = user?.name || "Admin"
   const role = user?.role || "admin"
   const { label: roleLabel, class: roleClass } = roleLabels[role] || roleLabels.admin
-
-  const initials = name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2)
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -197,11 +191,14 @@ function AdminNavbar() {
             className="flex cursor-pointer items-center gap-1.5 min-[260px]:gap-1 5xl:gap-2.5 rounded-md min-[360px]:rounded-lg 5xl:rounded-xl px-1.5 min-[360px]:px-2 5xl:px-3 py-1 transition-colors hover:bg-white/5"
           >
             <div className="flex h-5 min-[320px]:h-6 min-[400px]:h-8 5xl:h-10 6xl:h-12 w-5 min-[320px]:w-6 min-[400px]:w-8 5xl:w-10 6xl:w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 text-[8px] min-[320px]:text-[9px] min-[400px]:text-[11px] 5xl:text-sm 6xl:text-base font-semibold text-white ring-2 ring-white/10">
-              {user?.avatar ? (
-                <img src={user.avatar} alt={name} className="h-full w-full rounded-full object-cover" />
-              ) : (
-                initials
-              )}
+              <UserAvatar
+                name={name}
+                avatar={user?.avatar}
+                className="h-full w-full"
+                imgSizeClass="h-full w-full"
+                fallbackSizeClass="h-full w-full"
+                textClass="text-[8px] min-[320px]:text-[9px] min-[400px]:text-[11px] 5xl:text-sm 6xl:text-base font-semibold"
+              />
             </div>
             <span className="hidden min-[400px]:block text-xs min-[400px]:text-sm 5xl:text-base 6xl:text-lg font-medium text-white">{name}</span>
             <ChevronDown size={14} className={`hidden min-[400px]:block text-slate-500 transition-transform duration-200 ${isProfileOpen ? "rotate-180" : ""}`} />

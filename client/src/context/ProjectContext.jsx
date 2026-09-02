@@ -5,8 +5,10 @@ const ProjectContext = createContext(null)
 
 export function ProjectProvider({ children }) {
   const [projects, setProjects] = useState([])
+  const [loading, setLoading] = useState(true)
 
   const fetchProjects = useCallback(async () => {
+    setLoading(true)
     try {
       const res = await api.get("/projects")
       const items = res.data.data.items || res.data.data || []
@@ -14,6 +16,8 @@ export function ProjectProvider({ children }) {
     } catch (err) {
       console.error("Failed to fetch projects:", err)
       setProjects([])
+    } finally {
+      setLoading(false)
     }
   }, [])
 
@@ -98,6 +102,7 @@ export function ProjectProvider({ children }) {
 
   const value = {
     projects,
+    loading,
     addProject,
     updateProject,
     deleteProject,

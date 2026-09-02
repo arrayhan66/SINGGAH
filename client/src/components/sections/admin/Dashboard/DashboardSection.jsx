@@ -3,8 +3,18 @@ import DashboardPendingProjects from "./DashboardPendingProjects"
 import DashboardApprovedProjects from "./DashboardApprovedProjects"
 import DashboardActivityFeed from "./DashboardActivityFeed"
 import DashboardLatestNews from "./DashboardLatestNews"
+import { useProjects } from "../../../../context/ProjectContext"
+import { useBerita } from "../../../../context/BeritaContext"
+import { AdminDashboardSkeleton } from "../../../ui/PageSkeletons"
 
 export default function DashboardSection() {
+  const { loading: projectsLoading } = useProjects()
+  const { loading: beritaLoading } = useBerita()
+
+  if (projectsLoading || beritaLoading) {
+    return <AdminDashboardSkeleton />
+  }
+
   return (
     <div className="space-y-6 md:space-y-7 lg:space-y-8 pb-12 md:pb-16">
       <AdminHero />

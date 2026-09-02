@@ -236,6 +236,25 @@ html.light .to-cyan-500\/20 {
   --tw-gradient-to: #dbeafe;
 }
 
+/* ===== LONCENG/MODAL NOTIFIKASI ===== */
+/* Tombol aksi utama modal detail notif: gradasi biru + teks putih
+   di light mode (dark mode tetap teks brand-dark di atas cyan) */
+html.light .notification-detail-cta {
+  color: #ffffff;
+}
+
+/* Tile ikon tipe notifikasi di light mode:
+   gaya dark (gradasi + ring + glow) diganti permukaan putih besih
+   agar tidak "bawa gaya dark" ke mode terang. Ikon tetap berwarna. */
+html.light .notification-type-tile {
+  background: linear-gradient(160deg, #ffffff 0%, #eff5fc 100%);
+  border: 1px solid #dbe6f6;
+  box-shadow: 0 4px 12px -6px rgba(37, 99, 235, 0.22);
+}
+html.light .notification-type-tile svg {
+  filter: none;
+}
+
 /* ===== TINT STATUS (toast, badge, alert) ===== */
 html.light .bg-emerald-500\/10 {
   background-color: #ecfdf5;
@@ -415,13 +434,40 @@ html.light .bg-gradient-to-r.from-cyan-400\/20.via-blue-500\/20.to-purple-500\/2
    shimmer biru yang jelas kelihatan di atas permukaan off-white
    (shimmer putih tidak kontras). Dark mode tetap pakai utilitas dasar. */
 html.light .skeleton {
-  background-color: rgba(37, 99, 235, 0.08);
+  background-color: rgba(37, 99, 235, 0.14);
   background-image: linear-gradient(
     90deg,
     rgba(37, 99, 235, 0) 0%,
-    rgba(37, 99, 235, 0.16) 50%,
+    rgba(37, 99, 235, 0.3) 50%,
     rgba(37, 99, 235, 0) 100%
   );
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.18);
+}
+
+/* ===== KARTU SHELL WIREFRAME (canvas skeleton per-halaman) ===== */
+/* Kartu kosong jadi "kanvas" kerangka loading yang meniru konten
+   asli. Di dark mode memakai bg-white/[0.04] + border-white/10
+   (sudah terlihat); di light mode tint biru semi-transparan. */
+html.light .skeleton-card {
+  background-color: rgba(37, 99, 235, 0.05);
+  border-color: rgba(37, 99, 235, 0.16);
+}
+
+/* ===== WIREFRAME VIDEO YOUTUBE DI ARTIKEL (detail berita) ===== */
+/* iframe transparan selama konten belum siap -> skeleton shimmer
+   berdiri di belakangnya dan terbaca jelas di mode terang. */
+html.light .berita-detail-page .prose iframe {
+  background-color: rgba(37, 99, 235, 0.12);
+  background-image: linear-gradient(
+    90deg,
+    rgba(37, 99, 235, 0) 0%,
+    rgba(37, 99, 235, 0.28) 50%,
+    rgba(37, 99, 235, 0) 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.16);
 }
 
 /* ===== WIREFRAME LOADING ADMIN (animate-pulse) ===== */
@@ -667,6 +713,43 @@ html.light footer .hover\:text-cyan-300:hover {
 }
 
 /* ============================================================
+   HALAMAN UPLOAD KARYA (light mode)
+   Form & placeholder upload (thumbnail, galeri, dokumen) dibuat
+   putih murni #fff. Hover dropzone yang tadinya cyan/blue diganti
+   netral slate supaya tidak "meledak warna" saat diarahi mouse.
+   Dark mode tidak tersentuh (hanya aktif dalam html.light).
+   ============================================================ */
+html.light .upload-page .bg-white\/5 {
+  background-color: #ffffff;
+}
+html.light .upload-page .bg-slate-50 {
+  background-color: #ffffff;
+}
+html.light .upload-page .hover\:bg-cyan-50:hover {
+  background-color: #f1f5f9;
+}
+html.light .upload-page .hover\:border-cyan-400:hover {
+  border-color: #94a3b8;
+}
+html.light .upload-page .hover\:text-cyan-200:hover,
+html.light .upload-page .hover\:text-cyan-300:hover {
+  color: #1d4ed8;
+}
+html.light .upload-page .hover\:text-cyan-600:hover {
+  color: #334155;
+}
+html.light .upload-page .bg-cyan-100 {
+  background-color: #f8fafc;
+}
+html.light .upload-page .border-cyan-500 {
+  border-color: #94a3b8;
+}
+html.light .upload-page .text-cyan-500,
+html.light .upload-page .text-cyan-600 {
+  color: #475569;
+}
+
+/* ============================================================
    PATCH KONTRAS LIGHT MODE (finishing tambahan)
    ============================================================ */
 
@@ -742,4 +825,72 @@ html.light .via-brand-navy {
 }
 html.light .via-brand-dark {
   --tw-gradient-via: #f7fafd;
+}
+
+/* ============================================================
+   PATCH KONTRAS LIGHT MODE — SEKSI KOMENTAR
+   ============================================================ */
+
+/* Tombol submit (Kirim Komentar / Kirim Balasan / Simpan):
+   bg-cyan solid -> biru tua di light mode, teks slate-950 gelap
+   jadi nyaris tak terbaca -> diputihkan */
+html.light .bg-cyan-500.text-slate-950,
+html.light .bg-cyan-400.text-slate-950 {
+  color: #ffffff;
+}
+/* Hover tombol submit biru solid -> biru lebih tua (bukan cyan) */
+html.light .hover\:bg-cyan-400:hover,
+html.light .hover\:bg-cyan-300:hover {
+  background-color: #1d4ed8;
+}
+
+/* Tombol "Hapus" konfirmasi (merah solid) -> teks ikut diputihkan */
+html.light .bg-rose-500.text-white,
+html.light .bg-rose-400.text-white {
+  color: #ffffff;
+}
+
+/* Teks aksen cyan fraksi (Balas, mention @user) yang belum
+   ke-match rule .text-cyan-300 solid -> biru tua konsisten tema */
+html.light .text-cyan-300\/70,
+html.light .text-cyan-300\/75,
+html.light .text-cyan-300\/80,
+html.light .text-cyan-300\/90 {
+  color: #2563eb;
+}
+
+/* Tombol Hapus (komentar/balasan): saat hover teks jadi MERAH
+   senada dark mode, bukan rose muda yang pudar di atas putih */
+html.light .hover\:text-rose-400:hover,
+html.light .hover\:text-rose-500:hover {
+  color: #e11d48;
+}
+html.light .hover\:bg-rose-500\/10:hover {
+  background-color: #fff1f2;
+}
+
+/* Kotak konfirmasi "Hapus ...?" di light -> tint merah muda jelas,
+   teks & ikon merah tua yang terbaca di atas putih */
+html.light .border-rose-400\/30,
+html.light .border-rose-500\/30 {
+  border-color: #fecdd3;
+}
+html.light .bg-rose-500\/10 {
+  background-color: #fff1f2;
+}
+html.light .text-rose-200 {
+  color: #be123c;
+}
+html.light .bg-rose-500 {
+  background-color: #e11d48;
+}
+
+/* Garis benang balasan (border-l cyan) di light mode -> biru muda */
+html.light .border-cyan-400\/15 {
+  border-color: #bfdbfe;
+}
+/* Hover kartu komentar: border putih tak terlihat di atas permukaan
+   putih -> diganti garis biru muda supaya terbaca */
+html.light .hover\:border-white\/15:hover {
+  border-color: #93c5fd;
 }

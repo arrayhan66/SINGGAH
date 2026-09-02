@@ -278,6 +278,176 @@ html {
   }
 }
 
+/* ============================================================
+   LONCENG NOTIFIKASI (NotificationBell) — DARK DEFAULT
+   ============================================================ */
+.notification-bell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  cursor: pointer;
+  color: #7dd3fc;
+  background: linear-gradient(180deg, #16395c 0%, #0d2747 48%, #0a2039 100%);
+  border: 1px solid rgba(148, 180, 226, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -6px 12px rgba(2, 10, 26, 0.45),
+    0 4px 10px -4px rgba(2, 10, 26, 0.6);
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.notification-bell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at 50% -20%,
+    rgba(186, 230, 253, 0.16),
+    transparent 55%
+  );
+  pointer-events: none;
+}
+.notification-bell:hover {
+  color: #67e8f9;
+  border-color: rgba(103, 232, 249, 0.42);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -6px 12px rgba(2, 10, 26, 0.4),
+    0 8px 20px -6px rgba(34, 211, 238, 0.38);
+}
+.notification-bell:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.notification-bell .notification-bell-icon {
+  position: relative;
+  z-index: 1;
+  transform-origin: 50% 0%;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.notification-bell:hover .notification-bell-icon {
+  transform: rotate(-12deg) scale(1.08);
+}
+.notification-bell.has-unread {
+  color: #67e8f9;
+  border-color: rgba(103, 232, 249, 0.32);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -6px 12px rgba(2, 10, 26, 0.4),
+    0 0 0 1px rgba(34, 211, 238, 0.08),
+    0 6px 18px -6px rgba(34, 211, 238, 0.42);
+}
+.notification-bell.has-unread .notification-bell-icon {
+  animation: bell-ring 2.6s ease-in-out 0.9s infinite;
+}
+
+.notification-bell .notification-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 17px;
+  min-width: 17px;
+  padding: 0 4px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: #ffffff;
+  background: linear-gradient(180deg, #fb7185 0%, #e11d48 62%, #be123c 100%);
+  box-shadow:
+    0 0 0 2px rgba(6, 26, 51, 0.9),
+    0 3px 8px -2px rgba(225, 29, 72, 0.7);
+}
+.notification-bell .notification-badge::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.38),
+    transparent 46%
+  );
+  pointer-events: none;
+}
+
+@keyframes bell-ring {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  10% {
+    transform: rotate(-14deg);
+  }
+  20% {
+    transform: rotate(12deg);
+  }
+  30% {
+    transform: rotate(-9deg);
+  }
+  40% {
+    transform: rotate(6deg);
+  }
+  50% {
+    transform: rotate(0);
+  }
+}
+
+/* ===== DROPDOWN MOBILE: GARIS PEMISAH MENU ===== */
+.menu-divider-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.45));
+}
+.menu-divider-line-start {
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.45));
+}
+.menu-divider-line-end {
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.45), transparent);
+}
+
+/* Label seksi pemisah: teks kecil di tengah garis */
+.menu-section-label-text {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+  white-space: nowrap;
+  text-shadow: 0 0 10px rgba(34, 211, 238, 0.35);
+}
+
+/* ===== DROPDOWN MOBILE: KARTU ITEM ===== */
+.mobile-menu-item.border-cyan-400\/30 .mobile-menu-item-label {
+  color: #67e8f9;
+}
+.mobile-menu-item.border-cyan-400\/30 .pointer-events-none {
+  opacity: 1 !important;
+}
+.mobile-menu-item.border-cyan-400\/30 svg {
+  color: #67e8f9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notification-bell.has-unread .notification-bell-icon {
+    animation: none;
+  }
+  .notification-bell:hover .notification-bell-icon {
+    transform: none;
+  }
+}
+
 body {
   font-family: "Poppins", sans-serif;
   background: #041d38;

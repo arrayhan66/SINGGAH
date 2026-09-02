@@ -34,44 +34,59 @@ const typeLabel = {
   tipe_rejected: "Verifikasi Ditolak",
 }
 
+import {
+  Heart,
+  MessageCircle,
+  BadgeCheck,
+  XCircle,
+  Sparkles,
+  Pencil,
+  Trash2,
+  Megaphone,
+  UserPlus,
+  IdCard,
+  ShieldX,
+  Bell,
+} from "lucide-react"
+
 const iconMap = {
-  like: "♡",
-  comment: "💬",
-  project_approved: "✓",
-  project_rejected: "✗",
-  new_project: "🆕",
-  project_updated: "✎",
-  project_deleted: "🗑",
-  announcement: "📢",
-  user_registered: "📝",
-  tipe_approved: "🪪",
-  tipe_rejected: "🚫",
+  like: Heart,
+  comment: MessageCircle,
+  project_approved: BadgeCheck,
+  project_rejected: XCircle,
+  new_project: Sparkles,
+  project_updated: Pencil,
+  project_deleted: Trash2,
+  announcement: Megaphone,
+  user_registered: UserPlus,
+  tipe_approved: IdCard,
+  tipe_rejected: ShieldX,
 }
 
 const bgMap = {
-  like: "bg-pink-500/15",
-  comment: "bg-blue-500/15",
-  project_approved: "bg-emerald-500/15",
-  project_rejected: "bg-red-500/15",
-  new_project: "bg-indigo-500/15",
-  project_updated: "bg-cyan-500/15",
-  project_deleted: "bg-orange-500/15",
-  announcement: "bg-amber-500/15",
-  user_registered: "bg-indigo-500/15",
-  tipe_approved: "bg-emerald-500/15",
-  tipe_rejected: "bg-red-500/15",
+  like: "bg-gradient-to-br from-pink-500/25 to-rose-500/10 ring-1 ring-inset ring-pink-400/30 shadow-lg shadow-pink-500/10",
+  comment: "bg-gradient-to-br from-sky-500/25 to-blue-500/10 ring-1 ring-inset ring-sky-400/30 shadow-lg shadow-sky-500/10",
+  project_approved: "bg-gradient-to-br from-emerald-500/25 to-teal-500/10 ring-1 ring-inset ring-emerald-400/30 shadow-lg shadow-emerald-500/10",
+  project_rejected: "bg-gradient-to-br from-red-500/25 to-rose-500/10 ring-1 ring-inset ring-red-400/30 shadow-lg shadow-red-500/10",
+  new_project: "bg-gradient-to-br from-indigo-500/25 to-violet-500/10 ring-1 ring-inset ring-indigo-400/30 shadow-lg shadow-indigo-500/10",
+  project_updated: "bg-gradient-to-br from-cyan-500/25 to-blue-500/10 ring-1 ring-inset ring-cyan-400/40 shadow-lg shadow-cyan-500/10",
+  project_deleted: "bg-gradient-to-br from-orange-500/25 to-amber-500/10 ring-1 ring-inset ring-orange-400/30 shadow-lg shadow-orange-500/10",
+  announcement: "bg-gradient-to-br from-amber-500/25 to-yellow-500/10 ring-1 ring-inset ring-amber-400/30 shadow-lg shadow-amber-500/10",
+  user_registered: "bg-gradient-to-br from-fuchsia-500/25 to-purple-500/10 ring-1 ring-inset ring-fuchsia-400/30 shadow-lg shadow-fuchsia-500/10",
+  tipe_approved: "bg-gradient-to-br from-emerald-500/25 to-teal-500/10 ring-1 ring-inset ring-emerald-400/30 shadow-lg shadow-emerald-500/10",
+  tipe_rejected: "bg-gradient-to-br from-red-500/25 to-rose-500/10 ring-1 ring-inset ring-red-400/30 shadow-lg shadow-red-500/10",
 }
 
 const textMap = {
   like: "text-pink-400",
-  comment: "text-blue-400",
+  comment: "text-sky-400",
   project_approved: "text-emerald-400",
   project_rejected: "text-red-400",
   new_project: "text-indigo-400",
   project_updated: "text-cyan-400",
   project_deleted: "text-orange-400",
   announcement: "text-amber-400",
-  user_registered: "text-indigo-400",
+  user_registered: "text-fuchsia-400",
   tipe_approved: "text-emerald-400",
   tipe_rejected: "text-red-400",
 }
@@ -81,11 +96,14 @@ export function notifTypeLabel(type) {
 }
 
 export function notifIcon(type) {
-  return iconMap[type] || "🔔"
+  return iconMap[type] || Bell
 }
 
 export function notifBg(type) {
-  return bgMap[type] || "bg-slate-500/15"
+  return (
+    bgMap[type] ||
+    "bg-gradient-to-br from-slate-500/25 to-slate-600/10 ring-1 ring-inset ring-slate-400/30 shadow-lg shadow-slate-500/10"
+  )
 }
 
 export function notifText(type) {

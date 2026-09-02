@@ -5,6 +5,17 @@
    ============================================================ */
 @import "./light-shared.css";
 
+/* ===== MENTION @user DI KOMENTAR ===== */
+/* Light mode: accent cyan jadi #2563eb (terlalu biru/nyala utk teks
+   mention). Diredam ke biru kalem agar tidak menonjol/terlihat besar. */
+html.light
+  .karya-projectdetail-page
+  #komentar
+  p
+  > span.font-medium.text-cyan-300\/70 {
+  color: #2f6ea3;
+}
+
 /* ===== SECTION BACKGROUND ===== */
 /* Grid kotak-kotak lembut & buram — senada dengan halaman Karya.
    Berlaku utk: Karya Detail (#karya-detail), Project Detail
@@ -310,7 +321,10 @@ html.light .karya-detail-page .focus-within\:shadow-cyan-400\/30:focus-within {
 }
 
 /* ===== TOMBOL KEMBALI / AKSI ===== */
-html.light .detail-page button svg {
+/* Hanya dalam area konten (main). Navbar + dropdown notifikasi yang
+   punya warna ikon sendiri (bell, tile tipe, aksi) tidak boleh
+   disamakan jadi inherit agar warnanya tidak hilang. */
+html.light .detail-page main button svg {
   color: inherit;
 }
 
@@ -568,7 +582,22 @@ html.light .karya-detail-page h3.text-white {
 /* Garis pemisah statistik (like/komentar/views): tipis kebiruan,
    menyatu dengan border bingkai gambar */
 html.light .karya-detail-page .border-t.border-slate-700\/50 {
-  border-color: #e3ebf7;
+  border-color: #b8c7de;
+}
+
+/* Garis pemisah antar section card project detail (Tim Pengembang,
+   Teknologi yang Digunakan, dst.) -> dipertegas supaya jelas
+   terlihat di atas permukaan putih */
+html.light .karya-projectdetail-page .border-t.border-white\/10 {
+  border-color: #b3c6e0;
+}
+/* Garis di bawah tombol aksi (Suka / Bagikan / Simpan) -> dipertegas */
+html.light .karya-projectdetail-page .border-b.border-white\/10 {
+  border-color: #a8c0e0;
+}
+/* Card Komentar: tepi biru lebih tegas sebagai pembatas antar section */
+html.light .karya-projectdetail-page #komentar {
+  border-color: #a2c1e9;
 }
 
 /* Tombol "Lihat Detail": DATAR dengan WARNA ASLI (gradasi cyan ->

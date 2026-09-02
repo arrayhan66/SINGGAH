@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { Loader, AlertCircle } from "lucide-react"
+import { AlertCircle } from "lucide-react"
 import GlowBackground from "../../../ui/GlowBackground"
 import DustBackground from "../../../ui/DustBackground"
 import UploadThumbnail from "../Upload/UploadThumbnail"
@@ -13,6 +13,7 @@ import UploadAction from "../Upload/UploadAction"
 import api from "../../../../services/api"
 import { useProjects } from "../../../../context/ProjectContext"
 import SubmitSuccessModal from "../../../ui/SubmitSuccessModal"
+import { EditKaryaFormSkeleton } from "../../../ui/PageSkeletons"
 
 function EditKaryaSection({ redirectPath = "/my-karya" }) {
   const { slug } = useParams()
@@ -170,11 +171,10 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
 
   if (loading) {
     return (
-      <section className="relative flex min-h-screen items-center justify-center bg-brand-navy">
-        <div className="flex flex-col items-center gap-4">
-          <Loader className="h-8 w-8 animate-spin text-cyan-400" />
-          <p className="text-sm text-slate-400">Memuat data karya...</p>
-        </div>
+      <section className="relative min-h-screen overflow-hidden bg-brand-dark px-4 py-10 sm:py-12 md:px-8 lg:px-12 2xl:px-16 3xl:px-20 4xl:px-24">
+        <GlowBackground />
+        <DustBackground />
+        <EditKaryaFormSkeleton />
       </section>
     )
   }

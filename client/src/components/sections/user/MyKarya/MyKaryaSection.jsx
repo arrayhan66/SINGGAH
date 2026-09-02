@@ -8,7 +8,7 @@ import MyKaryaCard from "./MyKaryaCard"
 import MyKaryaDeleteModal from "./MyKaryaDeleteModal"
 import { FolderX, CheckCircle2 } from "lucide-react"
 import OutlineButton from "../../../ui/OutlineButton"
-import { ProjectGridSkeleton } from "../../../ui/Skeleton"
+import { MyKaryaPageSkeleton } from "../../../ui/PageSkeletons"
 import { useAuth } from "../../../../context/AuthContext"
 import PopupToast from "../../../ui/PopupToast"
 import api from "../../../../services/api"
@@ -108,53 +108,55 @@ function MyKaryaSection() {
         <DustBackground />
 
         <div className="mx-auto max-w-7xl px-5 sm:px-8 relative 2xl:max-w-[1440px] 2xl:px-12 3xl:max-w-[1800px] 3xl:px-16 4xl:max-w-[2200px] 4xl:px-20">
-          <MyKaryaStats stats={stats} isDosen={isDosen} />
-
-          <div className="mt-8 2xl:mt-12 3xl:mt-14 4xl:mt-16">
-            <MyKaryaFilter
-              search={search}
-              onSearchChange={handleSearchChange}
-              statusFilter={statusFilter}
-              onStatusChange={handleStatusChange}
-              isDosen={isDosen}
-            />
-          </div>
-
           {loading ? (
-            <div className="mt-14 2xl:mt-20 3xl:mt-24 4xl:mt-28">
-              <ProjectGridSkeleton count={6} />
-            </div>
-          ) : filteredData.length === 0 ? (
-            <div className="mt-14 flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 py-16 sm:mt-20 sm:py-24 2xl:mt-24 2xl:py-32 3xl:mt-28 3xl:py-40 4xl:mt-32 4xl:py-48">
-              <div className="mb-5 rounded-full bg-slate-800/50 p-4 ring-1 ring-slate-700/50 backdrop-blur-sm 3xl:p-6 4xl:p-8">
-                <FolderX className="h-10 w-10 text-slate-400 2xl:h-12 2xl:w-12 3xl:h-14 3xl:w-14 4xl:h-16 4xl:w-16" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-200 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl">
-                Belum ada karya
-              </h3>
-              <p className="mt-2 max-w-md text-center text-sm text-slate-400 sm:text-base 2xl:mt-3 2xl:text-lg 3xl:text-xl 4xl:text-2xl">
-                Kamu belum memiliki karya. Mulai upload karya pertamamu sekarang!
-              </p>
-            </div>
+            <MyKaryaPageSkeleton />
           ) : (
-            <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-3 2xl:mt-20 2xl:gap-10 3xl:mt-24 3xl:gap-12 4xl:mt-28 4xl:gap-14">
-              {visibleData.map((karyaItem) => (
-                <MyKaryaCard
-                  key={karyaItem.id}
-                  karya={karyaItem}
-                  onDeleteClick={handleDeleteClick}
+            <>
+              <MyKaryaStats stats={stats} isDosen={isDosen} />
+
+              <div className="mt-8 2xl:mt-12 3xl:mt-14 4xl:mt-16">
+                <MyKaryaFilter
+                  search={search}
+                  onSearchChange={handleSearchChange}
+                  statusFilter={statusFilter}
+                  onStatusChange={handleStatusChange}
                   isDosen={isDosen}
                 />
-              ))}
-            </div>
-          )}
+              </div>
 
-          {!showAll && visibleData.length < filteredData.length && (
-            <div className="mt-6 flex justify-center sm:mt-8 2xl:mt-12 3xl:mt-16 4xl:mt-20">
-              <OutlineButton onClick={() => setShowAll(true)}>
-                Tampilkan Semua
-              </OutlineButton>
-            </div>
+              {filteredData.length === 0 ? (
+                <div className="mt-14 flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 py-16 sm:mt-20 sm:py-24 2xl:mt-24 2xl:py-32 3xl:mt-28 3xl:py-40 4xl:mt-32 4xl:py-48">
+                  <div className="mb-5 rounded-full bg-slate-800/50 p-4 ring-1 ring-slate-700/50 backdrop-blur-sm 3xl:p-6 4xl:p-8">
+                    <FolderX className="h-10 w-10 text-slate-400 2xl:h-12 2xl:w-12 3xl:h-14 3xl:w-14 4xl:h-16 4xl:w-16" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-200 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl">
+                    Belum ada karya
+                  </h3>
+                  <p className="mt-2 max-w-md text-center text-sm text-slate-400 sm:text-base 2xl:mt-3 2xl:text-lg 3xl:text-xl 4xl:text-2xl">
+                    Kamu belum memiliki karya. Mulai upload karya pertamamu sekarang!
+                  </p>
+                </div>
+              ) : (
+                <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-3 2xl:mt-20 2xl:gap-10 3xl:mt-24 3xl:gap-12 4xl:mt-28 4xl:gap-14">
+                  {visibleData.map((karyaItem) => (
+                    <MyKaryaCard
+                      key={karyaItem.id}
+                      karya={karyaItem}
+                      onDeleteClick={handleDeleteClick}
+                      isDosen={isDosen}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {!showAll && visibleData.length < filteredData.length && (
+                <div className="mt-6 flex justify-center sm:mt-8 2xl:mt-12 3xl:mt-16 4xl:mt-20">
+                  <OutlineButton onClick={() => setShowAll(true)}>
+                    Tampilkan Semua
+                  </OutlineButton>
+                </div>
+              )}
+            </>
           )}
         </div>
 

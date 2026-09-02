@@ -142,12 +142,19 @@ function AdminNavbar() {
         <div ref={notifRef} className="relative ml-2 min-[400px]:ml-0">
           <button
             onClick={toggleNotif}
-            className="relative flex h-8 min-[360px]:h-9 5xl:h-11 6xl:h-12 w-8 min-[360px]:w-9 5xl:w-11 6xl:w-12 items-center justify-center rounded-md min-[360px]:rounded-lg 5xl:rounded-xl text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200 cursor-pointer"
+            className={`notification-bell h-8 min-[360px]:h-9 5xl:h-11 6xl:h-12 w-8 min-[360px]:w-9 5xl:w-11 6xl:w-12 ${
+              unreadCount > 0 ? "has-unread" : ""
+            }`}
             title="Notifikasi"
           >
-            <Bell size={18} />
+            <Bell
+              size={18}
+              fill="currentColor"
+              fillOpacity={0.12}
+              className="notification-bell-icon"
+            />
             {unreadCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-3 min-[360px]:h-4 5xl:h-5 6xl:h-6 min-w-[12px] min-[360px]:min-w-4 5xl:min-w-5 items-center justify-center rounded-full bg-red-500 px-0.5 min-[360px]:px-1 5xl:px-1.5 text-[8px] min-[360px]:text-[10px] 5xl:text-xs 6xl:text-sm font-bold text-white shadow-lg shadow-red-500/30">
+              <span className="notification-badge">
                 {unreadCount > 99 ? "99+" : unreadCount}
               </span>
             )}

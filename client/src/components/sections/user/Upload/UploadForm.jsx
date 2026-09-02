@@ -118,7 +118,7 @@ function UploadForm() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-brand-dark px-4 py-10 sm:py-12 md:px-8 lg:px-12 2xl:px-16 3xl:px-20 4xl:px-24">
+    <section className="upload-page relative overflow-hidden bg-brand-dark px-4 py-10 sm:py-12 md:px-8 lg:px-12 2xl:px-16 3xl:px-20 4xl:px-24">
       <GlowBackground />
       <DustBackground />
 

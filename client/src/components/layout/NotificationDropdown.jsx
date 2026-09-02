@@ -152,7 +152,7 @@ export default function NotificationDropdown({
       </div>
 
       {/* LIST */}
-      <div className="max-h-72 overflow-y-auto sm:max-h-80">
+      <div>
         {notifications.length === 0 ? (
           <div className="flex flex-col items-center gap-2.5 px-4 py-10 text-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 text-slate-600">
@@ -170,6 +170,7 @@ export default function NotificationDropdown({
         ) : (
           notifications.map((notif) => {
             const isSelected = selectedIds.includes(notif.id);
+            const Icon = notifIcon(notif.type);
             return (
               <div
                 key={notif.id}
@@ -210,11 +211,13 @@ export default function NotificationDropdown({
                   className="flex min-w-0 flex-1 cursor-pointer items-center gap-2.5 text-left disabled:cursor-not-allowed"
                 >
                   <div
-                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm ${notifBg(notif.type)}`}
+                    className={`notification-type-tile flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${notifBg(notif.type)}`}
                   >
-                    <span className={notifText(notif.type)}>
-                      {notifIcon(notif.type)}
-                    </span>
+                    <Icon
+                      size={18}
+                      strokeWidth={2.1}
+                      className={`${notifText(notif.type)} drop-shadow-[0_1px_1px_rgba(2,6,23,0.3)]`}
+                    />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p

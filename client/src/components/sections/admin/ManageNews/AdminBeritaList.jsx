@@ -5,12 +5,13 @@ import { useBerita } from "../../../../context/BeritaContext"
 import AdminBeritaCard from "./AdminBeritaCard"
 import AdminBeritaDeleteModal from "./AdminBeritaDeleteModal"
 import ShowMoreButton from "../../../ui/ShowMoreButton"
+import { AdminNewsListSkeleton } from "../../../ui/PageSkeletons"
 
 const INITIAL_VISIBLE = 6
 
 function AdminBeritaList({ search, statusFilter }) {
   const navigate = useNavigate()
-  const { beritaList, deleteBerita } = useBerita()
+  const { beritaList, loading, deleteBerita } = useBerita()
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deleteSuccess, setDeleteSuccess] = useState(false)
@@ -70,7 +71,9 @@ function AdminBeritaList({ search, statusFilter }) {
   return (
     <div className="px-4 md:px-6 lg:px-8 pt-6 md:pt-8 pb-12 md:pb-16">
       <div className="flex flex-col gap-5">
-        {filteredBerita.length === 0 ? (
+        {loading ? (
+          <AdminNewsListSkeleton />
+        ) : filteredBerita.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-2xl border border-white/10 bg-white/5 py-16 text-center">
             <Newspaper className="h-10 w-10 text-slate-500" />
             <p className="text-sm md:text-base text-slate-400">

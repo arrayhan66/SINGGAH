@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom"
-import { Calendar } from "lucide-react"
+import { Calendar, ArrowRight } from "lucide-react"
 import { imageUrl } from "../../../../utils/imageUrl"
+import GlassCard from "../../../ui/GlassCard"
 
 function KaryaTersimpanCard({ item }) {
   const navigate = useNavigate()
@@ -21,7 +22,10 @@ function KaryaTersimpanCard({ item }) {
   }
 
   return (
-    <div className="group flex h-full flex-col overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:shadow-xl hover:shadow-cyan-500/10">
+    <GlassCard
+      hover
+      className="group flex h-full flex-col overflow-hidden p-0 !cursor-default"
+    >
       <div className="relative overflow-hidden">
         <img
           src={imageUrl(coverImage)}
@@ -59,13 +63,17 @@ function KaryaTersimpanCard({ item }) {
 
           <button
             onClick={handleOpen}
-            className="mt-2.5 w-full cursor-pointer rounded-lg bg-white py-2 text-[11px] font-semibold text-slate-900 transition-colors duration-300 hover:bg-slate-200 sm:mt-3 sm:py-2.5 sm:text-xs md:text-sm"
+            className="group/btn mt-2.5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-white py-2.5 text-xs font-semibold text-slate-900 transition-colors duration-300 hover:bg-slate-200 sm:mt-3 sm:py-3 sm:text-sm"
           >
-            Lihat Karya
+            Lihat Detail
+            <ArrowRight
+              size={14}
+              className="transition-transform duration-300 group-hover/btn:translate-x-1 sm:size-[15px]"
+            />
           </button>
         </div>
       </div>
-    </div>
+    </GlassCard>
   )
 }
 

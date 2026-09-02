@@ -7,7 +7,7 @@ import PCBBackground from "../../ui/PCBBackground"
 import useSearchAndExpand from "../../../hooks/useSearchAndExpand"
 import SearchBar from "../../ui/SearchBar"
 import OutlineButton from "../../ui/OutlineButton"
-import Skeleton, { ProjectGridSkeleton, PageHeaderSkeleton } from "../../ui/Skeleton"
+import { KaryaProjectsPageSkeleton } from "../../ui/PageSkeletons"
 import KaryaProjectCard from "./KaryaProjectCard"
 import api from "../../../services/api"
 
@@ -68,13 +68,7 @@ function KaryaProjectSection() {
         <GlowBackground />
         <DustBackground />
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-5 md:px-8 lg:px-10 xl:px-12">
-          <Skeleton className="h-10 w-10 rounded-full" />
-          <div className="mt-8">
-            <PageHeaderSkeleton />
-          </div>
-          <div className="mt-10">
-            <ProjectGridSkeleton count={6} />
-          </div>
+          <KaryaProjectsPageSkeleton />
         </div>
       </section>
     )

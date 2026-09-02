@@ -10,33 +10,36 @@ import {
 } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
 import EmojiPicker from "../../../ui/EmojiPicker"
+import UserAvatar from "../../../ui/UserAvatar"
 import api from "../../../../services/api"
 
-function getInitial(name) {
-  return (name || "?").charAt(0).toUpperCase()
-}
-
-function Avatar({ name, isAdmin, size = "md" }) {
-  const sizeCls =
-    size === "sm"
-      ? "h-8 w-8 text-[11px]"
-      : "h-10 w-10 text-sm sm:h-11 sm:w-11 sm:text-base"
+function Avatar({ name, isAdmin, avatar, size = "md" }) {
+  const isSm = size === "sm"
+  const sizeCls = isSm ? "h-8 w-8" : "h-10 w-10 sm:h-11 sm:w-11"
+  const fallbackClass = isAdmin
+    ? "bg-gradient-to-br from-amber-400 to-orange-500 font-bold text-white"
+    : "bg-gradient-to-br from-cyan-400 to-blue-600 font-bold text-white"
 
   return (
-    <div
-      className={`${sizeCls} flex shrink-0 select-none items-center justify-center rounded-full border font-bold shadow-md ${
-        isAdmin
-          ? "border-amber-400/50 bg-gradient-to-br from-amber-500/40 to-orange-600/30 text-amber-200"
-          : "border-cyan-400/40 bg-gradient-to-br from-cyan-500/40 to-blue-600/30 text-cyan-100"
-      }`}
-    >
-      {getInitial(name)}
-    </div>
+    <UserAvatar
+      name={name}
+      avatar={avatar}
+      imgSizeClass={sizeCls}
+      fallbackSizeClass={sizeCls}
+      fallbackClass={fallbackClass}
+      textClass={isSm ? "text-[11px]" : "text-sm sm:text-base"}
+    />
   )
 }
 
 function CommentAvatar({ user: author }) {
-  return <Avatar name={author?.name} isAdmin={author?.role === "admin"} />
+  return (
+    <Avatar
+      name={author?.name}
+      isAdmin={author?.role === "admin"}
+      avatar={author?.avatar}
+    />
+  )
 }
 
 function MentionText({ text }) {
@@ -45,7 +48,7 @@ function MentionText({ text }) {
     <>
       {parts.map((part, i) =>
         /^@[\w.-]+$/.test(part) ? (
-          <span key={i} className="font-semibold text-cyan-300">
+          <span key={i} className="font-medium text-cyan-300/70">
             {part}
           </span>
         ) : (
@@ -107,7 +110,7 @@ function EditForm({ initialValue, onSubmit, onCancel, placeholder, busy }) {
           <button
             type="button"
             onClick={onCancel}
-            className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white"
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-white/10 hover:text-slate-200"
           >
             <X size={13} />
             Batal
@@ -132,7 +135,7 @@ function DeleteConfirm({ label, onConfirm, onCancel, busy }) {
       <button
         onClick={onCancel}
         disabled={busy}
-        className="cursor-pointer rounded-lg border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+        className="cursor-pointer rounded-lg border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-semibold text-slate-300 transition hover:bg-white/10 hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
       >
         Batal
       </button>
@@ -183,7 +186,12 @@ function ReplyItem({
 
   return (
     <div className="flex items-start gap-2.5 sm:gap-3">
-      <Avatar name={author.name} isAdmin={author.role === "admin"} size="sm" />
+      <Avatar
+        name={author.name}
+        isAdmin={author.role === "admin"}
+        avatar={author.avatar}
+        size="sm"
+      />
       <div className="min-w-0 flex-1">
         <div className="flex flex-col">
           <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 sm:gap-x-2">
@@ -263,11 +271,16 @@ function ReplyItem({
   )
 }
 
-function ReplyForm({ replyRef, replyText, setReplyText, insertEmojiIntoReply, handleReplySubmit, setShowReply, setReplyText: setRT, busy }) {
+function ReplyForm({ user, replyRef, replyText, setReplyText, insertEmojiIntoReply, handleReplySubmit, setShowReply, setReplyText: setRT, busy }) {
   return (
     <form onSubmit={handleReplySubmit} className="mt-3">
       <div className="flex items-start gap-2.5">
-        <Avatar name={null} size="sm" />
+        <Avatar
+          name={user?.name}
+          isAdmin={user?.role === "admin"}
+          avatar={user?.avatar}
+          size="sm"
+        />
         <div className="flex-1">
           <textarea
             ref={replyRef}
@@ -276,29 +289,37 @@ function ReplyForm({ replyRef, replyText, setReplyText, insertEmojiIntoReply, ha
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
             placeholder="Tulis balasanmu..."
-            className="w-full resize-y rounded-xl border border-white/15 bg-white/5 p-2.5 text-xs text-white placeholder-slate-500 transition focus:border-cyan-400/60 focus:outline-none focus:ring-4 focus:ring-cyan-400/10 sm:text-sm"
+            className="w-full min-w-0 resize-y rounded-xl border border-white/15 bg-white/5 p-2.5 text-xs text-white placeholder-slate-500 transition focus:border-cyan-400/60 focus:outline-none focus:ring-4 focus:ring-cyan-400/10 sm:text-sm max-[320px]:p-2 max-[320px]:text-[11px]"
           />
-          <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-            <EmojiPicker onSelect={insertEmojiIntoReply} closeOnSelect={false} direction="down" />
-            <div className="flex flex-wrap items-center gap-2">
+          <div className="mt-2 flex flex-nowrap items-center justify-between gap-1.5 max-[320px]:gap-1">
+            <EmojiPicker
+              onSelect={insertEmojiIntoReply}
+              closeOnSelect={false}
+              direction="down"
+              buttonClassName="max-[320px]:px-1.5 max-[320px]:py-1.5"
+            />
+            <div className="flex flex-nowrap items-center gap-1.5 max-[320px]:gap-1">
               <button
                 type="button"
+                title="Batal"
                 onClick={() => {
                   setRT("")
                   setShowReply(false)
                 }}
-                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white"
+                className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold whitespace-nowrap text-slate-300 transition hover:border-rose-400/50 hover:bg-rose-500/15 hover:text-rose-400 max-[400px]:px-2.5 max-[400px]:py-1.5 max-[320px]:text-[11px]"
               >
-                <X size={13} />
-                Batal
+                <X size={14} className="text-slate-400 transition hover:text-rose-400 max-[400px]:scale-110" />
+                <span className="max-[400px]:hidden">Batal</span>
               </button>
               <button
                 type="submit"
+                title="Kirim Balasan"
                 disabled={busy || !replyText.trim()}
-                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-cyan-500 px-3 py-1.5 text-xs font-semibold text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-cyan-500 px-3 py-1.5 text-xs font-semibold whitespace-nowrap text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50 max-[400px]:px-2.5 max-[400px]:py-1 max-[320px]:text-[11px]"
               >
                 <Send size={13} />
-                {busy ? "Mengirim..." : "Kirim Balasan"}
+                <span className="max-[400px]:hidden">Kirim Balasan</span>
+                <span className="hidden max-[400px]:inline">Kirim</span>
               </button>
             </div>
           </div>
@@ -313,6 +334,7 @@ function CommentItem({
   currentUserId,
   isAdmin,
   isLoggedIn,
+  user,
   formatDate,
   onAddReply,
   onEditComment,
@@ -406,7 +428,7 @@ function CommentItem({
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3.5 transition hover:border-white/15 sm:p-4">
+    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3.5 transition hover:border-white/15 sm:p-4 max-[320px]:p-2.5">
       <div className="flex items-start gap-3">
         <CommentAvatar user={author} />
         <div className="min-w-0 flex-1">
@@ -493,6 +515,7 @@ function CommentItem({
 
           {showReply && replyingToIndex === null && (
             <ReplyForm
+              user={user}
               replyRef={replyRef}
               replyText={replyText}
               setReplyText={setReplyText}
@@ -521,6 +544,7 @@ function CommentItem({
               />
               {showReply && replyingToIndex === idx && (
                 <ReplyForm
+                  user={user}
                   replyRef={replyRef}
                   replyText={replyText}
                   setReplyText={setReplyText}
@@ -664,7 +688,7 @@ function KaryaProjectComments({
   }
 
   return (
-    <GlassCard id="komentar" className="mt-8 p-4 sm:p-8 lg:p-10 2xl:mt-10 2xl:p-12">
+    <GlassCard id="komentar" className="mt-8 p-4 sm:p-8 lg:p-10 2xl:mt-10 2xl:p-12 max-[320px]:p-3">
       <div className="flex items-center justify-between gap-3">
         <h3 className="flex items-center gap-2 text-lg font-bold text-white sm:text-xl 2xl:text-2xl">
           <MessageCircle size={20} className="2xl:size-6" />
@@ -681,7 +705,7 @@ function KaryaProjectComments({
       {isLoggedIn ? (
         <form onSubmit={handleAddComment} className="mt-5">
           <div className="flex items-start gap-3">
-            <Avatar name={user?.name} isAdmin={isAdmin} />
+            <Avatar name={user?.name} isAdmin={isAdmin} avatar={user?.avatar} />
             <div className="min-w-0 flex-1">
               <textarea
                 ref={commentRef}
@@ -689,17 +713,25 @@ function KaryaProjectComments({
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Tulis tanggapan atau diskusimu di sini..."
-                className="w-full resize-y rounded-2xl border border-white/15 bg-white/5 p-3.5 text-sm text-white placeholder-slate-500 transition focus:border-cyan-400/60 focus:bg-white/[0.07] focus:outline-none focus:ring-4 focus:ring-cyan-400/10 2xl:text-base"
+                className="w-full min-w-0 resize-y rounded-2xl border border-white/15 bg-white/5 p-3.5 text-sm text-white placeholder-slate-500 transition focus:border-cyan-400/60 focus:bg-white/[0.07] focus:outline-none focus:ring-4 focus:ring-cyan-400/10 2xl:text-base max-[320px]:p-2.5 max-[320px]:text-xs"
               />
-              <div className="mt-2.5 flex flex-wrap items-center justify-between gap-3">
-                <EmojiPicker onSelect={insertEmojiIntoComment} showLabel closeOnSelect={false} direction="down" />
+              <div className="mt-2.5 flex flex-nowrap items-center justify-between gap-2 max-[320px]:gap-1.5">
+                <EmojiPicker
+                  onSelect={insertEmojiIntoComment}
+                  showLabel
+                  closeOnSelect={false}
+                  direction="down"
+                  buttonClassName="max-[320px]:px-2 max-[320px]:py-1.5 max-[320px]:text-[11px]"
+                />
                 <button
                   type="submit"
+                  title="Kirim Komentar"
                   disabled={posting || !newComment.trim()}
-                  className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-cyan-500 px-4 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm"
+                  className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-cyan-500 px-3 py-2 text-xs font-semibold whitespace-nowrap text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 max-[350px]:px-2.5 max-[350px]:py-1.5 max-[320px]:text-[11px]"
                 >
                   <Send size={14} />
-                  {posting ? "Mengirim..." : "Kirim Komentar"}
+                  <span className="max-[350px]:hidden">Kirim Komentar</span>
+                  <span className="hidden max-[350px]:inline">Kirim</span>
                 </button>
               </div>
             </div>
@@ -728,6 +760,7 @@ function KaryaProjectComments({
               currentUserId={currentUserId}
               isAdmin={isAdmin}
               isLoggedIn={isLoggedIn}
+              user={user}
               formatDate={formatDate}
               onAddReply={addReply}
               onEditComment={editComment}

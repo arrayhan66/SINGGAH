@@ -1,6 +1,7 @@
 import useSettings from "../../../../hooks/useSettings"
 import SettingsHero from "./SettingsHero"
 import SettingsForm from "./SettingsForm"
+import { AdminSettingsSkeleton } from "../../../ui/PageSkeletons"
 
 export default function SettingsSection() {
   const {
@@ -22,6 +23,10 @@ export default function SettingsSection() {
     toggleMenu,
     selectTabFromMenu,
   } = useSettings()
+
+  if (loading) {
+    return <AdminSettingsSkeleton />
+  }
 
   return (
     <>

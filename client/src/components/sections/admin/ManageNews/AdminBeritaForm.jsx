@@ -6,6 +6,7 @@ import AdminHeroBackground from "../../../ui/AdminHeroBackground"
 import AdminBeritaEditorMain from "../../../../components/sections/admin/ManageNews/AdminBeritaEditorMain"
 import AdminBeritaEditorSidebar from "../../../../components/sections/admin/ManageNews/AdminBeritaEditorSidebar"
 import Toast from "../../../ui/Toast"
+import { AdminNewsFormSkeleton } from "../../../ui/PageSkeletons"
 
 const emptyForm = {
   title: "",
@@ -214,6 +215,10 @@ function AdminBeritaForm() {
           />
         )}
 
+        {isEditMode && loading ? (
+          <AdminNewsFormSkeleton />
+        ) : (
+          <>
         <button
           onClick={() => navigate("/berita")}
           className="group inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 backdrop-blur-xl transition-all duration-200 hover:border-cyan-400/40 hover:bg-cyan-500/10 hover:text-cyan-300"
@@ -249,6 +254,8 @@ function AdminBeritaForm() {
             isEditMode={isEditMode}
           />
         </div>
+          </>
+        )}
       </div>
     </AdminHeroBackground>
   )

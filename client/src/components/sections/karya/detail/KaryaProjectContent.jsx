@@ -1,6 +1,7 @@
 import { ExternalLink, FileText } from "lucide-react";
 import { toEmbedUrl } from "../../../../utils/videoUrl";
 import { openDocument } from "../../../../utils/projectDocument";
+import Skeleton from "../../../ui/Skeleton";
 
 function KaryaProjectContent({ project }) {
   const descriptionText = project.description || "";
@@ -86,12 +87,13 @@ function KaryaProjectContent({ project }) {
           {videos.map((vid) => (
             <div
               key={vid.id}
-              className="aspect-video w-full overflow-hidden rounded-xl"
+              className="relative aspect-video w-full overflow-hidden rounded-xl bg-slate-950"
             >
+              <Skeleton className="absolute inset-0 rounded-none" />
               <iframe
                 src={toEmbedUrl(vid.video_url)}
                 title="Video Demo"
-                className="h-full w-full border-0"
+                className="relative h-full w-full border-0"
                 allowFullScreen
               />
             </div>

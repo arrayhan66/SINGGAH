@@ -26,7 +26,7 @@ export default defineConfig({
     allowedHosts: ['.trycloudflare.com'],
   },
   build: {
-    modulePreload: false,
+    modulePreload: { polyfill: false },
     rollupOptions: {
       output: {
         manualChunks(id) {

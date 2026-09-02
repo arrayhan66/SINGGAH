@@ -3,12 +3,13 @@ import { useSearchParams } from "react-router-dom"
 import AdminProjectsHero from "./AdminProjectsHero"
 import AdminProjectsList from "./AdminProjectsList"
 import { useProjects } from "../../../../context/ProjectContext"
+import { AdminProjectsSkeleton } from "../../../ui/PageSkeletons"
 import api from "../../../../services/api"
 
 const VALID_STATUSES = ["all", "pending", "published", "rejected"]
 
 export default function ManageProjectsSection() {
-  const { projects } = useProjects()
+  const { projects, loading } = useProjects()
 
   const [searchParams, setSearchParams] = useSearchParams()
   const [search, setSearch] = useState("")
@@ -82,23 +83,29 @@ export default function ManageProjectsSection() {
 
   return (
     <>
-      <AdminProjectsHero
-        stats={stats}
-        search={search}
-        onSearchChange={(e) => setSearch(e.target.value)}
-        statusFilter={statusFilter}
-        onStatusChange={handleStatusChange}
-        categories={categoriesWithCount}
-        categoryFilter={categoryFilter}
-        onCategoryChange={handleCategoryChange}
-      />
-      <AdminProjectsList
-        search={search}
-        onSearchChange={(e) => setSearch(e.target.value)}
-        statusFilter={statusFilter}
-        onStatusChange={handleStatusChange}
-        categoryFilter={categoryFilter}
-      />
+      {loading ? (
+        <AdminProjectsSkeleton />
+      ) : (
+        <>
+          <AdminProjectsHero
+            stats={stats}
+            search={search}
+            onSearchChange={(e) => setSearch(e.target.value)}
+            statusFilter={statusFilter}
+            onStatusChange={handleStatusChange}
+            categories={categoriesWithCount}
+            categoryFilter={categoryFilter}
+            onCategoryChange={handleCategoryChange}
+          />
+          <AdminProjectsList
+            search={search}
+            onSearchChange={(e) => setSearch(e.target.value)}
+            statusFilter={statusFilter}
+            onStatusChange={handleStatusChange}
+            categoryFilter={categoryFilter}
+          />
+        </>
+      )}
     </>
   )
 }

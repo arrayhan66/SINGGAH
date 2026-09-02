@@ -1,10 +1,12 @@
-import { lazy, Suspense } from "react"
+import { lazy, Suspense, useEffect } from "react"
 import { Routes, Route } from "react-router-dom"
 import { useTheme } from "../context/ThemeContext"
 import { ProtectedRoute } from "./ProtectedRoute"
 import { GuestRoute } from "./GuestRoute"
 import { ResetFlowRoute } from "./ResetFlowRoute"
 import RoleSplit from "./RoleSplit"
+import ScrollToTop from "../components/layout/ScrolltoTop"
+import { prefetch } from "../utils/prefetch"
 
 const Hall = lazy(() => import("../pages/Hall/Hall"))
 const Home = lazy(() => import("../pages/Home/Home"))
@@ -12,27 +14,21 @@ const News = lazy(() => import("../pages/News/News"))
 const NewsDetail = lazy(() => import("../pages/News/NewsDetail"))
 const About = lazy(() => import("../pages/About/About"))
 const NotFound = lazy(() => import("../pages/NotFound/NotFound"))
-import ScrollToTop from "../components/layout/ScrolltoTop"
 const Karya = lazy(() => import("../pages/Karya/Karya"))
 const KaryaDetail = lazy(() => import("../pages/Karya/KaryaDetail"))
 const KaryaProjectDetail = lazy(() => import("../pages/Karya/KaryaProjectDetail"))
-
-/* === LOGIN IMPORT === */
 const Login = lazy(() => import("../pages/auth/Login/Login"))
 const ForgotPassword = lazy(() => import("../pages/auth/ForgotPassword/ForgotPassword"))
 const Register = lazy(() => import("../pages/auth/Register/Register"))
 const VerifyCode = lazy(() => import("../pages/auth/VerifyCode/VerifyCode"))
 const ResetPassword = lazy(() => import("../pages/auth/ResetPassword/ResetPassword"))
-
-/* === USER IMPORT === */
 const UserUpload = lazy(() => import("../pages/user/Upload/Upload"))
 const UserEditKarya = lazy(() => import("../pages/user/EditKarya/EditKarya"))
 const UserMyKarya = lazy(() => import("../pages/user/MyKarya/MyKarya"))
 const UserProfile = lazy(() => import("../pages/user/Profile/Profile"))
 const UserKaryaTersimpan = lazy(() => import("../pages/user/KaryaTersimpan/KaryaTersimpan"))
-
-/* === ADMIN IMPORT === */
 const AdminHome = lazy(() => import("../pages/admin/Home/Home"))
+const AdminProfile = lazy(() => import("../pages/admin/Profile/Profile"))
 const AdminProjects = lazy(() => import("../pages/admin/ManageProjects/Projects"))
 const AdminProjectDetail = lazy(() => import("../pages/admin/ManageProjects/AdminProjectDetail"))
 const ProjectForm = lazy(() => import("../pages/admin/ManageProjects/ProjectForm"))
@@ -40,7 +36,6 @@ const AdminAddProjectView = lazy(() => import("../components/sections/admin/Mana
 const ManageNews = lazy(() => import("../pages/admin/ManageNews/Berita"))
 const BeritaForm = lazy(() => import("../pages/admin/ManageNews/BeritaForm"))
 const BeritaPreview = lazy(() => import("../pages/admin/ManageNews/BeritaPreview"))
-const AdminProfile = lazy(() => import("../pages/admin/Profile/Profile"))
 const ManageUsers = lazy(() => import("../pages/admin/ManageUsers/Users"))
 const UserForm = lazy(() => import("../pages/admin/ManageUsers/UserForm"))
 const UserDetail = lazy(() => import("../pages/admin/ManageUsers/UserDetail"))
@@ -52,6 +47,20 @@ const Settings = lazy(() => import("../pages/admin/Settings/Settings"))
 function AppRouter() {
   const { theme } = useTheme()
   const isDark = theme === "dark"
+
+  useEffect(() => {
+    prefetch(
+      () => import("../pages/Home/Home"),
+      () => import("../pages/Karya/Karya"),
+      () => import("../pages/News/News"),
+      () => import("../pages/About/About"),
+      () => import("../pages/Hall/Hall"),
+      () => import("../pages/user/Profile/Profile"),
+      () => import("../pages/admin/ManageProjects/Projects"),
+      () => import("../pages/Karya/KaryaDetail"),
+      () => import("../pages/News/NewsDetail")
+    )
+  }, [])
   const hallFallback = (
     <div
       className={`flex h-screen w-screen items-center justify-center ${
@@ -69,7 +78,7 @@ function AppRouter() {
   return (
     <>
       <ScrollToTop />
-      <Suspense fallback={hallFallback}>
+      <Suspense fallback={null}>
         <Routes>
         {/* === VISITOR ROUTES === */}
         <Route path="/" element={<Home />} />

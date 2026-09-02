@@ -13,7 +13,7 @@ import KaryaProjectGallery from "./detail/KaryaProjectGallery"
 import KaryaProjectHeader from "./detail/KaryaProjectHeader"
 import KaryaProjectContent from "./detail/KaryaProjectContent"
 import KaryaProjectComments from "./detail/KaryaProjectComments"
-import { DetailHeroSkeleton } from "../../ui/Skeleton"
+import { ProjectDetailSkeleton, CommentsSkeleton } from "../../ui/PageSkeletons"
 
 function KaryaProjectDetailSection() {
   const { slug, projectSlug } = useParams()
@@ -68,7 +68,8 @@ function KaryaProjectDetailSection() {
         <DustBackground />
         <GlowBackground />
         <div className="pt-6 sm:pt-8">
-          <DetailHeroSkeleton />
+          <ProjectDetailSkeleton />
+          <CommentsSkeleton />
         </div>
       </section>
     )

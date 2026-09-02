@@ -31,19 +31,26 @@ const NotificationBell = forwardRef(function NotificationBell(
     <div ref={ref} className="relative">
       <button
         onClick={onToggle}
-        className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition-all duration-300 hover:border-cyan-400/30 hover:bg-cyan-400/10 hover:text-cyan-300 min-[350px]:h-9 min-[350px]:w-9 sm:h-10 sm:w-10"
+        className={`notification-bell h-6 w-6 min-[350px]:h-8 min-[350px]:w-8 sm:h-9 sm:w-9 ${
+          unreadCount > 0 ? "has-unread" : ""
+        }`}
         aria-label="Notifikasi"
       >
-        <Bell size={18} className="w-3.5 h-3.5 min-[350px]:w-4 min-[350px]:h-4 sm:w-[18px] sm:h-[18px]" />
+        <Bell
+          size={18}
+          fill="currentColor"
+          fillOpacity={0.12}
+          className="notification-bell-icon w-3 h-3 min-[350px]:w-3.5 min-[350px]:h-3.5 sm:w-4 sm:h-4"
+        />
         {unreadCount > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-lg shadow-red-500/30">
+          <span className="notification-badge">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
       </button>
 
       <div
-        className={`hidden lg:block absolute left-1/2 -translate-x-1/2 top-full mt-3 w-80 overflow-hidden rounded-2xl border border-white/10 bg-brand-dark/95 shadow-2xl backdrop-blur-xl transition-all duration-200 sm:w-96 max-w-[calc(100vw-1.5rem)] ${
+        className={`hidden lg:block absolute left-1/2 -translate-x-1/2 top-full mt-3 w-80 max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border border-white/10 bg-brand-dark/95 shadow-2xl backdrop-blur-xl transition-all duration-200 sm:w-96 max-w-[calc(100vw-1.5rem)] ${
           isOpen
             ? "translate-y-0 opacity-100"
             : "pointer-events-none -translate-y-2 opacity-0"

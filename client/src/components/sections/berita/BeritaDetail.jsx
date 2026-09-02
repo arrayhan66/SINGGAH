@@ -17,7 +17,7 @@ import { useBerita } from "../../../context/BeritaContext"
 import { useTheme } from "../../../context/ThemeContext"
 import DustBackground from "../../ui/DustBackground"
 import PCBBackground from "../../ui/PCBBackground"
-import { DetailHeroSkeleton } from "../../ui/Skeleton"
+import { BeritaDetailSkeleton } from "../../ui/PageSkeletons"
 import { imageUrl } from "../../../utils/imageUrl"
 import { processContentHtml } from "../../../utils/processContentHtml"
 
@@ -292,7 +292,7 @@ function BeritaDetail() {
       <section className="relative min-h-screen overflow-hidden bg-brand-dark pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-16 sm:pb-20">
         <DustBackground />
         <div className="pt-6 sm:pt-8">
-          <DetailHeroSkeleton />
+          <BeritaDetailSkeleton />
         </div>
       </section>
     )
@@ -515,12 +515,13 @@ function BeritaDetail() {
             onClick={() => setIsShareModalOpen(false)}
           ></div>
 
-          <div className="relative w-full max-w-md transform overflow-hidden rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl shadow-cyan-900/20 transition-all sm:p-8">
+          <div className={`relative w-full max-w-md transform overflow-hidden rounded-3xl border p-6 shadow-2xl transition-all sm:p-8 ${isDark ? "border-white/10 bg-slate-900 text-white shadow-cyan-900/20" : "border-slate-200 bg-white text-slate-900 shadow-slate-300/50"}`}>
             <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-white">Bagikan ke...</h3>
+              <h3 className={`text-xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>Bagikan ke...</h3>
               <button
                 onClick={() => setIsShareModalOpen(false)}
-                className="cursor-pointer rounded-full bg-white/80 p-2 text-slate-500 transition hover:bg-white hover:text-slate-800"
+                className={`cursor-pointer rounded-full p-2 transition ${isDark ? "bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900"}`}
+                aria-label="Tutup"
               >
                 <X size={20} />
               </button>
@@ -588,13 +589,13 @@ function BeritaDetail() {
               </a>
             </div>
 
-            <div className="flex items-center justify-between rounded-xl border border-white/10 bg-black/30 p-1.5 pl-4">
-              <div className="mr-4 overflow-hidden text-ellipsis whitespace-nowrap text-sm text-slate-400">
+            <div className={`flex items-center justify-between rounded-xl border p-1.5 pl-4 ${isDark ? "border-white/10 bg-black/30" : "border-slate-200 bg-slate-50"}`}>
+              <div className={`mr-4 overflow-hidden text-ellipsis whitespace-nowrap text-sm ${isDark ? "text-slate-400" : "text-slate-600"}`}>
                 {currentUrl}
               </div>
               <button
                 onClick={handleCopyLink}
-                className="flex shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 border border-slate-200"
+                className={`flex shrink-0 cursor-pointer items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition border ${isDark ? "bg-white text-slate-700 hover:bg-slate-50 border-white/10" : "bg-blue-600 text-white hover:bg-blue-700 border-blue-600"}`}
               >
                 {copied ? <Check size={16} /> : <Copy size={16} />}
                 {copied ? "Tersalin!" : "Salin"}

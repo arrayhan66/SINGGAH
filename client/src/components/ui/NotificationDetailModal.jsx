@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { createElement, useEffect, useState } from "react";
 import { X, ArrowUpRight, CalendarClock, Loader2 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../services/api";
@@ -144,11 +144,13 @@ function NotificationDetailModal({ notif, onClose, onNavigate }) {
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
           <div className="flex items-center gap-3">
             <div
-              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-lg ${notifBg(notif.type)}`}
+              className={`notification-type-tile flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${notifBg(notif.type)}`}
             >
-              <span className={notifText(notif.type)}>
-                {notifIcon(notif.type)}
-              </span>
+              {createElement(notifIcon(notif.type), {
+                size: 22,
+                strokeWidth: 2.2,
+                className: `${notifText(notif.type)} drop-shadow-[0_1px_2px_rgba(2,6,23,0.35)]`,
+              })}
             </div>
             <div>
               <span
@@ -238,7 +240,7 @@ function NotificationDetailModal({ notif, onClose, onNavigate }) {
               type="button"
               onClick={handleNavigate}
               disabled={loadingRef}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 px-4 py-2.5 text-sm font-semibold text-brand-dark shadow-lg shadow-cyan-500/20 transition hover:from-cyan-300 hover:to-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
+              className="notification-detail-cta flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 px-4 py-2.5 text-sm font-semibold text-brand-dark shadow-lg shadow-cyan-500/20 transition hover:from-cyan-300 hover:to-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {actionLabel}
               <ArrowUpRight size={16} />

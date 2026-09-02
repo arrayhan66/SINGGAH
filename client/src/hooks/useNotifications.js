@@ -29,7 +29,7 @@ export default function useNotifications() {
   const fetchNotifications = useCallback(async (pageNum = 1) => {
     try {
       if (pageNum === 1) setIsLoading(true)
-      const result = await getNotifications(pageNum, 10)
+      const result = await getNotifications(pageNum, 4)
       const items = result.items || []
       if (pageNum === 1) {
         setNotifications(items)

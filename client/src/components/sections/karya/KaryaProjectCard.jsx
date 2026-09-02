@@ -152,7 +152,7 @@ function KaryaProjectCard({ project }) {
         </div>
 
         {/* Statistik */}
-        <div className="mt-3 flex items-center gap-4 border-t border-slate-700/50 pt-3 text-xs text-slate-400 sm:mt-4 sm:gap-4.5 sm:text-xs md:mt-5 md:gap-5 md:pt-4 md:text-sm lg:pt-5 lg:text-sm 3xl:mt-5 3xl:gap-6 3xl:pt-5 3xl:text-base 4xl:gap-7 4xl:text-lg">
+        <div className="mt-3 flex items-center gap-4 border-t border-slate-600/70 pt-3 text-xs text-slate-400 sm:mt-4 sm:gap-4.5 sm:text-xs md:mt-5 md:gap-5 md:pt-4 md:text-sm lg:pt-5 lg:text-sm 3xl:mt-5 3xl:gap-6 3xl:pt-5 3xl:text-base 4xl:gap-7 4xl:text-lg">
           <button
             onClick={handleLike}
             className="group/action flex cursor-pointer items-center gap-1.5 transition-colors hover:text-pink-400"

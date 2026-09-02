@@ -9,7 +9,6 @@ import ProfileDangerZone from "./ProfileDangerZone"
 import ProfileAction from "./ProfileAction"
 import ProfileVerification from "./ProfileVerification"
 import GlowBackground from "../../../ui/GlowBackground"
-import DustBackground from "../../../ui/DustBackground"
 
 function ProfileForm({ isAdmin = false }) {
   const { user } = useAuth()
@@ -70,12 +69,7 @@ function ProfileForm({ isAdmin = false }) {
 
   return (
     <section className="relative overflow-hidden bg-brand-dark px-4 py-12 md:px-12">
-      {!isAdmin && (
-        <>
-          <GlowBackground />
-          <DustBackground />
-        </>
-      )}
+      {!isAdmin && <GlowBackground />}
 
       <div className="relative z-10 mx-auto flex max-w-4xl flex-col gap-8">
         <ProfileAvatar

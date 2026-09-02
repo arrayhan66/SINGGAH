@@ -1,5 +1,6 @@
 import { Image, Upload, Loader2 } from "lucide-react"
 import MediaCard from "./MediaCard"
+import { AdminMediaSkeleton } from "../../../ui/PageSkeletons"
 
 export default function MediaLibraryContent({
   loading,
@@ -39,16 +40,7 @@ export default function MediaLibraryContent({
       )}
 
       {loading ? (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl p-6">
-          <div className="flex flex-col gap-3">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-[52px] animate-pulse rounded-xl border border-white/[0.06] bg-white/[0.04]"
-              />
-            ))}
-          </div>
-        </div>
+        <AdminMediaSkeleton />
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 py-16 text-center">
           <div className="rounded-full bg-slate-800/50 p-4 ring-1 ring-slate-700/50">

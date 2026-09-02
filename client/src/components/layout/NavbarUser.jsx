@@ -1,5 +1,15 @@
 import { useState, useRef, useEffect } from "react";
-import { User, LogOut, UploadCloud, ChevronDown, Bookmark } from "lucide-react";
+import {
+  User,
+  LogOut,
+  UploadCloud,
+  ChevronDown,
+  Bookmark,
+  Home,
+  LayoutGrid,
+  Info,
+  Newspaper,
+} from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../../assets/icons/logo.webp";
 import { useAuth } from "../../context/AuthContext";
@@ -12,6 +22,8 @@ import DeleteConfirmModal from "../ui/DeleteConfirmModal";
 import NotificationDetailModal from "../ui/NotificationDetailModal";
 import ThemeToggle from "../ui/ThemeToggle";
 import UserAvatar from "../ui/UserAvatar";
+import { itemSubtitle, itemAccent, itemActive, itemHover } from "./menuConstants";
+import { prefetchRouteFromLink } from "../../utils/routePrefetch";
 
 function NavbarUser() {
   const { user, logout } = useAuth();
@@ -22,11 +34,13 @@ function NavbarUser() {
   const tipe = user?.tipe || "umum";
 
   const menuItems = [
-    { to: "/", label: "Beranda" },
-    { to: "/karya", label: "Karya" },
-    ...(tipe !== "umum" ? [{ to: "/upload", label: "Upload Karya" }] : []),
-    { to: "/about", label: "Tentang" },
-    { to: "/berita", label: "Berita" },
+    { to: "/", label: "Beranda", icon: Home },
+    { to: "/karya", label: "Karya", icon: LayoutGrid },
+    ...(tipe !== "umum"
+      ? [{ to: "/upload", label: "Upload Karya", icon: UploadCloud }]
+      : []),
+    { to: "/about", label: "Tentang", icon: Info },
+    { to: "/berita", label: "Berita", icon: Newspaper },
   ];
 
   const profileMenuItems = [
@@ -45,6 +59,7 @@ function NavbarUser() {
   const headerRef = useRef(null);
   const profileRef = useRef(null);
   const notifRef = useRef(null);
+  const notifPanelRef = useRef(null);
 
   const {
     notifications,
@@ -89,7 +104,7 @@ function NavbarUser() {
         : "bg-slate-400/10 text-slate-400 ring-1 ring-slate-400/20";
 
   const navLinkClass = ({ isActive }) =>
-    `relative whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-all duration-300 ${
+    `relative whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 xl:px-5 ${
       isActive
         ? "bg-cyan-400/10 text-cyan-300 shadow-[0_0_18px_rgba(34,211,238,.15)]"
         : "text-slate-300 hover:bg-white/5 hover:text-cyan-300 hover:-translate-y-0.5"
@@ -100,6 +115,11 @@ function NavbarUser() {
   const handleMenuToggle = () => {
     closeNotif();
     setIsOpen((prev) => !prev);
+  };
+
+  const handleNotifToggle = () => {
+    setIsOpen(false);
+    toggleNotif();
   };
 
   const handleNotifClick = (notif) => {
@@ -130,7 +150,12 @@ function NavbarUser() {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setIsProfileOpen(false);
       }
-      if (notifRef.current && !notifRef.current.contains(event.target)) {
+      if (
+        notifRef.current &&
+        !notifRef.current.contains(event.target) &&
+        notifPanelRef.current &&
+        !notifPanelRef.current.contains(event.target)
+      ) {
         closeNotif();
       }
     }
@@ -140,6 +165,16 @@ function NavbarUser() {
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen, isProfileOpen, isNotifOpen, closeNotif]);
+
+  useEffect(() => {
+    const active = isOpen || isNotifOpen || isProfileOpen;
+    if (!active) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isOpen, isNotifOpen, isProfileOpen]);
 
   useEffect(() => {
     const el = headerRef.current;
@@ -204,12 +239,13 @@ function NavbarUser() {
         </NavLink>
 
         {/* Menu - Desktop */}
-        <nav className="hidden flex-1 items-center justify-center font-medium pl-4 min-[1100px]:flex min-[1100px]:pl-2 xl:pl-0 min-[1100px]:gap-4 xl:gap-12 2xl:gap-16">
+        <nav className="hidden flex-1 items-center justify-center font-medium pl-4 min-[1100px]:flex min-[1100px]:pl-2 xl:pl-0 min-[1100px]:gap-3 xl:gap-8 2xl:gap-16">
           {menuItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.to === "/"}
+              onMouseEnter={() => prefetchRouteFromLink(item.to)}
               className={navLinkClass}
             >
               {item.label}
@@ -221,12 +257,14 @@ function NavbarUser() {
         <div className="flex items-center gap-1.5 min-[350px]:gap-2 sm:gap-4">
           <ThemeToggle />
 
-          <NotificationBell
-            ref={notifRef}
-            isOpen={isNotifOpen}
-            onToggle={toggleNotif}
-            {...notifProps}
-          />
+          <div className="ml-1 min-[350px]:ml-1.5 sm:ml-2">
+            <NotificationBell
+              ref={notifRef}
+              isOpen={isNotifOpen}
+              onToggle={handleNotifToggle}
+              {...notifProps}
+            />
+          </div>
 
           {/* Profile - Desktop */}
           <div
@@ -292,14 +330,14 @@ function NavbarUser() {
 
             {/* Dropdown */}
             <div
-              className={`absolute right-0 top-full mt-3 w-52 overflow-hidden rounded-2xl border border-white/10 bg-brand-dark/95 shadow-xl backdrop-blur-xl transition-all duration-200 ${
+              className={`absolute right-0 top-full mt-3 w-64 overflow-hidden rounded-2xl border border-white/10 bg-brand-dark/95 shadow-xl backdrop-blur-xl transition-all duration-200 ${
                 isProfileOpen
                   ? "translate-y-0 opacity-100"
                   : "pointer-events-none -translate-y-2 opacity-0"
               }`}
             >
               <div className="border-b border-white/10 px-4 py-3">
-                <p className="text-sm font-medium text-white">{name}</p>
+                <p className="text-sm font-semibold text-white">{name}</p>
                 <span
                   className={`mt-1 inline-block rounded-full px-2 py-px text-[10px] font-medium ${roleBadgeClass}`}
                 >
@@ -307,28 +345,59 @@ function NavbarUser() {
                 </span>
               </div>
 
-              {profileMenuItems.map((item) => {
-                const ItemIcon = item.icon;
-                return (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    onClick={() => setIsProfileOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 transition hover:bg-white/5 hover:text-cyan-300"
-                  >
-                    <ItemIcon size={16} />
-                    {item.label}
-                  </NavLink>
-                );
-              })}
-              <div className="h-px bg-white/10" />
-              <button
-                onClick={handleLogout}
-                className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-sm text-slate-300 transition hover:bg-white/5 hover:text-red-400"
-              >
-                <LogOut size={16} />
-                Keluar
-              </button>
+              <div className="p-1.5">
+                {profileMenuItems.map((item) => {
+                  const ItemIcon = item.icon;
+                  return (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      onClick={() => setIsProfileOpen(false)}
+                      className={({ isActive }) =>
+                        "mobile-menu-item group relative flex items-center gap-3.5 rounded-2xl border px-3 py-2.5 transition-[background-color,border-color,color] duration-150 " +
+                        (isActive
+                          ? itemActive[item.label] || itemActive.Beranda
+                          : "border-transparent hover:bg-white/5")
+                      }
+                    >
+                      <span className="pointer-events-none absolute inset-y-1.5 left-0 w-[3px] rounded-full bg-gradient-to-b from-cyan-400 to-blue-500 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                      <span
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ring-1 ring-inset ${
+                          itemAccent[item.label] || "from-cyan-400/20 to-blue-500/10 text-cyan-400 ring-cyan-400/25"
+                        }`}
+                      >
+                        <ItemIcon size={17} strokeWidth={2} />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className={`block text-sm font-medium leading-tight text-slate-200 transition-colors ${itemHover[item.label] || "group-hover:text-cyan-300"}`}>
+                          {item.label}
+                        </span>
+                        <span className="mt-0.5 block truncate text-[11px] text-slate-500">
+                          {itemSubtitle[item.label] || ""}
+                        </span>
+                      </span>
+                    </NavLink>
+                  );
+                })}
+                <div className="mx-2 my-1.5 h-px bg-white/10" />
+                <button
+                  onClick={handleLogout}
+                  className="mobile-menu-item group relative flex w-full cursor-pointer items-center gap-3.5 rounded-2xl border border-transparent px-3 py-2.5 text-left transition-[background-color,border-color,color] duration-150 hover:border-red-400/20 hover:bg-red-400/10"
+                >
+                  <span className="pointer-events-none absolute inset-y-1.5 left-0 w-[3px] rounded-full bg-gradient-to-b from-red-500 to-rose-500 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ring-1 ring-inset from-red-500/20 to-rose-500/10 text-red-400 ring-red-400/30">
+                    <LogOut size={17} strokeWidth={2} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-medium leading-tight text-slate-200 transition-colors group-hover:text-red-400">
+                      Keluar
+                    </span>
+                    <span className="mt-0.5 block truncate text-[11px] text-slate-500">
+                      Akhiri sesi
+                    </span>
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -370,10 +439,12 @@ function NavbarUser() {
         menuItems={menuItems}
         profileMenuItems={profileMenuItems}
         onClose={closeMenu}
+        onPrefetch={prefetchRouteFromLink}
         onLogout={() => { closeMenu(); setShowLogoutConfirm(true); }}
       />
 
       <NotificationPanel
+        panelRef={notifPanelRef}
         isOpen={isNotifOpen}
         {...notifProps}
         onClickNotif={(notif) => {

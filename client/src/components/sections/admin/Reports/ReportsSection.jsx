@@ -1,6 +1,7 @@
 import useReports from "../../../../hooks/useReports"
 import ReportsHero from "./ReportsHero"
 import ReportsContent from "./ReportsContent"
+import { AdminReportsSkeleton } from "../../../ui/PageSkeletons"
 
 export default function ReportsSection() {
   const {
@@ -12,6 +13,10 @@ export default function ReportsSection() {
     years,
     handleYearChange,
   } = useReports()
+
+  if (loading) {
+    return <AdminReportsSkeleton />
+  }
 
   return (
     <>

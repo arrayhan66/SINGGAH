@@ -2,11 +2,14 @@ import { useState } from "react"
 import { Trash2, AlertTriangle, Eye, EyeOff } from "lucide-react"
 import api from "../../../../services/api"
 import { useAuth } from "../../../../context/AuthContext"
+import { useTheme } from "../../../../context/ThemeContext"
 import GlassCard from "../../../ui/GlassCard"
 import PopupToast from "../../../ui/PopupToast"
 
 function ProfileDangerZone() {
   const { token, logout } = useAuth()
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
   const [showModal, setShowModal] = useState(false)
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -68,54 +71,69 @@ function ProfileDangerZone() {
 
       {showModal && (
         <PopupToast show={showModal} variant="danger" onClose={handleClose} closeOnEscape={false} position="center">
-          <div className="px-4 py-3.5">
-            <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-500/20 border border-red-500/30">
-                <AlertTriangle className="h-4.5 w-4.5 text-red-400" />
+          <div className="p-1 sm:p-2">
+            <div className="flex items-start gap-3.5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-red-500/20 border border-red-500/40 shadow-lg shadow-red-500/20">
+                <AlertTriangle className="h-5 w-5 text-red-400" />
               </div>
               <div className="min-w-0 flex-1">
-                <h3 className="pt-1 text-sm font-semibold text-white">Hapus Akun</h3>
-                <p className="mt-0.5 text-xs text-slate-400">Semua data kamu akan dihapus permanen.</p>
+                <h3 className={`text-base font-bold tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>Hapus Akun Permanen</h3>
+                <p className={`mt-0.5 text-xs leading-relaxed ${isDark ? "text-slate-300" : "text-slate-600"}`}>Tindakan ini tidak dapat dibatalkan. Semua data kamu akan terhapus selamanya.</p>
               </div>
             </div>
 
             {error && (
-              <div className="mt-2.5 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-[11px] text-red-400">
+              <div className="mt-3.5 rounded-xl border border-red-500/40 bg-red-500/15 px-3.5 py-2.5 text-xs font-medium text-red-300 shadow-sm">
                 {error}
               </div>
             )}
 
-            <div className="mt-3 flex flex-col gap-2">
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Masukkan password"
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 pr-9 text-xs text-white placeholder:text-slate-500 focus:border-red-400/50 focus:outline-none"
-                />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 cursor-pointer">
-                  {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-                </button>
+            <div className="mt-4 flex flex-col gap-3">
+              <div className="flex flex-col gap-1">
+                <label className={`text-[11px] font-semibold ${isDark ? "text-slate-300" : "text-slate-700"}`}>Konfirmasi Password</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Masukkan password akunmu"
+                    className={`w-full rounded-xl border px-3.5 py-2.5 pr-10 text-xs transition-all focus:outline-none ${isDark ? "border-white/15 bg-white/5 text-white placeholder:text-slate-500 focus:border-red-400 focus:bg-white/10" : "border-slate-300 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-red-500 focus:bg-white"}`}
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className={`absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer transition-colors ${isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"}`}>
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
-              <div>
-                <label className="text-[11px] font-medium text-slate-300">Ketik <span className="font-bold text-red-400">SAYA MENGERTI</span></label>
+
+              <div className="flex flex-col gap-1">
+                <label className={`text-[11px] font-semibold ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                  Ketik <span className="font-bold text-red-500 tracking-wider">SAYA MENGERTI</span>
+                </label>
                 <input
                   type="text"
                   value={confirmText}
                   onChange={(e) => setConfirmText(e.target.value)}
                   placeholder="SAYA MENGERTI"
-                  className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-red-400/50 focus:outline-none"
+                  className={`w-full rounded-xl border px-3.5 py-2.5 text-xs transition-all uppercase tracking-wider focus:outline-none ${isDark ? "border-white/15 bg-white/5 text-white placeholder:text-slate-500 focus:border-red-400 focus:bg-white/10" : "border-slate-300 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-red-500 focus:bg-white"}`}
                 />
               </div>
             </div>
 
-            <div className="mt-3 flex gap-2">
-              <button type="button" onClick={handleClose} className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300 hover:bg-white/10 cursor-pointer">
+            <div className="mt-5 flex items-center gap-2.5">
+              <button 
+                type="button" 
+                onClick={handleClose} 
+                className={`flex-1 rounded-xl border px-4 py-2.5 text-xs font-semibold cursor-pointer transition-all ${isDark ? "border-white/15 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white" : "border-slate-300 bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900"}`}
+              >
                 Batal
               </button>
-              <button type="button" onClick={handleDelete} disabled={!canSubmit || submitting} className="flex-1 rounded-xl bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
-                {submitting ? "Menghapus..." : "Hapus Akun"}
+              <button 
+                type="button" 
+                onClick={handleDelete} 
+                disabled={!canSubmit || submitting} 
+                className="flex-1 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-red-600/30 hover:from-red-500 hover:to-rose-500 cursor-pointer transition-all disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {submitting ? "Menghapus..." : "Ya, Hapus Akun"}
               </button>
             </div>
           </div>

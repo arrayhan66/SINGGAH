@@ -6,6 +6,7 @@ import AdminUserDeleteModal from "./AdminUserDeleteModal"
 import AdminUserTipeModal from "./AdminUserTipeModal"
 import ShowMoreButton from "../../../ui/ShowMoreButton"
 import UserAvatar from "../../../ui/UserAvatar"
+import { AdminUsersSkeleton } from "../../../ui/PageSkeletons"
 
 const INITIAL_VISIBLE = 10
 
@@ -23,7 +24,7 @@ const pendingTipeLabel = {
 
 function AdminUserList({ search, statusFilter }) {
   const navigate = useNavigate()
-  const { userList, deleteUser, approveTipe, rejectTipe } = useUsers()
+  const { userList, loading, deleteUser, approveTipe, rejectTipe } = useUsers()
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deleteSuccess, setDeleteSuccess] = useState(false)
@@ -120,7 +121,9 @@ function AdminUserList({ search, statusFilter }) {
   return (
     <div className="px-4 md:px-6 lg:px-8 pt-4 pb-12">
       <div className="flex flex-col gap-5">
-        {filteredUsers.length === 0 ? (
+        {loading ? (
+          <AdminUsersSkeleton />
+        ) : filteredUsers.length === 0 ? (
           <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.04] to-white/[0.01] py-20 text-center backdrop-blur-xl">
             <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-slate-500/20 bg-slate-500/10">
               <UserSearch className="h-7 w-7 text-slate-400" />

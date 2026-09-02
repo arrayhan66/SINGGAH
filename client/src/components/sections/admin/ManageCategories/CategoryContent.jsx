@@ -3,6 +3,7 @@ import { Tag, Pencil, Trash2 } from "lucide-react"
 import ShowMoreButton from "../../../../components/ui/ShowMoreButton"
 import CategoryCard from "./CategoryCard"
 import { getCategoryIcon } from "../../../../utils/categoryHelpers"
+import { AdminCategoriesSkeleton } from "../../../../components/ui/PageSkeletons"
 
 const INITIAL_VISIBLE = 12
 
@@ -18,11 +19,7 @@ export default function CategoryContent({
   onDelete,
 }) {
   if (loading) {
-    return (
-      <div className="flex items-center justify-center rounded-3xl border border-dashed border-slate-700/50 bg-white/[0.02] py-20 text-sm text-slate-400">
-        Memuat kategori...
-      </div>
-    )
+    return <AdminCategoriesSkeleton />
   }
 
   if (filtered.length === 0) {

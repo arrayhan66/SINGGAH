@@ -30,8 +30,6 @@ function UploadThumbnail({ value, onChange, existingValue, onRemoveExisting }) {
 
   return (
     <GlassCard className="relative overflow-hidden p-3 min-[280px]:p-5 sm:p-6 2xl:p-8 3xl:p-10 4xl:p-12">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-blue-500/5" />
-
       <div className="relative z-10">
         <div className="flex items-center gap-1.5 min-[280px]:gap-2">
           <div className="flex shrink-0 h-[clamp(2.5rem,1.5rem+2.5vw,5rem)] w-[clamp(2.5rem,1.5rem+2.5vw,5rem)] items-center justify-center rounded-lg bg-cyan-400/10 border border-cyan-400/30">

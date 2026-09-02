@@ -167,7 +167,7 @@ function UploadInformation({ formData, updateField }) {
           <button
             type="button"
             onClick={handleAddMember}
-            className="mt-1 flex w-fit cursor-pointer items-center gap-1.5 text-xs min-[280px]:text-sm text-cyan-300 hover:text-cyan-200 transition-colors 2xl:text-base"
+            className="mt-1 flex w-fit cursor-pointer items-center gap-1.5 text-xs min-[280px]:text-sm text-cyan-300 hover:text-cyan-200 hover:underline transition-colors 2xl:text-base"
           >
             <Plus className="h-4 w-4 2xl:h-5 2xl:w-5" />
             Tambah anggota
@@ -217,7 +217,7 @@ function UploadInformation({ formData, updateField }) {
           <button
             type="button"
             onClick={handleAddLink}
-            className="mt-1 flex w-fit cursor-pointer items-center gap-1.5 text-xs min-[280px]:text-sm text-cyan-300 hover:text-cyan-200 transition-colors 2xl:text-base"
+            className="mt-1 flex w-fit cursor-pointer items-center gap-1.5 text-xs min-[280px]:text-sm text-cyan-300 hover:text-cyan-200 hover:underline transition-colors 2xl:text-base"
           >
             <Plus className="h-4 w-4 2xl:h-5 2xl:w-5" />
             Tambah link

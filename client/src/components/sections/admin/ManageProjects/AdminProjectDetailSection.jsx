@@ -19,7 +19,7 @@ import AdminProjectApproveModal from "./AdminProjectApproveModal"
 import AdminProjectRejectModal from "./AdminProjectRejectModal"
 import DeleteConfirmModal from "../../../ui/DeleteConfirmModal"
 import Toast from "../../../ui/Toast"
-import { DetailHeroSkeleton } from "../../../ui/Skeleton"
+import { ProjectDetailSkeleton, CommentsSkeleton } from "../../../ui/PageSkeletons"
 
 const statusConfig = {
   pending: {
@@ -127,7 +127,8 @@ function AdminProjectDetailSection() {
         <DustBackground />
         <GlowBackground />
         <div className="pt-6 sm:pt-8">
-          <DetailHeroSkeleton />
+          <ProjectDetailSkeleton />
+          <CommentsSkeleton />
         </div>
       </section>
     )

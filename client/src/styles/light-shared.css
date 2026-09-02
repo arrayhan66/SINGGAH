@@ -137,6 +137,117 @@ html.light header .menu-glow {
   background-color: rgba(37, 99, 235, 0.08);
 }
 
+/* ===== DROPDOWN MOBILE USER (Menu Utama vs Menu Pribadi) ===== */
+/* Panel utama: putih lebih pekat + border biru jelas supaya tidak
+   menyatu dengan background terang */
+html.light .mobile-menu-shell {
+  background: linear-gradient(170deg, #f9fcff 0%, #e9f2fc 100%);
+  border-color: #bed3f0;
+  box-shadow: 0 32px 80px -24px rgba(30, 64, 175, 0.32);
+}
+/* Pemisah menu utama / menu pribadi: garis biru lembut di light mode */
+html.light .menu-divider-line-start {
+  background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.45));
+}
+html.light .menu-divider-line-end {
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.45), transparent);
+}
+html.light .menu-section-label-text {
+  color: #2563eb;
+  text-shadow: none;
+}
+/* Kartu container menu: permukaan putih + border biru lembut */
+html.light .mobile-menu-card.border-white\/10 {
+  border-color: #dfe9f9;
+}
+html.light .mobile-menu-card.bg-white\/\[0\.03\] {
+  background: linear-gradient(180deg, #ffffff 0%, #f3f8ff 100%);
+}
+html.light .mobile-menu-shell .text-red-400\/80 {
+  color: #dc2626;
+}
+
+/* Profil header dropdown mobile */
+html.light .mobile-menu-profile .bg-\[\#0b2a50\] {
+  background-color: #ffffff;
+  box-shadow: inset 0 0 0 1px #dbe6f6;
+}
+html.light .mobile-menu-profile .bg-\[\#0b2a50\] .border-\[\#0b2a50\] {
+  border-color: #ffffff;
+}
+html.light .mobile-menu-profile {
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.06), transparent);
+}
+html.light .mobile-menu-profile p.text-white {
+  color: #0f172a;
+}
+html.light .mobile-menu-profile p.text-slate-500 {
+  color: #64748b;
+}
+
+/* Kartu item dropdown: permukaan putih + border biru lembut supaya
+   jejak dengan background terang terlihat jelas */
+html.light .mobile-menu-item.bg-white\/\[0\.03\] {
+  background-color: #ffffff;
+  box-shadow: inset 0 0 0 1px #e3ecf9;
+}
+html.light .mobile-menu-item.hover\:bg-white\/\[0\.06\]:hover {
+  background-color: #eef4fb;
+}
+html.light .mobile-menu-item .mobile-menu-item-label {
+  color: #1f3a63;
+}
+html.light .mobile-menu-item.border-cyan-400\/30 {
+  border-color: #93c5fd;
+  background-color: #eff6ff;
+}
+html.light .mobile-menu-item.border-cyan-400\/30 .mobile-menu-item-label {
+  color: #1d4ed8;
+}
+html.light .mobile-menu-item.border-cyan-400\/30 svg {
+  color: #1d4ed8;
+}
+html.light .mobile-menu-item .text-slate-500 {
+  color: #64748b;
+}
+
+/* ===== LONCENG NOTIFIKASI ===== */
+html.light .notification-bell {
+  color: #2563eb;
+  background: linear-gradient(180deg, #ffffff 0%, #f2f7fe 52%, #e6effb 100%);
+  border-color: #cfe0f7;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 3px 10px -3px rgba(37, 99, 235, 0.2);
+}
+html.light .notification-bell::after {
+  background: radial-gradient(
+    circle at 50% -20%,
+    rgba(147, 197, 253, 0.42),
+    transparent 55%
+  );
+}
+html.light .notification-bell:hover {
+  color: #1d4ed8;
+  border-color: #93c5fd;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 8px 18px -6px rgba(37, 99, 235, 0.32);
+}
+html.light .notification-bell.has-unread {
+  color: #1d4ed8;
+  border-color: #93c5fd;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 0 0 3px rgba(147, 197, 253, 0.28),
+    0 6px 16px -6px rgba(37, 99, 235, 0.28);
+}
+html.light .notification-bell .notification-badge {
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.95),
+    0 3px 8px -2px rgba(225, 29, 72, 0.6);
+}
+
 /* ===== GLASS CARD / SURFACE PUTIH ===== */
 /* Card putih solid + border biru + shadow biru */
 html.light .border-white\/10.bg-white\/5 {

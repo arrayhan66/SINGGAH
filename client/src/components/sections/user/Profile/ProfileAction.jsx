@@ -31,10 +31,15 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
     return () => clearTimeout(t)
   }, [showSuccess, emailChanged, navigate])
 
-  const isChangingPassword =
+  const isChangingPassword = Boolean(
     passwordData.currentPassword ||
     passwordData.newPassword ||
     passwordData.confirmPassword
+  )
+
+  const hasPasswordChanged = Boolean(
+    passwordData.currentPassword && passwordData.newPassword
+  )
 
   useEffect(() => {
     if (errors.length > 0) {
@@ -149,10 +154,10 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
             </div>
             <div className="min-w-0 flex-1">
               <h3 className="pt-1 text-sm font-semibold text-emerald-300">
-                {emailChanged ? "Periksa Email Baru!" : "Berhasil!"}
+                {emailChanged ? "Periksa Email Baru!" : hasPasswordChanged ? "Password Berhasil Diubah!" : "Berhasil!"}
               </h3>
               <p className="mt-0.5 text-xs text-emerald-300/80">
-                {emailChanged ? "Kode verifikasi telah dikirim ke email baru." : "Profil berhasil diperbarui."}
+                {emailChanged ? "Kode verifikasi telah dikirim ke email baru." : hasPasswordChanged ? "Password dan profil berhasil diperbarui." : "Profil berhasil diperbarui."}
               </p>
             </div>
           </div>
@@ -164,21 +169,12 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
         </div>
       </PopupToast>
 
-      <div className="flex flex-col min-[400px]:flex-row gap-3">
-        <button
-          type="button"
-          onClick={handleCancel}
-          className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium text-slate-300 hover:bg-white/10 transition-colors cursor-pointer"
-        >
-          <X size={16} />
-          Batal
-        </button>
-
+      <div className="flex flex-col">
         <button
           type="button"
           onClick={handleSubmit}
           disabled={submitting}
-          className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
         >
           <Save size={16} />
           {submitting ? "Menyimpan..." : "Simpan Perubahan"}

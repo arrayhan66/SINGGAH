@@ -13,6 +13,7 @@ import GlassCard from "../../../ui/GlassCard"
 import FormAlert from "../../../ui/FormAlert"
 import api from "../../../../services/api"
 import { useAuth } from "../../../../context/AuthContext"
+import { useTheme } from "../../../../context/ThemeContext"
 
 const tipeLabel = {
   mahasiswa: "Mahasiswa",
@@ -21,6 +22,8 @@ const tipeLabel = {
 
 function ProfileVerification() {
   const { user, login, token } = useAuth()
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
   const [targetTipe, setTargetTipe] = useState(null) // "mahasiswa" | "dosen" | null
   const [nimNip, setNimNip] = useState("")
   const [identitasPhoto, setIdentitasPhoto] = useState(null)
@@ -168,7 +171,7 @@ function ProfileVerification() {
                   ? "Masukkan NIM kamu"
                   : "Masukkan Kartu Identitas (Opsional)"
               }
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/50 focus:outline-none transition-colors"
+              className={`w-full rounded-xl border px-4 py-2.5 text-sm transition-colors focus:outline-none ${isDark ? "border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:border-cyan-400/50" : "border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-cyan-500"}`}
             />
           </div>
 
@@ -218,7 +221,7 @@ function ProfileVerification() {
               type="button"
               onClick={handleCancelApply}
               disabled={applying}
-              className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs md:text-sm font-medium text-slate-300 hover:bg-white/10"
+              className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs md:text-sm font-medium text-slate-300 hover:bg-white/10 cursor-pointer"
             >
               Batal
             </button>
@@ -234,15 +237,15 @@ function ProfileVerification() {
       ) : (
         <>
           {rejectedReason && (
-            <div className="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
-              <div className="flex items-center gap-2 text-sm font-medium text-red-400">
-                <XCircle size={16} className="shrink-0" />
+            <div className={`mt-5 rounded-xl border p-4 ${isDark ? "border-red-500/30 bg-red-500/10 text-red-200" : "border-red-200 bg-red-50 text-red-900"}`}>
+              <div className={`flex items-center gap-2 text-sm font-medium ${isDark ? "text-red-400" : "text-red-700"}`}>
+                <XCircle size={16} className="shrink-0 max-[389px]:hidden" />
                 Pengajuan sebelumnya ditolak
               </div>
-              <p className="mt-1.5 text-xs md:text-sm text-red-200">
+              <p className={`mt-1.5 text-xs md:text-sm ${isDark ? "text-red-200" : "text-red-800"}`}>
                 {rejectedReason}
               </p>
-              <p className="mt-2 text-[11px] text-red-300/70">
+              <p className={`mt-2 text-[11px] ${isDark ? "text-red-300/70" : "text-red-700/80"}`}>
                 Silakan ajukan ulang dengan NIM/Kartu Identitas dan foto KTM yang valid.
               </p>
             </div>
@@ -261,7 +264,7 @@ function ProfileVerification() {
               onClick={() => handleStartApply("mahasiswa")}
               className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm font-semibold text-cyan-200 transition-colors hover:bg-cyan-400/20"
             >
-              <GraduationCap size={16} />
+              <GraduationCap size={16} className="max-[599px]:hidden" />
               Ajukan sebagai Mahasiswa
             </button>
             <button
@@ -269,7 +272,7 @@ function ProfileVerification() {
               onClick={() => handleStartApply("dosen")}
               className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-blue-400/30 bg-blue-400/10 px-4 py-3 text-sm font-semibold text-blue-200 transition-colors hover:bg-blue-400/20"
             >
-              <Briefcase size={16} />
+              <Briefcase size={16} className="max-[599px]:hidden" />
               Ajukan sebagai Dosen
             </button>
           </div>

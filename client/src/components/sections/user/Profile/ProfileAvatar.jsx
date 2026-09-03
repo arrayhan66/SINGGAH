@@ -3,6 +3,7 @@ import { Camera, X } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
 import UserAvatar from "../../../ui/UserAvatar"
 import { useAuth } from "../../../../context/AuthContext"
+import { compressImage } from "../../../../utils/compressImage"
 
 function ProfileAvatar({ value, existingUrl, onChange, onRemove }) {
   const inputRef = useRef(null)
@@ -11,9 +12,12 @@ function ProfileAvatar({ value, existingUrl, onChange, onRemove }) {
   const previewUrl = value ? URL.createObjectURL(value) : null
   const displayUrl = previewUrl || existingUrl
 
-  function handleFileChange(e) {
+  async function handleFileChange(e) {
     const file = e.target.files?.[0]
-    if (file) onChange(file)
+    if (!file) return
+    const compressed = await compressImage(file, { maxSize: 1024 * 1024 })
+    onChange(compressed)
+    if (inputRef.current) inputRef.current.value = ""
   }
 
   function handleRemove(e) {

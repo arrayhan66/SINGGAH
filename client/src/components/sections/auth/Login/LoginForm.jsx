@@ -19,6 +19,7 @@ function LoginForm() {
   const [fieldErrors, setFieldErrors] = useState({ email: "", password: "" });
 
   const { login } = useAuth();
+  const [hasSentCode, setHasSentCode] = useState(false);
 
   const backTo = getRedirectFrom(location) || "/";
 
@@ -82,15 +83,36 @@ function LoginForm() {
         status === 403 &&
         /belum diverifikasi|belum dioverifikasi/i.test(message)
       ) {
+        const isPendingEmail =
+          /perubahan email belum diverifikasi/i.test(message)
+        const pendingEmail = err.response?.data?.data?.pending_email
+        const verifyEmail = (
+          isPendingEmail && pendingEmail
+            ? pendingEmail
+            : email.trim().toLowerCase()
+        )
+
         localStorage.setItem("verifyType", "register")
-        localStorage.setItem("registerEmail", email.trim().toLowerCase())
+        localStorage.setItem("registerEmail", verifyEmail)
         sessionStorage.setItem(
           "verifyPendingLogin",
           JSON.stringify({
-            email: email.trim().toLowerCase(),
+            email: verifyEmail,
             password,
           }),
         )
+
+        if (!hasSentCode) {
+          try {
+            await api.post("/auth/resend-verification", {
+              email: verifyEmail,
+            })
+          } catch {
+            /* abaikan — kode lama mungkin masih berlaku, pengguna bisa kirim ulang */
+          }
+          setHasSentCode(true)
+        }
+
         navigate("/verify-code", { replace: true })
         return
       }

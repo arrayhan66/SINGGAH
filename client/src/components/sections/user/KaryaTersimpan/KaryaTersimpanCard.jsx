@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom"
-import { Calendar, ArrowRight } from "lucide-react"
+import { Calendar, ArrowRight, Bookmark } from "lucide-react"
 import { imageUrl } from "../../../../utils/imageUrl"
 import GlassCard from "../../../ui/GlassCard"
 
-function KaryaTersimpanCard({ item }) {
+function KaryaTersimpanCard({ item, onRemove }) {
   const navigate = useNavigate()
 
   const categorySlug = item.Category?.slug || item.category || ""
@@ -21,6 +21,12 @@ function KaryaTersimpanCard({ item }) {
     navigate(`/karya/${categorySlug}/${item.slug || item.id}`)
   }
 
+  function handleUnbookmark(e) {
+    e.preventDefault()
+    e.stopPropagation()
+    onRemove?.()
+  }
+
   return (
     <GlassCard
       hover
@@ -36,6 +42,15 @@ function KaryaTersimpanCard({ item }) {
         <span className="absolute left-3 top-3 z-10 rounded-full border border-cyan-400/30 bg-brand-navy/80 px-2.5 py-0.5 text-[10px] font-medium text-cyan-300 backdrop-blur-sm sm:left-4 sm:top-4 sm:text-xs">
           {categoryName}
         </span>
+        <button
+          type="button"
+          onClick={handleUnbookmark}
+          aria-label="Hapus dari tersimpan"
+          title="Hapus dari tersimpan"
+          className="absolute right-3 top-3 z-10 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border border-white/10 bg-brand-navy/80 text-slate-200 backdrop-blur-sm transition-colors hover:border-cyan-400/30 hover:text-cyan-300 sm:right-4 sm:top-4 sm:h-8 sm:w-8"
+        >
+          <Bookmark size={14} className="fill-cyan-400 text-cyan-400 sm:size-[15px]" />
+        </button>
       </div>
 
       <div className="flex flex-1 flex-col p-4 sm:p-5">

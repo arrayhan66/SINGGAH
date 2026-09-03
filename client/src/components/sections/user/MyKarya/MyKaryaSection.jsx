@@ -93,11 +93,12 @@ function MyKaryaSection() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-brand-dark px-4 pt-[calc(var(--navbar-h)+24px)] pb-10 sm:px-6 sm:pt-[calc(var(--navbar-h)+32px)] sm:pb-16 md:px-8 lg:px-12 2xl:px-16 2xl:pb-20 3xl:px-20 3xl:pb-24 4xl:px-24 4xl:pb-28">
+      <section className="relative overflow-hidden bg-brand-dark px-4 pt-[calc(var(--navbar-h)+24px)] pb-6 sm:px-6 sm:pt-[calc(var(--navbar-h)+32px)] sm:pb-8 md:px-8 lg:px-12 2xl:px-16 2xl:pb-10 3xl:px-20 3xl:pb-12 4xl:px-24 4xl:pb-14">
         <GlowBackground />
 
         <div className="relative z-10 mx-auto max-w-7xl 2xl:max-w-[1440px] 3xl:max-w-[1800px] 4xl:max-w-[2200px]">
           <MyKaryaHero />
+          <MyKaryaStats stats={stats} isDosen={isDosen} />
         </div>
       </section>
 
@@ -112,9 +113,7 @@ function MyKaryaSection() {
             <MyKaryaPageSkeleton />
           ) : (
             <>
-              <MyKaryaStats stats={stats} isDosen={isDosen} />
-
-              <div className="mt-8 2xl:mt-12 3xl:mt-14 4xl:mt-16">
+              <div className="mt-4 2xl:mt-6 3xl:mt-8 4xl:mt-10">
                 <MyKaryaFilter
                   search={search}
                   onSearchChange={handleSearchChange}

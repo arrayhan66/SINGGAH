@@ -296,6 +296,7 @@ function ReplyForm({ user, replyRef, replyText, setReplyText, insertEmojiIntoRep
               onSelect={insertEmojiIntoReply}
               closeOnSelect={false}
               direction="down"
+              align="center"
               buttonClassName="max-[320px]:px-1.5 max-[320px]:py-1.5"
             />
             <div className="flex flex-nowrap items-center gap-1.5 max-[320px]:gap-1">
@@ -721,6 +722,7 @@ function KaryaProjectComments({
                   showLabel
                   closeOnSelect={false}
                   direction="down"
+                  align="center"
                   buttonClassName="max-[320px]:px-2 max-[320px]:py-1.5 max-[320px]:text-[11px]"
                 />
                 <button

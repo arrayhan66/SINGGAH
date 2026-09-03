@@ -6,6 +6,7 @@ import GlowBackground from "../../../ui/GlowBackground"
 import DustBackground from "../../../ui/DustBackground"
 import useSearchAndExpand from "../../../../hooks/useSearchAndExpand"
 import KaryaTersimpanCard from "./KaryaTersimpanCard"
+import { useAuth } from "../../../../context/AuthContext"
 import { SavedKaryaPageSkeleton } from "../../../ui/PageSkeletons"
 import api from "../../../../services/api"
 
@@ -13,6 +14,7 @@ function KaryaTersimpanSection() {
   const [initialCount, setInitialCount] = useState(6)
   const [bookmarks, setBookmarks] = useState([])
   const [loading, setLoading] = useState(true)
+  const { user } = useAuth()
 
   useEffect(() => {
     api.get("/projects/my-bookmarks")
@@ -30,15 +32,15 @@ function KaryaTersimpanSection() {
     const handleResize = () => {
       const w = window.innerWidth
       if (w >= 2560) {
-        setInitialCount(12)
+        setInitialCount(6)
       } else if (w >= 1920) {
-        setInitialCount(10)
+        setInitialCount(6)
       } else if (w >= 1536) {
-        setInitialCount(8)
+        setInitialCount(6)
       } else if (w >= 1024) {
         setInitialCount(6)
       } else {
-        setInitialCount(4)
+        setInitialCount(6)
       }
     }
 
@@ -55,6 +57,18 @@ function KaryaTersimpanSection() {
     showAll,
     setShowAll,
   } = useSearchAndExpand(bookmarks, initialCount)
+
+  function handleRemoveBookmark(id) {
+    if (!user) return
+    api
+      .post(`/projects/${id}/bookmark`)
+      .then(() => {
+        setBookmarks((prev) => prev.filter((b) => b.id !== id))
+      })
+      .catch((err) => {
+        console.error("Failed to remove bookmark:", err)
+      })
+  }
 
   return (
     <section className="relative overflow-hidden bg-brand-dark px-4 pt-[calc(var(--navbar-h)+24px)] pb-8 sm:px-5 sm:pt-[calc(var(--navbar-h)+32px)] sm:pb-10 md:px-8 lg:px-10 lg:pb-12 xl:px-12 3xl:px-16 4xl:px-20 4xl:pb-20">
@@ -94,7 +108,11 @@ function KaryaTersimpanSection() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:gap-6 lg:grid-cols-3 lg:gap-7 xl:gap-8 3xl:grid-cols-4 3xl:gap-9 4xl:grid-cols-5 4xl:gap-10">
                 {visibleBookmarks.length > 0 ? (
                   visibleBookmarks.map((item) => (
-                    <KaryaTersimpanCard key={item.id} item={item} />
+                    <KaryaTersimpanCard
+                      key={item.id}
+                      item={item}
+                      onRemove={() => handleRemoveBookmark(item.id)}
+                    />
                   ))
                 ) : (
                   <div className="col-span-full flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-700/60 bg-slate-800/20 py-10 sm:rounded-2xl sm:py-14 md:py-16 lg:py-20 3xl:py-24 4xl:py-28">
@@ -125,7 +143,7 @@ function KaryaTersimpanSection() {
             {/* Load more */}
             {!showAll && filteredBookmarks.length > initialCount && (
               <div className="mt-6 flex justify-center sm:mt-8 3xl:mt-10 4xl:mt-12">
-                <OutlineButton onClick={() => setShowAll(true)}>
+                <OutlineButton onClick={() => setShowAll(true)} className="karya-loadmore-btn">
                   Lihat Lebih Banyak
                 </OutlineButton>
               </div>

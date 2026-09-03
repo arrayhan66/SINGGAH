@@ -197,6 +197,76 @@ html.light .mobile-menu-item.hover\:bg-white\/\[0\.06\]:hover {
 html.light .mobile-menu-item .mobile-menu-item-label {
   color: #1f3a63;
 }
+html.light .mobile-menu-item.group:hover
+  > .min-w-0 > .mobile-menu-item-label.group-hover\:text-cyan-300 {
+  color: #0e7490;
+}
+html.light .mobile-menu-item.group:hover
+  > .min-w-0 > .mobile-menu-item-label.group-hover\:text-indigo-300 {
+  color: #4338ca;
+}
+html.light .mobile-menu-item.group:hover
+  > .min-w-0 > .mobile-menu-item-label.group-hover\:text-emerald-300 {
+  color: #047857;
+}
+html.light .mobile-menu-item.group:hover
+  > .min-w-0 > .mobile-menu-item-label.group-hover\:text-amber-300 {
+  color: #b45309;
+}
+html.light .mobile-menu-item.group:hover
+  > .min-w-0 > .mobile-menu-item-label.group-hover\:text-sky-300 {
+  color: #0369a1;
+}
+html.light .mobile-menu-item.group:hover
+  > .min-w-0 > .mobile-menu-item-label.group-hover\:text-blue-300 {
+  color: #1d4ed8;
+}
+html.light .mobile-menu-item.group:hover
+  > .min-w-0 > .mobile-menu-item-label.group-hover\:text-fuchsia-300 {
+  color: #a21caf;
+}
+html.light .mobile-menu-item.group:hover
+  > .min-w-0 > .mobile-menu-item-label.group-hover\:text-teal-300 {
+  color: #0f766e;
+}
+html.light .mobile-menu-item.group:hover
+  > .min-w-0 > .mobile-menu-item-label.group-hover\:text-blue-600 {
+  color: #2563eb;
+}
+html.light .mobile-menu-item.group:hover
+  > .min-w-0 > .mobile-menu-item-label.group-hover\:text-red-400 {
+  color: #dc2626;
+}
+html.light .mobile-menu-item.group:hover .group-hover\:text-cyan-300 {
+  color: #0e7490;
+}
+html.light .mobile-menu-item.group:hover .group-hover\:text-indigo-300 {
+  color: #4338ca;
+}
+html.light .mobile-menu-item.group:hover .group-hover\:text-emerald-300 {
+  color: #047857;
+}
+html.light .mobile-menu-item.group:hover .group-hover\:text-amber-300 {
+  color: #b45309;
+}
+html.light .mobile-menu-item.group:hover .group-hover\:text-sky-300 {
+  color: #0369a1;
+}
+html.light .mobile-menu-item.group:hover .group-hover\:text-blue-300 {
+  color: #1d4ed8;
+}
+html.light .mobile-menu-item.group:hover .group-hover\:text-fuchsia-300 {
+  color: #a21caf;
+}
+html.light .mobile-menu-item.group:hover .group-hover\:text-teal-300 {
+  color: #0f766e;
+}
+html.light .mobile-menu-item.group:hover .group-hover\:text-red-400 {
+  color: #dc2626;
+}
+html.light .mobile-menu-item.group:hover .group-hover\:text-blue-600 {
+  color: #2563eb;
+}
 html.light .mobile-menu-item.border-cyan-400\/30 {
   border-color: #93c5fd;
   background-color: #eff6ff;
@@ -206,6 +276,48 @@ html.light .mobile-menu-item.border-cyan-400\/30 .mobile-menu-item-label {
 }
 html.light .mobile-menu-item.border-cyan-400\/30 svg {
   color: #1d4ed8;
+}
+html.light .mobile-menu-item.border-indigo-400\/30 .mobile-menu-item-label {
+  color: #4338ca;
+}
+html.light .mobile-menu-item.border-indigo-400\/30 svg {
+  color: #4338ca;
+}
+html.light .mobile-menu-item.border-emerald-400\/30 .mobile-menu-item-label {
+  color: #047857;
+}
+html.light .mobile-menu-item.border-emerald-400\/30 svg {
+  color: #047857;
+}
+html.light .mobile-menu-item.border-amber-400\/30 .mobile-menu-item-label {
+  color: #b45309;
+}
+html.light .mobile-menu-item.border-amber-400\/30 svg {
+  color: #b45309;
+}
+html.light .mobile-menu-item.border-sky-400\/30 .mobile-menu-item-label {
+  color: #0369a1;
+}
+html.light .mobile-menu-item.border-sky-400\/30 svg {
+  color: #0369a1;
+}
+html.light .mobile-menu-item.border-blue-400\/30 .mobile-menu-item-label {
+  color: #1d4ed8;
+}
+html.light .mobile-menu-item.border-blue-400\/30 svg {
+  color: #1d4ed8;
+}
+html.light .mobile-menu-item.border-fuchsia-400\/30 .mobile-menu-item-label {
+  color: #a21caf;
+}
+html.light .mobile-menu-item.border-fuchsia-400\/30 svg {
+  color: #a21caf;
+}
+html.light .mobile-menu-item.border-teal-400\/30 .mobile-menu-item-label {
+  color: #0f766e;
+}
+html.light .mobile-menu-item.border-teal-400\/30 svg {
+  color: #0f766e;
 }
 html.light .mobile-menu-item .text-slate-500 {
   color: #64748b;

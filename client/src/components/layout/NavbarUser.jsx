@@ -13,7 +13,7 @@ import {
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../../assets/icons/logo.webp";
 import { useAuth } from "../../context/AuthContext";
-import useNotifications from "../../hooks/useNotifications";
+import { useNotifications } from "../../context/NotificationContext";
 import NotificationBell from "./NotificationBell";
 import NotificationPanel from "./NotificationPanel";
 import MobileMenu from "./MobileMenu";
@@ -22,7 +22,7 @@ import DeleteConfirmModal from "../ui/DeleteConfirmModal";
 import NotificationDetailModal from "../ui/NotificationDetailModal";
 import ThemeToggle from "../ui/ThemeToggle";
 import UserAvatar from "../ui/UserAvatar";
-import { itemSubtitle, itemAccent, itemActive, itemHover } from "./menuConstants";
+import { itemBar, itemSubtitle, itemAccent, itemActive, itemHover, itemHoverBox } from "./menuConstants";
 import { prefetchRouteFromLink } from "../../utils/routePrefetch";
 
 function NavbarUser() {
@@ -285,7 +285,7 @@ function NavbarUser() {
                 fallbackSizeClass="h-full w-full"
                 textClass="text-xs font-semibold"
               />
-              <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-[1.5px] border-brand-dark bg-emerald-400" />
+              <span className="absolute -bottom-0 -right-0 h-2.5 w-2.5 rounded-full bg-emerald-400" />
             </button>
 
             {/* Full (xl+) - name + badge + avatar + chevron */}
@@ -305,7 +305,7 @@ function NavbarUser() {
                     fallbackSizeClass="h-full w-full"
                     textClass="text-xs font-semibold"
                   />
-                  <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-[1.5px] border-brand-dark bg-emerald-400" />
+                  <span className="absolute -bottom-0 -right-0 h-2.5 w-2.5 rounded-full bg-emerald-400" />
                 </div>
 
                 <div className="select-none text-left">
@@ -357,10 +357,14 @@ function NavbarUser() {
                         "mobile-menu-item group relative flex items-center gap-3.5 rounded-2xl border px-3 py-2.5 transition-[background-color,border-color,color] duration-150 " +
                         (isActive
                           ? itemActive[item.label] || itemActive.Beranda
-                          : "border-transparent hover:bg-white/5")
-                      }
+                          : "border-transparent " + (itemHoverBox[item.label] || itemHoverBox.Beranda))
+                        }
                     >
-                      <span className="pointer-events-none absolute inset-y-1.5 left-0 w-[3px] rounded-full bg-gradient-to-b from-cyan-400 to-blue-500 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                      <span
+                        className={`pointer-events-none absolute inset-y-1.5 left-0 w-[3px] rounded-full bg-gradient-to-b opacity-0 transition-opacity duration-200 group-hover:opacity-100 ${
+                          itemBar[item.label] || itemBar.Beranda
+                        }`}
+                      />
                       <span
                         className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ring-1 ring-inset ${
                           itemAccent[item.label] || "from-cyan-400/20 to-blue-500/10 text-cyan-400 ring-cyan-400/25"

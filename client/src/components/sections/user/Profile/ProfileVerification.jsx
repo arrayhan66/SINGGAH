@@ -14,6 +14,7 @@ import FormAlert from "../../../ui/FormAlert"
 import api from "../../../../services/api"
 import { useAuth } from "../../../../context/AuthContext"
 import { useTheme } from "../../../../context/ThemeContext"
+import { compressImage } from "../../../../utils/compressImage"
 
 const tipeLabel = {
   mahasiswa: "Mahasiswa",
@@ -155,6 +156,12 @@ function ProfileVerification() {
             </button>
           </div>
 
+          <p className="text-[11px] leading-relaxed text-slate-400 md:text-xs">
+            {targetTipe === "mahasiswa"
+              ? "Ajukan ulang dengan NIM dan foto KTM kamu yang valid."
+              : "Ajukan ulang dengan NIP/NIDN dan foto Kartu Identitas yang valid."}
+          </p>
+
           <div className="flex flex-col gap-1.5">
             <label className="text-xs md:text-sm font-medium text-slate-300">
               {targetTipe === "mahasiswa"
@@ -169,7 +176,7 @@ function ProfileVerification() {
               placeholder={
                 targetTipe === "mahasiswa"
                   ? "Masukkan NIM kamu"
-                  : "Masukkan Kartu Identitas (Opsional)"
+                  : "Masukkan Kartu Identitas"
               }
               className={`w-full rounded-xl border px-4 py-2.5 text-sm transition-colors focus:outline-none ${isDark ? "border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:border-cyan-400/50" : "border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-cyan-500"}`}
             />
@@ -183,7 +190,7 @@ function ProfileVerification() {
               <div className="relative overflow-hidden rounded-xl border border-white/10">
                 <img
                   src={previewUrl}
-                  alt="KTM Preview"
+                  alt={targetTipe === "mahasiswa" ? "KTM Preview" : "Kartu Identitas Preview"}
                   className="max-h-48 w-full object-contain"
                 />
                 <button
@@ -201,7 +208,10 @@ function ProfileVerification() {
                 className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-white/15 bg-white/[0.03] px-4 py-6 text-slate-400 transition-colors hover:border-cyan-400/40 hover:text-cyan-300"
               >
                 <ImageOff className="h-6 w-6" />
-                <span className="text-xs">Klik untuk mengunggah foto identitas / KTM</span>
+                <span className="text-xs">
+                  Klik untuk mengunggah foto{" "}
+                  {targetTipe === "mahasiswa" ? "KTM" : "Kartu Identitas"}
+                </span>
               </button>
             )}
             <input
@@ -209,9 +219,14 @@ function ProfileVerification() {
               type="file"
               accept="image/*"
               className="hidden"
-              onChange={(e) => {
+              onChange={async (e) => {
                 const f = e.target.files?.[0]
-                if (f) setIdentitasPhoto(f)
+                if (!f) return
+                const compressed = await compressImage(f, {
+                  maxSize: 1024 * 1024,
+                })
+                setIdentitasPhoto(compressed)
+                if (fileInputRef.current) fileInputRef.current.value = ""
               }}
             />
           </div>
@@ -242,11 +257,16 @@ function ProfileVerification() {
                 <XCircle size={16} className="shrink-0 max-[389px]:hidden" />
                 Pengajuan sebelumnya ditolak
               </div>
-              <p className={`mt-1.5 text-xs md:text-sm ${isDark ? "text-red-200" : "text-red-800"}`}>
-                {rejectedReason}
-              </p>
+              <div className="mt-1.5 flex items-start gap-1.5">
+                <span className={`text-xs md:text-sm font-semibold ${isDark ? "text-red-300" : "text-red-700"}`}>
+                  Alasan:
+                </span>
+                <p className={`text-xs md:text-sm ${isDark ? "text-red-200" : "text-red-800"}`}>
+                  {rejectedReason}
+                </p>
+              </div>
               <p className={`mt-2 text-[11px] ${isDark ? "text-red-300/70" : "text-red-700/80"}`}>
-                Silakan ajukan ulang dengan NIM/Kartu Identitas dan foto KTM yang valid.
+                Silakan ajukan ulang dengan dokumen yang valid.
               </p>
             </div>
           )}
@@ -262,17 +282,17 @@ function ProfileVerification() {
             <button
               type="button"
               onClick={() => handleStartApply("mahasiswa")}
-              className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm font-semibold text-cyan-200 transition-colors hover:bg-cyan-400/20"
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-md shadow-cyan-500/10 transition-colors duration-300 hover:bg-slate-200"
             >
-              <GraduationCap size={16} className="max-[599px]:hidden" />
+              <GraduationCap size={16} className="max-[599px]:hidden text-cyan-500" />
               Ajukan sebagai Mahasiswa
             </button>
             <button
               type="button"
               onClick={() => handleStartApply("dosen")}
-              className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-blue-400/30 bg-blue-400/10 px-4 py-3 text-sm font-semibold text-blue-200 transition-colors hover:bg-blue-400/20"
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-md shadow-blue-500/10 transition-colors duration-300 hover:bg-slate-200"
             >
-              <Briefcase size={16} className="max-[599px]:hidden" />
+              <Briefcase size={16} className="max-[599px]:hidden text-blue-500" />
               Ajukan sebagai Dosen
             </button>
           </div>

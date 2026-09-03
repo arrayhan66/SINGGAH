@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { useNavigate } from "react-router-dom"
 import { Save, X, CheckCircle } from "lucide-react"
 import api from "../../../../services/api"
@@ -13,6 +14,7 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
   const [submitting, setSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [emailChanged, setEmailChanged] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(null)
 
   useEffect(() => {
     if (!showSuccess) return
@@ -93,29 +95,68 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
         )
       }
 
-      const formData = new FormData()
-      formData.append("name", profileData.name.trim())
-      formData.append("username", profileData.username.trim())
-      formData.append("email", profileData.email.trim())
-
-      if (profileData.nim_nip) {
-        formData.append("nim_nip", profileData.nim_nip.trim())
+      const payload = {
+        name: profileData.name.trim(),
+        username: profileData.username.trim(),
+        email: profileData.email.trim(),
+        ...(profileData.nim_nip
+          ? { nim_nip: profileData.nim_nip.trim() }
+          : {}),
       }
 
-      if (profileData.avatar) {
-        formData.append("avatar", profileData.avatar)
+      const hasFiles = Boolean(profileData.avatar || identitasPhoto)
+
+      const putProfile = async (attempt = 1) => {
+        try {
+          let data = payload
+          let headers = {
+            Authorization: `Bearer ${token}`,
+          }
+
+          if (hasFiles) {
+            const formData = new FormData()
+            Object.entries(payload).forEach(([k, v]) =>
+              formData.append(k, v),
+            )
+            if (profileData.avatar) {
+              formData.append("avatar", profileData.avatar)
+            }
+            if (identitasPhoto) {
+              formData.append("identitas_photo", identitasPhoto)
+            }
+            data = formData
+            headers["Content-Type"] = "multipart/form-data"
+          } else {
+            headers["Content-Type"] = "application/json"
+          }
+
+          return await api.put("/auth/profile", data, {
+            headers,
+            timeout: 60000,
+            onUploadProgress: (progressEvent) => {
+              if (!hasFiles) return
+              const total = progressEvent.total || 1
+              const percent = Math.round((progressEvent.loaded / total) * 100)
+              setUploadProgress(percent)
+            },
+          })
+        } catch (err) {
+          const isNetworkError =
+            !err.response &&
+            (err.code === "ECONNRESET" ||
+              err.code === "ETIMEDOUT" ||
+              err.message?.includes("Network Error") ||
+              err.code === "ERR_NETWORK")
+          if (isNetworkError && attempt < 4) {
+            const backoff = 1500 * attempt
+            await new Promise((r) => setTimeout(r, backoff))
+            return putProfile(attempt + 1)
+          }
+          throw err
+        }
       }
 
-      if (identitasPhoto) {
-        formData.append("identitas_photo", identitasPhoto)
-      }
-
-      const res = await api.put("/auth/profile", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      })
+      const res = await putProfile()
 
       const updatedUser = res.data.data
       login({ ...user, ...updatedUser }, token)
@@ -136,6 +177,7 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
       setErrors([msg])
     } finally {
       setSubmitting(false)
+      setUploadProgress(null)
     }
   }
 
@@ -146,28 +188,31 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
   return (
     <div className="relative flex flex-col gap-3">
       {/* Success Toast */}
-      <PopupToast show={showSuccess} variant="success" onClose={() => {}} duration={2500}>
-        <div className="px-4 py-3.5 text-center">
-          <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 border border-emerald-500/30">
-              <CheckCircle className="h-4.5 w-4.5 text-emerald-400" />
+      {createPortal(
+        <PopupToast show={showSuccess} variant="success" onClose={() => {}} duration={2500}>
+          <div className="px-4 py-3.5 text-center">
+            <div className="flex items-start gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 border border-emerald-500/30">
+                <CheckCircle className="h-4.5 w-4.5 text-emerald-400" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="pt-1 text-sm font-semibold text-emerald-300">
+                  {emailChanged ? "Periksa Email Baru!" : hasPasswordChanged ? "Password Berhasil Diubah!" : "Berhasil!"}
+                </h3>
+                <p className="mt-0.5 text-xs text-emerald-300/80">
+                  {emailChanged ? "Kode verifikasi telah dikirim ke email baru." : hasPasswordChanged ? "Password dan profil berhasil diperbarui." : "Profil berhasil diperbarui."}
+                </p>
+              </div>
             </div>
-            <div className="min-w-0 flex-1">
-              <h3 className="pt-1 text-sm font-semibold text-emerald-300">
-                {emailChanged ? "Periksa Email Baru!" : hasPasswordChanged ? "Password Berhasil Diubah!" : "Berhasil!"}
-              </h3>
-              <p className="mt-0.5 text-xs text-emerald-300/80">
-                {emailChanged ? "Kode verifikasi telah dikirim ke email baru." : hasPasswordChanged ? "Password dan profil berhasil diperbarui." : "Profil berhasil diperbarui."}
-              </p>
+            <div className="mt-3 flex justify-center gap-1.5">
+              <div className="h-1.5 w-1.5 animate-bounce rounded-full bg-emerald-400 [animation-delay:-0.3s]" />
+              <div className="h-1.5 w-1.5 animate-bounce rounded-full bg-emerald-400 [animation-delay:-0.15s]" />
+              <div className="h-1.5 w-1.5 animate-bounce rounded-full bg-emerald-400" />
             </div>
           </div>
-          <div className="mt-3 flex justify-center gap-1.5">
-            <div className="h-1.5 w-1.5 animate-bounce rounded-full bg-emerald-400 [animation-delay:-0.3s]" />
-            <div className="h-1.5 w-1.5 animate-bounce rounded-full bg-emerald-400 [animation-delay:-0.15s]" />
-            <div className="h-1.5 w-1.5 animate-bounce rounded-full bg-emerald-400" />
-          </div>
-        </div>
-      </PopupToast>
+        </PopupToast>,
+        document.body,
+      )}
 
       <div className="flex flex-col">
         <button
@@ -179,6 +224,22 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
           <Save size={16} />
           {submitting ? "Menyimpan..." : "Simpan Perubahan"}
         </button>
+
+        {submitting && (
+          <div className="mt-3">
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-200"
+                style={{ width: `${uploadProgress ?? 0}%` }}
+              />
+            </div>
+            <p className="mt-1.5 text-center text-[11px] font-medium text-cyan-300">
+              {uploadProgress !== null
+                ? `Menyimpan ${uploadProgress}%`
+                : "Menyimpan perubahan..."}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )

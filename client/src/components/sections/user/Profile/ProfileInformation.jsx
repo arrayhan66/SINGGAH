@@ -11,6 +11,7 @@ import {
 import { useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { MailCheck } from "lucide-react"
+import { compressImage } from "../../../../utils/compressImage"
 
 const tipeConfig = {
   admin: { label: "Admin", icon: CreditCard, color: "amber" },
@@ -191,9 +192,14 @@ function ProfileInformation({
               type="file"
               accept="image/*"
               className="hidden"
-              onChange={(e) => {
+              onChange={async (e) => {
                 const file = e.target.files?.[0]
-                if (file) onIdentitasChange(file)
+                if (!file) return
+                const compressed = await compressImage(file, {
+                  maxSize: 1024 * 1024,
+                })
+                onIdentitasChange(compressed)
+                if (identitasInputRef.current) identitasInputRef.current.value = ""
               }}
             />
             {!previewUrl && (

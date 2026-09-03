@@ -106,12 +106,44 @@ html.light .user-page .rounded-md.border-slate-700\/50.bg-slate-800\/50 {
   background-color: #f8fafc;
 }
 
-/* Tombol "Edit" putih di atas kartu putih: beri tepi biru tipis */
+/* ===== TOMBOL "AJUKAN SEBAGAI MAHASISWA/DOSEN" (LIGHT) ===== */
+/* Samakan dengan tombol "Lihat Karya" menu Karya: gradasi cyan ->
+   biru + teks putih, hover terangkat dengan crossfade gradasi. */
 html.light .user-page button.rounded-xl.bg-white.text-slate-900 {
-  background-color: #ffffff;
-  box-shadow:
-    inset 0 0 0 1px #bfdbfe,
-    0 1px 3px rgba(37, 99, 235, 0.1);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  color: #ffffff;
+  transition:
+    transform 0.3s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.3s ease;
+}
+html.light .user-page button.rounded-xl.bg-white.text-slate-900::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(to bottom right, #06b6d4, #1d4ed8);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+html.light .user-page button.rounded-xl.bg-white.text-slate-900:hover {
+  background-color: transparent;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -10px rgba(29, 78, 216, 0.6);
+}
+html.light .user-page button.rounded-xl.bg-white.text-slate-900:hover::before {
+  opacity: 1;
+}
+html.light .user-page button.rounded-xl.bg-white.text-slate-900 svg {
+  color: #ffffff;
+}
+html.light .user-page button.rounded-xl.bg-white.text-slate-900:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px -8px rgba(29, 78, 216, 0.5);
 }
 
 /* ===== DROPDOWN STATUS FILTER ===== */
@@ -263,9 +295,37 @@ html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl sp
   color: #ffffff;
   box-shadow: 0 4px 12px -4px rgba(37, 99, 235, 0.35);
 }
+html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl span.rounded-full svg {
+  color: #ffffff;
+  fill: #ffffff;
+}
+
+/* ===== KARYA TERSIMPAN: TOMBOL BOOKMARK (LIGHT) ===== */
+/* Samakan persis tombol bookmark halaman Karya Detail:
+   gradasi cyan -> biru + ikon putih, hover terangkat + glow biru */
+html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.rounded-full.bg-brand-navy\/80.text-slate-200 {
+  background-color: #2563eb;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+}
+html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.rounded-full.bg-brand-navy\/80.hover\:border-cyan-400\/30:hover {
+  border-color: rgba(255, 255, 255, 0.85);
+  background-color: #1d4ed8;
+  background-image: linear-gradient(to bottom right, #06b6d4, #1d4ed8);
+  box-shadow: 0 8px 18px -6px rgba(37, 99, 235, 0.6);
+  transform: translateY(-1px) scale(1.07);
+}
+html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.rounded-full.bg-brand-navy\/80.hover\:text-cyan-300:hover {
+  color: #ffffff;
+}
+html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.rounded-full.bg-brand-navy\/80 svg.text-cyan-400 {
+  color: #ffffff;
+  fill: #ffffff;
+}
 
 /* ===== KARYA TERSIMPAN: TOMBOL LIHAT KARYA (LIGHT) ===== */
-html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button {
+html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.rounded-xl {
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -275,7 +335,7 @@ html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl bu
     transform 0.3s cubic-bezier(0.33, 1, 0.68, 1),
     box-shadow 0.3s ease;
 }
-html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button::before {
+html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.rounded-xl::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -285,21 +345,198 @@ html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl bu
   opacity: 0;
   transition: opacity 0.35s ease;
 }
-html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button:hover {
+html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.rounded-xl:hover {
   background-color: transparent;
   color: #ffffff;
   transform: translateY(-2px);
   box-shadow: 0 10px 22px -10px rgba(29, 78, 216, 0.6);
 }
-html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button:hover::before {
+html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.rounded-xl:hover::before {
   opacity: 1;
 }
-html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button:active {
+html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.rounded-xl:active {
   transform: translateY(0);
   box-shadow: 0 4px 12px -8px rgba(29, 78, 216, 0.5);
 }
 
-/* ===== SEARCH BAR KARYA TERSIMPAN ===== */
+/* ===== KARYA TERSIMPAN: TOMBOL "LIHAT LEBIH BANYAK" ===== */
+/* Dark mode: muka PUTIH + slab bawah #02111f, persis tombol
+   "Lihat Lebih Banyak" di halaman Karya Detail */
+.user-page button.karya-loadmore-btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: transparent;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+  background-color: transparent;
+  color: #0f172a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 5px 0 #02111f,
+    0 12px 24px -10px rgba(2, 8, 23, 0.55);
+  transition:
+    transform 0.35s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.35s cubic-bezier(0.33, 1, 0.68, 1);
+}
+.user-page button.karya-loadmore-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(180deg, #f1f5f9 0%, #cbd5e1 100%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.user-page button.karya-loadmore-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 7px 0 #02111f,
+    0 18px 32px -14px rgba(2, 8, 23, 0.6);
+}
+.user-page button.karya-loadmore-btn:hover::before {
+  opacity: 1;
+}
+.user-page button.karya-loadmore-btn:active {
+  transform: translateY(3px);
+  transition-duration: 0.15s;
+  box-shadow:
+    inset 0 2px 4px rgba(2, 8, 23, 0.45),
+    0 1px 0 #02111f,
+    0 6px 14px -8px rgba(2, 8, 23, 0.5);
+}
+
+/* Light mode: samakan persis tombol "Lihat Lebih Banyak" menu Karya,
+   muka gradasi cyan -> biru, slab bawah #1d4ed8, hover terangkat.
+   Dibatasi dengan kelas khusus .karya-loadmore-btn agar tidak
+   mengubah tombol lain (mis. "Ajukan sebagai Mahasiswa"). */
+html.light .user-page button.karya-loadmore-btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: transparent;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  color: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 5px 0 #1d4ed8,
+    0 12px 24px -10px rgba(37, 99, 235, 0.35);
+  transition:
+    transform 0.35s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.35s cubic-bezier(0.33, 1, 0.68, 1);
+}
+html.light .user-page button.karya-loadmore-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(to bottom right, #06b6d4, #1d4ed8);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+html.light .user-page button.karya-loadmore-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 7px 0 #1d4ed8,
+    0 18px 32px -14px rgba(37, 99, 235, 0.42);
+}
+html.light .user-page button.karya-loadmore-btn:hover::before {
+  opacity: 1;
+}
+html.light .user-page button.karya-loadmore-btn:active {
+  transform: translateY(3px);
+  transition-duration: 0.15s;
+  box-shadow:
+    inset 0 2px 4px rgba(29, 78, 216, 0.35),
+    0 1px 0 #1d4ed8,
+    0 6px 14px -8px rgba(37, 99, 235, 0.3);
+}
+
+/* ===== MY KARYA STATS ICON COLOR ACCENTS (LIGHT & DARK) ===== */
+/* Total Karya (Cyan) */
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5:nth-child(1),
+.user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(1) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl {
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+}
+/* Menunggu Review (Amber/Kuning) */
+.user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(2) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl {
+  background-image: linear-gradient(to bottom right, #fbbf24, #d97706);
+}
+/* Disetujui (Emerald/Hijau) */
+.user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(3) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl {
+  background-image: linear-gradient(to bottom right, #34d399, #059669);
+}
+/* Ditolak (Red/Merah) */
+.user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(4) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl {
+  background-image: linear-gradient(to bottom right, #f87171, #dc2626);
+}
+
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl svg {
+  color: #ffffff !important;
+}
+
+/* ===== EDIT KARYA TITLE GRADIENT SINGLE COLOR FIX ===== */
+/* Ubah teks "Karya" di EditKaryaHero agar 1 warna (putih/netral) seperti dark mode */
+.user-page h1 span.bg-gradient-to-r.from-cyan-300 {
+  background-image: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  color: #ffffff;
+}
+html.light .user-page h1 span.bg-gradient-to-r.from-cyan-300 {
+  color: #404040;
+}
+
+/* Kartu daftar karya (MyKaryaCard) di light mode: 3D slab */
+html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl {
+  background-image:
+    linear-gradient(135deg, rgba(6, 182, 212, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%),
+    linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%);
+  background-color: #ffffff;
+  border-color: #c7dcfc;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    0 7px 0 #7fb1f5,
+    0 12px 26px -10px rgba(30, 64, 175, 0.35),
+    0 22px 44px -18px rgba(37, 99, 235, 0.28);
+}
+
+/* Tombol Edit & Hapus di MyKaryaCard (Light Mode -> Flat) */
+html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.rounded-xl {
+  background-image: none !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: none !important;
+}
+html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.rounded-xl::before {
+  display: none !important;
+}
+html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.rounded-xl:hover {
+  background-color: #f1f5f9 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Tombol Hapus khusus merah di Light Mode (Flat) */
+html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.bg-red-500 {
+  background-image: none !important;
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.bg-red-500::before {
+  display: none !important;
+}
+html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.bg-red-500:hover {
+  background-color: #dc2626 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
 html.light .user-page .border-white\/60.bg-white\/90 {
   background-color: #fbfcfe;
   border-color: #e2e8f0;
@@ -360,6 +597,7 @@ html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl {
    light-shared hanya menyembunyikan blur-[180px]). Blob cyan/biru
    itu menempel besar di atas section terang -> terlihat seperti
    konten ketutup. Sembunyikan di halaman user. */
-html.light .user-page section > .pointer-events-none.absolute.rounded-full[class*="blur-"] {
+html.light .user-page section > .pointer-events-none.absolute.rounded-full[class*="blur-"],
+html.light .user-page section > div.pointer-events-none.absolute.inset-0 .pointer-events-none.absolute.rounded-full[class*="blur-"] {
   display: none;
 }

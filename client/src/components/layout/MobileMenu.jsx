@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { ArrowUpRight, LogOut } from "lucide-react";
 import UserAvatar from "../ui/UserAvatar";
-import { itemSubtitle, itemAccent, itemActive, itemHover } from "./menuConstants";
+import { itemBar, itemSubtitle, itemAccent, itemActive, itemHoverBox } from "./menuConstants";
 
 export default function MobileMenu({
   isOpen,
@@ -27,11 +27,15 @@ export default function MobileMenu({
           "mobile-menu-item group relative flex cursor-pointer items-center gap-3.5 rounded-2xl border px-3.5 py-3 transition-[background-color,border-color,color] duration-150 " +
           (nav.isActive
             ? itemActive[accentKey] || itemActive.Beranda
-            : "border-transparent bg-white/[0.03] hover:bg-white/[0.06] " +
-              (itemHover[accentKey] || "hover:text-cyan-300"))
+            : "border-transparent bg-white/[0.03] " +
+              (itemHoverBox[accentKey] || itemHoverBox.Beranda))
       }
     >
-      <span className="pointer-events-none absolute inset-y-2 left-0 w-[3px] rounded-full bg-gradient-to-b from-cyan-400 to-blue-500 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+      <span
+        className={`pointer-events-none absolute inset-y-2 left-0 w-[3px] rounded-full bg-gradient-to-b opacity-0 transition-opacity duration-200 group-hover:opacity-100 ${
+          itemBar[accentKey] || itemBar.Beranda
+        }`}
+      />
 
       <span
         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ring-1 ring-inset ${
@@ -43,9 +47,7 @@ export default function MobileMenu({
 
       <span className="min-w-0 flex-1">
         <span
-          className={`mobile-menu-item-label block text-[15px] font-medium leading-tight text-slate-200 transition-colors ${
-            itemHover[accentKey] || "hover:text-cyan-300"
-          }`}
+          className="mobile-menu-item-label block text-[15px] font-medium leading-tight text-slate-200 transition-colors"
         >
           {item.label}
         </span>
@@ -63,7 +65,7 @@ export default function MobileMenu({
 
   return (
     <div
-      className={`absolute left-0 top-full z-50 w-full px-3 min-[350px]:px-5 md:px-8 min-[1100px]:hidden max-h-[calc(100dvh-var(--navbar-h)-1.25rem)] overflow-y-auto overscroll-contain transition-all duration-200 ${
+      className={`absolute left-0 top-full z-50 w-full px-3 min-[350px]:px-5 md:px-8 min-[1100px]:hidden max-h-[calc(100dvh-var(--navbar-h)-1.25rem)] overflow-y-auto overscroll-contain scroll-smooth menu-scroll transition-all duration-200 ${
         isOpen
           ? "mt-2 opacity-100 visible translate-y-0"
           : "opacity-0 invisible -translate-y-2 pointer-events-none"
@@ -104,20 +106,18 @@ export default function MobileMenu({
           />
 
           <div className="relative flex items-center gap-3.5">
-            <div className="relative shrink-0 rounded-[22px] bg-gradient-to-br from-cyan-400/30 to-blue-500/10 p-[2px]">
-              <div className="flex h-12 w-12 items-center justify-center rounded-[20px] bg-[#0b2a50] p-1 sm:h-14 sm:w-14">
-                <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-full">
-                  <UserAvatar
-                    name={user?.name}
-                    avatar={user?.avatar}
-                    className="h-full w-full"
-                    imgSizeClass="h-full w-full"
-                    fallbackSizeClass="h-full w-full"
-                    textClass="text-lg font-bold"
-                  />
-                  <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#0b2a50] bg-emerald-400" />
-                </div>
+            <div className="relative h-12 w-12 shrink-0 sm:h-14 sm:w-14">
+              <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-full">
+                <UserAvatar
+                  name={user?.name}
+                  avatar={user?.avatar}
+                  className="h-full w-full"
+                  imgSizeClass="h-full w-full"
+                  fallbackSizeClass="h-full w-full"
+                  textClass="text-lg font-bold"
+                />
               </div>
+              <span className="absolute -bottom-0 -right-0 h-3 w-3 rounded-full bg-emerald-400" />
             </div>
 
             <div className="min-w-0 flex-1">

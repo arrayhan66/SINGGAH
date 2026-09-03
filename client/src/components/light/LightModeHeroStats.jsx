@@ -36,10 +36,10 @@ function LightModeHeroStats({ variant = "card" }) {
 
   if (variant === "mobile") {
     return (
-      <div className="flex flex-col min-[400px]:flex-row items-center justify-between gap-6 min-[400px]:gap-0 rounded-2xl border border-paper-border bg-white px-4 md:px-6 py-5 min-[400px]:py-4 shadow-sm backdrop-blur-xl">
+      <div className="flex flex-col min-[500px]:flex-row items-center justify-between gap-6 min-[500px]:gap-0 rounded-2xl border border-paper-border bg-white px-4 md:px-6 py-5 min-[500px]:py-4 shadow-sm backdrop-blur-xl">
         {loading
           ? Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="flex w-full min-[400px]:w-auto flex-1 items-center justify-start min-[400px]:justify-center gap-4">
+              <div key={index} className="flex w-full min-[500px]:w-auto flex-1 items-center justify-start min-[500px]:justify-center gap-4">
                 <Skeleton className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-slate-200" />
                 <div className="space-y-2">
                   <Skeleton className="h-4 w-10 bg-slate-200" />
@@ -52,14 +52,14 @@ function LightModeHeroStats({ variant = "card" }) {
               return (
                 <div
                   key={stat.label}
-                  className="relative flex w-full min-[400px]:w-auto flex-1 items-center justify-start min-[400px]:justify-center gap-4"
+                  className="relative flex w-full min-[500px]:w-auto flex-1 items-center justify-start min-[500px]:justify-center gap-4"
                 >
                   <div className="flex h-10 w-10 md:h-12 md:w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50">
                     <Icon className="h-5 w-5 md:h-6 md:w-6 text-blue-600" />
                   </div>
 
                   <div className="text-left">
-                    <p className="text-base min-[400px]:text-sm md:text-lg font-bold text-[#404040] leading-none">
+                    <p className="text-base min-[500px]:text-sm md:text-lg font-bold text-[#404040] leading-none">
                       {stat.value}
                     </p>
                     <p className="mt-1 text-[11px] md:text-sm text-gray-500 leading-none">
@@ -68,11 +68,11 @@ function LightModeHeroStats({ variant = "card" }) {
                   </div>
 
                   {index < statsData.length - 1 && (
-                    <div className="hidden min-[400px]:block absolute right-0 top-1/2 h-8 w-px -translate-y-1/2 bg-slate-200 md:h-10" />
+                    <div className="hidden min-[500px]:block absolute right-0 top-1/2 h-8 w-px -translate-y-1/2 bg-slate-200 md:h-10" />
                   )}
 
                   {index < statsData.length - 1 && (
-                    <div className="block min-[400px]:hidden absolute -bottom-3 left-1/2 h-px w-[90%] -translate-x-1/2 bg-slate-200" />
+                    <div className="block min-[500px]:hidden absolute -bottom-3 left-1/2 h-px w-[90%] -translate-x-1/2 bg-slate-200" />
                   )}
                 </div>
               );

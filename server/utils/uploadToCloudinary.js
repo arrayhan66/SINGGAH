@@ -1,46 +1,35 @@
-const cloudinary = require("../config/cloudinary")
+const {
+  saveLocalFile,
+  deleteLocalFile,
+} = require("./localImage")
 
-exports.uploadImage = (fileBuffer, folder, options = {}) => {
-  if (process.env.NODE_ENV === "test") {
-    return Promise.resolve({
-      secure_url: "https://res.cloudinary.com/test/image/upload/v123456/test.jpg",
-      public_id: "test/test",
-    })
+// Wrapper Cloudinary-compatible yang menyimpan file ke disk lokal.
+// Menjaga bentuk return (secure_url, public_id, format, ...) agar
+// seluruh controller/service yang lama tidak perlu diubah.
+
+exports.uploadImage = async (fileOrBuffer, folder = "uploads", options = {}) => {
+  const result = await saveLocalFile(fileOrBuffer, folder, options)
+  return {
+    secure_url: result.url,
+    public_id: result.public_id,
+    format: result.format,
+    bytes: result.bytes,
+    created_at: result.created_at,
+    resource_type: result.resource_type,
+    width: result.width,
+    height: result.height,
+    filename: (options && options.filename) || null,
   }
-  return new Promise((resolve, reject) => {
-    cloudinary.uploader
-      .upload_stream(
-        {
-          folder,
-          ...options,
-        },
-        (error, result) => {
-          if (error) return reject(error)
-
-          resolve(result)
-        },
-      )
-      .end(fileBuffer)
-  })
 }
 
-exports.deleteImage = (publicId) => {
-  if (process.env.NODE_ENV === "test") {
-    return Promise.resolve({ result: "ok" })
-  }
-  return cloudinary.uploader.destroy(publicId)
-}
+exports.deleteImage = (value) => deleteLocalFile(value)
 
 exports.getPublicIdFromUrl = (url) => {
   if (!url) return null
-
-  const parts = url.split("/upload/")
-
-  if (parts.length < 2) return null
-
-  const pathWithVersion = parts[1]
-  const withoutVersion = pathWithVersion.replace(/^v\d+\//, "")
-  const withoutExtension = withoutVersion.replace(/\.[^/.]+$/, "")
-
-  return withoutExtension
+  // Hanya tangani file lokal. URL cloudinary lama tidak di-delete
+  // (tidak bisa diakses dari server ini).
+  if (!String(url).includes("/uploads/")) return null
+  const rel = String(url).split("/uploads/")[1]
+  if (!rel) return null
+  return rel.replace(/\.[^/.]+$/, "")
 }

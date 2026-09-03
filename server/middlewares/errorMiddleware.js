@@ -25,5 +25,5 @@ module.exports = (err, req, res, next) => {
   })
 
   // Jangan bocorkan detail internal (SQL error, stack, path) ke klien.
-  fail(res, isServerError ? "Terjadi kesalahan pada server." : err.message, statusCode)
+  fail(res, isServerError ? "Terjadi kesalahan pada server." : err.message, statusCode, err.data)
 }

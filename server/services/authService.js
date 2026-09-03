@@ -122,7 +122,7 @@ async function findEmailSuggestion(email) {
   return best
 }
 
-const deleteUserCloudinaryAssets = async (userId) => {
+const deleteUserStoredAssets = async (userId) => {
   const projects = await Project.findAll({
     where: { user_id: userId },
     include: [
@@ -177,6 +177,14 @@ exports.login = async (data) => {
     throw new AppError(
       "Email belum diverifikasi. Silakan verifikasi email Anda terlebih dahulu.",
       403,
+    )
+  }
+
+  if (user.pending_email) {
+    throw new AppError(
+      "Perubahan email belum diverifikasi. Silakan verifikasi email baru Anda terlebih dahulu.",
+      403,
+      { pending_email: user.pending_email },
     )
   }
 
@@ -1011,7 +1019,7 @@ exports.deleteAccount = async (userId, password) => {
     throw new AppError("Password salah", 400)
   }
 
-  await deleteUserCloudinaryAssets(userId)
+  await deleteUserStoredAssets(userId)
   await user.destroy()
 
   return true

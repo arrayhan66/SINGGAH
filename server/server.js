@@ -1,6 +1,7 @@
 require("dotenv").config()
 require("./config/env")
 
+const path = require("path")
 const express = require("express")
 const cors = require("cors")
 const helmet = require("helmet")
@@ -60,6 +61,14 @@ app.use(
 )
 
 app.use(express.json({ limit: "10mb" }))
+
+app.use(
+  "/uploads",
+  express.static(
+    path.join(__dirname, "uploads"),
+    { maxAge: "7d", immutable: false },
+  ),
+)
 
 if (process.env.NODE_ENV !== "test") {
   app.use(

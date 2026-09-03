@@ -13,7 +13,7 @@ const VALID_ROLES = ["admin", "user"]
 const VALID_TIPES = ["admin", "mahasiswa", "dosen", "umum"]
 const VALID_STATUSES = ["active", "inactive"]
 
-const deleteUserCloudinaryAssets = async (userId) => {
+const deleteUserStoredAssets = async (userId) => {
   const projects = await Project.findAll({
     where: { user_id: userId },
     include: [
@@ -424,7 +424,7 @@ exports.deleteUser = async (id) => {
     }
   }
 
-  await deleteUserCloudinaryAssets(id)
+  await deleteUserStoredAssets(id)
   await user.destroy()
 
   return true

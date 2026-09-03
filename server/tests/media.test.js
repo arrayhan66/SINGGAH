@@ -1,25 +1,20 @@
-jest.mock("../config/cloudinary", () => ({
-  search: {
-    expression: jest.fn(),
-    sort_by: jest.fn(),
-    max_results: jest.fn(),
-    execute: jest.fn(),
-  },
-  uploader: {
-    destroy: jest.fn(),
-  },
-}))
-
+const fs = require("fs")
+const path = require("path")
 const request = require("supertest")
 const app = require("../server")
 const { User } = require("../models")
-const cloudinary = require("../config/cloudinary")
+const { UPLOAD_ROOT } = require("../utils/localImage")
+
+const MEDIA_DIR = path.join(UPLOAD_ROOT, "media")
 
 describe("Media Endpoints", () => {
   let adminToken = ""
   let userToken = ""
 
   beforeAll(async () => {
+    fs.rmSync(MEDIA_DIR, { recursive: true, force: true })
+    fs.mkdirSync(MEDIA_DIR, { recursive: true })
+
     await User.destroy({ where: {} })
 
     await request(app).post("/api/auth/register").send({
@@ -59,10 +54,8 @@ describe("Media Endpoints", () => {
     userToken = userLogin.body.data.token
   })
 
-  beforeEach(() => {
-    cloudinary.search.expression.mockReturnValue(cloudinary.search)
-    cloudinary.search.sort_by.mockReturnValue(cloudinary.search)
-    cloudinary.search.max_results.mockReturnValue(cloudinary.search)
+  afterAll(() => {
+    fs.rmSync(MEDIA_DIR, { recursive: true, force: true })
   })
 
   describe("GET /api/media", () => {
@@ -81,21 +74,7 @@ describe("Media Endpoints", () => {
     })
 
     it("should list media resources for admin", async () => {
-      cloudinary.search.execute.mockResolvedValueOnce({
-        resources: [
-          {
-            public_id: "singgah/media/banner-1",
-            secure_url: "https://res.cloudinary.com/test/image/upload/banner-1.png",
-            filename: "banner-1.png",
-            format: "png",
-            resource_type: "image",
-            bytes: 1024,
-            created_at: "2026-01-01T00:00:00Z",
-            width: 1920,
-            height: 1080,
-          },
-        ],
-      })
+      fs.writeFileSync(path.join(MEDIA_DIR, "banner-x.png"), "test-img")
 
       const res = await request(app)
         .get("/api/media")
@@ -104,10 +83,12 @@ describe("Media Endpoints", () => {
       expect(res.status).toBe(200)
       expect(res.body.success).toBe(true)
       expect(Array.isArray(res.body.data)).toBe(true)
-      expect(res.body.data).toHaveLength(1)
-      expect(res.body.data[0]).toHaveProperty("publicId", "singgah/media/banner-1")
-      expect(res.body.data[0]).toHaveProperty("url")
-      expect(res.body.data[0]).toHaveProperty("format", "png")
+      expect(res.body.data.length).toBeGreaterThanOrEqual(1)
+      const found = res.body.data.find((m) => m.name === "banner-x.png")
+      expect(found).toBeTruthy()
+      expect(found).toHaveProperty("publicId", "media/banner-x")
+      expect(found).toHaveProperty("url")
+      expect(found).toHaveProperty("format", "png")
     })
   })
 
@@ -151,7 +132,7 @@ describe("Media Endpoints", () => {
       expect(res.body.success).toBe(true)
       expect(Array.isArray(res.body.data)).toBe(true)
       expect(res.body.data).toHaveLength(1)
-      expect(res.body.data[0]).toHaveProperty("publicId", "test/test")
+      expect(res.body.data[0]).toHaveProperty("publicId", "media/test")
       expect(res.body.data[0]).toHaveProperty("url")
     })
   })
@@ -172,24 +153,24 @@ describe("Media Endpoints", () => {
     })
 
     it("should return 404 when media not found", async () => {
-      cloudinary.uploader.destroy.mockResolvedValueOnce({ result: "not found" })
-
       const res = await request(app)
-        .delete("/api/media/does-not-exist")
+        .delete("/api/media/media/does-not-exist")
         .set("Authorization", `Bearer ${adminToken}`)
 
       expect(res.status).toBe(404)
     })
 
     it("should delete media as admin", async () => {
-      cloudinary.uploader.destroy.mockResolvedValueOnce({ result: "ok" })
+      const absPath = path.join(MEDIA_DIR, "delete-me.png")
+      fs.writeFileSync(absPath, "x")
 
       const res = await request(app)
-        .delete("/api/media/test-image")
+        .delete("/api/media/media/delete-me")
         .set("Authorization", `Bearer ${adminToken}`)
 
       expect(res.status).toBe(200)
       expect(res.body.success).toBe(true)
+      expect(fs.existsSync(absPath)).toBe(false)
     })
   })
 })

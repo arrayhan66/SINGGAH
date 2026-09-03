@@ -6,9 +6,6 @@ const requiredEnv = [
   "DB_USER",
   "EMAIL_USER",
   "EMAIL_PASSWORD",
-  "CLOUDINARY_CLOUD_NAME",
-  "CLOUDINARY_API_KEY",
-  "CLOUDINARY_API_SECRET",
 ]
 
 requiredEnv.forEach((key) => {

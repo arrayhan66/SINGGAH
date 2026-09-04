@@ -42,6 +42,44 @@ function NotificationDetailModal({ notif, onClose, onNavigate }) {
         : `/users/${referenceId}`;
 
   useEffect(() => {
+    const doc = document.documentElement;
+    const body = document.body;
+    const prevHtmlOverflow = doc.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+    const prevHtmlPos = doc.style.position;
+    const prevBodyPos = body.style.position;
+    const scrollY = window.scrollY;
+
+    doc.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+    doc.classList.add("no-scroll");
+
+    const blockScroll = (e) => e.preventDefault();
+    document.addEventListener("wheel", blockScroll, { passive: false });
+    document.addEventListener("touchmove", blockScroll, { passive: false });
+
+    return () => {
+      doc.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+      body.style.position = prevBodyPos;
+      body.style.top = "";
+      body.style.left = "";
+      body.style.right = "";
+      body.style.width = "";
+      doc.style.position = prevHtmlPos;
+      doc.classList.remove("no-scroll");
+      document.removeEventListener("wheel", blockScroll);
+      document.removeEventListener("touchmove", blockScroll);
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!endpoint) return;
     let active = true;
     api

@@ -137,13 +137,24 @@ export function KnownListSkeleton() {
   )
 }
 
-export function MyKaryaPageSkeleton({ stats = true }) {
+export function MyKaryaPageSkeleton({ stats = false }) {
   return (
     <div className="relative mx-auto max-w-7xl 2xl:max-w-[1440px] 3xl:max-w-[1800px] 4xl:max-w-[2200px]">
-      {stats && <MyKaryaStatsSkeleton />}
       <div className="pt-8 2xl:pt-12 3xl:pt-14 4xl:pt-16">
-        <KnownListSkeleton />
+        <ProjectGridSkeleton count={6} />
       </div>
+    </div>
+  )
+}
+
+export function MyKaryaFilterSkeleton() {
+  return (
+    <div className="flex flex-col gap-4 sm:gap-5 md:gap-6 lg:gap-7 3xl:gap-8 4xl:gap-9">
+      <div className="flex flex-col gap-3 min-[500px]:flex-row min-[500px]:items-center min-[500px]:gap-4 lg:gap-5 3xl:gap-6">
+        <Skeleton className="h-12 flex-1 min-w-0 rounded-xl sm:h-14 sm:rounded-2xl md:h-16 lg:h-[4.5rem]" />
+        <Skeleton className="h-12 w-full shrink-0 rounded-xl sm:h-14 sm:w-56 sm:rounded-2xl md:h-16 lg:h-[4.5rem]" />
+      </div>
+      <Skeleton className="h-12 w-full max-w-[16rem] rounded-xl sm:h-14 sm:rounded-2xl md:h-16" />
     </div>
   )
 }
@@ -847,6 +858,7 @@ export default {
   KaryaProjectsPageSkeleton,
   BeritaPageSkeleton,
   MyKaryaStatsSkeleton,
+  MyKaryaFilterSkeleton,
   MyKaryaPageSkeleton,
   SavedKaryaPageSkeleton,
   ProjectDetailSkeleton,

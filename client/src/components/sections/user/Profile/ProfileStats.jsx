@@ -5,9 +5,33 @@ import GlassCard from "../../../ui/GlassCard"
 import { FolderCheck, Clock, FolderOpen } from "lucide-react"
 
 const statsConfig = [
-  { key: "published", label: "Published", icon: FolderCheck, color: "text-emerald-400" },
-  { key: "pending", label: "Pending", icon: Clock, color: "text-amber-400" },
-  { key: "total", label: "Total", icon: FolderOpen, color: "text-cyan-400" },
+  {
+    key: "published",
+    label: "Published",
+    icon: FolderCheck,
+    iconBg: "bg-emerald-500/15",
+    iconBorder: "border-emerald-400/30",
+    text: "text-emerald-400",
+    glow: "shadow-emerald-500/20",
+  },
+  {
+    key: "pending",
+    label: "Pending",
+    icon: Clock,
+    iconBg: "bg-amber-500/15",
+    iconBorder: "border-amber-400/30",
+    text: "text-amber-400",
+    glow: "shadow-amber-500/20",
+  },
+  {
+    key: "total",
+    label: "Total",
+    icon: FolderOpen,
+    iconBg: "bg-cyan-500/15",
+    iconBorder: "border-cyan-400/30",
+    text: "text-cyan-400",
+    glow: "shadow-cyan-500/20",
+  },
 ]
 
 function ProfileStats() {
@@ -39,19 +63,26 @@ function ProfileStats() {
         Ringkasan project yang telah kamu upload.
       </p>
 
-      <div className="mt-5 grid grid-cols-3 gap-3">
+      <div className="mt-5 grid grid-cols-1 gap-3 min-[520px]:grid-cols-3">
         {statsConfig.map((s) => {
           const Icon = s.icon
           return (
             <div
               key={s.key}
-              className="flex flex-col items-center justify-center rounded-xl border border-white/5 bg-white/[0.02] px-3 py-4 text-center"
+              className={`group/stat relative flex min-w-0 flex-row items-center gap-2 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3.5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.07] ${s.glow} hover:shadow-lg`}
             >
-              <Icon className={`h-5 w-5 ${s.color}`} />
-              <span className="mt-2 text-2xl font-bold text-white">
+              <div
+                className={`absolute -right-4 -top-4 h-16 w-16 rounded-full blur-2xl transition-opacity duration-300 group-hover/stat:opacity-100 ${s.iconBg} opacity-70`}
+              />
+              <div
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${s.iconBorder} ${s.iconBg} transition-transform duration-300 group-hover/stat:scale-110 md:h-10 md:w-10`}
+              >
+                <Icon className={`h-[18px] w-[18px] ${s.text} md:h-5 md:w-5`} />
+              </div>
+              <span className="text-xl font-bold leading-none tracking-tight text-white md:text-3xl">
                 {stats ? stats[s.key] : "-"}
               </span>
-              <span className="mt-0.5 text-[11px] text-slate-400">
+              <span className="truncate text-[11px] font-medium text-slate-400">
                 {s.label}
               </span>
             </div>

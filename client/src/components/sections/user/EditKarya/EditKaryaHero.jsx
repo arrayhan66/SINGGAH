@@ -1,34 +1,47 @@
 import { PenSquare, ArrowLeft, Sparkles } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import GlowBackground from "../../../ui/GlowBackground"
+import { useTheme } from "../../../../context/ThemeContext"
+
+const darkVignette =
+  "radial-gradient(circle at top center, transparent 0%, rgba(4,29,56,0.2) 50%, rgba(4,29,56,0.85) 100%)"
+const lightVignette =
+  "radial-gradient(circle at top center, transparent 0%, rgba(37,99,235,0.05) 50%, rgba(30,64,120,0.16) 100%)"
 
 function EditKaryaHero() {
   const navigate = useNavigate()
+  const { theme } = useTheme()
 
   return (
-    <section className="relative overflow-hidden bg-brand-dark px-4 pt-[calc(var(--navbar-h)+24px)] pb-10 sm:px-6 sm:pt-[calc(var(--navbar-h)+32px)] sm:pb-16 md:px-8 lg:px-12 2xl:px-16 2xl:pb-20 3xl:px-20 3xl:pb-24 4xl:px-24 4xl:pb-28">
+    <section className="hero relative overflow-hidden bg-brand-dark px-4 pt-[calc(var(--navbar-h)+24px)] pb-10 sm:px-6 sm:pt-[calc(var(--navbar-h)+28px)] sm:pb-16 md:px-8 lg:px-12 2xl:px-16 2xl:pb-20 3xl:px-20 3xl:pb-24 4xl:px-24 4xl:pb-28">
       <GlowBackground />
 
-      <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center text-center">
-        <button
-          onClick={() => navigate("/my-karya")}
-          className="group inline-flex cursor-pointer items-center gap-2 self-start rounded-full border border-white/10 bg-white/5 p-2 sm:py-2 sm:pl-3 sm:pr-4 text-xs text-slate-300 backdrop-blur-sm transition-colors duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 sm:text-sm"
-        >
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 transition-colors duration-300 group-hover:bg-cyan-400/20 sm:h-6 sm:w-6">
-            <ArrowLeft
-              size={12}
-              className="transition-transform duration-300 group-hover:-translate-x-0.5 sm:size-[13px]"
-            />
-          </span>
-          <span>Kembali ke Karya Saya</span>
-        </button>
+      <div
+        className="pointer-events-none absolute inset-0 z-[1]"
+        style={{ background: theme === "light" ? lightVignette : darkVignette }}
+      />
 
-        <div className="mt-6 sm:mt-8 md:mt-10 relative">
+      <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center text-center">
+        <div className="mb-2 self-start sm:-mb-2 lg:-mb-4 3xl:-mb-6 4xl:-mb-8">
+          <button
+            onClick={() => navigate("/my-karya")}
+            aria-label="Kembali"
+            className="group inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 p-0 text-xs text-slate-300 backdrop-blur-sm transition-colors duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 cursor-pointer h-9 w-9 sm:h-auto sm:w-auto sm:py-[7px] sm:pl-[15px] sm:pr-[17px]"
+          >
+            <span className="flex h-5 w-5 items-center justify-center rounded-full transition-colors duration-300 group-hover:bg-cyan-400/20 sm:h-7 sm:w-7 sm:bg-white/10">
+              <ArrowLeft
+                size={12}
+                className="size-4 transition-transform duration-300 group-hover:-translate-x-0.5 sm:size-[13px]"
+              />
+            </span>
+            <span className="hidden sm:inline">Kembali</span>
+          </button>
+        </div>
+
+        <div className="relative -mt-4 sm:-mt-3 md:-mt-2">
           <span className="absolute inset-0 rounded-3xl bg-gradient-to-r from-cyan-400/20 via-blue-500/20 to-purple-500/20 blur-2xl" />
 
-          <span className="absolute -inset-3 rounded-[28px] border border-cyan-400/10 animate-[pulse_3s_ease-in-out_infinite]" />
-
-          <span className="absolute -inset-6 rounded-[32px] border border-cyan-400/5 animate-[pulse_5s_ease-in-out_infinite_0.5s]" />
+          <span className="hero-gelombang absolute -inset-6 rounded-[32px] border border-cyan-400/5 animate-[pulse_5s_ease-in-out_infinite_0.5s]" />
 
           <div className="relative inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-cyan-400/30 bg-gradient-to-br from-cyan-400/15 via-blue-500/10 to-purple-500/15 shadow-[0_0_40px_-8px_rgba(34,211,238,0.3)] backdrop-blur-xl sm:h-20 sm:w-20 md:h-24 md:w-24 lg:h-28 lg:w-28 3xl:h-32 3xl:w-32 4xl:h-36 4xl:w-36">
             <PenSquare className="h-8 w-8 text-cyan-300 sm:h-10 sm:w-10 md:h-12 md:w-12 lg:h-14 lg:w-14 3xl:h-16 3xl:w-16 4xl:h-18 4xl:w-18 drop-shadow-[0_0_12px_rgba(34,211,238,0.5)]" />
@@ -37,14 +50,11 @@ function EditKaryaHero() {
           </div>
         </div>
 
-        <h1 className="mt-4 sm:mt-5 md:mt-6 text-2xl min-[280px]:text-4xl sm:text-4xl lg:text-5xl 2xl:text-6xl 3xl:text-7xl 4xl:text-8xl font-black">
-          <span className="text-white">Edit </span>
-          <span className="bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(34,211,238,0.3)]">
-            Karya
-          </span>
-        </h1>
+        <h2 className="mt-10 sm:mt-12 md:mt-16 lg:mt-20 2xl:mt-24 3xl:mt-28 4xl:mt-32 text-3xl font-black text-white sm:text-4xl lg:text-5xl 2xl:text-6xl 3xl:text-7xl 4xl:text-8xl">
+          Edit <span className="text-cyan-300">Karya</span>
+        </h2>
 
-        <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-400 sm:text-lg sm:leading-8 2xl:mt-6 2xl:max-w-4xl 2xl:text-xl 2xl:leading-9 3xl:mt-8 3xl:max-w-5xl 3xl:text-2xl 3xl:leading-10 4xl:mt-10 4xl:max-w-6xl 4xl:text-3xl 4xl:leading-11">
+        <p className="mx-auto mt-3 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8 2xl:mt-4 2xl:max-w-4xl 2xl:text-xl 2xl:leading-9 3xl:mt-5 3xl:max-w-5xl 3xl:text-2xl 3xl:leading-10 4xl:mt-6 4xl:max-w-6xl 4xl:text-3xl 4xl:leading-11">
           Perbarui informasi karya yang sudah kamu upload ke SINGGAH.
         </p>
 

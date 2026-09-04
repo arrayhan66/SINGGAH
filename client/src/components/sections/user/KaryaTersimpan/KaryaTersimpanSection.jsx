@@ -4,6 +4,7 @@ import SearchBar from "../../../ui/SearchBar"
 import OutlineButton from "../../../ui/OutlineButton"
 import GlowBackground from "../../../ui/GlowBackground"
 import DustBackground from "../../../ui/DustBackground"
+import PCBBackground from "../../../ui/PCBBackground"
 import useSearchAndExpand from "../../../../hooks/useSearchAndExpand"
 import KaryaTersimpanCard from "./KaryaTersimpanCard"
 import { useAuth } from "../../../../context/AuthContext"
@@ -71,11 +72,15 @@ function KaryaTersimpanSection() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-brand-dark px-4 pt-[calc(var(--navbar-h)+24px)] pb-8 sm:px-5 sm:pt-[calc(var(--navbar-h)+32px)] sm:pb-10 md:px-8 lg:px-10 lg:pb-12 xl:px-12 3xl:px-16 4xl:px-20 4xl:pb-20">
+    <section
+      id="karya-tersimpan"
+      className="relative overflow-hidden bg-brand-dark min-h-screen pt-[calc(var(--navbar-h)+24px)] sm:pt-[calc(var(--navbar-h)+32px)] pb-6 sm:pb-10 lg:pb-12 3xl:pb-16 4xl:pb-20"
+    >
       <GlowBackground />
+      <PCBBackground />
       <DustBackground />
 
-      <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 xl:max-w-[1280px] 3xl:max-w-[1600px] 3xl:px-10 4xl:max-w-[2000px] 4xl:px-14">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8 relative 2xl:max-w-[1440px] 2xl:px-12 3xl:max-w-[1800px] 3xl:px-16 4xl:max-w-[2200px] 4xl:px-20">
         {loading ? (
           <SavedKaryaPageSkeleton />
         ) : (
@@ -85,7 +90,7 @@ function KaryaTersimpanSection() {
               <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 sm:h-16 sm:w-16 md:h-20 md:w-20 lg:h-24 lg:w-24 3xl:h-28 3xl:w-28 4xl:h-32 4xl:w-32">
                 <Bookmark className="h-7 w-7 text-cyan-300 sm:h-8 sm:w-8 md:h-10 md:w-10 lg:h-12 lg:w-12 3xl:h-14 3xl:w-14 4xl:h-16 4xl:w-16" />
               </div>
-              <h2 className="mt-2 sm:mt-3 md:mt-4 lg:mt-5 2xl:mt-6 3xl:mt-7 4xl:mt-8 text-2xl font-black text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-5xl 3xl:text-6xl 4xl:text-7xl">
+              <h2 className="mt-2 sm:mt-3 md:mt-4 lg:mt-5 2xl:mt-6 3xl:mt-7 4xl:mt-8 text-3xl font-black text-white sm:text-4xl lg:text-5xl 2xl:text-6xl 3xl:text-7xl 4xl:text-8xl">
                 Karya <span className="text-cyan-300">Tersimpan</span>
               </h2>
 
@@ -95,7 +100,7 @@ function KaryaTersimpanSection() {
             </div>
 
             {/* Search */}
-            <div className="mt-6 sm:mt-8 3xl:mt-10 4xl:mt-12">
+            <div className="mt-8 2xl:mt-12 3xl:mt-14 4xl:mt-16">
               <SearchBar
                 value={search}
                 onChange={handleSearchChange}
@@ -104,7 +109,7 @@ function KaryaTersimpanSection() {
             </div>
 
             {/* Grid */}
-            <div className="mt-8 sm:mt-10 3xl:mt-14 4xl:mt-16">
+            <div className="mt-14 2xl:mt-20 3xl:mt-24 4xl:mt-28">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:gap-6 lg:grid-cols-3 lg:gap-7 xl:gap-8 3xl:grid-cols-4 3xl:gap-9 4xl:grid-cols-5 4xl:gap-10">
                 {visibleBookmarks.length > 0 ? (
                   visibleBookmarks.map((item) => (
@@ -142,7 +147,7 @@ function KaryaTersimpanSection() {
 
             {/* Load more */}
             {!showAll && filteredBookmarks.length > initialCount && (
-              <div className="mt-6 flex justify-center sm:mt-8 3xl:mt-10 4xl:mt-12">
+              <div className="mt-6 flex justify-center sm:mt-8 2xl:mt-12 3xl:mt-16 4xl:mt-20">
                 <OutlineButton onClick={() => setShowAll(true)} className="karya-loadmore-btn">
                   Lihat Lebih Banyak
                 </OutlineButton>

@@ -57,7 +57,7 @@ html.light .user-page section.bg-brand-dark:has(> div.pointer-events-none.absolu
 }
 /* Border putih 10% terlalu redup di atas kartu gelap -> biru navy
    terang supaya outline kontainer & divider terbaca jelas */
-.user-page .border-white\/10 {
+.user-page main .border-white\/10 {
   border-color: #3f6da3;
 }
 /* Garis pemisah langkah (StepDivider): cyan lebih pekat di dark */
@@ -83,6 +83,49 @@ html.light .user-page .rounded-2xl.border-cyan-400\/30.bg-cyan-400\/10 svg {
   color: #ffffff;
 }
 
+/* ===== EDIT KARYA HERO: SATU RING "GELOMBANG" LUAR IKON (LIGHT) =====
+   Ring besar berdenyut (rounded-[32px]) yang membungkus kotak ikon
+   judul Edit Karya. Border cyan transparan (5%) terlalu redup di atas
+   latar terang -> diganti border biru pekat + glow agar tetap terlihat. */
+html.light .user-page .hero-gelombang.absolute.-inset-6.rounded-\[32px\].border-cyan-400\/5 {
+  border-color: rgba(37, 99, 235, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(37, 99, 235, 0.12),
+    0 0 26px -4px rgba(37, 99, 235, 0.4);
+}
+
+/* ===== EDIT KARYA HERO: RING "GELOMBANG" LUAR IKON (DARK) =====
+   Beri efek lebih hidup & kontras di atas latar gelap: border cyan
+   lebih pekat + glow biru-cyan menyala agar tidak tenggelam di latar
+   navy. */
+.user-page .hero-gelombang.absolute.-inset-6.rounded-\[32px\].border-cyan-400\/5 {
+  border-color: rgba(34, 211, 238, 0.55);
+  box-shadow:
+    0 0 0 1px rgba(34, 211, 238, 0.15),
+    0 0 30px -4px rgba(34, 211, 238, 0.55),
+    inset 0 0 26px -12px rgba(34, 211, 238, 0.5);
+}
+
+/* ===== TOMBOL KEMBALI (pill/lingkaran) — LIGHT MODE ===== */
+html.light .user-page button.rounded-full.border-white\/10.bg-white\/5 {
+  border-color: rgba(255, 255, 255, 0.35);
+  background-color: #2563eb;
+  background-image: linear-gradient(135deg, #22d3ee 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+html.light .user-page button.rounded-full.border-white\/10.bg-white\/5:hover {
+  border-color: rgba(255, 255, 255, 0.75);
+  background-color: #1d4ed8;
+  background-image: linear-gradient(135deg, #06b6d4 0%, #1d4ed8 100%);
+}
+html.light .user-page button.rounded-full.border-white\/10.bg-white\/5 span.rounded-full.bg-white\/10 {
+  background-color: rgba(255, 255, 255, 0.22);
+}
+html.light .user-page button.rounded-full.border-white\/10.bg-white\/5.hover\:text-cyan-300:hover {
+  color: #ffffff;
+}
+
 /* ===== UPLOAD PREVIEW: area thumbnail ===== */
 html.light .user-page .aspect-video.bg-brand-navy {
   background-color: #eef3fa;
@@ -100,10 +143,82 @@ html.light .user-page span.rounded-full.bg-brand-navy\/80 {
   background-color: #eff6ff;
 }
 
+/* ===== CHIP STATUS MyKarya: pill pastel senada (light & dark sama) ===== */
+/* Pill gradien pastel sesuai status, dipakai di light dan dark mode
+   supaya konsisten. Kontras tinggi di kartu manapun. */
+.user-page #my-karya span.rounded-full.bg-brand-navy\/80.border-amber-400\/30 {
+  background: linear-gradient(180deg, #fff7ed 0%, #fde9c8 100%);
+  border-color: #f6c25c !important;
+  color: #9a5b00 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 4px 12px -4px rgba(217, 119, 6, 0.45);
+}
+.user-page #my-karya span.rounded-full.bg-brand-navy\/80.border-emerald-400\/30 {
+  background: linear-gradient(180deg, #ecfdf5 0%, #c8f0dd 100%);
+  border-color: #5fd2a0 !important;
+  color: #04653d !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 4px 12px -4px rgba(16, 185, 129, 0.45);
+}
+.user-page #my-karya span.rounded-full.bg-brand-navy\/80.border-red-400\/30 {
+  background: linear-gradient(180deg, #fef2f2 0%, #fcd9d9 100%);
+  border-color: #f59797 !important;
+  color: #a1121a !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 4px 12px -4px rgba(239, 68, 68, 0.45);
+}
+.user-page #my-karya span.rounded-full.bg-brand-navy\/80 svg {
+  color: inherit !important;
+  fill: none !important;
+  stroke: currentColor !important;
+}
+
 /* Chip teknologi di kartu */
 html.light .user-page .rounded-md.border-slate-700\/50.bg-slate-800\/50 {
   border-color: #dbe7f7;
   background-color: #f8fafc;
+}
+
+/* ===== TAG KATEGORI KARYA (MyKarya) ===== */
+/* Dark mode: chip cyan lebih tegas + border supaya tidak nyatu dgn
+   kartu gelap. */
+.user-page #my-karya span.rounded-md.bg-cyan-400\/10.text-cyan-300 {
+  background-color: rgba(34, 211, 238, 0.12);
+  border: 1px solid rgba(34, 211, 238, 0.4);
+  color: #7dd3fc;
+}
+/* Light mode: chip biru putih jelas di atas kartu putih (tidak nyatu),
+   teks biru tua senada tema light. */
+html.light .user-page #my-karya span.rounded-md.bg-cyan-400\/10.text-cyan-300 {
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+/* ===== TAG TEKNOLOGI / STACK (MyKarya) ===== */
+/* DARK MODE: pill gelap glassy dgn aksen cyan & glow halus, lebih
+   menarik dan konsisten dgn tema dark (cyan). */
+.user-page #my-karya span.rounded-md.border-slate-700\/50.bg-slate-800\/50 {
+  background: linear-gradient(180deg, rgba(34, 211, 238, 0.14), rgba(30, 41, 59, 0.9) 45%);
+  border-color: rgba(34, 211, 238, 0.35);
+  color: #a5f3fc;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* LIGHT MODE: tag stack TETAP pill biru gelap (hanya background
+   halaman yang terang). Selector html.light + #my-karya dibuat lebih
+   spesifik agar mengalahkan rule dark/default di atas dan rule light
+   umum lain. */
+html.light .user-page #my-karya span.rounded-md.border-slate-700\/50.bg-slate-800\/50 {
+  background: #0d47a1 !important;
+  border-color: rgba(96, 165, 250, 0.55) !important;
+  color: #ffffff !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 3px 10px -4px rgba(21, 101, 192, 0.45) !important;
 }
 
 /* ===== TOMBOL "AJUKAN SEBAGAI MAHASISWA/DOSEN" (LIGHT) ===== */
@@ -455,37 +570,204 @@ html.light .user-page button.karya-loadmore-btn:active {
     0 6px 14px -8px rgba(37, 99, 235, 0.3);
 }
 
-/* ===== MY KARYA STATS ICON COLOR ACCENTS (LIGHT & DARK) ===== */
-/* Total Karya (Cyan) */
-html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5:nth-child(1),
-.user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(1) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl {
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+/* ===== MY KARYA STATS CARDS — DARK MODE (khas & hidup) ===== */
+/* Atur ulang kartu GlassCard pada grid statistik agar tampil lebih
+   hidup: slab bawah, glasir gradasi status di tepi, dan bukan
+   sekadar kotak biasa. */
+.user-page div.mt-8.grid.grid-cols-1.gap-4 {
+  position: relative;
 }
-/* Menunggu Review (Amber/Kuning) */
-.user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(2) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl {
-  background-image: linear-gradient(to bottom right, #fbbf24, #d97706);
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl {
+  position: relative;
+  overflow: hidden;
+  background-color: #0e2740;
+  background-image: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.02) 50%,
+    rgba(6, 182, 212, 0.04) 100%
+  );
+  border-color: #4a7ab5;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 14px 30px -12px rgba(0, 0, 0, 0.45);
+  transition:
+    transform 0.35s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
 }
-/* Disetujui (Emerald/Hijau) */
-.user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(3) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl {
-  background-image: linear-gradient(to bottom right, #34d399, #059669);
-}
-/* Ditolak (Red/Merah) */
-.user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(4) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl {
-  background-image: linear-gradient(to bottom right, #f87171, #dc2626);
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 20px 36px -14px rgba(0, 0, 0, 0.5);
+  border-color: #5c90c8;
 }
 
-html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl svg {
-  color: #ffffff !important;
+/* Glare di kanan atas kartu stat (sentuhan "kaca" agar tidak doyong) */
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 46%;
+  height: 100%;
+  background: radial-gradient(
+    120% 90% at 100% 0%,
+    rgba(34, 211, 238, 0.1) 0%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* ===== EDIT KARYA TITLE GRADIENT SINGLE COLOR FIX ===== */
-/* Ubah teks "Karya" di EditKaryaHero agar 1 warna (putih/netral) seperti dark mode */
-.user-page h1 span.bg-gradient-to-r.from-cyan-300 {
-  background-image: none !important;
-  -webkit-background-clip: unset !important;
-  background-clip: unset !important;
-  color: #ffffff;
+/* Pita aksen status di tepi atas kartu + watermark ikon besar */
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div.rounded-3xl .stats-accent {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  border-radius: 9999px 9999px 0 0;
 }
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div:nth-child(1) .stats-accent {
+  background: linear-gradient(90deg, #22d3ee, #2563eb);
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div:nth-child(2) .stats-accent {
+  background: linear-gradient(90deg, #fbbf24, #d97706);
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div:nth-child(3) .stats-accent {
+  background: linear-gradient(90deg, #34d399, #059669);
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div:nth-child(4) .stats-accent {
+  background: linear-gradient(90deg, #f87171, #dc2626);
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div.rounded-3xl .stats-watermark {
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 64px;
+  height: 64px;
+}
+
+
+/* Kotak ikon status — tile transparan lembut (DARK MODE).
+   Supaya terlihat alami & mahal: latar tipis warna status + ikon
+   berwarna lembut, tanpa gradasi keras yang terkesan "buatan AI". */
+.user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(1) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 {
+  background-color: rgba(6, 182, 212, 0.12);
+  background-image: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(2) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 {
+  background-color: rgba(251, 191, 36, 0.12);
+  background-image: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(3) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 {
+  background-color: rgba(52, 211, 153, 0.12);
+  background-image: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(4) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 {
+  background-color: rgba(248, 113, 113, 0.12);
+  background-image: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Watermark ikon: warna status sesuai kartu, tampil lebih jelas */
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(1) div.rounded-3xl .stats-watermark {
+  color: #0891b2;
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(2) div.rounded-3xl .stats-watermark {
+  color: #b45309;
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(3) div.rounded-3xl .stats-watermark {
+  color: #047857;
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(4) div.rounded-3xl .stats-watermark {
+  color: #b91c1c;
+}
+
+/* ===== MY KARYA STATS CARDS — LIGHT MODE ===== */
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 > div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl {
+  background-color: #ffffff;
+  background-image: linear-gradient(
+    145deg,
+    #ffffff 0%,
+    #f4f9ff 55%,
+    #eef5ff 100%
+  );
+  border-color: #c7dcfc;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    0 16px 32px -14px rgba(30, 64, 175, 0.28);
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 > div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    0 22px 40px -16px rgba(30, 64, 175, 0.32);
+  border-color: #a9c8f5;
+}
+
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 > div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl::after {
+  background: radial-gradient(
+    120% 90% at 100% 0%,
+    rgba(34, 211, 238, 0.12) 0%,
+    rgba(255, 255, 255, 0) 60%
+  );
+}
+
+/* Teks stat di light mode: angka & label gelap agar terbaca di kartu putih */
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div.rounded-3xl p.font-extrabold {
+  color: #0f172a;
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div.rounded-3xl p.font-semibold {
+  color: #334155;
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div.rounded-3xl p.text-slate-500 {
+  color: #64748b;
+}
+
+/* ===== MY KARYA STATS ICON COLOR ACCENTS (LIGHT MODE ONLY) ===== */
+/* Tile ikon transparan lembut warna status, senada theme terang.
+   Ikon warna status gelap pekat agar kontras di latar putih. */
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(1) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 {
+  background-image: none;
+  background-color: rgba(6, 182, 212, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(2) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 {
+  background-image: none;
+  background-color: rgba(251, 191, 36, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(3) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 {
+  background-image: none;
+  background-color: rgba(52, 211, 153, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(4) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 {
+  background-image: none;
+  background-color: rgba(248, 113, 113, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+/* Ikon pakai warna status pekat agar tetap terbaca di light mode */
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(1) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 svg {
+  color: #0891b2 !important;
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(2) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 svg {
+  color: #b45309 !important;
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(3) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 svg {
+  color: #047857 !important;
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(4) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 svg {
+  color: #b91c1c !important;
+}
+
+/* ===== EDIT KARYA TITLE GRADIENT SINGLE COLOR FIX (LIGHT MODE ONLY) ===== */
 html.light .user-page h1 span.bg-gradient-to-r.from-cyan-300 {
   color: #404040;
 }
@@ -537,21 +819,63 @@ html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.roun
   transform: none !important;
   box-shadow: none !important;
 }
-html.light .user-page .border-white\/60.bg-white\/90 {
-  background-color: #fbfcfe;
-  border-color: #e2e8f0;
-  box-shadow: 0 4px 16px -8px rgba(15, 23, 42, 0.12);
-}
-html.light .user-page .focus-within\:border-cyan-400:focus-within {
-  border-color: #93c5fd;
-}
 html.light .user-page .focus-within\:shadow-cyan-400\/30:focus-within {
   box-shadow:
     0 14px 28px -10px rgba(37, 99, 235, 0.38),
-    0 6px 12px -6px rgba(37, 99, 235, 0.22);
+    0 6px 12px -6px rgba(37, 99, 235, 0.22) !important;
 }
 html.light .user-page .group:focus-within svg {
   color: #2563eb;
+}
+html.light .user-page .group:focus-within button.bg-red-500 svg {
+  color: #ffffff;
+}
+
+/* ===== FILTER KARYA SAYA (cari + status) DI HEADER — LIGHT ===== */
+/* Search bar & dropdown status diubah jadi putih/terang di light mode */
+html.light .user-page div.group.flex.flex-1 {
+  background-color: #ffffff !important;
+  border-color: #dbe3ee !important;
+  box-shadow:
+    inset 0 1px 2px rgba(15, 23, 42, 0.04),
+    0 4px 16px -8px rgba(15, 23, 42, 0.12);
+}
+html.light .user-page div.group.flex.flex-1 input {
+  color: #1b2a4a;
+}
+html.light .user-page div.group.flex.flex-1 input::placeholder {
+  color: #94a3b8;
+}
+/* Tombol dropdown status (filter) di light mode */
+html.light .user-page div.relative.min-w-0 button.rounded-xl.border-2.border-white\/60.bg-white\/90 {
+  background-color: #ffffff !important;
+  border-color: #dbe3ee !important;
+  color: #1b2a4a;
+  box-shadow:
+    inset 0 1px 2px rgba(15, 23, 42, 0.04),
+    0 4px 16px -8px rgba(15, 23, 42, 0.12);
+}
+html.light .user-page div.relative.min-w-0 button.rounded-xl.border-2.border-white\/60.bg-white\/90 svg {
+  color: #64748b;
+}
+/* Menu dropdown status (popup) di light mode -> putih */
+html.light .user-page div.absolute.left-0.z-30.mt-2.w-\[220px\].overflow-hidden.rounded-xl.border-2.border-white\/10.bg-slate-900\/95 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 20px 40px -14px rgba(30, 64, 175, 0.28);
+}
+html.light .user-page div.absolute.left-0.z-30.mt-2.w-\[220px\].overflow-hidden.rounded-xl.border-2.border-white\/10.bg-slate-900\/95 button.text-slate-300 {
+  color: #475569;
+}
+html.light .user-page div.absolute.left-0.z-30.mt-2.w-\[220px\].overflow-hidden.rounded-xl.border-2.border-white\/10.bg-slate-900\/95 button.text-slate-300:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+html.light .user-page div.absolute.left-0.z-30.mt-2.w-\[220px\].overflow-hidden.rounded-xl.border-2.border-white\/10.bg-slate-900\/95 button.bg-cyan-400\/10 {
+  color: #0891b2;
+}
+html.light .user-page .focus-within\:border-cyan-400:focus-within {
+  border-color: #93c5fd !important;
 }
 
 /* ===== KARYA TERSIMPAN: KOTAK IKON HEADER ===== */
@@ -601,3 +925,112 @@ html.light .user-page section > .pointer-events-none.absolute.rounded-full[class
 html.light .user-page section > div.pointer-events-none.absolute.inset-0 .pointer-events-none.absolute.rounded-full[class*="blur-"] {
   display: none;
 }
+
+/* ============================================================
+   GRID KOTAK-KOTAK BACKGROUND: SEMUA HALAMAN USER (LIGHT MODE)
+   Menyamakan hero/profile/karya-saya/karya-tersimpan/edit-upload
+   dengan pola grid biru lembut pada halaman Berita & Karya.
+   Berlaku untuk section & permukaan hero (AdminHeroBackground).
+   Dark mode tidak tersentuh.
+   ============================================================ */
+
+/* --- DARK MODE: grid kotak-kotak biru redup senada PCBBackground
+   halaman Berita/Karya. Latar tetap navy bg-brand-dark; hanya
+   menambah tekstur grid di belakang konten. --- */
+.user-page section.bg-brand-dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(73, 126, 174, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(73, 126, 174, 0.15) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.45;
+}
+.user-page .bg-brand-dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(73, 126, 174, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(73, 126, 174, 0.15) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.45;
+}
+
+/* --- LIGHT MODE: latar gradasi terang & grid biru lembut --- */
+/* Latar gradasi terang menggantikan bg-brand-dark gelap */
+html.light .user-page section.bg-brand-dark {
+  background-image: linear-gradient(180deg, #f7fafd 0%, #edf3fa 55%, #e6edf7 100%);
+  background-color: transparent;
+}
+html.light .user-page .bg-brand-dark {
+  background-color: transparent;
+}
+
+/* Grid kotak-kotak lembut & buram */
+html.light .user-page section.bg-brand-dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(37, 99, 235, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.09) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.7;
+  filter: blur(0.6px);
+}
+
+/* Aura biru halus di puncak section (tak ada di hero bertipe
+   AdminHeroBackground karena sudah punya vignette sendiri) */
+html.light .user-page section.bg-brand-dark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    620px circle at 50% 0%,
+    rgba(37, 99, 235, 0.09),
+    transparent 65%
+  );
+}
+
+/* Grid untuk permukaan hero bertipe AdminHeroBackground (div) */
+html.light .user-page .bg-brand-dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(37, 99, 235, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.09) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.7;
+  filter: blur(0.6px);
+}
+
+/* ===== HEADER/HERO: TANPA GRID KOTAK-KOTAK =====
+   Bagian hero (judul) di semua halaman user tidak memakai grid,
+   hanya area konten/bawah yang ber-grid. */
+.user-page .hero::before,
+.user-page .hero::after {
+  display: none !important;
+}
+
+
+/* ===== KARYA TERSIMPAN: TEXT LIGHT =====
+   Satu section bg-brand-dark seperti menu Karya. Pastikan judul
+   utama & deskripsi terbaca di atas latar terang. Span "Tersimpan"
+   memakai gradasi biru dari rule generic section h2 span. */
+html.light .user-page #karya-tersimpan h2 {
+  color: #404040;
+}
+html.light .user-page #karya-tersimpan p {
+  color: #64748b;
+}
+
+/* Karya Tersimpan: sembunyikan PCBBackground (grid dark) di light mode
+   supaya tidak dobel dengan grid CSS ::before. */
+html.light .user-page section > .pointer-events-none.opacity-20 {
+  display: none;
+}
+

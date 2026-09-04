@@ -55,7 +55,10 @@ html.light [class*="bg-emerald-500"] .text-white,
 html.light [class*="from-blue-600"] .text-white,
 html.light [class*="from-cyan-400"] .text-white,
 html.light [class*="from-cyan-500"] .text-white,
-html.light [class*="to-blue-600"] .text-white {
+html.light [class*="from-red-500"] .text-white,
+html.light [class*="from-rose-600"] .text-white,
+html.light [class*="to-blue-600"] .text-white,
+html.light [class*="to-rose-600"] .text-white {
   color: #ffffff;
 }
 html.light [class*="bg-blue-600"][class*="text-white"],
@@ -68,7 +71,10 @@ html.light [class*="bg-emerald-500"][class*="text-white"],
 html.light [class*="from-blue-600"][class*="text-white"],
 html.light [class*="from-cyan-400"][class*="text-white"],
 html.light [class*="from-cyan-500"][class*="text-white"],
-html.light [class*="to-blue-600"][class*="text-white"] {
+html.light [class*="from-red-500"][class*="text-white"],
+html.light [class*="from-rose-600"][class*="text-white"],
+html.light [class*="to-blue-600"][class*="text-white"],
+html.light [class*="to-rose-600"][class*="text-white"] {
   color: #ffffff;
 }
 

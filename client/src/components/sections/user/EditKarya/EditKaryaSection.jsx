@@ -12,6 +12,7 @@ import UploadPreview from "../Upload/UploadPreview"
 import UploadAction from "../Upload/UploadAction"
 import api from "../../../../services/api"
 import { useProjects } from "../../../../context/ProjectContext"
+import { useAuth } from "../../../../context/AuthContext"
 import SubmitSuccessModal from "../../../ui/SubmitSuccessModal"
 import { EditKaryaFormSkeleton } from "../../../ui/PageSkeletons"
 
@@ -19,6 +20,7 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
   const { slug } = useParams()
   const navigate = useNavigate()
   const { updateProject } = useProjects()
+  const { user } = useAuth()
 
   const [loading, setLoading] = useState(true)
   const [fetchError, setFetchError] = useState(null)
@@ -256,6 +258,8 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
         karyaTitle={formData.title}
         redirectPath={redirectPath}
         mode="edit"
+        role={user?.role || "user"}
+        tipe={user?.tipe || "umum"}
         onClose={() => setSuccessOpen(false)}
       />
     </section>

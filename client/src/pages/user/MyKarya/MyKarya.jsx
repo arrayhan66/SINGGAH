@@ -4,7 +4,7 @@ import "../../../styles/user-light.css"
 
 export default function MyKarya() {
   return (
-    <div className="user-page">
+    <div className="user-page light-page">
       <MainLayout>
         <MyKaryaSection />
       </MainLayout>

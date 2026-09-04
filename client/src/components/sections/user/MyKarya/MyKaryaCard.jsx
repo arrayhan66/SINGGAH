@@ -6,6 +6,7 @@ import {
   XCircle,
   AlertTriangle,
   Calendar,
+  Loader2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import GlassCard from "../../../ui/GlassCard";
@@ -42,7 +43,7 @@ const categoryLabels = {
   otomasi: "Otomasi",
 };
 
-function MyKaryaCard({ karya, onDeleteClick, isDosen = false }) {
+function MyKaryaCard({ karya, onDeleteClick, isDosen = false, isDeleting = false }) {
   const navigate = useNavigate();
 
   const showEdit = true;
@@ -192,13 +193,21 @@ function MyKaryaCard({ karya, onDeleteClick, isDosen = false }) {
           <button
             type="button"
             onClick={handleDelete}
-            className="group/btn flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-500 py-2.5 text-xs font-semibold text-white transition-colors duration-300 hover:bg-red-600 sm:py-3 sm:text-sm md:text-sm lg:py-3.5 lg:text-base 3xl:py-4 3xl:text-base 4xl:py-5 4xl:text-lg"
+            disabled={isDeleting}
+            className="group/btn flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-500 py-2.5 text-xs font-semibold text-white transition-colors duration-300 hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-70 sm:py-3 sm:text-sm md:text-sm lg:py-3.5 lg:text-base 3xl:py-4 3xl:text-base 4xl:py-5 4xl:text-lg"
           >
-            <Trash2
-              size={14}
-              className="sm:size-[15px] md:size-4 lg:size-[18px] 3xl:size-5 4xl:size-[22px]"
-            />
-            Hapus
+            {isDeleting ? (
+              <Loader2
+                size={14}
+                className="animate-spin sm:size-[15px] md:size-4 lg:size-[18px] 3xl:size-5 4xl:size-[22px]"
+              />
+            ) : (
+              <Trash2
+                size={14}
+                className="sm:size-[15px] md:size-4 lg:size-[18px] 3xl:size-5 4xl:size-[22px]"
+              />
+            )}
+            {isDeleting ? "Menghapus" : "Hapus"}
           </button>
         </div>
       </div>

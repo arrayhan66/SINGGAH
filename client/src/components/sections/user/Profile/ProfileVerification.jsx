@@ -196,9 +196,11 @@ function ProfileVerification() {
                 <button
                   type="button"
                   onClick={() => setIdentitasPhoto(null)}
-                  className="absolute right-2 top-2 rounded-lg bg-black/70 p-1.5 text-slate-300 hover:text-white"
+                  aria-label="Hapus foto"
+                  title="Hapus foto"
+                  className="group/remove absolute right-2 top-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-slate-900/90 text-white shadow-lg ring-1 ring-white/40 transition-all duration-200 hover:bg-red-500 hover:ring-red-300 hover:shadow-red-500/50 active:scale-90"
                 >
-                  <X size={14} />
+                  <X size={15} strokeWidth={3} />
                 </button>
               </div>
             ) : (

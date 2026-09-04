@@ -12,6 +12,7 @@ import { useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { MailCheck } from "lucide-react"
 import { compressImage } from "../../../../utils/compressImage"
+import { useTheme } from "../../../../context/ThemeContext"
 
 const tipeConfig = {
   admin: { label: "Admin", icon: CreditCard, color: "amber" },
@@ -31,6 +32,8 @@ function ProfileInformation({
   onIdentitasRemove,
 }) {
   const navigate = useNavigate()
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
   const tipe = tipeConfig[userTipe] || tipeConfig.umum
   const TipeIcon = tipe.icon
   const identitasInputRef = useRef(null)
@@ -170,9 +173,11 @@ function ProfileInformation({
                 <button
                   type="button"
                   onClick={onIdentitasRemove}
-                  className="absolute right-2 top-2 cursor-pointer rounded-lg border border-white/10 bg-black/70 p-1.5 text-slate-300 transition-colors hover:text-white"
+                  aria-label="Hapus foto"
+                  title="Hapus foto"
+                  className="group/remove absolute right-2 top-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-slate-900/90 text-white shadow-lg ring-1 ring-white/40 transition-all duration-200 hover:bg-red-500 hover:ring-red-300 hover:shadow-red-500/50 active:scale-90"
                 >
-                  <X size={14} />
+                  <X size={15} strokeWidth={3} />
                 </button>
               </div>
             ) : (

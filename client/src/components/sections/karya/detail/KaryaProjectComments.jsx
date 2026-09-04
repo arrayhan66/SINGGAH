@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   MessageCircle,
   Send,
@@ -68,6 +68,14 @@ function EditForm({ initialValue, onSubmit, onCancel, placeholder, busy }) {
   const [value, setValue] = useState(initialValue)
   const editRef = useRef(null)
 
+  useEffect(() => {
+    const el = editRef.current
+    if (el) {
+      el.focus()
+      el.setSelectionRange(el.value.length, el.value.length)
+    }
+  }, [])
+
   function handleSubmit(e) {
     e.preventDefault()
     if (!value.trim() || busy) return
@@ -105,7 +113,7 @@ function EditForm({ initialValue, onSubmit, onCancel, placeholder, busy }) {
             className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-cyan-500 px-3.5 py-1.5 text-xs font-semibold text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Check size={13} />
-            {busy ? "Menyimpan..." : "Simpan"}
+            <span className={busy ? "hidden" : "max-[340px]:hidden"}>{busy ? "Menyimpan..." : "Simpan"}</span>
           </button>
           <button
             type="button"
@@ -113,7 +121,7 @@ function EditForm({ initialValue, onSubmit, onCancel, placeholder, busy }) {
             className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-white/10 hover:text-slate-200"
           >
             <X size={13} />
-            Batal
+            <span className="max-[400px]:hidden">Batal</span>
           </button>
         </div>
       </div>
@@ -125,20 +133,22 @@ function DeleteConfirm({ label, onConfirm, onCancel, busy }) {
   return (
     <div className="mt-2.5 inline-flex flex-wrap items-center gap-2 rounded-xl border border-rose-400/30 bg-rose-500/10 px-3 py-2">
       <span className="text-xs font-medium text-rose-200">{label}</span>
-      <button
-        onClick={onConfirm}
-        disabled={busy}
-        className="cursor-pointer rounded-lg bg-rose-500 px-3 py-1 text-[11px] font-semibold text-white transition hover:bg-rose-400 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {busy ? "Menghapus..." : "Hapus"}
-      </button>
-      <button
-        onClick={onCancel}
-        disabled={busy}
-        className="cursor-pointer rounded-lg border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-semibold text-slate-300 transition hover:bg-white/10 hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        Batal
-      </button>
+      <div className="flex flex-wrap items-center gap-2 max-[450px]:w-full max-[450px]:justify-end">
+        <button
+          onClick={onConfirm}
+          disabled={busy}
+          className="cursor-pointer rounded-lg bg-rose-500 px-3 py-1 text-[11px] font-semibold text-white transition hover:bg-rose-400 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {busy ? "Menghapus..." : "Hapus"}
+        </button>
+        <button
+          onClick={onCancel}
+          disabled={busy}
+          className="cursor-pointer rounded-lg border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-semibold text-slate-300 transition hover:bg-white/10 hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Batal
+        </button>
+      </div>
     </div>
   )
 }
@@ -225,18 +235,16 @@ function ReplyItem({
 
         {!editing && (
           <div className="mt-1.5 flex flex-wrap items-center gap-1">
-            <button
-              onClick={() => onReply(author)}
-              title={isLoggedIn ? `Balas ${author.name || "user"}` : "Login untuk membalas"}
-              className={`inline-flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold transition ${
-                isLoggedIn
-                  ? "text-cyan-300/90 hover:bg-cyan-500/10 hover:text-cyan-300"
-                  : "cursor-not-allowed text-slate-600"
-              }`}
-            >
-              <CornerDownRight size={11} />
-              Balas
-            </button>
+            {isLoggedIn && (
+              <button
+                onClick={() => onReply(author)}
+                title={`Balas ${author.name || "user"}`}
+                className="inline-flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold text-cyan-300/90 transition hover:bg-cyan-500/10 hover:text-cyan-300"
+              >
+                <CornerDownRight size={11} />
+                Balas
+              </button>
+            )}
             {canEdit && (
               <button
                 onClick={() => setEditing(true)}
@@ -318,9 +326,9 @@ function ReplyForm({ user, replyRef, replyText, setReplyText, insertEmojiIntoRep
                 disabled={busy || !replyText.trim()}
                 className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-cyan-500 px-3 py-1.5 text-xs font-semibold whitespace-nowrap text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50 max-[400px]:px-2.5 max-[400px]:py-1 max-[320px]:text-[11px]"
               >
-                <Send size={13} />
-                <span className="max-[400px]:hidden">Kirim Balasan</span>
-                <span className="hidden max-[400px]:inline">Kirim</span>
+                <Send size={13} className="hidden min-[320px]:block" />
+                <span className="max-[450px]:hidden">Kirim Balasan</span>
+                <span className="hidden max-[450px]:inline">Kirim</span>
               </button>
             </div>
           </div>
@@ -465,25 +473,22 @@ function CommentItem({
 
           {!editing && (
             <div className="mt-2 flex flex-wrap items-center gap-1">
-              <button
-                onClick={() => {
-                  if (!isLoggedIn) return
-                  if (showReply && replyingToIndex === null) {
-                    setShowReply(false)
-                  } else {
-                    startReplyWithMention(author, null)
-                  }
-                }}
-                title={isLoggedIn ? "Balas komentar ini" : "Login untuk membalas"}
-                className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-semibold transition ${
-                  isLoggedIn
-                    ? "text-cyan-300/90 hover:bg-cyan-500/10 hover:text-cyan-300"
-                    : "cursor-not-allowed text-slate-600"
-                }`}
-              >
-                <CornerDownRight size={12} />
-                Balas
-              </button>
+              {isLoggedIn && (
+                <button
+                  onClick={() => {
+                    if (showReply && replyingToIndex === null) {
+                      setShowReply(false)
+                    } else {
+                      startReplyWithMention(author, null)
+                    }
+                  }}
+                  title="Balas komentar ini"
+                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-semibold text-cyan-300/90 transition hover:bg-cyan-500/10 hover:text-cyan-300"
+                >
+                  <CornerDownRight size={12} />
+                  Balas
+                </button>
+              )}
               {canEdit && (
                 <button
                   onClick={() => setEditing(true)}
@@ -583,6 +588,7 @@ function KaryaProjectComments({
     name: user?.name || "Anonim",
     username: user?.username,
     role: user?.role,
+    avatar: user?.avatar,
   }
 
   function insertEmojiIntoComment(emoji) {
@@ -731,7 +737,7 @@ function KaryaProjectComments({
                   disabled={posting || !newComment.trim()}
                   className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-cyan-500 px-3 py-2 text-xs font-semibold whitespace-nowrap text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 max-[350px]:px-2.5 max-[350px]:py-1.5 max-[320px]:text-[11px]"
                 >
-                  <Send size={14} />
+                  <Send size={14} className="hidden min-[320px]:block" />
                   <span className="max-[350px]:hidden">Kirim Komentar</span>
                   <span className="hidden max-[350px]:inline">Kirim</span>
                 </button>

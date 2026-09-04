@@ -10,6 +10,8 @@ function SubmitSuccessModal({
   karyaTitle = "",
   redirectPath = "/my-karya",
   mode = "edit",
+  role = "user",
+  tipe = "umum",
   onClose,
 }) {
   const navigate = useNavigate()
@@ -26,6 +28,14 @@ function SubmitSuccessModal({
   if (!isOpen) return null
 
   const headline = mode === "upload" ? "Karya Berhasil Diunggah" : "Karya Berhasil Diperbarui"
+  const langsungPublish = role === "admin" || tipe === "dosen"
+  const subtext = !langsungPublish
+    ? mode === "upload"
+      ? "Karya kamu akan diverifikasi oleh admin terlebih dahulu sebelum dipublikasikan."
+      : "Perubahan karya kamu akan diverifikasi oleh admin."
+    : mode === "upload"
+      ? "Karya kamu langsung dipublikasikan dan tersedia di galeri."
+      : "Perubahan karyamu langsung dipublikasikan."
 
   return (
     <PopupToast show={isOpen} variant="success" onClose={onClose} duration={5000}>
@@ -38,6 +48,11 @@ function SubmitSuccessModal({
             <h3 className="pt-1 text-sm font-semibold text-white">{headline}</h3>
             <p className="mt-0.5 text-xs text-slate-400 min-w-0 break-words line-clamp-2">"{karyaTitle}"</p>
           </div>
+        </div>
+        <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2">
+          <p className="text-[11px] font-medium text-amber-300">
+            {subtext}
+          </p>
         </div>
         <div className="mt-3 flex gap-2">
           <button

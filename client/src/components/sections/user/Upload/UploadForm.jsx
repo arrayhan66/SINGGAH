@@ -8,6 +8,7 @@ import UploadDocuments from "./UploadDocuments"
 import UploadPreview from "./UploadPreview"
 import UploadAction from "./UploadAction"
 import { useProjects } from "../../../../context/ProjectContext"
+import { useAuth } from "../../../../context/AuthContext"
 import GlowBackground from "../../../ui/GlowBackground"
 import DustBackground from "../../../ui/DustBackground"
 import SubmitSuccessModal from "../../../ui/SubmitSuccessModal"
@@ -61,6 +62,7 @@ function UploadForm() {
   const [error, setError] = useState(null)
   const [successOpen, setSuccessOpen] = useState(false)
   const { addProject } = useProjects()
+  const { user } = useAuth()
 
   function updateField(field, value) {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -167,6 +169,8 @@ function UploadForm() {
         karyaTitle={formData.title}
         redirectPath="/my-karya"
         mode="upload"
+        role={user?.role || "user"}
+        tipe={user?.tipe || "umum"}
         onClose={() => setSuccessOpen(false)}
       />
     </section>

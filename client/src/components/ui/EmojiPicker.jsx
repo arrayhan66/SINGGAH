@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { Search, Smile, X } from "lucide-react"
 
 const RECENT_KEY = "singgah-recent-emojis"
@@ -176,13 +177,45 @@ function EmojiPicker({
   const [activeCat, setActiveCat] = useState(EMOJI_CATEGORIES[0].id)
   const [recent, setRecent] = useState(loadRecent)
   const [preview, setPreview] = useState(null)
+  const [coords, setCoords] = useState(null)
   const containerRef = useRef(null)
+  const buttonRef = useRef(null)
+  const popupRef = useRef(null)
+
+  useLayoutEffect(() => {
+    if (!open) return
+
+    function measure() {
+      const el = buttonRef.current
+      if (!el) return
+      const r = el.getBoundingClientRect()
+      const vh = window.innerHeight
+      const top = r.bottom + 8
+      const maxH = Math.max(120, vh - top - 8)
+      const narrow = window.innerWidth < 300
+      const left = narrow ? null : Math.min(r.left, window.innerWidth - 304)
+      setCoords({ left, top, maxH })
+    }
+
+    measure()
+    const id = window.setTimeout(measure, 60)
+    window.addEventListener("resize", measure)
+    window.addEventListener("scroll", measure, true)
+    return () => {
+      window.clearTimeout(id)
+      window.removeEventListener("resize", measure)
+      window.removeEventListener("scroll", measure, true)
+    }
+  }, [open, align, direction])
 
   useEffect(() => {
     if (!open) return
 
     function handleClickOutside(e) {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
+      const inside =
+        (containerRef.current && containerRef.current.contains(e.target)) ||
+        (popupRef.current && popupRef.current.contains(e.target))
+      if (!inside) {
         setOpen(false)
       }
     }
@@ -224,9 +257,117 @@ function EmojiPicker({
     : null
   const visibleEmojis = searchResults || activeEmojis
 
+  const popupBody = (
+    <>
+      {/* Header + Pencarian */}
+      <div className="emoji-pop-head border-b border-white/10 bg-white/[0.04] px-3 py-2.5">
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <div className="emoji-pop-search pointer-events-none absolute inset-y-0 left-2.5 flex items-center text-slate-500">
+              <Search size={13} />
+            </div>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Cari emoji..."
+              className="emoji-pop-input w-full rounded-lg border border-white/10 bg-white/5 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 outline-none transition focus:border-cyan-400/50 focus:bg-white/10"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                className="emoji-pop-clear absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer rounded-full p-0.5 text-slate-500 transition hover:bg-white/10 hover:text-white"
+                aria-label="Hapus pencarian"
+              >
+                <X size={12} />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Recent */}
+      {!searchResults && recent.length > 0 && (
+        <div className="px-3 pt-2.5 bg-white/[0.04]">
+          <p className="emoji-pop-label mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+            Baru-baru ini
+          </p>
+          <div className="flex flex-wrap gap-0.5">
+            {recent.map((item) => (
+              <EmojiButton
+                key={item.e}
+                item={item}
+                onClick={handlePick}
+                onHover={setPreview}
+              />
+            ))}
+          </div>
+          <div className="emoji-pop-divider my-2.5 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+        </div>
+      )}
+
+      {/* Tab kategori */}
+      {!searchResults && (
+        <div className="emoji-pop-cats mt-2 px-3 pb-2">
+          <div className="flex items-center gap-1">
+            {EMOJI_CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setActiveCat(cat.id)}
+                title={cat.label}
+                className={`emoji-pop-tab flex h-7 flex-1 cursor-pointer items-center justify-center rounded-lg text-base transition ${
+                  activeCat === cat.id
+                    ? "emoji-pop-tab-active bg-cyan-500/15 ring-1 ring-cyan-400/30"
+                    : "opacity-60 hover:bg-white/5 hover:opacity-100"
+                }`}
+              >
+                {cat.tab}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Grid emoji */}
+      <div className="emoji-pop-grid scrollbar-thin scrollbar-thumb-white/10 max-h-44 overflow-y-auto px-3 pb-3">
+        {searchResults && searchResults.length === 0 ? (
+          <div className="py-8 text-center">
+            <p className="text-2xl">🤷</p>
+            <p className="emoji-pop-empty mt-2 text-[11px] text-slate-500">
+              Emoji &ldquo;{query}&rdquo; tidak ditemukan.
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-0.5">
+            {visibleEmojis.map((item) => (
+              <EmojiButton
+                key={item.e}
+                item={item}
+                onClick={handlePick}
+                onHover={setPreview}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Preview */}
+      <div className="emoji-pop-preview flex items-center gap-2.5 border-t border-white/10 bg-white/[0.04] px-3 py-2">
+        <span className="emoji-pop-preview-icon flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/10 text-xl ring-1 ring-cyan-400/20">
+          {preview?.e || "😀"}
+        </span>
+        <p className="emoji-pop-preview-text truncate text-[11px] font-medium text-slate-300">
+          {preview ? preview.n : "Pilih emoji untuk menyisipkan"}
+        </p>
+      </div>
+    </>
+  )
+
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="inline-flex">
       <button
+        ref={buttonRef}
         type="button"
         aria-label={label}
         title={label}
@@ -239,117 +380,23 @@ function EmojiPicker({
         {showLabel && <span>Emoji</span>}
       </button>
 
-      {open && (
-        <div
-          className={`emoji-pop animate-modal-in absolute z-50 w-72 max-w-[calc(100vw-1.25rem)] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 shadow-2xl shadow-black/60 ring-1 ring-cyan-400/10 backdrop-blur-2xl sm:w-80 ${
-            direction === "down" ? "top-full mt-2" : "bottom-full mb-2"
-          } ${
-            align === "right" ? "right-0" : "left-0"
-          }`}
-        >
-          {/* Header + Pencarian */}
-          <div className="emoji-pop-head border-b border-white/10 bg-white/[0.04] px-3 py-2.5">
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1">
-                <Search
-                  size={13}
-                  className="emoji-pop-search pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500"
-                />
-                <input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Cari emoji..."
-                  className="emoji-pop-input w-full rounded-lg border border-white/10 bg-white/5 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 outline-none transition focus:border-cyan-400/50 focus:bg-white/10"
-                />
-                {query && (
-                  <button
-                    type="button"
-                    onClick={() => setQuery("")}
-                    className="emoji-pop-clear absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer rounded-full p-0.5 text-slate-500 transition hover:bg-white/10 hover:text-white"
-                    aria-label="Hapus pencarian"
-                  >
-                    <X size={12} />
-                  </button>
-                )}
-              </div>
+      {open &&
+        coords &&
+        createPortal(
+          <div
+            ref={popupRef}
+            className="emoji-pop animate-modal-in fixed z-40 w-72 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 shadow-2xl shadow-black/60 ring-1 ring-cyan-400/10 backdrop-blur-2xl max-[300px]:left-1/2 max-[300px]:-translate-x-1/2 max-[300px]:w-60 max-[300px]:max-w-[calc(100vw-1rem)] sm:w-80"
+            style={{
+              top: coords.top,
+              ...(coords.left != null ? { left: coords.left } : {}),
+            }}
+          >
+            <div className="overflow-y-auto" style={{ maxHeight: coords.maxH }}>
+              {popupBody}
             </div>
-          </div>
-
-          {/* Recent */}
-          {!searchResults && recent.length > 0 && (
-            <div className="px-3 pt-2.5 bg-white/[0.04]">
-              <p className="emoji-pop-label mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                Baru-baru ini
-              </p>
-              <div className="flex flex-wrap gap-0.5">
-                {recent.map((item) => (
-                  <EmojiButton
-                    key={item.e}
-                    item={item}
-                    onClick={handlePick}
-                    onHover={setPreview}
-                  />
-                ))}
-              </div>
-              <div className="emoji-pop-divider my-2.5 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-            </div>
-          )}
-
-          {/* Tab kategori */}
-          {!searchResults && (
-            <div className="mt-2 flex items-center gap-1 px-3 pb-2 bg-white/[0.04]">
-              {EMOJI_CATEGORIES.map((cat) => (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => setActiveCat(cat.id)}
-                  title={cat.label}
-                  className={`emoji-pop-tab flex h-7 flex-1 cursor-pointer items-center justify-center rounded-lg text-base transition ${
-                    activeCat === cat.id
-                      ? "emoji-pop-tab-active bg-cyan-500/15 ring-1 ring-cyan-400/30"
-                      : "opacity-60 hover:bg-white/5 hover:opacity-100"
-                  }`}
-                >
-                  {cat.tab}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Grid emoji */}
-          <div className="emoji-pop-grid scrollbar-thin scrollbar-thumb-white/10 max-h-44 overflow-y-auto px-3 pb-3 bg-white/[0.04]">
-            {searchResults && searchResults.length === 0 ? (
-              <div className="py-8 text-center">
-                <p className="text-2xl">🤷</p>
-                <p className="emoji-pop-empty mt-2 text-[11px] text-slate-500">
-                  Emoji &ldquo;{query}&rdquo; tidak ditemukan.
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-0.5">
-                {visibleEmojis.map((item) => (
-                  <EmojiButton
-                    key={item.e}
-                    item={item}
-                    onClick={handlePick}
-                    onHover={setPreview}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Preview */}
-          <div className="emoji-pop-preview flex items-center gap-2.5 border-t border-white/10 bg-white/[0.04] px-3 py-2">
-            <span className="emoji-pop-preview-icon flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/10 text-xl ring-1 ring-cyan-400/20">
-              {preview?.e || "😀"}
-            </span>
-            <p className="emoji-pop-preview-text truncate text-[11px] font-medium text-slate-300">
-              {preview ? preview.n : "Pilih emoji untuk menyisipkan"}
-            </p>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   )
 }

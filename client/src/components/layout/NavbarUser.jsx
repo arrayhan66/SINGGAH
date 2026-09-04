@@ -167,14 +167,58 @@ function NavbarUser() {
   }, [isOpen, isProfileOpen, isNotifOpen, closeNotif]);
 
   useEffect(() => {
-    const active = isOpen || isNotifOpen || isProfileOpen;
-    if (!active) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
+    if (!isNotifOpen) return;
+
+    const doc = document.documentElement;
+    const body = document.body;
+    const prevHtmlOverflow = doc.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+
+    doc.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    doc.classList.add("no-scroll");
+
+    const blockScroll = (e) => {
+      const target = e.target;
+      const insidePanel =
+        notifPanelRef.current?.contains(target) ||
+        notifRef.current?.contains(target);
+      if (insidePanel) return;
+      e.preventDefault();
     };
-  }, [isOpen, isNotifOpen, isProfileOpen]);
+
+    const blockKeyScroll = (e) => {
+      if (
+        e.key === "ArrowUp" ||
+        e.key === "ArrowDown" ||
+        e.key === "PageUp" ||
+        e.key === "PageDown" ||
+        e.key === "Home" ||
+        e.key === "End" ||
+        e.key === " "
+      ) {
+        if (
+          !notifPanelRef.current?.contains(e.target) &&
+          !notifRef.current?.contains(e.target)
+        ) {
+          e.preventDefault();
+        }
+      }
+    };
+
+    document.addEventListener("wheel", blockScroll, { passive: false });
+    document.addEventListener("touchmove", blockScroll, { passive: false });
+    document.addEventListener("keydown", blockKeyScroll);
+
+    return () => {
+      doc.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+      doc.classList.remove("no-scroll");
+      document.removeEventListener("wheel", blockScroll);
+      document.removeEventListener("touchmove", blockScroll);
+      document.removeEventListener("keydown", blockKeyScroll);
+    };
+  }, [isNotifOpen]);
 
   useEffect(() => {
     const el = headerRef.current;

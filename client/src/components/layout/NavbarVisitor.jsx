@@ -23,12 +23,13 @@ const navLinkClass = ({ isActive }) =>
   }`
 
   useEffect(() => {
-    if (!isOpen) return
-    const prev = document.body.style.overflow
-    document.body.style.overflow = "hidden"
-    return () => {
-      document.body.style.overflow = prev
+    const doc = document.documentElement
+    if (isOpen) {
+      doc.classList.add("no-scroll")
+    } else {
+      doc.classList.remove("no-scroll")
     }
+    return () => doc.classList.remove("no-scroll")
   }, [isOpen])
 
   const closeMenu = () => setIsOpen(false)

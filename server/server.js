@@ -169,7 +169,19 @@ const startServer = async () => {
 }
 
 if (process.env.NODE_ENV !== "test") {
-  startServer()
+  if (require.main === module) {
+    // Dijalankan langsung (node server.js / nodemon) -> mulai server.
+    startServer()
+  } else {
+    // Mode serverless (misalnya Vercel): app diekspor TANPA listen.
+    app.use((req, res) => {
+      res.status(404).json({
+        success: false,
+        message: "Endpoint tidak ditemukan",
+      })
+    })
+    app.use(errorMiddleware)
+  }
 } else {
   // Saat test, skip loadSwagger (swagger-parser lambat) supaya startup
   // cepat & deterministik; docs API tidak dipakai di test.

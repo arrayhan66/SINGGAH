@@ -2,12 +2,15 @@ const winston = require("winston")
 const path = require("path")
 
 const isTest = process.env.NODE_ENV === "test"
+const isProduction = process.env.NODE_ENV === "production"
 
 const logDir = path.join(__dirname, "..", "logs")
 
 const transports = []
 
-if (!isTest) {
+// Di production (Vercel/Render) filesystem bersifat read-only/ephemeral,
+// jadi log file di-skip; log tetap tampil di console/stdout.
+if (!isTest && !isProduction) {
   transports.push(
     new winston.transports.File({
       filename: path.join(logDir, "error.log"),
@@ -22,6 +25,11 @@ if (!isTest) {
       maxFiles: 5,
       tailable: true,
     }),
+  )
+}
+
+if (!isTest) {
+  transports.push(
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),

@@ -8,6 +8,13 @@ server/.env
 
 # Logs
 *.log
+*.err
+
+# Lingkungan kerja lokal opencode (jangan ikut commit)
+.opencode/
+
+# Tool tunneling lokal (cloudflared/ngrok binary + log)
+tools/
 
 # Build
 client/dist/
@@ -22,3 +29,9 @@ Thumbs.db
 
 # Temporary
 *.tmp
+# Sisa file media era penyimpanan lokal (sudah tidak dipakai lagi,
+# media sekarang tersimpan di Cloudinary). Dibuat agar tidak ikut dicommit.
+server/uploads/
+
+# Cloudinary backup (jangan commit berisi secret)
+server/.env.cloudinary.bak

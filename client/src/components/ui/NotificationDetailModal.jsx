@@ -10,6 +10,7 @@ import {
   notifTypeLabel,
 } from "../../utils/notificationHelpers";
 import { imageUrl } from "../../utils/imageUrl";
+import SmartImage from "./SmartImage";
 
 const tipeLabel = {
   admin: "Admin",
@@ -233,7 +234,7 @@ function NotificationDetailModal({ notif, onClose, onNavigate }) {
                     }`}
                   >
                     {shownRef.image ? (
-                      <img
+                      <SmartImage
                         src={imageUrl(shownRef.image)}
                         alt={shownRef.title}
                         className="h-full w-full object-cover"

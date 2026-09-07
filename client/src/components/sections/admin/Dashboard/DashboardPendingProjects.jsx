@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { Clock, ArrowRight, Eye, Inbox } from "lucide-react"
 import { useProjects } from "../../../../context/ProjectContext"
 import { imageUrl } from "../../../../utils/imageUrl"
+import SmartImage from "../../../ui/SmartImage"
 
 function DashboardPendingProjects() {
   const navigate = useNavigate()
@@ -46,7 +47,7 @@ function DashboardPendingProjects() {
               className="group flex flex-col gap-3 rounded-[14px] border border-white/10 bg-white/[0.04] p-3 transition-all duration-250 hover:-translate-y-[2px] hover:bg-white/[0.08] hover:border-white/20 hover:shadow-lg sm:flex-row sm:items-center"
               style={{ minHeight: 90 }}
             >
-              <img
+              <SmartImage
                 src={imageUrl(project.thumbnail)}
                 alt={project.title}
                 className="h-[72px] w-full shrink-0 rounded-lg object-cover sm:h-[72px] sm:w-[72px]"

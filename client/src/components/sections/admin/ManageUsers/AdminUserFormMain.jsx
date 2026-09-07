@@ -1,5 +1,6 @@
 import { GraduationCap, Briefcase, Users, CreditCard } from "lucide-react"
 import { imageUrl } from "../../../../utils/imageUrl"
+import SmartImage from "../../../ui/SmartImage"
 
 const tipeOptions = [
   { value: "mahasiswa", label: "Mahasiswa", icon: GraduationCap },
@@ -128,7 +129,7 @@ function AdminUserFormMain({ formData, updateField, onPublish, isEditMode, savin
             </label>
             {formData.identitas_photo ? (
               <div className="relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-2">
-                <img
+                <SmartImage
                   src={
                     typeof formData.identitas_photo === "string" && formData.identitas_photo.startsWith("blob:")
                       ? formData.identitas_photo

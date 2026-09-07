@@ -7,6 +7,7 @@ import {
   Eye,
 } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
+import SmartImage from "../../../ui/SmartImage"
 
 function UploadPreview({ formData, existingThumbnail }) {
   const thumbnailUrl = formData.thumbnail
@@ -32,7 +33,7 @@ function UploadPreview({ formData, existingThumbnail }) {
         {/* Thumbnail */}
         <div className="aspect-video w-full bg-brand-navy">
           {thumbnailUrl ? (
-            <img
+            <SmartImage
               src={thumbnailUrl}
               alt="Preview thumbnail"
               className="h-full w-full object-cover"

@@ -6,6 +6,7 @@ import api from "../../../../services/api";
 import { useAuth } from "../../../../context/AuthContext";
 import FormAlert from "../../../ui/FormAlert";
 import GoogleLogin from "../../../ui/GoogleLoginButton";
+import SmartImage from "../../../ui/SmartImage";
 import { getRedirectFrom } from "../../../../utils/redirectFrom";
 
 function LoginForm() {
@@ -128,9 +129,10 @@ function LoginForm() {
       <div className="mb-7 flex items-center justify-between sm:mb-12 lg:hidden">
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-100/30 bg-white/10 p-3 shadow-md backdrop-blur-md sm:h-16 sm:w-16 sm:p-3.5">
-            <img
+            <SmartImage
               src={logo}
               alt="Logo SINGGAH"
+              eager
               className="h-full w-full object-contain"
             />
           </div>

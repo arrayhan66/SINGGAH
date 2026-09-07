@@ -8,6 +8,7 @@ import { X, MessageCircle, Check, Send, Share2, Link2 } from "lucide-react"
 import { useAuth } from "../../../context/AuthContext"
 import api from "../../../services/api"
 import { imageUrl } from "../../../utils/imageUrl"
+import SmartImage from "../../ui/SmartImage"
 
 import KaryaProjectGallery from "./detail/KaryaProjectGallery"
 import KaryaProjectHeader from "./detail/KaryaProjectHeader"
@@ -241,7 +242,7 @@ function KaryaProjectDetailSection() {
             {/* Preview kartu karya */}
             <div className="share-preview mb-6">
               <div className="share-preview-media">
-                <img
+                <SmartImage
                   src={shareImage}
                   alt={project.title}
                   className="h-full w-full object-cover"

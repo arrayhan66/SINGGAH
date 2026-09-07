@@ -1,6 +1,7 @@
 import { Node, mergeAttributes } from "@tiptap/core"
 import { ReactNodeViewRenderer } from "@tiptap/react"
 import { useState } from "react"
+import SmartImage from "../../../../ui/SmartImage"
 
 function SeeAlsoView({ node, updateAttributes, selected }) {
   const [editing, setEditing] = useState(false)
@@ -213,7 +214,7 @@ function SeeAlsoView({ node, updateAttributes, selected }) {
             >
               {item.image ? (
                 <div className="h-14 w-20 shrink-0 overflow-hidden rounded-lg bg-amber-100">
-                  <img
+                  <SmartImage
                     src={item.image}
                     alt={item.title}
                     className="h-full w-full object-cover"

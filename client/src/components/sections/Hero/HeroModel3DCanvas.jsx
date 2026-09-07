@@ -1,8 +1,9 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Float } from "@react-three/drei";
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useRef, useState, useCallback } from "react";
 import Mahasiswa from "../../../three/models/Mahasiswa";
 import Loader from "../../ui/Loader";
+import { attachWebGLContextGuard } from "../../../three/utils/webglGuard";
 
 function AnimatedModel() {
   const groupRef = useRef();
@@ -36,8 +37,16 @@ function AnimatedModel() {
 }
 
 function HeroModel3DCanvas() {
+  const [epoch, setEpoch] = useState(0);
+  const remount = useCallback(() => setEpoch((n) => n + 1), []);
+
   return (
-    <Canvas shadows camera={{ position: [0, 1.3, 3.5], fov: 32 }}>
+    <Canvas
+      key={epoch}
+      onCreated={({ gl }) => attachWebGLContextGuard(gl, remount)}
+      shadows
+      camera={{ position: [0, 1.3, 3.5], fov: 32 }}
+    >
       <ambientLight intensity={2} />
       <directionalLight position={[5, 8, 5]} intensity={3} castShadow />
 

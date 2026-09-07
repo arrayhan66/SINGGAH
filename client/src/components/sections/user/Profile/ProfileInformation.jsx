@@ -1,4 +1,5 @@
 import GlassCard from "../../../ui/GlassCard"
+import SmartImage from "../../../ui/SmartImage"
 import {
   GraduationCap,
   Briefcase,
@@ -165,7 +166,7 @@ function ProfileInformation({
             </label>
             {previewUrl ? (
               <div className="relative overflow-hidden rounded-xl border border-white/10">
-                <img
+                <SmartImage
                   src={previewUrl}
                   alt="Foto identitas"
                   className="max-h-56 w-full object-contain"

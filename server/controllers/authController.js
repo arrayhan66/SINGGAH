@@ -1,7 +1,11 @@
 const authService = require("../services/authService")
 const asyncHandler = require("../utils/asyncHandler")
 const { success } = require("../utils/response")
-const { saveLocalFile, deleteLocalFile } = require("../utils/localImage")
+const {
+  uploadImage,
+  deleteImage,
+  getPublicIdFromUrl,
+} = require("../utils/uploadToCloudinary")
 
 exports.register = asyncHandler(async (req, res) => {
   let avatarUrl
@@ -9,13 +13,19 @@ exports.register = asyncHandler(async (req, res) => {
 
   try {
     if (req.files && req.files.avatar && req.files.avatar[0]) {
-      const result = await saveLocalFile(req.files.avatar[0], "avatars")
-      avatarUrl = result.url
+      const result = await uploadImage(
+        req.files.avatar[0].buffer,
+        "singgah/avatars",
+      )
+      avatarUrl = result.secure_url
     }
 
     if (req.files && req.files.identitas_photo && req.files.identitas_photo[0]) {
-      const result = await saveLocalFile(req.files.identitas_photo[0], "identitas")
-      identitasUrl = result.url
+      const result = await uploadImage(
+        req.files.identitas_photo[0].buffer,
+        "singgah/identitas",
+      )
+      identitasUrl = result.secure_url
     }
     const user = await authService.register({
       ...req.body,
@@ -30,11 +40,22 @@ exports.register = asyncHandler(async (req, res) => {
       201,
     )
   } catch (err) {
+    const publicIds = []
+
+    if (avatarUrl) {
+      const publicId = getPublicIdFromUrl(avatarUrl)
+      if (publicId) publicIds.push(publicId)
+    }
+
+    if (identitasUrl) {
+      const publicId = getPublicIdFromUrl(identitasUrl)
+      if (publicId) publicIds.push(publicId)
+    }
+
     await Promise.all(
-      [avatarUrl, identitasUrl]
-        .filter(Boolean)
-        .map((url) => deleteLocalFile(url).catch(() => {})),
+      publicIds.map((publicId) => deleteImage(publicId).catch(() => {})),
     )
+
     throw err
   }
 })
@@ -107,17 +128,18 @@ exports.updateProfile = asyncHandler(async (req, res) => {
 
     if (req.files && req.files.avatar && req.files.avatar[0]) {
       tasks.push(
-        saveLocalFile(req.files.avatar[0], "avatars").then(
-          (r) => (avatarUrl = r.url),
+        uploadImage(req.files.avatar[0].buffer, "singgah/avatars").then(
+          (r) => (avatarUrl = r.secure_url),
         ),
       )
     }
 
     if (req.files && req.files.identitas_photo && req.files.identitas_photo[0]) {
       tasks.push(
-        saveLocalFile(req.files.identitas_photo[0], "identitas").then(
-          (r) => (identitasUrl = r.url),
-        ),
+        uploadImage(
+          req.files.identitas_photo[0].buffer,
+          "singgah/identitas",
+        ).then((r) => (identitasUrl = r.secure_url)),
       )
     }
 
@@ -134,20 +156,33 @@ exports.updateProfile = asyncHandler(async (req, res) => {
     // kalau service throw (mis. email sudah dipakai) file lama tidak hilang.
     const deletions = []
     if (avatarUrl && req.user.avatar) {
-      deletions.push(deleteLocalFile(req.user.avatar).catch(() => {}))
+      const publicId = getPublicIdFromUrl(req.user.avatar)
+      if (publicId) deletions.push(deleteImage(publicId).catch(() => {}))
     }
     if (identitasUrl && req.user.identitas_photo) {
-      deletions.push(deleteLocalFile(req.user.identitas_photo).catch(() => {}))
+      const publicId = getPublicIdFromUrl(req.user.identitas_photo)
+      if (publicId) deletions.push(deleteImage(publicId).catch(() => {}))
     }
     await Promise.all(deletions)
 
     success(res, user, "Profil berhasil diperbarui")
   } catch (err) {
+    const publicIds = []
+
+    if (avatarUrl) {
+      const publicId = getPublicIdFromUrl(avatarUrl)
+      if (publicId) publicIds.push(publicId)
+    }
+
+    if (identitasUrl) {
+      const publicId = getPublicIdFromUrl(identitasUrl)
+      if (publicId) publicIds.push(publicId)
+    }
+
     await Promise.all(
-      [avatarUrl, identitasUrl]
-        .filter(Boolean)
-        .map((url) => deleteLocalFile(url).catch(() => {})),
+      publicIds.map((publicId) => deleteImage(publicId).catch(() => {})),
     )
+
     throw err
   }
 })
@@ -157,8 +192,11 @@ exports.applyTipe = asyncHandler(async (req, res) => {
 
   try {
     if (req.files && req.files.identitas_photo && req.files.identitas_photo[0]) {
-      const result = await saveLocalFile(req.files.identitas_photo[0], "identitas")
-      identitasUrl = result.url
+      const result = await uploadImage(
+        req.files.identitas_photo[0].buffer,
+        "singgah/identitas",
+      )
+      identitasUrl = result.secure_url
     }
 
     const user = await authService.applyTipe(
@@ -170,13 +208,15 @@ exports.applyTipe = asyncHandler(async (req, res) => {
 
     // Hapus file identitas lama HANYA setelah service sukses (validasi lulus).
     if (identitasUrl && req.user.identitas_photo) {
-      await deleteLocalFile(req.user.identitas_photo).catch(() => {})
+      const publicId = getPublicIdFromUrl(req.user.identitas_photo)
+      if (publicId) await deleteImage(publicId).catch(() => {})
     }
 
     success(res, user, "Pengajuan verifikasi tipe berhasil dikirim ke admin")
   } catch (err) {
     if (identitasUrl) {
-      await deleteLocalFile(identitasUrl).catch(() => {})
+      const publicId = getPublicIdFromUrl(identitasUrl)
+      if (publicId) await deleteImage(publicId).catch(() => {})
     }
     throw err
   }

@@ -38,19 +38,13 @@ function EditKaryaHero() {
           </button>
         </div>
 
-        <div className="relative -mt-4 sm:-mt-3 md:-mt-2">
-          <span className="absolute inset-0 rounded-3xl bg-gradient-to-r from-cyan-400/20 via-blue-500/20 to-purple-500/20 blur-2xl" />
-
-          <span className="hero-gelombang absolute -inset-6 rounded-[32px] border border-cyan-400/5 animate-[pulse_5s_ease-in-out_infinite_0.5s]" />
-
-          <div className="relative inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-cyan-400/30 bg-gradient-to-br from-cyan-400/15 via-blue-500/10 to-purple-500/15 shadow-[0_0_40px_-8px_rgba(34,211,238,0.3)] backdrop-blur-xl sm:h-20 sm:w-20 md:h-24 md:w-24 lg:h-28 lg:w-28 3xl:h-32 3xl:w-32 4xl:h-36 4xl:w-36">
-            <PenSquare className="h-8 w-8 text-cyan-300 sm:h-10 sm:w-10 md:h-12 md:w-12 lg:h-14 lg:w-14 3xl:h-16 3xl:w-16 4xl:h-18 4xl:w-18 drop-shadow-[0_0_12px_rgba(34,211,238,0.5)]" />
-            <Sparkles className="absolute -right-1 -top-1 h-4 w-4 text-cyan-400/60 animate-[spin_6s_linear_infinite] sm:h-5 sm:w-5 md:-right-1.5 md:-top-1.5 md:h-6 md:w-6" />
-            <Sparkles className="absolute -bottom-1 -left-1 h-3 w-3 text-purple-400/50 animate-[spin_8s_linear_infinite_reverse] sm:h-4 sm:w-4 md:-bottom-1.5 md:-left-1.5 md:h-5 md:w-5" />
-          </div>
+        <div className="relative inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-cyan-400/30 bg-gradient-to-br from-cyan-400/15 via-blue-500/10 to-purple-500/15 shadow-[0_0_40px_-8px_rgba(34,211,238,0.3)] backdrop-blur-xl sm:h-20 sm:w-20 md:h-24 md:w-24 lg:h-28 lg:w-28 3xl:h-32 3xl:w-32 4xl:h-36 4xl:w-36 -mt-2 sm:-mt-2 md:-mt-2 lg:-mt-4 xl:-mt-2 2xl:-mt-1 3xl:mt-0 4xl:mt-1">
+          <PenSquare className="h-8 w-8 text-cyan-300 sm:h-10 sm:w-10 md:h-12 md:w-12 lg:h-14 lg:w-14 3xl:h-16 3xl:w-16 4xl:h-18 4xl:w-18 drop-shadow-[0_0_12px_rgba(34,211,238,0.5)]" />
+          <Sparkles className="absolute -right-1 -top-1 h-4 w-4 text-cyan-400/60 animate-[spin_6s_linear_infinite] sm:h-5 sm:w-5 md:-right-1.5 md:-top-1.5 md:h-6 md:w-6" />
+          <Sparkles className="absolute -bottom-1 -left-1 h-3 w-3 text-purple-400/50 animate-[spin_8s_linear_infinite_reverse] sm:h-4 sm:w-4 md:-bottom-1.5 md:-left-1.5 md:h-5 md:w-5" />
         </div>
 
-        <h2 className="mt-10 sm:mt-12 md:mt-16 lg:mt-20 2xl:mt-24 3xl:mt-28 4xl:mt-32 text-3xl font-black text-white sm:text-4xl lg:text-5xl 2xl:text-6xl 3xl:text-7xl 4xl:text-8xl">
+        <h2 className="mt-6 sm:mt-7 md:mt-8 lg:mt-10 2xl:mt-12 3xl:mt-14 4xl:mt-16 text-3xl font-black text-white sm:text-4xl lg:text-5xl 2xl:text-6xl 3xl:text-7xl 4xl:text-8xl">
           Edit <span className="text-cyan-300">Karya</span>
         </h2>
 

@@ -11,6 +11,7 @@ import {
 } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
 import FormAlert from "../../../ui/FormAlert"
+import SmartImage from "../../../ui/SmartImage"
 import api from "../../../../services/api"
 import { useAuth } from "../../../../context/AuthContext"
 import { useTheme } from "../../../../context/ThemeContext"
@@ -188,7 +189,7 @@ function ProfileVerification() {
             </label>
             {previewUrl ? (
               <div className="relative overflow-hidden rounded-xl border border-white/10">
-                <img
+                <SmartImage
                   src={previewUrl}
                   alt={targetTipe === "mahasiswa" ? "KTM Preview" : "Kartu Identitas Preview"}
                   className="max-h-48 w-full object-contain"

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { imageUrl } from "../../../../utils/imageUrl";
+import SmartImage from "../../../ui/SmartImage";
 
 const NAV_HEIGHT_PX = 64;
 
@@ -107,10 +108,10 @@ function KaryaProjectGallery({
             <div key={index} className="gallery-slide w-full shrink-0">
               <div className="gallery-image">
                 <div className="gallery-image-crop">
-                  <img
+                  <SmartImage
                     src={imageUrl(img)}
                     alt={`${projectTitle} ${index + 1}`}
-                    loading={index === 0 ? "eager" : "lazy"}
+                    eager={index === 0}
                     onLoad={(e) => {
                       const pos = calcObjectPosition(
                         e.target.naturalWidth,

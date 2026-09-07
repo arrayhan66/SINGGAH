@@ -7,6 +7,7 @@ import {
   isPdf,
   formatDate,
 } from "../../../../utils/mediaHelpers"
+import SmartImage from "../../../ui/SmartImage"
 
 function FileIcon({ mime, size = 16, className = "" }) {
   return createElement(getFileIcon(mime), { size, className })
@@ -68,7 +69,7 @@ export default function PreviewModal({ item, onClose }) {
         >
           {isPreviewable(item.type) ? (
             <div className="flex items-center justify-center p-2">
-              <img
+              <SmartImage
                 src={item.url}
                 alt={item.name}
                 className="max-h-[65vh] max-w-full rounded-lg object-contain"

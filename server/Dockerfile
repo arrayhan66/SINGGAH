@@ -1,19 +1,26 @@
-# --- Stage 1: dependensi (dipisah agar layer cache optimal) ---
-FROM node:22-slim AS deps
+# --- Stage 1: build frontend (client) ---
+FROM node:22-slim AS client-build
 WORKDIR /app
+COPY client/package*.json ./
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
+COPY client/ ./client/
+RUN npm run build
 
-# Konflik peer yang sudah diketahui (multer-storage-cloudinary vs cloudinary).
+# --- Stage 2: dependensi server ---
+FROM node:22-slim AS deps
+WORKDIR /app/server
+COPY server/package*.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --legacy-peer-deps
 
-# --- Stage 2: runtime ---
+# --- Stage 3: runtime ---
 FROM node:22-slim
 ENV NODE_ENV=production
-WORKDIR /app
-
-COPY --from=deps /app/node_modules ./node_modules
-COPY package.json ./
-COPY . .
+WORKDIR /app/server
+COPY --from=deps /app/server/node_modules ./node_modules
+COPY --from=client-build /app/client/dist ../client/dist
+COPY server/ ./
 
 # Jangan ikut tertimpa saat container start; env mutation via compose/env vars.
 EXPOSE 5000

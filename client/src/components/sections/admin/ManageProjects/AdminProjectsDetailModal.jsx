@@ -4,6 +4,7 @@ import {
   FileText, AlertTriangle, Pencil, Trash2, Globe,
 } from "lucide-react"
 import { imageUrl } from "../../../../utils/imageUrl"
+import SmartImage from "../../../ui/SmartImage"
 
 const statusConfig = {
   published: {
@@ -128,7 +129,7 @@ function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onCl
             <main className="min-w-0 p-4 min-[400px]:p-5 md:p-6">
               <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-brand-dark">
                 <div className="aspect-video w-full">
-                  <img
+                  <SmartImage
                     src={currentImage}
                     alt={project.title}
                     className="h-full w-full object-cover"
@@ -158,7 +159,7 @@ function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onCl
                             : "border-white/10 opacity-60 hover:opacity-100"
                         }`}
                       >
-                        <img src={img} alt="" loading="lazy" className="h-full w-full object-cover" />
+                        <SmartImage src={img} alt={`Thumbnail ${i + 1}`} className="h-full w-full object-cover" />
                         {active && (
                           <span className="absolute inset-x-0 bottom-0 flex h-6 items-center justify-center bg-cyan-400/20 backdrop-blur-sm">
                             <CheckCircle2 className="h-3.5 w-3.5 text-cyan-300" />

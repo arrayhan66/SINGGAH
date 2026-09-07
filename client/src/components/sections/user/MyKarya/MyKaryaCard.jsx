@@ -11,6 +11,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import GlassCard from "../../../ui/GlassCard";
 import { imageUrl } from "../../../../utils/imageUrl";
+import SmartImage from "../../../ui/SmartImage";
 
 const statusConfig = {
   pending: {
@@ -89,7 +90,7 @@ function MyKaryaCard({ karya, onDeleteClick, isDosen = false, isDeleting = false
     >
       {/* Cover */}
       <div className="relative overflow-hidden">
-        <img
+        <SmartImage
           src={imageUrl(coverImage)}
           alt={karya.title}
           className="h-40 w-full object-cover transition-all duration-500 sm:h-48 md:h-52 lg:h-56 xl:h-60 3xl:h-72 4xl:h-80"
@@ -180,7 +181,7 @@ function MyKaryaCard({ karya, onDeleteClick, isDosen = false, isDeleting = false
             <button
               type="button"
               onClick={handleEdit}
-              className="group/btn flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-white py-2.5 text-xs font-semibold text-slate-900 transition-colors duration-300 hover:bg-slate-200 sm:py-3 sm:text-sm md:text-sm lg:py-3.5 lg:text-base 3xl:py-4 3xl:text-base 4xl:py-5 4xl:text-lg"
+              className="group/btn flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-white py-2.5 text-xs font-semibold text-slate-900 shadow-md shadow-cyan-500/10 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:scale-[1.03] hover:bg-slate-200 hover:shadow-xl hover:shadow-cyan-500/30 hover:brightness-105 active:scale-[0.98] sm:py-3 sm:text-sm md:text-sm lg:py-3.5 lg:text-base 3xl:py-4 3xl:text-base 4xl:py-5 4xl:text-lg"
             >
               <Pencil
                 size={14}
@@ -194,7 +195,7 @@ function MyKaryaCard({ karya, onDeleteClick, isDosen = false, isDeleting = false
             type="button"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="group/btn flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-500 py-2.5 text-xs font-semibold text-white transition-colors duration-300 hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-70 sm:py-3 sm:text-sm md:text-sm lg:py-3.5 lg:text-base 3xl:py-4 3xl:text-base 4xl:py-5 4xl:text-lg"
+            className="group/btn flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-500 py-2.5 text-xs font-semibold text-white shadow-md shadow-red-500/20 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:scale-[1.03] hover:bg-red-600 hover:shadow-xl hover:shadow-red-500/30 hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:scale-100 sm:py-3 sm:text-sm md:text-sm lg:py-3.5 lg:text-base 3xl:py-4 3xl:text-base 4xl:py-5 4xl:text-lg"
           >
             {isDeleting ? (
               <Loader2

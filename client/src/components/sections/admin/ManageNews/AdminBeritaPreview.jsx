@@ -11,6 +11,7 @@ import {
 import { useBerita } from "../../../../context/BeritaContext"
 import { imageUrl } from "../../../../utils/imageUrl"
 import { processContentHtml } from "../../../../utils/processContentHtml"
+import SmartImage from "../../../ui/SmartImage"
 
 function parseSeeAlsoItems(htmlStr) {
   if (!htmlStr) return []
@@ -32,7 +33,7 @@ function SeeAlsoBlockPreview({ htmlAttributes }) {
             <div key={index} className="flex items-start gap-3 px-5 py-3.5">
               {item.image ? (
                 <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-amber-100">
-                  <img src={item.image} alt={item.title} className="h-full w-full object-cover" loading="lazy" />
+                  <SmartImage src={item.image} alt={item.title} className="h-full w-full object-cover" eager={false} />
                 </div>
               ) : (
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-sm font-bold text-amber-500">{index + 1}</div>
@@ -195,7 +196,7 @@ function AdminBeritaPreview() {
                 {correspondingPhoto && (
                   <figure className="my-4 sm:my-5 rounded-xl overflow-hidden">
                     <div className="w-full max-h-[500px] overflow-hidden bg-slate-100">
-                      <img
+                      <SmartImage
                         src={imageUrl(correspondingPhoto.url)}
                         alt={correspondingPhoto.caption}
                         className="w-full h-auto object-cover block"
@@ -217,7 +218,7 @@ function AdminBeritaPreview() {
               {correspondingPhoto && (
                 <figure className="my-4 sm:my-5 rounded-xl overflow-hidden">
                   <div className="w-full max-h-[500px] overflow-hidden bg-slate-100">
-                    <img
+                    <SmartImage
                       src={imageUrl(correspondingPhoto.url)}
                       alt={correspondingPhoto.caption}
                       className="w-full h-auto object-cover block"
@@ -242,7 +243,7 @@ function AdminBeritaPreview() {
             {item.gallery.slice(paragraphs.length).map((photo, i) => (
               <figure key={i} className="rounded-xl overflow-hidden">
                 <div className="w-full max-h-[500px] overflow-hidden bg-slate-100">
-                  <img
+                  <SmartImage
                     src={imageUrl(photo.url)}
                     alt={photo.caption}
                     className="w-full h-auto object-cover block"
@@ -339,7 +340,7 @@ function AdminBeritaPreview() {
 
           {headlineSrc && (
             <div className="relative h-48 sm:h-88 lg:h-[420px] w-full overflow-hidden bg-slate-950 border-b border-slate-800">
-              <img
+              <SmartImage
                 src={headlineSrc}
                 alt={item.title}
                 className="h-full w-full object-cover transition-transform duration-700 hover:scale-102"
@@ -401,7 +402,7 @@ function AdminBeritaPreview() {
                   className="group cursor-pointer overflow-hidden border border-slate-700/50 bg-slate-900/40 backdrop-blur-xl rounded-xl sm:rounded-2xl transition-all duration-300 hover:-translate-y-1.5 hover:border-cyan-400/50 shadow-xl"
                 >
                   <div className="h-40 sm:h-44 w-full overflow-hidden bg-slate-950 relative">
-                    <img
+                    <SmartImage
                       src={imageUrl(news.image)}
                       alt={news.title}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"

@@ -1,0 +1,47 @@
+# Render Blueprint — SINGGAH (API + frontend dalam satu service, selalu online)
+# Cara pakai:
+#   1) Push repo ke GitHub (sudah via `origin`).
+#   2) Di dashboard Render: New > Blueprint > pilih repo ini.
+#   3) Isi env vars di bawah (sync:false = diisi manual di dashboard):
+#      DB_*, JWT_SECRET, EMAIL_*, FRONTEND_URL, CLOUDINARY_*, dll.
+#   4) Render build server/Dockerfile → otomatis build client & deploy.
+
+services:
+  - type: web
+    name: singgah-api
+    runtime: docker
+    repo: https://github.com/arrayhan66/SINGGAH.git
+    dockerfilePath: ./server/Dockerfile
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false

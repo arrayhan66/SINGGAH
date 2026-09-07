@@ -18,6 +18,7 @@ import { saveHallReturn } from "../../three/hooks/useWalk"
 import api from "../../services/api"
 import { toEmbedUrl } from "../../utils/videoUrl"
 import { openDocument } from "../../utils/projectDocument"
+import SmartImage from "../ui/SmartImage"
 
 function ProjectDetailModal({ project, categoryTitle, onClose }) {
   const navigate = useNavigate()
@@ -130,7 +131,7 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
         <h3 className="text-2xl md:text-3xl font-extrabold text-white">{project.title}</h3>
 
         <div className="rounded-2xl overflow-hidden border border-sky-800/60 bg-black/50 flex items-center justify-center">
-          <img
+          <SmartImage
             src={coverImage}
             alt={project.title}
             className="w-full max-h-72 object-contain"

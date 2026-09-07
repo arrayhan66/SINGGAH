@@ -4,6 +4,7 @@ import { Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import logo from "../../../../assets/icons/logo.webp";
 import api from "../../../../services/api";
 import FormAlert from "../../../ui/FormAlert";
+import SmartImage from "../../../ui/SmartImage";
 import SuccessPopup from "../../../ui/SuccessPopup";
 
 function ResetPasswordForm() {
@@ -79,9 +80,10 @@ function ResetPasswordForm() {
         <div className="mb-8 flex items-center justify-between sm:mb-12 lg:hidden">
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-100/30 bg-white/10 p-3 shadow-md backdrop-blur-md sm:h-16 sm:w-16 sm:p-3.5">
-              <img
+              <SmartImage
                 src={logo}
                 alt="Logo SINGGAH"
+                eager
                 className="h-full w-full object-contain"
               />
             </div>

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { Calendar, ArrowRight, Bookmark } from "lucide-react"
 import { imageUrl } from "../../../../utils/imageUrl"
 import GlassCard from "../../../ui/GlassCard"
+import SmartImage from "../../../ui/SmartImage"
 
 function KaryaTersimpanCard({ item, onRemove }) {
   const navigate = useNavigate()
@@ -33,7 +34,7 @@ function KaryaTersimpanCard({ item, onRemove }) {
       className="group flex h-full flex-col overflow-hidden p-0 !cursor-default"
     >
       <div className="relative overflow-hidden">
-        <img
+        <SmartImage
           src={imageUrl(coverImage)}
           alt={item.title}
           className="h-36 w-full object-cover transition-all duration-500 sm:h-40 md:h-44"

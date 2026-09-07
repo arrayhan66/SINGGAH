@@ -12,6 +12,7 @@ import {
 import GlassCard from "../../ui/GlassCard";
 import { useAuth } from "../../../context/AuthContext";
 import { imageUrl } from "../../../utils/imageUrl";
+import SmartImage from "../../ui/SmartImage";
 import api from "../../../services/api";
 
 function KaryaProjectCard({ project }) {
@@ -91,7 +92,7 @@ function KaryaProjectCard({ project }) {
     >
       {/* Cover */}
       <div className="relative overflow-hidden">
-        <img
+        <SmartImage
           src={imageUrl(coverImage)}
           alt={title}
           className="h-40 w-full object-cover transition-all duration-500 sm:h-48 md:h-52 lg:h-56 xl:h-60 3xl:h-72 4xl:h-80"

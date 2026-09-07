@@ -4,6 +4,7 @@ import logo from "../../../../assets/icons/logo.webp";
 import bgloginDark from "../../../../assets/images/bg-login.webp";
 import logoPoliban from "../../../../assets/icons/Logo_Poliban.png";
 import { useTheme } from "../../../../context/ThemeContext";
+import SmartImage from "../../../ui/SmartImage";
 
 function AuthBranding({ backTo = "/" }) {
   const { theme } = useTheme();
@@ -11,11 +12,12 @@ function AuthBranding({ backTo = "/" }) {
   const bglogin = bgloginDark;
   return (
     <div className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-slate-950 p-10 lg:p-14 2xl:p-16 lg:flex border-r border-cyan-500/20">
-      <img
+      <SmartImage
         src={bglogin}
-        loading="lazy"
+        eager
         alt="Background"
-        className="absolute inset-0 h-full w-full object-cover scale-105 transition-transform duration-1000 opacity-35 mix-blend-luminosity"
+        opacity={0.35}
+        className="absolute inset-0 h-full w-full object-cover scale-105 transition-transform duration-1000 mix-blend-luminosity"
       />
 
       <div className="absolute inset-0 backdrop-blur-[2px] bg-gradient-to-tr from-slate-950/95 via-night-deep/90 to-night/80" />
@@ -36,9 +38,10 @@ function AuthBranding({ backTo = "/" }) {
         </Link>
 
         <div className="select-none hidden lg:flex items-center gap-2 rounded-full border border-slate-300/60 bg-white/80 px-3 py-1.5 shadow-md shadow-slate-200 backdrop-blur-md">
-          <img
+          <SmartImage
             src={logoPoliban}
             alt="Poliban"
+            eager
             className="h-4 w-4 rounded-full object-contain"
           />
           <span className="text-[11px] font-bold tracking-wide text-slate-700">
@@ -53,9 +56,10 @@ function AuthBranding({ backTo = "/" }) {
 
           <div className="flex items-center gap-3.5 mb-6">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-100 bg-gradient-to-br from-white to-cyan-50 p-2 shadow-xl shadow-cyan-200/40">
-              <img
+              <SmartImage
                 src={logo}
                 alt="Logo SINGGAH"
+                eager
                 className="h-9 w-9 object-contain"
               />
             </div>

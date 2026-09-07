@@ -1,0 +1,30 @@
+# Node
+node_modules
+client/node_modules
+server/node_modules
+
+# Secrets & env
+**/.env
+**/.env.*
+!.env.example
+server/.env.cloudinary.bak
+
+# Logs
+*.log
+cloudflared*.log
+
+# Build & temp
+client/dist
+*.tmp
+coverage
+
+# Git
+.git
+.gitignore
+
+# Local uploads (jangan dibundel ke image Docker)
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Tools lokal (cloudflared, ngrok)
+tools

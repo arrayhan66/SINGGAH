@@ -2,6 +2,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
+// Override: VITE_PROXY_TARGET=http://192.168.1.10:5000 npm run dev
+// berguna saat server backend jalan di PC / mesin lain.
+const API_TARGET = process.env.VITE_PROXY_TARGET || 'http://localhost:5000'
+
 export default defineConfig({
   plugins: [
     react(),
@@ -11,11 +15,7 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-      },
-      '/uploads': {
-        target: 'http://localhost:5000',
+        target: API_TARGET,
         changeOrigin: true,
       },
     },
@@ -25,11 +25,7 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-      },
-      '/uploads': {
-        target: 'http://localhost:5000',
+        target: API_TARGET,
         changeOrigin: true,
       },
     },

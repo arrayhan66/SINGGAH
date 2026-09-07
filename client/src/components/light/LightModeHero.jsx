@@ -3,6 +3,7 @@ import { ArrowRight, ChevronDown } from "lucide-react";
 import { Suspense, lazy, useState } from "react";
 import logoPoliban from "../../assets/icons/Logo_Poliban.png";
 import { useNavigate } from "react-router-dom";
+import SmartImage from "../ui/SmartImage";
 import LightModeHeroStats from "./LightModeHeroStats";
 
 const HeroModel3D = lazy(() => import("../../components/sections/Hero/HeroModel3D"));
@@ -66,9 +67,10 @@ function LightModeHero() {
         <div className="relative z-10 mx-auto flex min-h-screen max-w-[1700px] flex-col lg:flex-row items-center justify-between px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-[calc(var(--navbar-h,80px)+24px)] pb-12">
           <div className="flex w-full flex-col items-center text-center md:max-w-2xl md:mx-auto lg:max-w-xl 2xl:max-w-2xl lg:mx-0 lg:items-start lg:text-left lg:-mt-20">
             <div className="inline-flex items-center gap-2 min-[350px]:gap-3 rounded-full border border-blue-300 bg-white px-3 min-[350px]:px-4 py-2 shadow-sm backdrop-blur-md">
-              <img
+              <SmartImage
                 src={logoPoliban}
                 alt="Logo Poliban"
+                eager
                 className="h-4 w-4 min-[350px]:h-5 min-[350px]:w-5 md:h-6 md:w-6 2xl:h-8 2xl:w-8 object-contain"
               />
               <span className="text-[10px] min-[350px]:text-xs md:text-sm 2xl:text-lg font-medium text-blue-700">

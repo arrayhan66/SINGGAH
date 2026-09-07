@@ -53,6 +53,7 @@ export default function GoogleLogin({ onError, label = "Lanjutkan dengan Google"
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const cbRef = useRef(null);
+  const initializedRef = useRef(null);
 
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -95,11 +96,19 @@ export default function GoogleLogin({ onError, label = "Lanjutkan dengan Google"
     loadGsi()
       .then((google) => {
         if (cancelled) return;
-        google.accounts.id.initialize({
-          client_id: clientId,
-          callback: (response) => cbRef.current(response),
-          auto_select: false,
-        });
+        const accounts = google?.accounts?.id;
+        if (!accounts) return;
+
+        // initialize hanya SEKALI per clientId; callback memakai ref terbaru
+        // supaya tidak ada peringatan "initialize() called multiple times".
+        if (initializedRef.current !== clientId) {
+          accounts.initialize({
+            client_id: clientId,
+            callback: (response) => cbRef.current(response),
+            auto_select: false,
+          });
+          initializedRef.current = clientId;
+        }
       })
       .catch(() => {
         if (!cancelled && onError) {

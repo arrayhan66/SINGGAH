@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom"
 import logo from "../../assets/icons/logo.webp"
 import { visitorMenu } from "../../constants/navigation"
 import { Moon } from "lucide-react"
+import SmartImage from "../ui/SmartImage"
 
 function LightModeNavbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -48,9 +49,10 @@ function LightModeNavbar() {
           className="flex items-center gap-1.5 min-[350px]:gap-2 sm:gap-3"
         >
           <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-xl min-[350px]:h-9 min-[350px]:w-9 sm:h-10 sm:w-10 md:h-11 md:w-11">
-            <img
+            <SmartImage
               src={logo}
               alt="SINGGAH Logo"
+              eager
               className="h-full w-full object-contain"
             />
           </div>

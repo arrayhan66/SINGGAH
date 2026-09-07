@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { X, Plus, Image as ImageIcon, Upload, Trash, Eye, Save } from "lucide-react"
+import SmartImage from "../../../ui/SmartImage"
 
 function AdminBeritaEditorSidebar({
   formData,
@@ -115,7 +116,7 @@ function AdminBeritaEditorSidebar({
 
         <div className="mt-4 overflow-hidden rounded-xl border border-dashed border-white/10 bg-brand-dark">
           {formData.image ? (
-            <img
+            <SmartImage
               src={
                 typeof formData.image === "string"
                   ? formData.image

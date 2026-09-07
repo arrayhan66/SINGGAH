@@ -3,6 +3,7 @@ import { ShieldCheck, ShieldX, AtSign, Mail, IdCard, CalendarClock, MessageSquar
 import { formatFullDate } from "../../../../utils/notificationHelpers"
 import PopupToast from "../../../ui/PopupToast"
 import UserAvatar from "../../../ui/UserAvatar"
+import SmartImage from "../../../ui/SmartImage"
 
 const tipeLabel = { mahasiswa: "Mahasiswa", dosen: "Dosen" }
 
@@ -77,7 +78,7 @@ function AdminUserTipeModal({ user, decision, onConfirm, onCancel, loading }) {
         {user.identitas_photo && (
           <div className="mt-2 rounded-xl border border-white/[0.08] bg-white/[0.04] p-3">
             <div className="flex items-center gap-2 mb-2"><IdCard className="h-3.5 w-3.5 text-cyan-300" /><span className="text-[11px] font-semibold text-white">Foto Identitas</span></div>
-            <img src={user.identitas_photo} alt="" className="w-full max-h-32 rounded-lg border border-white/10 object-contain" />
+            <SmartImage src={user.identitas_photo} alt="Foto Identitas" className="w-full max-h-32 rounded-lg border border-white/10 object-contain" />
           </div>
         )}
 

@@ -6,7 +6,7 @@ const AuthContext = createContext(null)
 
 function loadStoredUser() {
   try {
-    const raw = localStorage.getItem("user")
+    const raw = sessionStorage.getItem("user")
     return raw ? JSON.parse(raw) : null
   } catch {
     return null
@@ -14,17 +14,17 @@ function loadStoredUser() {
 }
 
 function hasStoredSession() {
-  return Boolean(localStorage.getItem("token") && localStorage.getItem("user"))
+  return Boolean(sessionStorage.getItem("token") && sessionStorage.getItem("user"))
 }
 
 export function AuthProvider({ children }) {
   const navigate = useNavigate()
   const [user, setUser] = useState(loadStoredUser)
-  const [token, setToken] = useState(() => localStorage.getItem("token"))
+  const [token, setToken] = useState(() => sessionStorage.getItem("token"))
   const [isLoading, setIsLoading] = useState(() => hasStoredSession())
 
   // Sinkronkan data user dengan server supaya field
-  // seperti created_at tidak hilang/stale di localStorage.
+  // seperti created_at tidak hilang/stale di sessionStorage.
   useEffect(() => {
     if (!hasStoredSession()) return
 
@@ -34,7 +34,7 @@ export function AuthProvider({ children }) {
         const freshUser = res.data?.data
         if (freshUser) {
           setUser(freshUser)
-          localStorage.setItem("user", JSON.stringify(freshUser))
+          sessionStorage.setItem("user", JSON.stringify(freshUser))
         }
       })
       .catch((err) => {
@@ -42,8 +42,8 @@ export function AuthProvider({ children }) {
         if (err.response?.status === 401) {
           setUser(null)
           setToken(null)
-          localStorage.removeItem("token")
-          localStorage.removeItem("user")
+          sessionStorage.removeItem("token")
+          sessionStorage.removeItem("user")
         } else {
           console.error("Gagal menyinkronkan data user:", err)
         }
@@ -55,15 +55,15 @@ export function AuthProvider({ children }) {
     setUser(userData)
     setToken(token)
 
-    localStorage.setItem("user", JSON.stringify(userData))
-    localStorage.setItem("token", token)
+    sessionStorage.setItem("user", JSON.stringify(userData))
+    sessionStorage.setItem("token", token)
   }
 
   const logout = () => {
     setUser(null)
     setToken(null)
-    localStorage.removeItem("token")
-    localStorage.removeItem("user")
+    sessionStorage.removeItem("token")
+    sessionStorage.removeItem("user")
     localStorage.removeItem("admin-sidebar-collapsed")
     navigate("/login")
   }

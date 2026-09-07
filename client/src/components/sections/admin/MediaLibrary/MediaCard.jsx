@@ -6,6 +6,7 @@ import {
   isPreviewable,
   formatDate,
 } from "../../../../utils/mediaHelpers"
+import SmartImage from "../../../ui/SmartImage"
 
 function FileIcon({ mime, size = 16, className = "" }) {
   return createElement(getFileIcon(mime), { size, className })
@@ -24,7 +25,7 @@ export default function MediaCard({
       <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl transition-all duration-300 hover:-translate-y-[2px] hover:border-cyan-400/30 hover:bg-white/[0.09] hover:shadow-[0_0_30px_-6px_rgba(34,211,238,0.15)]">
         <div className="relative aspect-[4/3] overflow-hidden bg-brand-navy">
           {isPreviewable(item.type) ? (
-            <img
+            <SmartImage
               src={item.url}
               alt={item.name}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -91,7 +92,7 @@ export default function MediaCard({
             onClick={() => onPreview(item)}
           >
             {isPreviewable(item.type) ? (
-              <img
+              <SmartImage
                 src={item.url}
                 alt={item.name}
                 className="h-full w-full object-cover"

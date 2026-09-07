@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import api from "../../../../services/api";
 import GoogleLogin from "../../../ui/GoogleLoginButton";
+import SmartImage from "../../../ui/SmartImage";
 import PopupToast from "../../../ui/PopupToast";
 
 function RegisterForm() {
@@ -638,9 +639,10 @@ function RegisterForm() {
                       <div className="relative">
                         <div className="absolute -inset-1.5 rounded-full bg-gradient-to-br from-cyan-400/60 via-blue-500/30 to-blue-400/50 blur-[6px]" />
                         <div className="relative h-28 w-28 overflow-hidden rounded-full border-2 border-white/90 shadow-lg shadow-cyan-500/20">
-                          <img
+                          <SmartImage
                             src={fotoProfilPreview}
                             alt="Preview Foto Profil"
+                            eager
                             className="h-full w-full object-cover"
                           />
                         </div>
@@ -684,9 +686,10 @@ function RegisterForm() {
                         <div className="relative mx-auto w-fit max-w-full">
                           <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-400/60 via-blue-500/30 to-blue-400/50 blur-[6px]" />
                           <div className="relative flex items-center justify-center rounded-2xl p-2">
-                            <img
+                            <SmartImage
                               src={fotoIdentitasPreview}
                               alt="Preview Foto Identitas"
+                              eager
                               className="max-h-40 w-auto max-w-full object-contain"
                             />
                           </div>

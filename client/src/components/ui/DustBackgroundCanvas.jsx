@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import { Canvas } from "@react-three/fiber"
 import { Sparkles } from "@react-three/drei"
+import { attachWebGLContextGuard } from "../../three/utils/webglGuard"
 
 function DustBackgroundCanvas({ color = "#7dd3fc", count = 80 }) {
   const wrapRef = useRef(null)
@@ -8,6 +9,8 @@ function DustBackgroundCanvas({ color = "#7dd3fc", count = 80 }) {
   const [mounted, setMounted] = useState(false)
   const [inView, setInView] = useState(false)
   const [scrolling, setScrolling] = useState(false)
+  const [epoch, setEpoch] = useState(0)
+  const remount = useCallback(() => setEpoch((n) => n + 1), [])
 
   useEffect(() => {
     const el = wrapRef.current
@@ -47,6 +50,8 @@ function DustBackgroundCanvas({ color = "#7dd3fc", count = 80 }) {
     <div ref={wrapRef} className="pointer-events-none absolute inset-0">
       {mounted && (
         <Canvas
+          key={epoch}
+          onCreated={({ gl }) => attachWebGLContextGuard(gl, remount)}
           frameloop={playing ? "always" : "never"}
           camera={{ position: [0, 0, 5], fov: 60 }}
           style={{ pointerEvents: "none" }}

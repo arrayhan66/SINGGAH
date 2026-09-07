@@ -1,6 +1,7 @@
 // LIGHT MODE - versi pembanding skripsi, terpisah dari dark mode
 import { NavLink } from "react-router-dom";
 import logo from "../../assets/icons/logo.webp";
+import SmartImage from "../ui/SmartImage";
 
 function LightModeFooter() {
   return (
@@ -9,9 +10,10 @@ function LightModeFooter() {
         {/* LOGO */}
         <NavLink to="/light-mode" className="flex items-center gap-2.5 sm:gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:h-10 sm:w-10 md:h-11 md:w-11 2xl:h-14 2xl:w-14">
-            <img
+            <SmartImage
               src={logo}
               alt="SINGGAH Logo"
+              eager
               className="h-10 w-10 object-contain sm:h-12 sm:w-12 2xl:h-16 2xl:w-16"
             />
           </div>

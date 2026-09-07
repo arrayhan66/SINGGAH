@@ -17,6 +17,7 @@ import {
   IdCard,
 } from "lucide-react"
 import UserAvatar from "../../../ui/UserAvatar"
+import SmartImage from "../../../ui/SmartImage"
 
 const tipeConfig = {
   mahasiswa: { label: "Mahasiswa", icon: GraduationCap, color: "cyan" },
@@ -193,7 +194,7 @@ function AdminUserProfileCard({ user, onEdit, onDelete }) {
               </div>
               <div className="mt-3 rounded-xl border border-white/[0.04] bg-white/[0.03] p-4">
                 {user.identitas_photo ? (
-                  <img
+                  <SmartImage
                     src={user.identitas_photo}
                     alt="Foto identitas"
                     className="mx-auto max-h-72 rounded-lg border border-white/10 object-contain"

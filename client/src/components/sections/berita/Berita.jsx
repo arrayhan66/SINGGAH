@@ -11,6 +11,7 @@ import { useBerita } from "../../../context/BeritaContext"
 import { useTheme } from "../../../context/ThemeContext"
 import { BeritaPageSkeleton } from "../../ui/PageSkeletons"
 import { imageUrl } from "../../../utils/imageUrl"
+import SmartImage from "../../ui/SmartImage"
 
 function Berita() {
   const navigate = useNavigate()
@@ -77,7 +78,7 @@ function Berita() {
                     {/* Gambar Berita */}
                     <div className="relative h-40 w-full overflow-hidden bg-gradient-to-br from-royal/40 to-brand-navy/60 flex-shrink-0 sm:h-48 md:h-52 lg:h-56 3xl:h-64 4xl:h-72">
                       {item.image ? (
-                        <img
+                        <SmartImage
                           src={imageUrl(item.image)}
                           alt={item.title}
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"

@@ -2,6 +2,7 @@ import { useRef } from "react"
 import { ImagePlus, X, Image } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
 import { imageUrl } from "../../../../utils/imageUrl"
+import SmartImage from "../../../ui/SmartImage"
 
 function UploadGallery({ value, onChange, existingItems, onRemoveExisting }) {
   const inputRef = useRef(null)
@@ -40,7 +41,7 @@ function UploadGallery({ value, onChange, existingItems, onRemoveExisting }) {
             const src = imageUrl(typeof img === "string" ? img : img.image_url || img.url)
             return (
               <div key={`existing-${index}`} className="relative aspect-square">
-                <img
+                <SmartImage
                   src={src}
                   alt={`Existing ${index + 1}`}
                   className="h-full w-full rounded-xl object-cover border border-white/10"
@@ -60,7 +61,7 @@ function UploadGallery({ value, onChange, existingItems, onRemoveExisting }) {
           const previewUrl = URL.createObjectURL(file)
           return (
             <div key={`new-${index}`} className="relative aspect-square">
-              <img
+              <SmartImage
                 src={previewUrl}
                 alt={`New ${index + 1}`}
                 className="h-full w-full rounded-xl object-cover border border-white/10"

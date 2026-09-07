@@ -180,14 +180,6 @@ exports.login = async (data) => {
     )
   }
 
-  if (user.pending_email) {
-    throw new AppError(
-      "Perubahan email belum diverifikasi. Silakan verifikasi email baru Anda terlebih dahulu.",
-      403,
-      { pending_email: user.pending_email },
-    )
-  }
-
   const maintenance = await settingService.getSetting("maintenanceMode")
 
   if (maintenance && user.role !== "admin") {

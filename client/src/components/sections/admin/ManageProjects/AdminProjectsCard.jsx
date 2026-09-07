@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Clock, CheckCircle2, XCircle, Eye, Heart, Calendar, Tag, Globe, Pencil, Trash2, Star, Crown } from "lucide-react"
 import { imageUrl } from "../../../../utils/imageUrl"
+import SmartImage from "../../../ui/SmartImage"
 
 const statusConfig = {
   pending: {
@@ -42,7 +43,7 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
         className="aspect-video w-full overflow-hidden bg-brand-navy relative cursor-pointer"
         onClick={() => onViewDetail(project)}
       >
-        <img
+        <SmartImage
           src={imageUrl(project.thumbnail)}
           alt={project.title}
           className="h-full w-full object-cover transition-all duration-500"

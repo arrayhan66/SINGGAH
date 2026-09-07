@@ -1,6 +1,7 @@
 import { useRef, useState } from "react"
 import { ImagePlus, X } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
+import SmartImage from "../../../ui/SmartImage"
 
 function UploadThumbnail({ value, onChange, existingValue, onRemoveExisting }) {
   const inputRef = useRef(null)
@@ -48,9 +49,10 @@ function UploadThumbnail({ value, onChange, existingValue, onRemoveExisting }) {
         <div className="mt-2 min-[280px]:mt-4">
           {previewUrl ? (
             <div className="relative w-full">
-              <img
+              <SmartImage
                 src={previewUrl}
                 alt="Preview thumbnail"
+                eager
                 className="aspect-video w-full rounded-xl object-cover border border-white/10 shadow-lg"
               />
               <button

@@ -1,13 +1,19 @@
-import { Suspense } from "react"
+import { Suspense, useState, useCallback } from "react"
 import { Canvas } from "@react-three/fiber"
 import VirtualExhibition from "../../three/scenes/VirtualExhibition"
 import CanvasErrorBoundary from "./CanvasErrorBoundary"
 import { DPR_FOR } from "../../three/hooks/useQuality"
+import { attachWebGLContextGuard } from "../../three/utils/webglGuard"
 
 export default function HallCanvas({ tier, hallData, onArea, onSelectProject, onReady }) {
+  const [epoch, setEpoch] = useState(0)
+  const remount = useCallback(() => setEpoch((n) => n + 1), [])
+
   return (
     <CanvasErrorBoundary>
       <Canvas
+        key={epoch}
+        onCreated={({ gl }) => attachWebGLContextGuard(gl, remount)}
         shadows={tier === "tinggi"}
         dpr={DPR_FOR[tier]}
         gl={{ powerPreference: "high-performance", antialias: tier !== "rendah" }}

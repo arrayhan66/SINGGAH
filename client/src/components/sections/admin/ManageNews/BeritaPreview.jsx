@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { Newspaper, ArrowRight, BookOpen } from "lucide-react"
 import { useBerita } from "../../../../context/BeritaContext"
 import { imageUrl } from "../../../../utils/imageUrl"
+import SmartImage from "../../../ui/SmartImage"
 
 function DashboardLatestNews() {
   const navigate = useNavigate()
@@ -44,7 +45,7 @@ function DashboardLatestNews() {
               className="group flex flex-col gap-3 rounded-[14px] border border-slate-200/80 bg-white p-3 transition-all duration-250 hover:-translate-y-[2px] hover:bg-slate-50 hover:shadow-md sm:flex-row sm:items-center"
               style={{ minHeight: 90 }}
             >
-              <img
+              <SmartImage
                 src={imageUrl(news.image)}
                 alt={news.title}
                 className="h-[72px] w-full shrink-0 rounded-lg object-cover sm:h-[72px] sm:w-[72px]"

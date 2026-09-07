@@ -20,6 +20,7 @@ import PCBBackground from "../../ui/PCBBackground"
 import { BeritaDetailSkeleton } from "../../ui/PageSkeletons"
 import { imageUrl } from "../../../utils/imageUrl"
 import { processContentHtml } from "../../../utils/processContentHtml"
+import SmartImage from "../../ui/SmartImage"
 
 function parseSeeAlsoItems(htmlStr) {
   if (!htmlStr) return []
@@ -56,11 +57,10 @@ function SeeAlsoBlock({ htmlAttributes }) {
             >
               {item.image ? (
                 <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-amber-100">
-                  <img
+                  <SmartImage
                     src={item.image}
                     alt={item.title}
                     className="h-full w-full object-cover"
-                    loading="lazy"
                   />
                 </div>
               ) : (
@@ -211,7 +211,7 @@ function NewsContent({ item }) {
             {correspondingPhoto && (
               <figure className="relative my-2 min-[350px]:my-5 rounded-none overflow-hidden">
                 <div className={`w-full max-h-[500px] overflow-hidden ${isDark ? "bg-slate-800" : "bg-slate-100"}`}>
-                  <img
+                  <SmartImage
                     src={imageUrl(correspondingPhoto.url)}
                     alt={correspondingPhoto.caption}
                     className="block h-auto w-full max-w-full"
@@ -236,7 +236,7 @@ function NewsContent({ item }) {
           {correspondingPhoto && (
             <figure className="my-2 min-[350px]:my-5 rounded-none overflow-hidden">
               <div className={`w-full max-h-[500px] overflow-hidden ${isDark ? "bg-slate-800" : "bg-slate-100"}`}>
-                <img
+                <SmartImage
                   src={correspondingPhoto.url}
                   alt={correspondingPhoto.caption}
                   className="block h-auto w-full max-w-full"
@@ -408,7 +408,7 @@ function BeritaDetail() {
           </div>
 
           <div className="relative h-48 min-[350px]:h-64 sm:h-88 lg:h-[420px] w-full overflow-hidden bg-slate-950">
-            <img
+            <SmartImage
               src={imageUrl(item.image)}
               alt={item.title}
               className="h-full w-full object-cover transition-transform duration-700 hover:scale-102"
@@ -482,7 +482,7 @@ function BeritaDetail() {
                   className={`berita-related-card group cursor-pointer overflow-hidden rounded-xl min-[350px]:rounded-2xl transition-all duration-300 hover:-translate-y-1.5 ${isDark ? "border border-slate-700/50 bg-brand-navy hover:border-cyan-400/50" : "border border-slate-200 bg-white hover:border-cyan-400/50"}`}
                 >
                   <div className={`h-40 min-[350px]:h-44 w-full overflow-hidden relative ${isDark ? "bg-slate-950" : "bg-slate-100"}`}>
-                    <img
+                    <SmartImage
                       src={imageUrl(news.image)}
                       alt={news.title}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"

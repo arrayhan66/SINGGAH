@@ -70,7 +70,9 @@ describe("Auth Endpoints", () => {
 
     const user = await User.findOne({ where: { email: "avatar@example.com" } })
     expect(user).not.toBeNull()
-    expect(user.avatar).toBe("https://test.local/uploads/avatars/test.jpg")
+    expect(user.avatar).toBe(
+      "https://res.cloudinary.com/test/image/upload/v123456/singgah/avatars/test.jpg",
+    )
   })
 
   it("should register with identitas photo and notify admins", async () => {
@@ -105,7 +107,7 @@ describe("Auth Endpoints", () => {
     })
     expect(user).not.toBeNull()
     expect(user.identitas_photo).toBe(
-      "https://test.local/uploads/identitas/test.jpg",
+      "https://res.cloudinary.com/test/image/upload/v123456/singgah/identitas/test.jpg",
     )
 
     const admins = await User.findAll({

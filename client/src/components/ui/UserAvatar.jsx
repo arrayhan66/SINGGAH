@@ -1,4 +1,5 @@
 import { useState } from "react"
+import SmartImage from "./SmartImage"
 
 function getInitials(name) {
   return (name || "?")
@@ -26,10 +27,11 @@ function UserAvatar({
   return (
     <div className={`${className} flex shrink-0 items-center justify-center`}>
       {showImg ? (
-        <img
+        <SmartImage
           src={avatar}
           alt={name}
-          loading="lazy"
+          eager
+          fallback={false}
           onError={() => setImgFailed(true)}
           className={`${imgSizeClass} rounded-full ${imgClass}`}
         />

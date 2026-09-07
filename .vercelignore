@@ -1,0 +1,11 @@
+# Jangan ikut di-upload ke Vercel (dibuild ulang di server Vercel)
+client/node_modules
+server/node_modules
+client/dist
+server/uploads
+server/logs
+.opencode
+tools
+.git
+*.log
+*.err

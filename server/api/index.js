@@ -1,4 +1,9 @@
 const serverless = require("serverless-http")
+
+// mysql2 dimuat Sequelize secara DINAMIS, sehingga bundler serverless Vercel
+// tidak ikut membundelnya. Require statis ini memastikan driver DB ikut ter-bundle.
+require("mysql2")
+
 const app = require("../server.js")
 
 const BINARY_TYPES = [

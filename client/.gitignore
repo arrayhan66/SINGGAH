@@ -32,3 +32,5 @@ playwright/.cache/
 
 # Large source media kept only for re-compression
 media/
+.vercel
+.env*

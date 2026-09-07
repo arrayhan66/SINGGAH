@@ -35,3 +35,6 @@ server/uploads/
 
 # Cloudinary backup (jangan commit berisi secret)
 server/.env.cloudinary.bak
+
+.vercel
+.env*

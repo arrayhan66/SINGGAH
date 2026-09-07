@@ -9,6 +9,9 @@
  * https://res.cloudinary.com/... sehingga media kembali tampil setelah
  * deploy (route /uploads sudah tidak dilayani). */
 require("dotenv").config({ path: require("path").join(__dirname, "..", ".env") })
+require("dotenv").config({
+  path: require("path").join(__dirname, "..", ".env.cloudinary.bak"),
+})
 
 const fs = require("fs")
 const path = require("path")

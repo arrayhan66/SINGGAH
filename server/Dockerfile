@@ -1,6 +1,12 @@
 # --- Stage 1: build frontend (client) ---
 FROM node:22-slim AS client-build
 WORKDIR /app
+# Dijadikan build-time ARG agar tombol Google Login aktif saat deploy.
+# Render meneruskan environment variable sebagai build ARG secara otomatis.
+ARG VITE_GOOGLE_CLIENT_ID
+ARG VITE_API_URL=/api
+ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+ENV VITE_API_URL=$VITE_API_URL
 COPY client/package*.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci

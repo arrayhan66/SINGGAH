@@ -11,7 +11,9 @@
     "lowercase:usernames": "node scripts/lowercaseUsernames.js",
     "sync:db": "node scripts/syncDb.js",
     "indexes:add": "node scripts/addIndexes.js",
-    "seed:ci": "node scripts/seedCi.js"
+    "seed:ci": "node scripts/seedCi.js",
+    "migrate:media": "node scripts/migrateLegacyUploads.js",
+    "migrate:media:dry": "node scripts/migrateLegacyUploads.js --dry-run"
   },
   "keywords": [],
   "author": "",

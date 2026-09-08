@@ -78,6 +78,7 @@ exports.getProjectById = asyncHandler(async (req, res) => {
     req.params.id,
     req.user?.id || null,
     req.user?.role || null,
+    req.tokenInvalid,
   )
 
   success(res, project)

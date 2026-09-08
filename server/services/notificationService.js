@@ -1,22 +1,27 @@
 const { Notification, User } = require("../models")
 const { Op } = require("sequelize")
 const AppError = require("../utils/AppError")
+const { withDbRetry } = require("../utils/dbRetry")
 
 exports.getMyNotifications = async (userId, query) => {
   const page = parseInt(query.page) || 1
   const limit = parseInt(query.limit) || 10
   const offset = (page - 1) * limit
 
-  const { count, rows } = await Notification.findAndCountAll({
-    where: { user_id: userId },
-    order: [["created_at", "DESC"]],
-    limit,
-    offset,
-  })
+  const { count, rows } = await withDbRetry(() =>
+    Notification.findAndCountAll({
+      where: { user_id: userId },
+      order: [["created_at", "DESC"]],
+      limit,
+      offset,
+    }),
+  )
 
-  const unreadCount = await Notification.count({
-    where: { user_id: userId, is_read: false },
-  })
+  const unreadCount = await withDbRetry(() =>
+    Notification.count({
+      where: { user_id: userId, is_read: false },
+    }),
+  )
 
   return {
     items: rows,

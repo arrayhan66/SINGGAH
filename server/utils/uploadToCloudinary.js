@@ -22,8 +22,11 @@ exports.uploadImage = async (fileOrBuffer, folder = "uploads", options = {}) => 
     })
   }
 
-  const buffer =
+  const raw =
     fileOrBuffer && fileOrBuffer.buffer ? fileOrBuffer.buffer : fileOrBuffer
+
+  // Multer versi terbaru (Node 20+) bisa memberi ArrayBuffer, bukan Buffer.
+  const buffer = Buffer.isBuffer(raw) ? raw : Buffer.from(raw)
 
   return new Promise((resolve, reject) => {
     cloudinary.uploader

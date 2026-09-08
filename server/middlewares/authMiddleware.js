@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken")
 const { User } = require("../models")
 const { getTokenFromCookie } = require("../utils/authCookie")
+const { isConnectionError, withDbRetry } = require("../utils/dbRetry")
 
 async function authMiddleware(req, res, next) {
   try {
@@ -22,11 +23,23 @@ async function authMiddleware(req, res, next) {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-    const user = await User.findByPk(decoded.id, {
-      attributes: {
-        exclude: ["password"],
-      },
-    })
+    let user
+    try {
+      user = await withDbRetry(() =>
+        User.findByPk(decoded.id, {
+          attributes: {
+            exclude: ["password"],
+          },
+        }),
+      )
+    } catch (error) {
+      if (isConnectionError(error)) {
+        return res.status(503).json({
+          message: "Database sedang tidak dapat diakses. Silakan coba lagi.",
+        })
+      }
+      throw error
+    }
 
     if (!user) {
       return res.status(401).json({
@@ -50,6 +63,11 @@ async function authMiddleware(req, res, next) {
 
     next()
   } catch (error) {
+    if (isConnectionError(error)) {
+      return res.status(503).json({
+        message: "Database sedang tidak dapat diakses. Silakan coba lagi.",
+      })
+    }
     return res.status(401).json({
       message: "Token tidak valid",
     })

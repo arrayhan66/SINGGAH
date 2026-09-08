@@ -17,8 +17,10 @@ module.exports = (err, req, res, next) => {
   const isServerError = statusCode >= 500
 
   logger.error(`${req.method} ${req.originalUrl}`, {
-    message: err.message,
-    stack: isServerError ? err.stack : undefined,
+    name: err && err.name,
+    message: err && err.message,
+    full: err && String(err),
+    stack: isServerError ? err && err.stack : undefined,
     statusCode,
     body: redactBody(req.body),
     user: req.user ? req.user.id : null,

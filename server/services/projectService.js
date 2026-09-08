@@ -426,7 +426,7 @@ exports.setProjectFeatured = async (id, slot = null) => {
   return project
 }
 
-exports.getProjectById = async (id, currentUserId = null, currentUserRole = null) => {
+exports.getProjectById = async (id, currentUserId = null, currentUserRole = null, tokenInvalid = false) => {
   const where = /^\d+$/.test(id) ? { id: Number(id) } : { slug: id }
 
   const project = await Project.findOne({
@@ -454,6 +454,9 @@ exports.getProjectById = async (id, currentUserId = null, currentUserRole = null
   const isAdmin = currentUserRole === "admin"
 
   if (project.status !== "published" && !isOwner && !isAdmin) {
+    if (tokenInvalid) {
+      throw new AppError("Sesi berakhir. Silakan masuk kembali.", 401)
+    }
     throw new AppError("Project tidak ditemukan", 404)
   }
 

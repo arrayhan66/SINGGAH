@@ -9,7 +9,7 @@ import toast from "../../../../utils/toast"
 
 function ProfileAction({ profileData, passwordData, onResetPassword, identitasPhoto }) {
   const navigate = useNavigate()
-  const { token, user, login } = useAuth()
+  const { user, login } = useAuth()
   const [errors, setErrors] = useState([])
   const [submitting, setSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
@@ -91,7 +91,6 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
             oldPassword: passwordData.currentPassword,
             newPassword: passwordData.newPassword,
           },
-          { headers: { Authorization: `Bearer ${token}` } },
         )
       }
 
@@ -109,9 +108,7 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
       const putProfile = async (attempt = 1) => {
         try {
           let data = payload
-          let headers = {
-            Authorization: `Bearer ${token}`,
-          }
+          let headers = {}
 
           if (hasFiles) {
             const formData = new FormData()
@@ -159,7 +156,7 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
       const res = await putProfile()
 
       const updatedUser = res.data.data
-      login({ ...user, ...updatedUser }, token)
+      login({ ...user, ...updatedUser })
 
       const changedEmail = Boolean(updatedUser.email_changed)
       setEmailChanged(changedEmail)

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react"
-import { useAuth } from "../../../../context/AuthContext"
 import api from "../../../../services/api"
 import GlassCard from "../../../ui/GlassCard"
 import { FolderCheck, Clock, FolderOpen } from "lucide-react"
@@ -35,16 +34,13 @@ const statsConfig = [
 ]
 
 function ProfileStats() {
-  const { token } = useAuth()
   const [stats, setStats] = useState(null)
 
   useEffect(() => {
     let cancelled = false
     async function fetchStats() {
       try {
-        const res = await api.get("/auth/profile-stats", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        const res = await api.get("/auth/profile-stats")
         if (!cancelled) setStats(res.data.data)
       } catch {
         if (!cancelled) setStats({ published: 0, pending: 0, rejected: 0, total: 0 })
@@ -52,7 +48,7 @@ function ProfileStats() {
     }
     fetchStats()
     return () => { cancelled = true }
-  }, [token])
+  }, [])
 
   return (
     <GlassCard className="p-5 md:p-6">

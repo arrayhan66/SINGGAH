@@ -61,9 +61,9 @@ function LoginForm() {
     try {
       setIsLoading(true);
       const res = await api.post("/auth/login", { email, password });
-      const { token, user } = res.data.data;
+      const { user } = res.data.data;
 
-      login(user, token);
+      login(user);
 
       const from = getRedirectFrom(location);
 

@@ -8,7 +8,7 @@ import GlassCard from "../../../ui/GlassCard"
 import PopupToast from "../../../ui/PopupToast"
 
 function ProfileDangerZone() {
-  const { token, logout } = useAuth()
+  const { logout } = useAuth()
   const { theme } = useTheme()
   const isDark = theme === "dark"
   const [showModal, setShowModal] = useState(false)
@@ -42,7 +42,6 @@ function ProfileDangerZone() {
     setError("")
     try {
       await api.delete("/auth/account", {
-        headers: { Authorization: `Bearer ${token}` },
         data: { password },
       })
       logout()

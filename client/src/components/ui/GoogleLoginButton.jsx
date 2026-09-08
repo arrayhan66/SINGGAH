@@ -67,8 +67,8 @@ export default function GoogleLogin({ onError, label = "Lanjutkan dengan Google"
       try {
         setLoading(true);
         const res = await api.post("/auth/google", { idToken });
-        const { token, user } = res.data.data;
-        login(user, token);
+        const { user } = res.data.data;
+        login(user);
         const from = getRedirectFrom(location);
         if (user.role === "admin") {
           navigate("/admin");

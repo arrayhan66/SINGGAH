@@ -2,6 +2,10 @@ const authService = require("../services/authService")
 const asyncHandler = require("../utils/asyncHandler")
 const { success } = require("../utils/response")
 const {
+  setAuthCookie,
+  clearAuthCookie,
+} = require("../utils/authCookie")
+const {
   uploadImage,
   deleteImage,
   getPublicIdFromUrl,
@@ -62,12 +66,19 @@ exports.register = asyncHandler(async (req, res) => {
 
 exports.login = asyncHandler(async (req, res) => {
   const result = await authService.login(req.body)
+  setAuthCookie(res, result.token)
   success(res, result, "Login berhasil")
 })
 
 exports.googleLogin = asyncHandler(async (req, res) => {
   const result = await authService.googleLogin(req.body)
+  setAuthCookie(res, result.token)
   success(res, result, "Login Google berhasil")
+})
+
+exports.logout = asyncHandler(async (req, res) => {
+  clearAuthCookie(res)
+  success(res, null, "Logout berhasil")
 })
 
 exports.checkEmail = asyncHandler(async (req, res) => {

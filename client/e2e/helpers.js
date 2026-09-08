@@ -41,7 +41,7 @@ export async function loginViaUi(page, email, password) {
 }
 
 /**
- * Login via API dan dapatkan token + user (untuk skip UI login bila perlu).
+ * Login via API dan dapatkan cookie (untuk skip UI login bila perlu).
  */
 export async function loginViaApi(email, password) {
   const api = await request.newContext({
@@ -50,21 +50,29 @@ export async function loginViaApi(email, password) {
   const res = await api.post("/api/auth/login", { data: { email, password } });
   const json = await res.json();
   if (!res.ok()) throw new Error(`Login gagal: ${json.message}`);
-  return json.data;
+  const setCookie = (res.headers()["set-cookie"] || "").split(";")[0];
+  const cookieValue = setCookie.split("=").slice(1).join("=");
+  return { token: cookieValue, user: json.data?.user };
 }
 
 /**
- * Helper login langsung set localStorage (industri umum untuk E2E),
+ * Helper login langsung set cookie (industri umum untuk E2E),
  * supaya tidak harus melalui klik tiap kali.
  */
 export async function loginViaState(page, email, password) {
   const data = await loginViaApi(email, password);
-  await page.goto("/");
-  await page.evaluate(
-    ([token, user]) => {
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
+  const baseUrl = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:5173";
+  const domain = new URL(baseUrl).hostname;
+  await page.context().addCookies([
+    {
+      name: "singgah_token",
+      value: data.token,
+      domain,
+      path: "/",
+      httpOnly: true,
+      sameSite: "Lax",
+      secure: false,
     },
-    [data.token, data.user],
-  );
+  ]);
+  await page.goto("/");
 }

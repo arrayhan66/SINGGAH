@@ -1,17 +1,24 @@
 const jwt = require("jsonwebtoken")
 const { User } = require("../models")
+const { getTokenFromCookie } = require("../utils/authCookie")
 
 async function authMiddleware(req, res, next) {
   try {
     const authHeader = req.headers.authorization
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    let token = null
+
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1]
+    } else {
+      token = getTokenFromCookie(req)
+    }
+
+    if (!token) {
       return res.status(401).json({
         message: "Token tidak ditemukan",
       })
     }
-
-    const token = authHeader.split(" ")[1]
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
 

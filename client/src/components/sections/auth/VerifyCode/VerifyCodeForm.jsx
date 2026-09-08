@@ -11,7 +11,7 @@ import VerificationPendingModal from "./VerificationPendingModal";
 
 function VerifyCodeForm() {
   const navigate = useNavigate();
-  const { user, login, token } = useAuth();
+  const { user, login } = useAuth();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ message: "", type: "" });
@@ -233,9 +233,9 @@ function VerifyCodeForm() {
               email: pendingLogin.email,
               password: pendingLogin.password,
             })
-            const { token: lrToken, user: lrUser } = lr.data.data
+            const lrUser = lr.data.data.user
             sessionStorage.removeItem("verifyPendingLogin")
-            login(lrUser, lrToken)
+            login(lrUser)
             setTimeout(() => {
               navigate(lrUser.role === "admin" ? "/admin" : "/", {
                 replace: true,
@@ -263,8 +263,8 @@ function VerifyCodeForm() {
         localStorage.removeItem("verifyType");
         setLoading(false);
 
-        if (res.data?.data && login && token) {
-          login({ ...user, ...res.data.data }, token);
+        if (res.data?.data && login) {
+          login({ ...user, ...res.data.data });
         }
 
         setShowSuccess(true);

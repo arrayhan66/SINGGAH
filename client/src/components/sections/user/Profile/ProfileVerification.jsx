@@ -23,7 +23,7 @@ const tipeLabel = {
 }
 
 function ProfileVerification() {
-  const { user, login, token } = useAuth()
+  const { user, login } = useAuth()
   const { theme } = useTheme()
   const isDark = theme === "dark"
   const [targetTipe, setTargetTipe] = useState(null) // "mahasiswa" | "dosen" | null
@@ -89,12 +89,11 @@ function ProfileVerification() {
 
       const res = await api.post("/auth/apply-tipe", formData, {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       })
 
-      login({ ...user, ...res.data.data }, token)
+      login({ ...user, ...res.data.data })
       const submittedTipe = targetTipe
       setTargetTipe(null)
       setMessage({

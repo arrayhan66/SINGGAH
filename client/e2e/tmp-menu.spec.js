@@ -15,11 +15,6 @@ test("mobile hamburger menu: item clickable + timing", async ({ page }) => {
     route.fulfill({ json: { data: FAKE_USER } }),
   );
 
-  await page.addInitScript(([token, user]) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-  }, ["fake-token", FAKE_USER]);
-
   await page.goto("/");
 
   // Open hamburger

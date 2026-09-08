@@ -1,75 +1,60 @@
-import { createContext, useContext, useState, useEffect } from "react"
+import { createContext, useContext, useState, useEffect, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import api from "../services/api"
 
 const AuthContext = createContext(null)
 
-function loadStoredUser() {
-  try {
-    const raw = sessionStorage.getItem("user")
-    return raw ? JSON.parse(raw) : null
-  } catch {
-    return null
-  }
-}
-
-function hasStoredSession() {
-  return Boolean(sessionStorage.getItem("token") && sessionStorage.getItem("user"))
-}
-
 export function AuthProvider({ children }) {
   const navigate = useNavigate()
-  const [user, setUser] = useState(loadStoredUser)
-  const [token, setToken] = useState(() => sessionStorage.getItem("token"))
-  const [isLoading, setIsLoading] = useState(() => hasStoredSession())
+  const [user, setUser] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Sinkronkan data user dengan server supaya field
-  // seperti created_at tidak hilang/stale di sessionStorage.
+  // Token & user disimpan di cookie HttpOnly sisi server, jadi di sini
+  // cukup tanya ke /auth/me untuk tahu siapa yang login saat ini.
   useEffect(() => {
-    if (!hasStoredSession()) return
+    let cancelled = false
 
     api
       .get("/auth/me")
       .then((res) => {
+        if (cancelled) return
         const freshUser = res.data?.data
-        if (freshUser) {
-          setUser(freshUser)
-          sessionStorage.setItem("user", JSON.stringify(freshUser))
-        }
+        setUser(freshUser || null)
       })
       .catch((err) => {
-        // Token kedaluwarsa/tidak valid -> bersihkan sesi.
+        if (cancelled) return
         if (err.response?.status === 401) {
           setUser(null)
-          setToken(null)
-          sessionStorage.removeItem("token")
-          sessionStorage.removeItem("user")
         } else {
           console.error("Gagal menyinkronkan data user:", err)
         }
       })
-      .finally(() => setIsLoading(false))
+      .finally(() => {
+        if (!cancelled) setIsLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
-  const login = (userData, token) => {
+  const login = useCallback((userData) => {
     setUser(userData)
-    setToken(token)
+  }, [])
 
-    sessionStorage.setItem("user", JSON.stringify(userData))
-    sessionStorage.setItem("token", token)
-  }
-
-  const logout = () => {
+  const logout = useCallback(async () => {
+    try {
+      await api.post("/auth/logout")
+    } catch {
+      // abaikan — cookie mungkin sudah kedaluwarsa
+    }
     setUser(null)
-    setToken(null)
-    sessionStorage.removeItem("token")
-    sessionStorage.removeItem("user")
     localStorage.removeItem("admin-sidebar-collapsed")
     navigate("/login")
-  }
+  }, [navigate])
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   )

@@ -49,6 +49,7 @@ router.post(
   googleLimiter,
   authController.googleLogin,
 )
+router.post("/logout", authController.logout)
 router.post(
   "/check-email",
   checkEmailLimiter,

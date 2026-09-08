@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { Plus, FileText, UserPlus, Image, ArrowRight } from "lucide-react"
 
 const actions = [
-  { label: "Tambah Project", icon: Plus, to: "/projects/tambah", color: "text-cyan-400", glow: "shadow-cyan-500/20" },
+  { label: "Tambah Karya", icon: Plus, to: "/projects/tambah", color: "text-cyan-400", glow: "shadow-cyan-500/20" },
   { label: "Tulis Berita", icon: FileText, to: "/berita/tambah", color: "text-pink-400", glow: "shadow-pink-500/20" },
   { label: "Tambah User", icon: UserPlus, to: "/users/tambah", color: "text-emerald-400", glow: "shadow-emerald-500/20" },
   { label: "Upload Media", icon: Image, to: "/media", color: "text-violet-400", glow: "shadow-violet-500/20" },

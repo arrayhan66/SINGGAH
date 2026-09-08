@@ -58,7 +58,7 @@ function ProfileInformation({
             Data Diri
           </h2>
           <p className="mt-1 text-xs md:text-sm text-slate-400">
-            Informasi ini akan ditampilkan pada profil dan project kamu.
+            Informasi ini akan ditampilkan pada profil dan karya kamu.
           </p>
         </div>
 

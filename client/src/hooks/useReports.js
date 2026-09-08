@@ -66,7 +66,7 @@ export default function useReports() {
         trend: pctChange(userSeries[monthIdx], userSeries[prevIdx]),
       },
       {
-        label: "Total Project",
+        label: "Total Karya",
         value: fmt(report.stats.totalProject || 0),
         icon: FolderKanban,
         color: "text-violet-400",

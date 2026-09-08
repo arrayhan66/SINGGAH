@@ -163,7 +163,7 @@ function NotificationDetailModal({ notif, onClose, onNavigate }) {
     ? null
     : referenceType === "project"
       ? isAdmin
-        ? "Lihat Project"
+        ? "Lihat Karya"
         : "Lihat Karya"
       : referenceType === "news"
         ? "Lihat Berita"

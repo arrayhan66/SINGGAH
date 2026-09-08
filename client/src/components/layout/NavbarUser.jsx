@@ -145,6 +145,7 @@ function NavbarUser() {
 
   useEffect(() => {
     function handleClickOutside(event) {
+      if (detailNotif || showLogoutConfirm || confirmDeleteAll) return
       if (navRef.current && !navRef.current.contains(event.target)) {
         setIsOpen(false);
       }
@@ -165,7 +166,7 @@ function NavbarUser() {
       document.addEventListener("mousedown", handleClickOutside);
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen, isProfileOpen, isNotifOpen, closeNotif]);
+  }, [isOpen, isProfileOpen, isNotifOpen, closeNotif, detailNotif, showLogoutConfirm, confirmDeleteAll]);
 
   useEffect(() => {
     if (!isNotifOpen) return;
@@ -499,7 +500,6 @@ function NavbarUser() {
         {...notifProps}
         onClickNotif={(notif) => {
           handleNotifClick(notif);
-          closeNotif();
         }}
       />
 

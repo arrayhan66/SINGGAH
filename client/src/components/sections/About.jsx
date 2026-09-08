@@ -17,7 +17,7 @@ import { AboutPageSkeleton } from "../ui/PageSkeletons"
 
 function About() {
   const [stats, setStats] = useState([
-    { num: "-", label: "Project" },
+    { num: "-", label: "Karya" },
     { num: "-", label: "Visitor" },
   ])
   const [settings, setSettings] = useState({})
@@ -46,7 +46,7 @@ function About() {
       .then((res) => {
         const d = res.data.data || res.data
         setStats([
-          { num: String(d.totalProject ?? "-"), label: "Project" },
+          { num: String(d.totalProject ?? "-"), label: "Karya" },
           { num: String(d.totalVisitors ?? "-"), label: "Visitor" },
         ])
       })
@@ -81,7 +81,7 @@ function About() {
 
               <p className="mt-6 text-justify text-base leading-relaxed text-slate-300 lg:mt-8 lg:text-lg 2xl:mt-10 2xl:text-2xl 2xl:leading-loose 3xl:mt-12 3xl:text-3xl 3xl:leading-loose 4xl:mt-14 4xl:text-4xl 4xl:leading-loose">
                 {settings.siteDescription ||
-                  "PamerIT merupakan platform digital yang menampilkan berbagai karya terbaik mahasiswa di bidang teknologi informasi. Pengunjung dapat mengeksplorasi project secara interaktif layaknya memasuki sebuah exhibition hall virtual."}
+                  "PamerIT merupakan platform digital yang menampilkan berbagai karya terbaik mahasiswa di bidang teknologi informasi. Pengunjung dapat mengeksplorasi karya secara interaktif layaknya memasuki sebuah exhibition hall virtual."}
               </p>
             </div>
 
@@ -160,7 +160,7 @@ function About() {
                 {
                   icon: Trophy,
                   title: "Prestasi",
-                  desc: "Mengapresiasi project terbaik setiap tahunnya.",
+                  desc: "Mengapresiasi karya terbaik setiap tahunnya.",
                 },
               ].map((item, idx) => {
                 const IconEl = item.icon

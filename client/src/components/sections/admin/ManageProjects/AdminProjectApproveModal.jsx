@@ -15,9 +15,9 @@ function AdminProjectApproveModal({ project, onConfirm, onCancel }) {
             <CheckCircle2 className="h-4.5 w-4.5 text-emerald-400" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="pt-1 text-sm font-semibold text-white">Setujui Project?</h3>
+            <h3 className="pt-1 text-sm font-semibold text-white">Setujui Karya?</h3>
             <p className="mt-0.5 text-xs text-slate-400 min-w-0 break-words">
-              Project <span className="font-medium text-slate-200">"{project.title}"</span> akan disetujui.
+              Karya <span className="font-medium text-slate-200">"{project.title}"</span> akan disetujui.
             </p>
           </div>
         </div>

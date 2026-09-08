@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import {
-  ArrowLeft,
-  FolderKanban,
-  Clock,
+  Hourglass,
   CheckCircle2,
   XCircle,
   AlertTriangle,
   Loader2,
+  Inbox,
 } from "lucide-react"
-import AdminHeroBackground from "../../../ui/AdminHeroBackground"
+import EditKaryaHero from "../../user/EditKarya/EditKaryaHero"
 import EditKaryaSection from "../../user/EditKarya/EditKaryaSection"
 import Toast from "../../../ui/Toast"
 import PopupToast from "../../../ui/PopupToast"
 import { useProjects } from "../../../../context/ProjectContext"
+import api from "../../../../services/api"
 
 const predefinedReasons = [
   "Dokumentasi tidak lengkap",
@@ -27,7 +27,7 @@ const predefinedReasons = [
 const statusConfig = {
   pending: {
     label: "Menunggu Review",
-    icon: Clock,
+    icon: Hourglass,
     chip: "border-amber-400/30 bg-amber-400/10 text-amber-300",
     softBg: "bg-amber-500/10",
     softColor: "text-amber-400",
@@ -59,7 +59,56 @@ function AdminProjectForm() {
   const navigate = useNavigate()
   const { getProjectBySlug, approveProject, rejectProject } = useProjects()
 
-  const existing = getProjectBySlug(slug)
+  const contextProject = getProjectBySlug(slug)
+
+  const [data, setData] = useState(() => ({
+    slug,
+    status: contextProject ? "ready" : "loading",
+    error: null,
+  }))
+
+  useEffect(() => {
+    if (contextProject) return
+
+    let cancelled = false
+
+    api
+      .get(`/projects/${slug}`)
+      .then((res) => {
+        if (cancelled) return
+        setData({
+          slug,
+          status: "ready",
+          error: null,
+          project: res.data?.data || res.data || null,
+        })
+      })
+      .catch((err) => {
+        if (cancelled) return
+        if (err.response?.status === 401) return
+        setData({
+          slug,
+          status: "error",
+          error:
+            err.response?.data?.message || "Gagal memuat karya. Coba lagi.",
+          project: null,
+        })
+      })
+      .finally(() => {
+        if (!cancelled) setData((prev) => ({ ...prev, status: "idle" }))
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [slug, contextProject])
+
+  const staleData = String(data.slug) !== String(slug)
+  const existing =
+    contextProject ||
+    (data.project && !staleData ? data.project : null)
+  const dataLoading = staleData || data.status === "loading"
+  const dataError = !staleData ? data.error : null
 
   const [rejectReason, setRejectReason] = useState("")
   const [rejecting, setRejecting] = useState(false)
@@ -100,10 +149,10 @@ function AdminProjectForm() {
     setNotification(null)
     try {
       await approveProject(existing.id, approveNote)
-      setActionSuccess({ type: "approve", message: "Project disetujui & diterbitkan!" })
+      setActionSuccess({ type: "approve", message: "Karya disetujui & diterbitkan!" })
       setTimeout(() => navigate("/projects"), 2000)
     } catch {
-      showNotification("Gagal menyetujui project. Coba lagi.", "error")
+      showNotification("Gagal menyetujui karya. Coba lagi.", "error")
     } finally {
       setSavingStatus(false)
     }
@@ -124,10 +173,10 @@ function AdminProjectForm() {
     setNotification(null)
     try {
       await rejectProject(existing.id, rejectReason)
-      setActionSuccess({ type: "reject", message: "Project ditolak." })
+      setActionSuccess({ type: "reject", message: "Karya ditolak." })
       setTimeout(() => navigate("/projects"), 2000)
     } catch {
-      showNotification("Gagal menolak project. Coba lagi.", "error")
+      showNotification("Gagal menolak karya. Coba lagi.", "error")
     } finally {
       setSavingStatus(false)
     }
@@ -137,37 +186,12 @@ function AdminProjectForm() {
   const StatusIcon = config.icon
 
   return (
-    <>
-      <AdminHeroBackground fullWidth>
-        <div className="pt-8 pb-10 sm:pt-10 sm:pb-16 2xl:pt-12 2xl:pb-20 3xl:pb-24 4xl:pb-28">
-          <button
-            onClick={() => navigate("/projects")}
-            className="group inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-white/5 p-2 sm:py-2 sm:pl-3 sm:pr-4 text-xs text-slate-300 backdrop-blur-sm transition-colors duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 sm:text-sm"
-          >
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 transition-colors duration-300 group-hover:bg-cyan-400/20 sm:h-6 sm:w-6">
-              <ArrowLeft
-                size={12}
-                className="transition-transform duration-300 group-hover:-translate-x-0.5 sm:size-[13px]"
-              />
-            </span>
-            <span className="hidden sm:inline">Kembali ke Kelola Project</span>
-          </button>
-
-          <div className="mx-auto mt-6 flex max-w-5xl flex-col items-center text-center sm:mt-8">
-            <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 sm:h-16 sm:w-16 md:h-20 md:w-20 lg:h-24 lg:w-24 3xl:h-28 3xl:w-28 4xl:h-32 4xl:w-32">
-              <FolderKanban className="h-8 w-8 text-cyan-300 sm:h-9 sm:w-9 md:h-10 md:w-10 lg:h-12 lg:w-12 3xl:h-14 3xl:w-14 4xl:h-16 4xl:w-16" />
-            </div>
-
-            <h1 className="mt-2 sm:mt-3 md:mt-4 lg:mt-5 2xl:mt-6 3xl:mt-7 4xl:mt-8 text-2xl min-[280px]:text-4xl sm:text-4xl lg:text-5xl 2xl:text-6xl 3xl:text-7xl 4xl:text-8xl font-black text-white">
-              Edit <span className="text-slate-100">Project</span>
-            </h1>
-
-            <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8 2xl:mt-8 2xl:max-w-4xl 2xl:text-xl 2xl:leading-9 3xl:mt-10 3xl:max-w-5xl 3xl:text-2xl 3xl:leading-10 4xl:mt-12 4xl:max-w-6xl 4xl:text-3xl 4xl:leading-11">
-              Perbarui informasi dan tinjau status project mahasiswa di SINGGAH.
-            </p>
-          </div>
-        </div>
-      </AdminHeroBackground>
+    <div className="user-page">
+      <EditKaryaHero
+        backPath="/projects"
+        subtitle="Perbarui informasi dan tinjau status karya mahasiswa di SINGGAH."
+        ptClass="pt-6 sm:pt-8 2xl:pt-10"
+      />
 
       <div className="bg-brand-dark pt-10 sm:pt-12">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 md:px-8 lg:px-12 2xl:px-16 3xl:px-20 4xl:px-24">
@@ -180,25 +204,26 @@ function AdminProjectForm() {
           )}
 
           {existing && existing.status !== "published" && (
-            <div className="relative mb-6 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/60 p-5 backdrop-blur-xl shadow-xl sm:p-6">
-              <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-cyan-500/10 blur-3xl" />
-              <div className="pointer-events-none absolute -bottom-24 -left-16 h-44 w-44 rounded-full bg-emerald-500/5 blur-3xl" />
-
-              <div className="relative flex flex-wrap items-start justify-between gap-3">
-                <div className="flex min-w-0 items-start gap-3">
-                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${config.softBg}`}>
-                    <StatusIcon className={`h-5 w-5 ${config.softColor}`} />
-                  </span>
+            <div className="relative mb-6 rounded-3xl border border-white/10 bg-white/5 p-5 shadow-xl backdrop-blur-xl sm:p-6">
+              <div className="relative flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+                <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-amber-400/30 bg-amber-400/10 shadow-lg shadow-amber-500/10">
+                    <StatusIcon className="h-6 w-6 text-amber-300" strokeWidth={2.2} />
+                  </div>
                   <div className="min-w-0">
-                    <h3 className="text-sm font-semibold text-white">Status Review</h3>
+                    <h2 className="text-sm font-semibold text-white sm:text-base">
+                      Status Review
+                    </h2>
                     <p className="mt-0.5 text-xs text-slate-400">
                       {statusDescription[existing.status] || statusDescription.pending}
                     </p>
                   </div>
                 </div>
 
-                <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium ${config.chip}`}>
-                  <StatusIcon size={12} />
+                <span
+                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-semibold ${config.chip}`}
+                >
+                  <StatusIcon size={13} strokeWidth={2.2} />
                   {config.label}
                 </span>
               </div>
@@ -263,6 +288,7 @@ function AdminProjectForm() {
                     type="button"
                     onClick={handleApprove}
                     disabled={savingStatus}
+                    style={{ color: "#ffffff" }}
                     className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition hover:from-emerald-400 hover:to-green-500 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <CheckCircle2 size={17} />
@@ -295,6 +321,7 @@ function AdminProjectForm() {
                       type="button"
                       onClick={handleApprove}
                       disabled={savingStatus}
+                      style={{ color: "#ffffff" }}
                       className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition hover:from-emerald-400 hover:to-green-500 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {savingStatus ? <Loader2 size={17} className="animate-spin" /> : <CheckCircle2 size={17} />}
@@ -346,7 +373,34 @@ function AdminProjectForm() {
           )}
         </div>
 
-        <EditKaryaSection redirectPath="/projects" />
+        {dataLoading && !existing ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
+              <p className="text-sm text-slate-400">Memuat karya...</p>
+            </div>
+          </div>
+        ) : existing ? (
+          <EditKaryaSection redirectPath="/projects" />
+        ) : (
+          <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-slate-900/60 px-6 py-14 text-center backdrop-blur-xl">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5">
+              <Inbox className="h-7 w-7 text-slate-500" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white">Karya Tidak Ditemukan</h2>
+              <p className="mx-auto mt-1.5 max-w-md text-sm leading-6 text-slate-400">
+                {dataError || "Karya dengan alamat ini tidak ditemukan atau sudah dihapus."}
+              </p>
+            </div>
+            <button
+              onClick={() => navigate("/projects")}
+              className="cursor-pointer rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25 transition hover:from-cyan-400 hover:to-blue-500"
+            >
+              Kembali ke Kelola Karya
+            </button>
+          </div>
+        )}
       </div>
 
       {actionSuccess && (
@@ -373,13 +427,13 @@ function AdminProjectForm() {
                   {actionSuccess.type === "approve" ? "Berhasil Disetujui!" : "Berhasil Ditolak"}
                 </h3>
                 <p className="mt-0.5 text-xs text-slate-400">{actionSuccess.message}</p>
-                <p className="mt-0.5 text-[11px] text-slate-500">Mengalihkan ke halaman projects...</p>
+                <p className="mt-0.5 text-[11px] text-slate-500">Mengalihkan ke halaman karya...</p>
               </div>
             </div>
           </div>
         </PopupToast>
       )}
-    </>
+    </div>
   )
 }
 

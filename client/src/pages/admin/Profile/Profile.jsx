@@ -5,8 +5,10 @@ import ProfileForm from "../../../components/sections/user/Profile/ProfileForm"
 export default function AdminProfile() {
   return (
     <AdminLayout>
-      <ProfileHero isAdmin />
-      <ProfileForm isAdmin />
+      <div className="user-page">
+        <ProfileHero isAdmin />
+        <ProfileForm isAdmin />
+      </div>
     </AdminLayout>
   )
 }

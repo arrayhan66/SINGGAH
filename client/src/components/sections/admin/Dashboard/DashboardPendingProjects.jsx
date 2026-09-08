@@ -1,25 +1,45 @@
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Clock, ArrowRight, Eye, Inbox } from "lucide-react"
-import { useProjects } from "../../../../context/ProjectContext"
+import api from "../../../../services/api"
 import { imageUrl } from "../../../../utils/imageUrl"
 import SmartImage from "../../../ui/SmartImage"
 
 function DashboardPendingProjects() {
   const navigate = useNavigate()
-  const { projects } = useProjects()
-  const pendingProjects = projects
-    .filter((p) => p.status === "pending")
-    .slice(0, 4)
+  const [pendingProjects, setPendingProjects] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let isMounted = true
+
+    api
+      .get("/dashboard")
+      .then((res) => {
+        const items = res.data?.data?.pendingProjects || []
+        if (isMounted) setPendingProjects(items.slice(0, 4))
+      })
+      .catch((err) => {
+        console.error("Failed to fetch pending projects:", err)
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5 shadow-xl backdrop-blur-xl md:p-6">
+    <div className="dashboard-pending-card dashboard-panel group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl transition-all duration-300 md:p-6">
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/15">
             <Clock className="h-4 w-4 text-amber-400" />
           </div>
           <h2 className="text-[14px] font-semibold text-white min-[500px]:text-[17px] md:text-[18px]">
-            <span className="hidden min-[500px]:inline">Project </span>Menunggu Review
+            <span className="hidden min-[500px]:inline">Karya </span>Menunggu Review
           </h2>
         </div>
 
@@ -32,11 +52,28 @@ function DashboardPendingProjects() {
         </button>
       </div>
 
-      {pendingProjects.length === 0 ? (
+      {loading ? (
+        <div className="mt-4 flex flex-col gap-3">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="flex flex-col gap-3 rounded-[14px] border border-white/10 bg-white/[0.04] p-3 sm:flex-row sm:items-center"
+              style={{ minHeight: 90 }}
+            >
+              <div className="aspect-video w-full shrink-0 animate-pulse rounded-lg bg-white/10 sm:h-[84px] sm:w-[150px]" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="h-4 w-2/3 animate-pulse rounded bg-white/10" />
+                <div className="h-3 w-1/3 animate-pulse rounded bg-white/10" />
+              </div>
+              <div className="h-7 w-28 shrink-0 animate-pulse rounded-md bg-white/10" />
+            </div>
+          ))}
+        </div>
+      ) : pendingProjects.length === 0 ? (
         <div className="mt-6 flex flex-col items-center gap-2 py-6 text-center">
           <Inbox className="h-8 w-8 text-slate-500" />
           <p className="text-sm text-slate-400">
-            Tidak ada project yang menunggu review.
+            Tidak ada karya yang menunggu review.
           </p>
         </div>
       ) : (
@@ -44,13 +81,13 @@ function DashboardPendingProjects() {
           {pendingProjects.map((project) => (
             <div
               key={project.id}
-              className="group flex flex-col gap-3 rounded-[14px] border border-white/10 bg-white/[0.04] p-3 transition-all duration-250 hover:-translate-y-[2px] hover:bg-white/[0.08] hover:border-white/20 hover:shadow-lg sm:flex-row sm:items-center"
+              className="dashboard-pending-item group flex flex-col gap-3 rounded-[14px] border border-white/10 bg-white/[0.04] p-3 transition-all duration-250 hover:-translate-y-[2px] hover:bg-white/[0.08] hover:border-white/20 hover:shadow-lg sm:flex-row sm:items-center"
               style={{ minHeight: 90 }}
             >
               <SmartImage
                 src={imageUrl(project.thumbnail)}
                 alt={project.title}
-                className="h-[72px] w-full shrink-0 rounded-lg object-cover sm:h-[72px] sm:w-[72px]"
+                className="aspect-video w-full shrink-0 rounded-lg border border-white/15 object-cover sm:h-[84px] sm:w-[150px]"
               />
               <div className="min-w-0 flex-1">
                 <p className="text-[15px] font-semibold text-white md:text-[17px]">
@@ -66,9 +103,9 @@ function DashboardPendingProjects() {
                 </span>
                 <button
                   onClick={() => navigate(`/projects/edit/${project.slug || project.id}`)}
-                  className="flex cursor-pointer items-center gap-1 rounded-md bg-cyan-500/15 px-2.5 py-1.5 text-[11px] font-medium text-cyan-400 transition-all duration-200 hover:bg-cyan-500/25 hover:text-cyan-300"
+                  className="dashboard-review-btn group/rev flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-95"
                 >
-                  <Eye size={13} />
+                  <Eye size={13} strokeWidth={2.5} className="transition-transform duration-300 group-hover/rev:-translate-x-0.5 group-hover/rev:scale-110" />
                   Review
                 </button>
               </div>

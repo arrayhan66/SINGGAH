@@ -83,14 +83,14 @@ function AdminProjectDetailSection() {
 
   function handleApprove(note) {
     approveProject(project.id, note)
-    showNotification("Project berhasil disetujui")
+    showNotification("Karya berhasil disetujui")
     setApproveModal(false)
     setProject((prev) => prev ? { ...prev, status: "published", approveNote: note } : prev)
   }
 
   function handleReject(reason) {
     rejectProject(project.id, reason)
-    showNotification("Project ditolak", "error")
+    showNotification("Karya ditolak", "error")
     setRejectModal(false)
     setProject((prev) => prev ? { ...prev, status: "rejected", rejection_reason: reason } : prev)
   }
@@ -102,7 +102,7 @@ function AdminProjectDetailSection() {
       await deleteProject(project.id)
       setDeleteLoading(false)
       setDeleteSuccess(true)
-      showNotification("Project berhasil dihapus")
+      showNotification("Karya berhasil dihapus")
       setTimeout(() => navigate("/projects"), 1200)
     } catch {
       setDeleteLoading(false)
@@ -137,12 +137,12 @@ function AdminProjectDetailSection() {
   if (!project) {
     return (
       <section className="relative overflow-hidden bg-brand-dark py-32 text-center">
-        <p className="text-slate-300">Project tidak ditemukan.</p>
+        <p className="text-slate-300">Karya tidak ditemukan.</p>
         <button
           onClick={() => navigate("/projects")}
           className="mt-6 cursor-pointer rounded-xl border border-slate-200 bg-white px-5 py-3 text-slate-700 transition hover:bg-slate-50"
         >
-          Kembali ke Projects
+          Kembali ke Karya
         </button>
       </section>
     )
@@ -184,7 +184,7 @@ function AdminProjectDetailSection() {
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 transition-colors duration-300 group-hover:bg-cyan-400/20">
             <ArrowLeft size={14} className="transition-transform duration-300 group-hover:-translate-x-0.5" />
           </span>
-          Kembali ke Projects
+          Kembali ke Karya
         </button>
 
         {/* Admin Status Banner */}
@@ -356,9 +356,9 @@ function AdminProjectDetailSection() {
 
       {deleteModal && (
         <DeleteConfirmModal
-          title="Hapus project ini?"
-          message={`Project "${project.title}" akan dihapus permanen bersama semua data terkait dan tidak bisa dikembalikan.`}
-          confirmLabel="Ya, Hapus Project"
+          title="Hapus karya ini?"
+          message={`Karya "${project.title}" akan dihapus permanen bersama semua data terkait dan tidak bisa dikembalikan.`}
+          confirmLabel="Ya, Hapus Karya"
           onConfirm={handleDelete}
           onCancel={() => {
             setDeleteModal(false)

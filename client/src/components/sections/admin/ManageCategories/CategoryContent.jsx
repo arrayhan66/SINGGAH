@@ -52,7 +52,7 @@ export default function CategoryContent({
                 <tr className="border-b border-white/5 bg-white/[0.03]">
                   <th className="px-4 py-3.5 font-medium text-slate-400">Kategori</th>
                   <th className="px-4 py-3.5 font-medium text-slate-400">Deskripsi</th>
-                  <th className="px-4 py-3.5 font-medium text-slate-400">Project</th>
+                  <th className="px-4 py-3.5 font-medium text-slate-400">Karya</th>
                   <th className="px-4 py-3.5 font-medium text-slate-400 text-right">Aksi</th>
                 </tr>
               </thead>

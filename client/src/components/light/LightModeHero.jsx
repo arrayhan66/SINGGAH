@@ -26,17 +26,17 @@ const faq = [
   {
     question: "Bagaimana cara mengikuti pameran ini?",
     answer:
-      "Gampang! Cukup daftar dan unggah project kamu lewat halaman registrasi. Tim kami akan meninjau karyamu sebentar, lalu project langsung tayang di Virtual Hall dan siap dilihat pengunjung dari mana saja.",
+      "Gampang! Cukup daftar dan unggah karya kamu lewat halaman registrasi. Tim kami akan meninjau karyamu sebentar, lalu karya langsung tayang di Virtual Hall dan siap dilihat pengunjung dari mana saja.",
   },
   {
-    question: "Apakah masyarakat umum bisa melihat project yang dipamerkan?",
+    question: "Apakah masyarakat umum bisa melihat karya yang dipamerkan?",
     answer:
-      "Bisa banget. Semua project yang sudah tayang terbuka untuk siapa saja — mahasiswa, dosen, atau masyarakat umum — tanpa perlu login atau daftar akun dulu.",
+      "Bisa banget. Semua karya yang sudah tayang terbuka untuk siapa saja — mahasiswa, dosen, atau masyarakat umum — tanpa perlu login atau daftar akun dulu.",
   },
   {
-    question: "Apakah project yang dipamerkan bisa diunduh?",
+    question: "Apakah karya yang dipamerkan bisa diunduh?",
     answer:
-      "Tergantung pemiliknya. Beberapa project menyediakan source code atau dokumentasi lengkap untuk diunduh, sementara yang lain hanya menampilkan demo atau preview saja.",
+      "Tergantung pemiliknya. Beberapa karya menyediakan source code atau dokumentasi lengkap untuk diunduh, sementara yang lain hanya menampilkan demo atau preview saja.",
   },
 ];
 

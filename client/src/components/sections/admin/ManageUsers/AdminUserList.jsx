@@ -150,7 +150,7 @@ function AdminUserList({ search, statusFilter }) {
                       <th className="px-4 py-3.5 font-medium text-slate-400">User</th>
                       <th className="px-4 py-3.5 font-medium text-slate-400">Tipe</th>
                       <th className="px-4 py-3.5 font-medium text-slate-400">Status</th>
-                      <th className="px-4 py-3.5 font-medium text-slate-400">Project</th>
+                      <th className="px-4 py-3.5 font-medium text-slate-400">Karya</th>
                       <th className="px-4 py-3.5 font-medium text-slate-400 text-right">Aksi</th>
                     </tr>
                   </thead>

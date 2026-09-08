@@ -7,7 +7,7 @@ export default function ReportsContent({ monthlyData, summary, viewYear }) {
     <div className="px-4 pb-12 md:px-6 lg:px-8 md:pb-16">
       <div className="mt-6 grid grid-cols-1 gap-6 md:mt-8 lg:grid-cols-2">
         <MonthlyBarChart
-          title="Project per Bulan"
+          title="Karya per Bulan"
           subtitle={`Tahun ${viewYear}`}
           data={monthlyData}
           valueKey="projects"
@@ -45,7 +45,7 @@ export default function ReportsContent({ monthlyData, summary, viewYear }) {
         <div className="grid grid-cols-1 gap-3 min-[600px]:grid-cols-2 min-[1500px]:grid-cols-4">
           <SummaryCard
             icon={FolderKanban}
-            label="Rata-rata Project/Bulan"
+            label="Rata-rata Karya/Bulan"
             value={summary.avgProjects.toFixed(1)}
             color="cyan"
           />
@@ -67,7 +67,7 @@ export default function ReportsContent({ monthlyData, summary, viewYear }) {
           />
           <SummaryCard
             icon={Sparkles}
-            label="Proyek Baru (Bulan Ini)"
+            label="Karya Baru (Bulan Ini)"
             value={summary.newProjectsThisMonth}
             color="amber"
           />

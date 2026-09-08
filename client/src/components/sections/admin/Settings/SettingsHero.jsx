@@ -20,12 +20,12 @@ export default function SettingsHero({
     <AdminHeroBackground fullWidth>
       <div className="px-4 min-[260px]:px-3 pt-5 min-[260px]:pt-5 md:px-6 md:pt-6">
         <div className="flex flex-col items-center text-center sm:flex-row sm:text-left gap-[clamp(0.75rem,0.5rem+1vw,1rem)]">
-          <div className="flex h-[clamp(2.75rem,2.25rem+2vw,3.5rem)] w-[clamp(2.75rem,2.25rem+2vw,3.5rem)] shrink-0 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10 sm:h-16 sm:w-16">
-            <Settings2 className="h-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] w-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] text-cyan-300 sm:h-8 sm:w-8" />
+          <div className="dashboard-hero-icon flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 sm:h-16 sm:w-16">
+            <Settings2 className="h-7 w-7 text-cyan-300 sm:h-8 sm:w-8" />
           </div>
           <div className="min-w-0">
             <h1 className="text-[clamp(1.25rem,0.9375rem+1.5vw,1.5rem)] sm:text-3xl font-black text-white">
-              Pengaturan <span className="text-slate-100">Website</span>
+              Pengaturan <span className="text-cyan-300">Website</span>
             </h1>
             <p className="mt-1 max-w-xl text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400">
               Kelola konfigurasi, identitas visual, dan sistem platform SINGGAH

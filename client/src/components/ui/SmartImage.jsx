@@ -1,5 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { imageUrl, FALLBACK_IMAGE } from "../../utils/imageUrl";
+
+function isCached(url) {
+  if (typeof globalThis.Image === "undefined" || !url) return false;
+  const probe = new Image();
+  probe.src = url;
+  return probe.complete && probe.naturalWidth > 0;
+}
 
 function SmartImage({
   src,
@@ -13,10 +20,16 @@ function SmartImage({
   style,
   ...rest
 }) {
-  const [ready, setReady] = useState(false);
+  const initialSrc = imageUrl(src);
+  const [ready, setReady] = useState(() => isCached(initialSrc));
   const [failed, setFailed] = useState(false);
 
-  const finalSrc = fallback && failed ? FALLBACK_IMAGE : imageUrl(src);
+  useEffect(() => {
+    setReady(isCached(initialSrc));
+    setFailed(false);
+  }, [initialSrc]);
+
+  const finalSrc = fallback && failed ? FALLBACK_IMAGE : initialSrc;
 
   return (
     <img

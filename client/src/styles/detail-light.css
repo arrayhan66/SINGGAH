@@ -5,6 +5,25 @@
    ============================================================ */
 @import "./light-shared.css";
 
+/* ===== CHIP KATEGORI (kartu karya di halaman detail/list) =====
+   Light: gradasi cyan -> biru + teks putih + ikon lembut, konsisten
+   dengan badge kategori header. Dark: gelap pekat + border cyan terang + glow. */
+html.light .karya-detail-page .category-chip {
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-color: #2563eb;
+  border-color: rgba(255, 255, 255, 0.55);
+  color: #ffffff;
+  box-shadow: 0 4px 14px -4px rgba(37, 99, 235, 0.45);
+}
+html.light .karya-detail-page .category-chip .category-chip-icon {
+  color: #e0f2fe;
+}
+html:not(.light) .karya-detail-page .category-chip {
+  background-color: rgba(2, 17, 31, 0.85);
+  border-color: rgba(103, 232, 249, 0.55);
+  box-shadow: 0 0 14px -4px rgba(34, 211, 238, 0.45);
+}
+
 /* ===== MENTION @user DI KOMENTAR ===== */
 /* Light mode: accent cyan jadi #2563eb (terlalu biru/nyala utk teks
    mention). Diredam ke biru kalem agar tidak menonjol/terlihat besar. */

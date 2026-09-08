@@ -191,7 +191,7 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
             onClick={() => navigate(redirectPath)}
             className="cursor-pointer rounded-xl bg-cyan-500 px-5 py-2.5 text-sm font-semibold text-white"
           >
-            {redirectPath === "/my-karya" ? "Kembali ke My Karya" : "Kembali ke Kelola Project"}
+            {redirectPath === "/my-karya" ? "Kembali ke My Karya" : "Kembali ke Kelola Karya"}
           </button>
         </div>
       </section>

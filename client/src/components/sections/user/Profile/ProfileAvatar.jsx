@@ -32,19 +32,19 @@ function ProfileAvatar({ value, existingUrl, onChange, onRemove }) {
         Foto Profil
       </h2>
       <p className="mt-1 text-xs md:text-sm text-slate-400">
-        Foto ini akan tampil di Navbar dan project yang kamu upload.
+        Foto ini akan tampil di Navbar dan karya yang kamu upload.
       </p>
 
       <div className="mt-4 flex items-center gap-5">
         <div className="relative">
-          <UserAvatar
-            name={user?.name}
-            avatar={displayUrl}
-            imgSizeClass="h-20 w-20 md:h-24 md:w-24 border border-white/10"
-            fallbackSizeClass="h-20 w-20 md:h-24 md:w-24"
-            fallbackClass="bg-gradient-to-br from-cyan-500 to-blue-700 font-bold text-white border border-white/10"
-            textClass="text-2xl md:text-3xl"
-          />
+            <UserAvatar
+              name={user?.name}
+              avatar={displayUrl}
+              imgSizeClass="h-20 w-20 aspect-square shrink-0 md:h-24 md:w-24 border border-white/10"
+              fallbackSizeClass="h-20 w-20 aspect-square shrink-0 md:h-24 md:w-24"
+              fallbackClass="bg-gradient-to-br from-cyan-500 to-blue-700 font-bold text-white border border-white/10"
+              textClass="text-2xl md:text-3xl"
+            />
 
           <button
             type="button"

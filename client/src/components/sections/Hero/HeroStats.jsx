@@ -29,7 +29,7 @@ function HeroStats({ variant = "card" }) {
   }, []);
 
   const statsData = [
-    { icon: Layers, value: stats.projectsCount, label: "Proyek" },
+    { icon: Layers, value: stats.projectsCount, label: "Karya" },
     { icon: Grid3x3, value: stats.categoriesCount, label: "Kategori" },
     { icon: Users, value: stats.visitorsCount, label: "Pengunjung" },
   ];

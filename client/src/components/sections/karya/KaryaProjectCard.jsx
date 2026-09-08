@@ -8,12 +8,32 @@ import {
   Eye,
   MessageSquare,
   Bookmark,
+  Globe,
+  Smartphone,
+  Cpu,
+  Brain,
+  Database,
+  ShieldCheck,
+  Layout,
+  Gamepad2,
+  Layers,
 } from "lucide-react";
 import GlassCard from "../../ui/GlassCard";
 import { useAuth } from "../../../context/AuthContext";
 import { imageUrl } from "../../../utils/imageUrl";
 import SmartImage from "../../ui/SmartImage";
 import api from "../../../services/api";
+
+const CATEGORY_ICON_MAP = {
+  website: Globe,
+  "mobile-app": Smartphone,
+  iot: Cpu,
+  "artificial-intelligence": Brain,
+  "data-science": Database,
+  "cyber-security": ShieldCheck,
+  "ui-ux-design": Layout,
+  "game-development": Gamepad2,
+};
 
 function KaryaProjectCard({ project }) {
   const navigate = useNavigate();
@@ -101,7 +121,11 @@ function KaryaProjectCard({ project }) {
         <div className="absolute inset-0 bg-gradient-to-t from-brand-navy via-transparent to-transparent" />
 
         {Category && (
-          <span className="absolute left-3 top-3 z-10 rounded-full border border-cyan-400/30 bg-brand-navy/80 px-2 py-0.5 text-[10px] font-medium text-cyan-300 backdrop-blur-sm sm:left-4 sm:top-4 sm:px-3 sm:py-1 sm:text-xs md:left-5 md:top-5 md:px-4 md:py-1.5 md:text-sm 3xl:text-sm 4xl:px-5 4xl:py-2 4xl:text-base">
+          <span className="category-chip absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full border-2 border-cyan-400/40 bg-brand-navy/80 px-2.5 py-1 text-[10px] font-semibold text-cyan-300 backdrop-blur-sm sm:left-4 sm:top-4 sm:gap-2 sm:px-3 sm:py-1 sm:text-xs md:left-5 md:top-5 md:px-4 md:py-1.5 md:text-sm 3xl:text-sm 4xl:px-5 4xl:py-2 4xl:text-base">
+            {(() => {
+              const CategoryIcon = CATEGORY_ICON_MAP[Category.slug] || Layers;
+              return <CategoryIcon className="category-chip-icon h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 3xl:h-4 3xl:w-4" strokeWidth={2.5} />;
+            })()}
             {Category.name}
           </span>
         )}

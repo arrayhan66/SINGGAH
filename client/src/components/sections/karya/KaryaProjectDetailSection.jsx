@@ -34,12 +34,15 @@ function KaryaProjectDetailSection() {
   const [showShareModal, setShowShareModal] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
 
+  const logFetchError = (err) => {
+    if (err?.response?.status === 404) return
+    console.error(err)
+  }
+
   useEffect(() => {
     api.post(`/projects/${projectSlug}/view`)
       .then(() => {})
-      .catch((err) => {
-        console.error("Failed to record view:", err)
-      })
+      .catch(logFetchError)
 
     api.get(`/projects/${projectSlug}`)
       .then((res) => {
@@ -49,18 +52,14 @@ function KaryaProjectDetailSection() {
         setIsLiked(Boolean(p.liked))
         setIsBookmarked(Boolean(p.bookmarked))
       })
-      .catch((err) => {
-        console.error("Failed to fetch project detail:", err)
-      })
+      .catch(logFetchError)
       .finally(() => setLoading(false))
 
     api.get(`/projects/${projectSlug}/comments`)
       .then((res) => {
         setComments(Array.isArray(res.data.data) ? res.data.data : [])
       })
-      .catch((err) => {
-        console.error("Failed to fetch comments:", err)
-      })
+      .catch(logFetchError)
   }, [projectSlug])
 
   if (loading) {
@@ -79,7 +78,7 @@ function KaryaProjectDetailSection() {
   if (!project) {
     return (
       <section className="relative overflow-hidden bg-brand-dark py-32 text-center">
-        <p className="text-slate-300">Project tidak ditemukan.</p>
+        <p className="text-slate-300">Karya tidak ditemukan.</p>
         <button
           onClick={() => navigate("/karya")}
           className="mt-6 cursor-pointer rounded-xl border border-slate-200 bg-white px-5 py-3 text-slate-700 transition hover:bg-slate-50"

@@ -15,7 +15,7 @@ function UserAvatar({
   name,
   avatar,
   className = "",
-  imgClass = "object-cover",
+  imgClass = "",
   imgSizeClass = "h-10 w-10",
   fallbackClass = "bg-gradient-to-br from-cyan-400 to-blue-600 font-bold text-white",
   fallbackSizeClass = "h-10 w-10",
@@ -33,11 +33,11 @@ function UserAvatar({
           eager
           fallback={false}
           onError={() => setImgFailed(true)}
-          className={`${imgSizeClass} rounded-full ${imgClass}`}
+          className={`${imgSizeClass} aspect-square shrink-0 object-cover rounded-full ${imgClass}`}
         />
       ) : (
         <div
-          className={`flex items-center justify-center rounded-full ${fallbackSizeClass} ${fallbackClass} ${textClass}`}
+          className={`flex items-center justify-center aspect-square shrink-0 rounded-full ${fallbackSizeClass} ${fallbackClass} ${textClass}`}
         >
           {getInitials(name)}
         </div>

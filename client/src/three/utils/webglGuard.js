@@ -7,6 +7,25 @@ export function attachWebGLContextGuard(gl, onRestore) {
   const el = gl && gl.domElement
   if (!el) return () => {}
 
+  let remountTimer = null
+  let lastRemountAt = 0
+  const REMOUNT_GAP = 1500
+
+  const scheduleRemount = () => {
+    if (Date.now() - lastRemountAt < REMOUNT_GAP) return
+    if (document.visibilityState !== "visible") return
+    if (!el.isConnected) return
+    lastRemountAt = Date.now()
+    window.clearTimeout(remountTimer)
+    remountTimer = window.setTimeout(() => {
+      try {
+        if (typeof onRestore === "function") onRestore()
+      } catch {
+        // abaikan error pada saat remount
+      }
+    }, 250)
+  }
+
   const onLost = (event) => {
     event.preventDefault()
     try {
@@ -16,13 +35,7 @@ export function attachWebGLContextGuard(gl, onRestore) {
     }
   }
 
-  const onRestored = () => {
-    try {
-      if (typeof onRestore === "function") onRestore()
-    } catch {
-      // abaikan error pada saat remount
-    }
-  }
+  const onRestored = () => scheduleRemount()
 
   el.addEventListener("webglcontextlost", onLost, false)
   el.addEventListener("webglcontextrestored", onRestored, false)
@@ -30,5 +43,6 @@ export function attachWebGLContextGuard(gl, onRestore) {
   return () => {
     el.removeEventListener("webglcontextlost", onLost)
     el.removeEventListener("webglcontextrestored", onRestored)
+    window.clearTimeout(remountTimer)
   }
 }

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react"
 import api from "../services/api"
+import { useAuth } from "./AuthContext"
 
 const ProjectContext = createContext(null)
 
@@ -7,10 +8,16 @@ export function ProjectProvider({ children }) {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
 
+  const { user, isLoading: authLoading } = useAuth()
+  const isAuthed = Boolean(user)
+
   const fetchProjects = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await api.get("/projects")
+      // limit besar agar list & angka filter admin (Semua/Menunggu/
+      // Disetujui/Ditolak + per kategori) mencakup seluruh karya,
+      // bukan hanya 10 terbaru bawaan API.
+      const res = await api.get("/projects", { params: { limit: 500 } })
       const items = res.data.data.items || res.data.data || []
       setProjects(items)
     } catch (err) {
@@ -21,9 +28,12 @@ export function ProjectProvider({ children }) {
     }
   }, [])
 
+  // Fetch baru setiap status login berubah (guest->member/admin, login/logout)
+  // supaya data & hitungan filter tidak basi. Menunggu auth selesai dulu.
   useEffect(() => {
+    if (authLoading) return
     fetchProjects()
-  }, [fetchProjects])
+  }, [fetchProjects, authLoading, isAuthed])
 
   const addProject = useCallback(async (formData) => {
     try {

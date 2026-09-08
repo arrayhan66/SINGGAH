@@ -28,6 +28,7 @@ function GoogleLogo({ className = "h-5 w-5" }) {
 }
 
 let gsiPromise = null;
+let initializedClientId = null;
 
 function loadGsi() {
   if (window.google?.accounts?.id) return Promise.resolve(window.google);
@@ -53,7 +54,6 @@ export default function GoogleLogin({ onError, label = "Lanjutkan dengan Google"
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const cbRef = useRef(null);
-  const initializedRef = useRef(null);
 
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -101,13 +101,13 @@ export default function GoogleLogin({ onError, label = "Lanjutkan dengan Google"
 
         // initialize hanya SEKALI per clientId; callback memakai ref terbaru
         // supaya tidak ada peringatan "initialize() called multiple times".
-        if (initializedRef.current !== clientId) {
+        if (initializedClientId !== clientId) {
           accounts.initialize({
             client_id: clientId,
             callback: (response) => cbRef.current(response),
             auto_select: false,
           });
-          initializedRef.current = clientId;
+          initializedClientId = clientId;
         }
       })
       .catch(() => {

@@ -404,6 +404,13 @@ html.light .user-page section h2 span.text-cyan-300 {
   background-clip: text;
   color: transparent;
 }
+/* ===== HERO "KARYA SAYA": teks jadi gelap di light mode ===== */
+html.light .user-page .hero h2 {
+  color: #0f172a;
+}
+html.light .user-page .hero p {
+  color: #475569;
+}
 html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl span.rounded-full {
   background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
   border-color: transparent;

@@ -90,7 +90,7 @@ function AuthBranding({ backTo = "/" }) {
               </div>
               <div>
                 <h4 className="text-xs font-bold text-slate-800">
-                  Smart Project
+                  Smart Karya
                 </h4>
                 <p className="text-[10px] text-slate-500">
                   Manajemen terstruktur

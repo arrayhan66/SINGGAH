@@ -56,7 +56,7 @@ function ProfileStats() {
         Statistik Saya
       </h2>
       <p className="mt-1 text-xs md:text-sm text-slate-400">
-        Ringkasan project yang telah kamu upload.
+        Ringkasan karya yang telah kamu upload.
       </p>
 
       <div className="mt-5 grid grid-cols-1 gap-3 min-[520px]:grid-cols-3">

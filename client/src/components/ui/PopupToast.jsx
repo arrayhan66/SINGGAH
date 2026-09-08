@@ -85,11 +85,18 @@ function PopupToast({
 
   return (
     <div
-      className={`pointer-events-none fixed inset-0 z-[100] flex p-4 pt-12 sm:p-6 ${wrapperClass}`}
+      onClick={(e) => {
+        if (isCentered && e.target === e.currentTarget) handleClose()
+      }}
+      className={`fixed inset-0 z-[100] flex p-4 pt-12 sm:p-6 ${wrapperClass} ${
+        isCentered ? "pointer-events-auto cursor-pointer" : "pointer-events-none"
+      }`}
     >
       <div
         className={`pointer-events-auto w-full ${
-          isCentered ? "max-w-lg" : "max-w-sm sm:max-w-md"
+          isCentered
+            ? "max-w-2xl sm:max-w-3xl 5xl:max-w-[1400px] 6xl:max-w-[1600px]"
+            : "max-w-sm sm:max-w-md"
         }`}
       >
         <div

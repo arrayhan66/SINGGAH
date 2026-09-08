@@ -117,7 +117,7 @@ function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onCl
             ref={closeButtonRef}
             type="button"
             onClick={handleClose}
-            aria-label="Tutup detail project"
+            aria-label="Tutup detail karya"
             className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
           >
             <X size={16} />
@@ -240,9 +240,9 @@ function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onCl
                       <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-semibold text-emerald-400">Project Disetujui</h4>
+                      <h4 className="text-xs font-semibold text-emerald-400">Karya Disetujui</h4>
                       <p className="mt-1 text-sm leading-relaxed text-emerald-200/80">
-                        {project.approveNote || "Project ini sudah disetujui dan ditampilkan di halaman Karya."}
+                        {project.approveNote || "Karya ini sudah disetujui dan ditampilkan di halaman Karya."}
                       </p>
                     </div>
                   </div>
@@ -270,7 +270,7 @@ function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onCl
               <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
                 <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
                   <FileText className="h-3.5 w-3.5" />
-                  Detail Project
+                  Detail Karya
                 </h4>
                 <dl className="mt-3 flex flex-col gap-3">
                   <div className="flex items-center justify-between gap-3">
@@ -325,7 +325,7 @@ function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onCl
                     </button>
                   </div>
                   <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
-                    Project akan langsung tampil di halaman Karya setelah disetujui.
+                    Karya akan langsung tampil di halaman Karya setelah disetujui.
                   </p>
                 </div>
               ) : (
@@ -355,7 +355,7 @@ function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onCl
             className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-2.5 text-sm font-medium text-cyan-300 transition hover:bg-cyan-400/20"
           >
             <Pencil size={15} />
-            Edit Project
+            Edit Karya
           </button>
           <button
             type="button"
@@ -363,7 +363,7 @@ function AdminProjectsDetailModal({ project, onApproveClick, onRejectClick, onCl
             className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-400 transition hover:bg-red-500/20"
           >
             <Trash2 size={15} />
-            Hapus Project
+            Hapus Karya
           </button>
           <div className="flex-1" />
           <button

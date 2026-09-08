@@ -82,7 +82,7 @@ function DashboardActivityFeed() {
   const visibleActivities = activities.slice(0, 5)
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5 shadow-xl backdrop-blur-xl md:p-6">
+    <div className="dashboard-activity-card dashboard-panel group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl transition-all duration-300 md:p-6">
       <div className="mb-4 flex items-center gap-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-500/15">
           <Activity className="h-4 w-4 text-slate-400" />
@@ -114,7 +114,7 @@ function DashboardActivityFeed() {
             const config = actionConfig[item.action] || DEFAULT_ACTION
             const Icon = config.icon
             return (
-              <div key={item.id} className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-3 transition-all hover:bg-white/[0.08]">
+              <div key={item.id} className="dashboard-activity-item flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-3 transition-all hover:bg-white/[0.08]">
                 <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${config.bg}`}>
                   <Icon size={16} className={config.color} />
                 </div>

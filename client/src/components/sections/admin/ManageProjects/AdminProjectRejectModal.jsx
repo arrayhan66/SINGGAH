@@ -34,9 +34,9 @@ function AdminProjectRejectModal({ project, onConfirm, onCancel }) {
             <XCircle className="h-4.5 w-4.5 text-red-400" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="pt-1 text-sm font-semibold text-white">Tolak Project?</h3>
+            <h3 className="pt-1 text-sm font-semibold text-white">Tolak Karya?</h3>
             <p className="mt-0.5 text-xs text-slate-400 min-w-0 break-words">
-              Project <span className="font-medium text-slate-200">"{project.title}"</span> akan ditolak.
+              Karya <span className="font-medium text-slate-200">"{project.title}"</span> akan ditolak.
             </p>
           </div>
         </div>

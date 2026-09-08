@@ -174,9 +174,9 @@ function AdminUserProfileCard({ user, onEdit, onDelete }) {
               <div className="flex items-center gap-3 rounded-xl border border-white/[0.04] bg-white/[0.03] px-4 py-3">
                 <FolderKanban className="h-4 w-4 shrink-0 text-slate-400" />
                 <div className="min-w-0">
-                  <p className="text-[11px] text-slate-500">Project</p>
+                  <p className="text-[11px] text-slate-500">Karya</p>
                   <p className="text-sm text-slate-200">
-                    {user.projectCount ?? 0} project
+                    {user.projectCount ?? 0} karya
                   </p>
                 </div>
               </div>

@@ -7,11 +7,18 @@ const darkVignette =
 const lightVignette =
   "radial-gradient(circle at top center, transparent 0%, rgba(37,99,235,0.05) 50%, rgba(30,64,120,0.16) 100%)"
 
-function UploadHero() {
+function UploadHero({
+  headingLabel = "Upload",
+  headingAccent = "Karya",
+  subtitle = "Bagikan karya terbaikmu dan jadilah bagian dari galeri SINGGAH. Karya akan melalui proses tinjauan admin dahulu sebelum hadir di Hall.",
+  ptClass = "pt-[calc(var(--navbar-h)+24px)] sm:pt-[calc(var(--navbar-h)+32px)]",
+}) {
   const { theme } = useTheme()
 
   return (
-    <section className="hero relative overflow-hidden bg-brand-dark px-4 pt-[calc(var(--navbar-h)+24px)] pb-10 sm:px-6 sm:pt-[calc(var(--navbar-h)+32px)] sm:pb-16 md:px-8 lg:px-12 2xl:px-16 2xl:pb-20 3xl:px-20 3xl:pb-24 4xl:px-24 4xl:pb-28">
+    <section
+      className={`hero relative overflow-hidden bg-brand-dark px-4 ${ptClass} pb-10 sm:px-6 sm:pb-16 md:px-8 lg:px-12 2xl:px-16 2xl:pb-20 3xl:px-20 3xl:pb-24 4xl:px-24 4xl:pb-28`}
+    >
       <GlowBackground />
 
       <div
@@ -25,13 +32,11 @@ function UploadHero() {
         </div>
 
         <h1 className="mt-2 sm:mt-3 md:mt-4 lg:mt-5 2xl:mt-6 3xl:mt-7 4xl:mt-8 text-2xl min-[280px]:text-4xl sm:text-4xl lg:text-5xl 2xl:text-6xl 3xl:text-7xl 4xl:text-8xl font-black text-white">
-          Upload <span className="text-cyan-300">Karya</span>
+          {headingLabel} <span className="text-cyan-300">{headingAccent}</span>
         </h1>
 
         <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8 2xl:mt-8 2xl:max-w-4xl 2xl:text-xl 2xl:leading-9 3xl:mt-10 3xl:max-w-5xl 3xl:text-2xl 3xl:leading-10 4xl:mt-12 4xl:max-w-6xl 4xl:text-3xl 4xl:leading-11">
-          Bagikan karya terbaikmu dan jadilah bagian dari galeri SINGGAH.
-          Karya akan melalui proses tinjauan admin dahulu sebelum hadir
-          di Hall.
+          {subtitle}
         </p>
       </div>
     </section>

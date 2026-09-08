@@ -139,8 +139,8 @@ function AdminUserHero({ search, onSearchChange, statusFilter, onStatusChange })
         <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-6 backdrop-blur-xl md:p-8">
           <div className="flex flex-col items-center text-center sm:flex-row sm:text-left gap-[clamp(0.75rem,0.5rem+1vw,1rem)]">
             <div className="relative">
-              <div className="flex h-[clamp(2.75rem,2.25rem+2vw,3.5rem)] w-[clamp(2.75rem,2.25rem+2vw,3.5rem)] items-center justify-center rounded-xl bg-cyan-400/10 border border-cyan-400/30">
-                <Users className="h-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] w-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] text-cyan-300" />
+              <div className="dashboard-hero-icon flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 sm:h-16 sm:w-16">
+                <Users className="h-7 w-7 text-cyan-300 sm:h-8 sm:w-8" />
               </div>
               <div className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-cyan-500 text-[10px] font-bold text-white shadow-md">
                 {stats.total}
@@ -148,7 +148,7 @@ function AdminUserHero({ search, onSearchChange, statusFilter, onStatusChange })
             </div>
             <div className="min-w-0">
               <h1 className="text-[clamp(1.25rem,0.9375rem+1.5vw,1.5rem)] sm:text-3xl font-black text-white">
-                Kelola <span className="text-slate-100">User</span>
+                Kelola <span className="text-cyan-300">User</span>
               </h1>
               <p className="mt-1 text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400 max-w-xl">
                 Tambah, edit, hapus, dan kelola seluruh pengguna SINGGAH.

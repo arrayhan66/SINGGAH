@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { UploadCloud } from "lucide-react"
+import { Image, Info, Layers, ImagePlus, FileText, Eye, Send } from "lucide-react"
 import AdminLayout from "../../../../layouts/AdminLayout"
-import AdminHeroBackground from "../../../ui/AdminHeroBackground"
+import UploadHero from "../../user/Upload/UploadHero"
+import GlowBackground from "../../../ui/GlowBackground"
+import DustBackground from "../../../ui/DustBackground"
 import UploadThumbnail from "../../user/Upload/UploadThumbnail"
 import UploadInformation from "../../user/Upload/UploadInformation"
 import UploadTechnology from "../../user/Upload/UploadTechnology"
@@ -14,13 +16,13 @@ import { useProjects } from "../../../../context/ProjectContext"
 import api from "../../../../services/api"
 
 const steps = [
-  { icon: UploadCloud, label: "Thumbnail" },
-  { icon: UploadCloud, label: "Informasi" },
-  { icon: UploadCloud, label: "Teknologi" },
-  { icon: UploadCloud, label: "Galeri" },
-  { icon: UploadCloud, label: "Dokumen" },
-  { icon: UploadCloud, label: "Preview" },
-  { icon: UploadCloud, label: "Submit" },
+  { icon: Image, label: "Thumbnail" },
+  { icon: Info, label: "Informasi" },
+  { icon: Layers, label: "Teknologi" },
+  { icon: ImagePlus, label: "Galeri" },
+  { icon: FileText, label: "Dokumen" },
+  { icon: Eye, label: "Preview" },
+  { icon: Send, label: "Submit" },
 ]
 
 function StepDivider({ step, currentIndex }) {
@@ -131,7 +133,7 @@ function AdminAddProjectView() {
       navigate("/projects")
     } catch (err) {
       const msg =
-        err.response?.data?.message || "Gagal menambahkan project. Coba lagi."
+        err.response?.data?.message || "Gagal menambahkan karya. Coba lagi."
       setError(msg)
     } finally {
       setSubmitting(false)
@@ -140,72 +142,62 @@ function AdminAddProjectView() {
 
   return (
     <AdminLayout>
-      <AdminHeroBackground fullWidth>
-        <div className="pt-8 pb-10 sm:pt-10 sm:pb-16 2xl:pt-12 2xl:pb-20 3xl:pb-24 4xl:pb-28">
-          <div className="mx-auto flex max-w-5xl flex-col items-center text-center">
-          <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 sm:h-16 sm:w-16 md:h-20 md:w-20 lg:h-24 lg:w-24 3xl:h-28 3xl:w-28 4xl:h-32 4xl:w-32">
-            <UploadCloud className="h-8 w-8 text-cyan-300 sm:h-9 sm:w-9 md:h-10 md:w-10 lg:h-12 lg:w-12 3xl:h-14 3xl:w-14 4xl:h-16 4xl:w-16" />
+      <div className="user-page">
+        <UploadHero
+          headingLabel="Tambah"
+          subtitle="Tambahkan karya mahasiswa ke SINGGAH. Karya akan langsung dipublikasikan ke Hall."
+          ptClass="pt-6 sm:pt-8 2xl:pt-10"
+        />
+
+        <section className="relative overflow-hidden bg-brand-dark px-4 py-10 sm:py-12 md:px-8 lg:px-12 2xl:px-16 3xl:px-20 4xl:px-24">
+          <GlowBackground />
+          <DustBackground />
+
+          <div className="relative z-10 mx-auto flex max-w-5xl flex-col gap-6 sm:gap-8 2xl:gap-10 3xl:gap-12 4xl:gap-14">
+            <StepDivider step={steps[0]} currentIndex={0} />
+            <UploadThumbnail
+              value={formData.thumbnail}
+              onChange={(file) => updateField("thumbnail", file)}
+            />
+
+            <StepDivider step={steps[1]} currentIndex={1} />
+            <UploadInformation
+              formData={formData}
+              updateField={updateField}
+            />
+
+            <StepDivider step={steps[2]} currentIndex={2} />
+            <UploadTechnology
+              value={formData.technologies}
+              onChange={(tags) => updateField("technologies", tags)}
+            />
+
+            <StepDivider step={steps[3]} currentIndex={3} />
+            <UploadGallery
+              value={formData.images}
+              onChange={(files) => updateField("images", files)}
+            />
+
+            <StepDivider step={steps[4]} currentIndex={4} />
+            <UploadDocuments
+              value={formData.documents}
+              onChange={(files) => updateField("documents", files)}
+            />
+
+            <StepDivider step={steps[5]} currentIndex={5} />
+            <UploadPreview formData={formData} />
+
+            <StepDivider step={steps[6]} currentIndex={6} />
+            <UploadAction
+              formData={formData}
+              onSubmit={handleSubmit}
+              submitting={submitting}
+              apiError={error}
+              submitLabel="Publikasikan"
+            />
           </div>
-
-          <h1 className="mt-2 sm:mt-3 md:mt-4 lg:mt-5 2xl:mt-6 3xl:mt-7 4xl:mt-8 text-[clamp(1.5rem,1rem+2vw,2.25rem)] sm:text-4xl lg:text-5xl 2xl:text-6xl 3xl:text-7xl 4xl:text-8xl font-black text-white">
-            Tambah <span className="text-slate-100">Project</span>
-          </h1>
-
-          <p className="mx-auto mt-6 max-w-2xl text-[clamp(0.875rem,0.8125rem+0.5vw,1rem)] leading-7 text-slate-300 sm:text-lg sm:leading-8 2xl:mt-8 2xl:max-w-4xl 2xl:text-xl 2xl:leading-9 3xl:mt-10 3xl:max-w-5xl 3xl:text-2xl 3xl:leading-10 4xl:mt-12 4xl:max-w-6xl 4xl:text-3xl 4xl:leading-11">
-            Tambahkan project mahasiswa ke SINGGAH. Project akan langsung
-            dipublikasikan ke Hall.
-          </p>
-          </div>
-        </div>
-      </AdminHeroBackground>
-
-      <div className="bg-brand-dark py-10 sm:py-12 2xl:py-14">
-        <div className="mx-auto flex max-w-5xl flex-col gap-6 sm:gap-8 2xl:gap-10 3xl:gap-12 4xl:gap-14">
-          <StepDivider step={steps[0]} currentIndex={0} />
-          <UploadThumbnail
-            value={formData.thumbnail}
-            onChange={(file) => updateField("thumbnail", file)}
-          />
-
-          <StepDivider step={steps[1]} currentIndex={1} />
-          <UploadInformation
-            formData={formData}
-            updateField={updateField}
-          />
-
-          <StepDivider step={steps[2]} currentIndex={2} />
-          <UploadTechnology
-            value={formData.technologies}
-            onChange={(tags) => updateField("technologies", tags)}
-          />
-
-          <StepDivider step={steps[3]} currentIndex={3} />
-          <UploadGallery
-            value={formData.images}
-            onChange={(files) => updateField("images", files)}
-          />
-
-          <StepDivider step={steps[4]} currentIndex={4} />
-          <UploadDocuments
-            value={formData.documents}
-            onChange={(files) => updateField("documents", files)}
-          />
-
-          <StepDivider step={steps[5]} currentIndex={5} />
-          <UploadPreview formData={formData} />
-
-          <StepDivider step={steps[6]} currentIndex={6} />
-          <UploadAction
-            formData={formData}
-            onSubmit={handleSubmit}
-            submitting={submitting}
-            apiError={error}
-            submitLabel="Publikasikan"
-          />
-        </div>
+        </section>
       </div>
     </AdminLayout>
   )
 }
-
-export default AdminAddProjectView

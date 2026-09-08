@@ -8,12 +8,18 @@ const darkVignette =
 const lightVignette =
   "radial-gradient(circle at top center, transparent 0%, rgba(37,99,235,0.05) 50%, rgba(30,64,120,0.16) 100%)"
 
-function EditKaryaHero() {
+function EditKaryaHero({
+  backPath = "/my-karya",
+  subtitle = "Perbarui informasi karya yang sudah kamu upload ke SINGGAH.",
+  ptClass = "pt-[calc(var(--navbar-h)+24px)] sm:pt-[calc(var(--navbar-h)+28px)]",
+}) {
   const navigate = useNavigate()
   const { theme } = useTheme()
 
   return (
-    <section className="hero relative overflow-hidden bg-brand-dark px-4 pt-[calc(var(--navbar-h)+24px)] pb-10 sm:px-6 sm:pt-[calc(var(--navbar-h)+28px)] sm:pb-16 md:px-8 lg:px-12 2xl:px-16 2xl:pb-20 3xl:px-20 3xl:pb-24 4xl:px-24 4xl:pb-28">
+    <section
+      className={`hero relative overflow-hidden bg-brand-dark px-4 ${ptClass} pb-10 sm:px-6 sm:pb-16 md:px-8 lg:px-12 2xl:px-16 2xl:pb-20 3xl:px-20 3xl:pb-24 4xl:px-24 4xl:pb-28`}
+    >
       <GlowBackground />
 
       <div
@@ -24,7 +30,7 @@ function EditKaryaHero() {
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center text-center">
         <div className="mb-2 self-start sm:-mb-2 lg:-mb-4 3xl:-mb-6 4xl:-mb-8">
           <button
-            onClick={() => navigate("/my-karya")}
+            onClick={() => navigate(backPath)}
             aria-label="Kembali"
             className="group inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 p-0 text-xs text-slate-300 backdrop-blur-sm transition-colors duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 cursor-pointer h-9 w-9 sm:h-auto sm:w-auto sm:py-[7px] sm:pl-[15px] sm:pr-[17px]"
           >
@@ -49,7 +55,7 @@ function EditKaryaHero() {
         </h2>
 
         <p className="mx-auto mt-3 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8 2xl:mt-4 2xl:max-w-4xl 2xl:text-xl 2xl:leading-9 3xl:mt-5 3xl:max-w-5xl 3xl:text-2xl 3xl:leading-10 4xl:mt-6 4xl:max-w-6xl 4xl:text-3xl 4xl:leading-11">
-          Perbarui informasi karya yang sudah kamu upload ke SINGGAH.
+          {subtitle}
         </p>
 
         <div className="mt-5 flex items-center gap-2 rounded-full border border-white/5 bg-white/[0.02] px-4 py-1.5 text-[11px] text-slate-500 backdrop-blur-sm sm:text-xs">

@@ -109,18 +109,18 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
     <div className="px-4 md:px-6 lg:px-8 pt-6 md:pt-8 pb-12 md:pb-16">
       <div className="flex flex-col gap-8 md:gap-10">
         {filteredProjects.length === 0 ? (
-          <div className="animate-fade-in-up flex flex-col items-center gap-4 rounded-2xl border border-dashed border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] py-16 text-center">
+          <div className="admin-empty-projects animate-fade-in-up flex flex-col items-center gap-4 rounded-2xl border border-dashed border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] py-16 text-center">
             <div className="rounded-full bg-slate-800/50 p-4 ring-1 ring-slate-700/50">
               <FolderX className="h-8 w-8 text-slate-500" />
             </div>
             <div>
               <p className="text-base font-semibold text-slate-300">
-                Tidak ada project yang cocok
+                Tidak ada karya yang cocok
               </p>
               <p className="mt-1 text-sm text-slate-500">
                 {search
-                  ? `Tidak ditemukan project dengan kata kunci "${search}"`
-                  : "Belum ada project dengan filter ini."}
+                  ? `Tidak ditemukan karya dengan kata kunci "${search}"`
+                  : "Belum ada karya dengan filter ini."}
               </p>
             </div>
           </div>
@@ -174,9 +174,9 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
 
       {deleteProjectTarget && (
         <DeleteConfirmModal
-          title="Hapus project ini?"
-          message={`Project "${deleteProjectTarget.title}" akan dihapus permanen bersama semua data terkait (gambar, komentar, dll) dan tidak bisa dikembalikan.`}
-          confirmLabel="Ya, Hapus Project"
+          title="Hapus karya ini?"
+          message={`Karya "${deleteProjectTarget.title}" akan dihapus permanen bersama semua data terkait (gambar, komentar, dll) dan tidak bisa dikembalikan.`}
+          confirmLabel="Ya, Hapus Karya"
           onConfirm={handleConfirmDelete}
           onCancel={() => {
             setDeleteProjectTarget(null)

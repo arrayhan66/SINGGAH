@@ -114,7 +114,7 @@ function DashboardAnalytics() {
         <div className="mb-3 flex items-center gap-2">
           <BarChart3 className="h-4 w-4 text-slate-400" />
           <h2 className="text-[17px] font-semibold text-white md:text-[18px]">
-            Project per Bulan
+            Karya per Bulan
           </h2>
         </div>
         <BarChart data={barData} />
@@ -123,7 +123,7 @@ function DashboardAnalytics() {
         <div className="mb-3 flex items-center gap-2">
           <PieChart className="h-4 w-4 text-slate-400" />
           <h2 className="text-[17px] font-semibold text-white md:text-[18px]">
-            Status Project
+            Status Karya
           </h2>
         </div>
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-center sm:gap-4">

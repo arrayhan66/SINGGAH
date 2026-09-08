@@ -1,16 +1,44 @@
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Newspaper, ArrowRight, BookOpen } from "lucide-react"
-import { useBerita } from "../../../../context/BeritaContext"
+import api from "../../../../services/api"
 import { imageUrl } from "../../../../utils/imageUrl"
 import SmartImage from "../../../ui/SmartImage"
 
 function DashboardLatestNews() {
   const navigate = useNavigate()
-  const { beritaList } = useBerita()
-  const latestNews = beritaList.slice(0, 4)
+  const [latestNews, setLatestNews] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let isMounted = true
+
+    api
+      .get("/news", { params: { status: "published", limit: 4 } })
+      .then((res) => {
+        const items = res.data?.data?.items || res.data?.data || []
+        if (isMounted)
+          setLatestNews(
+            items.slice(0, 4).map((item) => ({
+              ...item,
+              image: item.image || item.headline_image || "",
+            })),
+          )
+      })
+      .catch((err) => {
+        console.error("Failed to fetch latest news:", err)
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5 shadow-xl backdrop-blur-xl md:p-6">
+    <div className="dashboard-news-card dashboard-panel group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl transition-all duration-300 md:p-6">
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/15">
@@ -30,7 +58,23 @@ function DashboardLatestNews() {
         </button>
       </div>
 
-      {latestNews.length === 0 ? (
+      {loading ? (
+        <div className="mt-4 flex flex-col gap-3">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="flex flex-col gap-3 rounded-[14px] border border-white/10 bg-white/[0.04] p-3 sm:flex-row sm:items-center"
+              style={{ minHeight: 90 }}
+            >
+              <div className="aspect-video w-full shrink-0 animate-pulse rounded-lg bg-white/10 sm:h-[84px] sm:w-[150px]" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="h-4 w-2/3 animate-pulse rounded bg-white/10" />
+                <div className="h-3 w-1/3 animate-pulse rounded bg-white/10" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : latestNews.length === 0 ? (
         <div className="mt-6 flex flex-col items-center gap-2 py-6 text-center">
           <BookOpen className="h-8 w-8 text-slate-500" />
           <p className="text-sm text-slate-400">
@@ -42,13 +86,13 @@ function DashboardLatestNews() {
           {latestNews.map((news) => (
             <div
               key={news.id}
-              className="group flex flex-col gap-3 rounded-[14px] border border-white/10 bg-white/[0.04] p-3 transition-all duration-250 hover:-translate-y-[2px] hover:bg-white/[0.08] hover:border-white/20 hover:shadow-lg sm:flex-row sm:items-center"
+              className="dashboard-news-item group flex flex-col gap-3 rounded-[14px] border border-white/10 bg-white/[0.04] p-3 transition-all duration-250 hover:-translate-y-[2px] hover:bg-white/[0.08] hover:border-white/20 hover:shadow-lg sm:flex-row sm:items-center"
               style={{ minHeight: 90 }}
             >
               <SmartImage
                 src={imageUrl(news.image)}
                 alt={news.title}
-                className="h-[72px] w-full shrink-0 rounded-lg object-cover sm:h-[72px] sm:w-[72px]"
+                className="aspect-video w-full shrink-0 rounded-lg border border-white/15 object-cover sm:h-[84px] sm:w-[150px]"
               />
               <div className="min-w-0 flex-1">
                 <p className="line-clamp-1 text-[15px] font-semibold text-white md:text-[17px]">

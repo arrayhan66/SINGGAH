@@ -42,11 +42,11 @@ function AnnouncementModal({ onSend, onClose, isSending, error, success }) {
 
   if (showSuccess && success) {
     return (
-      <PopupToast show variant="success" onClose={handleClose} position="center">
-        <div className="px-4 py-3.5">
+      <PopupToast key="success" show variant="success" onClose={handleClose} position="center">
+        <div className="success-panel px-4 py-3.5 animate-fade-up">
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-400/20 border border-amber-400/30">
-              <Check className="h-4.5 w-4.5 text-amber-300" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-400/20 border border-cyan-400/30 animate-success-pop">
+              <Check className="h-4.5 w-4.5 text-cyan-300" />
             </div>
             <div className="min-w-0 flex-1">
               <h3 className="pt-1 text-sm font-semibold text-white">Pengumuman Terkirim!</h3>
@@ -54,7 +54,7 @@ function AnnouncementModal({ onSend, onClose, isSending, error, success }) {
             </div>
           </div>
           <div className="mt-3">
-            <button type="button" onClick={handleClose} className="w-full rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2 text-xs font-semibold text-brand-dark shadow-lg shadow-amber-500/25 cursor-pointer">
+            <button type="button" onClick={handleClose} className="w-full rounded-xl bg-gradient-to-r from-cyan-400 to-cyan-600 px-4 py-2 text-xs font-semibold text-brand-dark shadow-lg shadow-cyan-500/25 cursor-pointer">
               Selesai
             </button>
           </div>
@@ -64,11 +64,11 @@ function AnnouncementModal({ onSend, onClose, isSending, error, success }) {
   }
 
   return (
-    <PopupToast show variant="default" onClose={handleClose} position="center">
+    <PopupToast key="form" show variant="default" onClose={handleClose} position="center">
       <form onSubmit={handleSubmit} className="px-4 py-3.5 max-h-[80vh] overflow-y-auto custom-scrollbar">
         <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 border border-amber-500/30">
-            <Megaphone className="h-4.5 w-4.5 text-amber-400" />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-500/15 border border-cyan-500/30">
+            <Megaphone className="h-4.5 w-4.5 text-cyan-400" />
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="pt-1 text-sm font-semibold text-white">Kirim Pengumuman</h3>
@@ -83,7 +83,7 @@ function AnnouncementModal({ onSend, onClose, isSending, error, success }) {
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Judul pengumuman..."
             maxLength={120}
-            className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white placeholder-slate-600 outline-none focus:border-cyan-400/40"
+            className="announce-field w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white placeholder-slate-600 outline-none focus:border-cyan-400/40"
           />
           <div>
             <textarea
@@ -92,7 +92,7 @@ function AnnouncementModal({ onSend, onClose, isSending, error, success }) {
               placeholder="Isi pesan..."
               rows={3}
               maxLength={500}
-              className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white placeholder-slate-600 outline-none focus:border-cyan-400/40"
+              className="announce-field w-full resize-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white placeholder-slate-600 outline-none focus:border-cyan-400/40"
             />
             <span className="mt-0.5 block text-right text-[10px] text-slate-600">{message.length}/500</span>
           </div>
@@ -115,7 +115,7 @@ function AnnouncementModal({ onSend, onClose, isSending, error, success }) {
             Batal
           </button>
           <button type="submit" disabled={!canSubmit || isSending}
-            className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2 text-xs font-semibold text-brand-dark shadow-lg shadow-amber-500/20 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
+            className="announce-submit flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-400 to-cyan-600 px-4 py-2 text-xs font-semibold text-brand-dark shadow-lg shadow-cyan-500/20 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
             {isSending ? <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand-dark/30 border-t-brand-dark" /> : <Send className="h-3.5 w-3.5" />}
             {isSending ? "Mengirim..." : "Kirim"}
           </button>

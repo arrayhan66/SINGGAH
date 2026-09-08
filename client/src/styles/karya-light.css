@@ -12,6 +12,29 @@ html.light .karya-page #karya.bg-brand-dark {
   background: linear-gradient(180deg, #f7fafd 0%, #edf3fa 55%, #e6edf7 100%);
 }
 
+/* ===== CHIP KATEGORI (kartu karya) LIGHT =====
+   Tebal 2px + ikon + gradasi cyan -> biru + teks putih,
+   konsisten dengan badge kategori di halaman detail. */
+html.light .karya-page .category-chip {
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-color: #2563eb;
+  border-color: rgba(255, 255, 255, 0.55);
+  color: #ffffff;
+  box-shadow: 0 4px 14px -4px rgba(37, 99, 235, 0.45);
+}
+html.light .karya-page .category-chip .category-chip-icon {
+  color: #e0f2fe;
+}
+
+/* ===== CHIP KATEGORI (kartu karya) DARK =====
+   Gelap kepekatan + border cyan terang + glow halus biar kontras
+   & terlihat "menempel" di atas foto */
+html:not(.light) .karya-page .category-chip {
+  background-color: rgba(2, 17, 31, 0.85);
+  border-color: rgba(103, 232, 249, 0.55);
+  box-shadow: 0 0 14px -4px rgba(34, 211, 238, 0.45);
+}
+
 /* Grid kotak-kotak lembut & buram (pengganti PCBBackground).
    TANPA bercak/aura biru apapun. */
 html.light .karya-page #karya::before {

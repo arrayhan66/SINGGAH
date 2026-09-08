@@ -325,8 +325,7 @@ html.no-scroll body {
   border: 1px solid rgba(148, 180, 226, 0.16);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -6px 12px rgba(2, 10, 26, 0.45),
-    0 4px 10px -4px rgba(2, 10, 26, 0.6);
+    0 3px 8px -4px rgba(2, 10, 26, 0.5);
   transition:
     color 0.3s ease,
     border-color 0.3s ease,
@@ -340,7 +339,7 @@ html.no-scroll body {
   border-radius: inherit;
   background: radial-gradient(
     circle at 50% -20%,
-    rgba(186, 230, 253, 0.16),
+    rgba(186, 230, 253, 0.09),
     transparent 55%
   );
   pointer-events: none;
@@ -351,8 +350,7 @@ html.no-scroll body {
   transform: translateY(-1px);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -6px 12px rgba(2, 10, 26, 0.4),
-    0 8px 20px -6px rgba(34, 211, 238, 0.38);
+    0 6px 14px -6px rgba(34, 211, 238, 0.32);
 }
 .notification-bell:active {
   transform: translateY(0) scale(0.95);
@@ -365,7 +363,7 @@ html.no-scroll body {
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .notification-bell:hover .notification-bell-icon {
-  transform: rotate(-12deg) scale(1.08);
+  transform: rotate(-12deg) scale(1.04);
 }
 .notification-bell.has-unread {
   color: #67e8f9;
@@ -382,25 +380,25 @@ html.no-scroll body {
 
 .notification-bell .notification-badge {
   position: absolute;
-  top: -3px;
-  right: -3px;
+  top: -2px;
+  right: -2px;
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 17px;
-  min-width: 17px;
-  padding: 0 4px;
+  height: 14px;
+  min-width: 14px;
+  padding: 0 3px;
   border-radius: 9999px;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0.01em;
   color: #ffffff;
   background: linear-gradient(180deg, #fb7185 0%, #e11d48 62%, #be123c 100%);
   box-shadow:
-    0 0 0 2px rgba(6, 26, 51, 0.9),
-    0 3px 8px -2px rgba(225, 29, 72, 0.7);
+    0 0 0 1.5px rgba(6, 26, 51, 0.9),
+    0 2px 6px -2px rgba(225, 29, 72, 0.7);
 }
 .notification-bell .notification-badge::after {
   content: "";
@@ -526,6 +524,54 @@ html.no-scroll body {
 }
 .mobile-menu-item.border-cyan-400\/30 svg {
   color: #67e8f9;
+}
+
+/* ===== SIDEBAR ADMIN: item menu ala dropdown (style sendiri) ===== */
+.sidebar-menu-item-label {
+  color: #cbd5e1;
+  transition: color 0.15s;
+}
+.sidebar-menu-item .sidebar-menu-subtitle {
+  color: #64748b;
+}
+.sidebar-menu-item.border-cyan-400\/30 .sidebar-menu-item-label {
+  color: #67e8f9;
+}
+.sidebar-menu-item.border-indigo-400\/30 .sidebar-menu-item-label {
+  color: #a5b4fc;
+}
+.sidebar-menu-item.border-sky-400\/30 .sidebar-menu-item-label {
+  color: #7dd3fc;
+}
+.sidebar-menu-item.border-amber-400\/30 .sidebar-menu-item-label {
+  color: #fcd34d;
+}
+.sidebar-menu-item.border-fuchsia-400\/30 .sidebar-menu-item-label {
+  color: #f0abfc;
+}
+.sidebar-menu-item.border-emerald-400\/30 .sidebar-menu-item-label {
+  color: #6ee7b7;
+}
+.sidebar-menu-item.border-blue-400\/30 .sidebar-menu-item-label {
+  color: #93c5fd;
+}
+.sidebar-menu-item.border-slate-400\/30 .sidebar-menu-item-label {
+  color: #cbd5e1;
+}
+/* Hover: label jadi putih (menimpa status aktif) */
+.sidebar-menu-item:hover .sidebar-menu-item-label {
+  color: #ffffff;
+}
+.sidebar-menu-item:hover .sidebar-menu-subtitle {
+  color: #94a3b8;
+}
+
+/* Kartu item BELUM AKTIF: border ringan agar tepi terlihat jelas */
+.sidebar-menu-item.bg-white\/\[0\.03\] {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.sidebar-menu-item.bg-white\/\[0\.03\]:hover {
+  border-color: rgba(34, 211, 238, 0.3);
 }
 
 @media (prefers-reduced-motion: reduce) {

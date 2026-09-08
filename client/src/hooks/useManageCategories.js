@@ -6,7 +6,7 @@ const INITIAL_VISIBLE = 9
 
 export const stateTabs = [
   { value: "all", label: "Semua" },
-  { value: "used", label: "Berisi Project" },
+  { value: "used", label: "Berisi Karya" },
   { value: "empty", label: "Kosong" },
 ]
 

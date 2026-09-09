@@ -22,16 +22,22 @@ exports.getNewsById = asyncHandler(async (req, res) => {
 })
 
 exports.createNews = asyncHandler(async (req, res) => {
-  if (!req.files || !req.files.headline_image) {
+  const hasFile = req.files && req.files.headline_image
+  const hasImageUrl =
+    req.body.headline_image && typeof req.body.headline_image === "string"
+
+  if (!hasFile && !hasImageUrl) {
     throw new AppError("Headline image wajib diupload", 400)
   }
 
-  const headlineResult = await uploadImage(
-    req.files.headline_image[0].buffer,
-    "singgah/news",
-  )
+  if (hasFile) {
+    const headlineResult = await uploadImage(
+      req.files.headline_image[0].buffer,
+      "singgah/news",
+    )
 
-  req.body.headline_image = headlineResult.secure_url
+    req.body.headline_image = headlineResult.secure_url
+  }
 
   const news = await newsService.createNews(req.body, req.user.id)
 

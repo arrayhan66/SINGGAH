@@ -340,6 +340,11 @@ exports.updateProjectStatus = async (id, status, reason = "") => {
       status === "rejected" ? note || null : null
     project.approve_note =
       status === "published" ? note || null : null
+    // Karya yang tidak lagi published otomatis di-lepas dari slot unggulan,
+    // supaya tidak menyandera slot (1 & 2) untuk karya lain.
+    if (status !== "published") {
+      project.featured_slot = null
+    }
     await project.save({ transaction: t })
 
     if (status === "published") {
@@ -381,11 +386,22 @@ exports.updateProjectStatus = async (id, status, reason = "") => {
 }
 
 // Set / hapus slot karya unggulan (1 atau 2) sebuah project.
-// Satu slot hanya boleh ditempati satu project: kalau slot sudah diambil
-// project lain, project lain tersebut otomatis dilepas dari slot itu.
+// Slot unggulan bersifat PER PORTAL (per kategori): satu portal hanya punya
+// slot 1 & 2. Satu slot hanya boleh ditempati satu project dalam kategori
+// yang sama, apa pun jenis authornya (mahasiswa/dosen), jadi begitu slot 2
+// sebuah portal terisi, karya lain di portal yang sama tidak bisa mengisinya
+// lagi sampai dilepas dulu.
 exports.setProjectFeatured = async (id, slot = null) => {
   const where = /^\d+$/.test(String(id)) ? { id: Number(id) } : { slug: id }
-  const project = await Project.findOne({ where })
+  const project = await Project.findOne({
+    where,
+    include: [
+      {
+        model: User,
+        attributes: ["id", "name", "tipe", "nim_nip"],
+      },
+    ],
+  })
 
   if (!project) {
     throw new AppError("Project tidak ditemukan", 404)
@@ -407,16 +423,21 @@ exports.setProjectFeatured = async (id, slot = null) => {
 
   await sequelize.transaction(async (t) => {
     if (normalizedSlot !== null) {
-      await Project.update(
-        { featured_slot: null },
-        {
-          where: {
-            featured_slot: normalizedSlot,
-            id: { [Op.ne]: project.id },
-          },
-          transaction: t,
+      const occupant = await Project.findOne({
+        where: {
+          featured_slot: normalizedSlot,
+          category_id: project.category_id,
+          id: { [Op.ne]: project.id },
         },
-      )
+        transaction: t,
+      })
+
+      if (occupant) {
+        throw new AppError(
+          `Slot ${normalizedSlot} pada portal kategori ini sudah terisi oleh karya "${occupant.title}". Lepas dulu karya tersebut dari unggulan sebelum mengisi slot ${normalizedSlot}.`,
+          409,
+        )
+      }
     }
 
     project.featured_slot = normalizedSlot

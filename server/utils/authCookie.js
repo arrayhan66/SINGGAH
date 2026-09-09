@@ -1,5 +1,5 @@
 const COOKIE_NAME = "singgah_token"
-const SESSION_MS = 2 * 60 * 60 * 1000
+const SESSION_MS = 6 * 60 * 60 * 1000
 
 const isProduction = () => process.env.NODE_ENV === "production"
 

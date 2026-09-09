@@ -74,7 +74,7 @@ exports.createCategory = async (data) => {
   })
 
   if (nameExists) {
-    throw new AppError("Nama kategori sudah digunakan", 400)
+    return nameExists
   }
 
   const slugExists = await Category.findOne({

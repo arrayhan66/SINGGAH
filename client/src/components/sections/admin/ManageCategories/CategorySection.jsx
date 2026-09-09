@@ -12,8 +12,6 @@ export default function CategorySection() {
     setSearch,
     stateFilter,
     setStateFilter,
-    view,
-    setView,
     showForm,
     editing,
     formName,
@@ -25,8 +23,12 @@ export default function CategorySection() {
     deleteTarget,
     setDeleteTarget,
     isOpen,
+    setIsOpen,
     dropdownPos,
     notification,
+    setNotification,
+    saving,
+    deleting,
     buttonRef,
     panelRef,
     filtered,
@@ -46,7 +48,7 @@ export default function CategorySection() {
         <Toast
           message={notification.message}
           type={notification.type}
-          onDone={() => {}}
+          onDone={() => setNotification(null)}
         />
       )}
 
@@ -56,8 +58,6 @@ export default function CategorySection() {
         stateFilter={stateFilter}
         onStateFilterChange={setStateFilter}
         stateCounts={stateCounts}
-        view={view}
-        onViewChange={setView}
         onAddClick={handleOpenAdd}
         isOpen={isOpen}
         dropdownPos={dropdownPos}
@@ -66,6 +66,7 @@ export default function CategorySection() {
         panelRef={panelRef}
         onFilterSelect={(value) => {
           setStateFilter(value)
+          setIsOpen(false)
         }}
       />
 
@@ -79,6 +80,7 @@ export default function CategorySection() {
             onDescChange={setFormDesc}
             onSave={handleSave}
             onClose={handleCloseForm}
+            saving={saving}
           />
         )}
 
@@ -89,7 +91,6 @@ export default function CategorySection() {
           search={search}
           showAll={showAll}
           onShowAllToggle={() => setShowAll((prev) => !prev)}
-          view={view}
           onEdit={handleOpenEdit}
           onDelete={(cat) => setDeleteTarget(cat)}
         />
@@ -99,6 +100,7 @@ export default function CategorySection() {
         category={deleteTarget}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}
+        loading={deleting}
       />
     </>
   )

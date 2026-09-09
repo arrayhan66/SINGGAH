@@ -44,7 +44,7 @@ function AdminBeritaHero({ search, onSearchChange, statusFilter, onStatusChange 
               value={search}
               onChange={onSearchChange}
               placeholder="Cari judul berita..."
-              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none shadow-sm focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
+              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
             />
           </div>
           <button
@@ -58,7 +58,7 @@ function AdminBeritaHero({ search, onSearchChange, statusFilter, onStatusChange 
         </div>
 
         <div className="mt-5 flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-1">
+          <div className="admin-filter-tabs flex items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-1">
             {filterTabs.map((tab) => (
               <button
                 key={tab.value}

@@ -10,7 +10,7 @@ export default function CategoryCard({ cat, onEdit, onDelete }) {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-100" />
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-4 min-w-0">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 shadow-inner transition-transform duration-300 group-hover:scale-105 sm:h-14 sm:w-14">
+          <div className="admin-category-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-xl shadow-inner transition-transform duration-300 group-hover:scale-105 sm:h-14 sm:w-14">
             {createElement(IconComponent, { size: 24 })}
           </div>
           <div className="min-w-0">

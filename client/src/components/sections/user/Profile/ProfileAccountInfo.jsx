@@ -99,15 +99,15 @@ function ProfileAccountInfo() {
           return (
             <div
               key={item.label}
-              className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] px-4 py-3"
+              className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-xl border border-white/5 bg-white/[0.02] px-4 py-3"
             >
-              <div className="flex items-center gap-3">
-                <Icon className={`h-4 w-4 ${item.iconColor}`} />
-                <span className="text-xs md:text-sm text-slate-400">
+              <div className="flex min-w-0 items-center gap-3">
+                <Icon className={`h-4 w-4 shrink-0 ${item.iconColor}`} />
+                <span className="min-w-0 text-xs md:text-sm text-slate-400">
                   {item.label}
                 </span>
               </div>
-              <span className="text-xs md:text-sm font-medium text-white text-end min-w-0">
+              <span className="min-w-0 text-xs md:text-sm font-medium text-white text-end">
                 {item.value}
               </span>
             </div>

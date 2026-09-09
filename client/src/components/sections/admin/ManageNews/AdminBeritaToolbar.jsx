@@ -2,8 +2,6 @@ import {
   Bold,
   Italic,
   Underline as UnderlineIcon,
-  List,
-  ListOrdered,
   Quote,
   Image as ImageIcon,
   Undo2,
@@ -15,13 +13,46 @@ import {
   AlignRight,
   AlignJustify,
   Type,
+  LetterText,
+  AlignVerticalJustifyStart,
 } from "lucide-react"
 
-const HEADING_OPTIONS = [
-  { label: "Normal", value: 0 },
-  { label: "Heading 1", value: 1 },
-  { label: "Heading 2", value: 2 },
-  { label: "Heading 3", value: 3 },
+const FONT_SIZE_OPTIONS = [
+  { label: "Normal", value: "" },
+  { label: "Kecil (18)", value: "18px" },
+  { label: "Sedang (20)", value: "20px" },
+  { label: "Besar (24)", value: "24px" },
+  { label: "Sangat Besar (28)", value: "28px" },
+  { label: "Jumbo (34)", value: "34px" },
+]
+
+const FONT_FAMILY_OPTIONS = [
+  { label: "Default", value: "" },
+  { label: "Poppins", value: "Poppins, sans-serif" },
+  { label: "Times New Roman", value: "Georgia, 'Times New Roman', serif" },
+  { label: "Arial", value: "Arial, Helvetica, sans-serif" },
+  { label: "Helvetica", value: "'Helvetica Neue', Helvetica, Arial, sans-serif" },
+  { label: "Courier", value: "'Courier New', monospace" },
+]
+
+const LINE_HEIGHT_OPTIONS = [
+  { label: "Otomatis", value: "normal" },
+  { label: "1", value: "1" },
+  { label: "1.15", value: "1.15" },
+  { label: "1.5", value: "1.5" },
+  { label: "1.75", value: "1.75" },
+  { label: "2", value: "2" },
+  { label: "2.5", value: "2.5" },
+  { label: "3", value: "3" },
+]
+
+const PARAGRAPH_SPACING_OPTIONS = [
+  { label: "Standar", value: "" },
+  { label: "Rapat", value: "0.25rem" },
+  { label: "Normal", value: "0.6rem" },
+  { label: "Sedang", value: "1rem" },
+  { label: "Lebar", value: "1.5rem" },
+  { label: "Ekstra Lebar", value: "2rem" },
 ]
 
 function ToolbarButton({ onClick, active, children, title, disabled }) {
@@ -34,12 +65,12 @@ function ToolbarButton({ onClick, active, children, title, disabled }) {
       }}
       title={title}
       disabled={disabled}
-      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-all ${
-        disabled
-          ? "bg-slate-100 text-slate-300 border border-slate-200 cursor-not-allowed opacity-50"
-          : active
-            ? "bg-cyan-600 text-white shadow-sm ring-2 ring-cyan-400/40 cursor-pointer"
-            : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer"
+      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-all sm:h-9 sm:w-9 sm:rounded-lg ${
+disabled
+              ? "bg-slate-800/50 text-slate-600 border border-slate-800 cursor-not-allowed opacity-50"
+              : active
+                ? "bg-cyan-600 text-white shadow-sm ring-2 ring-cyan-400/40 cursor-pointer"
+                : "bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 cursor-pointer"
       }`}
     >
       {children}
@@ -49,12 +80,12 @@ function ToolbarButton({ onClick, active, children, title, disabled }) {
 
 function ToolbarSelect({ value, options, onChange, title, icon: Icon }) {
   return (
-    <div className="relative" title={title}>
+    <div className="relative w-full sm:w-auto" title={title}>
       <select
         value={value}
         onMouseDown={(e) => e.stopPropagation()}
         onChange={(e) => onChange(e.target.value)}
-        className="h-9 cursor-pointer appearance-none rounded-lg border border-slate-200 bg-white px-2 pr-6 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100 focus:border-cyan-400 focus:outline-none"
+        className="h-8 w-full cursor-pointer appearance-none rounded-lg border border-slate-700 bg-slate-800 px-2 pr-6 text-xs font-medium text-slate-200 transition-colors hover:bg-slate-700 focus:border-cyan-400 focus:outline-none sm:h-9 sm:w-auto"
       >
         {options.map((opt) => (
           <option key={String(opt.value)} value={String(opt.value)}>
@@ -74,99 +105,127 @@ function ToolbarSelect({ value, options, onChange, title, icon: Icon }) {
 function AdminBeritaToolbar({ editor, insertImage, insertLink }) {
   if (!editor) return null
 
-  const currentHeading = (() => {
-    for (let i = 1; i <= 3; i++) {
-      if (editor.isActive("heading", { level: i })) return String(i)
-    }
-    return "0"
-  })()
+  const currentFontSize = editor.getAttributes("textStyle").fontSize || ""
+
+  const currentFontFamily = editor.getAttributes("textStyle").fontFamily || ""
+
+  const currentLineHeight = editor.getAttributes("paragraph").lineHeight || "normal"
+
+  const currentParagraphSpacing = editor.getAttributes("paragraph").marginBottom || ""
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5 border-b border-slate-200 bg-slate-50 p-3">
+    <div className="editor-toolbar flex flex-wrap items-center gap-1 border-b border-slate-700 bg-slate-900 p-2 sm:gap-x-2 sm:gap-y-2 sm:p-3">
       {/* Undo / Redo */}
-      <ToolbarButton
-        onClick={() => editor.chain().focus().undo().run()}
-        disabled={!editor.can().undo()}
-        title="Undo"
-      >
-        <Undo2 size={17} />
-      </ToolbarButton>
+      <div className="flex items-center gap-1">
+        <ToolbarButton
+          onClick={() => editor.chain().focus().undo().run()}
+          disabled={!editor.can().undo()}
+          title="Undo"
+        >
+          <Undo2 size={17} />
+        </ToolbarButton>
 
-      <ToolbarButton
-        onClick={() => editor.chain().focus().redo().run()}
-        disabled={!editor.can().redo()}
-        title="Redo"
-      >
-        <Redo2 size={17} />
-      </ToolbarButton>
+        <ToolbarButton
+          onClick={() => editor.chain().focus().redo().run()}
+          disabled={!editor.can().redo()}
+          title="Redo"
+        >
+          <Redo2 size={17} />
+        </ToolbarButton>
+      </div>
 
-      <div className="h-5 w-[1px] bg-slate-300 mx-1" />
-
-      {/* Heading Dropdown — works like Word */}
+      {/* Font Size Dropdown — inline, hanya teks yang dipilih */}
+      <div className="flex flex-wrap items-center gap-1 sm:border-l sm:border-slate-600 sm:pl-2">
       <ToolbarSelect
-        title="Format Heading / Paragraf"
+        title="Ukuran Huruf (hanya teks terpilih)"
         icon={Type}
-        value={currentHeading}
-        options={HEADING_OPTIONS}
+        value={currentFontSize}
+        options={FONT_SIZE_OPTIONS}
         onChange={(val) => {
-          const level = Number(val)
-          if (level === 0) {
-            editor.chain().focus().setParagraph().run()
+          if (!val) {
+            editor.chain().focus().unsetFontSize().run()
           } else {
-            editor.chain().focus().toggleHeading({ level }).run()
+            editor.chain().focus().setFontSize(val).run()
           }
         }}
       />
 
-      <div className="h-5 w-[1px] bg-slate-300 mx-1" />
+      {/* Font Family Dropdown — hanya teks terpilih */}
+      <ToolbarSelect
+        title="Tipe Font (hanya teks terpilih)"
+        icon={LetterText}
+        value={currentFontFamily}
+        options={FONT_FAMILY_OPTIONS}
+        onChange={(val) => {
+          if (!val) {
+            editor.chain().focus().unsetFontFamily().run()
+          } else {
+            editor.chain().focus().setFontFamily(val).run()
+          }
+        }}
+      />
+
+      {/* Line Spacing Dropdown */}
+      <ToolbarSelect
+        title="Spasi Baris (Line Height)"
+        icon={AlignVerticalJustifyStart}
+        value={currentLineHeight}
+        options={LINE_HEIGHT_OPTIONS}
+        onChange={(val) => {
+          if (!val || val === "normal") {
+            editor.chain().focus().unsetLineHeight().run()
+          } else {
+            editor.chain().focus().setLineHeight(val).run()
+          }
+        }}
+      />
+
+      {/* Paragraph Spacing Dropdown */}
+      <ToolbarSelect
+        title="Spasi Antar Paragraf"
+        icon={AlignVerticalJustifyStart}
+        value={currentParagraphSpacing}
+        options={PARAGRAPH_SPACING_OPTIONS}
+        onChange={(val) => {
+          if (!val) {
+            editor.chain().focus().unsetParagraphSpacing().run()
+          } else {
+            editor.chain().focus().setParagraphSpacing(val).run()
+          }
+        }}
+      />
+
+      </div>
 
       {/* Inline formatting */}
-      <ToolbarButton
-        active={editor.isActive("bold")}
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        title="Tebal (Bold)"
-      >
-        <Bold size={17} />
-      </ToolbarButton>
+      <div className="flex flex-wrap items-center gap-1 sm:border-l sm:border-slate-600 sm:pl-2">
+        <ToolbarButton
+          active={editor.isActive("bold")}
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          title="Tebal (Bold)"
+        >
+          <Bold size={17} />
+        </ToolbarButton>
 
-      <ToolbarButton
-        active={editor.isActive("italic")}
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        title="Miring (Italic)"
-      >
-        <Italic size={17} />
-      </ToolbarButton>
+        <ToolbarButton
+          active={editor.isActive("italic")}
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          title="Miring (Italic)"
+        >
+          <Italic size={17} />
+        </ToolbarButton>
 
-      <ToolbarButton
-        active={editor.isActive("underline")}
-        onClick={() => editor.chain().focus().toggleUnderline().run()}
-        title="Garis Bawah (Underline)"
-      >
-        <UnderlineIcon size={17} />
-      </ToolbarButton>
-
-      <div className="h-5 w-[1px] bg-slate-300 mx-1" />
-
-      {/* List */}
-      <ToolbarButton
-        active={editor.isActive("bulletList")}
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-        title="Bullet List"
-      >
-        <List size={17} />
-      </ToolbarButton>
-
-      <ToolbarButton
-        active={editor.isActive("orderedList")}
-        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        title="Numbered List"
-      >
-        <ListOrdered size={17} />
-      </ToolbarButton>
-
-      <div className="h-5 w-[1px] bg-slate-300 mx-1" />
+        <ToolbarButton
+          active={editor.isActive("underline")}
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          title="Garis Bawah (Underline)"
+        >
+          <UnderlineIcon size={17} />
+        </ToolbarButton>
+      </div>
 
       {/* Alignment */}
+      <div className="flex flex-wrap items-center gap-1 sm:border-l sm:border-slate-600 sm:pl-2">
       <ToolbarButton
         active={editor.isActive({ textAlign: "left" })}
         onClick={() => {
@@ -222,36 +281,37 @@ function AdminBeritaToolbar({ editor, insertImage, insertLink }) {
       >
         <AlignJustify size={17} />
       </ToolbarButton>
-
-      <div className="h-5 w-[1px] bg-slate-300 mx-1" />
+      </div>
 
       {/* Block & Insert */}
-      <ToolbarButton
-        active={editor.isActive("blockquote")}
-        onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        title="Kutipan"
-      >
-        <Quote size={17} />
-      </ToolbarButton>
+      <div className="flex items-center gap-1 sm:border-l sm:border-slate-600 sm:pl-2">
+        <ToolbarButton
+          active={editor.isActive("blockquote")}
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          title="Kutipan"
+        >
+          <Quote size={17} />
+        </ToolbarButton>
 
-      <ToolbarButton
-        active={editor.isActive("link")}
-        onClick={insertLink}
-        title="Sisipkan Link"
-      >
-        <LinkIcon size={17} />
-      </ToolbarButton>
+        <ToolbarButton
+          active={editor.isActive("link")}
+          onClick={insertLink}
+          title="Sisipkan Link"
+        >
+          <LinkIcon size={17} />
+        </ToolbarButton>
 
-      <ToolbarButton onClick={insertImage} title="Sisipkan Foto / Galeri Foto">
-        <ImageIcon size={17} />
-      </ToolbarButton>
+        <ToolbarButton onClick={insertImage} title="Sisipkan Foto / Galeri Foto">
+          <ImageIcon size={17} />
+        </ToolbarButton>
 
-      <ToolbarButton
-        onClick={() => editor.chain().focus().setHorizontalRule().run()}
-        title="Garis Pemisah"
-      >
-        <Minus size={17} />
-      </ToolbarButton>
+        <ToolbarButton
+          onClick={() => editor.chain().focus().setHorizontalRule().run()}
+          title="Garis Pemisah"
+        >
+          <Minus size={17} />
+        </ToolbarButton>
+      </div>
     </div>
   )
 }

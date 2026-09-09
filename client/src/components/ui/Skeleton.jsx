@@ -12,7 +12,7 @@ export function ImageSkeleton({ className = "" }) {
 
 export function ProjectCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+    <div className="skeleton-card overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-4">
       <ImageSkeleton className="rounded-xl" />
       <div className="mt-4 space-y-2.5">
         <TextSkeleton className="h-5 w-3/4" />
@@ -39,7 +39,7 @@ export function ProjectGridSkeleton({ count = 6 }) {
 
 export function NewsCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
+    <div className="skeleton-card overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
       <Skeleton className="h-40 w-full rounded-none sm:h-48 md:h-52 lg:h-56 3xl:h-64 4xl:h-72" />
       <div className="p-4 sm:p-5 md:p-6 lg:p-7 space-y-3">
         <div className="flex items-center justify-between">
@@ -86,7 +86,7 @@ export function PageHeaderSkeleton() {
 export function DetailHeroSkeleton() {
   return (
     <div className="mx-auto w-full max-w-5xl px-2 min-[280px]:px-3 sm:px-5">
-      <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04]">
+      <div className="skeleton-card overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04]">
         <ImageSkeleton className="aspect-video rounded-none" />
         <div className="p-4 sm:p-8 lg:p-10 2xl:p-12">
           <div className="mb-5 flex flex-wrap items-center gap-2 sm:mb-6 sm:gap-4">
@@ -118,7 +118,7 @@ export function StatsRowSkeleton({ count = 3 }) {
       {Array.from({ length: count }, (_, i) => (
         <div
           key={i}
-          className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-5"
+          className="skeleton-card flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-5"
         >
           <Skeleton className="h-6 w-16" />
           <Skeleton className="h-4 w-28" />
@@ -130,7 +130,7 @@ export function StatsRowSkeleton({ count = 3 }) {
 
 export function CategoryCardSkeleton() {
   return (
-    <div className="flex h-full flex-col rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl sm:p-8 2xl:p-10 3xl:p-12 4xl:p-14">
+    <div className="skeleton-card flex h-full flex-col rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl sm:p-8 2xl:p-10 3xl:p-12 4xl:p-14">
       <div className="flex items-start justify-between">
         <Skeleton className="h-16 w-16 rounded-3xl sm:h-20 sm:w-20 2xl:h-24 2xl:w-24 3xl:h-28 3xl:w-28 4xl:h-32 4xl:w-32" />
         <Skeleton className="h-6 w-20 rounded-full sm:h-7 sm:w-24 3xl:h-8 3xl:w-28 4xl:h-9 4xl:w-32" />

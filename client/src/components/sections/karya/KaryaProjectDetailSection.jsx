@@ -197,15 +197,17 @@ function KaryaProjectDetailSection() {
           </div>
         </GlassCard>
 
-        <KaryaProjectComments
-          comments={comments}
-          setComments={setComments}
-          projectSlug={projectSlug}
-          isLoggedIn={isLoggedIn}
-          user={user}
-          handleAuthRedirect={() => navigate("/login", { state: { from: location } })}
-          formatDate={formatDate}
-        />
+        {project.status === "published" && (
+          <KaryaProjectComments
+            comments={comments}
+            setComments={setComments}
+            projectSlug={projectSlug}
+            isLoggedIn={isLoggedIn}
+            user={user}
+            handleAuthRedirect={() => navigate("/login", { state: { from: location } })}
+            formatDate={formatDate}
+          />
+        )}
       </div>
 
       {showShareModal && (

@@ -13,7 +13,7 @@ const DOSEN_MARKERS = ["dr.", "prof.", "dra.", "h."]
 const MAX_DOSEN = 4
 const MAX_MAHASISWA = 12
 
-function classify(project) {
+export function classify(project) {
   const tipe = project.User?.tipe || project.authorType
   if (tipe === "dosen") return "dosen"
   if (tipe === "mahasiswa") return "mahasiswa"

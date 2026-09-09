@@ -7,10 +7,20 @@ function UploadInformation({ formData, updateField }) {
   const [categories, setCategories] = useState([])
 
   useEffect(() => {
-    api
-      .get("/categories")
-      .then((res) => setCategories(res.data.data || res.data))
-      .catch(() => setCategories([]))
+    let mounted = true
+    const load = () =>
+      api
+        .get("/categories")
+        .then((res) => {
+          if (mounted) setCategories(res.data.data || res.data)
+        })
+        .catch(() => {})
+    load()
+    window.addEventListener("focus", load)
+    return () => {
+      mounted = false
+      window.removeEventListener("focus", load)
+    }
   }, [])
 
   function handleAddMember() {

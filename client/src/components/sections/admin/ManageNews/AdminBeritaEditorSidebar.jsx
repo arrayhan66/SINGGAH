@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { X, Plus, Image as ImageIcon, Upload, Trash, Eye, Save } from "lucide-react"
+import { X, Plus, Image as ImageIcon, Upload, Trash, Eye, Save, Loader2 } from "lucide-react"
 import SmartImage from "../../../ui/SmartImage"
 
 function AdminBeritaEditorSidebar({
@@ -8,6 +8,7 @@ function AdminBeritaEditorSidebar({
   onPublish,
   isEditMode,
   onPreview,
+  saving,
 }) {
   const [tagInput, setTagInput] = useState("")
 
@@ -88,9 +89,17 @@ function AdminBeritaEditorSidebar({
           <button
             type="button"
             onClick={onPublish}
-            className="w-full cursor-pointer rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
+            disabled={saving}
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {formData.status === "draft" ? "Simpan sebagai Draft" : isEditMode ? "Simpan Perubahan" : "Publikasikan"}
+            {saving ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Menyimpan...
+              </>
+            ) : (
+              formData.status === "draft" ? "Simpan sebagai Draft" : isEditMode ? "Simpan Perubahan" : "Publikasikan"
+            )}
           </button>
         </div>
       </div>
@@ -168,7 +177,7 @@ function AdminBeritaEditorSidebar({
               type="text"
               value={formData.winner}
               onChange={(e) => updateField("winner", e.target.value)}
-              placeholder="Contoh: Tim Redaksi / Tim Elektro"
+              placeholder="Contoh: Tim Redaksi"
               className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/50 focus:outline-none focus:ring-1 focus:ring-cyan-400/20 transition-all"
             />
           </div>
@@ -211,7 +220,7 @@ function AdminBeritaEditorSidebar({
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
             onKeyDown={handleTagKeyDown}
-            placeholder="Ketik tag lalu Enter atau klik +"
+            placeholder="Ketik tag lalu Enter"
             className="w-full min-w-0 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/50 focus:outline-none focus:ring-1 focus:ring-cyan-400/20 transition-all"
           />
           <button
@@ -222,12 +231,6 @@ function AdminBeritaEditorSidebar({
             <Plus size={16} />
           </button>
         </div>
-
-        {formData.tags.length === 0 && (
-          <p className="mt-2 text-[10px] text-slate-500">
-            Tambah tag untuk memudahkan pencarian berita
-          </p>
-        )}
 
         {formData.tags.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1.5">

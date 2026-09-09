@@ -49,7 +49,7 @@ function AdminBeritaDeleteModal({ berita, onConfirm, onCancel, loading = false, 
               <p className="mt-0.5 text-xs text-emerald-300/80">Berita telah dihapus permanen.</p>
             ) : (
               <p className="mt-0.5 text-xs text-slate-400 min-w-0 break-words">
-                Kamu akan menghapus{" "}
+                Kamu akan menghapus berita{" "}
                 <span className="font-medium text-slate-200">"{berita.title}"</span>.
               </p>
             )}

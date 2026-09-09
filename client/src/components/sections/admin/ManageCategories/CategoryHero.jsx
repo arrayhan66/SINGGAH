@@ -4,8 +4,6 @@ import {
   Plus,
   Search,
   LayoutGrid,
-  Grid3X3,
-  List,
   FolderOpen,
   PackageOpen,
   ChevronDown,
@@ -23,10 +21,7 @@ export default function CategoryHero({
   search,
   onSearchChange,
   stateFilter,
-  onStateFilterChange,
   stateCounts,
-  view,
-  onViewChange,
   onAddClick,
   isOpen,
   dropdownPos,
@@ -59,7 +54,7 @@ export default function CategoryHero({
       </div>
 
       <div className="px-4 pt-6 pb-6 md:px-6 md:pt-7 md:pb-7 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
@@ -70,59 +65,21 @@ export default function CategoryHero({
               className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
             />
           </div>
-          <div className="flex items-center gap-3 shrink-0">
-            {onViewChange && (
-              <div
-                className="flex items-center rounded-xl border border-white/10 bg-white/5 p-1"
-                role="group"
-                aria-label="Tampilan kategori"
-              >
-                <button
-                  type="button"
-                  onClick={() => onViewChange("list")}
-                  className={`cursor-pointer rounded-lg p-2 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/40 focus-visible:outline-none ${
-                    view === "list"
-                      ? "bg-cyan-500/20 text-cyan-300"
-                      : "text-slate-400 hover:text-white"
-                  }`}
-                  title="Tampilan daftar (tabel)"
-                  aria-label="Tampilan daftar"
-                  aria-pressed={view === "list"}
-                >
-                  <List size={16} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onViewChange("grid")}
-                  className={`cursor-pointer rounded-lg p-2 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/40 focus-visible:outline-none ${
-                    view === "grid"
-                      ? "bg-cyan-500/20 text-cyan-300"
-                      : "text-slate-400 hover:text-white"
-                  }`}
-                  title="Tampilan grid"
-                  aria-label="Tampilan grid"
-                  aria-pressed={view === "grid"}
-                >
-                  <Grid3X3 size={16} />
-                </button>
-              </div>
-            )}
-            <button
-              type="button"
-              onClick={onAddClick}
-              className="group flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
-            >
-              <Plus
-                size={16}
-                className="transition-transform duration-300 group-hover:rotate-90"
-              />
-              <span>Tambah Kategori</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onAddClick}
+            className="flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
+          >
+            <Plus
+              size={16}
+              className="transition-transform duration-300 group-hover:rotate-90"
+            />
+            Tambah Kategori
+          </button>
         </div>
 
         <div className="mt-4">
-          <div className="relative w-full min-[550px]:hidden">
+          <div className="relative w-full">
             <button
               ref={buttonRef}
               type="button"
@@ -181,7 +138,7 @@ export default function CategoryHero({
                       >
                         <Icon
                           className={`h-4 w-4 shrink-0 ${
-                            isActive ? "text-cyan-300" : "text-slate-500"
+                            isActive ? "text-white" : "text-slate-500"
                           }`}
                         />
                         <span className="min-w-0 flex-1 truncate">
@@ -207,45 +164,6 @@ export default function CategoryHero({
                 </div>,
                 document.body,
               )}
-          </div>
-
-          <div className="hidden min-[550px]:flex min-[550px]:w-fit min-[550px]:flex-wrap min-[550px]:items-center min-[550px]:gap-1 rounded-xl border border-white/10 bg-white/5 min-[550px]:p-1">
-            {stateTabs.map((tab) => {
-              const Icon = tab.icon
-              const isActive = stateFilter === tab.value
-              const count = stateCounts[tab.value]
-              return (
-                <button
-                  key={tab.value}
-                  type="button"
-                  onClick={() => onStateFilterChange(tab.value)}
-                  className={`inline-flex min-w-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-cyan-400/40 focus-visible:outline-none ${
-                    isActive
-                      ? "bg-gradient-to-r from-cyan-500/25 to-blue-500/25 text-white shadow-sm ring-1 ring-cyan-400/30"
-                      : "text-slate-400 hover:bg-white/[0.06] hover:text-white"
-                  }`}
-                  aria-pressed={isActive}
-                >
-                  <Icon
-                    className={`h-3.5 w-3.5 shrink-0 transition-colors duration-200 ${
-                      isActive ? "text-cyan-300" : "text-slate-500"
-                    }`}
-                  />
-                  {tab.label}
-                  {count !== undefined && (
-                    <span
-                      className={`rounded-full px-1.5 py-0.5 text-[10px] tabular-nums ${
-                        isActive
-                          ? "bg-cyan-500/25 text-cyan-300"
-                          : "bg-white/[0.07] text-slate-400"
-                      }`}
-                    >
-                      {count}
-                    </span>
-                  )}
-                </button>
-              )
-            })}
           </div>
         </div>
       </div>

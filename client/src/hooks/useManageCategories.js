@@ -25,6 +25,8 @@ export default function useManageCategories() {
   const [isOpen, setIsOpen] = useState(false)
   const [dropdownPos, setDropdownPos] = useState(null)
   const [notification, setNotification] = useState(null)
+  const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const buttonRef = useRef(null)
   const panelRef = useRef(null)
 
@@ -132,6 +134,7 @@ export default function useManageCategories() {
 
   async function handleSave() {
     if (!formName.trim()) return
+    setSaving(true)
     try {
       if (editing) {
         await api.put(`/categories/${editing.id}`, {
@@ -152,11 +155,14 @@ export default function useManageCategories() {
     } catch (err) {
       const message = err.response?.data?.message || "Gagal menyimpan kategori"
       notify(message, "error")
+    } finally {
+      setSaving(false)
     }
   }
 
   async function handleConfirmDelete() {
     if (!deleteTarget) return
+    setDeleting(true)
     try {
       await api.delete(`/categories/${deleteTarget.id}`)
       notify("Kategori berhasil dihapus", "success")
@@ -164,6 +170,8 @@ export default function useManageCategories() {
     } catch (err) {
       const message = err.response?.data?.message || "Gagal menghapus kategori"
       notify(message, "error")
+    } finally {
+      setDeleting(false)
     }
     setDeleteTarget(null)
   }
@@ -193,6 +201,8 @@ export default function useManageCategories() {
     dropdownPos,
     notification,
     setNotification,
+    saving,
+    deleting,
     buttonRef,
     panelRef,
     filtered,

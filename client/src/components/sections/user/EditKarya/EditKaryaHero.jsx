@@ -28,7 +28,7 @@ function EditKaryaHero({
       />
 
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center text-center">
-        <div className="mb-2 self-start sm:-mb-2 lg:-mb-4 3xl:-mb-6 4xl:-mb-8">
+        <div className="mb-2 self-end sm:-mb-2 lg:-mb-4 3xl:-mb-6 4xl:-mb-8">
           <button
             onClick={() => navigate(backPath)}
             aria-label="Kembali"

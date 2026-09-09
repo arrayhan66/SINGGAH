@@ -1,4 +1,4 @@
-import { Plus, Pencil } from "lucide-react"
+import { Plus, Pencil, Loader2 } from "lucide-react"
 
 export default function CategoryForm({
   editing,
@@ -8,6 +8,7 @@ export default function CategoryForm({
   onDescChange,
   onSave,
   onClose,
+  saving = false,
 }) {
   return (
     <div className="animate-slide-down absolute inset-x-0 top-0 z-20 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-brand-navy/95 via-brand-dark/95 to-slate-900/95 p-6 shadow-2xl shadow-black/50 backdrop-blur-2xl sm:p-8">
@@ -26,32 +27,37 @@ export default function CategoryForm({
       <div className="flex flex-col gap-3">
         <input
           type="text"
-          placeholder="Nama kategori (contoh: Desain Grafis)"
+          placeholder="Nama kategori..."
           value={formName}
           onChange={(e) => onNameChange(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && onSave()}
-          className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+          onKeyDown={(e) => e.key === "Enter" && !saving && onSave()}
+          disabled={saving}
+          className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-50"
           autoFocus
         />
         <textarea
-          placeholder="Deskripsi kategori (paragraf yang tampil di halaman visitor, contoh: Menampilkan karya desain grafis mahasiswa Teknik Elektro.)"
+          placeholder="Deskripsi kategori..."
           value={formDesc}
           onChange={(e) => onDescChange(e.target.value)}
           rows={3}
-          className="flex-1 resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+          disabled={saving}
+          className="flex-1 resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-50"
         />
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={onSave}
-            className="flex cursor-pointer items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-cyan-500/20 transition-all hover:from-cyan-400 hover:to-blue-500 hover:-translate-y-0.5 active:translate-y-0"
+            disabled={saving}
+            className="flex cursor-pointer items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-cyan-500/20 transition-all hover:from-cyan-400 hover:to-blue-500 hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0"
           >
+            {saving && <Loader2 size={16} className="animate-spin" />}
             {editing ? "Simpan" : "Tambah"}
           </button>
           <button
             type="button"
             onClick={onClose}
-            className="flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-slate-300 transition-all hover:bg-white/10 hover:text-white"
+            disabled={saving}
+            className="flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-slate-300 transition-all hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
           >
             Batal
           </button>

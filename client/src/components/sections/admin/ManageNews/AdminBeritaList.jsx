@@ -74,11 +74,20 @@ function AdminBeritaList({ search, statusFilter }) {
         {loading ? (
           <AdminNewsListSkeleton />
         ) : filteredBerita.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 rounded-2xl border border-white/10 bg-white/5 py-16 text-center">
-            <Newspaper className="h-10 w-10 text-slate-500" />
-            <p className="text-sm md:text-base text-slate-400">
-              Belum ada berita yang cocok.
-            </p>
+          <div className="admin-empty-news animate-fade-in-up flex flex-col items-center gap-4 rounded-2xl border border-dashed border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] py-16 text-center">
+            <div className="rounded-full bg-slate-800/50 p-4 ring-1 ring-slate-700/50">
+              <Newspaper className="h-8 w-8 text-slate-500" />
+            </div>
+            <div>
+              <p className="text-base font-semibold text-slate-300">
+                Tidak ada berita yang cocok
+              </p>
+              <p className="mt-1 text-sm text-slate-500">
+                {search
+                  ? `Tidak ditemukan berita dengan kata kunci "${search}"`
+                  : "Belum ada berita dengan filter ini."}
+              </p>
+            </div>
           </div>
         ) : (
           <>

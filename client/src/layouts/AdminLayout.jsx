@@ -2,7 +2,7 @@ import { useState } from "react"
 import { ChevronDown } from "lucide-react"
 import SidebarAdmin from "../components/layout/SidebarAdmin"
 import AdminNavbar from "../components/layout/AdminNavbar"
-import Footer from "../components/layout/Footer"
+import AdminFooter from "../components/layout/AdminFooter"
 import "../styles/admin-light.css"
 
 function AdminLayout({ children }) {
@@ -55,7 +55,7 @@ function AdminLayout({ children }) {
         </div>
       </main>
       <div className={`transition-all duration-300 ${mainPad}`}>
-        <Footer />
+        <AdminFooter />
       </div>
     </div>
   )

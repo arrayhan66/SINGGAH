@@ -73,10 +73,14 @@ function AdminAddProjectView() {
   useEffect(() => {
     if (categoriesFetched.current) return
     categoriesFetched.current = true
-    api
-      .get("/categories")
-      .then((res) => setCategories(res.data.data || res.data))
-      .catch(() => setCategories([]))
+    const load = () =>
+      api
+        .get("/categories")
+        .then((res) => setCategories(res.data.data || res.data))
+        .catch(() => setCategories([]))
+    load()
+    window.addEventListener("focus", load)
+    return () => window.removeEventListener("focus", load)
   }, [])
 
   function updateField(field, value) {

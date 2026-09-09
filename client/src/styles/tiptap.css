@@ -144,3 +144,70 @@
   animation: skeleton-shimmer 1.6s ease-in-out infinite;
   box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.14);
 }
+
+/* ============================================================
+   DARK MODE (default): editor berita jadi panel gelap senada
+   kartu admin. Light mode tetap putih (override di bawah).
+   ============================================================ */
+html:not(.light) .ProseMirror {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+html:not(.light) .ProseMirror p.is-editor-empty:first-child::before {
+  color: #64748b;
+}
+
+html:not(.light) .ProseMirror h1,
+html:not(.light) .ProseMirror h2,
+html:not(.light) .ProseMirror h3,
+html:not(.light) .ProseMirror h4,
+html:not(.light) .ProseMirror h5,
+html:not(.light) .ProseMirror h6 {
+  color: #ffffff;
+}
+
+html:not(.light) .ProseMirror blockquote {
+  border-left-color: #06b6d4;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 0 6px 6px 0;
+}
+
+html:not(.light) .ProseMirror code {
+  background: #0f172a;
+  color: #22d3ee;
+}
+
+html:not(.light) .ProseMirror pre {
+  background: #0f172a;
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+html:not(.light) .ProseMirror hr {
+  border-top-color: #334155;
+}
+
+html:not(.light) .ProseMirror a {
+  color: #22d3ee;
+}
+
+html:not(.light) .ProseMirror figcaption {
+  color: #94a3b8;
+}
+
+/* Light mode: pulihkan permukaan putih */
+html.light .ProseMirror {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+html.light .ProseMirror h1,
+html.light .ProseMirror h2,
+html.light .ProseMirror h3,
+html.light .ProseMirror h4,
+html.light .ProseMirror h5,
+html.light .ProseMirror h6 {
+  color: #0f172a;
+}

@@ -42,7 +42,7 @@ export default function MediaLibraryContent({
       {loading ? (
         <AdminMediaSkeleton />
       ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 py-16 text-center">
+        <div className="admin-empty-news animate-fade-in-up flex flex-col items-center gap-4 rounded-2xl border border-dashed border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] py-16 text-center">
           <div className="rounded-full bg-slate-800/50 p-4 ring-1 ring-slate-700/50">
             <Image className="h-8 w-8 text-slate-500" />
           </div>

@@ -95,7 +95,7 @@ function UploadDocuments({ value, onChange, existingItems, onRemoveExisting }) {
       >
         <FileUp className="h-4 w-4 min-[280px]:h-5 min-[280px]:w-5 text-cyan-400 2xl:h-6 2xl:w-6 3xl:h-7 3xl:w-7 4xl:h-8 4xl:w-8" />
         <span className="min-[280px]:text-sm 2xl:text-base 3xl:text-lg 4xl:text-xl">
-          Klik untuk upload dokumen
+          Upload dokumen
         </span>
       </button>
 

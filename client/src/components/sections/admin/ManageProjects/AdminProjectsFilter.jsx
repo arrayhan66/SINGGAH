@@ -30,17 +30,24 @@ function AdminProjectsFilter({
         setIsOpen(false)
       }
     }
-    function handleClose() {
-      setIsOpen(false)
+    function updatePosition() {
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect()
+        setDropdownPos({
+          top: rect.bottom + 6,
+          left: rect.left,
+          width: rect.width,
+        })
+      }
     }
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside)
-      window.addEventListener("scroll", handleClose, true)
-      window.addEventListener("resize", handleClose)
+      window.addEventListener("scroll", updatePosition, true)
+      window.addEventListener("resize", updatePosition)
       return () => {
         document.removeEventListener("mousedown", handleClickOutside)
-        window.removeEventListener("scroll", handleClose, true)
-        window.removeEventListener("resize", handleClose)
+        window.removeEventListener("scroll", updatePosition, true)
+        window.removeEventListener("resize", updatePosition)
       }
     }
   }, [isOpen])
@@ -64,7 +71,7 @@ function AdminProjectsFilter({
 
   return (
     <>
-      <div className="relative w-full min-[450px]:hidden">
+      <div className="relative w-full min-[600px]:hidden">
         <button
           ref={buttonRef}
           type="button"
@@ -101,7 +108,7 @@ function AdminProjectsFilter({
                 left: dropdownPos.left,
                 width: dropdownPos.width,
               }}
-              className="z-50 min-w-[200px] animate-fade-in-up overflow-hidden rounded-xl border border-white/10 bg-slate-900/95 shadow-2xl shadow-black/40 backdrop-blur-xl"
+              className="admin-filter-panel z-50 min-w-[200px] animate-fade-in-up overflow-hidden rounded-2xl border border-cyan-400/25 bg-gradient-to-b from-[#0d1f3c] via-[#0b1628] to-[#081020] shadow-[0_24px_60px_-16px_rgba(34,211,238,0.35),0_18px_40px_-12px_rgba(0,0,0,0.85)] ring-1 ring-white/5 backdrop-blur-xl"
             >
               {tabs.map((tab) => {
                 const Icon = tab.icon
@@ -143,7 +150,7 @@ function AdminProjectsFilter({
           )}
       </div>
 
-      <div className="hidden min-[450px]:grid w-full grid-cols-2 gap-1.5 rounded-xl border border-white/10 bg-white/5 p-1.5 min-[630px]:flex min-[630px]:w-fit min-[630px]:flex-wrap min-[630px]:items-center min-[630px]:gap-1 min-[630px]:p-1">
+      <div className="hidden min-[600px]:grid w-full grid-cols-2 gap-1.5 rounded-xl border border-white/10 bg-white/5 p-1.5 min-[630px]:flex min-[630px]:w-fit min-[630px]:flex-wrap min-[630px]:items-center min-[630px]:gap-1 min-[630px]:p-1">
         {tabs.map((tab) => {
           const Icon = tab.icon
           const isActive = statusFilter === tab.value

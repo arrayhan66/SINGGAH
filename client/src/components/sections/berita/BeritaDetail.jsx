@@ -32,10 +32,12 @@ function parseSeeAlsoItems(htmlStr) {
 }
 
 function SeeAlsoBlock({ htmlAttributes }) {
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
   const items = parseSeeAlsoItems(htmlAttributes["data-see-also-items"])
 
   return (
-    <div className="my-8 overflow-hidden rounded-2xl border border-amber-200 bg-white shadow-md">
+    <div className={`my-8 overflow-hidden rounded-2xl border shadow-md ${isDark ? "border-amber-500/20 bg-slate-900" : "border-amber-200 bg-white"}`}>
       <div className="flex items-center gap-3 bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-3">
         <BookOpen size={18} className="text-white" />
         <span className="text-sm font-black uppercase tracking-widest text-white">
@@ -44,7 +46,7 @@ function SeeAlsoBlock({ htmlAttributes }) {
         <div className="h-px flex-1 bg-white/30" />
       </div>
       {items.length > 0 ? (
-        <div className="grid divide-y divide-amber-100">
+        <div className={`grid divide-y ${isDark ? "divide-slate-800" : "divide-amber-100"}`}>
           {items.map((item, index) => (
             <a
               key={index}
@@ -52,11 +54,11 @@ function SeeAlsoBlock({ htmlAttributes }) {
               target={item.url ? "_blank" : undefined}
               rel={item.url ? "noopener noreferrer" : undefined}
               className={`flex items-start gap-3 px-5 py-3.5 transition-colors ${
-                item.url ? "hover:bg-amber-50/80 cursor-pointer" : ""
+                item.url ? (isDark ? "hover:bg-white/5 cursor-pointer" : "hover:bg-amber-50/80 cursor-pointer") : ""
               }`}
             >
               {item.image ? (
-                <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-amber-100">
+                <div className={`h-16 w-24 shrink-0 overflow-hidden rounded-lg ${isDark ? "bg-slate-800" : "bg-amber-100"}`}>
                   <SmartImage
                     src={item.image}
                     alt={item.title}
@@ -64,16 +66,16 @@ function SeeAlsoBlock({ htmlAttributes }) {
                   />
                 </div>
               ) : (
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-sm font-bold text-amber-500">
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${isDark ? "bg-slate-800 text-amber-400" : "bg-amber-100 text-amber-500"}`}>
                   {index + 1}
                 </div>
               )}
               <div className="min-w-0 flex-1 py-0.5">
-                <p className="text-sm font-bold leading-snug text-slate-800 line-clamp-2 group-hover:text-amber-700">
+                <p className={`text-sm font-bold leading-snug line-clamp-2 ${isDark ? "text-slate-200" : "text-slate-800"} ${item.url ? "group-hover:text-amber-400" : ""}`}>
                   {item.title}
                 </p>
                 {item.url && (
-                  <p className="mt-1 text-[11px] text-cyan-600 truncate">
+                  <p className={`mt-1 text-[11px] truncate ${isDark ? "text-cyan-400" : "text-cyan-600"}`}>
                     {item.url}
                   </p>
                 )}
@@ -93,12 +95,14 @@ function SeeAlsoBlock({ htmlAttributes }) {
 }
 
 function AdBlockRender({ htmlAttributes }) {
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
   const title = htmlAttributes["data-ad-title"] || ""
   const content = htmlAttributes["data-ad-content"] || ""
   const url = htmlAttributes["data-ad-url"] || ""
 
   return (
-    <div className="my-8 overflow-hidden rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-sm">
+    <div className={`my-8 overflow-hidden rounded-2xl border shadow-sm ${isDark ? "border-blue-500/20 bg-gradient-to-br from-blue-950 to-indigo-950" : "border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50"}`}>
       <div className="flex items-center gap-3 bg-gradient-to-r from-blue-500 to-indigo-500 px-5 py-3">
         <Megaphone size={16} className="text-white" />
         <span className="text-xs font-black uppercase tracking-widest text-white">
@@ -108,14 +112,14 @@ function AdBlockRender({ htmlAttributes }) {
       </div>
       <div className="px-5 py-4">
         {content && (
-          <p className="text-sm leading-relaxed text-slate-700">{content}</p>
+          <p className={`text-sm leading-relaxed ${isDark ? "text-slate-300" : "text-slate-700"}`}>{content}</p>
         )}
         {url && (
           <a
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+            className={`mt-2 inline-flex items-center gap-1.5 text-xs font-semibold transition-colors ${isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-700"}`}
           >
             Selengkapnya &rarr;
           </a>
@@ -361,8 +365,8 @@ function BeritaDetail() {
 
             <div className="mt-6 min-[350px]:mt-8 sm:mt-10 space-y-2 min-[350px]:space-y-3">
               {item.tags?.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 min-[350px]:gap-2">
-                  {item.tags.map((tag) => (
+                <div className="flex flex-wrap items-center gap-1.5 min-[350px]:gap-2">
+                  {item.tags.slice(0, 3).map((tag) => (
                     <span
                       key={tag}
                       className="rounded-md min-[350px]:rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-2 min-[350px]:px-3 py-0.5 min-[350px]:py-1 text-[10px] min-[350px]:text-xs font-bold tracking-wider uppercase text-cyan-300 shadow-xs"
@@ -370,6 +374,11 @@ function BeritaDetail() {
                       {tag}
                     </span>
                   ))}
+                  {item.tags.length > 3 && (
+                    <span className="rounded-md min-[350px]:rounded-lg border border-white/10 bg-white/5 px-2 min-[350px]:px-3 py-0.5 min-[350px]:py-1 text-[10px] min-[350px]:text-xs font-semibold tracking-wider text-slate-400">
+                      +{item.tags.length - 3}
+                    </span>
+                  )}
                 </div>
               )}
 
@@ -464,7 +473,7 @@ function BeritaDetail() {
             <div className="flex flex-wrap items-center justify-between gap-3 mb-4 min-[350px]:mb-6">
               <h2 className={`text-lg min-[350px]:text-xl sm:text-2xl font-black tracking-tight flex items-center gap-2 ${isDark ? "text-white" : "text-slate-800"}`}>
                 <span className={`w-1.5 min-[350px]:w-2 h-5 min-[350px]:h-6 rounded-full inline-block ${isDark ? "bg-cyan-400" : "bg-cyan-600"}`}></span>
-                Berita & Kegiatan Terkait
+                Berita & Kegiatan Lainnya
               </h2>
               <Link
                 to="/berita"
@@ -608,4 +617,5 @@ function BeritaDetail() {
   )
 }
 
+export { NewsContent }
 export default BeritaDetail

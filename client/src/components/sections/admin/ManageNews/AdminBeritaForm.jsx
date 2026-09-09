@@ -65,6 +65,8 @@ function AdminBeritaForm() {
   const isEditMode = Boolean(slug)
   const [formData, setFormData] = useState(emptyForm)
   const [notification, setNotification] = useState(null)
+  const [saving, setSaving] = useState(false)
+  const [pendingRedirect, setPendingRedirect] = useState(false)
 
   useEffect(() => {
     if (isEditMode && !loading) {
@@ -118,11 +120,20 @@ function AdminBeritaForm() {
     setNotification({ message, type })
   }
 
+  function handleNotificationDone() {
+    setNotification(null)
+    if (pendingRedirect) {
+      setPendingRedirect(false)
+      navigate("/berita")
+    }
+  }
+
   function updateField(field, value) {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
   async function handlePublish() {
+    if (saving) return
     if (!formData.title.trim()) {
       showNotification("Judul berita wajib diisi", "error")
       return
@@ -131,6 +142,8 @@ function AdminBeritaForm() {
       showNotification("Konten berita tidak boleh kosong", "error")
       return
     }
+
+    setSaving(true)
 
     const contentParagraphs = extractParagraphsFromHTML(formData.contentText)
 
@@ -174,12 +187,13 @@ function AdminBeritaForm() {
         successMsg = "Berita berhasil dipublikasikan"
       }
       showNotification(successMsg, "success")
-
-      setTimeout(() => navigate("/berita"), 1000)
+      setPendingRedirect(true)
     } catch (err) {
       const message =
         err.response?.data?.message || "Gagal menyimpan berita"
       showNotification(message, "error")
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -205,17 +219,17 @@ function AdminBeritaForm() {
   }
 
   return (
-    <AdminHeroBackground fullWidth>
+    <AdminHeroBackground fullWidth className="admin-berita-form-root">
       <div className="px-6 py-8 md:px-10 md:py-10">
         {notification && (
           <Toast
             message={notification.message}
             type={notification.type}
-            onDone={() => setNotification(null)}
+            onDone={handleNotificationDone}
           />
         )}
 
-        {isEditMode && loading ? (
+        {isEditMode && loading && !saving ? (
           <AdminNewsFormSkeleton />
         ) : (
           <>
@@ -252,6 +266,7 @@ function AdminBeritaForm() {
             onPublish={handlePublish}
             onPreview={handlePreview}
             isEditMode={isEditMode}
+            saving={saving}
           />
         </div>
           </>

@@ -214,7 +214,7 @@ function ReplyItem({
             {isEdited(reply) && <span className="text-[10px] italic text-slate-500">(diedit)</span>}
             <span className="text-[10px] text-slate-500 sm:text-[11px]">· {formatDate(reply.created_at)}</span>
           </div>
-          {author.username && (
+          {author.username && author.role !== "admin" && (
             <span className="mt-0.5 text-[10px] font-medium leading-none text-cyan-300/70">@{author.username}</span>
           )}
         </div>
@@ -452,7 +452,7 @@ function CommentItem({
               {isEdited(comment) && <span className="text-[10px] italic text-slate-500">(diedit)</span>}
               <span className="text-[10px] text-slate-500 sm:text-[11px]">· {formatDate(comment.created_at)}</span>
             </div>
-            {author.username && (
+            {author.username && author.role !== "admin" && (
               <span className="mt-0.5 text-[10px] font-medium leading-none text-cyan-300/70">@{author.username}</span>
             )}
           </div>

@@ -8,11 +8,14 @@ import "../../../../styles/tiptap.css"
 import Underline from "@tiptap/extension-underline"
 import Link from "@tiptap/extension-link"
 import TextAlign from "@tiptap/extension-text-align"
+import { TextStyle, FontSize, FontFamily } from "@tiptap/extension-text-style"
 import HorizontalRule from "@tiptap/extension-horizontal-rule"
 import AdminBeritaToolbar from "./AdminBeritaToolbar"
 import FileHandler from "@tiptap/extension-file-handler"
 import AdBlock from "./extensions/AdBlock.jsx"
 import SeeAlso from "./extensions/SeeAlso.jsx"
+import LineHeight from "./extensions/LineHeight.jsx"
+import ParagraphSpacing from "./extensions/ParagraphSpacing.jsx"
 
 import {
   Image as ImageIcon,
@@ -179,6 +182,11 @@ function AdminBeritaEditorMain({ formData, updateField, isEditMode }) {
       }),
       AdBlock,
       SeeAlso,
+      LineHeight,
+      ParagraphSpacing,
+      TextStyle,
+      FontSize,
+      FontFamily,
     ],
     content: formData.contentText,
     onUpdate({ editor }) {
@@ -359,7 +367,7 @@ function AdminBeritaEditorMain({ formData, updateField, isEditMode }) {
           }
           autoResizeTitle()
         }}
-        placeholder="Judul Berita / Artikel..."
+        placeholder="Judul Berita..."
         className="w-full resize-none overflow-hidden bg-transparent text-2xl md:text-3xl font-bold text-white placeholder:text-slate-600 focus:outline-none"
       />
 
@@ -370,12 +378,12 @@ function AdminBeritaEditorMain({ formData, updateField, isEditMode }) {
         value={formData.desc}
         onChange={(e) => updateField("desc", e.target.value)}
         rows={2}
-        placeholder="Ringkasan / deskripsi singkat berita..."
+        placeholder="Deskripsi berita..."
         className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/50 focus:outline-none"
       />
 
       {/* Rich Text Editor Card (Word / WordPress Style with Inline Image Resizing & Caption) */}
-      <div className="overflow-hidden rounded-2xl border border-slate-700 bg-white shadow-2xl">
+      <div className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl">
         <AdminBeritaToolbar
           editor={editor}
           insertImage={insertImage}

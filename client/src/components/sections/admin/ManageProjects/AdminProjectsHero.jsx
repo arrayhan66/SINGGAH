@@ -27,14 +27,14 @@ function AdminProjectsHero({
             <h1 className="text-[clamp(1.25rem,0.9375rem+1.5vw,1.5rem)] font-black text-white sm:text-3xl">
               Kelola <span className="text-cyan-300">Karya</span>
             </h1>
-            <p className="mt-1.5 max-w-xl text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-300/90">
+            <p className="mt-1 max-w-xl text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400">
               Tinjau, setujui, atau tolak karya yang diunggah mahasiswa.
             </p>
           </div>
         </div>
       </div>
 
-      <div className="px-4 pt-12 pb-6 md:px-6 md:pt-14 md:pb-8 lg:px-8">
+      <div className="px-4 md:px-6 lg:px-8 pt-6 md:pt-7 pb-6 md:pb-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
@@ -43,7 +43,7 @@ function AdminProjectsHero({
               value={search}
               onChange={onSearchChange}
               placeholder="Cari judul atau nama mahasiswa..."
-              className="w-full rounded-xl border border-slate-200/90 bg-slate-100 py-3 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-500 shadow-lg shadow-black/20 outline-none transition-all duration-[250ms] focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-400/20"
+              className="admin-search-input w-full rounded-xl border border-slate-200/90 bg-slate-100 py-3 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-500 shadow-lg shadow-black/20 outline-none transition-all duration-[250ms] focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-400/20"
             />
           </div>
           <button
@@ -56,7 +56,7 @@ function AdminProjectsHero({
           </button>
         </div>
 
-        <div className="mt-4 flex flex-col gap-2.5 md:mt-5">
+        <div className="mt-5 flex flex-col gap-2.5">
           <AdminProjectsFilter
             statusFilter={statusFilter}
             onStatusChange={onStatusChange}

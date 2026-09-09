@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, useLocation } from "react-router-dom"
 import {
   Hourglass,
   CheckCircle2,
@@ -26,25 +26,19 @@ const predefinedReasons = [
 
 const statusConfig = {
   pending: {
-    label: "Menunggu Review",
     icon: Hourglass,
-    chip: "border-amber-400/30 bg-amber-400/10 text-amber-300",
-    softBg: "bg-amber-500/10",
-    softColor: "text-amber-400",
+    iconBox: "border-amber-400/30 bg-amber-400/10 shadow-amber-500/10",
+    iconColor: "text-amber-300",
   },
   published: {
-    label: "Disetujui",
     icon: CheckCircle2,
-    chip: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
-    softBg: "bg-emerald-500/10",
-    softColor: "text-emerald-400",
+    iconBox: "border-emerald-400/30 bg-emerald-400/10 shadow-emerald-500/10",
+    iconColor: "text-emerald-300",
   },
   rejected: {
-    label: "Ditolak",
     icon: XCircle,
-    chip: "border-red-400/30 bg-red-400/10 text-red-300",
-    softBg: "bg-red-500/10",
-    softColor: "text-red-400",
+    iconBox: "border-red-400/30 bg-red-400/10 shadow-red-500/10",
+    iconColor: "text-red-300",
   },
 }
 
@@ -57,6 +51,8 @@ const statusDescription = {
 function AdminProjectForm() {
   const { slug } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
+  const fromPath = location.state?.from || "/projects"
   const { getProjectBySlug, approveProject, rejectProject } = useProjects()
 
   const contextProject = getProjectBySlug(slug)
@@ -188,7 +184,7 @@ function AdminProjectForm() {
   return (
     <div className="user-page">
       <EditKaryaHero
-        backPath="/projects"
+        backPath={fromPath}
         subtitle="Perbarui informasi dan tinjau status karya mahasiswa di SINGGAH."
         ptClass="pt-6 sm:pt-8 2xl:pt-10"
       />
@@ -207,8 +203,8 @@ function AdminProjectForm() {
             <div className="relative mb-6 rounded-3xl border border-white/10 bg-white/5 p-5 shadow-xl backdrop-blur-xl sm:p-6">
               <div className="relative flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
                 <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-amber-400/30 bg-amber-400/10 shadow-lg shadow-amber-500/10">
-                    <StatusIcon className="h-6 w-6 text-amber-300" strokeWidth={2.2} />
+                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border shadow-lg ${config.iconBox}`}>
+                    <StatusIcon className={`h-6 w-6 ${config.iconColor}`} strokeWidth={2.2} />
                   </div>
                   <div className="min-w-0">
                     <h2 className="text-sm font-semibold text-white sm:text-base">
@@ -219,13 +215,6 @@ function AdminProjectForm() {
                     </p>
                   </div>
                 </div>
-
-                <span
-                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-semibold ${config.chip}`}
-                >
-                  <StatusIcon size={13} strokeWidth={2.2} />
-                  {config.label}
-                </span>
               </div>
 
               {rejecting && (
@@ -282,8 +271,9 @@ function AdminProjectForm() {
                 </div>
               )}
 
-              <div className="relative mt-5 flex flex-col gap-3 min-[420px]:flex-row">
-                {!approving && !rejecting && existing.status === "pending" && (
+              {existing.status === "pending" && (
+                <div className="relative mt-5 flex flex-col gap-3 min-[420px]:flex-row">
+                  {!approving && !rejecting && (
                   <button
                     type="button"
                     onClick={handleApprove}
@@ -292,11 +282,11 @@ function AdminProjectForm() {
                     className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition hover:from-emerald-400 hover:to-green-500 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <CheckCircle2 size={17} />
-                    Setujui & Terbitkan
+                    Setujui
                   </button>
                 )}
 
-                {!approving && !rejecting && existing.status === "pending" && (
+                {!approving && !rejecting && (
                   <button
                     type="button"
                     onClick={handleReject}
@@ -350,14 +340,28 @@ function AdminProjectForm() {
                     </button>
                   </>
                 )}
-              </div>
+                </div>
+              )}
 
               {existing.status === "rejected" && existing.rejection_reason && (
-                <div className="relative mt-4 flex items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/5 p-3">
-                  <AlertTriangle className="h-4 w-4 shrink-0 text-red-400" />
-                  <p className="text-xs text-red-300/90">
-                    Alasan penolakan saat ini: {existing.rejection_reason}
-                  </p>
+                <div className="relative mt-3 overflow-hidden rounded-xl border border-red-400/25 bg-red-500/5 p-3.5 sm:p-4">
+                  <span
+                    className="pointer-events-none absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-red-400 to-rose-500"
+                    aria-hidden="true"
+                  />
+                  <div className="flex items-start gap-3 pl-1.5">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-red-400/30 bg-red-500/15">
+                      <AlertTriangle className="h-4 w-4 text-red-400" strokeWidth={2.2} />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-red-400">
+                        Alasan Penolakan
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-slate-300">
+                        {existing.rejection_reason}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -381,7 +385,7 @@ function AdminProjectForm() {
             </div>
           </div>
         ) : existing ? (
-          <EditKaryaSection redirectPath="/projects" />
+          <EditKaryaSection redirectPath={fromPath} />
         ) : (
           <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-slate-900/60 px-6 py-14 text-center backdrop-blur-xl">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5">

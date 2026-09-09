@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { CheckCircle2, XCircle, X } from "lucide-react"
 
 const DURATION = 3000
@@ -29,6 +29,11 @@ export default function Toast({ message, type = "success", onDone }) {
   const [progress, setProgress] = useState(100)
   const config = typeConfig[type] || typeConfig.success
   const Icon = config.icon
+  const onDoneRef = useRef(onDone)
+
+  useEffect(() => {
+    onDoneRef.current = onDone
+  }, [onDone])
 
   useEffect(() => {
     requestAnimationFrame(() => setShow(true))
@@ -40,11 +45,11 @@ export default function Toast({ message, type = "success", onDone }) {
       if (remaining <= 0) {
         clearInterval(tick)
         setShow(false)
-        setTimeout(() => onDone?.(), 300)
+        setTimeout(() => onDoneRef.current?.(), 300)
       }
     }, 30)
     return () => clearInterval(tick)
-  }, [onDone])
+  }, [message, type])
 
   return (
     <div
@@ -75,7 +80,7 @@ export default function Toast({ message, type = "success", onDone }) {
           <button
             onClick={() => {
               setShow(false)
-              setTimeout(() => onDone?.(), 300)
+              setTimeout(() => onDoneRef.current?.(), 300)
             }}
             className="shrink-0 cursor-pointer text-slate-500 transition-colors hover:text-white pt-1"
           >

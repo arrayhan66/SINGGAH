@@ -6,6 +6,7 @@ import AdminProjectsCard from "./AdminProjectsCard"
 import AdminProjectApproveModal from "./AdminProjectApproveModal"
 import AdminProjectRejectModal from "./AdminProjectRejectModal"
 import DeleteConfirmModal from "../../../ui/DeleteConfirmModal"
+import toast from "../../../../utils/toast"
 
 function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
   const navigate = useNavigate()
@@ -61,6 +62,25 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
     }
     return groups
   }, [filteredProjects])
+
+  // Peta slot unggulan per PORTAL (kategori). Satu portal punya slot 1 & 2.
+// Dipakai untuk memblokir slot yang sudah terisi karya lain (harus dilepas
+// dulu). Hanya karya published yang dianggap mengisi slot, supaya karya yang
+// di-unpublish/ditolak tidak "menyandera" slot unggulan selamanya.
+  const featuredScopeKey = (p) => String(p.category_id ?? p.Category?.id ?? "")
+
+  const featuredBySlot = useMemo(() => {
+    const map = {}
+    for (const p of projects) {
+      const slotNum = Number(p.featured_slot)
+      if (p.status === "published" && (slotNum === 1 || slotNum === 2)) {
+        const key = featuredScopeKey(p)
+        map[key] = map[key] || {}
+        map[key][slotNum] = p
+      }
+    }
+    return map
+  }, [projects])
 
   function handleViewDetail(project) {
     navigate(`/projects/detail/${project.slug || project.id}`)
@@ -127,9 +147,9 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
         ) : (
           groupedProjects.map((group) => (
             <div key={group.id} className="flex flex-col gap-4">
-              <div className="flex items-center gap-2.5 border-b border-white/10 pb-3">
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30">
-                  <FolderOpen size={15} />
+              <div className="category-group-divider flex items-center gap-2.5 border-b border-white/10 pb-3">
+                <div className="category-group-icon flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30">
+                  <FolderOpen size={15} strokeWidth={2.2} />
                 </div>
                 <h3 className="text-base font-bold text-white tracking-wide">
                   {group.name} <span className="ml-1 text-xs font-normal text-slate-400">({group.projects.length})</span>
@@ -146,7 +166,17 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
                       onQuickReject={handleRejectClick}
                       onEdit={handleEditClick}
                       onDelete={handleDeleteClick}
-                      onSetFeatured={(p, slot) => setFeaturedSlot(p.id, slot)}
+                      onSetFeatured={(p, slot) => {
+                        setFeaturedSlot(p.id, slot).catch((err) => {
+                          toast.error(
+                            err?.response?.data?.message ||
+                              (slot
+                                ? `Gagal memperbarui slot karya unggulan slot ${slot}`
+                                : "Gagal melepas karya dari unggulan"),
+                          )
+                        })
+                      }}
+                      featuredBySlot={featuredBySlot}
                     />
                   </div>
                 ))}

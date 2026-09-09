@@ -31,17 +31,24 @@ function AdminProjectsCategoryFilter({
         setIsOpen(false)
       }
     }
-    function handleClose() {
-      setIsOpen(false)
+    function updatePosition() {
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect()
+        setDropdownPos({
+          top: rect.bottom + 6,
+          left: rect.left,
+          width: Math.max(rect.width, 220),
+        })
+      }
     }
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside)
-      window.addEventListener("scroll", handleClose, true)
-      window.addEventListener("resize", handleClose)
+      window.addEventListener("scroll", updatePosition, true)
+      window.addEventListener("resize", updatePosition)
       return () => {
         document.removeEventListener("mousedown", handleClickOutside)
-        window.removeEventListener("scroll", handleClose, true)
-        window.removeEventListener("resize", handleClose)
+        window.removeEventListener("scroll", updatePosition, true)
+        window.removeEventListener("resize", updatePosition)
       }
     }
   }, [isOpen])
@@ -65,7 +72,7 @@ function AdminProjectsCategoryFilter({
 
   return (
     <>
-      <div className="relative w-full min-[450px]:hidden">
+      <div className="relative w-full min-[600px]:hidden">
         <button
           ref={buttonRef}
           type="button"
@@ -102,7 +109,7 @@ function AdminProjectsCategoryFilter({
                 left: dropdownPos.left,
                 width: dropdownPos.width,
               }}
-              className="z-50 max-h-[70vh] min-w-[220px] animate-fade-in-up overflow-y-auto rounded-xl border border-white/10 bg-slate-900/95 shadow-2xl shadow-black/40 backdrop-blur-xl"
+              className="admin-filter-panel z-50 max-h-[70vh] min-w-[220px] animate-fade-in-up overflow-y-auto rounded-2xl border border-cyan-400/25 bg-gradient-to-b from-[#0d1f3c] via-[#0b1628] to-[#081020] shadow-[0_24px_60px_-16px_rgba(34,211,238,0.35),0_18px_40px_-12px_rgba(0,0,0,0.85)] ring-1 ring-white/5 backdrop-blur-xl"
             >
               {tabs.map((tab) => {
                 const isActive = categoryFilter === tab.value
@@ -147,7 +154,7 @@ function AdminProjectsCategoryFilter({
           )}
       </div>
 
-      <div className="hidden min-[450px]:flex min-[450px]:w-fit min-[450px]:max-w-full min-[450px]:flex-wrap min-[450px]:items-center min-[450px]:gap-1 rounded-xl border border-white/10 bg-white/5 min-[450px]:p-1">
+      <div className="hidden min-[600px]:flex min-[600px]:w-fit min-[600px]:max-w-full min-[600px]:flex-wrap min-[600px]:items-center min-[600px]:gap-1 rounded-xl border border-white/10 bg-white/5 min-[600px]:p-1">
         {tabs.map((tab) => {
           const isActive = categoryFilter === tab.value
           return (

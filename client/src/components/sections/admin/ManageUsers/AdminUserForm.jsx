@@ -32,6 +32,7 @@ function AdminUserForm() {
     if (isEditMode) {
       const existing = getUserByUsername(slug)
       if (existing) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setFormData({
           name: existing.name || "",
           username: existing.username || "",
@@ -50,13 +51,7 @@ function AdminUserForm() {
   }, [slug])
 
   function updateField(field, value) {
-    setFormData((prev) => {
-      const next = { ...prev, [field]: value }
-      if (field === "role" && value === "admin") {
-        next.tipe = "umum"
-      }
-      return next
-    })
+    setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
   const [saving, setSaving] = useState(false)
@@ -99,7 +94,7 @@ function AdminUserForm() {
           projectCount: 0,
         })
       }
-      navigate("/users")
+      navigate("/admin/pengguna")
     } catch (err) {
       setSaving(false)
       notifyError(
@@ -120,7 +115,7 @@ function AdminUserForm() {
       )}
       <div className="px-6 pt-6 pb-10 md:px-10 md:pt-8">
         <button
-          onClick={() => navigate("/users")}
+          onClick={() => navigate("/admin/pengguna")}
           className="flex cursor-pointer items-center gap-2 text-sm text-slate-300 hover:text-cyan-300 transition-colors"
         >
           <ArrowLeft size={16} />

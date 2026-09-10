@@ -34,7 +34,7 @@ function AdminUserDetail() {
   }, [slug, user])
 
   function handleEdit(target) {
-    navigate(`/users/edit/${target.username}`)
+    navigate(`/admin/pengguna/edit/${target.username}`)
   }
 
   function handleDeleteClick(target) {
@@ -48,7 +48,7 @@ function AdminUserDetail() {
       await deleteUser(deleteTarget.id)
       setDeleteLoading(false)
       setDeleteSuccess(true)
-      setTimeout(() => navigate("/users"), 1200)
+      setTimeout(() => navigate("/admin/pengguna"), 1200)
     } catch {
       setDeleteLoading(false)
       setDeleteTarget(null)
@@ -78,7 +78,7 @@ function AdminUserDetail() {
       <AdminHeroBackground fullWidth>
         <div className="px-4 md:px-6 lg:px-8 pt-6 pb-10 md:pt-8">
           <button
-            onClick={() => navigate("/users")}
+            onClick={() => navigate("/admin/pengguna")}
             className="group inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 backdrop-blur-xl transition-all duration-200 hover:border-cyan-400/40 hover:bg-cyan-500/10 hover:text-cyan-300"
           >
             <ArrowLeft

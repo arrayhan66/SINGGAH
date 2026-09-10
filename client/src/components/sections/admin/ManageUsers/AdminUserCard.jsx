@@ -21,7 +21,7 @@ const pendingTipeLabel = {
 }
 
 function AdminUserCard({ user, onEdit, onDelete, onDetail, onApprove, onReject, approving }) {
-  const tipe = tipeConfig[user.tipe] || tipeConfig.umum
+  const tipe = tipeConfig[user.role === "admin" ? "admin" : user.tipe] || tipeConfig.umum
   const isPending = Boolean(user.pending_tipe)
   const pendingLabel = pendingTipeLabel[user.pending_tipe] || "Tipe Baru"
 

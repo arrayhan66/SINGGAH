@@ -44,7 +44,7 @@ function DashboardPendingProjects() {
         </div>
 
         <button
-          onClick={() => navigate("/projects?status=pending")}
+          onClick={() => navigate("/admin/karya?status=pending")}
           className="group ml-auto hidden cursor-pointer min-[600px]:flex items-center gap-1 text-[9px] font-medium text-cyan-400 transition-all duration-200 hover:text-cyan-300 min-[500px]:text-xs"
         >
           Lihat Semua
@@ -102,7 +102,7 @@ function DashboardPendingProjects() {
                   Pending
                 </span>
                 <button
-                  onClick={() => navigate(`/projects/edit/${project.slug || project.id}`, { state: { from: "/admin" } })}
+                  onClick={() => navigate(`/admin/karya/edit/${project.slug || project.id}`, { state: { from: "/admin" } })}
                   className="dashboard-review-btn group/rev flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-95"
                 >
                   <Eye size={13} strokeWidth={2.5} className="transition-transform duration-300 group-hover/rev:-translate-x-0.5 group-hover/rev:scale-110" />

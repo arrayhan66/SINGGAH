@@ -48,6 +48,8 @@ export default function useUserForm() {
   const [saving, setSaving] = useState(false)
   const [loadedUser, setLoadedUser] = useState(null)
   const [error, setError] = useState("")
+  const [notification, setNotification] = useState(null)
+  const [redirectPending, setRedirectPending] = useState(false)
   const initedFor = useRef(null)
 
   useEffect(() => {
@@ -75,13 +77,14 @@ export default function useUserForm() {
   const editTarget = existing ? { id: existing.id } : loadedUser
 
   function updateField(field, value) {
-    setFormData((prev) => {
-      const next = { ...prev, [field]: value }
-      if (field === "role" && value === "admin") {
-        next.tipe = "umum"
-      }
-      return next
-    })
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  function clearNotification() {
+    setNotification(null)
+    if (redirectPending) {
+      navigate("/admin/pengguna")
+    }
   }
 
   async function handlePublish() {
@@ -102,18 +105,23 @@ export default function useUserForm() {
     try {
       if (isEditMode && editTarget) {
         await updateUser(editTarget.id, formData)
+        setSaving(false)
+        setRedirectPending(true)
+        setNotification({ type: "success", message: "Perubahan user berhasil disimpan" })
       } else if (!isEditMode) {
         await addUser({
           ...formData,
           created_at: new Date().toISOString(),
           projectCount: 0,
         })
+        setSaving(false)
+        setRedirectPending(true)
+        setNotification({ type: "success", message: "User berhasil ditambahkan" })
       } else {
         setSaving(false)
         setError("User tidak ditemukan di daftar. Muat ulang halaman lalu coba lagi.")
         return
       }
-      navigate("/users")
     } catch (err) {
       setSaving(false)
       setError(err.response?.data?.message || "Gagal menyimpan user. Silakan coba lagi.")
@@ -121,7 +129,7 @@ export default function useUserForm() {
   }
 
   function goBack() {
-    navigate("/users")
+    navigate("/admin/pengguna")
   }
 
   return {
@@ -133,6 +141,8 @@ export default function useUserForm() {
     saving,
     error,
     clearError: () => setError(""),
+    notification,
+    clearNotification,
     goBack,
   }
 }

@@ -40,7 +40,7 @@ function AdminUserProfileCard({ user, onEdit, onDelete }) {
   if (!user) return null
 
   const isActive = user.status === "Aktif"
-  const tipe = tipeConfig[user.tipe] || tipeConfig.umum
+  const tipe = tipeConfig[user.role === "admin" ? "admin" : user.tipe] || tipeConfig.umum
   const TipeIcon = tipe.icon
 
   return (

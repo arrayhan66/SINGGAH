@@ -28,16 +28,16 @@ export default function ReportsContent({ monthlyData, summary, viewYear }) {
         />
       </div>
 
-      <div className="mt-6 rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-6 shadow-xl backdrop-blur-xl md:p-8">
+      <div className="reports-summary-panel mt-6 rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-6 shadow-xl backdrop-blur-xl md:p-8">
         <div className="mb-6 flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10 shadow-lg shadow-cyan-500/20">
             <Calendar className="h-4 w-4 text-cyan-300" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-white">
+            <h3 className="panel-title text-base font-semibold text-white">
               Ringkasan Cepat
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="panel-desc text-xs text-slate-400">
               Gambaran singkat aktivitas platform.
             </p>
           </div>

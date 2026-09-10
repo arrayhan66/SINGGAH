@@ -2,12 +2,12 @@ import { Tag } from "lucide-react"
 import ShowMoreButton from "../../../../components/ui/ShowMoreButton"
 import CategoryCard from "./CategoryCard"
 import { AdminCategoriesSkeleton } from "../../../../components/ui/PageSkeletons"
-
-const INITIAL_VISIBLE = 12
+import { INITIAL_VISIBLE } from "../../../../hooks/useManageCategories"
 
 export default function CategoryContent({
   loading,
   filtered,
+  total,
   visibleCategories,
   search,
   showAll,
@@ -41,6 +41,9 @@ export default function CategoryContent({
 
   return (
     <div className="flex flex-col gap-8">
+      <p className="text-xs text-slate-500">
+        Menampilkan {filtered.length} dari {total} kategori
+      </p>
       <div className="grid grid-cols-1 min-[750px]:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
         {visibleCategories.map((cat) => (
           <CategoryCard

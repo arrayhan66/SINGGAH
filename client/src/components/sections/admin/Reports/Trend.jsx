@@ -5,7 +5,7 @@ export default function Trend({ value }) {
   const TrendIcon = isUp ? TrendingUp : TrendingDown
   return (
     <span
-      className={`inline-flex items-center gap-1 text-xs font-semibold ${
+      className={`trend-badge inline-flex items-center gap-1 text-xs font-semibold ${
         isUp ? "text-emerald-400" : "text-rose-400"
       }`}
     >

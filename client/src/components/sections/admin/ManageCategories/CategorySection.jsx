@@ -87,6 +87,7 @@ export default function CategorySection() {
         <CategoryContent
           loading={loading}
           filtered={filtered}
+          total={stateCounts.all}
           visibleCategories={visibleCategories}
           search={search}
           showAll={showAll}

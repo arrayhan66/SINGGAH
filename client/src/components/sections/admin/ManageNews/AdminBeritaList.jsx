@@ -38,11 +38,11 @@ function AdminBeritaList({ search, statusFilter }) {
   const visibleBerita = showAll ? filteredBerita : filteredBerita.slice(0, INITIAL_VISIBLE)
 
   function handlePreviewClick(berita) {
-    navigate(`/berita/preview/${berita.slug}`)
+    navigate(`/admin/berita/preview/${berita.slug}`)
   }
 
   function handleEditClick(berita) {
-    navigate(`/berita/edit/${berita.slug}`)
+    navigate(`/admin/berita/edit/${berita.slug}`)
   }
 
   function handleDeleteClick(berita) {
@@ -71,7 +71,7 @@ function AdminBeritaList({ search, statusFilter }) {
   return (
     <div className="px-4 md:px-6 lg:px-8 pt-6 md:pt-8 pb-12 md:pb-16">
       <div className="flex flex-col gap-5">
-        {loading ? (
+        {loading && beritaList.length === 0 ? (
           <AdminNewsListSkeleton />
         ) : filteredBerita.length === 0 ? (
           <div className="admin-empty-news animate-fade-in-up flex flex-col items-center gap-4 rounded-2xl border border-dashed border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] py-16 text-center">

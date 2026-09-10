@@ -12,13 +12,13 @@ test.describe("ADMIN — dashboard & kelola", () => {
 
   test("AD-01 dashboard menampilkan statistik", async ({ page }) => {
     await page.goto("/admin");
-    await expect(page.getByText("Total Project").first()).toBeVisible();
+    await expect(page.getByText("Total Karya").first()).toBeVisible();
     await expect(page.getByText("Total Berita").first()).toBeVisible();
   });
 
   test("AD-10 kelola project termuat", async ({ page }) => {
-    await page.goto("/projects");
-    await expect(page.getByText("Kelola Project").first()).toBeVisible();
+    await page.goto("/admin/karya");
+    await expect(page.getByText("Kelola Karya").first()).toBeVisible();
   });
 
   test("AD-20 kelola berita (RoleSplit) termuat", async ({ page }) => {
@@ -27,12 +27,12 @@ test.describe("ADMIN — dashboard & kelola", () => {
   });
 
   test("AD-31 kelola user termuat", async ({ page }) => {
-    await page.goto("/users");
+    await page.goto("/admin/pengguna");
     await expect(page.getByText("Total User").first()).toBeVisible();
   });
 
   test("AD-40 kelola kategori termuat", async ({ page }) => {
-    await page.goto("/kategori");
+    await page.goto("/admin/kategori");
     await expect(page.getByRole("button", { name: /Tambah Kategori/i }).first()).toBeVisible();
   });
 });

@@ -75,15 +75,15 @@ export default function ReportsHero({ stats, loading, viewYear, years, onYearCha
             return (
               <div
                 key={stat.label}
-                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-6 shadow-lg backdrop-blur-xl transition-all duration-[250ms] ease-out hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.09] hover:shadow-xl"
+                className="reports-stat-card group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-6 shadow-lg backdrop-blur-xl transition-all duration-[250ms] ease-out hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.09] hover:shadow-xl"
               >
                 <div
                   className={`pointer-events-none absolute -right-12 -bottom-14 h-32 w-32 rounded-full bg-gradient-to-br ${stat.glow} to-transparent blur-2xl opacity-60 transition-opacity duration-[250ms] group-hover:opacity-80`}
                 />
 
                 <div className="relative flex items-start justify-between gap-4">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/[0.06] ring-1 ring-inset ring-white/10">
-                    <Icon size={16} strokeWidth={2} className={stat.color} />
+                  <div className="reports-stat-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.07] ring-1 ring-inset ring-white/10 transition-all duration-300 group-hover:scale-105">
+                    <Icon size={18} strokeWidth={2} className={stat.color} />
                   </div>
                   <Sparkline
                     data={stat.spark}
@@ -92,14 +92,14 @@ export default function ReportsHero({ stats, loading, viewYear, years, onYearCha
                   />
                 </div>
 
-                <div className="relative mt-6">
+                <div className="relative mt-5">
                   <p
-                    className="animate-fade-up text-[30px] font-bold tracking-tight text-white leading-none tabular-nums md:text-[32px]"
+                    className="stat-value animate-fade-up text-[30px] font-bold tracking-tight text-white leading-none tabular-nums md:text-[32px]"
                     style={{ animationDelay: `${index * 80 + 120}ms` }}
                   >
                     {stat.value}
                   </p>
-                  <p className="mt-2 text-sm font-medium text-slate-400">
+                  <p className="stat-label mt-2 text-sm font-medium text-slate-400">
                     {stat.label}
                   </p>
                 </div>

@@ -27,8 +27,8 @@ function AdminBeritaPreview() {
   const relatedNews = isTempPreview ? [] : beritaList.filter((b) => b.slug !== slug).slice(0, 3)
 
   const backTarget = isTempPreview
-    ? (fromEditor && editSlug ? `/berita/edit/${editSlug}` : "/berita/tambah")
-    : "/berita"
+    ? (fromEditor && editSlug ? `/admin/berita/edit/${editSlug}` : "/admin/berita/tambah")
+    : "/admin/berita"
 
   const headlineSrc = useMemo(() => {
     if (!item?.image) return null
@@ -49,7 +49,7 @@ function AdminBeritaPreview() {
             Artikel yang kamu cari mungkin sudah dihapus atau tidak tersedia.
           </p>
           <Link
-            to="/berita"
+            to="/admin/berita"
             className="mt-6 inline-flex items-center gap-2 text-cyan-300 hover:text-cyan-200 transition-colors"
           >
             <ArrowLeft size={16} />
@@ -78,7 +78,7 @@ function AdminBeritaPreview() {
                 </span>
                 <span className="font-semibold">
                   Kembali{" "}
-                  <span className="hidden sm:inline">{backTarget === "/berita" ? "ke Kelola Berita" : "ke Editor"}</span>
+                  <span className="hidden sm:inline">{backTarget === "/admin/berita" ? "ke Kelola Berita" : "ke Editor"}</span>
                 </span>
               </Link>
 
@@ -200,7 +200,7 @@ function AdminBeritaPreview() {
                 Berita & Kegiatan Lainnya
               </h2>
               <Link
-                to="/berita"
+                to="/admin/berita"
                 className={`text-[11px] min-[350px]:text-xs sm:text-sm font-semibold transition-all ${isDark ? "text-cyan-400 hover:text-cyan-300 hover:underline hover:underline-offset-4" : "text-cyan-600 hover:text-cyan-700 hover:underline hover:underline-offset-4"}`}
               >
                 Lihat Semua &rarr;
@@ -211,7 +211,7 @@ function AdminBeritaPreview() {
               {relatedNews.map((news) => (
                 <div
                   key={news.id}
-                  onClick={() => navigate(`/berita/preview/${news.slug}`)}
+                  onClick={() => navigate(`/admin/berita/preview/${news.slug}`)}
                   className={`berita-related-card group cursor-pointer overflow-hidden rounded-xl min-[350px]:rounded-2xl transition-all duration-300 hover:-translate-y-1.5 ${isDark ? "border border-slate-700/50 bg-brand-navy hover:border-cyan-400/50" : "border border-slate-200 bg-white hover:border-cyan-400/50"}`}
                 >
                   <div className={`h-40 min-[350px]:h-44 w-full overflow-hidden relative ${isDark ? "bg-slate-950" : "bg-slate-100"}`}>

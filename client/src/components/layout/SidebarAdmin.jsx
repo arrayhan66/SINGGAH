@@ -73,13 +73,13 @@ const ACCENTS = {
 
 const menuItems = [
   { to: "/admin", label: "Beranda", subtitle: "Ringkasan statistik", icon: LayoutDashboard, accent: "cyan", end: true },
-  { to: "/projects", label: "Karya", subtitle: "Manajemen karya", icon: FolderKanban, accent: "cyan" },
-  { to: "/berita", label: "Berita", subtitle: "Kabar pengumuman", icon: Newspaper, accent: "cyan" },
-  { to: "/kategori", label: "Kategori", subtitle: "Grup & label", icon: Tag, accent: "cyan" },
-  { to: "/media", label: "Media", subtitle: "Galeri berkas", icon: Image, accent: "cyan" },
-  { to: "/users", label: "Pengguna", subtitle: "Kelola akun", icon: Users, accent: "cyan" },
-  { to: "/laporan", label: "Laporan", subtitle: "Statistik aktivitas", icon: BarChart3, accent: "cyan" },
-  { to: "/pengaturan", label: "Pengaturan", subtitle: "Konfigurasi sistem", icon: Settings2, accent: "cyan" },
+  { to: "/admin/karya", label: "Karya", subtitle: "Manajemen karya", icon: FolderKanban, accent: "cyan" },
+  { to: "/admin/berita", label: "Berita", subtitle: "Kabar pengumuman", icon: Newspaper, accent: "cyan" },
+  { to: "/admin/kategori", label: "Kategori", subtitle: "Grup & label", icon: Tag, accent: "cyan" },
+  { to: "/admin/media", label: "Media", subtitle: "Galeri berkas", icon: Image, accent: "cyan" },
+  { to: "/admin/pengguna", label: "Pengguna", subtitle: "Kelola akun", icon: Users, accent: "cyan" },
+  { to: "/admin/laporan", label: "Laporan", subtitle: "Statistik aktivitas", icon: BarChart3, accent: "cyan" },
+  { to: "/admin/pengaturan", label: "Pengaturan", subtitle: "Konfigurasi sistem", icon: Settings2, accent: "cyan" },
 ]
 
 function SidebarAdmin({ collapsed, onToggle, mobileOpen, onMobileToggle }) {

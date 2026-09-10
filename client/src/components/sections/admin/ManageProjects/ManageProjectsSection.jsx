@@ -83,7 +83,7 @@ export default function ManageProjectsSection() {
 
   return (
     <>
-      {loading ? (
+      {loading && projects.length === 0 ? (
         <AdminProjectsSkeleton />
       ) : (
         <>

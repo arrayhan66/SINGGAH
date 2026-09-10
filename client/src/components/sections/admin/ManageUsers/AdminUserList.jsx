@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { UserSearch, BadgeCheck, FolderKanban, ShieldCheck, ShieldX, Hourglass, Pencil, Trash2, Eye } from "lucide-react"
+import { UserSearch, BadgeCheck, FolderKanban, ShieldCheck, ShieldX, Hourglass, Pencil, Trash2, Eye, GraduationCap, BookOpen, User } from "lucide-react"
 import { useUsers } from "../../../../context/UserContext"
 import AdminUserDeleteModal from "./AdminUserDeleteModal"
 import AdminUserTipeModal from "./AdminUserTipeModal"
@@ -11,10 +11,10 @@ import { AdminUsersSkeleton } from "../../../ui/PageSkeletons"
 const INITIAL_VISIBLE = 10
 
 const tipeConfig = {
-  mahasiswa: { label: "Mahasiswa", color: "border-cyan-400/20 bg-cyan-400/10 text-cyan-300" },
-  dosen: { label: "Dosen", color: "border-blue-400/20 bg-blue-400/10 text-blue-300" },
-  admin: { label: "Admin", color: "border-purple-400/20 bg-purple-400/10 text-purple-300" },
-  umum: { label: "Umum", color: "border-slate-400/20 bg-slate-400/10 text-slate-300" },
+  mahasiswa: { label: "Mahasiswa", icon: GraduationCap, color: "border-cyan-400/25 bg-cyan-400/10 text-cyan-300" },
+  dosen: { label: "Dosen", icon: BookOpen, color: "border-blue-400/25 bg-blue-400/10 text-blue-300" },
+  admin: { label: "Admin", icon: ShieldCheck, color: "border-purple-400/25 bg-purple-400/10 text-purple-300" },
+  umum: { label: "Umum", icon: User, color: "border-amber-400/25 bg-amber-400/10 text-amber-300" },
 }
 
 const pendingTipeLabel = {
@@ -55,11 +55,11 @@ function AdminUserList({ search, statusFilter }) {
   const visibleUsers = showAll ? filteredUsers : filteredUsers.slice(0, INITIAL_VISIBLE)
 
   function handleEditClick(user) {
-    navigate(`/users/edit/${user.username}`)
+    navigate(`/admin/pengguna/edit/${user.username}`)
   }
 
   function handleDetailClick(user) {
-    navigate(`/users/${user.username}`)
+    navigate(`/admin/pengguna/${user.username}`)
   }
 
   function handleDeleteClick(user) {
@@ -124,8 +124,8 @@ function AdminUserList({ search, statusFilter }) {
         {loading ? (
           <AdminUsersSkeleton />
         ) : filteredUsers.length === 0 ? (
-          <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.04] to-white/[0.01] py-20 text-center backdrop-blur-xl">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-slate-500/20 bg-slate-500/10">
+          <div className="admin-empty-users animate-fade-in-up flex flex-col items-center gap-4 rounded-2xl border border-dashed border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] py-20 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-slate-800/50 ring-1 ring-slate-700/50">
               <UserSearch className="h-7 w-7 text-slate-400" />
             </div>
             <div>
@@ -142,11 +142,11 @@ function AdminUserList({ search, statusFilter }) {
             <p className="text-xs text-slate-500">
               Menampilkan {filteredUsers.length} dari {userList.length} user
             </p>
-            <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
+            <div className="admin-media-table admin-user-table overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[900px] text-left text-sm">
                   <thead>
-                    <tr className="border-b border-white/5 bg-white/[0.03]">
+                    <tr className="admin-media-table-head border-b border-white/5 bg-white/[0.03]">
                       <th className="px-4 py-3.5 font-medium text-slate-400">User</th>
                       <th className="px-4 py-3.5 font-medium text-slate-400">Tipe</th>
                       <th className="px-4 py-3.5 font-medium text-slate-400">Status</th>
@@ -156,9 +156,11 @@ function AdminUserList({ search, statusFilter }) {
                   </thead>
                   <tbody>
                     {visibleUsers.map((user, i) => {
-                      const tipe = tipeConfig[user.tipe] || tipeConfig.umum
+                      const tipe = tipeConfig[user.role === "admin" ? "admin" : user.tipe] || tipeConfig.umum
                       const isPending = Boolean(user.pending_tipe)
                       const pendingLabel = pendingTipeLabel[user.pending_tipe] || "Tipe Baru"
+                      const projectCount = user.projectCount ?? 0
+                      const hasProjects = projectCount > 0
 
                       return (
                         <tr
@@ -205,8 +207,9 @@ function AdminUserList({ search, statusFilter }) {
                           </td>
                           <td className="px-4 py-3.5">
                             <div className="flex flex-wrap items-center gap-1.5">
-                              <span className={`rounded-md border px-2.5 py-1 text-xs font-medium ${tipe.color}`}>
-                                {user.tipe}
+                              <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${tipe.color}`}>
+                                <tipe.icon className="h-3.5 w-3.5" />
+                                {tipe.label}
                               </span>
                               {isPending && (
                                 <span className="inline-flex items-center gap-1 rounded-md border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-[11px] font-semibold text-amber-300">
@@ -227,11 +230,18 @@ function AdminUserList({ search, statusFilter }) {
                               {user.status}
                             </span>
                           </td>
-                          <td className="px-4 py-3.5 text-slate-300">
-                            <span className="inline-flex items-center gap-1.5 rounded-md border border-white/[0.06] bg-white/[0.03] px-2.5 py-1 text-xs font-medium text-slate-300">
-                              <FolderKanban className="h-3 w-3 text-cyan-400" />
-                              {user.projectCount ?? 0} Project
-                            </span>
+                          <td className="px-4 py-3.5">
+                            {hasProjects ? (
+                              <span className="inline-flex items-center gap-1.5 rounded-md border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-1 text-xs font-semibold text-cyan-200">
+                                <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_6px_rgba(34,211,238,0.9)]" />
+                                {projectCount} Karya
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 rounded-md border border-white/[0.06] bg-white/[0.02] px-2.5 py-1 text-xs font-medium text-slate-500">
+                                <FolderKanban className="h-3 w-3 text-slate-500" />
+                                Belum ada karya
+                              </span>
+                            )}
                           </td>
                           <td className="px-4 py-3.5 text-right">
                             <div className="flex items-center justify-end gap-1.5">
@@ -259,22 +269,22 @@ function AdminUserList({ search, statusFilter }) {
                               ) : null}
                               <button
                                 onClick={() => handleDetailClick(user)}
-                                className="flex cursor-pointer items-center gap-1 rounded-lg bg-white/5 border border-white/10 px-2.5 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white"
-                                title="Detail User"
+                                className="user-action-detail flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-900 shadow-sm transition-all duration-200 hover:bg-slate-50 hover:shadow-md active:scale-95"
+                                title="Lihat Detail User"
                               >
-                                <Eye size={14} />
+                                <Eye size={14} className="text-slate-600" />
                                 <span className="hidden sm:inline">Detail</span>
                               </button>
                               <button
                                 onClick={() => handleEditClick(user)}
-                                className="flex cursor-pointer items-center justify-center rounded-lg bg-white/5 border border-white/10 p-1.5 text-slate-300 transition hover:bg-cyan-500/20 hover:text-cyan-300"
+                                className="flex cursor-pointer items-center justify-center rounded-lg border border-cyan-400/30 bg-cyan-400/[0.07] p-1.5 text-cyan-300 transition hover:bg-cyan-400/15 hover:text-cyan-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/40 active:scale-95"
                                 title="Edit User"
                               >
                                 <Pencil size={14} />
                               </button>
                               <button
                                 onClick={() => handleDeleteClick(user)}
-                                className="flex cursor-pointer items-center justify-center rounded-lg bg-white/5 border border-white/10 p-1.5 text-slate-300 transition hover:bg-red-500/20 hover:text-red-400"
+                                className="flex cursor-pointer items-center justify-center rounded-lg border border-red-400/30 bg-red-400/[0.07] p-1.5 text-red-300 transition hover:bg-red-500/15 hover:text-red-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 active:scale-95"
                                 title="Hapus User"
                               >
                                 <Trash2 size={14} />

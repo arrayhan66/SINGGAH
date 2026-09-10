@@ -124,7 +124,7 @@ function AdminBeritaForm() {
     setNotification(null)
     if (pendingRedirect) {
       setPendingRedirect(false)
-      navigate("/berita")
+      navigate("/admin/berita")
     }
   }
 
@@ -206,9 +206,9 @@ function AdminBeritaForm() {
     }
     setTempPreviewData(data)
     if (isEditMode) {
-      navigate(`/berita/preview/temp?from=edit&slug=${slug}`)
+      navigate(`/admin/berita/preview/temp?from=edit&slug=${slug}`)
     } else {
-      navigate("/berita/preview/temp")
+      navigate("/admin/berita/preview/temp")
     }
   }
 
@@ -234,8 +234,8 @@ function AdminBeritaForm() {
         ) : (
           <>
         <button
-          onClick={() => navigate("/berita")}
-          className="group inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 backdrop-blur-xl transition-all duration-200 hover:border-cyan-400/40 hover:bg-cyan-500/10 hover:text-cyan-300"
+          onClick={() => navigate("/admin/berita")}
+          className="user-form-back group inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 backdrop-blur-xl transition-all duration-200 hover:border-cyan-400/40 hover:bg-cyan-500/10 hover:text-cyan-300"
         >
           <ArrowLeft
             size={14}

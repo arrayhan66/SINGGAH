@@ -1,7 +1,9 @@
-import { AlertTriangle } from "lucide-react"
+import { AlertTriangle, Loader2 } from "lucide-react"
 import PopupToast from "../../../../components/ui/PopupToast"
+import useLockBodyScroll from "../../../../hooks/useLockBodyScroll"
 
-export default function ConfirmDeleteModal({ item, onConfirm, onCancel }) {
+export default function ConfirmDeleteModal({ item, onConfirm, onCancel, loading = false }) {
+  useLockBodyScroll(Boolean(item))
   if (!item) return null
 
   return (
@@ -23,16 +25,25 @@ export default function ConfirmDeleteModal({ item, onConfirm, onCancel }) {
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300 hover:bg-white/10 cursor-pointer"
+            disabled={loading}
+            className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300 hover:bg-white/10 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
           >
             Batal
           </button>
           <button
             type="button"
             onClick={() => onConfirm(item.id)}
-            className="flex-1 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-red-500/30 hover:from-red-600 hover:to-rose-700 cursor-pointer"
+            disabled={loading}
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-red-500/30 hover:from-red-600 hover:to-rose-700 cursor-pointer disabled:cursor-wait disabled:opacity-70"
           >
-            Ya, Hapus
+            {loading ? (
+              <>
+                <Loader2 size={14} className="animate-spin" />
+                Menghapus...
+              </>
+            ) : (
+              "Ya, Hapus"
+            )}
           </button>
         </div>
       </div>

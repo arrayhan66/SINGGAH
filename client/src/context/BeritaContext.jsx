@@ -11,7 +11,7 @@ export function BeritaProvider({ children }) {
   const fetchNews = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await api.get("/news")
+      const res = await api.get("/news", { params: { limit: 1000 } })
       const items = res.data.data.items || res.data.data || []
       const normalized = items.map((item) => ({
         ...item,

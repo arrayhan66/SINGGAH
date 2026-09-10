@@ -9,6 +9,7 @@ export default function MediaLibrarySection() {
   const {
     loading,
     uploading,
+    media,
     search,
     setSearch,
     typeFilter,
@@ -20,6 +21,7 @@ export default function MediaLibrarySection() {
     setPreviewItem,
     deleteTarget,
     setDeleteTarget,
+    deleting,
     isDragging,
     notification,
     setNotification,
@@ -73,8 +75,10 @@ export default function MediaLibrarySection() {
       <MediaLibraryContent
         loading={loading}
         filtered={filtered}
-        media={filtered}
+        media={media}
         view={view}
+        search={search}
+        typeFilter={typeFilter}
         isDragging={isDragging}
         uploading={uploading}
         copiedId={copiedId}
@@ -100,6 +104,7 @@ export default function MediaLibrarySection() {
           item={deleteTarget}
           onConfirm={confirmDelete}
           onCancel={() => setDeleteTarget(null)}
+          loading={deleting}
         />
       )}
 

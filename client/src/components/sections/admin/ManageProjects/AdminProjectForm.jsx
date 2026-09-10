@@ -52,7 +52,7 @@ function AdminProjectForm() {
   const { slug } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  const fromPath = location.state?.from || "/projects"
+  const fromPath = location.state?.from || "/admin/karya"
   const { getProjectBySlug, approveProject, rejectProject } = useProjects()
 
   const contextProject = getProjectBySlug(slug)
@@ -146,7 +146,7 @@ function AdminProjectForm() {
     try {
       await approveProject(existing.id, approveNote)
       setActionSuccess({ type: "approve", message: "Karya disetujui & diterbitkan!" })
-      setTimeout(() => navigate("/projects"), 2000)
+      setTimeout(() => navigate("/admin/karya"), 2000)
     } catch {
       showNotification("Gagal menyetujui karya. Coba lagi.", "error")
     } finally {
@@ -170,7 +170,7 @@ function AdminProjectForm() {
     try {
       await rejectProject(existing.id, rejectReason)
       setActionSuccess({ type: "reject", message: "Karya ditolak." })
-      setTimeout(() => navigate("/projects"), 2000)
+      setTimeout(() => navigate("/admin/karya"), 2000)
     } catch {
       showNotification("Gagal menolak karya. Coba lagi.", "error")
     } finally {
@@ -398,7 +398,7 @@ function AdminProjectForm() {
               </p>
             </div>
             <button
-              onClick={() => navigate("/projects")}
+              onClick={() => navigate("/admin/karya")}
               className="cursor-pointer rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25 transition hover:from-cyan-400 hover:to-blue-500"
             >
               Kembali ke Kelola Karya

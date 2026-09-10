@@ -95,7 +95,7 @@ function NotificationDetailModal({ notif, onClose, onNavigate }) {
             image: d.thumbnail,
             subtitle: d.category ? `Karya • ${d.category}` : "Karya",
             path: isAdmin
-              ? `/projects/edit/${d.slug || d.id}`
+              ? `/admin/karya/edit/${d.slug || d.id}`
               : `/karya/${d.category || ""}/${d.slug || d.id}`,
           });
         } else if (referenceType === "news") {
@@ -120,7 +120,7 @@ function NotificationDetailModal({ notif, onClose, onNavigate }) {
             ]
               .filter(Boolean)
               .join(" • "),
-            path: `/users/${d.username || d.id}`,
+            path: `/admin/pengguna/${d.username || d.id}`,
           });
         }
       })
@@ -151,12 +151,14 @@ function NotificationDetailModal({ notif, onClose, onNavigate }) {
     ? null
     : referenceType === "project"
       ? isAdmin
-        ? "/projects"
+        ? "/admin/karya"
         : "/karya"
       : referenceType === "news"
-        ? "/berita"
+        ? isAdmin
+          ? "/admin/berita"
+          : "/berita"
         : isAdmin
-          ? "/users"
+          ? "/admin/pengguna"
           : "/profile";
 
   const actionLabel = !referenceType

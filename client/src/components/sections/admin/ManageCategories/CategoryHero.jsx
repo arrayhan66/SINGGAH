@@ -21,6 +21,7 @@ export default function CategoryHero({
   search,
   onSearchChange,
   stateFilter,
+  onStateFilterChange,
   stateCounts,
   onAddClick,
   isOpen,
@@ -79,7 +80,7 @@ export default function CategoryHero({
         </div>
 
         <div className="mt-4">
-          <div className="relative w-full">
+          <div className="relative w-full min-[550px]:hidden">
             <button
               ref={buttonRef}
               type="button"
@@ -164,6 +165,45 @@ export default function CategoryHero({
                 </div>,
                 document.body,
               )}
+          </div>
+
+          <div className="hidden min-[550px]:flex min-[550px]:w-fit min-[550px]:flex-wrap min-[550px]:items-center min-[550px]:gap-1 rounded-xl border border-white/10 bg-white/5 min-[550px]:p-1">
+            {stateTabs.map((tab) => {
+              const Icon = tab.icon
+              const isActive = stateFilter === tab.value
+              const count = stateCounts[tab.value]
+              return (
+                <button
+                  key={tab.value}
+                  type="button"
+                  onClick={() => onStateFilterChange(tab.value)}
+                  className={`inline-flex min-w-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-cyan-400/40 focus-visible:outline-none ${
+                    isActive
+                      ? "bg-gradient-to-r from-cyan-500/25 to-blue-500/25 text-white shadow-sm ring-1 ring-cyan-400/30"
+                      : "text-slate-400 hover:bg-white/[0.06] hover:text-white"
+                  }`}
+                  aria-pressed={isActive}
+                >
+                  <Icon
+                    className={`h-3.5 w-3.5 shrink-0 transition-colors duration-200 ${
+                      isActive ? "text-white" : "text-slate-500"
+                    }`}
+                  />
+                  {tab.label}
+                  {count !== undefined && (
+                    <span
+                      className={`rounded-full px-1.5 py-0.5 text-[10px] tabular-nums ${
+                        isActive
+                          ? "bg-cyan-500/25 text-cyan-300"
+                          : "bg-white/[0.07] text-slate-400"
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>

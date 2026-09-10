@@ -15,7 +15,7 @@ export default function MonthlyBarChart({
   const bestIndex = data.findIndex((d) => (d[valueKey] || 0) === maxValue)
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-5 shadow-xl backdrop-blur-xl transition-all duration-300 hover:border-white/20 md:p-6">
+    <div className="reports-bar-card group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-5 shadow-xl backdrop-blur-xl transition-all duration-300 hover:border-white/20 md:p-6">
       <div
         className={`pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full ${c.glow} blur-3xl opacity-50 transition-opacity duration-300 group-hover:opacity-80`}
       />
@@ -27,10 +27,10 @@ export default function MonthlyBarChart({
             <Icon className={`h-5 w-5 ${c.iconText}`} />
           </div>
           <div className="min-w-0">
-            <h3 className="truncate text-[17px] font-semibold text-white leading-tight md:text-[18px]">
+            <h3 className="bar-title truncate text-[17px] font-semibold text-white leading-tight md:text-[18px]">
               {title}
             </h3>
-            <p className="text-xs text-slate-400">{subtitle}</p>
+            <p className="bar-subtitle text-xs text-slate-400">{subtitle}</p>
           </div>
         </div>
         <div
@@ -58,8 +58,12 @@ export default function MonthlyBarChart({
                 className="flex flex-1 flex-col items-center gap-1.5"
               >
                 <span
-                  className={`text-[10px] font-semibold tabular-nums ${
-                    val > 0 ? c.top : "text-slate-600"
+                  className={`bar-value text-[10px] font-semibold tabular-nums ${
+                    val > 0
+                      ? isBest
+                        ? `${c.top} bar-value-active`
+                        : c.top
+                      : "text-slate-600"
                   }`}
                 >
                   {formatter(val)}
@@ -73,9 +77,9 @@ export default function MonthlyBarChart({
                   style={{ height: `${height}%` }}
                 />
                 <span
-                  className={`text-[10px] ${
+                  className={`bar-month text-[10px] ${
                     isBest
-                      ? `font-semibold ${c.badgeText}`
+                      ? `font-semibold ${c.badgeText} bar-month-active`
                       : "text-slate-500"
                   }`}
                 >

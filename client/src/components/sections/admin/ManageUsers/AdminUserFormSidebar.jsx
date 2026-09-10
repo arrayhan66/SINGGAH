@@ -1,6 +1,7 @@
 import { useRef, useState } from "react"
 import { Camera, BadgeCheck, BadgeAlert, Eye, EyeOff } from "lucide-react"
 import UserAvatar from "../../../ui/UserAvatar"
+import { compressImage } from "../../../../utils/compressImage"
 
 const roleOptions = [
   { value: "user", label: "User Biasa" },
@@ -12,27 +13,33 @@ function AdminUserFormSidebar({ formData, updateField, isEditMode }) {
   const inputRef = useRef(null)
   const [showPassword, setShowPassword] = useState(false)
 
-  function handleFileChange(e) {
+  const avatarPreview =
+    formData.avatar instanceof File
+      ? URL.createObjectURL(formData.avatar)
+      : formData.avatar
+
+  async function handleFileChange(e) {
     const file = e.target.files?.[0]
     if (!file) return
-    const previewUrl = URL.createObjectURL(file)
-    updateField("avatar", previewUrl)
+    const compressed = await compressImage(file, { maxSize: 1024 * 1024 })
+    updateField("avatar", compressed)
+    if (inputRef.current) inputRef.current.value = ""
   }
 
   return (
     <div className="flex flex-col gap-4">
       {/* Avatar */}
-      <div className="rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-5 backdrop-blur-xl">
+      <div className="admin-user-form-panel rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-5 backdrop-blur-xl">
         <h3 className="text-sm font-semibold text-white">Foto Profil</h3>
         <p className="mt-0.5 text-xs text-slate-400">
           Klik ikon kamera untuk mengganti
         </p>
 
-        <div className="mt-4 flex items-center gap-4">
-          <div className="relative">
+<div className="mt-4 flex items-center gap-4">
+          <div className="user-form-avatar relative">
             <UserAvatar
               name={formData.name}
-              avatar={formData.avatar}
+              avatar={avatarPreview}
               imgSizeClass="h-20 w-20 border border-white/10"
               imgClass="rounded-xl"
               fallbackSizeClass="h-20 w-20"
@@ -43,7 +50,7 @@ function AdminUserFormSidebar({ formData, updateField, isEditMode }) {
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="absolute -bottom-1 -right-1 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-cyan-500 text-white shadow-lg transition-colors hover:bg-cyan-400"
+              className="user-form-camera absolute -bottom-1 -right-1 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-cyan-500 text-white shadow-lg transition-colors hover:bg-cyan-400"
             >
               <Camera size={12} />
             </button>
@@ -64,7 +71,7 @@ function AdminUserFormSidebar({ formData, updateField, isEditMode }) {
       </div>
 
       {/* Detail Akun */}
-      <div className="rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-5 backdrop-blur-xl">
+      <div className="admin-user-form-panel rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-5 backdrop-blur-xl">
         <h3 className="text-sm font-semibold text-white">Detail Akun</h3>
 
         <div className="mt-4 flex flex-col gap-4">

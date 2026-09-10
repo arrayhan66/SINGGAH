@@ -5,13 +5,13 @@ import logo from "../../assets/icons/logo.webp"
 
 const menuItems = [
   { to: "/admin", label: "Beranda", end: true },
-  { to: "/projects", label: "Karya" },
-  { to: "/berita", label: "Berita" },
-  { to: "/kategori", label: "Kategori" },
-  { to: "/media", label: "Media" },
-  { to: "/users", label: "Pengguna" },
-  { to: "/laporan", label: "Laporan" },
-  { to: "/pengaturan", label: "Pengaturan" },
+{ to: "/admin/karya", label: "Karya" },
+  { to: "/admin/berita", label: "Berita" },
+  { to: "/admin/kategori", label: "Kategori" },
+  { to: "/admin/media", label: "Media" },
+  { to: "/admin/pengguna", label: "Pengguna" },
+  { to: "/admin/laporan", label: "Laporan" },
+  { to: "/admin/pengaturan", label: "Pengaturan" },
 ]
 
 function AdminFooter() {

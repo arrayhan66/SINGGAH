@@ -1,12 +1,18 @@
+import { useState } from "react"
 import { Image, Upload, Loader2 } from "lucide-react"
 import MediaCard from "./MediaCard"
+import ShowMoreButton from "../../../ui/ShowMoreButton"
 import { AdminMediaSkeleton } from "../../../ui/PageSkeletons"
+
+const INITIAL_VISIBLE = 12
 
 export default function MediaLibraryContent({
   loading,
   filtered,
   media,
   view,
+  search,
+  typeFilter,
   isDragging,
   uploading,
   copiedId,
@@ -19,6 +25,17 @@ export default function MediaLibraryContent({
   onDrop,
   fileInputRef,
 }) {
+  const [showAll, setShowAll] = useState(false)
+  const filterKey = `${search}|${typeFilter}|${view}`
+  const [activeFilter, setActiveFilter] = useState(filterKey)
+  if (filterKey !== activeFilter) {
+    setActiveFilter(filterKey)
+    setShowAll(false)
+  }
+
+  const visible = showAll ? filtered : filtered.slice(0, INITIAL_VISIBLE)
+  const showButton = filtered.length > INITIAL_VISIBLE
+
   return (
     <div
       onDragOver={onDragOver}
@@ -40,7 +57,7 @@ export default function MediaLibraryContent({
       )}
 
       {loading ? (
-        <AdminMediaSkeleton />
+        <AdminMediaSkeleton view={view} />
       ) : filtered.length === 0 ? (
         <div className="admin-empty-news animate-fade-in-up flex flex-col items-center gap-4 rounded-2xl border border-dashed border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] py-16 text-center">
           <div className="rounded-full bg-slate-800/50 p-4 ring-1 ring-slate-700/50">
@@ -72,8 +89,12 @@ export default function MediaLibraryContent({
           )}
         </div>
       ) : view === "grid" ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          {filtered.map((item) => (
+        <>
+        <p className="text-xs text-slate-500 mb-4">
+          Menampilkan {filtered.length} dari {media.length} file
+        </p>
+        <div className="grid max-[400px]:grid-cols-1 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          {visible.map((item) => (
             <MediaCard
               key={item.id}
               item={item}
@@ -85,12 +106,26 @@ export default function MediaLibraryContent({
             />
           ))}
         </div>
+        {showButton && (
+          <ShowMoreButton
+            label="Lihat Semua File"
+            total={filtered.length}
+            showAll={showAll}
+            onToggle={() => setShowAll((prev) => !prev)}
+            className="mt-6"
+          />
+        )}
+        </>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
+        <>
+        <p className="text-xs text-slate-500 mb-4">
+          Menampilkan {filtered.length} dari {media.length} file
+        </p>
+        <div className="admin-media-table overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] text-left text-sm">
               <thead>
-                <tr className="border-b border-white/5 bg-white/[0.03]">
+                <tr className="admin-media-table-head border-b border-white/5 bg-white/[0.03]">
                   <th className="px-4 py-3 font-medium text-slate-400">
                     File
                   </th>
@@ -112,7 +147,7 @@ export default function MediaLibraryContent({
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((item) => (
+                {visible.map((item) => (
                   <MediaCard
                     key={item.id}
                     item={item}
@@ -127,6 +162,16 @@ export default function MediaLibraryContent({
             </table>
           </div>
         </div>
+        {showButton && (
+          <ShowMoreButton
+            label="Lihat Semua File"
+            total={filtered.length}
+            showAll={showAll}
+            onToggle={() => setShowAll((prev) => !prev)}
+            className="mt-6"
+          />
+        )}
+        </>
       )}
     </div>
   )

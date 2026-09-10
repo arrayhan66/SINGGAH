@@ -50,7 +50,7 @@ function DashboardLatestNews() {
         </div>
 
         <button
-          onClick={() => navigate("/berita")}
+          onClick={() => navigate("/admin/berita")}
           className="group ml-auto hidden cursor-pointer min-[600px]:flex items-center gap-1 text-[9px] font-medium text-cyan-400 transition-all duration-200 hover:text-cyan-300 min-[500px]:text-xs"
         >
           Lihat Semua

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import api from "../services/api"
 import { slugify } from "../utils/categoryHelpers"
 
-const INITIAL_VISIBLE = 9
+export const INITIAL_VISIBLE = 9
 
 export const stateTabs = [
   { value: "all", label: "Semua" },
@@ -32,7 +32,7 @@ export default function useManageCategories() {
 
   const fetchCategories = useCallback(async () => {
     try {
-      const res = await api.get("/categories")
+      const res = await api.get("/categories", { params: { all: 1 } })
       const items = res.data.data.items || res.data.data || []
       setCategories(items)
     } catch (err) {

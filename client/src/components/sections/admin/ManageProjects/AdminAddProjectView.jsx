@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
 import { Image, Info, Layers, ImagePlus, FileText, Eye, Send } from "lucide-react"
 import AdminLayout from "../../../../layouts/AdminLayout"
 import UploadHero from "../../user/Upload/UploadHero"
@@ -12,6 +11,7 @@ import UploadGallery from "../../user/Upload/UploadGallery"
 import UploadDocuments from "../../user/Upload/UploadDocuments"
 import UploadPreview from "../../user/Upload/UploadPreview"
 import UploadAction from "../../user/Upload/UploadAction"
+import SubmitSuccessModal from "../../../ui/SubmitSuccessModal"
 import { useProjects } from "../../../../context/ProjectContext"
 import api from "../../../../services/api"
 
@@ -65,8 +65,8 @@ function AdminAddProjectView() {
   const [formData, setFormData] = useState(initialFormData)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
+  const [successOpen, setSuccessOpen] = useState(false)
   const [categories, setCategories] = useState([])
-  const navigate = useNavigate()
   const { addProject } = useProjects()
   const categoriesFetched = useRef(false)
 
@@ -134,7 +134,7 @@ function AdminAddProjectView() {
       }
 
       await addProject(fd)
-      navigate("/projects")
+      setSuccessOpen(true)
     } catch (err) {
       const msg =
         err.response?.data?.message || "Gagal menambahkan karya. Coba lagi."
@@ -201,7 +201,18 @@ function AdminAddProjectView() {
             />
           </div>
         </section>
+
+      <SubmitSuccessModal
+        isOpen={successOpen}
+        karyaTitle={formData.title}
+        redirectPath="/admin/karya"
+        mode="upload"
+        role="admin"
+        onClose={() => setSuccessOpen(false)}
+      />
       </div>
     </AdminLayout>
   )
 }
+
+export default AdminAddProjectView

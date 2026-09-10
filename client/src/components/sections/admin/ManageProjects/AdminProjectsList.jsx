@@ -6,6 +6,7 @@ import AdminProjectsCard from "./AdminProjectsCard"
 import AdminProjectApproveModal from "./AdminProjectApproveModal"
 import AdminProjectRejectModal from "./AdminProjectRejectModal"
 import DeleteConfirmModal from "../../../ui/DeleteConfirmModal"
+import ProjectDeletedModal from "../../../ui/ProjectDeletedModal"
 import toast from "../../../../utils/toast"
 
 function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
@@ -16,7 +17,7 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
   const [rejectModalProject, setRejectModalProject] = useState(null)
   const [deleteProjectTarget, setDeleteProjectTarget] = useState(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
-  const [deleteSuccess, setDeleteSuccess] = useState(false)
+  const [deletedTitle, setDeletedTitle] = useState(null)
 
   const filterKey = `${search}|${statusFilter}|${categoryFilter}`
   const [activeFilter, setActiveFilter] = useState(filterKey)
@@ -83,7 +84,7 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
   }, [projects])
 
   function handleViewDetail(project) {
-    navigate(`/projects/detail/${project.slug || project.id}`)
+    navigate(`/admin/karya/detail/${project.slug || project.id}`)
   }
 
   const handleApproveClick = useCallback((project) => {
@@ -95,7 +96,7 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
   }, [])
 
   const handleEditClick = useCallback((project) => {
-    navigate(`/projects/edit/${project.slug || project.id}`)
+    navigate(`/admin/karya/edit/${project.slug || project.id}`)
   }, [navigate])
 
   const handleDeleteClick = useCallback((project) => {
@@ -108,7 +109,8 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
     try {
       await deleteProject(deleteProjectTarget.id)
       setDeleteLoading(false)
-      setDeleteSuccess(true)
+      setDeletedTitle(deleteProjectTarget.title)
+      setDeleteProjectTarget(null)
     } catch {
       setDeleteLoading(false)
       setDeleteProjectTarget(null)
@@ -211,12 +213,17 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
           onCancel={() => {
             setDeleteProjectTarget(null)
             setDeleteLoading(false)
-            setDeleteSuccess(false)
           }}
           loading={deleteLoading}
-          success={deleteSuccess}
         />
       )}
+
+      <ProjectDeletedModal
+        isOpen={!!deletedTitle}
+        karyaTitle={deletedTitle || ""}
+        redirectPath="/admin/karya"
+        onClose={() => setDeletedTitle(null)}
+      />
     </div>
   )
 }

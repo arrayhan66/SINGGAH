@@ -105,7 +105,7 @@ function AppRouter() {
             </Suspense>
           }
         />
-        <Route path="/berita" element={<RoleSplit admin={<ManageNews />} visitor={<News />} />} />
+        <Route path="/berita" element={<News />} />
         <Route path="/berita/:slug" element={<NewsDetail />} />
 
         {/* === AUTH ROUTES === */}
@@ -190,7 +190,15 @@ function AppRouter() {
           }
         />
         <Route
-          path="/berita/tambah"
+          path="/admin/berita"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <ManageNews />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/berita/tambah"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <BeritaForm />
@@ -198,7 +206,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/berita/edit/:slug"
+          path="/admin/berita/edit/:slug"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <BeritaForm />
@@ -206,7 +214,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/berita/preview/:slug"
+          path="/admin/berita/preview/:slug"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <BeritaPreview />
@@ -214,7 +222,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/projects"
+          path="/admin/karya"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AdminProjects />
@@ -222,7 +230,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/projects/detail/:slug"
+          path="/admin/karya/detail/:slug"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AdminProjectDetail />
@@ -230,7 +238,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/projects/tambah"
+          path="/admin/karya/tambah"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AdminAddProjectView />
@@ -238,7 +246,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/projects/edit/:slug"
+          path="/admin/karya/edit/:slug"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <ProjectForm />
@@ -246,7 +254,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/users"
+          path="/admin/pengguna"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <ManageUsers />
@@ -254,7 +262,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/users/tambah"
+          path="/admin/pengguna/tambah"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <UserForm />
@@ -262,7 +270,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/users/edit/:slug"
+          path="/admin/pengguna/edit/:slug"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <UserForm />
@@ -270,7 +278,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/users/:slug"
+          path="/admin/pengguna/:slug"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <UserDetail />
@@ -278,7 +286,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/kategori"
+          path="/admin/kategori"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <ManageCategories />
@@ -286,7 +294,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/media"
+          path="/admin/media"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <MediaLibrary />
@@ -294,7 +302,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/laporan"
+          path="/admin/laporan"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <Reports />
@@ -302,7 +310,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/pengaturan"
+          path="/admin/pengaturan"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <Settings />

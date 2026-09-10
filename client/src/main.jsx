@@ -12,11 +12,13 @@ import { NotificationProvider } from "./context/NotificationContext"
 // Pesan ini datang dari iframe Google/ekstensi browser saat port komunikasinya
 // ditutup duluan (mis. navigasi cepat). Tidak memengaruhi aplikasi, jadi
 // dibuang dari console.
+const MESSAGE_PORT_NOISE = /message port closed/i
+
 window.addEventListener("unhandledrejection", (event) => {
   const reason = event.reason
-  const message =
-    reason && reason.message ? reason.message : String(reason)
-  if (message.includes("message port closed")) {
+  const text = reason?.message ? String(reason.message) : String(reason ?? "")
+  const stack = reason?.stack ? String(reason.stack) : ""
+  if (MESSAGE_PORT_NOISE.test(text) || MESSAGE_PORT_NOISE.test(stack)) {
     event.preventDefault()
   }
 })
@@ -54,6 +56,8 @@ window.addEventListener("error", (event) => {
   const message = event.message || ""
   const stack = event.error && event.error.stack ? event.error.stack : ""
   if (
+    MESSAGE_PORT_NOISE.test(message) ||
+    MESSAGE_PORT_NOISE.test(stack) ||
     stack.includes("reportAllChanges") ||
     message.includes("Cannot read properties of undefined (reading 'startTime')")
   ) {

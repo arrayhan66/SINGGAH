@@ -50,8 +50,11 @@ export default function CategoryForm({
             disabled={saving}
             className="flex cursor-pointer items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-cyan-500/20 transition-all hover:from-cyan-400 hover:to-blue-500 hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0"
           >
-            {saving && <Loader2 size={16} className="animate-spin" />}
-            {editing ? "Simpan" : "Tambah"}
+            {saving ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              editing ? "Simpan" : "Tambah"
+            )}
           </button>
           <button
             type="button"

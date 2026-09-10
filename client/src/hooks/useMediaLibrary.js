@@ -12,6 +12,7 @@ export default function useMediaLibrary() {
   const [view, setView] = useState("list")
   const [previewItem, setPreviewItem] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [deleting, setDeleting] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [notification, setNotification] = useState(null)
   const [filterOpen, setFilterOpen] = useState(false)
@@ -176,6 +177,7 @@ export default function useMediaLibrary() {
   )
 
   function confirmDelete(id) {
+    setDeleting(true)
     api
       .delete(`/media/${id}`)
       .then(() => {
@@ -190,6 +192,7 @@ export default function useMediaLibrary() {
         )
       })
       .finally(() => {
+        setDeleting(false)
         setDeleteTarget(null)
       })
   }
@@ -220,12 +223,8 @@ export default function useMediaLibrary() {
     () => ({
       total: media.length,
       images: media.filter((m) => m.type?.startsWith("image/")).length,
-      videos: media.filter((m) => m.type?.startsWith("video/")).length,
       documents: media.filter(
-        (m) =>
-          m.type &&
-          !m.type.startsWith("image/") &&
-          !m.type.startsWith("video/"),
+        (m) => m.type && !m.type.startsWith("image/"),
       ).length,
     }),
     [media],
@@ -235,7 +234,6 @@ export default function useMediaLibrary() {
     () => ({
       all: media.length,
       image: stats.images,
-      video: stats.videos,
       document: stats.documents,
     }),
     [media, stats],
@@ -256,6 +254,7 @@ export default function useMediaLibrary() {
     setPreviewItem,
     deleteTarget,
     setDeleteTarget,
+    deleting,
     isDragging,
     notification,
     setNotification,

@@ -18,6 +18,7 @@ import KaryaProjectComments from "../../karya/detail/KaryaProjectComments"
 import AdminProjectApproveModal from "./AdminProjectApproveModal"
 import AdminProjectRejectModal from "./AdminProjectRejectModal"
 import DeleteConfirmModal from "../../../ui/DeleteConfirmModal"
+import ProjectDeletedModal from "../../../ui/ProjectDeletedModal"
 import Toast from "../../../ui/Toast"
 import { ProjectDetailSkeleton, CommentsSkeleton } from "../../../ui/PageSkeletons"
 
@@ -42,7 +43,7 @@ function AdminProjectDetailSection() {
   const [rejectModal, setRejectModal] = useState(false)
   const [deleteModal, setDeleteModal] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
-  const [deleteSuccess, setDeleteSuccess] = useState(false)
+  const [deletedTitle, setDeletedTitle] = useState(null)
   const [notification, setNotification] = useState(null)
 
   useEffect(() => {
@@ -83,9 +84,8 @@ function AdminProjectDetailSection() {
     try {
       await deleteProject(project.id)
       setDeleteLoading(false)
-      setDeleteSuccess(true)
-      showNotification("Karya berhasil dihapus")
-      setTimeout(() => navigate("/projects"), 1200)
+      setDeletedTitle(project.title)
+      setDeleteModal(false)
     } catch {
       setDeleteLoading(false)
       setDeleteModal(false)
@@ -121,7 +121,7 @@ function AdminProjectDetailSection() {
       <section className="karya-projectdetail-page relative overflow-hidden bg-brand-dark py-32 text-center">
         <p className="text-slate-300">Karya tidak ditemukan.</p>
         <button
-          onClick={() => navigate("/projects")}
+          onClick={() => navigate("/admin/karya")}
           className="mt-6 cursor-pointer rounded-xl border border-slate-200 bg-white px-5 py-3 text-slate-700 transition hover:bg-slate-50"
         >
           Kembali ke Karya
@@ -205,7 +205,7 @@ function AdminProjectDetailSection() {
           <div className="grid w-full grid-cols-2 gap-2 min-[820px]:flex min-[820px]:w-auto min-[820px]:items-center">
             <button
               type="button"
-              onClick={() => navigate(`/projects/edit/${project.slug || project.id}`)}
+              onClick={() => navigate(`/admin/karya/edit/${project.slug || project.id}`)}
               className="banner-btn banner-btn--ghost"
             >
               <Pencil size={14} />
@@ -347,12 +347,17 @@ function AdminProjectDetailSection() {
           onCancel={() => {
             setDeleteModal(false)
             setDeleteLoading(false)
-            setDeleteSuccess(false)
           }}
           loading={deleteLoading}
-          success={deleteSuccess}
         />
       )}
+
+      <ProjectDeletedModal
+        isOpen={!!deletedTitle}
+        karyaTitle={deletedTitle || ""}
+        redirectPath="/admin/karya"
+        onClose={() => setDeletedTitle(null)}
+      />
     </section>
   )
 }

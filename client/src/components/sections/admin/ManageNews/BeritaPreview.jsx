@@ -22,7 +22,7 @@ function DashboardLatestNews() {
         </div>
 
         <button
-          onClick={() => navigate("/berita")}
+          onClick={() => navigate("/admin/berita")}
           className="group flex cursor-pointer items-center gap-1.5 text-xs font-medium text-cyan-400 transition-all duration-200 hover:text-cyan-300"
         >
           Lihat Semua

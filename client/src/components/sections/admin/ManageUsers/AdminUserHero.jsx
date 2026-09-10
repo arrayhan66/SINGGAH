@@ -111,13 +111,13 @@ function AdminUserHero({ search, onSearchChange, statusFilter, onStatusChange })
     return (
       <div
         key={s.key}
-        className={`group relative min-w-0 overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br ${gradMap[s.color]} px-4 py-4 transition-all duration-300 hover:border-white/20 hover:-translate-y-0.5`}
+        className={`user-stat-item group relative min-w-0 overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br ${gradMap[s.color]} px-4 py-4 transition-all duration-300 hover:border-white/20 hover:-translate-y-0.5`}
       >
         <Icon
-          className={`absolute -right-2 -top-2 h-20 w-20 rotate-12 ${textMap[s.color]} opacity-[0.07] transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110`}
+          className={`user-stat-watermark absolute -right-2 -top-2 h-20 w-20 rotate-12 ${textMap[s.color]} opacity-[0.07] transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110`}
         />
         <div className="relative flex items-center gap-3.5">
-          <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border shadow-lg ${glowMap[s.color]} ${iconBgMap[s.color]} transition-transform duration-300 group-hover:scale-105`}>
+          <div className={`user-stat-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border shadow-lg ${glowMap[s.color]} ${iconBgMap[s.color]} transition-transform duration-300 group-hover:scale-105`}>
             <Icon className={`h-5 w-5 ${textMap[s.color]}`} />
           </div>
           <div className="min-w-0">
@@ -169,12 +169,12 @@ function AdminUserHero({ search, onSearchChange, statusFilter, onStatusChange })
               value={search}
               onChange={onSearchChange}
               placeholder="Cari nama, email, atau username..."
-              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none shadow-sm focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
+              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/25 focus:shadow-lg focus:shadow-cyan-500/10"
             />
           </div>
           <button
             type="button"
-            onClick={() => navigate("/users/tambah")}
+            onClick={() => navigate("/admin/pengguna/tambah")}
             className="flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0]"
           >
             <Plus size={16} />

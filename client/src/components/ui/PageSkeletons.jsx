@@ -416,95 +416,92 @@ export function AdminDashboardSkeleton() {
           <Skeleton className="h-11 flex-1 basis-0 rounded-lg max-w-[150px] min-[260px]:max-w-[136px]" />
         </div>
       </div>
-      <div className="px-4 min-[260px]:px-3 pb-1 md:px-6">
+
+      <div className="px-4 min-[260px]:px-3 md:px-6">
         <div className="grid grid-cols-1 min-[640px]:grid-cols-2 min-[1200px]:grid-cols-4 gap-3 md:gap-4">
           {Array.from({ length: 4 }, (_, i) => (
-            <FormShell key={i} className="flex items-start gap-2 p-5 md:p-6">
-              <div className="flex items-center gap-3 min-w-0">
-                <Skeleton className="h-11 w-11 shrink-0 rounded-xl" />
-                <Skeleton className="h-8 w-10" />
+            <FormShell key={i} className="p-5 md:p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-11 w-11 shrink-0 rounded-xl" />
+                  <Skeleton className="h-9 w-9" />
+                </div>
+                <Skeleton className="h-6 w-16 rounded-full" />
               </div>
-              <div className="ml-auto flex flex-col items-end gap-1">
-                <Skeleton className="h-8 w-20" />
-                <Skeleton className="h-3.5 w-14" />
+              <div className="mt-3 flex items-end justify-between">
+                <Skeleton className="h-4 w-20" />
               </div>
             </FormShell>
           ))}
         </div>
       </div>
 
-      <div className="px-4 md:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-6 min-[1200px]:grid-cols-3 min-[1200px]:gap-7">
-          <div className="flex flex-col gap-6 min-[1200px]:col-span-2 min-[1200px]:gap-7">
-            <FormShell className="p-5 md:p-6">
-              <div className="flex items-center gap-3 pb-4">
-                <Skeleton className="h-8 w-8 rounded-lg" />
-                <Skeleton className="h-5 w-44" />
-              </div>
-              <div className="space-y-3">
-                {[0, 1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-3 rounded-[14px] p-3">
-                    <Skeleton className="h-[72px] w-[72px] shrink-0 rounded-lg" />
-                    <div className="min-w-0 flex-1">
-                      <Skeleton className="h-4 w-3/4" />
-                      <Skeleton className="mt-2 h-3 w-1/3" />
-                    </div>
-                    <Skeleton className="h-7 w-12 shrink-0 rounded-md" />
-                    <Skeleton className="h-8 w-16 shrink-0 rounded-md" />
-                  </div>
-                ))}
-              </div>
-            </FormShell>
-            <FormShell className="p-5 md:p-6">
-              <div className="flex items-center gap-3 pb-4">
-                <Skeleton className="h-8 w-8 rounded-lg" />
-                <Skeleton className="h-5 w-44" />
-              </div>
-              <div className="space-y-3">
-                {[0, 1, 2].map((i) => (
-                  <div key={i} className="flex items-center gap-3 rounded-[14px] p-3">
-                    <Skeleton className="h-[72px] w-[72px] shrink-0 rounded-lg" />
-                    <div className="min-w-0 flex-1">
-                      <Skeleton className="h-4 w-3/4" />
-                      <Skeleton className="mt-2 h-3 w-1/3" />
-                    </div>
-                    <Skeleton className="h-7 w-12 shrink-0 rounded-md" />
-                  </div>
-                ))}
-              </div>
-            </FormShell>
+      <div className="px-4 min-[260px]:px-3 md:px-6">
+        <FormShell className="p-5 md:p-6">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-5 w-36" />
+            <Skeleton className="h-4 w-24" />
           </div>
-          <div className="flex flex-col gap-6 min-[1200px]:gap-7">
-            <FormShell className="p-5 md:p-6">
-              <div className="flex items-center gap-3 pb-4">
-                <Skeleton className="h-8 w-8 rounded-lg" />
-                <Skeleton className="h-5 w-40" />
-              </div>
-              <div className="space-y-3">
-                {[0, 1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-start gap-2.5 py-1">
-                    <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
-                    <div className="min-w-0 flex-1 space-y-2">
-                      <Skeleton className="h-3.5 w-11/12" />
-                      <Skeleton className="h-3 w-2/3" />
-                    </div>
-                    <Skeleton className="h-3 w-10 shrink-0" />
-                  </div>
-                ))}
-              </div>
-            </FormShell>
-            <FormShell className="p-5 md:p-6">
-              <div className="flex items-center gap-3 pb-4">
-                <Skeleton className="h-8 w-8 rounded-lg" />
-                <Skeleton className="h-5 w-36" />
-              </div>
-              <div className="space-y-3">
-                <Skeleton className="h-14 w-full rounded-xl" />
-                <Skeleton className="h-14 w-full rounded-xl" />
-              </div>
-            </FormShell>
+          <div className="mt-2">
+            <Skeleton className="h-4 w-16 rounded-full" />
           </div>
-        </div>
+          <div className="mt-6 grid grid-cols-2 gap-4 min-[600px]:grid-cols-3 min-[900px]:grid-cols-4 min-[1200px]:grid-cols-6 min-[1500px]:grid-cols-12">
+            {Array.from({ length: 12 }, (_, i) => (
+              <div key={i} className="flex flex-col items-center gap-2">
+                <Skeleton className="h-3 w-6" />
+                <Skeleton className="w-full rounded-sm" style={{ height: `${[32, 0, 0, 0, 0, 0, 64, 128, 96, 0, 0, 0][i]}px`, minHeight: i === 6 || i === 7 || i === 8 ? undefined : '2px' }} />
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-4 min-[600px]:grid-cols-3 min-[900px]:grid-cols-4 min-[1200px]:grid-cols-6 min-[1500px]:grid-cols-12">
+            {Array.from({ length: 12 }, (_, i) => (
+              <Skeleton key={i} className="mx-auto h-3 w-6" />
+            ))}
+          </div>
+        </FormShell>
+      </div>
+
+      <div className="px-4 min-[260px]:px-3 md:px-6">
+        <FormShell className="p-5 md:p-6">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-5 w-44" />
+            <Skeleton className="h-4 w-24" />
+          </div>
+          <div className="mt-2">
+            <Skeleton className="h-4 w-20 rounded-full" />
+          </div>
+          <div className="mt-6 grid grid-cols-2 gap-4 min-[600px]:grid-cols-3 min-[900px]:grid-cols-4 min-[1200px]:grid-cols-6 min-[1500px]:grid-cols-12">
+            {Array.from({ length: 12 }, (_, i) => (
+              <div key={i} className="flex flex-col items-center gap-2">
+                <Skeleton className="h-3 w-6" />
+                <Skeleton className="w-full rounded-sm" style={{ height: `${[0, 0, 0, 0, 0, 0, 56, 112, 80, 0, 0, 0][i]}px`, minHeight: i === 6 || i === 7 || i === 8 ? undefined : '2px' }} />
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-4 min-[600px]:grid-cols-3 min-[900px]:grid-cols-4 min-[1200px]:grid-cols-6 min-[1500px]:grid-cols-12">
+            {Array.from({ length: 12 }, (_, i) => (
+              <Skeleton key={i} className="mx-auto h-3 w-6" />
+            ))}
+          </div>
+        </FormShell>
+      </div>
+
+      <div className="px-4 min-[260px]:px-3 md:px-6">
+        <FormShell className="p-5 md:p-6">
+          <Skeleton className="h-5 w-36" />
+          <Skeleton className="mt-1 h-3.5 w-48" />
+          <div className="mt-5 grid grid-cols-1 gap-4 min-[500px]:grid-cols-2 min-[900px]:grid-cols-4">
+            {Array.from({ length: 4 }, (_, i) => (
+              <div key={i} className="flex items-center gap-3 rounded-xl bg-white/[0.05] p-4">
+                <Skeleton className="h-10 w-10 shrink-0 rounded-xl" />
+                <div>
+                  <Skeleton className="h-7 w-12" />
+                  <Skeleton className="mt-1.5 h-3.5 w-28" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </FormShell>
       </div>
     </div>
   )
@@ -688,32 +685,94 @@ export function AdminUserDetailSkeleton() {
 
 export function AdminCategoriesSkeleton() {
   return (
-    <FormShell className="overflow-hidden rounded-2xl p-0">
-      <div className="grid grid-cols-4 gap-2 border-b border-white/5 bg-white/[0.03] px-4 py-3.5">
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-4 w-28" />
-        <Skeleton className="h-4 w-14" />
-        <Skeleton className="h-4 w-12 justify-self-end" />
-      </div>
-      <div className="divide-y divide-white/5">
-        {Array.from({ length: 6 }, (_, i) => (
-          <div key={i} className="flex items-center gap-2 px-4 py-3.5">
-            <Skeleton className="h-6 w-6 rounded-lg" />
-            <Skeleton className="h-3.5 w-32" />
-            <Skeleton className="ml-auto h-3.5 w-40 hidden min-[800px]:block" />
-            <Skeleton className="ml-auto h-3 w-20" />
-            <Skeleton className="h-8 w-8 rounded-lg" />
-            <Skeleton className="h-8 w-8 rounded-lg" />
+    <div className="grid grid-cols-1 min-[750px]:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 animate-fade-in-up">
+      {Array.from({ length: 6 }, (_, i) => (
+        <FormShell key={i} className="overflow-hidden rounded-2xl p-5 sm:p-6">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent" />
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-4 min-w-0">
+              <Skeleton className="h-12 w-12 shrink-0 rounded-xl sm:h-14 sm:w-14" />
+              <div className="min-w-0">
+                <Skeleton className="h-4 w-40 max-w-[14rem]" />
+                <Skeleton className="mt-2 h-3 w-24" />
+              </div>
+            </div>
+            <div className="hidden min-[400px]:flex gap-1">
+              <Skeleton className="h-8 w-8 rounded-lg" />
+              <Skeleton className="h-8 w-8 rounded-lg" />
+            </div>
           </div>
-        ))}
-      </div>
-    </FormShell>
+          <div className="mt-4 space-y-2">
+            <Skeleton className="h-3.5 w-full" />
+            <Skeleton className="h-3.5 w-2/3" />
+          </div>
+          <div className="mt-5 flex items-center justify-between border-t border-white/[0.1] pt-4">
+            <Skeleton className="h-6 w-20 rounded-md" />
+            <Skeleton className="hidden h-3 w-14 min-[400px]:block" />
+          </div>
+        </FormShell>
+      ))}
+    </div>
   )
 }
 
-export function AdminMediaSkeleton() {
+export function AdminMediaSkeleton({ view = "grid" }) {
+  if (view === "list") {
+    return (
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[720px] text-left text-sm">
+            <thead>
+              <tr className="border-b border-white/5 bg-white/[0.03]">
+                {["File", "Tipe", "Ukuran", "Tanggal", "Digunakan", "Aksi"].map(
+                  (h) => (
+                    <th key={h} className={`px-4 py-3 ${h === "Aksi" ? "text-right" : ""}`}>
+                      <Skeleton className={`h-3.5 ${h === "File" ? "w-16" : h === "Tipe" ? "w-10" : h === "Ukuran" ? "w-14" : h === "Tanggal" ? "w-20" : h === "Digunakan" ? "w-24" : "w-10"} ${h === "Aksi" ? "ml-auto" : ""}`} />
+                    </th>
+                  )
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: 8 }, (_, i) => (
+                <tr key={i} className="border-b border-white/5">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-9 w-9 shrink-0 rounded-lg" />
+                      <div className="flex-1 space-y-1.5">
+                        <Skeleton className="h-3.5 w-48 max-w-[14rem]" />
+                        <Skeleton className="h-2.5 w-28" />
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Skeleton className="h-4 w-12 rounded-md" />
+                  </td>
+                  <td className="px-4 py-3">
+                    <Skeleton className="h-3.5 w-16" />
+                  </td>
+                  <td className="px-4 py-3">
+                    <Skeleton className="h-3.5 w-24" />
+                  </td>
+                  <td className="px-4 py-3">
+                    <Skeleton className="h-3.5 w-20" />
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-1">
+                      <Skeleton className="h-8 w-8 rounded-lg" />
+                      <Skeleton className="h-8 w-8 rounded-lg" />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
+  }
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+    <div className="grid max-[400px]:grid-cols-1 grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
       {Array.from({ length: 12 }, (_, i) => (
         <FormShell key={i} className="overflow-hidden rounded-xl p-0">
           <Skeleton className="aspect-square w-full rounded-none" />

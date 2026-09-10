@@ -5,7 +5,9 @@ const { success } = require("../utils/response")
 const { logActivity } = require("../services/activityLogService")
 
 exports.getCategories = asyncHandler(async (req, res) => {
-  const categories = await categoryService.getCategories()
+  const categories = await categoryService.getCategories({
+    allStatuses: String(req.query.all).toLowerCase() === "true" || req.query.all === "1",
+  })
 
   success(res, categories)
 })

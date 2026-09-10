@@ -380,7 +380,7 @@ exports.updateProjectStatus = async (id, status, reason = "") => {
     }
   })
 
-  await cache.del("categories:list")
+  await cache.delPrefix("categories:list")
 
   return project
 }
@@ -597,6 +597,8 @@ exports.createProject = async (data, user, imageUrls = [], documentUrls = []) =>
     return created
   })
 
+  await cache.delPrefix("categories:list")
+
   return await exports.getProjectById(project.id, user.id, user.role)
 }
 
@@ -654,6 +656,8 @@ exports.updateProject = async (id, data, user) => {
     await persistRelations(project, relations, { transaction: t })
   })
 
+  await cache.delPrefix("categories:list")
+
   // Admin mengubah karya milik user lain -> beri tahu pemilik.
   if (user.role === "admin" && project.user_id !== user.id) {
     await createNotification(
@@ -706,6 +710,8 @@ exports.deleteProject = async (id, user) => {
       transaction: t,
     })
   })
+
+  await cache.delPrefix("categories:list")
 
   // Admin menghapus karya milik user lain -> beri tahu pemilik.
   if (user.role === "admin" && project.user_id !== user.id) {

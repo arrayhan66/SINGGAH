@@ -19,6 +19,7 @@ const Notification = require("./Notification")
 const Setting = require("./Setting")
 const ActivityLog = require("./ActivityLog")
 const CommentReply = require("./CommentReply")
+const MediaUsage = require("./MediaUsage")
 
 /* ================= USERS ================= */
 User.hasMany(Project, { foreignKey: "user_id", onDelete: "CASCADE" })
@@ -118,4 +119,5 @@ module.exports = {
   Setting,
   ActivityLog,
   CommentReply,
+  MediaUsage,
 }

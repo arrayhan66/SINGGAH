@@ -200,10 +200,12 @@ exports.createUser = async (data) => {
     email,
     password,
     avatar,
+    identitas_photo,
     nim_nip,
     tipe,
     role,
     status,
+    is_verified,
   } = data
 
   if (!name || !username || !email || !password) {
@@ -252,17 +254,23 @@ exports.createUser = async (data) => {
 
   const hashedPassword = await bcrypt.hash(password, 10)
 
+  // Multipart (upload file) mengirim boolean sebagai string.
+  let verified = is_verified
+  if (verified === "true") verified = true
+  else if (verified === "false") verified = false
+
   const user = await User.create({
     name,
     username: normalizedUsername,
     email: normalizedEmail,
     password: hashedPassword,
     avatar: avatar || null,
+    identitas_photo: identitas_photo || null,
     nim_nip: nim_nip || null,
     tipe: normalizedTipe,
     role: normalizedRole,
     status: normalizedStatus,
-    is_verified: true,
+    is_verified: verified ?? true,
   })
 
   return {
@@ -271,6 +279,7 @@ exports.createUser = async (data) => {
     username: user.username,
     email: user.email,
     avatar: user.avatar,
+    identitas_photo: user.identitas_photo,
     nim_nip: user.nim_nip,
     tipe: user.tipe,
     role: user.role,
@@ -285,6 +294,7 @@ exports.updateUser = async (id, data) => {
     email,
     password,
     avatar,
+    identitas_photo,
     nim_nip,
     tipe,
     role,
@@ -361,9 +371,15 @@ exports.updateUser = async (id, data) => {
     user.role = VALID_ROLES.includes(role) ? role : user.role
     user.status = VALID_STATUSES.includes(status) ? status : user.status
     user.avatar = avatar ?? user.avatar
+    user.identitas_photo = identitas_photo ?? user.identitas_photo
     user.nim_nip = nim_nip ?? user.nim_nip
     user.tipe = VALID_TIPES.includes(tipe) ? tipe : user.tipe
-    user.is_verified = is_verified ?? user.is_verified
+
+    // Multipart (upload file) mengirim boolean sebagai string.
+    let verified = is_verified
+    if (verified === "true") verified = true
+    else if (verified === "false") verified = false
+    user.is_verified = verified ?? user.is_verified
 
     if (isEmailChanged) {
       user.email = normalizedEmail

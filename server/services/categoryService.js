@@ -4,21 +4,24 @@ const cache = require("../utils/cache")
 
 const CATEGORIES_TTL = 60 * 1000
 const CATEGORIES_KEY = "categories:list"
+const CATEGORIES_ALL_KEY = `${CATEGORIES_KEY}:all`
 
-exports.getCategories = async () => {
-  const cached = await cache.get(CATEGORIES_KEY)
+// Hitung karya per kategori. Default hanya karya published (dipakai halaman
+// publik/Hall). Saat allStatuses=true, menghitung semua status — dipakai halaman
+// admin Kelola Kategori agar sinkron dengan jumlah di Kelola Karya.
+exports.getCategories = async ({ allStatuses = false } = {}) => {
+  const cacheKey = allStatuses ? CATEGORIES_ALL_KEY : CATEGORIES_KEY
+
+  const cached = await cache.get(cacheKey)
   if (cached) return cached
+
+  const countExpr = allStatuses
+    ? "(SELECT COUNT(*) FROM projects WHERE projects.category_id = Category.id)"
+    : "(SELECT COUNT(*) FROM projects WHERE projects.category_id = Category.id AND projects.status = 'published')"
 
   const categories = await Category.findAll({
     attributes: {
-      include: [
-        [
-          sequelize.literal(
-            "(SELECT COUNT(*) FROM projects WHERE projects.category_id = Category.id AND projects.status = 'published')",
-          ),
-          "projectCount",
-        ],
-      ],
+      include: [[sequelize.literal(countExpr), "projectCount"]],
     },
     order: [
       ["sort_order", "ASC"],
@@ -26,7 +29,7 @@ exports.getCategories = async () => {
     ],
   })
 
-  await cache.set(CATEGORIES_KEY, categories, CATEGORIES_TTL)
+  await cache.set(cacheKey, categories, CATEGORIES_TTL)
 
   return categories
 }
@@ -95,7 +98,7 @@ exports.createCategory = async (data) => {
     is_active: is_active ?? true,
   })
 
-  await cache.del(CATEGORIES_KEY)
+  await cache.delPrefix(CATEGORIES_KEY)
 
   return category
 }
@@ -147,7 +150,7 @@ exports.updateCategory = async (id, data) => {
 
   await category.save()
 
-  await cache.del(CATEGORIES_KEY)
+  await cache.delPrefix(CATEGORIES_KEY)
 
   return category
 }
@@ -161,7 +164,7 @@ exports.deleteCategory = async (id) => {
 
   try {
     await category.destroy()
-    await cache.del(CATEGORIES_KEY)
+    await cache.delPrefix(CATEGORIES_KEY)
   } catch (error) {
     if (error.name === "SequelizeForeignKeyConstraintError") {
       throw new AppError("Kategori masih digunakan oleh project", 400)

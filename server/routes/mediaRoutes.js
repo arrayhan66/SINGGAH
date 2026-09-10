@@ -21,6 +21,13 @@ router.post(
   mediaController.uploadMedia,
 )
 
+router.post(
+  "/usage",
+  authMiddleware,
+  roleMiddleware("admin"),
+  mediaController.recordUsage,
+)
+
 router.delete(
   "/{*publicId}",
   authMiddleware,

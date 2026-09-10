@@ -14,28 +14,32 @@ const DOCUMENT_MIMETYPES = [
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
   "application/vnd.ms-excel",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  "text/plain",
   "application/zip",
   "application/x-zip-compressed",
   "application/x-rar-compressed",
   "application/vnd.rar",
 ]
 
-const VIDEO_MIMETYPES = [
-  "video/mp4",
-  "video/webm",
-  "video/ogg",
-  "video/quicktime",
-  "video/x-msvideo",
-]
+const IMAGE_EXTS = ["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp", "avif", "tiff", "ico", "heic", "heif"]
+const DOCUMENT_EXTS = ["pdf", "doc", "docx", "ppt", "pptx", "xls", "xlsx", "zip", "rar"]
+
+function getExtension(filename) {
+  const idx = (filename || "").lastIndexOf(".")
+  return idx === -1 ? "" : filename.slice(idx + 1).toLowerCase()
+}
 
 const fileFilter = (req, file, cb) => {
+  const ext = getExtension(file.originalname)
+
   if (file.fieldname === "files") {
     const isImage = file.mimetype && file.mimetype.startsWith("image/")
-    const isVideo = file.mimetype && VIDEO_MIMETYPES.includes(file.mimetype)
     const isDocument = file.mimetype && DOCUMENT_MIMETYPES.includes(file.mimetype)
 
-    if (isImage || isVideo || isDocument) {
+    if (isImage || isDocument) {
+      return cb(null, true)
+    }
+
+    if (IMAGE_EXTS.includes(ext) || DOCUMENT_EXTS.includes(ext)) {
       return cb(null, true)
     }
 
@@ -47,10 +51,18 @@ const fileFilter = (req, file, cb) => {
       return cb(null, true)
     }
 
+    if (DOCUMENT_EXTS.includes(ext)) {
+      return cb(null, true)
+    }
+
     return cb(new AppError("File dokumen tidak didukung", 400))
   }
 
   if (file.mimetype && file.mimetype.startsWith("image/")) {
+    return cb(null, true)
+  }
+
+  if (IMAGE_EXTS.includes(ext)) {
     return cb(null, true)
   }
 

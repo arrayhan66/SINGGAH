@@ -45,7 +45,7 @@ exports.uploadImage = async (fileOrBuffer, folder = "uploads", options = {}) => 
   })
 }
 
-exports.deleteImage = (publicId) => {
+exports.deleteImage = (publicId, options = {}) => {
   if (process.env.NODE_ENV === "test") {
     // Stub test: kasih sinyal "not found" supaya alur 404 bisa diuji.
     const id = String(publicId || "")
@@ -55,7 +55,7 @@ exports.deleteImage = (publicId) => {
         : "ok",
     })
   }
-  return cloudinary.uploader.destroy(publicId)
+  return cloudinary.uploader.destroy(publicId, options)
 }
 
 exports.getPublicIdFromUrl = (url) => {

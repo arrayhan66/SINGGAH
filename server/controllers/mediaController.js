@@ -45,3 +45,9 @@ exports.deleteMedia = asyncHandler(async (req, res) => {
 
   success(res, null, "Media berhasil dihapus")
 })
+
+exports.recordUsage = asyncHandler(async (req, res) => {
+  const { publicId, type } = req.body
+  const result = await mediaService.recordUsage(publicId, type)
+  success(res, result)
+})

@@ -2,6 +2,36 @@ const userService = require("../services/userService")
 const asyncHandler = require("../utils/asyncHandler")
 const { success } = require("../utils/response")
 const { logActivity } = require("../services/activityLogService")
+const {
+  uploadImage,
+  deleteImage,
+  getPublicIdFromUrl,
+} = require("../utils/uploadToCloudinary")
+
+// Unggah file avatar/identitas (jika ada di multipart) ke Cloudinary.
+async function extractUploads(req) {
+  const out = {}
+  if (req.files?.avatar?.[0]) {
+    const r = await uploadImage(req.files.avatar[0].buffer, "singgah/avatars")
+    out.avatar = r.secure_url
+  }
+  if (req.files?.identitas_photo?.[0]) {
+    const r = await uploadImage(
+      req.files.identitas_photo[0].buffer,
+      "singgah/identitas",
+    )
+    out.identitas_photo = r.secure_url
+  }
+  return out
+}
+
+async function deleteCloudinary(urls) {
+  const publicIds = urls
+    .filter(Boolean)
+    .map((u) => getPublicIdFromUrl(u))
+    .filter(Boolean)
+  await Promise.all(publicIds.map((pid) => deleteImage(pid).catch(() => {})))
+}
 
 exports.getUsers = asyncHandler(async (req, res) => {
   const users = await userService.getUsers(req.query)
@@ -16,7 +46,8 @@ exports.getUserById = asyncHandler(async (req, res) => {
 })
 
 exports.createUser = asyncHandler(async (req, res) => {
-  const user = await userService.createUser(req.body)
+  const uploads = await extractUploads(req)
+  const user = await userService.createUser({ ...req.body, ...uploads })
 
   await logActivity({
     userId: req.user.id,
@@ -30,7 +61,16 @@ exports.createUser = asyncHandler(async (req, res) => {
 })
 
 exports.updateUser = asyncHandler(async (req, res) => {
-  const user = await userService.updateUser(req.params.id, req.body)
+  const previous = await userService.getUserById(req.params.id)
+  const uploads = await extractUploads(req)
+  const user = await userService.updateUser(req.params.id, {
+    ...req.body,
+    ...uploads,
+  })
+
+  // Hapus file lama HANYA setelah update DB sukses.
+  if (uploads.avatar) await deleteCloudinary([previous.avatar])
+  if (uploads.identitas_photo) await deleteCloudinary([previous.identitas_photo])
 
   await logActivity({
     userId: req.user.id,

@@ -24,11 +24,11 @@ export default function HallHUDHeader({ area }) {
 
         <button
           onClick={() => navigate("/")}
-          className="group flex items-center gap-2.5 rounded-2xl border border-night-border bg-black/50 px-4 py-2.5 backdrop-blur-md shadow-xl transition-all duration-300 hover:border-white/25 hover:bg-white/[0.06] hover:shadow-[0_8px_25px_-8px_rgba(255,255,255,0.25)] hover:scale-[1.03] active:scale-95 cursor-pointer"
+          className="group flex items-center gap-2.5 rounded-2xl border border-night-border bg-black/50 px-4 py-2.5 backdrop-blur-md shadow-xl transition-all duration-300 hover:border-sky-400/50 hover:bg-sky-500/15 hover:shadow-[0_8px_30px_-8px_rgba(56,189,248,0.45)] hover:scale-[1.03] active:scale-95 cursor-pointer"
           aria-label="Kembali ke Beranda"
         >
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/[0.06] transition-colors duration-300 group-hover:bg-white/15">
-            <ArrowLeft className="w-4 h-4 text-night-muted transition-all duration-300 group-hover:-translate-x-1 group-hover:text-white" />
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-sky-400/30 bg-sky-500/20 transition-colors duration-300 group-hover:border-sky-300/60 group-hover:bg-sky-400/30">
+            <ArrowLeft className="w-4 h-4 text-sky-300 transition-all duration-300 group-hover:-translate-x-1 group-hover:text-white" />
           </span>
           <span className="text-xs font-semibold text-night-muted transition-colors duration-300 group-hover:text-white">
             Kembali

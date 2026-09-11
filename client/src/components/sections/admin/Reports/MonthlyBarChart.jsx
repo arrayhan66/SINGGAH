@@ -13,6 +13,7 @@ export default function MonthlyBarChart({
   const total = data.reduce((s, d) => s + (d[valueKey] || 0), 0)
   const maxValue = Math.max(...data.map((d) => d[valueKey] || 0), 1)
   const bestIndex = data.findIndex((d) => (d[valueKey] || 0) === maxValue)
+  const trackHeight = 118
 
   return (
     <div className="reports-bar-card group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-5 shadow-xl backdrop-blur-xl transition-all duration-300 hover:border-white/20 md:p-6">
@@ -51,7 +52,7 @@ export default function MonthlyBarChart({
             const val = d[valueKey] || 0
             const isBest = val > 0 && i === bestIndex
             const height =
-              val > 0 ? Math.max((val / maxValue) * 100, 4) : 3
+              val > 0 ? Math.max((val / maxValue) * trackHeight, 5) : 3
             return (
               <div
                 key={d.month}
@@ -74,7 +75,7 @@ export default function MonthlyBarChart({
                       ? `${c.glowShadow} shadow-lg opacity-100`
                       : "opacity-60 group-hover:opacity-100"
                   }`}
-                  style={{ height: `${height}%` }}
+                  style={{ height: `${height}px` }}
                 />
                 <span
                   className={`bar-month text-[10px] ${

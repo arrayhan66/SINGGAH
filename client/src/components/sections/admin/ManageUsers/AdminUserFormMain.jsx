@@ -1,4 +1,4 @@
-import { GraduationCap, Briefcase, Users, CreditCard } from "lucide-react"
+import { GraduationCap, Briefcase, Users, CreditCard, Loader2 } from "lucide-react"
 import { imageUrl } from "../../../../utils/imageUrl"
 import SmartImage from "../../../ui/SmartImage"
 
@@ -190,13 +190,18 @@ function AdminUserFormMain({ formData, updateField, onPublish, isEditMode, savin
           type="button"
           onClick={onPublish}
           disabled={saving}
-          className="w-full cursor-pointer rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {saving
-            ? "Menyimpan..."
-            : isEditMode
-              ? "Simpan Perubahan"
-              : "Tambah User"}
+          {saving ? (
+            <>
+              <Loader2 size={16} className="animate-spin" />
+              Menyimpan...
+            </>
+          ) : isEditMode ? (
+            "Simpan Perubahan"
+          ) : (
+            "Tambah User"
+          )}
         </button>
       </div>
     </div>

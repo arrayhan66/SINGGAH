@@ -7,6 +7,7 @@ import { useDownscaledTexture } from "../utils/useDownscaledTexture"
 import { markTvReady, resetTvReady } from "../hooks/useTvReady"
 import { BOOK_COVER_FILES, DEFAULT_COVER_KEY } from "../utils/bookCovers"
 import logo from "../../assets/icons/logo.webp"
+import bajupraktek from "../../assets/images/bajupraktekelktro.jpg"
 
 const WOOD = "#2a3d5f"
 const WOOD_DARK = "#1f2f4e"
@@ -231,19 +232,6 @@ function ShelfObject({ type, x, y, z = -0.04, rand }) {
           ))}
         </group>
       )
-    case "photo":
-      return (
-        <group position={[x, y, z]} rotation={[0.14, 0, (rand() - 0.5) * 0.08]}>
-          <mesh position={[0, 0.12, 0]} castShadow>
-            <boxGeometry args={[0.13, 0.17, 0.025]} />
-            <meshStandardMaterial color={BRASS} metalness={0.6} roughness={0.35} />
-          </mesh>
-          <mesh position={[0, 0.12, 0.013]}>
-            <planeGeometry args={[0.1, 0.14]} />
-            <meshStandardMaterial color="#93b4d4" roughness={0.45} />
-          </mesh>
-        </group>
-      )
     case "plant":
       return (
         <group position={[x, y, z]}>
@@ -327,7 +315,7 @@ function ShelfContent({ y, seed, z = -0.04 }) {
       } else if (r < 0.98) {
         const w = 0.2
         if (x + w > half) break
-        const ob = ["globe", "vase", "photo", "plant", "sculpture"][(rand() * 5) | 0]
+        const ob = ["globe", "vase", "plant", "sculpture"][(rand() * 4) | 0]
         arr.push({ t: "obj", x: x + w / 2, ob })
         x += w + 0.06
       } else {
@@ -385,7 +373,11 @@ function Bookcase({ position, rotationY = 0, variant = 0, low = false }) {
       <mesh geometry={BOOKCASE_TOP} material={BOOKCASE_FRAME_DARK_MAT} position={[0, H + 0.025, -0.01]} />
 
       {SHELVES.map((sy, i) => (
-        <ShelfContent key={i} y={sy + 0.0225} seed={(variant + 1) * 10007 + i + 1} />
+        <ShelfContent
+          key={i}
+          y={sy + 0.0225}
+          seed={(variant + 1) * 10007 + i + 1}
+        />
       ))}
 
       {topGlobe > 0 && (
@@ -416,7 +408,18 @@ function DeskLamp({ position }) {
   )
 }
 
-function PhotoFrame({ position, tilt = 0.05 }) {
+function PhotoFrame({ position, tilt = 0.05, image }) {
+  const tex = useDownscaledTexture(image, 256)
+  const img = tex.image
+  const aspect = img && img.width ? img.width / img.height : 0.7
+  const maxW = 0.24
+  const maxH = 0.34
+  let fw = maxW
+  let fh = maxW / aspect
+  if (fh > maxH) {
+    fh = maxH
+    fw = maxH * aspect
+  }
   return (
     <group position={position} rotation={[0, 0, tilt]}>
       <mesh castShadow>
@@ -424,8 +427,12 @@ function PhotoFrame({ position, tilt = 0.05 }) {
         <meshStandardMaterial color={BRASS} metalness={0.6} roughness={0.35} />
       </mesh>
       <mesh position={[0, 0, 0.02]}>
-        <planeGeometry args={[0.24, 0.34]} />
-        <meshStandardMaterial color="#7dd3fc" roughness={0.45} />
+        <planeGeometry args={[maxW, maxH]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.45} />
+      </mesh>
+      <mesh position={[0, 0, 0.021]}>
+        <planeGeometry args={[fw, fh]} />
+        <meshStandardMaterial map={tex} roughness={0.45} />
       </mesh>
     </group>
   )
@@ -463,7 +470,7 @@ function Console({ position, rotationY = 0, scale = 1 }) {
         <meshStandardMaterial color={WOOD} roughness={0.5} />
       </mesh>
       <DeskLamp position={[-1.55, 0.9, 0]} />
-      <PhotoFrame position={[1.6, 1.12, 0]} />
+      <PhotoFrame position={[1.6, 1.12, 0]} image={bajupraktek} />
     </group>
   )
 }

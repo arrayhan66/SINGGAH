@@ -25,5 +25,7 @@ export const inputClass =
 
 export const toggleClass = "relative inline-flex cursor-pointer items-center"
 
-export const switchClass =
-  "h-6 w-11 rounded-full border border-white/10 bg-white/10 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-slate-300 after:shadow-md after:transition-all peer-checked:border-cyan-400 peer-checked:bg-cyan-500 peer-checked:after:translate-x-full peer-checked:after:bg-white"
+export const getSwitchClass = (isDark) =>
+  isDark
+    ? "h-6 w-11 rounded-full border border-white/15 bg-white/10 shadow-inner transition-all after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-slate-300 after:shadow-md after:transition-all peer-checked:border-transparent peer-checked:bg-gradient-to-r peer-checked:from-cyan-400 peer-checked:to-blue-600 peer-checked:shadow-[0_0_10px_rgba(34,211,238,0.4)] peer-checked:after:translate-x-5 peer-checked:after:bg-white"
+    : "h-6 w-11 rounded-full border border-slate-300 bg-gradient-to-b from-slate-100 to-slate-200 shadow-inner transition-all after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-sm after:transition-all peer-checked:border-blue-600 peer-checked:bg-gradient-to-r peer-checked:from-cyan-500 peer-checked:to-blue-600 peer-checked:shadow-[0_2px_10px_rgba(37,99,235,0.45)] peer-checked:after:translate-x-5 peer-checked:after:bg-white"

@@ -1,5 +1,5 @@
 import { lazy, Suspense, useMemo } from "react"
-import { Text } from "@react-three/drei"
+import { useTexture } from "@react-three/drei"
 import * as THREE from "three"
 import { useQualityStore } from "../hooks/useQuality"
 import { textures } from "../utils/textures"
@@ -13,7 +13,6 @@ import {
   Console,
   Bookcase,
   Armchair,
-  FloorLamp,
   SideTable,
   WallClock,
   WindowCurtains,
@@ -21,16 +20,20 @@ import {
   RoundRug,
   PresidentPortrait,
   Television,
-  HangingPlant,
 } from "../components/HomeDecor"
 import prabowoImg from "../../assets/images/prabowo.webp"
 import gibranImg from "../../assets/images/gibran.webp"
+import posterutama from "../../assets/images/posterutama.png"
+
+// Poster banner hall utama (1983x339, aspect 5.85:1), dipasang di frame
+// hitam 16x2.4 dengan proporsi asli dipertahankan (fit height).
+const POSTER_W = 2.4 * (1983 / 339)
+
 import {
   Plant,
   Chandelier,
   InfoKiosk,
   WallSconce,
-  CCTV,
 } from "../components/Props"
 import {
   rooms,
@@ -148,6 +151,7 @@ function HallFloorMesh({ room, floorMap }) {
 }
 
 function Museum({ hallData }) {
+  const posterTex = useTexture(posterutama)
   const wallMap = useMemo(() => textures.wallPlaster(), [])
   const marbleMap = useMemo(() => textures.marbleFloor(), [])
   const hallGradMap = useMemo(() => textures.hallGradient(), [])
@@ -208,34 +212,16 @@ function Museum({ hallData }) {
           <meshBasicMaterial map={hallGradMap} transparent depthWrite={false} />
         </mesh>
 
-        <mesh position={[0, 6.4, HALL_Z0 + 0.15]}>
-          <planeGeometry args={[16, 2.4]} />
-          <meshStandardMaterial color="#1e293b" roughness={0.6} />
-        </mesh>
-        <Text
-          position={[0, 7.3, HALL_Z0 + 0.05]}
-          fontSize={1.05}
-          color="#38bdf8"
-          anchorX="center"
-          anchorY="middle"
-          outlineWidth={0.04}
-          outlineColor="#0b1220"
-          raycast={() => null}
-          font="/fonts/Poppins-SemiBold.ttf"
-        >
-          SINGGAH — VIRTUAL EXHIBITION
-        </Text>
-        <Text
-          position={[0, 6.3, HALL_Z0 + 0.05]}
-          fontSize={0.36}
-          color="#93c5fd"
-          anchorX="center"
-          anchorY="middle"
-          raycast={() => null}
-          font="/fonts/Poppins-Medium.ttf"
-        >
-          Pameran Karya Dosen & Mahasiswa Jurusan Teknologi Informasi
-        </Text>
+        <group position={[0, 6.4, HALL_Z0 + 0.15]}>
+          <mesh>
+            <planeGeometry args={[16, 2.4]} />
+            <meshStandardMaterial color="#1e293b" roughness={0.6} />
+          </mesh>
+          <mesh position={[0, 0, 0.02]}>
+            <planeGeometry args={[POSTER_W, 2.4]} />
+            <meshStandardMaterial map={posterTex} roughness={0.6} />
+          </mesh>
+        </group>
 
         <mesh position={[0, 0.135, 0]} receiveShadow>
           <cylinderGeometry args={[4.1, 4.1, 0.03, 48]} />
@@ -290,8 +276,8 @@ function Museum({ hallData }) {
           />
         )}
 
-        <Plant position={[-2.6, 0, 0]} variant="topiary" scale={1} />
-        <Plant position={[2.6, 0, 0]} variant="topiary" scale={1} />
+        <Plant position={[-2.6, 0, 0]} variant="persian" potStyle="matte" scale={1} />
+        <Plant position={[2.6, 0, 0]} variant="persian" potStyle="matte" scale={1} />
 
         <MuseumBarrier />
         <LoungeSeating />
@@ -303,13 +289,6 @@ function Museum({ hallData }) {
           <Pillar key={i} position={p.position} />
         ))}
 
-        <Plant position={[-17.4, 0, -12]} variant="flower" flowerColor="#60a5fa" scale={1.0} />
-        <Plant position={[-17.4, 0, 0]} variant="flower" flowerColor="#f8fafc" scale={1.0} />
-        <Plant position={[-17.4, 0, 12]} variant="flower" flowerColor="#60a5fa" scale={1.0} />
-
-        <Plant position={[17.4, 0, -9]} variant="flower" flowerColor="#60a5fa" scale={1.0} />
-        <Plant position={[17.4, 0, 9]} variant="flower" flowerColor="#f8fafc" scale={1.0} />
-
         <InfoKiosk position={[-4.5, 0, 6]} rotationY={0.35} stats={stats} categories={categories} />
         <InfoKiosk position={[4.5, 0, 6]} rotationY={-0.35} variant="guide" />
 
@@ -319,11 +298,6 @@ function Museum({ hallData }) {
             <WallSconce position={[17.8, 2.8, zPos]} rotationY={-Math.PI / 2} />
           </group>
         ))}
-
-        <CCTV position={[-17.75, HALL_H - 0.9, -26.75]} rotation={[0, Math.PI / 4, 0]} />
-        <CCTV position={[17.75, HALL_H - 0.9, -26.75]} rotation={[0, -Math.PI / 4, 0]} />
-        <CCTV position={[-17.75, HALL_H - 0.9, 26.75]} rotation={[0, (3 * Math.PI) / 4, 0]} />
-        <CCTV position={[17.75, HALL_H - 0.9, 26.75]} rotation={[0, -(3 * Math.PI) / 4, 0]} />
 
         <RectRug position={[0, 0.015, 22.0]} w={7.2} d={2.5} map={rugRectMap} />
         <Console position={[0, 0, 26.6]} rotationY={Math.PI} scale={1.35} />
@@ -343,7 +317,6 @@ function Museum({ hallData }) {
 
         <RoundRug position={[15.2, 0.015, 9.2]} radius={1.35} map={rugMap} />
         <Armchair position={[15.0, 0, 9.4]} rotationY={-1.89} />
-        <FloorLamp position={[16.35, 0, 9.0]} rotationY={-1.1} />
         <SideTable
           position={[13.4, 0, 9.0]}
           rotationY={1.9}
@@ -353,7 +326,6 @@ function Museum({ hallData }) {
 
         <RoundRug position={[-15.2, 0.015, 9.2]} radius={1.35} map={rugMap} />
         <Armchair position={[-15.0, 0, 9.4]} rotationY={1.89} />
-        <FloorLamp position={[-16.35, 0, 9.0]} rotationY={1.1} />
         <SideTable
           position={[-13.4, 0, 9.0]}
           rotationY={-1.9}
@@ -364,12 +336,10 @@ function Museum({ hallData }) {
 
         <RoundRug position={[15.2, 0.015, -9.2]} radius={1.35} map={rugMap} />
         <Armchair position={[15.0, 0, -9.4]} rotationY={-1.25} />
-        <FloorLamp position={[16.35, 0, -9.0]} rotationY={1.1} />
         <SideTable position={[13.4, 0, -9.0]} rotationY={-1.9} book1="makanyamikir" book2="khilafah" />
 
         <RoundRug position={[-15.2, 0.015, -9.2]} radius={1.35} map={rugMap} />
         <Armchair position={[-15.0, 0, -9.4]} rotationY={1.25} />
-        <FloorLamp position={[-16.35, 0, -9.0]} rotationY={-1.1} />
         <SideTable
           position={[-13.4, 0, -9.0]}
           rotationY={1.9}
@@ -377,10 +347,6 @@ function Museum({ hallData }) {
           book1="ananda"
           book2="putusin"
         />
-
-        <HangingPlant position={[0, HALL_H - 0.55, 6]} drop={0.85} />
-        <HangingPlant position={[7.2, HALL_H - 0.55, -6]} drop={0.7} />
-        <HangingPlant position={[-7.2, HALL_H - 0.55, 18]} drop={1.0} />
 
         <WallGuard />
       </group>

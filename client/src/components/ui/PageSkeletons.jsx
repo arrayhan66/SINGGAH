@@ -826,6 +826,29 @@ export function AdminReportsSkeleton() {
           </div>
         </FormShell>
       </div>
+
+      <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+        <div className="mb-6 flex items-center gap-2.5">
+          <Skeleton className="h-9 w-9 rounded-xl" />
+          <div>
+            <Skeleton className="h-5 w-40" />
+            <Skeleton className="mt-1 h-3.5 w-56" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 gap-3 min-[600px]:grid-cols-2 min-[1500px]:grid-cols-4">
+          {Array.from({ length: 4 }, (_, i) => (
+            <FormShell key={i} className="p-4">
+              <div className="flex items-center gap-3.5">
+                <Skeleton className="h-12 w-12 rounded-xl" />
+                <div className="min-w-0 flex-1">
+                  <Skeleton className="h-7 w-16" />
+                  <Skeleton className="mt-1.5 h-3.5 w-32" />
+                </div>
+              </div>
+            </FormShell>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

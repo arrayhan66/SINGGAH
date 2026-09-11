@@ -82,7 +82,7 @@ export default function ReportsHero({ stats, loading, viewYear, years, onYearCha
                 />
 
                 <div className="relative flex items-start justify-between gap-4">
-                  <div className="reports-stat-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.07] ring-1 ring-inset ring-white/10 transition-all duration-300 group-hover:scale-105">
+                  <div className={`reports-stat-icon reports-stat-${stat.tone} flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.07] ring-1 ring-inset ring-white/10 transition-all duration-300 group-hover:scale-105`}>
                     <Icon size={18} strokeWidth={2} className={stat.color} />
                   </div>
                   <Sparkline

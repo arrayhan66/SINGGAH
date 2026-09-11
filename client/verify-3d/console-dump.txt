@@ -1,0 +1,22 @@
+[log] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info.
+[debug] [vite] connecting...
+[debug] [vite] connected.
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[warning] [.WebGL-0x73ec001b7800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[warning] [.WebGL-0x73ec001b7800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[warning] [.WebGL-0x73ec001b7800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[warning] [.WebGL-0x73ec001b7800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)
+[resp] 200 wooden-table.glb
+[resp] 200 mahasiswa.glb
+[resp] 200 mahasiswi.glb
+[resp] 200 laptop.glb
+[resp] 200 office-chair.glb
+[resp] 200 rugged-laptop.glb
+[log] [fit] wooden-table.glb target=0.86 sf=1.89e+0 size=(0.947, 0.860, 1.848) topY=0.860 probe: bmin=-0.23
+[log] [fit] office-chair.glb target=1 sf=1.02e+0 size=(0.681, 1.000, 0.722) topY=1.000 probe: bmin=-0.49
+[log] [fit] office-chair.glb target=1 sf=1.02e+0 size=(0.681, 1.000, 0.722) topY=1.000 probe: bmin=-0.49
+[log] [fit] rugged-laptop.glb target=0.42 sf=4.28e-1 size=(0.391, 0.334, 0.420) topY=0.334 probe: bmin=-0.39
+[log] [fit] laptop.glb target=0.42 sf=4.29e-1 size=(0.364, 0.291, 0.420) topY=0.291 probe: bmin=-0.34
+[log] [fit] mahasiswa.glb target=1.6700000000000002 sf=1.70e+0 size=(0.430, 1.670, 1.544) topY=1.670 probe: bmin=-0.49
+[log] [fit] mahasiswi.glb target=1.62 sf=1.65e+0 size=(0.413, 1.620, 1.423) topY=1.620 probe: bmin=-0.49
+[warning] THREE.WebGLShadowMap: PCFSoftShadowMap has been deprecated. Using PCFShadowMap instead.

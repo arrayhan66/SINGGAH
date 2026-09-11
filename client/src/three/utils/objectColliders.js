@@ -23,6 +23,15 @@ import {
 // Positions must stay in sync with the decor rendered in Museum.jsx.
 const PLATFORM_RADIUS = 4.0
 
+// HallCharacters comment desk (rendered at [-13, 0, -16] in Museum.jsx).
+const COMMENT_DESK = [
+  { x: -13, z: -16, radius: 1.15 },
+  { x: -11.5, z: -16, radius: 0.8 },
+  { x: -14.5, z: -16, radius: 0.8 },
+  { x: -13, z: -17.2, radius: 0.9 },
+  { x: -13, z: -14.9, radius: 0.5 },
+]
+
 // Barrier geometry must stay in sync with MuseumBarrier.jsx (posts + entrance gap).
 const BARRIER_RADIUS = 6.05
 const BARRIER_POSTS = 24
@@ -187,6 +196,7 @@ export function getObjectColliders() {
     ...HALL_PLANTS.map(([x, z]) => ({ x, z, radius: 0.45 })),
     ...KIOSKS.map((k) => ({ x: k.x, z: k.z, radius: 0.75 })),
     ...HOME_DECOR,
+    ...COMMENT_DESK,
     ...barrierCircles(),
     ...loungeCircles(),
     ...roomFurnitureColliders(),

@@ -1,36 +1,27 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Float } from "@react-three/drei";
 import { Suspense, useRef, useState, useCallback } from "react";
-import Mahasiswa from "../../../three/models/Mahasiswa";
+import StudentDeskVisual from "../../../three/components/StudentDeskScene";
 import Loader from "../../ui/Loader";
 import { attachWebGLContextGuard } from "../../../three/utils/webglGuard";
 
-function AnimatedModel() {
+function AnimatedScene() {
   const groupRef = useRef();
   const [progress, setProgress] = useState(0);
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (progress < 1 && groupRef.current) {
-      const next = Math.min(progress + delta * 1.5, 1);
+      const next = Math.min(progress + delta * 1.2, 1);
       setProgress(next);
-
       const eased = 1 - Math.pow(1 - next, 3);
-
-      groupRef.current.scale.setScalar(eased * 1.6);
-
-      groupRef.current.traverse((child) => {
-        if (child.isMesh && child.material) {
-          child.material.transparent = true;
-          child.material.opacity = eased;
-        }
-      });
+      groupRef.current.scale.setScalar(0.82 * eased);
     }
   });
 
   return (
-    <group ref={groupRef} scale={0}>
-      <Float speed={1} rotationIntensity={0.05} floatIntensity={0.12}>
-        <Mahasiswa scale={1} position={[0, 0, 0]} rotation={[0, Math.PI, 0]} />
+    <group ref={groupRef} scale={0} position={[0, -0.45, 0]}>
+      <Float speed={0.8} rotationIntensity={0.01} floatIntensity={0.04}>
+        <StudentDeskVisual />
       </Float>
     </group>
   );
@@ -51,7 +42,7 @@ function HeroModel3DCanvas() {
       <directionalLight position={[5, 8, 5]} intensity={3} castShadow />
 
       <Suspense fallback={<Loader />}>
-        <AnimatedModel />
+        <AnimatedScene />
       </Suspense>
 
       <OrbitControls

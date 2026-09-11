@@ -20,7 +20,7 @@ function AdminUserDetail() {
 
   useEffect(() => {
     let cancelled = false
-    if (!slug || user) return
+    if (!slug || user || deleteSuccess) return
 
     setLoading(true)
     fetchUserByUsername(slug).finally(() => {
@@ -31,7 +31,7 @@ function AdminUserDetail() {
       cancelled = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug, user])
+  }, [slug, user, deleteSuccess])
 
   function handleEdit(target) {
     navigate(`/admin/pengguna/edit/${target.username}`)
@@ -65,7 +65,7 @@ function AdminUserDetail() {
     return <AdminUserDetailSkeleton />
   }
 
-  if (!user) {
+  if (!user && !deleteSuccess) {
     return (
       <div className="px-6 py-10 md:px-10 text-center text-slate-400">
         User tidak ditemukan.
@@ -79,7 +79,7 @@ function AdminUserDetail() {
         <div className="px-4 md:px-6 lg:px-8 pt-6 pb-10 md:pt-8">
           <button
             onClick={() => navigate("/admin/pengguna")}
-            className="group inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 backdrop-blur-xl transition-all duration-200 hover:border-cyan-400/40 hover:bg-cyan-500/10 hover:text-cyan-300"
+            className="user-form-back group inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 backdrop-blur-xl transition-all duration-200 hover:border-cyan-400/40 hover:bg-cyan-500/10 hover:text-cyan-300"
           >
             <ArrowLeft
               size={14}
@@ -89,7 +89,7 @@ function AdminUserDetail() {
           </button>
 
           <div className="mt-6 flex items-center gap-[clamp(0.75rem,0.5rem+1vw,1rem)] min-w-0">
-            <div className="flex h-[clamp(2.75rem,2.25rem+2vw,3.5rem)] w-[clamp(2.75rem,2.25rem+2vw,3.5rem)] shrink-0 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10">
+            <div className="dashboard-hero-icon flex h-[clamp(2.75rem,2.25rem+2vw,3.5rem)] w-[clamp(2.75rem,2.25rem+2vw,3.5rem)] shrink-0 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10">
               <UserRound className="h-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] w-[clamp(1.375rem,1.25rem+0.6vw,1.75rem)] text-cyan-300" />
             </div>
             <div className="min-w-0">

@@ -1,4 +1,4 @@
-import { TrendingUp, Eye, FolderKanban, UserCheck, Sparkles, Calendar } from "lucide-react"
+import { TrendingUp, Eye, FolderKanban, UserCheck, CirclePlus, Calendar } from "lucide-react"
 import MonthlyBarChart from "./MonthlyBarChart"
 import SummaryCard from "./SummaryCard"
 
@@ -66,7 +66,7 @@ export default function ReportsContent({ monthlyData, summary, viewYear }) {
             color="blue"
           />
           <SummaryCard
-            icon={Sparkles}
+            icon={CirclePlus}
             label="Karya Baru (Bulan Ini)"
             value={summary.newProjectsThisMonth}
             color="amber"

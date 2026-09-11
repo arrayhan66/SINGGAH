@@ -31,6 +31,267 @@ const PLANT_STEM_MAT = new THREE.MeshStandardMaterial({ color: "#3a3322", roughn
 const PLANT_LEAF_MAT = new THREE.MeshStandardMaterial({ color: "#3a6a5a", roughness: 0.85 })
 const PLANT_LEAF_DARK_MAT = new THREE.MeshStandardMaterial({ color: "#2f5f4f", roughness: 0.85 })
 
+// ---- Potted tropical leaf plant (textured, canvas-generated leaves) ----
+// Instead of smooth primitive blobs we bake realistic foliage onto alpha-mapped
+// planes: gradient green, mottling, midrib + side veins, gloss sheen and even
+// lime colour-breaks (variegation). Three different textures drive variety.
+function makeLeafCanvas({ base, tip, vein, variegate = false, variegateRGB = "216,234,158", boldVeins = false, seed = 7 }) {
+  const w = 256
+  const h = 512
+  const canvas = document.createElement("canvas")
+  canvas.width = w
+  canvas.height = h
+  const ctx = canvas.getContext("2d")
+  let rnd = seed
+  const rndf = () => {
+    rnd = (rnd * 16807) % 2147483647
+    return rnd / 2147483647
+  }
+
+  // Soft ovate "houseplant" lamina: broad rounded ellipse with a gentle
+  // point at the tip and a tapered junction at the base.
+  const outline = () => {
+    ctx.beginPath()
+    ctx.moveTo(w * 0.5, h * 0.98) // petiole junction (base)
+    ctx.bezierCurveTo(w * 0.8, h * 0.9, w * 0.96, h * 0.55, w * 0.8, h * 0.13)
+    ctx.bezierCurveTo(w * 0.7, h * 0.02, w * 0.3, h * 0.02, w * 0.2, h * 0.13)
+    ctx.bezierCurveTo(w * 0.04, h * 0.55, w * 0.2, h * 0.9, w * 0.5, h * 0.98)
+    ctx.closePath()
+  }
+
+  outline()
+  const grad = ctx.createLinearGradient(0, h, 0, 0)
+  grad.addColorStop(0, base)
+  grad.addColorStop(1, tip)
+  ctx.fillStyle = grad
+  ctx.fill()
+
+  ctx.save()
+  outline()
+  ctx.clip()
+
+  // mottling / organic texture
+  for (let i = 0; i < 260; i++) {
+    const x = rndf() * w
+    const y = rndf() * h
+    const r = 5 + rndf() * 24
+    const light = rndf() > 0.5
+    ctx.fillStyle = light
+      ? `rgba(255,255,255,${0.015 + rndf() * 0.05})`
+      : `rgba(6,40,20,${0.02 + rndf() * 0.05})`
+    ctx.beginPath()
+    ctx.ellipse(x, y, r * (0.6 + rndf()), r * (0.4 + rndf() * 0.6), rndf() * Math.PI, 0, Math.PI * 2)
+    ctx.fill()
+  }
+
+  // wide lime colour-breaks (variegation)
+  if (variegate) {
+    for (let i = 0; i < 6; i++) {
+      const py = h * (0.16 + rndf() * 0.62)
+      const px = w * (0.28 + rndf() * 0.44)
+      const pr = 24 + rndf() * 62
+      const g = ctx.createRadialGradient(px, py, 2, px, py, pr)
+      g.addColorStop(0, `rgba(${variegateRGB},${0.4 + rndf() * 0.3})`)
+      g.addColorStop(1, "rgba(216,234,158,0)")
+      ctx.fillStyle = g
+      ctx.beginPath()
+      ctx.ellipse(px, py, pr, pr * (0.55 + rndf() * 0.4), rndf() * Math.PI, 0, Math.PI * 2)
+      ctx.fill()
+    }
+  }
+
+  // midrib, sweeping up the centre
+  const mw = boldVeins ? 7.5 : 5
+  const sw = boldVeins ? 4.4 : 2
+  ctx.strokeStyle = vein
+  ctx.lineWidth = mw
+  ctx.lineCap = "round"
+  ctx.beginPath()
+  ctx.moveTo(w * 0.5, h * 0.95)
+  ctx.quadraticCurveTo(w * 0.504, h * 0.5, w * 0.5, h * 0.05)
+  ctx.stroke()
+  ctx.lineWidth = mw * 0.6
+  ctx.strokeStyle = vein
+  ctx.beginPath()
+  ctx.moveTo(w * 0.5, h * 0.14)
+  ctx.quadraticCurveTo(w * 0.504, h * 0.5, w * 0.5, h * 0.05)
+  ctx.stroke()
+
+  // gentle curved side veins (fewer, softer — lush glossy houseplants)
+  ctx.lineWidth = sw
+  const pairs = boldVeins ? 6 : 5
+  for (let i = 1; i <= pairs; i++) {
+    const vy = h * (0.82 - i * (boldVeins ? 0.125 : 0.15))
+    const len = (boldVeins ? 52 : 40) + (i % 2) * 12
+    ctx.beginPath()
+    ctx.moveTo(w * 0.5, vy)
+    ctx.quadraticCurveTo(w * 0.5 - len * 0.5, vy - 6, w * 0.5 - len, vy + 14)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(w * 0.5, vy)
+    ctx.quadraticCurveTo(w * 0.5 + len * 0.5, vy - 6, w * 0.5 + len, vy + 14)
+    ctx.stroke()
+  }
+
+  // glossy sheen band (stronger, for a polished 3D-render finish)
+  const sheen = ctx.createLinearGradient(w * 0.04, 0, w * 0.56, 0)
+  sheen.addColorStop(0, "rgba(255,255,255,0.4)")
+  sheen.addColorStop(0.4, "rgba(255,255,255,0.07)")
+  sheen.addColorStop(1, "rgba(255,255,255,0)")
+  ctx.fillStyle = sheen
+  ctx.beginPath()
+  ctx.ellipse(w * 0.22, h * 0.42, w * 0.26, h * 0.4, -0.2, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.restore()
+
+  const tex = new THREE.CanvasTexture(canvas)
+  tex.colorSpace = THREE.SRGBColorSpace
+  tex.anisotropy = 8
+  return tex
+}
+
+const LEAF_TEX_A = makeLeafCanvas({ base: "#1a4a2e", tip: "#4f9a5e", vein: "rgba(10,44,24,0.4)", seed: 11 })
+const LEAF_TEX_B = makeLeafCanvas({ base: "#1f5c38", tip: "#63ac6d", vein: "rgba(14,52,28,0.35)", seed: 37 })
+const LEAF_TEX_C = makeLeafCanvas({ base: "#2c7a44", tip: "#8cc66f", vein: "rgba(20,60,34,0.3)", variegate: true, seed: 73 })
+
+const MAT_LEAF_A = new THREE.MeshStandardMaterial({ map: LEAF_TEX_A, alphaTest: 0.5, roughness: 0.26, metalness: 0.04, side: THREE.DoubleSide, emissive: new THREE.Color("#0d1f13"), emissiveIntensity: 0.18 })
+const MAT_LEAF_B = new THREE.MeshStandardMaterial({ map: LEAF_TEX_B, alphaTest: 0.5, roughness: 0.3, metalness: 0.04, side: THREE.DoubleSide, emissive: new THREE.Color("#11260f"), emissiveIntensity: 0.18 })
+const MAT_LEAF_C = new THREE.MeshStandardMaterial({ map: LEAF_TEX_C, alphaTest: 0.5, roughness: 0.32, metalness: 0.04, side: THREE.DoubleSide, emissive: new THREE.Color("#173011"), emissiveIntensity: 0.18 })
+const MAT_TRUNK = new THREE.MeshStandardMaterial({ color: "#2f2a22", roughness: 0.7 })
+const MAT_TRUNK_DS = new THREE.MeshStandardMaterial({ color: "#2f2a22", roughness: 0.7, side: THREE.DoubleSide })
+// ---- Persian Shield (Strobilanthes dyerianus) iridescent purple foliage ----
+const PERSIAN_TEX_A = makeLeafCanvas({ base: "#3c1f4e", tip: "#7c4f98", vein: "rgba(140,225,110,0.85)", boldVeins: true, seed: 101 })
+const PERSIAN_TEX_B = makeLeafCanvas({ base: "#45264e", tip: "#9a6fae", vein: "rgba(150,230,120,0.85)", boldVeins: true, seed: 137 })
+const PERSIAN_TEX_C = makeLeafCanvas({ base: "#583270", tip: "#b48cc4", vein: "rgba(160,235,130,0.85)", boldVeins: true, variegate: true, variegateRGB: "190,160,220", seed: 173 })
+
+const MAT_PERSIAN_A = new THREE.MeshStandardMaterial({ map: PERSIAN_TEX_A, alphaTest: 0.5, roughness: 0.22, metalness: 0.36, side: THREE.DoubleSide, emissive: new THREE.Color("#250c33"), emissiveIntensity: 0.2 })
+const MAT_PERSIAN_B = new THREE.MeshStandardMaterial({ map: PERSIAN_TEX_B, alphaTest: 0.5, roughness: 0.24, metalness: 0.36, side: THREE.DoubleSide, emissive: new THREE.Color("#2c0f3d"), emissiveIntensity: 0.2 })
+const MAT_PERSIAN_C = new THREE.MeshStandardMaterial({ map: PERSIAN_TEX_C, alphaTest: 0.5, roughness: 0.26, metalness: 0.36, side: THREE.DoubleSide, emissive: new THREE.Color("#36144d"), emissiveIntensity: 0.2 })
+
+// Leaf plane, bowed along its length so blades cup naturally (alpha map gives
+// the silhouette). BASE is pinned to the ORIGIN (y = 0) and the tip points at
+// +Y (y = 1) — so placing the mesh at a position pins the leaf's ATTACHMENT
+// POINT there, not the sheet's middle. The texture's base (v = 0) matches the
+// plane's bottom edge, tip (v = 1) matches +Y, so mapping stays correct.
+const LEAF_GEO = (() => {
+  const len = 1.0
+  const geo = new THREE.PlaneGeometry(0.86, len, 6, 20)
+  const pos = geo.attributes.position
+  for (let i = 0; i < pos.count; i++) {
+    const y = pos.getY(i)
+    const t = (y + len / 2) / len // 0 at base .. 1 at tip (pre-shift)
+    pos.setY(i, y + len / 2) // shift so base lands on y = 0, tip on y = 1
+    pos.setZ(i, Math.sin(Math.PI * t) * -0.12) // soft cup for a fleshy blade
+  }
+  geo.computeVertexNormals()
+  return geo
+})()
+
+// Persian Shield geometry (slightly narrower lanceolate/ovate blade)
+const PERSIAN_GEO = (() => {
+  const len = 1.0
+  const geo = new THREE.PlaneGeometry(0.66, len, 6, 20)
+  const pos = geo.attributes.position
+  for (let i = 0; i < pos.count; i++) {
+    const y = pos.getY(i)
+    const t = (y + len / 2) / len
+    pos.setY(i, y + len / 2)
+    pos.setZ(i, Math.sin(Math.PI * t) * -0.14)
+  }
+  geo.computeVertexNormals()
+  return geo
+})()
+
+function leafQuat(leafDir, radial, spinJit) {
+  const up = new THREE.Vector3(0, 1, 0)
+  const q0 = new THREE.Quaternion().setFromUnitVectors(up, leafDir)
+  const fn0 = new THREE.Vector3(0, 0, 1).applyQuaternion(q0)
+  const faceTarget = radial.clone().multiplyScalar(0.92).add(up.clone().multiplyScalar(0.39)).normalize()
+  const t = faceTarget.clone().addScaledVector(leafDir, -faceTarget.dot(leafDir))
+  if (t.lengthSq() > 1e-6) t.normalize()
+  const cross = new THREE.Vector3().crossVectors(fn0, t)
+  const faceSpin = Math.atan2(cross.dot(leafDir), fn0.dot(t))
+  return q0.multiply(new THREE.Quaternion().setFromAxisAngle(up, faceSpin + spinJit))
+}
+
+// THREE.Vector3 tidak memiliki method .slerp (hanya Quaternion yang punya).
+// Fungsi ini memberikan interpolasi spherical antar dua vektor satuan arah
+// dengan mengubah rotasi a→b menjadi quaternion lalu slerp dari identitas.
+function slerpUnitVectors(a, b, t) {
+  const id = new THREE.Quaternion()
+  const q = new THREE.Quaternion().setFromUnitVectors(a.normalize(), b.normalize())
+  id.slerp(q, t)
+  return a.clone().applyQuaternion(id)
+}
+
+// Transitional collar between the round petiole and the leaf base. The bottom
+// ring is the petiole's own circle (radius = stemR, placed just before the
+// tube's end so the round cut is hidden); the top ring is a flattened ellipse
+// sized from the leaf's REAL base width (halfW * 0.8 along the blade width,
+// paper-thin along the blade face), tucked just behind the blade plane so the
+// sheet appears to grow out of it. The loft morphs circle → flat ellipse with a
+// smoothstep flare, producing petiole bulat → mengecil → melebar/pipih → base
+// daun, all in one continuous piece.
+function makeLeafCollar({ bC, tangDir, shankTop, bladeX, bladeZ, stemR, halfW, slotDepth }) {
+  const rings = 7
+  const sides = 16
+  const n0 = tangDir.clone().normalize()
+  const n1 = bladeZ
+  let U0 = new THREE.Vector3().crossVectors(n0, new THREE.Vector3(0, 1, 0))
+  if (U0.lengthSq() < 1e-6) U0 = new THREE.Vector3().crossVectors(n0, new THREE.Vector3(1, 0, 0))
+  U0.normalize()
+  const U1 = bladeX
+  const a0 = stemR
+  const a1 = Math.max(halfW * 0.68, stemR * 1.5)
+  const b0 = stemR
+  const b1 = slotDepth
+
+  const pos = []
+  const idx = []
+  for (let r = 0; r <= rings; r++) {
+    const t = r / rings
+    const C = new THREE.Vector3().lerpVectors(bC, shankTop, t)
+    const n = slerpUnitVectors(n0, n1, t).normalize()
+    const U = slerpUnitVectors(U0, U1, t).normalize()
+    const V = new THREE.Vector3().crossVectors(n, U).normalize()
+    U.crossVectors(V, n).normalize()
+    const e = t * t * (3 - 2 * t) // smoothstep: stay slim, flare at the very top
+    const a = a0 + (a1 - a0) * e
+    const b = b0 + (b1 - b0) * t
+    for (let s = 0; s <= sides; s++) {
+      const th = (s / sides) * Math.PI * 2
+      pos.push(
+        C.x + Math.cos(th) * U.x * a + Math.sin(th) * V.x * b,
+        C.y + Math.cos(th) * U.y * a + Math.sin(th) * V.y * b,
+        C.z + Math.cos(th) * U.z * a + Math.sin(th) * V.z * b,
+      )
+    }
+  }
+  const row = sides + 1
+  for (let r = 0; r < rings; r++) {
+    for (let s = 0; s < sides; s++) {
+      const a = r * row + s
+      const c = (r + 1) * row + s + 1
+      idx.push(a, a + 1, c, a, c, c - 1)
+    }
+  }
+  // Caps: bottom vanishes inside the petiole area, top tucks behind the blade.
+  const bt = (rings + 1) * row
+  const tp = bt + 1
+  pos.push(bC.x, bC.y, bC.z, shankTop.x, shankTop.y, shankTop.z)
+  for (let s = 0; s < sides; s++) {
+    idx.push(bt, s, s + 1)
+    idx.push(rings * row + s, rings * row + s + 1, tp)
+  }
+
+  const geo = new THREE.BufferGeometry()
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3))
+  geo.setIndex(idx)
+  geo.computeVertexNormals()
+  return geo
+}
+
 export const POT_STYLES = [
   "terracotta",
   "ceramic",
@@ -42,6 +303,7 @@ export const POT_STYLES = [
   "ridged",
   "copper",
   "modern",
+  "matte",
 ]
 export const FLOWER_TYPES = ["daisy", "tulip", "lavender", "sunflower", "orchid"]
 
@@ -62,6 +324,12 @@ const MAT_COPPER = new THREE.MeshStandardMaterial({ color: "#b87333", metalness:
 const MAT_COPPER_DARK = new THREE.MeshStandardMaterial({ color: "#8a5a24", metalness: 0.85, roughness: 0.35 })
 const MAT_MODERN = new THREE.MeshStandardMaterial({ color: "#14181f", roughness: 0.55, metalness: 0.1 })
 const MAT_MODERN_LIP = new THREE.MeshStandardMaterial({ color: "#e5e7eb", roughness: 0.5 })
+
+// Elegant matte stoneware planter (used for the centerpiece foliage plants)
+const MAT_MATTE = new THREE.MeshStandardMaterial({ color: "#d6cdb8", roughness: 0.55 })
+const MAT_MATTE_BASE = new THREE.MeshStandardMaterial({ color: "#b5ab93", roughness: 0.55 })
+const MAT_MATTE_LIP = new THREE.MeshStandardMaterial({ color: "#e6dfcc", roughness: 0.5 })
+const MAT_MATTE_ACCENT = new THREE.MeshStandardMaterial({ color: "#c9a35e", metalness: 0.7, roughness: 0.3 })
 
 // Renders a shared material, or an inline tinted one when `color` is given
 // (used for the legacy potColor prop override).
@@ -274,6 +542,27 @@ function Pot({ style, colorOverride }) {
           </mesh>
         </group>
       )
+    case "matte":
+      return (
+        <group>
+          <mesh position={[0, 0.03, 0]} castShadow>
+            <cylinderGeometry args={[0.165, 0.185, 0.05, 24]} />
+            <primitive object={MAT_MATTE_BASE} attach="material" />
+          </mesh>
+          <mesh position={[0, 0.24, 0]} castShadow>
+            <cylinderGeometry args={[0.24, 0.19, 0.42, 26]} />
+            <PMat mat={MAT_MATTE} color={colorOverride} roughness={0.85} />
+          </mesh>
+          <mesh position={[0, 0.44, 0]} rotation={[Math.PI / 2, 0, 0]}>
+            <torusGeometry args={[0.27, 0.011, 8, 28]} />
+            <primitive object={MAT_MATTE_ACCENT} attach="material" />
+          </mesh>
+          <mesh position={[0, 0.475, 0]} castShadow>
+            <cylinderGeometry args={[0.305, 0.26, 0.05, 26]} />
+            <primitive object={MAT_MATTE_LIP} attach="material" />
+          </mesh>
+        </group>
+      )
     default:
       return null
   }
@@ -429,6 +718,249 @@ function resolveFlower(flowerType, h) {
   return FLOWER_TYPES[(h >>> 11) % 5]
 }
 
+// A potted tropical broad-leaf plant grown from a single clump. Instead of a
+// perfect radial fan, every leaf carries an explicit, hand-placed pose from an
+// intentionally asymmetric set: outer leaves lean far outward (some nearly
+// horizontal, some nodding under their weight), middle leaves fill the crown
+// more upright, and young leaves shoot almost vertically from the crown's top
+// centre. Petiole length/bend, blade panel, cup depth and face orientation all
+// vary per leaf; only a small seed-based jitter separates one plant from the
+// next, so the pair flanking the hologram reads organic but related. Every
+// blade's broad face is spun to face outward from the clump, so no leaf shows
+// its back dead-black to the hall lights.
+function Foliage({ h }) {
+  const leafMats = [MAT_LEAF_A, MAT_LEAF_B, MAT_LEAF_C]
+  const j = (seed) => {
+    const x = Math.sin((h % 1000) * 0.31 + seed * 12.9898) * 43758.5453
+    return x - Math.floor(x)
+  }
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v))
+
+  // yaw (world azimuth), reach (horizontal throw), height (petiole tip Y),
+  // bend (arc push-out), open (blade angle from vertical, rad — bigger = more
+  // horizontal), scale, wa (width ratio), cup (deep). Hand-placed, asymmetric,
+  // and dense: a rounded lush dome like a 3D-rendered houseplant, with low
+  // spread blades low-down, taller upright blades filling the centre, and a
+  // few young ones on top.
+  const LEAVES = [
+    // --- lower spread (widest part of the dome) ---
+    { yaw: -2.75, reach: 0.5, height: 0.6, bend: 0.26, open: 1.12, scale: 1.0, wa: 1.04, cup: 1.0 },
+    { yaw: -1.5, reach: 0.52, height: 0.56, bend: 0.32, open: 1.22, scale: 1.06, wa: 1.1, cup: 1.12 },
+    { yaw: -0.25, reach: 0.48, height: 0.66, bend: 0.28, open: 1.0, scale: 0.92, wa: 0.96, cup: 0.9 },
+    { yaw: 0.95, reach: 0.54, height: 0.58, bend: 0.34, open: 1.25, scale: 1.08, wa: 1.12, cup: 1.18 },
+    { yaw: 2.2, reach: 0.46, height: 0.68, bend: 0.24, open: 0.95, scale: 0.9, wa: 0.98, cup: 0.95 },
+    { yaw: 3.4, reach: 0.5, height: 0.62, bend: 0.3, open: 1.15, scale: 1.0, wa: 1.02, cup: 1.06 },
+    { yaw: 4.2, reach: 0.42, height: 0.74, bend: 0.2, open: 0.85, scale: 0.8, wa: 0.9, cup: 0.88 },
+    // --- upright fillers (dome's body) ---
+    { yaw: -1.95, reach: 0.3, height: 0.98, bend: 0.16, open: 0.62, scale: 0.8, wa: 0.96, cup: 0.95 },
+    { yaw: -0.35, reach: 0.34, height: 0.92, bend: 0.2, open: 0.72, scale: 0.86, wa: 1.02, cup: 1.0 },
+    { yaw: 1.6, reach: 0.28, height: 1.05, bend: 0.14, open: 0.55, scale: 0.74, wa: 0.92, cup: 0.9 },
+    { yaw: 3.15, reach: 0.32, height: 0.98, bend: 0.18, open: 0.66, scale: 0.82, wa: 0.98, cup: 0.98 },
+    // --- young crown (top centre) ---
+    { yaw: 0.45, reach: 0.15, height: 1.24, bend: 0.08, open: 0.3, scale: 0.56, wa: 0.92, cup: 0.8 },
+    { yaw: 2.3, reach: 0.13, height: 1.32, bend: 0.07, open: 0.22, scale: 0.5, wa: 0.85, cup: 0.74 },
+    { yaw: 4.0, reach: 0.16, height: 1.18, bend: 0.1, open: 0.38, scale: 0.6, wa: 0.95, cup: 0.84 },
+  ]
+
+  const up = new THREE.Vector3(0, 1, 0)
+
+  return (
+    <group position={[0, 0.32, 0]}>
+      {LEAVES.map((base, idx) => {
+        // Deterministic micro-jitter so the two flanking plants differ subtly.
+        const yaw = base.yaw + (j(idx + 61) - 0.5) * 0.28
+        const openness = clamp(base.open + (j(idx + 62) - 0.5) * 0.12, 0.08, 1.52)
+        const scale = base.scale * (0.96 + j(idx + 63) * 0.08)
+        const height = base.height + (j(idx + 64) - 0.5) * 0.08
+        const reach = base.reach * (0.96 + j(idx + 65) * 0.08)
+        const bend = base.bend * (0.9 + j(idx + 66) * 0.2)
+        const spinJit = (j(idx + 67) - 0.5) * 1.2
+        const wa = base.wa * (0.97 + j(idx + 68) * 0.06)
+        const cup = base.cup
+        const stemR = 0.014 + scale * 0.007
+
+        // Petiole bases come from a slightly scattered crown point, not one
+        // clean centre — one more reason it reads as a real clump.
+        const ox = (j(idx + 69) - 0.5) * 0.05
+        const oz = (j(idx + 70) - 0.5) * 0.05
+        const oy = 0.04 + j(idx + 71) * 0.03
+        const p0 = new THREE.Vector3(ox, oy, oz)
+        const O = Math.sin(yaw)
+        const A = Math.cos(yaw)
+        const radial = new THREE.Vector3(O, 0, A).normalize()
+        const tip = new THREE.Vector3(ox + O * reach, height, oz + A * reach)
+        const mid = p0.clone().lerp(tip, 0.5).add(radial.clone().multiplyScalar(bend)).add(new THREE.Vector3(0, 0.12, 0))
+        const curve = new THREE.QuadraticBezierCurve3(p0, mid, tip)
+
+        const tang = curve.getTangent(1)
+        const attach = new THREE.Vector3(tip.x - tang.x * 0.03, tip.y - tang.y * 0.03, tip.z - tang.z * 0.03)
+
+        // Blade attitude, role-driven: lean from vertical along this leaf's
+        // azimuth; a couple of leaves also nod in/out of that plane slightly.
+        const leafDir = up.clone().multiplyScalar(Math.cos(openness)).add(radial.clone().multiplyScalar(Math.sin(openness)))
+        leafDir.add(new THREE.Vector3((j(idx + 72) - 0.5) * 0.16, 0, (j(idx + 73) - 0.5) * 0.16))
+        leafDir.normalize()
+
+        // Orient the blade's length axis (+Y) onto leafDir via a quaternion.
+        const q0 = new THREE.Quaternion().setFromUnitVectors(up, leafDir)
+        // Then spin the broad FACE to aim outward (radial, slight up bias) so
+        // every leaf presents its lit face to the room; the jitter only fans it
+        // a little, never exposing a dead-black reverse side.
+        const fn0 = new THREE.Vector3(0, 0, 1).applyQuaternion(q0)
+        const faceTarget = radial.clone().multiplyScalar(0.92).add(up.clone().multiplyScalar(0.39)).normalize()
+        const t = faceTarget.clone().addScaledVector(leafDir, -faceTarget.dot(leafDir))
+        if (t.lengthSq() > 1e-6) t.normalize()
+        const cross = new THREE.Vector3().crossVectors(fn0, t)
+        const faceSpin = Math.atan2(cross.dot(leafDir), fn0.dot(t))
+        const q = q0.multiply(new THREE.Quaternion().setFromAxisAngle(up, faceSpin + spinJit))
+
+        const mat = leafMats[(idx + (h >>> 5)) % 3]
+
+        // Collar sized from the ACTUAL leaf base width, always landing on the
+        // joint (kept from the previous attachment fix).
+        const halfW = 0.43 * wa * scale
+        const slotDepth = Math.max(stemR * 1.1, 0.014)
+        const bladeX = new THREE.Vector3(1, 0, 0).applyQuaternion(q)
+        const bladeZ = new THREE.Vector3(0, 0, 1).applyQuaternion(q)
+        const bC = curve.getPoint(0.97)
+        const shankTop = attach.clone().addScaledVector(bladeZ, -0.015)
+        const collarGeo = makeLeafCollar({
+          bC,
+          tangDir: tang,
+          shankTop,
+          bladeX,
+          bladeZ,
+          stemR,
+          halfW,
+          slotDepth,
+        })
+
+        return (
+          <group key={idx}>
+            {/* Petiole */}
+            <mesh castShadow>
+              <tubeGeometry args={[curve, 9, stemR, 6, false]} />
+              <primitive object={MAT_TRUNK} attach="material" />
+            </mesh>
+            {/* Petiole → leaf transition (round end flares into the leaf base) */}
+            <mesh geometry={collarGeo} material={MAT_TRUNK_DS} castShadow />
+            {/* Textured blade, base pinned at the petiole tip */}
+            <group position={[attach.x, attach.y, attach.z]} quaternion={q}>
+              <mesh geometry={LEAF_GEO} material={mat} scale={[wa * scale, scale, cup]} castShadow />
+            </group>
+          </group>
+        )
+      })}
+    </group>
+  )
+}
+
+// Persian Shield (Strobilanthes dyerianus) houseplant variant: short robust
+// stems with clustered iridescent purple/silver-green veined leaves.
+function PersianFoliage({ h }) {
+  const leafMats = [MAT_PERSIAN_A, MAT_PERSIAN_B, MAT_PERSIAN_C]
+  const j = (seed) => {
+    const x = Math.sin((h % 1000) * 0.31 + seed * 12.9898) * 43758.5453
+    return x - Math.floor(x)
+  }
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, b))
+
+  const stems = [
+    { yaw: -2.6, reach: 0.2, height: 0.64, bend: 0.14 },
+    { yaw: -1.0, reach: 0.24, height: 0.54, bend: 0.2 },
+    { yaw: 0.4, reach: 0.16, height: 0.68, bend: 0.1 },
+    { yaw: 1.9, reach: 0.22, height: 0.58, bend: 0.17 },
+    { yaw: 3.5, reach: 0.26, height: 0.48, bend: 0.22 },
+  ]
+
+  const up = new THREE.Vector3(0, 1, 0)
+
+  return (
+    <group position={[0, 0.32, 0]}>
+      {stems.map((s, si) => {
+        const yaw = s.yaw + (j(si + 11) - 0.5) * 0.35
+        const reach = s.reach * (0.9 + j(si + 12) * 0.2)
+        const height = s.height + (j(si + 13) - 0.5) * 0.1
+        const bend = s.bend * (0.8 + j(si + 14) * 0.4)
+        const O = Math.sin(yaw)
+        const A = Math.cos(yaw)
+        const ox = (j(si + 15) - 0.5) * 0.04
+        const oz = (j(si + 16) - 0.5) * 0.04
+        const p0 = new THREE.Vector3(ox, 0.04, oz)
+        const tip = new THREE.Vector3(ox + O * reach, height, oz + A * reach)
+        const radial = new THREE.Vector3(O, 0, A).normalize()
+        const mid = p0.clone().lerp(tip, 0.5).add(radial.clone().multiplyScalar(bend)).add(new THREE.Vector3(0, 0.08, 0))
+        const curve = new THREE.QuadraticBezierCurve3(p0, mid, tip)
+        const stemR = 0.013 + j(si + 17) * 0.005
+
+        // Each stem carries 3 leaves: two opposite side leaves lower down, and one terminal at tip
+        const leafDefs = [
+          { t: 0.62, azOffset: 0.85, openness: 0.72, scale: 0.72, wa: 0.95 },
+          { t: 0.62, azOffset: -0.85, openness: 0.78, scale: 0.68, wa: 0.9 },
+          { t: 0.985, azOffset: 0, openness: 0.38, scale: 0.82, wa: 1.02 },
+        ]
+
+        return (
+          <group key={si}>
+            {/* Stem tube */}
+            <mesh castShadow>
+              <tubeGeometry args={[curve, 8, stemR, 6, false]} />
+              <primitive object={MAT_TRUNK} attach="material" />
+            </mesh>
+
+            {leafDefs.map((ld, li) => {
+              const lId = si * 3 + li
+              const leafYaw = yaw + ld.azOffset + (j(lId + 30) - 0.5) * 0.2
+              const lO = Math.sin(leafYaw), lA = Math.cos(leafYaw)
+              const lRadial = new THREE.Vector3(lO, 0, lA).normalize()
+              const pt = curve.getPoint(ld.t)
+              const tang = curve.getTangent(ld.t)
+              const attach = new THREE.Vector3(pt.x - tang.x * 0.02, pt.y - tang.y * 0.02, pt.z - tang.z * 0.02)
+
+              const openness = clamp(ld.openness + (j(lId + 40) - 0.5) * 0.15, 0.15, 1.25)
+              const leafDir = up.clone().multiplyScalar(Math.cos(openness)).add(lRadial.clone().multiplyScalar(Math.sin(openness))).normalize()
+
+              const spinJit = (j(lId + 50) - 0.5) * 0.9
+              const q = leafQuat(leafDir, lRadial, spinJit)
+
+              const scale = ld.scale * (0.94 + j(lId + 60) * 0.12)
+              const wa = ld.wa * (0.95 + j(lId + 70) * 0.1)
+              const cup = 0.9 + j(lId + 80) * 0.3
+              const mat = leafMats[(lId + (h >>> 4)) % 3]
+
+              const halfW = 0.33 * wa * scale
+              const slotDepth = Math.max(stemR * 1.1, 0.014)
+              const bladeX = new THREE.Vector3(1, 0, 0).applyQuaternion(q)
+              const bladeZ = new THREE.Vector3(0, 0, 1).applyQuaternion(q)
+              const bC = curve.getPoint(Math.max(0, ld.t - 0.04))
+              const shankTop = attach.clone().addScaledVector(bladeZ, -0.012)
+              const collarGeo = makeLeafCollar({
+                bC,
+                tangDir: tang,
+                shankTop,
+                bladeX,
+                bladeZ,
+                stemR,
+                halfW,
+                slotDepth,
+              })
+
+              return (
+                <group key={li}>
+                  <mesh geometry={collarGeo} material={MAT_TRUNK_DS} castShadow />
+                  <group position={[attach.x, attach.y, attach.z]} quaternion={q}>
+                    <mesh geometry={PERSIAN_GEO} material={mat} scale={[wa * scale, scale, cup]} castShadow />
+                  </group>
+                </group>
+              )
+            })}
+          </group>
+        )
+      })}
+    </group>
+  )
+}
+
 function Plant({
   position,
   scale = 1,
@@ -560,6 +1092,14 @@ function Plant({
             <primitive object={PLANT_LEAF_DARK_MAT} attach="material" />
           </mesh>
         </>
+      )}
+
+      {variant === "leafy" && (
+        <Foliage h={h} />
+      )}
+
+      {variant === "persian" && (
+        <PersianFoliage h={h} />
       )}
     </group>
   )
@@ -805,7 +1345,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
 
             {[
               "Selamat datang di SINGGAH",
-              "Virtual Exhibition — pameran",
+              "Virtual Exhibition",
               "karya Dosen & Mahasiswa.",
               "Masuki portal biru untuk",
               "menjelajahi setiap kategori.",

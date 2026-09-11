@@ -31,10 +31,10 @@ export default function SettingsForm({
 
   return (
     <form onSubmit={onSave} className="mx-auto mt-6 max-w-5xl md:mt-8">
-      <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-xl backdrop-blur-xl min-[500px]:p-6 md:p-8">
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-brand-navy/95 via-brand-dark/95 to-slate-900/95 p-6 shadow-2xl shadow-black/50 backdrop-blur-2xl min-[500px]:p-6 md:p-8">
         <div className="mb-7 flex items-center gap-3.5 border-b border-white/10 pb-5">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-400/10">
-            <TabIcon className="h-5 w-5 text-cyan-300" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600">
+            <TabIcon className="h-5 w-5 text-white" />
           </div>
           <div>
             <h3 className="text-base font-semibold text-white">

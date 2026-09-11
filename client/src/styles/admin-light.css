@@ -2642,6 +2642,15 @@ html.light .admin-page .admin-media-card .bg-white\/15 {
   color: #ffffff;
 }
 
+/* ===== PENGATURAN: IKON CHIP TETAP PUTIH (LIGHT) =====
+   global-light.css mengubah .text-white jadi tinta gelap di light
+   mode. Chip ikon Mode Maintenance pakai gradasi amber (tidak ada
+   di daftar pengecualian global), jadi dipaksa putih agar terbaca. */
+html.light .admin-page [class*="from-amber-400"] .text-white,
+html.light .admin-page [class*="from-amber-400"] .text-white\/90 {
+  color: #ffffff;
+}
+
 /* ============================================================
    MEDIA LIBRARY: PREVIEW MODAL (.admin-preview-modal) — LIGHT
    Panel modal sudah jadi gradasi putih via [class*=from-...].
@@ -2893,6 +2902,216 @@ html.light .admin-page [data-role-card].cursor-not-allowed [class*="text-cyan-30
 }
 
 /* ============================================================
+   KELOLA USER: DETAIL USER — LIGHT MODE.
+   Kartu mengikuti gaya panel form tambah user: header gradasi biru
+   tua (konten dipaksa terang), body putih + border biru muda.
+   Dark mode & komposisi kartu tidak berubah.
+   ============================================================ */
+html.light .admin-page .admin-user-detail-card .admin-user-detail-hero {
+  background-color: #0c1f4d;
+  background-image: radial-gradient(720px 260px at 88% -10%, rgba(34, 211, 238, 0.35), transparent 60%),
+    radial-gradient(520px 240px at -10% 110%, rgba(99, 102, 241, 0.28), transparent 60%),
+    linear-gradient(135deg, #0b3d91 0%, #123a7d 42%, #0c1f4d 100%);
+}
+html.light .admin-page .admin-user-detail-card .admin-user-detail-hero h2,
+html.light .admin-page .admin-user-detail-card .admin-user-detail-hero .text-slate-200 {
+  color: #ffffff;
+}
+html.light .admin-page .admin-user-detail-card .admin-user-detail-hero p.text-slate-400 {
+  color: #c7d2e8;
+}
+html.light .admin-page .admin-user-detail-card
+  .admin-user-detail-hero
+  span.border-white\/10.bg-white\/5 {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+html.light .admin-page .admin-user-detail-card
+  .admin-user-detail-hero
+  span.border-white\/10.bg-white\/5
+  svg.text-cyan-400 {
+  color: #67e8f9;
+}
+html.light .admin-page .admin-user-detail-card .admin-user-detail-hero .border-emerald-400\/20 {
+  background-color: rgba(16, 185, 129, 0.22);
+  border-color: rgba(52, 211, 153, 0.55);
+  color: #6ee7b7;
+}
+html.light .admin-page .admin-user-detail-card .admin-user-detail-hero .border-amber-400\/20 {
+  background-color: rgba(245, 158, 11, 0.22);
+  border-color: rgba(251, 191, 36, 0.55);
+  color: #fcd34d;
+}
+html.light .admin-page .admin-user-detail-card .admin-user-detail-hero .border-red-400\/20 {
+  background-color: rgba(239, 68, 68, 0.22);
+  border-color: rgba(248, 113, 113, 0.55);
+  color: #fca5a5;
+}
+/* Body kartu: baris info disesuaikan agar terbaca di atas putih */
+html.light .admin-page .admin-user-detail-row {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+}
+html.light .admin-page .admin-user-detail-row-icon {
+  background-color: #eef3fa;
+  border-color: #e3ebf5;
+}
+html.light .admin-page .admin-user-detail-row p.text-slate-500 {
+  color: #64748b;
+}
+html.light .admin-page .admin-user-detail-row p.text-slate-200 {
+  color: #0f172a;
+}
+html.light .admin-page .admin-user-detail-row svg.text-slate-400,
+html.light .admin-page .admin-user-detail-row-icon svg.text-slate-400 {
+  color: #64748b;
+}
+/* Tombol aksi edit/hapus */
+html.light .admin-page .admin-user-detail-actions button.border-white\/\[0\.06\].bg-white\/\[0\.04\] {
+  background-color: #f8fafc;
+  border-color: #dfe6f0;
+  color: #0f172a;
+}
+html.light .admin-page .admin-user-detail-actions button.border-white\/\[0\.06\].bg-white\/\[0\.04\]:hover {
+  background-color: #eaf2fd;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+html.light .admin-page .admin-user-detail-actions button.border-red-500\/20.bg-red-500\/\[0\.04\] {
+  background-color: rgba(239, 68, 68, 0.07);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #dc2626;
+}
+html.light .admin-page .admin-user-detail-actions button.border-red-500\/20.bg-red-500\/\[0\.04\]:hover {
+  background-color: rgba(239, 68, 68, 0.12);
+  border-color: rgba(248, 113, 113, 0.6);
+  color: #b91c1c;
+}
+
+/* ---- Detail User: dekorasi "keren" ---- */
+/* Tile ikon baris info (dark mode: translucent + warna terang) */
+.admin-page .admin-user-detail-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+}
+.admin-page .admin-user-detail-icon-sm {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.4rem;
+}
+.admin-page .admin-user-detail-icon[data-accent="blue"] {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #7ea6f6;
+}
+.admin-page .admin-user-detail-icon[data-accent="cyan"] {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: rgba(6, 182, 212, 0.22);
+  color: #39d5ef;
+}
+.admin-page .admin-user-detail-icon[data-accent="purple"] {
+  background: rgba(168, 85, 247, 0.12);
+  border-color: rgba(168, 85, 247, 0.25);
+  color: #c084fc;
+}
+.admin-page .admin-user-detail-icon[data-accent="amber"] {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.25);
+  color: #fbbf24;
+}
+.admin-page .admin-user-detail-icon[data-accent="emerald"] {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.25);
+  color: #34d399;
+}
+.admin-page .admin-user-detail-icon[data-accent="indigo"] {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: rgba(99, 102, 241, 0.25);
+  color: #a5b4fc;
+}
+/* Grid dekoratif di header kartu (dark) */
+.admin-page .admin-user-detail-grid {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+  background-size: 34px 34px;
+  -webkit-mask-image: linear-gradient(115deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.55) 48%, transparent 82%);
+  mask-image: linear-gradient(115deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.55) 48%, transparent 82%);
+}
+/* Light mode: kartu lebih premium, ikon pastel + warna vivid, baris & foto ringan */
+html.light .admin-page .admin-user-detail-card {
+  background-color: #f6f9fd;
+  background-image: linear-gradient(160deg, #f8fbff 0%, #eef3fa 55%, #e9effa 100%);
+  border-color: #d5e2f2;
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 10px 24px -16px rgba(30, 64, 175, 0.28);
+}
+html.light .admin-page .admin-user-detail-icon {
+  background: #f4f7fd;
+  border-color: #dfe6f2;
+  color: #475569;
+}
+html.light .admin-page .admin-user-detail-icon[data-accent="blue"] {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #1d4ed8;
+}
+html.light .admin-page .admin-user-detail-icon[data-accent="cyan"] {
+  background: rgba(8, 145, 178, 0.1);
+  border-color: rgba(8, 145, 178, 0.28);
+  color: #0e7490;
+}
+html.light .admin-page .admin-user-detail-icon[data-accent="purple"] {
+  background: rgba(147, 51, 234, 0.1);
+  border-color: rgba(147, 51, 234, 0.28);
+  color: #7c3aed;
+}
+html.light .admin-page .admin-user-detail-icon[data-accent="amber"] {
+  background: rgba(217, 119, 6, 0.1);
+  border-color: rgba(217, 119, 6, 0.3);
+  color: #b45309;
+}
+html.light .admin-page .admin-user-detail-icon[data-accent="emerald"] {
+  background: rgba(5, 150, 105, 0.1);
+  border-color: rgba(5, 150, 105, 0.28);
+  color: #047857;
+}
+html.light .admin-page .admin-user-detail-icon[data-accent="indigo"] {
+  background: rgba(79, 70, 229, 0.1);
+  border-color: rgba(79, 70, 229, 0.28);
+  color: #4338ca;
+}
+html.light .admin-page .admin-user-detail-grid {
+  background-image: linear-gradient(rgba(148, 187, 255, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 187, 255, 0.18) 1px, transparent 1px);
+}
+html.light .admin-page .admin-user-detail-row:hover {
+  background-color: #fbfdff;
+  border-color: #dbe7f6;
+}
+html.light .admin-page .admin-user-detail-photo {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+}
+html.light .admin-page .admin-user-detail-actions button.border-white\/10.bg-white\/5 {
+  background-color: #ffffff;
+  border-color: #dbe7f6;
+}
+html.light .admin-page .admin-user-detail-actions button.border-white\/10.bg-white\/5:hover {
+  background-color: #eef5ff;
+  border-color: #a5c7ff;
+}
+
+/* ============================================================
    REPORTS / STATISTIK — LIGHT MODE OVERRIDES
    Agar bar chart, sparkline, stat card, dan summary card
    tetap tampil vibrant (warna dark mode) di light mode.
@@ -2926,10 +3145,34 @@ html.light .admin-page .reports-stat-card:active {
     0 8px 16px -10px rgba(30, 64, 175, 0.3) !important;
 }
 
-/* Stat card icon: biru solid di light mode */
+/* Stat card icon: solid gradient per warna di light mode (seperti dark, disesuaikan) */
 html.light .admin-page .reports-stat-icon {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-  box-shadow: 0 6px 16px -4px rgba(37, 99, 235, 0.45) !important;
+  background: linear-gradient(135deg, #22d3ee, #0e7490) !important;
+  box-shadow: 0 6px 16px -4px rgba(14, 165, 233, 0.45) !important;
+}
+html.light .admin-page .reports-stat-icon.reports-stat-cyan {
+  background: linear-gradient(135deg, #22d3ee, #0e7490) !important;
+  box-shadow: 0 6px 16px -4px rgba(6, 182, 212, 0.45) !important;
+}
+html.light .admin-page .reports-stat-icon.reports-stat-violet {
+  background: linear-gradient(135deg, #a78bfa, #6d28d9) !important;
+  box-shadow: 0 6px 16px -4px rgba(139, 92, 246, 0.45) !important;
+}
+html.light .admin-page .reports-stat-icon.reports-stat-emerald {
+  background: linear-gradient(135deg, #34d399, #047857) !important;
+  box-shadow: 0 6px 16px -4px rgba(16, 185, 129, 0.45) !important;
+}
+html.light .admin-page .reports-stat-icon.reports-stat-rose {
+  background: linear-gradient(135deg, #fb7185, #be123c) !important;
+  box-shadow: 0 6px 16px -4px rgba(244, 63, 94, 0.45) !important;
+}
+html.light .admin-page .reports-stat-icon.reports-stat-cyan:active,
+html.light .admin-page .reports-stat-icon.reports-stat-violet:active,
+html.light .admin-page .reports-stat-icon.reports-stat-emerald:active,
+html.light .admin-page .reports-stat-icon.reports-stat-rose:active {
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    0 3px 0 rgba(30, 64, 175, 0.35) !important;
 }
 html.light .admin-page .reports-stat-icon svg {
   color: #ffffff !important;
@@ -3007,14 +3250,16 @@ html.light .admin-page .reports-bar-card .bar-value-active {
 
 /* ============================================================
    REPORTS "RINGKASAN CEPAT" — SUMMARY CARDS + PANEL (LIGHT MODE)
-   Mengikuti pola Media Library stat cards: dasar putih + wash
-   gradient transparan per hue, border berwarna per kartu.
+   - Icon tile: solid gradient (seperti ReportsHero) + ikon putih,
+     beda hue per kartu (cyan/emerald/blue/amber).
+   - Border: biru lembut senada card Karya per Bulan.
+   - Wash gradient transparan per hue tetap sebagai pembeda.
    ============================================================ */
 
 /* Container panel: latar netral hampir putih (override Tailwind) */
 html.light .admin-page .reports-summary-panel {
   background: #f8fafd !important;
-  border-color: #e3eaf5 !important;
+  border-color: #c7dcfc !important;
   box-shadow:
     0 6px 20px -14px rgba(37, 99, 235, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
@@ -3027,34 +3272,47 @@ html.light .admin-page .reports-summary-panel .panel-desc {
   color: #64748b !important;
 }
 
-/* Summary card base: putih + shadow lembut, reset Tailwind gradient */
+/* Summary card base: putih + border senada card Karya per Bulan */
 html.light .admin-page .reports-summary-card {
   background-color: #ffffff !important;
   background-image: none !important;
-  border: 1px solid #e9eef8 !important;
-  box-shadow: 0 2px 10px -6px rgba(37, 99, 235, 0.18) !important;
+  border: 1px solid #c7dcfc !important;
+  box-shadow: 0 8px 28px -12px rgba(30, 64, 175, 0.18) !important;
 }
 html.light .admin-page .reports-summary-card:hover {
-  box-shadow: 0 6px 20px -10px rgba(37, 99, 235, 0.28) !important;
+  border-color: #93c5fd !important;
+  box-shadow: 0 12px 32px -14px rgba(37, 99, 235, 0.25) !important;
   transform: translateY(-2px) !important;
 }
 
-/* Per-color borders & gradient washes (matching Media Library pattern) */
+/* Per-color gradient washes (pembeda hue utama) */
 html.light .admin-page .reports-summary-card.reports-summary-cyan {
-  border-color: #3aa9dd !important;
   background-image: linear-gradient(135deg, rgba(8, 145, 178, 0.32), rgba(8, 145, 178, 0.11) 55%, rgba(255, 255, 255, 0)) !important;
+  border-color: #67e8f9 !important;
 }
 html.light .admin-page .reports-summary-card.reports-summary-emerald {
-  border-color: #2fbf8f !important;
   background-image: linear-gradient(135deg, rgba(5, 150, 105, 0.3), rgba(5, 150, 105, 0.1) 55%, rgba(255, 255, 255, 0)) !important;
+  border-color: #6ee7b7 !important;
 }
 html.light .admin-page .reports-summary-card.reports-summary-blue {
-  border-color: #4c8df1 !important;
   background-image: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.1) 55%, rgba(255, 255, 255, 0)) !important;
+  border-color: #93c5fd !important;
 }
 html.light .admin-page .reports-summary-card.reports-summary-amber {
-  border-color: #d4a017 !important;
   background-image: linear-gradient(135deg, rgba(217, 119, 6, 0.28), rgba(217, 119, 6, 0.1) 55%, rgba(255, 255, 255, 0)) !important;
+  border-color: #fcd34d !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-cyan:hover {
+  border-color: #22d3ee !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-emerald:hover {
+  border-color: #34d399 !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-blue:hover {
+  border-color: #60a5fa !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-amber:hover {
+  border-color: #fbbf24 !important;
 }
 
 /* Watermark icon: warna mengikuti hue kartu */
@@ -3074,40 +3332,25 @@ html.light .admin-page .reports-summary-card.reports-summary-amber .reports-summ
   color: #b45309 !important;
 }
 
-/* Icon tile: pastel solid per warna (override Tailwind classes) */
+/* Icon tile: solid gradient per hue + ikon putih (seperti ReportsHero) */
 html.light .admin-page .reports-summary-icon {
-  border: 1px solid;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  border: none !important;
+  box-shadow: 0 6px 16px -4px rgba(37, 99, 235, 0.45) !important;
 }
 html.light .admin-page .reports-summary-card.reports-summary-cyan .reports-summary-icon {
-  background-color: #e0f2fe !important;
-  border-color: #7dd3fc !important;
+  background: linear-gradient(135deg, #06b6d4, #0e7490) !important;
 }
 html.light .admin-page .reports-summary-card.reports-summary-emerald .reports-summary-icon {
-  background-color: #d1fae5 !important;
-  border-color: #6ee7b7 !important;
+  background: linear-gradient(135deg, #10b981, #047857) !important;
 }
 html.light .admin-page .reports-summary-card.reports-summary-blue .reports-summary-icon {
-  background-color: #dbeafe !important;
-  border-color: #93c5fd !important;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
 }
 html.light .admin-page .reports-summary-card.reports-summary-amber .reports-summary-icon {
-  background-color: #fef3c7 !important;
-  border-color: #fcd34d !important;
+  background: linear-gradient(135deg, #f59e0b, #b45309) !important;
 }
-
-/* Icon color: gelap pekat agar kontras di tile pastel (override Tailwind) */
-html.light .admin-page .reports-summary-card.reports-summary-cyan .reports-summary-icon .text-cyan-300 {
-  color: #0e7490 !important;
-}
-html.light .admin-page .reports-summary-card.reports-summary-emerald .reports-summary-icon .text-emerald-300 {
-  color: #047857 !important;
-}
-html.light .admin-page .reports-summary-card.reports-summary-blue .reports-summary-icon .text-blue-300 {
-  color: #1d4ed8 !important;
-}
-html.light .admin-page .reports-summary-card.reports-summary-amber .reports-summary-icon .text-amber-300 {
-  color: #b45309 !important;
+html.light .admin-page .reports-summary-card .reports-summary-icon svg {
+  color: #ffffff !important;
 }
 
 /* Value & label: gelap agar terbaca di latar putih (override Tailwind) */

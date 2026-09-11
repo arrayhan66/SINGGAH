@@ -24,7 +24,7 @@ function toForm(found) {
     avatar: found.avatar || "",
     role: found.role === "admin" ? "admin" : "user",
     status: found.status || "Aktif",
-    tipe: found.tipe || "umum",
+    tipe: ["mahasiswa", "dosen", "umum"].includes(found.tipe) ? found.tipe : "umum",
     nim_nip: found.nim_nip || "",
     identitas_photo: found.identitas_photo || "",
     is_verified: found.is_verified ?? false,

@@ -134,7 +134,7 @@ exports.checkEmailLimiter = rateLimit({
 
 exports.registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 5,
+  max: 1000,
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => isRateLimitDisabled,

@@ -92,7 +92,11 @@ router.post(
   authController.resetPassword,
 )
 
-router.get("/me", authMiddleware, authController.me)
+router.get(
+  "/me",
+  authMiddleware.optionalAuthMiddleware,
+  authController.me,
+)
 router.get("/profile-stats", authMiddleware, authController.getProfileStats)
 router.put(
   "/profile",

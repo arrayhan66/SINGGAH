@@ -1,7 +1,7 @@
 import { lazy, Suspense, useMemo } from "react"
 import { useTexture } from "@react-three/drei"
 import * as THREE from "three"
-import { useQualityStore } from "../hooks/useQuality"
+import { useQualityStore, useLiteMode } from "../hooks/useQuality"
 import { textures } from "../utils/textures"
 import Pillar from "../components/Pillar"
 import Centerpiece from "../components/Centerpiece"
@@ -158,6 +158,7 @@ function Museum({ hallData }) {
   const rugMap = useMemo(() => textures.roundRug(), [])
   const rugRectMap = useMemo(() => textures.rugRect(), [])
   const tier = useQualityStore((s) => s.tier)
+  const lite = useLiteMode()
 
   const categories = hallData?.categories || []
   const projects = hallData?.projects || []
@@ -355,6 +356,9 @@ function Museum({ hallData }) {
 
       {rooms.map((room) => {
         if (room.floor === "marble") return null
+        // Mode ringan (HP/device lemah): potong light per-ruang agar
+        // shader semua material tidak membayar ~8 difusi point light
+        if (lite) return null
         const cx = (room.x[0] + room.x[1]) / 2
         return (
           <group key={`light-${room.id}`}>

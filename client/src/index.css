@@ -583,23 +583,19 @@ html.no-scroll body {
   }
 }
 
+html {
+  background: #041d38;
+}
+
 body {
   font-family: "Poppins", sans-serif;
   background: #041d38;
   overflow-x: hidden;
 }
 
-html.light body {
-  background: #f3f5f8 !important;
-  color: #1b2a4a !important;
-}
-
-:root {
+:root,
+html {
   color-scheme: dark;
-}
-
-html.light {
-  color-scheme: light;
 }
 
 /* ============================================================
@@ -867,4 +863,288 @@ html.light .emoji-pop-preview-text {
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Hero showcase — kartu JAJAR GENJANG (paralelogram, sesuai referensi):
+   - kartu di-skewX(-4deg) senyawa dengan lapisan belakang (.showcase-back-*),
+     ukuran/layout kotak TIDAK berubah (transform tidak memengaruhi flow).
+   - border = strip SATU WARNA solid (cyan terang / biru tua light) lewat
+     teknik "isi solid penuh + konten inset": .showcase-border memenuhi
+     seluruh kartu, konten di inset-[3px] (.showcase-inner), sehingga ring
+     border terlihat merata di keempat sisi.
+   - glow lembut lewat box-shadow. */
+.hero-karya-showcase .showcase-card {
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: none;
+  transform: skewX(-4deg);
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.22),
+    0 0 18px rgba(34, 211, 238, 0.45),
+    0 30px 60px -24px rgba(2, 12, 32, 0.85);
+}
+
+html.light .hero-karya-showcase .showcase-card {
+  box-shadow:
+    0 0 0 1px rgba(37, 99, 235, 0.25),
+    0 0 16px rgba(56, 189, 248, 0.35),
+    0 30px 60px -28px rgba(37, 99, 235, 0.55);
+}
+
+.hero-karya-showcase .showcase-card .showcase-border {
+  border-radius: inherit;
+}
+
+.hero-karya-showcase .showcase-card .showcase-inner {
+  border-radius: 2px;
+}
+
+.hero-karya-showcase .showcase-back-3 {
+  border-radius: 0;
+  transform: translate(-32px, -32px) skewX(-4deg);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.18), 0 0 18px rgba(34, 211, 238, 0.3);
+}
+
+.hero-karya-showcase .showcase-back-2 {
+  border-radius: 0;
+  transform: translate(34px, -24px) skewX(-4deg);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.2), 0 0 18px rgba(34, 211, 238, 0.35);
+}
+
+.hero-karya-showcase .showcase-back-1 {
+  border-radius: 0;
+  transform: translate(14px, 18px) skewX(-4deg);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.25), 0 0 18px rgba(34, 211, 238, 0.4);
+}
+
+html.light .hero-karya-showcase .showcase-back-3 {
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.18), 0 0 18px rgba(37, 99, 235, 0.3);
+}
+
+html.light .hero-karya-showcase .showcase-back-2 {
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2), 0 0 18px rgba(37, 99, 235, 0.35);
+}
+
+html.light .hero-karya-showcase .showcase-back-1 {
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25), 0 0 18px rgba(37, 99, 235, 0.4);
+}
+
+/* Garis rule Kategori — kilau berjalan melintasi garis. */
+.hero-karya-showcase .cat-rule-shine {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.65) 50%,
+    transparent 100%
+  );
+  opacity: 0.7;
+  animation: cat-shine 3s ease-in-out infinite;
+}
+
+@keyframes cat-shine {
+  0% {
+    transform: translateX(-75%);
+  }
+  55%,
+  100% {
+    transform: translateX(75%);
+  }
+}
+
+@media (max-width: 1023px) {
+  .hero-karya-showcase .showcase-back-3 {
+    transform: translate(-24px, -24px) skewX(-3deg);
+  }
+
+  .hero-karya-showcase .showcase-back-2 {
+    transform: translate(26px, -18px) skewX(-3deg);
+  }
+
+  .hero-karya-showcase .showcase-back-1 {
+    transform: translate(10px, 14px) skewX(-3deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-karya-showcase .showcase-back-3 {
+    transform: translate(-14px, -14px) skewX(-3deg);
+  }
+
+  .hero-karya-showcase .showcase-back-2 {
+    transform: translate(16px, -10px) skewX(-3deg);
+  }
+
+  .hero-karya-showcase .showcase-back-1 {
+    transform: translate(6px, 8px) skewX(-3deg);
+  }
+}
+
+/* Badge konektor & pill: ukuran + jarak menyesuaikan lebar layar sehingga
+   tidak pernah keluar viewport (pill menaiki tepi kartu di layar sedang,
+   mengambang penuh hanya bila tersedia ruang). */
+.hero-karya-showcase .showcase-connector {
+  transform: scale(0.6);
+}
+
+.hero-karya-showcase .showcase-badge-left {
+  transform: translateX(-18%) scale(0.72);
+}
+
+.hero-karya-showcase .showcase-badge-right {
+  transform: translateX(18%) scale(0.72);
+}
+
+@media (min-width: 1024px) {
+  .hero-karya-showcase .showcase-connector {
+    transform: scale(0.78);
+  }
+
+  .hero-karya-showcase .showcase-badge-left {
+    transform: translateX(-24%) scale(0.82);
+  }
+
+  .hero-karya-showcase .showcase-badge-right {
+    transform: translateX(24%) scale(0.82);
+  }
+}
+
+@media (min-width: 1280px) {
+  .hero-karya-showcase .showcase-connector {
+    transform: scale(0.88);
+  }
+
+  .hero-karya-showcase .showcase-badge-left {
+    transform: translateX(-30%) scale(0.78);
+  }
+
+  .hero-karya-showcase .showcase-badge-right {
+    transform: translateX(30%) scale(0.78);
+  }
+}
+
+@media (min-width: 1580px) {
+  .hero-karya-showcase .showcase-connector {
+    transform: scale(0.96);
+  }
+
+  .hero-karya-showcase .showcase-badge-left {
+    transform: translateX(-46%) scale(0.95);
+  }
+
+  .hero-karya-showcase .showcase-badge-right {
+    transform: translateX(46%) scale(0.95);
+  }
+}
+
+@media (min-width: 2100px) {
+  .hero-karya-showcase .showcase-connector {
+    transform: scale(1);
+  }
+
+  .hero-karya-showcase .showcase-badge-left {
+    transform: translateX(-100%) scale(1);
+  }
+
+  .hero-karya-showcase .showcase-badge-right {
+    transform: translateX(100%) scale(1);
+  }
+}
+/* Hero showcase — animasi pergantian slide & layer belakang.
+   Slide masuk dari kanan (maju) atau kiri (mundur/wrap balik), memberat
+   dan sedikit zoom — selaras dengan gerakan lapisan belakang (back-sway)
+   yang menyusul dengan lembut. */
+@keyframes karta-slide-in-right {
+  from {
+    transform: translateX(4.5%) scale(0.985);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes karta-slide-in-left {
+  from {
+    transform: translateX(-4.5%) scale(0.985);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes karta-back-sway {
+  from {
+    transform: translateX(-16px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@utility animate-karta-slide-in-right {
+  animation: karta-slide-in-right 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@utility animate-karta-slide-in-left {
+  animation: karta-slide-in-left 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@utility animate-karta-back-sway {
+  animation: karta-back-sway 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Floating badge & blob glow — dekorasi sekitar kartu showcase.
+   Badge bobbing naik-turun halus dengan delay berbeda per elemen;
+   blob menarik-mengembang pelan sebagai ambient glow di belakang. */
+@keyframes karta-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes karta-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+@utility animate-karta-float {
+  animation: karta-float 3.4s ease-in-out infinite;
+}
+
+@utility animate-karta-pulse {
+  animation: karta-pulse 7s ease-in-out infinite;
+}
+
+@utility animate-karta-pulse-slow {
+  animation: karta-pulse 9s ease-in-out infinite;
+}
+
+/* Garis konektor dotted dari floating badge ke tepi kartu utama.
+   Satu-shot draw-in (bukan infinite): strokeLength dinormalisasi
+   pakai SVG pathLength="1", dashoffset ditarik dari 1 ke 0. */
+@keyframes karta-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@utility animate-karta-draw {
+  animation: karta-draw 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }

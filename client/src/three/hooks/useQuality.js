@@ -75,3 +75,16 @@ export function useLow() {
 export function isMobile() {
   return detectMobile()
 }
+
+// Mobile rendering preset. HP layar Retina tinggi (DPR 2.5-3): render di
+// resolusi penuh -> fill-rate meledak dan HP panas. Tapi resolusi terlalu
+// rendah (<=1.0) terlihat burik. Karena di HP kita MATIKAN shadow + semua
+// light dekoratif (budget GPU terhemat besar), resolusi bisa dinaikkan ke
+// 1.25-1.75 — jauh lebih tajam, tetap sangat ringan.
+export const DPR_LITE = [1.25, 1.75]
+
+// Aktifkan preset ringan untuk HP (dan tablet layar kecil), atau jika
+// kualitas device tergolong "rendah".
+export function useLiteMode() {
+  return detectMobile() || useQualityStore.getState().tier === "rendah"
+}

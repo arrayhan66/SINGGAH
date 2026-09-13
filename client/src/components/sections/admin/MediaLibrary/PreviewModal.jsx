@@ -101,7 +101,7 @@ export default function PreviewModal({ item, onClose }) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => recordUsage("view")}
-              className="hidden cursor-pointer items-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] sm:inline-flex"
+              className={`admin-preview-open hidden cursor-pointer items-center gap-1.5 rounded-xl bg-gradient-to-br ${style.bg} px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-black/30 transition-all duration-300 hover:brightness-110 active:scale-95 sm:inline-flex`}
             >
               <ExternalLink size={14} />
               Buka di Tab Baru

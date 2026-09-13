@@ -1,5 +1,4 @@
 import { ArrowRight } from "lucide-react";
-import { Suspense, lazy } from "react";
 import DustBackground from "../../ui/DustBackground";
 import { useTheme } from "../../../context/ThemeContext";
 import GlowBackground from "../../ui/GlowBackground";
@@ -8,10 +7,7 @@ import logoPoliban from "../../../assets/icons/Logo_Poliban.png";
 import { useNavigate } from "react-router-dom";
 import SmartImage from "../../ui/SmartImage";
 import HeroStats from "./HeroStats";
-
-const HeroModel3D = lazy(() => import("./HeroModel3D"));
-const HERO_MODEL_BOX =
-  "h-[400px] w-full lg:h-[680px] lg:w-[520px] xl:h-[760px] xl:w-[620px] 2xl:h-[900px] 2xl:w-[860px]";
+import HeroKaryaShowcase from "./HeroKaryaShowcase";
 
 function Hero() {
   const navigate = useNavigate();
@@ -30,8 +26,9 @@ function Hero() {
       <DustBackground color={isDark ? "#7dd3fc" : "#2563eb"} />
 
       {/* Class lg:items-start dihapus, jadi items-center berlaku untuk desktop juga biar sejajar */}
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-[1700px] flex-col lg:flex-row items-center justify-between px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-[calc(var(--navbar-h)+24px)] pb-12">
-        <div className="flex w-full flex-col items-center text-center md:max-w-2xl md:mx-auto lg:max-w-xl 2xl:max-w-2xl lg:mx-0 lg:items-start lg:text-left lg:-mt-20">
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-[1700px] w-full flex-col items-center px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-[calc(var(--navbar-h)+24px)] pb-12">
+        <div className="flex w-full min-w-0 flex-1 flex-col lg:flex-row lg:flex-wrap items-center lg:justify-between">
+        <div className="flex w-full flex-col items-center text-center md:max-w-2xl md:mx-auto lg:max-w-xl 2xl:max-w-2xl lg:mx-0 lg:items-start lg:text-left lg:w-auto lg:flex-1 lg:min-w-0">
           <div className="inline-flex items-center gap-2 min-[350px]:gap-3 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 min-[350px]:px-4 py-2 backdrop-blur-md">
             <SmartImage
               src={logoPoliban}
@@ -75,18 +72,12 @@ function Hero() {
               </span>
             </button>
           </div>
-
-          <div className="hidden lg:block mt-10 w-full">
-            <HeroStats />
-          </div>
         </div>
 
-        {/* Di desktop margin dibikin normal lg:mt-0 biar sejajar persis di tengah sama teks kiri */}
-        <div className="mt-8 flex w-full lg:w-[45%] xl:w-1/2 items-center justify-center shrink-0 lg:-mt-20">
-          <div className="w-full max-w-xs md:max-w-lg lg:max-w-full">
-            <Suspense fallback={<div className={HERO_MODEL_BOX} aria-hidden="true" />}>
-              <HeroModel3D />
-            </Suspense>
+        {/* Karya Terbaru Showcase (menggantikan area model 3D di sisi kanan) */}
+        <div className="mt-8 flex w-full lg:w-[40%] xl:w-[43%] items-center justify-center shrink-0">
+          <div className="w-full max-w-md md:max-w-xl lg:max-w-full">
+            <HeroKaryaShowcase />
           </div>
         </div>
 
@@ -106,11 +97,15 @@ function Hero() {
               </span>
             </button>
           </div>
-
-          <div className="w-full">
-            <HeroStats variant="mobile" />
-          </div>
         </div>
+
+        {/* tutup wrapper konten atas (kolom teks + showcase + CTA) */}
+      </div>
+
+      {/* Unified 4-stats row full-width, langsung di bawah showcase */}
+      <div className="w-full mt-4 lg:mt-6 mb-5 flex justify-center">
+        <HeroStats />
+      </div>
       </div>
 
       <div

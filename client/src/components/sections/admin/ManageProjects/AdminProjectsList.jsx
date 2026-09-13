@@ -169,14 +169,22 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
                       onEdit={handleEditClick}
                       onDelete={handleDeleteClick}
                       onSetFeatured={(p, slot) => {
-                        setFeaturedSlot(p.id, slot).catch((err) => {
-                          toast.error(
-                            err?.response?.data?.message ||
-                              (slot
-                                ? `Gagal memperbarui slot karya unggulan slot ${slot}`
-                                : "Gagal melepas karya dari unggulan"),
-                          )
-                        })
+                        setFeaturedSlot(p.id, slot)
+                          .then(() => {
+                            toast.success(
+                              slot
+                                ? `Karya "${p.title}" berhasil ditambahkan ke unggulan slot ${slot}`
+                                : `Karya "${p.title}" berhasil dilepaskan dari unggulan`,
+                            )
+                          })
+                          .catch((err) => {
+                            toast.error(
+                              err?.response?.data?.message ||
+                                (slot
+                                  ? `Gagal memperbarui slot karya unggulan slot ${slot}`
+                                  : "Gagal melepas karya dari unggulan"),
+                            )
+                          })
                       }}
                       featuredBySlot={featuredBySlot}
                     />

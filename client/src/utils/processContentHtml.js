@@ -27,7 +27,7 @@ export function processContentHtml(html) {
     figcaption.textContent = caption
 
     const wrapper = doc.createElement("div")
-    wrapper.className = "w-full max-h-[500px] overflow-hidden bg-slate-100 dark:bg-slate-800"
+    wrapper.className = "w-full max-h-[500px] overflow-hidden bg-[#112942]"
     wrapper.appendChild(imgClone)
 
     figure.appendChild(wrapper)

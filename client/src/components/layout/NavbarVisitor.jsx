@@ -79,7 +79,7 @@ const navLinkClass = ({ isActive }) =>
       <div className={`mx-auto mt-3 flex w-full max-w-[1700px] items-center justify-between rounded-2xl px-2.5 py-2.5 backdrop-blur-xl min-[350px]:mt-5 min-[350px]:px-4 min-[350px]:py-3 sm:mt-6 sm:px-6 sm:py-4 md:mt-7 md:px-8 2xl:mt-8 2xl:px-10 ${
           isDark
             ? "border border-white/10 bg-[#132d4d]"
-            : "border-2 border-slate-300 bg-white shadow-xl shadow-slate-300/60"
+            : "border-2 border-slate-300/60 bg-white/40 shadow-md shadow-slate-300/30"
         }`}>
         <NavLink
           to="/"

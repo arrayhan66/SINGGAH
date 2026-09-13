@@ -1,14 +1,11 @@
 // LIGHT MODE - versi pembanding skripsi, terpisah dari dark mode
 import { ArrowRight, ChevronDown } from "lucide-react";
-import { Suspense, lazy, useState } from "react";
+import { useState } from "react";
 import logoPoliban from "../../assets/icons/Logo_Poliban.png";
 import { useNavigate } from "react-router-dom";
 import SmartImage from "../ui/SmartImage";
 import LightModeHeroStats from "./LightModeHeroStats";
-
-const HeroModel3D = lazy(() => import("../../components/sections/Hero/HeroModel3D"));
-const HERO_MODEL_BOX =
-  "h-[400px] w-full lg:h-[680px] lg:w-[520px] xl:h-[760px] xl:w-[620px] 2xl:h-[900px] 2xl:w-[860px]";
+import HeroKaryaShowcase from "../sections/Hero/HeroKaryaShowcase";
 
 const faq = [
   {
@@ -64,7 +61,7 @@ function LightModeHero() {
           }}
         />
 
-        <div className="relative z-10 mx-auto flex min-h-screen max-w-[1700px] flex-col lg:flex-row items-center justify-between px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-[calc(var(--navbar-h,80px)+24px)] pb-12">
+        <div className="relative z-10 mx-auto flex min-h-screen max-w-[1700px] flex-col lg:flex-row lg:flex-wrap lg:content-center items-center justify-between px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-[calc(var(--navbar-h,80px)+24px)] pb-12">
           <div className="flex w-full flex-col items-center text-center md:max-w-2xl md:mx-auto lg:max-w-xl 2xl:max-w-2xl lg:mx-0 lg:items-start lg:text-left lg:-mt-20">
             <div className="inline-flex items-center gap-2 min-[350px]:gap-3 rounded-full border border-blue-300 bg-white px-3 min-[350px]:px-4 py-2 shadow-sm backdrop-blur-md">
               <SmartImage
@@ -109,18 +106,6 @@ function LightModeHero() {
                 </span>
               </button>
             </div>
-
-            <div className="hidden lg:block mt-10 w-full">
-              <LightModeHeroStats />
-            </div>
-          </div>
-
-          <div className="mt-8 flex w-full lg:w-[45%] xl:w-1/2 items-center justify-center shrink-0 lg:-mt-20">
-            <div className="w-full max-w-xs md:max-w-lg lg:max-w-full">
-              <Suspense fallback={<div className={HERO_MODEL_BOX} aria-hidden="true" />}>
-                <HeroModel3D />
-              </Suspense>
-            </div>
           </div>
 
           <div className="mt-8 flex w-full max-w-lg md:max-w-2xl flex-col items-center gap-8 lg:hidden">
@@ -139,10 +124,18 @@ function LightModeHero() {
                 </span>
               </button>
             </div>
+          </div>
 
-            <div className="w-full">
-              <LightModeHeroStats variant="mobile" />
+          {/* Karya Terbaru Showcase (menggantikan area model 3D di sisi kanan) */}
+          <div className="mt-8 flex w-full lg:w-[40%] xl:w-[43%] items-center justify-center shrink-0 lg:-mt-20">
+            <div className="w-full max-w-md md:max-w-xl lg:max-w-full">
+              <HeroKaryaShowcase variant="light" />
             </div>
+          </div>
+
+          {/* Unified 4-stats row full-width, langsung di bawah showcase */}
+          <div className="w-full lg:basis-full mt-10">
+            <LightModeHeroStats />
           </div>
         </div>
       </section>

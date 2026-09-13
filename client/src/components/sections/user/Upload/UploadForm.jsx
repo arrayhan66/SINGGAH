@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Image, Info, Layers, ImagePlus, FileText, Eye, Send } from "lucide-react"
 import UploadThumbnail from "./UploadThumbnail"
 import UploadInformation from "./UploadInformation"
@@ -12,6 +12,10 @@ import { useAuth } from "../../../../context/AuthContext"
 import GlowBackground from "../../../ui/GlowBackground"
 import DustBackground from "../../../ui/DustBackground"
 import SubmitSuccessModal from "../../../ui/SubmitSuccessModal"
+import { clearDraft, getDraft, putDraft } from "../../../../utils/draftStorage"
+
+const DRAFT_FIELDS_KEY = "singgah-upload-fields"
+const DRAFT_FILES_KEY = "singgah-upload-files"
 
 const steps = [
   { icon: Image, label: "Thumbnail" },
@@ -61,8 +65,68 @@ function UploadForm() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
   const [successOpen, setSuccessOpen] = useState(false)
+  const [hydrated, setHydrated] = useState(false)
   const { addProject } = useProjects()
   const { user } = useAuth()
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      let restored = null
+      try {
+        const fieldsRaw = sessionStorage.getItem(DRAFT_FIELDS_KEY)
+        const files = await getDraft(DRAFT_FILES_KEY)
+        if (fieldsRaw || files) {
+          restored = { ...initialFormData }
+          if (fieldsRaw) Object.assign(restored, JSON.parse(fieldsRaw))
+          if (files) {
+            restored.thumbnail = files.thumbnail || null
+            restored.images = Array.isArray(files.images) ? files.images : []
+            restored.documents = Array.isArray(files.documents)
+              ? files.documents
+              : []
+          }
+        }
+      } catch {
+        // draft rusak/disk penuh: abaikan, mulai kosong
+      }
+      if (cancelled) return
+      if (restored) setFormData((prev) => ({ ...prev, ...restored }))
+      setHydrated(true)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const { title, description, category_id, year, videoUrl, technologies, members, links } =
+    formData
+
+  useEffect(() => {
+    if (!hydrated) return
+    sessionStorage.setItem(
+      DRAFT_FIELDS_KEY,
+      JSON.stringify({
+        title,
+        description,
+        category_id,
+        year,
+        videoUrl,
+        technologies,
+        members,
+        links,
+      })
+    )
+  }, [hydrated, title, description, category_id, year, videoUrl, technologies, members, links])
+
+  useEffect(() => {
+    if (!hydrated) return
+    putDraft(DRAFT_FILES_KEY, {
+      thumbnail: formData.thumbnail,
+      images: formData.images,
+      documents: formData.documents,
+    })
+  }, [hydrated, formData.thumbnail, formData.images, formData.documents])
 
   function updateField(field, value) {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -108,6 +172,9 @@ function UploadForm() {
       }
 
       await addProject(fd)
+
+      sessionStorage.removeItem(DRAFT_FIELDS_KEY)
+      await clearDraft(DRAFT_FILES_KEY)
 
       setSuccessOpen(true)
     } catch (err) {

@@ -28,6 +28,7 @@ export default function HallSection() {
       <HallCanvas
         tier={tier}
         hallData={hallData}
+        interactive={!selectedProject}
         onArea={setArea}
         onSelectProject={setSelectedProject}
         onReady={() => setSceneReady(true)}

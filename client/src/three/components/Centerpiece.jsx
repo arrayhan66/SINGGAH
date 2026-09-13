@@ -2,7 +2,7 @@ import { useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import { Text, Billboard } from "@react-three/drei"
 import * as THREE from "three"
-import { useLow } from "../hooks/useQuality"
+import { useLow, useLiteMode } from "../hooks/useQuality"
 import { useDownscaledTexture } from "../utils/useDownscaledTexture"
 import logoPoliban from "../../assets/icons/Logo_Poliban.png"
 
@@ -16,6 +16,7 @@ function Centerpiece({ title = "HALL UTAMA" }) {
   const ringB = useRef()
   const glow = useRef()
   const low = useLow()
+  const lite = useLiteMode()
   const logoMap = useDownscaledTexture(logoPoliban, 512)
 
   useFrame((state, delta) => {
@@ -182,7 +183,9 @@ function Centerpiece({ title = "HALL UTAMA" }) {
         {title}
       </Text>
 
-      <pointLight position={[0, 2.3, 0]} intensity={6} distance={14} color="#7dd3fc" />
+      {!lite && (
+        <pointLight position={[0, 2.3, 0]} intensity={6} distance={14} color="#7dd3fc" />
+      )}
     </group>
   )
 }

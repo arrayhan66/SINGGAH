@@ -56,6 +56,13 @@ router.patch(
   projectController.setProjectFeatured,
 )
 
+router.patch(
+  "/:id/slideshow",
+  authMiddleware,
+  roleMiddleware("admin"),
+  projectController.setProjectSlideshow,
+)
+
 router.put(
   "/:id",
   authMiddleware,

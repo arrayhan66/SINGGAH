@@ -20,6 +20,8 @@ const { Op } = require("sequelize")
 const { createNotification, notifyAdmins } = require("./notificationService")
 const cache = require("../utils/cache")
 
+const SLIDESHOW_MAX_ITEMS = 6
+
 // ---- Shape bersama agar response project konsisten dengan kebutuhan hall 3D ----
 const PROJECT_COUNT_ATTRIBUTES = [
   [
@@ -243,7 +245,7 @@ async function applyUserFlags(items, userId) {
 }
 
 exports.getProjects = async (query = {}, currentUserId = null, userRole = null) => {
-  const { search, category_id, status, year, page, limit } = query
+  const { search, category_id, status, year, slideshow, page, limit } = query
 
   const andConditions = []
 
@@ -259,6 +261,10 @@ exports.getProjects = async (query = {}, currentUserId = null, userRole = null) 
 
   if (category_id) {
     andConditions.push({ category_id })
+  }
+
+  if (slideshow === "true" || slideshow === "1") {
+    andConditions.push({ is_shown_in_slideshow: true })
   }
 
   if (status) {
@@ -344,6 +350,7 @@ exports.updateProjectStatus = async (id, status, reason = "") => {
     // supaya tidak menyandera slot (1 & 2) untuk karya lain.
     if (status !== "published") {
       project.featured_slot = null
+      project.is_shown_in_slideshow = false
     }
     await project.save({ transaction: t })
 
@@ -441,8 +448,64 @@ exports.setProjectFeatured = async (id, slot = null) => {
     }
 
     project.featured_slot = normalizedSlot
+    // Karya yang dilepas dari unggulan otomatis tidak lagi tampil di
+    // slideshow beranda (slideshow hanya untuk karya unggulan).
+    if (normalizedSlot === null) {
+      project.is_shown_in_slideshow = false
+    }
     await project.save({ transaction: t })
   })
+
+  return project
+}
+
+// Tampilkan / sembunyikan karya dari slideshow beranda (hero). Hanya karya
+// published dan sedang unggulan (featured_slot terisi) yang boleh tampil.
+// Jumlah maksimal dibatasi SLIDESHOW_MAX_ITEMS lintas seluruh kategori.
+exports.setProjectSlideshow = async (id, visible) => {
+  const where = /^\d+$/.test(String(id)) ? { id: Number(id) } : { slug: id }
+  const project = await Project.findOne({ where })
+
+  if (!project) {
+    throw new AppError("Project tidak ditemukan", 404)
+  }
+
+  const isVisible =
+    visible === true || visible === "true" || visible === 1 || visible === "1"
+
+  if (isVisible) {
+    if (project.status !== "published") {
+      throw new AppError(
+        "Hanya project yang sudah dipublikasikan yang bisa tampil di slideshow beranda",
+        400,
+      )
+    }
+
+    if (!project.featured_slot) {
+      throw new AppError(
+        "Tandai karya ini sebagai Unggulan terlebih dahulu sebelum dimunculkan di slideshow beranda",
+        400,
+      )
+    }
+
+    const activeCount = await Project.count({
+      where: {
+        is_shown_in_slideshow: true,
+        status: "published",
+        id: { [Op.ne]: project.id },
+      },
+    })
+
+    if (activeCount >= SLIDESHOW_MAX_ITEMS) {
+      throw new AppError(
+        `Maksimal ${SLIDESHOW_MAX_ITEMS} karya untuk slideshow beranda. Nonaktifkan salah satu karya slideshow lain terlebih dahulu.`,
+        409,
+      )
+    }
+  }
+
+  project.is_shown_in_slideshow = isVisible
+  await project.save()
 
   return project
 }

@@ -189,6 +189,33 @@ exports.setProjectFeatured = asyncHandler(async (req, res) => {
   success(res, project, "Slot karya unggulan berhasil diperbarui")
 })
 
+exports.setProjectSlideshow = asyncHandler(async (req, res) => {
+  const project = await projectService.setProjectSlideshow(
+    req.params.id,
+    req.body.visible,
+  )
+
+  const description = project.is_shown_in_slideshow
+    ? `${req.user.name} menampilkan project "${project.title}" di slideshow beranda`
+    : `${req.user.name} menyembunyikan project "${project.title}" dari slideshow beranda`
+
+  await logActivity({
+    userId: req.user.id,
+    action: "project_slideshow_updated",
+    targetType: "project",
+    targetId: project.id,
+    description,
+  })
+
+  success(
+    res,
+    project,
+    project.is_shown_in_slideshow
+      ? "Karya kini tampil di slideshow beranda"
+      : "Karya tidak lagi tampil di slideshow beranda",
+  )
+})
+
 exports.updateProject = asyncHandler(async (req, res) => {
   const existingProject = await projectService.getProjectById(
     req.params.id,

@@ -50,6 +50,13 @@ const Project = sequelize.define(
         isIn: [[1, 2]],
       },
     },
+    // Muncul di slideshow beranda (hero). Hanya bisa aktif jika project
+    // menjadi karya unggulan (featured_slot terisi). Maks 6 lewat service.
+    is_shown_in_slideshow: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     tableName: "projects",

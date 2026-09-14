@@ -36,6 +36,7 @@ const reportRoutes = require("./routes/reportRoutes")
 const hallRoutes = require("./routes/hallRoutes")
 const maintenanceMiddleware = require("./middlewares/maintenanceMiddleware")
 const ensureGoogleIdColumn = require("./scripts/ensureGoogleIdColumn")
+const ensureSlideshowColumn = require("./scripts/ensureSlideshowColumn")
 
 const swaggerUi = require("swagger-ui-express")
 const loadSwagger = require("./config/swagger")
@@ -137,6 +138,7 @@ const startServer = async () => {
     // Buat tabel yang belum ada (tanpa mengubah tabel lama)
     if (process.env.NODE_ENV !== "test") {
       await ensureGoogleIdColumn()
+      await ensureSlideshowColumn()
       await sequelize.sync()
     }
 

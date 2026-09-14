@@ -1,5 +1,5 @@
 import { Text, useTexture } from "@react-three/drei"
-import { useCallback, useMemo, useState } from "react"
+import { Suspense, useCallback, useMemo, useState } from "react"
 import * as THREE from "three"
 import { useDownscaledTexture } from "../utils/useDownscaledTexture"
 import logo from "../../assets/icons/logo.webp"
@@ -185,7 +185,12 @@ function Portal({ position, rotationY, width, title, action }) {
       {/* ==== Tengah portal: logo SINGGAH (masuk) / icon EXIT merah (keluar) ==== */}
       {title ? (
         <>
-          <LogoPlate position={[0, LOGO_Y, 0.02]} width={1.25} />
+          {/* Logo plate textures decode asynchronously — wrap them so the
+              frame + rift always render and the logo pops in when ready
+              (otherwise a slow mobile fetch would blank the whole scene). */}
+          <Suspense fallback={null}>
+            <LogoPlate position={[0, LOGO_Y, 0.02]} width={1.25} />
+          </Suspense>
           <Text
             position={[0, TEXT_Y, 0.03]}
             fontSize={0.24}
@@ -200,7 +205,9 @@ function Portal({ position, rotationY, width, title, action }) {
           </Text>
         </>
       ) : (
-        <ExitIcon />
+        <Suspense fallback={null}>
+          <ExitIcon />
+        </Suspense>
       )}
 
       {/* Trim tepi dalam (merah untuk exit) supaya simetris dan rapi */}

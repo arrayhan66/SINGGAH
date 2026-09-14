@@ -5,7 +5,7 @@ import InstancedMeshes from "../utils/InstancedMeshes"
 import { textures } from "../utils/textures"
 import { useDownscaledTexture } from "../utils/useDownscaledTexture"
 import { markTvReady, resetTvReady } from "../hooks/useTvReady"
-import { BOOK_COVER_FILES, DEFAULT_COVER_KEY } from "../utils/bookCovers"
+import { BOOK_COVER_FILES, DEFAULT_COVER_KEY, getRandomUniqueBookKeys } from "../utils/bookCovers"
 import logo from "../../assets/icons/logo.webp"
 import bajupraktek from "../../assets/images/bajupraktekelktro.jpg"
 
@@ -580,7 +580,16 @@ function RealBook({ coverKey, x, y, z, rot = 0, w = 0.15, h = 0.03 }) {
   const aspect = img && img.width ? img.width / img.height : 0.66
   const depth = w / aspect
   return (
-    <group position={[x, y, z]} rotation={[0, rot, 0]}>
+    <group
+      position={[x, y, z]}
+      rotation={[0, rot, 0]}
+      userData={{
+        action: {
+          type: "bookInfo",
+          coverKey,
+        },
+      }}
+    >
       <mesh castShadow>
         <boxGeometry args={[w, h, depth]} />
         <meshStandardMaterial map={pages} roughness={0.9} />

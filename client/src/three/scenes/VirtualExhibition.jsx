@@ -4,6 +4,8 @@ import { useNavigate, useParams } from "react-router-dom"
 import GalleryLights from "../components/GalleryLights"
 import Museum from "../rooms/Museum"
 import LookControls from "../controls/LookControls"
+import WalkTargetMarker from "../components/WalkTargetMarker"
+import FloorHoverMarker from "../components/FloorHoverMarker"
 import { useWalkStore, loadHallReturn, clearHallReturn } from "../hooks/useWalk"
 import { MUSEUM, findRoom, rooms } from "../rooms/museumLayout"
 
@@ -79,6 +81,8 @@ function VirtualExhibition({ onArea, onSelectProject, onReady, hallData }) {
       <GalleryLights />
       <Museum hallData={hallData} />
       <LookControls bounds={MUSEUM.bounds} onSelectProject={onSelectProject} />
+      <WalkTargetMarker />
+      <FloorHoverMarker />
       <AreaLabel onArea={onArea} />
     </>
   )

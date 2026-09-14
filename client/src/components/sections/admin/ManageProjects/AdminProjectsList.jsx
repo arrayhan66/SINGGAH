@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from "react"
-import { FolderX, FolderOpen } from "lucide-react"
+import { FolderX, FolderOpen, AlertTriangle } from "lucide-react"
+import PopupToast from "../../../ui/PopupToast"
 import { useNavigate } from "react-router-dom"
 import { useProjects } from "../../../../context/ProjectContext"
 import AdminProjectsCard from "./AdminProjectsCard"
@@ -11,13 +12,14 @@ import toast from "../../../../utils/toast"
 
 function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
   const navigate = useNavigate()
-  const { projects, approveProject, rejectProject, deleteProject, setFeaturedSlot } = useProjects()
+  const { projects, approveProject, rejectProject, deleteProject, setFeaturedSlot, setSlideshowVisible } = useProjects()
 
   const [approveModalProject, setApproveModalProject] = useState(null)
   const [rejectModalProject, setRejectModalProject] = useState(null)
   const [deleteProjectTarget, setDeleteProjectTarget] = useState(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deletedTitle, setDeletedTitle] = useState(null)
+  const [slideshowUnpublishTarget, setSlideshowUnpublishTarget] = useState(null)
 
   const filterKey = `${search}|${statusFilter}|${categoryFilter}`
   const [activeFilter, setActiveFilter] = useState(filterKey)
@@ -27,7 +29,11 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
 
   const filteredProjects = useMemo(() => {
     return projects.filter((p) => {
-      const matchStatus = statusFilter === "all" || p.status === statusFilter
+      // Tab "Slideshow Beranda" menampilkan karya slideshow aktif lintas status/kategori.
+      const matchStatus =
+        statusFilter === "slideshow"
+          ? p.is_shown_in_slideshow
+          : statusFilter === "all" || p.status === statusFilter
       const matchCategory =
         categoryFilter === "all" ||
         String(p.category_id ?? p.Category?.id ?? "") === String(categoryFilter)
@@ -83,6 +89,11 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
     return map
   }, [projects])
 
+  const slideshowCount = useMemo(
+    () => projects.filter((p) => p.is_shown_in_slideshow).length,
+    [projects],
+  )
+
   function handleViewDetail(project) {
     navigate(`/admin/karya/detail/${project.slug || project.id}`)
   }
@@ -127,6 +138,24 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
     setRejectModalProject(null)
   }, [rejectProject])
 
+  const doSetFeatured = useCallback(async (p, slot) => {
+    try {
+      await setFeaturedSlot(p.id, slot)
+      toast.success(
+        slot
+          ? `Karya "${p.title}" berhasil ditambahkan ke unggulan slot ${slot}`
+          : `Karya "${p.title}" berhasil dilepaskan dari unggulan`,
+      )
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message ||
+          (slot
+            ? `Gagal memperbarui slot karya unggulan slot ${slot}`
+            : "Gagal melepas karya dari unggulan"),
+      )
+    }
+  }, [setFeaturedSlot])
+
   return (
     <div className="px-4 md:px-6 lg:px-8 pt-6 md:pt-8 pb-12 md:pb-16">
       <div className="flex flex-col gap-8 md:gap-10">
@@ -169,24 +198,34 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
                       onEdit={handleEditClick}
                       onDelete={handleDeleteClick}
                       onSetFeatured={(p, slot) => {
-                        setFeaturedSlot(p.id, slot)
+                         // Melepas unggulan pada karya yang sedang tampil di
+                         // slideshow otomatis menonaktifkannya dari slideshow.
+                         if (!slot && p.is_shown_in_slideshow) {
+                           setSlideshowUnpublishTarget(p)
+                           return
+                         }
+                         doSetFeatured(p, slot)
+                       }}
+                      onToggleSlideshow={(p, visible) => {
+                        setSlideshowVisible(p.id, visible)
                           .then(() => {
                             toast.success(
-                              slot
-                                ? `Karya "${p.title}" berhasil ditambahkan ke unggulan slot ${slot}`
-                                : `Karya "${p.title}" berhasil dilepaskan dari unggulan`,
+                              visible
+                                ? `Karya "${p.title}" kini tampil di slideshow beranda`
+                                : `Karya "${p.title}" tidak lagi tampil di slideshow beranda`,
                             )
                           })
                           .catch((err) => {
                             toast.error(
                               err?.response?.data?.message ||
-                                (slot
-                                  ? `Gagal memperbarui slot karya unggulan slot ${slot}`
-                                  : "Gagal melepas karya dari unggulan"),
+                                (visible
+                                  ? "Gagal menampilkan karya di slideshow beranda"
+                                  : "Gagal menyembunyikan karya dari slideshow beranda"),
                             )
                           })
                       }}
                       featuredBySlot={featuredBySlot}
+                      slideshowCount={slideshowCount}
                     />
                   </div>
                 ))}
@@ -232,6 +271,48 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
         redirectPath="/admin/karya"
         onClose={() => setDeletedTitle(null)}
       />
+
+      {slideshowUnpublishTarget && (
+        <PopupToast
+          show
+          variant="danger"
+          position="center"
+          onClose={() => setSlideshowUnpublishTarget(null)}
+        >
+          <div className="px-4 py-3.5">
+            <div className="flex items-start gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 border border-amber-500/30">
+                <AlertTriangle className="h-4.5 w-4.5 text-amber-400" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="pt-1 text-sm font-semibold text-white">Nonaktifkan slideshow?</h3>
+                <p className="mt-0.5 text-xs text-slate-400 leading-relaxed">
+                  Karya <span className="font-medium text-slate-200">"{slideshowUnpublishTarget.title}"</span> sedang aktif di slideshow beranda. Melepas status unggulan otomatis akan menonaktifkan tampilnya di slideshow. Lanjutkan?
+                </p>
+              </div>
+            </div>
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                onClick={() => setSlideshowUnpublishTarget(null)}
+                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300 hover:bg-white/10 cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  doSetFeatured(slideshowUnpublishTarget, null)
+                  setSlideshowUnpublishTarget(null)
+                }}
+                className="flex-1 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-amber-500/25 hover:from-amber-600 hover:to-orange-600 cursor-pointer"
+              >
+                Ya, Lepas
+              </button>
+            </div>
+          </div>
+        </PopupToast>
+      )}
     </div>
   )
 }

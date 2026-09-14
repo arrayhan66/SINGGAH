@@ -1067,6 +1067,121 @@ function premiumMarbleTexture() {
   return toTexture(ctx.canvas, 1, 1)
 }
 
+// Navy-gradient plaque board for the featured "KARYA UNGGULAN" title board.
+// Vertical navy gradient with faint linen speckle + a soft warm glow zone
+// behind the text, so the gold lettering reads "premium" instead of flat.
+let _navyPlaque = null
+
+function navyPlaqueTexture() {
+  if (_navyPlaque) return _navyPlaque
+  const w = 256
+  const h = 96
+  const canvas = document.createElement("canvas")
+  canvas.width = w
+  canvas.height = h
+  const ctx = canvas.getContext("2d")
+
+  const grad = ctx.createLinearGradient(0, 0, 0, h)
+  grad.addColorStop(0, "#23446e")
+  grad.addColorStop(0.5, "#143052")
+  grad.addColorStop(1, "#0a1a30")
+  ctx.fillStyle = grad
+  ctx.fillRect(0, 0, w, h)
+
+  for (let i = 0; i < 1200; i++) {
+    const a = rand(0, 0.05)
+    ctx.fillStyle = `rgba(235,245,255,${a})`
+    ctx.fillRect(rand(0, w), rand(0, h), 2, 2)
+    ctx.fillStyle = `rgba(4,10,24,${rand(0, 0.08)})`
+    ctx.fillRect(rand(0, w), rand(0, h), 2, 2)
+  }
+
+  const glow = ctx.createRadialGradient(w / 2, h / 2, 4, w / 2, h / 2, w / 2.4)
+  glow.addColorStop(0, "rgba(140,180,235,0.18)")
+  glow.addColorStop(1, "rgba(140,180,235,0)")
+  ctx.fillStyle = glow
+  ctx.fillRect(0, 0, w, h)
+
+  const sheen = ctx.createLinearGradient(0, 0, 0, h)
+  sheen.addColorStop(0, "rgba(255,255,255,0.1)")
+  sheen.addColorStop(0.12, "rgba(255,255,255,0)")
+  sheen.addColorStop(1, "rgba(0,0,0,0.35)")
+  ctx.fillStyle = sheen
+  ctx.fillRect(0, 0, w, h)
+
+  _navyPlaque = toTexture(canvas, 1, 1)
+  return _navyPlaque
+}
+
+// Navy-gold info plaque for the featured works (the plakat under each karya).
+// Keeps the exact same board size/position as the previous gold design; only
+// the surface is re-styled: navy gradient base, thin double gold border,
+// corner studs and a soft inner glow.
+let _featuredInfoPlaque = null
+
+function featuredInfoPlaqueTexture() {
+  if (_featuredInfoPlaque) return _featuredInfoPlaque
+  const w = 480
+  const h = 138
+  const canvas = document.createElement("canvas")
+  canvas.width = w
+  canvas.height = h
+  const ctx = canvas.getContext("2d")
+
+  const grad = ctx.createLinearGradient(0, 0, 0, h)
+  grad.addColorStop(0, "#23446e")
+  grad.addColorStop(0.5, "#143052")
+  grad.addColorStop(1, "#0a1a30")
+  ctx.fillStyle = grad
+  ctx.fillRect(0, 0, w, h)
+
+  for (let i = 0; i < 1800; i++) {
+    ctx.fillStyle = `rgba(235,245,255,${rand(0, 0.05)})`
+    ctx.fillRect(rand(0, w), rand(0, h), 2, 2)
+    ctx.fillStyle = `rgba(4,10,24,${rand(0, 0.08)})`
+    ctx.fillRect(rand(0, w), rand(0, h), 2, 2)
+  }
+
+  ctx.strokeStyle = "#c9a35e"
+  ctx.lineWidth = 7
+  ctx.strokeRect(5, 5, w - 10, h - 10)
+  ctx.strokeStyle = "rgba(255,229,179,0.6)"
+  ctx.lineWidth = 2
+  ctx.strokeRect(14, 14, w - 28, h - 28)
+
+  ctx.fillStyle = "#e9c878"
+  const corners = [
+    [8, 8],
+    [w - 8, 8],
+    [8, h - 8],
+    [w - 8, h - 8],
+  ]
+  for (const [cx, cy] of corners) {
+    ctx.beginPath()
+    ctx.arc(cx, cy, 4.5, 0, Math.PI * 2)
+    ctx.fill()
+  }
+
+  const cg = ctx.createRadialGradient(w / 2, h / 2, 2, w / 2, h / 2, w / 3)
+  cg.addColorStop(0, "rgba(140,180,235,0.16)")
+  cg.addColorStop(1, "rgba(140,180,235,0)")
+  ctx.fillStyle = cg
+  ctx.fillRect(0, 0, w, h)
+
+  const sheen = ctx.createLinearGradient(0, 0, 0, h)
+  sheen.addColorStop(0, "rgba(255,255,255,0.09)")
+  sheen.addColorStop(0.18, "rgba(255,255,255,0)")
+  sheen.addColorStop(1, "rgba(0,0,0,0.3)")
+  ctx.fillStyle = sheen
+  ctx.fillRect(0, 0, w, h)
+
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.anisotropy = getAnisotropy()
+  _featuredInfoPlaque = texture
+  return _featuredInfoPlaque
+}
+
 // Video texture for the main-hall TV. Falls back to the static canvas
 // artwork until the video file is actually playing (e.g. missing file).
 // Autoplay must start muted; the sound is switched on at the first user
@@ -1179,4 +1294,6 @@ export const textures = {
   bookPages: bookPagesTexture,
   bookCover: bookCoverTexture,
   premiumMarble: premiumMarbleTexture,
+  navyPlaque: navyPlaqueTexture,
+  featuredInfoPlaque: featuredInfoPlaqueTexture,
 }

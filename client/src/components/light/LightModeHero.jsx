@@ -108,7 +108,7 @@ function LightModeHero() {
             </div>
           </div>
 
-          <div className="mt-8 flex w-full max-w-lg md:max-w-2xl flex-col items-center gap-8 lg:hidden">
+          <div className="mt-5 flex w-full max-w-lg md:max-w-2xl flex-col items-center gap-8 lg:hidden">
             <div className="w-full max-w-sm md:max-w-md">
               <button
                 onClick={() => navigate("/hall")}
@@ -127,7 +127,7 @@ function LightModeHero() {
           </div>
 
           {/* Karya Terbaru Showcase (menggantikan area model 3D di sisi kanan) */}
-          <div className="mt-8 flex w-full lg:w-[40%] xl:w-[43%] items-center justify-center shrink-0 lg:-mt-20">
+          <div className="mt-5 flex w-full lg:w-[40%] xl:w-[43%] items-center justify-center shrink-0 lg:-mt-20">
             <div className="w-full max-w-md md:max-w-xl lg:max-w-full">
               <HeroKaryaShowcase variant="light" />
             </div>

@@ -81,7 +81,7 @@ function Hero() {
           </div>
         </div>
 
-        <div className="mt-8 flex w-full max-w-lg md:max-w-2xl flex-col items-center gap-8 lg:hidden">
+        <div className="mt-5 flex w-full max-w-lg md:max-w-2xl flex-col items-center gap-8 lg:hidden">
           <div className="w-full max-w-sm md:max-w-md">
             <button
               onClick={() => navigate("/hall")}

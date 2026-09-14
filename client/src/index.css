@@ -865,190 +865,257 @@ html.light .emoji-pop-preview-text {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Hero showcase — kartu JAJAR GENJANG (paralelogram, sesuai referensi):
-   - kartu di-skewX(-4deg) senyawa dengan lapisan belakang (.showcase-back-*),
-     ukuran/layout kotak TIDAK berubah (transform tidak memengaruhi flow).
-   - border = strip SATU WARNA solid (cyan terang / biru tua light) lewat
-     teknik "isi solid penuh + konten inset": .showcase-border memenuhi
-     seluruh kartu, konten di inset-[3px] (.showcase-inner), sehingga ring
-     border terlihat merata di keempat sisi.
-   - glow lembut lewat box-shadow. */
+/* ============================================================
+   HERO SHOWCASE — carousel futuristik "floating digital exhibit"
+   - Kartu utama : LANDSCAPE 16:9 bersih (tanpa skew), rounded,
+     border cyan luminous + glow lembut. Fokus paling depan.
+   - 2 frame belakang PARALLELOGRAM (skewX + sudut terpotong lewat
+     clip-path) => panel HUD miring, BUKAN persegi biasa:
+       LAYER 3 (back)  : +18px kanan, +15px bawah
+       LAYER 2 (mid)   : +9px  kanan, +7.5px bawah
+     Keduanya sesumbu, radius/aspect sama dgn kartu utama, jelas
+     terlihat & simetris.
+   - 4 badge hologram mengambang DI LUAR sudut kartu (panel kaca
+     angular + aura neon + ikon bercahaya + label uppercase).
+   - Z-axis: background → frame back → frame mid → main → badge → arrow.
+   ============================================================ */
+/* ============================================================
+   SHOWCASE — THEME TOKENS (CSS custom properties).
+   Dark defaults : :root scope under .hero-karya-showcase.
+   Light values  : html.light .hero-karya-showcase overrides.
+   Media queries : transform/size ONLY — colors never differ
+                   between breakpoints (tokens are identical).
+   ============================================================ */
+.hero-karya-showcase {
+  --kc-card-border: rgba(34, 211, 238, 0.65);
+  --kc-card-bg: #072747;
+  --kc-card-shadow:
+    0 0 0 1px rgba(34, 211, 238, 0.18),
+    0 0 28px -6px rgba(34, 211, 238, 0.45),
+    0 26px 50px -22px rgba(2, 12, 32, 0.8);
+  --kc-rear-border: rgba(56, 189, 248, 0.75);
+  --kc-rear-bg: linear-gradient(160deg, rgba(26, 62, 116, 0.92), rgba(10, 32, 62, 0.95));
+  --kc-rear-after-border: rgba(34, 211, 238, 0.28);
+  --kc-rear-shadow: drop-shadow(0 20px 36px rgba(2, 12, 32, 0.55));
+  --kc-glass-stop1: rgba(255, 255, 255, 0.12);
+  --kc-glass-stop2: rgba(255, 255, 255, 0.05);
+  --kc-glass-stop3: rgba(140, 170, 255, 0.07);
+  --kc-aura: radial-gradient(closest-side, rgba(34, 211, 238, 0.5), transparent 70%);
+  --kc-badge-border: rgba(34, 211, 238, 0.55);
+  --kc-badge-bg: linear-gradient(140deg, rgba(8, 34, 62, 0.85), rgba(5, 20, 40, 0.92));
+  --kc-badge-shadow:
+    drop-shadow(0 8px 16px rgba(2, 12, 32, 0.65))
+    drop-shadow(0 0 12px rgba(34, 211, 238, 0.22));
+  --kc-badge-inner: rgba(255, 255, 255, 0.16);
+  --kc-ico-color: #e0feff;
+  --kc-ico-bg: linear-gradient(135deg, #22d3ee, #2563eb);
+  --kc-ico-shadow: 0 0 14px rgba(34, 211, 238, 0.55);
+  --kc-value-color: #f0fcff;
+  --kc-label-color: #7dd3fc;
+  --kc-accent: linear-gradient(90deg, transparent, #22d3ee);
+}
+html.light .hero-karya-showcase {
+  --kc-card-border: rgba(37, 99, 235, 0.8);
+  --kc-card-bg: #ffffff;
+  --kc-card-shadow:
+    0 0 0 1px rgba(59, 130, 246, 0.3),
+    0 0 22px -6px rgba(59, 130, 246, 0.5),
+    0 22px 46px -18px rgba(37, 99, 235, 0.42);
+  --kc-rear-border: rgba(37, 99, 235, 0.8);
+  --kc-rear-bg: linear-gradient(160deg, rgba(219, 234, 254, 0.96), rgba(191, 219, 254, 0.93));
+  --kc-rear-shadow: drop-shadow(0 18px 34px rgba(37, 99, 235, 0.35));
+  --kc-rear-after-border: rgba(59, 130, 246, 0.5);
+  --kc-aura: radial-gradient(closest-side, rgba(59, 130, 246, 0.5), transparent 70%);
+  --kc-badge-border: rgba(37, 99, 235, 0.55);
+  --kc-badge-bg: linear-gradient(140deg, rgba(255, 255, 255, 0.97), rgba(226, 239, 254, 0.95));
+  --kc-badge-shadow:
+    drop-shadow(0 8px 16px rgba(37, 99, 235, 0.28))
+    drop-shadow(0 0 12px rgba(56, 189, 248, 0.2));
+  --kc-ico-color: #ffffff;
+  --kc-ico-bg: linear-gradient(135deg, #0ea5e9, #2563eb);
+  --kc-ico-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
+  --kc-value-color: #0b2e52;
+  --kc-label-color: #0369a1;
+  --kc-accent: linear-gradient(90deg, transparent, #2563eb);
+}
+
+/* === SHOWCASE CARD — panel kaca utama (skewX: 5deg desktop, 4deg mobile) === */
 .hero-karya-showcase .showcase-card {
   box-sizing: border-box;
-  border-radius: 4px;
-  border: none;
-  transform: skewX(-4deg);
-  box-shadow:
-    0 0 0 1px rgba(56, 189, 248, 0.22),
-    0 0 18px rgba(34, 211, 238, 0.45),
-    0 30px 60px -24px rgba(2, 12, 32, 0.85);
-}
-
-html.light .hero-karya-showcase .showcase-card {
-  box-shadow:
-    0 0 0 1px rgba(37, 99, 235, 0.25),
-    0 0 16px rgba(56, 189, 248, 0.35),
-    0 30px 60px -28px rgba(37, 99, 235, 0.55);
-}
-
-.hero-karya-showcase .showcase-card .showcase-border {
-  border-radius: inherit;
-}
-
-.hero-karya-showcase .showcase-card .showcase-inner {
-  border-radius: 2px;
-}
-
-.hero-karya-showcase .showcase-back-3 {
-  border-radius: 0;
-  transform: translate(-32px, -32px) skewX(-4deg);
-  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.18), 0 0 18px rgba(34, 211, 238, 0.3);
-}
-
-.hero-karya-showcase .showcase-back-2 {
-  border-radius: 0;
-  transform: translate(34px, -24px) skewX(-4deg);
-  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.2), 0 0 18px rgba(34, 211, 238, 0.35);
-}
-
-.hero-karya-showcase .showcase-back-1 {
-  border-radius: 0;
-  transform: translate(14px, 18px) skewX(-4deg);
-  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.25), 0 0 18px rgba(34, 211, 238, 0.4);
-}
-
-html.light .hero-karya-showcase .showcase-back-3 {
-  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.18), 0 0 18px rgba(37, 99, 235, 0.3);
-}
-
-html.light .hero-karya-showcase .showcase-back-2 {
-  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2), 0 0 18px rgba(37, 99, 235, 0.35);
-}
-
-html.light .hero-karya-showcase .showcase-back-1 {
-  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25), 0 0 18px rgba(37, 99, 235, 0.4);
-}
-
-/* Garis rule Kategori — kilau berjalan melintasi garis. */
-.hero-karya-showcase .cat-rule-shine {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.65) 50%,
-    transparent 100%
-  );
-  opacity: 0.7;
-  animation: cat-shine 3s ease-in-out infinite;
-}
-
-@keyframes cat-shine {
-  0% {
-    transform: translateX(-75%);
-  }
-  55%,
-  100% {
-    transform: translateX(75%);
-  }
+  border-radius: 16px;
+  border: 1.5px solid var(--kc-card-border);
+  background-color: var(--kc-card-bg);
+  transform: skewX(5deg);
+  box-shadow: var(--kc-card-shadow);
 }
 
 @media (max-width: 1023px) {
-  .hero-karya-showcase .showcase-back-3 {
-    transform: translate(-24px, -24px) skewX(-3deg);
-  }
+  .hero-karya-showcase .showcase-card { transform: skewX(4deg); }
+}
+@media (max-width: 640px) {
+  .hero-karya-showcase .showcase-card { transform: skewX(4deg); }
+}
 
-  .hero-karya-showcase .showcase-back-2 {
-    transform: translate(26px, -18px) skewX(-3deg);
-  }
+/* === REFLEKSI KACA kilau diagonal tipis di seluruh isi slide (gelap solid; light mode tampak tipis — tidak diubah) === */
+.hero-karya-showcase .showcase-glass {
+  background: linear-gradient(
+    115deg,
+    var(--kc-glass-stop1) 0%,
+    var(--kc-glass-stop2) 10%,
+    transparent 30%,
+    transparent 68%,
+    var(--kc-glass-stop3) 100%
+  );
+  mix-blend-mode: screen;
+}
 
-  .hero-karya-showcase .showcase-back-1 {
-    transform: translate(10px, 14px) skewX(-3deg);
-  }
+/* === FRAME BELAKANG PARALLELOGRAM — sudut terpotong + skew (panel HUD) === */
+.hero-karya-showcase .showcase-rear {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--kc-rear-border);
+  background: var(--kc-rear-bg);
+  transform: skewX(5deg);
+  clip-path: polygon(
+    0 28px,
+    14px 0,
+    calc(100% - 14px) 0,
+    100% 28px,
+    100% calc(100% - 28px),
+    calc(100% - 14px) 100%,
+    14px 100%,
+    0 calc(100% - 28px)
+  );
+  filter: var(--kc-rear-shadow);
+}
+
+.hero-karya-showcase .showcase-rear::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 1px solid var(--kc-rear-after-border);
+  clip-path: polygon(
+    0 20px,
+    10px 0,
+    calc(100% - 10px) 0,
+    100% 20px,
+    100% calc(100% - 20px),
+    calc(100% - 10px) 100%,
+    10px 100%,
+    0 calc(100% - 20px)
+  );
+}
+
+.hero-karya-showcase .showcase-rear-back { transform: translate(18px, 15px) skewX(5deg); }
+.hero-karya-showcase .showcase-rear-mid   { transform: translate(9px, 7.5px) skewX(5deg); }
+
+@media (max-width: 1023px) {
+  .hero-karya-showcase .showcase-rear-back { transform: translate(13px, 11px) skewX(4deg); }
+  .hero-karya-showcase .showcase-rear-mid   { transform: translate(6.5px, 5.5px) skewX(4deg); }
+}
+@media (max-width: 640px) {
+  .hero-karya-showcase .showcase-rear-back { transform: translate(9px, 8px) skewX(4deg); }
+  .hero-karya-showcase .showcase-rear-mid   { transform: translate(4.5px, 4px) skewX(4deg); }
+}
+
+/* === BADGE HOLOGRAM (floating HUD chip) — tema sama (light/dark), hanya token berubah === */
+.hero-karya-showcase .badge-aura {
+  position: absolute; inset: -7px; z-index: -1; border-radius: 50%;
+  background: var(--kc-aura);
+  filter: blur(6px);
+  animation: karta-badge-aura 3.6s ease-in-out infinite;
+}
+
+.hero-karya-showcase .badge-shell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.45rem 1.1rem 0.45rem 0.45rem;
+  border: 1px solid var(--kc-badge-border);
+  background: var(--kc-badge-bg);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  filter: var(--kc-badge-shadow);
+}
+
+/* Inner highlight halus di tepi atas panel (gelap). */
+.hero-karya-showcase .badge-shell::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  pointer-events: none;
+  background: linear-gradient(135deg, var(--kc-badge-inner), transparent 45%);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+
+/* Ikon bercahaya — kotak angular kecil dengan gradien neon. */
+.hero-karya-showcase .badge-ico {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  color: var(--kc-ico-color);
+  background: var(--kc-ico-bg);
+  clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 7px 100%, 0 calc(100% - 7px));
+  box-shadow: var(--kc-ico-shadow);
+}
+
+/* Teks: nilai tebal + descriptor uppercase kecil. */
+.hero-karya-showcase .badge-txt {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.15;
+  min-width: 0;
+}
+
+.hero-karya-showcase .badge-value {
+  display: block;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--kc-value-color);
+}
+
+.hero-karya-showcase .badge-label {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--kc-label-color);
+}
+
+/* Aksen garis cyan di sisi kanan panel — dekorasi HUD. */
+.hero-karya-showcase .badge-accent {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  width: 18px;
+  height: 2px;
+  background: var(--kc-accent);
+  opacity: 0.85;
+  animation: karta-badge-aura 3.6s ease-in-out infinite reverse;
 }
 
 @media (max-width: 640px) {
-  .hero-karya-showcase .showcase-back-3 {
-    transform: translate(-14px, -14px) skewX(-3deg);
-  }
-
-  .hero-karya-showcase .showcase-back-2 {
-    transform: translate(16px, -10px) skewX(-3deg);
-  }
-
-  .hero-karya-showcase .showcase-back-1 {
-    transform: translate(6px, 8px) skewX(-3deg);
-  }
+  .hero-karya-showcase .badge-shell { gap: 0.5rem; padding: 0.32rem 0.85rem 0.32rem 0.32rem; }
+  .hero-karya-showcase .badge-ico   { width: 22px; height: 22px; }
+  .hero-karya-showcase .badge-value { max-width: 115px; font-size: 11px; }
+  .hero-karya-showcase .badge-label { font-size: 8px; }
 }
 
-/* Badge konektor & pill: ukuran + jarak menyesuaikan lebar layar sehingga
-   tidak pernah keluar viewport (pill menaiki tepi kartu di layar sedang,
-   mengambang penuh hanya bila tersedia ruang). */
-.hero-karya-showcase .showcase-connector {
-  transform: scale(0.6);
-}
 
-.hero-karya-showcase .showcase-badge-left {
-  transform: translateX(-18%) scale(0.72);
-}
-
-.hero-karya-showcase .showcase-badge-right {
-  transform: translateX(18%) scale(0.72);
-}
-
-@media (min-width: 1024px) {
-  .hero-karya-showcase .showcase-connector {
-    transform: scale(0.78);
-  }
-
-  .hero-karya-showcase .showcase-badge-left {
-    transform: translateX(-24%) scale(0.82);
-  }
-
-  .hero-karya-showcase .showcase-badge-right {
-    transform: translateX(24%) scale(0.82);
-  }
-}
-
-@media (min-width: 1280px) {
-  .hero-karya-showcase .showcase-connector {
-    transform: scale(0.88);
-  }
-
-  .hero-karya-showcase .showcase-badge-left {
-    transform: translateX(-30%) scale(0.78);
-  }
-
-  .hero-karya-showcase .showcase-badge-right {
-    transform: translateX(30%) scale(0.78);
-  }
-}
-
-@media (min-width: 1580px) {
-  .hero-karya-showcase .showcase-connector {
-    transform: scale(0.96);
-  }
-
-  .hero-karya-showcase .showcase-badge-left {
-    transform: translateX(-46%) scale(0.95);
-  }
-
-  .hero-karya-showcase .showcase-badge-right {
-    transform: translateX(46%) scale(0.95);
-  }
-}
-
-@media (min-width: 2100px) {
-  .hero-karya-showcase .showcase-connector {
-    transform: scale(1);
-  }
-
-  .hero-karya-showcase .showcase-badge-left {
-    transform: translateX(-100%) scale(1);
-  }
-
-  .hero-karya-showcase .showcase-badge-right {
-    transform: translateX(100%) scale(1);
-  }
-}
 /* Hero showcase — animasi pergantian slide & layer belakang.
    Slide masuk dari kanan (maju) atau kiri (mundur/wrap balik), memberat
    dan sedikit zoom — selaras dengan gerakan lapisan belakang (back-sway)
@@ -1096,16 +1163,160 @@ html.light .hero-karya-showcase .showcase-back-1 {
   animation: karta-back-sway 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Floating badge & blob glow — dekorasi sekitar kartu showcase.
-   Badge bobbing naik-turun halus dengan delay berbeda per elemen;
-   blob menarik-mengembang pelan sebagai ambient glow di belakang. */
+/* Blob glow — dekorasi ambient di belakang kartu showcase.
+   Blob menarik-mengembang pelan sebagai ambient glow. Pill metadata di
+   dalam kartu juga menimbang naik-turun halus (karta-float). */
 @keyframes karta-float {
   0%,
   100% {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-8px);
+  }
+}
+
+@utility animate-karta-float {
+  animation: karta-float 3.4s ease-in-out infinite;
+}
+
+/* Badge hologram — animasi melayang NAIT-TURUN terus-menerus, cukup terlihat
+   (6-9px) dengan fasa & timing berbeda per badge (parallax berirama). Inspired:
+   chip berkelip pelan seperti panel HUD yang disuspensi. */
+/* Badge hologram — animasi melayang lebih HIDUP: naik-turun (6-10px) yang
+   tidak kaku, plus miring halus (rotate ±1.8°) & "bernafas" (scale) sehingga
+   terasa seperti panel HUD tersuspensi / mengambang, bukan sekadar bolak-balik
+   vertikal. Fasa & timing berbeda per badge (parallax berirama). */
+@keyframes karta-badge-a {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(-1deg) scale(1);
+  }
+  25% {
+    transform: translate(1px, -4px) rotate(-1.8deg) scale(1.02);
+  }
+  50% {
+    transform: translate(0, -9px) rotate(0.6deg) scale(1.045);
+  }
+  75% {
+    transform: translate(-1px, -3px) rotate(1.6deg) scale(1.02);
+  }
+}
+
+@keyframes karta-badge-b {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(1deg) scale(1);
+  }
+  25% {
+    transform: translate(2px, -3px) rotate(1.9deg) scale(1.02);
+  }
+  50% {
+    transform: translate(3px, -8px) rotate(-0.7deg) scale(1.05);
+  }
+  75% {
+    transform: translate(1px, -2px) rotate(-1.8deg) scale(1.02);
+  }
+}
+
+@keyframes karta-badge-c {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate(1px, -7px) rotate(1.2deg) scale(1.04);
+  }
+}
+
+@keyframes karta-badge-d {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(-1deg) scale(1);
+  }
+  25% {
+    transform: translate(-2px, 3px) rotate(-1.9deg) scale(1.02);
+  }
+  50% {
+    transform: translate(-3px, -9px) rotate(0.7deg) scale(1.05);
+  }
+  75% {
+    transform: translate(-1px, -2px) rotate(1.8deg) scale(1.02);
+  }
+}
+
+@keyframes karta-badge-aura {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Kelas CSS PLAIN (bukan @utility) — selalu dihasilkan tanpa bergantung
+   deteksi nama class Tailwind, jadi animasi badge dijamin jalan. Wrapper
+   perlu position relative sebagai acuan aura di belakang panel. */
+.karta-float {
+  position: relative;
+}
+
+.karta-float-a {
+  animation: karta-badge-a 3.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+.karta-float-b {
+  animation: karta-badge-b 2.9s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+.karta-float-c {
+  animation: karta-badge-c 3.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+.karta-float-d {
+  animation: karta-badge-d 3.9s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+/* POSISI BADGE — disematkan DI DALAM kartu di semua breakpoint dan SEGARIS
+   dengan sudut-inner jajar genjang. Kartu di-skew (5° desktop / 4° ≤1023px)
+   sehingga sudut visualnya bergeser horizontal ±(H/2)·tan(θ) ≈ ±2.5% lebar
+   kartu. Offset % negatif di calc() mengimbangi pergeseran itu, lalu
+   ditambah margin tetap — hasilnya jarak ke tepi miring & tepi lurus terasa
+   konsisten di semua ukuran, tidak "asad saja". */
+.hero-karya-showcase .karta-bpos {
+  position: absolute;
+}
+
+.hero-karya-showcase .karta-bpos-tl {
+  left: calc(-2.5% + 8px);
+  top: 14px;
+}
+
+.hero-karya-showcase .karta-bpos-tr {
+  right: calc(-2.5% + 18px);
+  top: 14px;
+}
+
+.hero-karya-showcase .karta-bpos-br {
+  right: calc(-2.5% + 8px);
+  bottom: 16px;
+}
+
+@media (max-width: 640px) {
+  .hero-karya-showcase .karta-bpos-tl {
+    left: calc(-2% + 4px);
+    top: 10px;
+  }
+
+  .hero-karya-showcase .karta-bpos-tr {
+    right: calc(-2% + 14px);
+    top: 10px;
+  }
+
+  .hero-karya-showcase .karta-bpos-br {
+    right: calc(-2% + 5px);
+    bottom: 12px;
   }
 }
 
@@ -1121,30 +1332,10 @@ html.light .hero-karya-showcase .showcase-back-1 {
   }
 }
 
-@utility animate-karta-float {
-  animation: karta-float 3.4s ease-in-out infinite;
-}
-
 @utility animate-karta-pulse {
   animation: karta-pulse 7s ease-in-out infinite;
 }
 
 @utility animate-karta-pulse-slow {
   animation: karta-pulse 9s ease-in-out infinite;
-}
-
-/* Garis konektor dotted dari floating badge ke tepi kartu utama.
-   Satu-shot draw-in (bukan infinite): strokeLength dinormalisasi
-   pakai SVG pathLength="1", dashoffset ditarik dari 1 ke 0. */
-@keyframes karta-draw {
-  from {
-    stroke-dashoffset: 1;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@utility animate-karta-draw {
-  animation: karta-draw 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }

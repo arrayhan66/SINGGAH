@@ -1,0 +1,122 @@
+{
+  "aku": {
+    "judul": "Aku",
+    "penulis": "(isi manual)",
+    "sinopsis": "Novel biografi Chairil Anwar karya Sjuman Djaya yang mengisahkan perjalanan hidup sang penyair ternama Indonesia."
+  },
+  "ATMOICHABITS": {
+    "judul": "Atomic Habits",
+    "penulis": "James Clear",
+    "sinopsis": "Perubahan kecil yang memberikan hasil luar biasa. Cara mudah dan terbukti untuk membentuk kebiasaan baik dan menghilangkan kebiasaan buruk."
+  },
+  "buku pemrograman c++": {
+    "judul": "Pemrograman C++",
+    "penulis": "(isi manual)",
+    "sinopsis": "Panduan lengkap mempelajari bahasa pemrograman C++ dari konsep dasar hingga pemrograman berorientasi objek."
+  },
+  "bukupython": {
+    "judul": "Python untuk Pemula",
+    "penulis": "(isi manual)",
+    "sinopsis": "Panduan praktis belajar bahasa pemrograman Python dari dasar hingga tingkat lanjut untuk pemula."
+  },
+  "Christopher-Paolini-Eragon": {
+    "judul": "Eragon",
+    "penulis": "Christopher Paolini",
+    "sinopsis": "Kisah petualangan epik Eragon dan naga setianya, Saphira, dalam menyelamatkan dunia Alagaësia dari tirani Raja Galbatorix."
+  },
+  "cover-novel-bintang-karya-tere-liye": {
+    "judul": "Bintang",
+    "penulis": "Tere Liye",
+    "sinopsis": "Petualangan seru tiga sahabat menjelajahi dunia paralel penuh misteri dan keajaiban bersama Klan Bulan dan Matahari."
+  },
+  "dasar-dasarpemrograman": {
+    "judul": "Dasar Dasar Pemrograman",
+    "penulis": "(isi manual)",
+    "sinopsis": "Konsep fundamental ilmu komputer dan algoritma pemrograman untuk membangun fondasi logika coding yang kuat."
+  },
+  "demoninthewood": {
+    "judul": "Demon in the Wood",
+    "penulis": "Leigh Bardugo",
+    "sinopsis": "Kisah masa lalu kelam Darkling sebelum menjadi penjahat legendaris di Grishaverse."
+  },
+  "einsteinwalterisaacson": {
+    "judul": "Einstein: His Life and Universe",
+    "penulis": "Walter Isaacson",
+    "sinopsis": "Biografi mendalam tentang kehidupan, pemikiran revolusioner, dan sisi humanis dari fisikawan jenius Albert Einstein."
+  },
+  "filosofi teras": {
+    "judul": "Filosofi Teras",
+    "penulis": "Henry Manampiring",
+    "sinopsis": "Filsafat Yunani-Romawi kuno Stoicism untuk mental tangguh menghadapi hiruk-pikuk dunia modern."
+  },
+  "gadisjalanan": {
+    "judul": "Gadis Jalanan",
+    "penulis": "(isi manual)",
+    "sinopsis": "Kisah dramatis mengenai perjuangan hidup di jalanan kota besar penuh tantangan dan pelajaran moral."
+  },
+  "gahzi": {
+    "judul": "Gahzi",
+    "penulis": "(isi manual)",
+    "sinopsis": "Novel inspiratif penuh makna mengenai keteguhan prinsip dan pencarian jati diri."
+  },
+  "gustirabykatakokoh": {
+    "judul": "Gusti Raby Kata Kokoh",
+    "penulis": "(isi manual)",
+    "sinopsis": "Refleksi spiritual dan filosofis kehidupan yang mendalam tentang kebijaksanaan lokal."
+  },
+  "kisah tanah jawa": {
+    "judul": "Kisah Tanah Jawa",
+    "penulis": "Tim Kisah Tanah Jawa",
+    "sinopsis": "Penelusuran misteri, sejarah mistis, dan cerita angker di berbagai sudut pulau Jawa berdasarkan investigasi mendalam."
+  },
+  "knhilafah": {
+    "judul": "Khilafah",
+    "penulis": "(isi manual)",
+    "sinopsis": "Kajian historis dan pemikiran seputar sistem tata kelola pemerintahan dalam sejarah peradaban."
+  },
+  "laskar-pelangi": {
+    "judul": "Laskar Pelangi",
+    "penulis": "Andrea Hirata",
+    "sinopsis": "Kisah inspiratif sekelompok anak Belitung yang berjuang menempuh pendidikan di tengah keterbatasan."
+  },
+  "makanyamikir": {
+    "judul": "Makan Ya Mikir",
+    "penulis": "(isi manual)",
+    "sinopsis": "Esai ringan namun tajam mengenai pentingnya berpikir kritis dan logis dalam menyikapi fenomena sehari-hari."
+  },
+  "mohammadattauntuknegeriku": {
+    "judul": "Mohammad Hatta Untuk Negeriku",
+    "penulis": "(isi manual)",
+    "sinopsis": "Biografi pemikiran ekonomi dan perjuangan politik Bung Hatta demi kemerdekaan dan kedaulatan bangsa Indonesia."
+  },
+  "pemrograman berbasis kecerdansan buatan": {
+    "judul": "Pemrograman Berbasis Kecerdasan Buatan",
+    "penulis": "(isi manual)",
+    "sinopsis": "Pengantar penerapan algoritma Artificial Intelligence dan Machine Learning dalam pengembangan aplikasi modern."
+  },
+  "saat ananda bertanya islam": {
+    "judul": "Saat Ananda Bertanya Islam",
+    "penulis": "(isi manual)",
+    "sinopsis": "Panduan orang tua dalam menjawab pertanyaan mendasar anak-anak seputar akidah, ibadah, dan nilai keislaman."
+  },
+  "samuel": {
+    "judul": "Samuel",
+    "penulis": "(isi manual)",
+    "sinopsis": "Kisah fiksi menarik tentang dinamika persahabatan, cinta, dan pencarian tujuan hidup."
+  },
+  "sherlock holmes": {
+    "judul": "Sherlock Holmes",
+    "penulis": "Sir Arthur Conan Doyle",
+    "sinopsis": "Kumpulan misteri detektif paling brilian di dunia dengan metode deduksi logis bersama Dr. John Watson."
+  },
+  "stephenking": {
+    "judul": "Stephen King",
+    "penulis": "Stephen King",
+    "sinopsis": "Kumpulan karya horor dan thriller psikologis karya master cerita menegangkan dunia."
+  },
+  "udahputusin aja": {
+    "judul": "Udah Putusin Aja!",
+    "penulis": "Felix Y. Siauw",
+    "sinopsis": "Motivasi Islami mengenai pentingnya menjaga kehormatan diri dan memilih jalan hubungan yang diridhoi."
+  }
+}

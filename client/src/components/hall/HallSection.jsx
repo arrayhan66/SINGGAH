@@ -1,3 +1,5 @@
+import { useEffect } from "react"
+import { useTexture } from "@react-three/drei"
 import useHall from "../../hooks/useHall"
 import { useWalkStore } from "../../three/hooks/useWalk"
 import HallCanvas from "./HallCanvas"
@@ -6,6 +8,10 @@ import HallHUDFooter from "./HallHUDFooter"
 import LoadingOverlay from "./LoadingOverlay"
 import PortalTransitionOverlay from "./PortalTransitionOverlay"
 import ProjectDetailModal from "./ProjectDetailModal"
+import PlantInfoModal from "./PlantInfoModal"
+import { preloadTexture } from "../../three/utils/useDownscaledTexture"
+import logo from "../../assets/icons/logo.webp"
+import exitImg from "../../assets/images/exit.jpg"
 
 export default function HallSection() {
   const {
@@ -20,6 +26,14 @@ export default function HallSection() {
     closeProject,
   } = useHall()
   const isSitting = useWalkStore((s) => s.isSitting)
+
+  // Warm the portal logo + exit textures before/while the canvas mounts so the
+  // blue portal is fully drawn (frame, rift, logo, caption) the moment the
+  // loading overlay lifts on mobile — no "kosongan" portal.
+  useEffect(() => {
+    preloadTexture(logo, 256)
+    useTexture.preload(exitImg)
+  }, [])
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-night text-white select-none">
@@ -58,6 +72,8 @@ export default function HallSection() {
           onClose={closeProject}
         />
       )}
+
+      <PlantInfoModal />
     </div>
   )
 }

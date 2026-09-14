@@ -6,7 +6,7 @@ import { useProjects } from "../../../../context/ProjectContext"
 import { AdminProjectsSkeleton } from "../../../ui/PageSkeletons"
 import api from "../../../../services/api"
 
-const VALID_STATUSES = ["all", "pending", "published", "rejected"]
+const VALID_STATUSES = ["all", "pending", "published", "rejected", "slideshow"]
 
 export default function ManageProjectsSection() {
   const { projects, loading } = useProjects()
@@ -78,7 +78,8 @@ export default function ManageProjectsSection() {
     const pending = projects.filter((p) => p.status === "pending").length
     const published = projects.filter((p) => p.status === "published").length
     const rejected = projects.filter((p) => p.status === "rejected").length
-    return { total, pending, published, rejected }
+    const slideshow = projects.filter((p) => p.is_shown_in_slideshow).length
+    return { total, pending, published, rejected, slideshow }
   }, [projects])
 
   return (

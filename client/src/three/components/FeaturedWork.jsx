@@ -8,10 +8,10 @@ import { textures } from "../utils/textures"
 
 const GOLD = "#c9a35e"
 const GOLD_DEEP = "#8a6a2f"
+const GOLD_LIGHT = "#e9c878"
 const MARBLE = "#f4f7fb"
-const NAVY = "#0f2036"
 const NAVY_DARK = "#0a1526"
-const VELVET = "#7f1d1d"
+const NAVY_ROPE = "#1d2c49"
 const CYAN = "#38bdf8"
 
 // Full-size frames centered on the podium top. Raised so each frame's info
@@ -19,6 +19,13 @@ const CYAN = "#38bdf8"
 // frame width (canvas + 0.34m gold rim); FRAME_GAP keeps the two works apart
 // so their frames never touch each other.
 const BOTTOM_Y = 3.35
+// Overall booth scale. The booth is built with its origin on the floor
+// (position arrives at Y = 0 ground or FLOOR2_Y mezzanine), so scaling the
+// whole group keeps the plinth planted while every element shrinks toward the
+// floor — proportions and layout stay identical. 0.9 pulls the pediment apex
+// (6.71 → 6.04) below the ground-storey slab (6.68) and below the tight upper
+// storey, restoring comfortable ceiling clearance (~0.6 m) in both tiers.
+const BOOTH_SCALE = 0.87
 const HALF_FRAME = (PAINTING_SIZE.w + 0.34) / 2
 const FRAME_GAP = 0.45
 const PLAQUE_FONT = 0.3
@@ -72,10 +79,15 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
   const tier = useQualityStore((s) => s.tier)
   const group = useRef()
   const spot = useRef()
+  const warmSpot = useRef()
+  const plaqueSpot = useRef()
+  const warmWorkTarget = useMemo(() => new THREE.Object3D(), [])
+  const plaqueLightTarget = useMemo(() => new THREE.Object3D(), [])
   const list = (projects || []).slice(0, 2)
   const slots = list.length === 2 ? [-(HALF_FRAME + FRAME_GAP), HALF_FRAME + FRAME_GAP] : [0]
 
   const marbleMap = useMemo(() => textures.premiumMarble(), [])
+  const plaqueMap = useMemo(() => textures.navyPlaque(), [])
   const pediment = useMemo(() => pedimentShape(), [])
 
   const [plaqueW, setPlaqueW] = useState(3.6)
@@ -96,10 +108,20 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
       spot.current.target = group.current
       spot.current.target.updateMatrixWorld()
     }
-  }, [tier])
+    if (warmSpot.current) warmSpot.current.target = warmWorkTarget
+    if (plaqueSpot.current) plaqueSpot.current.target = plaqueLightTarget
+  }, [tier, warmWorkTarget, plaqueLightTarget])
+
+  // Decorative gold filigree flanking the title, fitted to the measured
+  // plaque width so the lines always hug the text edges (kept within the
+  // board so the plaque's outer size/position never changes).
+  const textHalf = (plaqueW - PLAQUE_PAD_X * 2) / 2
+  const lineStart = textHalf + 0.14
+  const lineEnd = plaqueW / 2 - 0.1
+  const lineLen = Math.max(0.02, lineEnd - lineStart)
 
   return (
-    <group ref={group} position={position} rotation={[0, rotationY, 0]}>
+    <group ref={group} position={position} rotation={[0, rotationY, 0]} scale={BOOTH_SCALE}>
       {/* ==== Podium: stepped marble base + gold trim + polished top ==== */}
       <mesh position={[0, 0.11, 0]} castShadow>
         <boxGeometry args={[7.0, 0.22, 1.4]} />
@@ -188,6 +210,29 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
         <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.2} />
       </mesh>
 
+      {/* Decorative gilded rosettes flanking the pediment base */}
+      {[-1, 1].map((s) => (
+        <mesh key={s} position={[s * 1.85, 5.62, -0.05]} rotation={[0, 0, Math.PI / 4]}>
+          <boxGeometry args={[0.16, 0.16, 0.05]} />
+          <meshStandardMaterial color={GOLD_LIGHT} metalness={0.85} roughness={0.25} />
+        </mesh>
+      ))}
+      {/* Central pediment medallion (monogram-style rosette) */}
+      <group position={[0, 6.08, -0.06]}>
+        <mesh rotation={[0, 0, 0]}>
+          <torusGeometry args={[0.15, 0.024, 9, 26]} />
+          <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.2} />
+        </mesh>
+        <mesh position={[0, 0, 0.012]}>
+          <sphereGeometry args={[0.06, 14, 14]} />
+          <meshStandardMaterial color={GOLD_LIGHT} metalness={0.9} roughness={0.2} />
+        </mesh>
+        <mesh position={[0, 0, 0.03]}>
+          <sphereGeometry args={[0.02, 10, 10]} />
+          <meshStandardMaterial color="#fff7e0" emissive="#ffe3a6" emissiveIntensity={1.6} />
+        </mesh>
+      </group>
+
       {/* ==== Info plaque on the podium face ==== */}
       <group position={[0, 0.82, 0.55]}>
         {/* Gold outer frame */}
@@ -201,10 +246,10 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
             emissiveIntensity={0.35}
           />
         </mesh>
-        {/* Navy board */}
+        {/* Navy board — gradient plaque texture for a premium feel */}
         <mesh position={[0, 0, 0.02]}>
           <boxGeometry args={[plaqueW, plaqueH, 0.03]} />
-          <meshStandardMaterial color={NAVY} roughness={0.5} metalness={0.3} />
+          <meshStandardMaterial map={plaqueMap} color="#ffffff" roughness={0.45} metalness={0.25} />
         </mesh>
         {/* Inner bevel */}
         <mesh position={[0, 0, 0.03]}>
@@ -223,13 +268,56 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
             <meshStandardMaterial color={GOLD} metalness={0.85} roughness={0.25} />
           </mesh>
         ))}
-        {/* Title */}
+
+        {/* Thin decorative gold filigree lines flanking the title */}
+        {lineLen > 0.02 &&
+          [-1, 1].map((s) => {
+            const cx = s * (lineStart + lineLen / 2)
+            return (
+              <group key={s}>
+                <mesh position={[cx, 0, 0.058]}>
+                  <boxGeometry args={[lineLen, 0.018, 0.008]} />
+                  <meshStandardMaterial
+                    color={GOLD_LIGHT}
+                    emissive={GOLD}
+                    emissiveIntensity={0.4}
+                    metalness={0.85}
+                    roughness={0.25}
+                  />
+                </mesh>
+                <mesh position={[s * (plaqueW / 2 - 0.07), 0, 0.058]} rotation={[0, 0, Math.PI / 4]}>
+                  <boxGeometry args={[0.045, 0.045, 0.008]} />
+                  <meshStandardMaterial color={GOLD_LIGHT} metalness={0.85} roughness={0.25} />
+                </mesh>
+              </group>
+            )
+          })}
+
+        {/* Drop shadow under the title (emboss feel) */}
+        <Text
+          position={[0, -0.013, 0.056]}
+          fontSize={PLAQUE_FONT}
+          letterSpacing={0.05}
+          color="#241a06"
+          anchorX="center"
+          anchorY="middle"
+          fillOpacity={0.9}
+          raycast={() => null}
+          font="/fonts/Poppins-SemiBold.ttf"
+        >
+          KARYA UNGGULAN
+        </Text>
+        {/* Title with soft gold glow outline */}
         <Text
           onSync={handlePlaqueSync}
-          position={[0, 0, 0.055]}
+          position={[0, 0, 0.058]}
           fontSize={PLAQUE_FONT}
-          letterSpacing={0.04}
-          color={GOLD}
+          letterSpacing={0.05}
+          color={GOLD_LIGHT}
+          outlineWidth={0.007}
+          outlineColor="#ffeebb"
+          outlineBlur={0.014}
+          outlineOpacity={0.9}
           anchorX="center"
           anchorY="middle"
           raycast={() => null}
@@ -251,11 +339,23 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
       <Stanchion x={2.75} z={1.45} />
       <mesh position={[0, 0.72, 1.45]} rotation={[0, 0, Math.PI / 2]} castShadow>
         <cylinderGeometry args={[0.042, 0.042, 5.35, 12]} />
-        <meshStandardMaterial color={VELVET} roughness={0.75} />
+        <meshStandardMaterial color={NAVY_ROPE} roughness={0.5} metalness={0.2} />
       </mesh>
       <mesh position={[0, 0.7, 1.46]}>
         <boxGeometry args={[5.4, 0.06, 0.05]} />
         <meshStandardMaterial color={GOLD} metalness={0.85} roughness={0.25} />
+      </mesh>
+      {/* Gold rings framing the rope at both stanchions + a small hanging
+          "KARYA UNGGULAN" medallion at the centre of the rope */}
+      {[-1, 1].map((s) => (
+        <mesh key={s} position={[s * 2.6, 0.72, 1.45]}>
+          <torusGeometry args={[0.045, 0.012, 8, 18]} />
+          <meshStandardMaterial color={GOLD_LIGHT} metalness={0.9} roughness={0.2} />
+        </mesh>
+      ))}
+      <mesh position={[0, 0.52, 1.45]}>
+        <cylinderGeometry args={[0.05, 0.05, 0.012, 14]} />
+        <meshStandardMaterial color={GOLD_LIGHT} metalness={0.9} roughness={0.2} />
       </mesh>
 
       {/* ==== Floor label in front ==== */}
@@ -275,15 +375,41 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
 
       {/* ==== Spotlight: only on high quality to keep the light count low ==== */}
       {tier === "tinggi" && (
-        <spotLight
-          ref={spot}
-          position={[0, 6.5, 0]}
-          angle={0.65}
-          penumbra={0.6}
-          intensity={340}
-          distance={16}
-          color="#e6f4ff"
-        />
+        <>
+          {/* Cyan accent spotlight (kept as existing aksen) */}
+          <spotLight
+            ref={spot}
+            position={[0, 6.5, 0]}
+            angle={0.65}
+            penumbra={0.6}
+            intensity={340}
+            distance={16}
+            color="#e6f4ff"
+          />
+          {/* Warm gold key light aimed at the works/screens */}
+          <spotLight
+            ref={warmSpot}
+            position={[2.6, 7.8, 1.9]}
+            angle={0.5}
+            penumbra={0.55}
+            intensity={300}
+            distance={22}
+            color="#ffdba3"
+          />
+          {/* Warm gold accent aimed at the "KARYA UNGGULAN" plaque */}
+          <spotLight
+            ref={plaqueSpot}
+            position={[-2.6, 4.6, 2.3]}
+            angle={0.42}
+            penumbra={0.45}
+            intensity={170}
+            distance={15}
+            color="#ffe3ae"
+          />
+          {/* Target anchors for the warm spotlights (must stay in the scene) */}
+          <primitive object={warmWorkTarget} position={[0, 3.3, -0.5]} />
+          <primitive object={plaqueLightTarget} position={[0, 0.85, 0.75]} />
+        </>
       )}
     </group>
   )

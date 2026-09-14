@@ -102,6 +102,16 @@ export function ProjectProvider({ children }) {
     }
   }, [fetchProjects])
 
+  const setSlideshowVisible = useCallback(async (id, visible) => {
+    try {
+      await api.patch(`/projects/${id}/slideshow`, { visible })
+      await fetchProjects()
+    } catch (err) {
+      console.error("Failed to set slideshow visibility:", err)
+      throw err
+    }
+  }, [fetchProjects])
+
   const getProjectById = useCallback((id) => {
     return projects.find((p) => String(p.id) === String(id))
   }, [projects])
@@ -119,6 +129,7 @@ export function ProjectProvider({ children }) {
     approveProject,
     rejectProject,
     setFeaturedSlot,
+    setSlideshowVisible,
     getProjectById,
     getProjectBySlug,
   }

@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import * as THREE from "three"
-import { MUSEUM } from "../rooms/museumLayout"
+import { MUSEUM, resolveHeight } from "../rooms/museumLayout"
 
 const EYE_HEIGHT = 1.7
 
@@ -21,6 +21,10 @@ export const useWalkStore = create((set, get) => ({
   level: 0,
   locked: false,
   isSitting: false,
+  // Titik lantai yang sedang di-hover kursor (ring kursor). Null saat tidak
+  // menunjuk area jalan.
+  pointerPosition: null,
+  hoverFloor: false,
 
   setLocked(value) {
     set({ locked: Boolean(value) })
@@ -28,6 +32,14 @@ export const useWalkStore = create((set, get) => ({
 
   setSitting(value) {
     set({ isSitting: Boolean(value) })
+  },
+
+  setPointerPosition(point) {
+    set({ pointerPosition: point ? point.clone() : null })
+  },
+
+  setHoverFloor(value) {
+    set({ hoverFloor: Boolean(value) })
   },
 
   look(dx, dy, sensitivity = 0.0035) {
@@ -38,7 +50,13 @@ export const useWalkStore = create((set, get) => ({
   },
 
   setTarget(point) {
-    set({ target: point.clone().setY(get().position.y) })
+    // Target duduk di ketinggian lantai yang benar di titik itu (bukan ikut
+    // tinggi pemain), jadi garis & marker klik selalu menempel di lantai tujuan
+    // meski pemain sedang di lantai lain / di tengah tangga.
+    const p = point.clone()
+    const rh = resolveHeight(p.x, p.z, get().level)
+    p.setY(rh.height)
+    set({ target: p })
   },
 
   setArrive(fn) {
@@ -53,18 +71,20 @@ export const useWalkStore = create((set, get) => ({
     set({ pendingClick: point ? point.clone() : null })
   },
 
-  reset(position = [0, 0, 20], yaw = 0) {
+reset(position = [0, 0, 20], yaw = 0) {
     set({
-      position: new THREE.Vector3(position[0], position[1], position[2]),
+      position: new THREE.Vector3(...position),
       yaw,
       pitch: 0,
-      target: null,
-      onArrive: null,
+      isSitting: false,
+      locked: false,
       dragMoved: false,
       pendingClick: null,
       level: 0,
-      locked: false,
-      isSitting: false,
+      target: null,
+      onArrive: null,
+      pointerPosition: null,
+      hoverFloor: false,
     })
   },
 }))

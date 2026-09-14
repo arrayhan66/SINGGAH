@@ -33,7 +33,6 @@ import {
   Plant,
   Chandelier,
   InfoKiosk,
-  WallSconce,
 } from "../components/Props"
 import {
   rooms,
@@ -277,8 +276,26 @@ function Museum({ hallData }) {
           />
         )}
 
-        <Plant position={[-2.6, 0, 0]} variant="persian" potStyle="matte" scale={1} />
-        <Plant position={[2.6, 0, 0]} variant="persian" potStyle="matte" scale={1} />
+        <Plant
+          position={[-2.6, 0, 0]}
+          variant="leafy"
+          potStyle="matte"
+          scale={1}
+          info={{
+            title: "Rubber Plant (Ficus elastica)",
+            text: "Tanaman hias populer dengan daun hijau tebal mengkilap yang tahan banting. Melambangkan pertumbuhan, kemakmuran, dan keteguhan — dipercaya membawa energi positif serta mudah dirawat sehingga cocok untuk ruang kerja maupun pameran.",
+          }}
+        />
+        <Plant
+          position={[2.6, 0, 0]}
+          variant="leafy"
+          potStyle="matte"
+          scale={1}
+          info={{
+            title: "Rubber Plant (Ficus elastica)",
+            text: "Tanaman hias populer dengan daun hijau tebal mengkilap yang tahan banting. Melambangkan pertumbuhan, kemakmuran, dan keteguhan — dipercaya membawa energi positif serta mudah dirawat sehingga cocok untuk ruang kerja maupun pameran.",
+          }}
+        />
 
         <MuseumBarrier />
         <LoungeSeating />
@@ -292,13 +309,6 @@ function Museum({ hallData }) {
 
         <InfoKiosk position={[-4.5, 0, 6]} rotationY={0.35} stats={stats} categories={categories} />
         <InfoKiosk position={[4.5, 0, 6]} rotationY={-0.35} variant="guide" />
-
-        {[-12, 12].map((zPos, i) => (
-          <group key={i}>
-            <WallSconce position={[-17.8, 2.8, zPos]} rotationY={Math.PI / 2} />
-            <WallSconce position={[17.8, 2.8, zPos]} rotationY={-Math.PI / 2} />
-          </group>
-        ))}
 
         <RectRug position={[0, 0.015, 22.0]} w={7.2} d={2.5} map={rugRectMap} />
         <Console position={[0, 0, 26.6]} rotationY={Math.PI} scale={1.35} />

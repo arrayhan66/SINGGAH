@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react"
 import { useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
 import { useWalkStore, EYE, INTERACT_RANGE } from "../hooks/useWalk"
+import { usePlantInfoStore } from "../hooks/usePlantInfo"
 import { useTransitionStore } from "../hooks/useTransition"
 import { getWalls, portals, findRoom, resolveHeight, FLOOR2_Y } from "../rooms/museumLayout"
 import { resolveCollision, resolveObjectCollision, resolveAABBs } from "../utils/collision"
@@ -68,6 +69,22 @@ function pickVisible(raycaster, scene, now) {
   return hits
 }
 
+// Hanya mesh lantai / area jalan (aksi "floor"/"walk"). Ujung tombak untuk
+// ring kursor: jumlahnya sedikit dan statis, jadi raycast tiap pointermove
+// tetap murah (tanpa throttle seperti hover umum).
+function collectFloorMeshes(root) {
+  const out = []
+  const stack = []
+  for (const c of root.children) stack.push(c)
+  while (stack.length) {
+    const o = stack.pop()
+    if (!o.visible) continue
+    if (findAction(o)?.type === "floor" || findAction(o)?.type === "walk") out.push(o)
+    for (const c of o.children) stack.push(c)
+  }
+  return out
+}
+
 function LookControls({ bounds, onSelectProject }) {
   const { camera, gl, scene } = useThree()
   const keysRef = useRef({})
@@ -81,6 +98,8 @@ function LookControls({ bounds, onSelectProject }) {
     startY: 0,
   })
   const raycaster = useRef(new THREE.Raycaster())
+  const floorRaycaster = useRef(new THREE.Raycaster())
+  const floorMeshesRef = useRef([])
   const mouse = useRef(new THREE.Vector2())
   const euler = useRef(new THREE.Euler(0, 0, 0, "YXZ"))
   const stuckRef = useRef(0)
@@ -100,6 +119,8 @@ function LookControls({ bounds, onSelectProject }) {
       useWalkStore.getState().setTarget(action.point)
     } else if (action.type === "project") {
       onSelectProject(action.project)
+    } else if (action.type === "info") {
+      usePlantInfoStore.getState().setInfo(action.info)
     } else if (action.type === "teleport") {
       teleportTo(action.point, action.yaw)
     } else if (action.type === "sit") {
@@ -255,6 +276,15 @@ function LookControls({ bounds, onSelectProject }) {
           ) > DRAG_THRESHOLD
         useWalkStore.getState().setDragMoved(moved)
       } else {
+        // Ring kursor mengikuti lantai TANPA throttle (raycast ringan ke mesh
+        // lantai saja) supaya posisinya selalu segar dan animasi terasa hidup.
+        if (floorMeshesRef.current.length) {
+          floorRaycaster.current.setFromCamera(mouse.current, camera)
+          const hits = floorRaycaster.current.intersectObjects(floorMeshesRef.current, false)
+          const p = hits.length ? hits[0].point : null
+          useWalkStore.getState().setPointerPosition(p)
+        }
+
         // Hover raycasts are expensive on a scene this dense — throttle them
         // so a fast mouse sweep only samples a few times per frame.
         const now = performance.now()
@@ -265,13 +295,22 @@ function LookControls({ bounds, onSelectProject }) {
         const action = hits.length ? findAction(hits[0].object) : null
         // Movement actions (walk / floor) work at any distance; interactions
         // (project, teleport) need the player close enough to reach them.
-        const actionable =
+        const isMoveAction =
           action && (action.type === "floor" || action.type === "walk")
+        const actionable =
+          isMoveAction
             ? action
             : action && withinRange(hits[0].point, INTERACT_RANGE)
               ? action
               : null
-        document.body.style.cursor = actionable ? "pointer" : "default"
+        useWalkStore.getState().setHoverFloor(actionable?.type === "floor" || actionable?.type === "walk")
+        // Lantai pakai crosshair (bukan pointer panah) + ring 3D menyala;
+        // objek interaktif tetap pointer.
+        document.body.style.cursor = actionable
+          ? isMoveAction
+            ? "crosshair"
+            : "pointer"
+          : "default"
       }
     }
 
@@ -286,6 +325,7 @@ function LookControls({ bounds, onSelectProject }) {
       if (!hit) return
       const action = findAction(hit.object)
       if (action.type === "project" && !withinRange(hit.point, INTERACT_RANGE)) return
+      if (action.type === "info" && !withinRange(hit.point, INTERACT_RANGE)) return
       if (action.type === "teleport" && !withinRange(hit.point, TELEPORT_RANGE)) return
       handleAction(action, hit.point, hit.object)
     }
@@ -324,9 +364,11 @@ function LookControls({ bounds, onSelectProject }) {
     // rebuild once more shortly after (catches late-mounted props / textures).
     if (!modelColliderBuilt.current) {
       modelCollidersRef.current = getCollidableAABBs(scene)
+      floorMeshesRef.current = collectFloorMeshes(scene)
       modelColliderBuilt.current = 1
     } else if (modelColliderBuilt.current === 1 && state.clock.elapsedTime > 1.5) {
       modelCollidersRef.current = getCollidableAABBs(scene)
+      floorMeshesRef.current = collectFloorMeshes(scene)
       modelColliderBuilt.current = 2
     }
 

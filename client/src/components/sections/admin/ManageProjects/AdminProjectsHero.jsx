@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import AdminHeroBackground from "../../../ui/AdminHeroBackground"
 import AdminProjectsFilter from "./AdminProjectsFilter"
 import AdminProjectsCategoryFilter from "./AdminProjectsCategoryFilter"
+import { SLIDESHOW_MAX_ITEMS } from "../../../../constants/slideshow"
 
 function AdminProjectsHero({
   stats,
@@ -60,7 +61,11 @@ function AdminProjectsHero({
           <AdminProjectsFilter
             statusFilter={statusFilter}
             onStatusChange={onStatusChange}
-            counts={{ all: stats?.total ?? 0, ...stats }}
+            counts={{
+              all: stats?.total ?? 0,
+              ...stats,
+              slideshow: `${stats?.slideshow ?? 0}/${SLIDESHOW_MAX_ITEMS}`,
+            }}
           />
           {categories?.items?.length > 0 && (
             <AdminProjectsCategoryFilter

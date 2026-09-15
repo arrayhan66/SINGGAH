@@ -866,18 +866,14 @@ html.light .emoji-pop-preview-text {
 }
 
 /* ============================================================
-   HERO SHOWCASE — carousel futuristik "floating digital exhibit"
-   - Kartu utama : LANDSCAPE 16:9 bersih (tanpa skew), rounded,
-     border cyan luminous + glow lembut. Fokus paling depan.
-   - 2 frame belakang PARALLELOGRAM (skewX + sudut terpotong lewat
-     clip-path) => panel HUD miring, BUKAN persegi biasa:
-       LAYER 3 (back)  : +18px kanan, +15px bawah
-       LAYER 2 (mid)   : +9px  kanan, +7.5px bawah
-     Keduanya sesumbu, radius/aspect sama dgn kartu utama, jelas
-     terlihat & simetris.
-   - 4 badge hologram mengambang DI LUAR sudut kartu (panel kaca
+   HERO SHOWCASE — floating digital exhibit
+   MINIMALIST (Notion/Linear/Stripe): 1 card, 1 border, 1 shadow.
+   - Kartu utama : LANDSCAPE 16:9, rounded-2xl, 1px solid border
+     netral + soft box-shadow. TANPA transform/skew (border sejajar
+     sumbu, lurus & tajam). Tanpa rear-frame/glow/pulse.
+   - 4 badge hologram mengambang di sudut kartu (panel kaca
      angular + aura neon + ikon bercahaya + label uppercase).
-   - Z-axis: background → frame back → frame mid → main → badge → arrow.
+   - Z-axis: background → main card → badge → arrow.
    ============================================================ */
 /* ============================================================
    SHOWCASE — THEME TOKENS (CSS custom properties).
@@ -887,25 +883,15 @@ html.light .emoji-pop-preview-text {
                    between breakpoints (tokens are identical).
    ============================================================ */
 .hero-karya-showcase {
-  --kc-card-border: rgba(34, 211, 238, 0.65);
+  --kc-card-border: rgba(255, 255, 255, 0.1);
   --kc-card-bg: #072747;
-  --kc-card-shadow:
-    0 0 0 1px rgba(34, 211, 238, 0.18),
-    0 0 28px -6px rgba(34, 211, 238, 0.45),
-    0 26px 50px -22px rgba(2, 12, 32, 0.8);
-  --kc-rear-border: rgba(56, 189, 248, 0.75);
-  --kc-rear-bg: linear-gradient(160deg, rgba(26, 62, 116, 0.92), rgba(10, 32, 62, 0.95));
-  --kc-rear-after-border: rgba(34, 211, 238, 0.28);
-  --kc-rear-shadow: drop-shadow(0 20px 36px rgba(2, 12, 32, 0.55));
+  --kc-card-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
   --kc-glass-stop1: rgba(255, 255, 255, 0.12);
   --kc-glass-stop2: rgba(255, 255, 255, 0.05);
   --kc-glass-stop3: rgba(140, 170, 255, 0.07);
   --kc-aura: radial-gradient(closest-side, rgba(34, 211, 238, 0.5), transparent 70%);
   --kc-badge-border: rgba(34, 211, 238, 0.55);
   --kc-badge-bg: linear-gradient(140deg, rgba(8, 34, 62, 0.85), rgba(5, 20, 40, 0.92));
-  --kc-badge-shadow:
-    drop-shadow(0 8px 16px rgba(2, 12, 32, 0.65))
-    drop-shadow(0 0 12px rgba(34, 211, 238, 0.22));
   --kc-badge-inner: rgba(255, 255, 255, 0.16);
   --kc-ico-color: #e0feff;
   --kc-ico-bg: linear-gradient(135deg, #22d3ee, #2563eb);
@@ -915,22 +901,16 @@ html.light .emoji-pop-preview-text {
   --kc-accent: linear-gradient(90deg, transparent, #22d3ee);
 }
 html.light .hero-karya-showcase {
-  --kc-card-border: rgba(37, 99, 235, 0.8);
-  --kc-card-bg: #ffffff;
-  --kc-card-shadow:
-    0 0 0 1px rgba(59, 130, 246, 0.3),
-    0 0 22px -6px rgba(59, 130, 246, 0.5),
-    0 22px 46px -18px rgba(37, 99, 235, 0.42);
-  --kc-rear-border: rgba(37, 99, 235, 0.8);
-  --kc-rear-bg: linear-gradient(160deg, rgba(219, 234, 254, 0.96), rgba(191, 219, 254, 0.93));
-  --kc-rear-shadow: drop-shadow(0 18px 34px rgba(37, 99, 235, 0.35));
-  --kc-rear-after-border: rgba(59, 130, 246, 0.5);
-  --kc-aura: radial-gradient(closest-side, rgba(59, 130, 246, 0.5), transparent 70%);
-  --kc-badge-border: rgba(37, 99, 235, 0.55);
+  /* LIGHT — STRUKTUR DISAMAKAN dgn dark mode (bukan menyamakan warnanya):
+     bg card = satu keluarga dgn body (kontras rendah), definisi dari tepi
+     biru lembut di rentang opacity yg sama (0.25 ring border²), rear stack
+     jelas bertumpuk, aura + drop gelap tipis. Dark mode tidak disentuh. */
+   --kc-card-border: rgba(0, 0, 0, 0.08);
+   --kc-card-bg: linear-gradient(180deg, #f5f9fd, #e5edf7);
+   --kc-card-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.15);
+   --kc-aura: radial-gradient(closest-side, rgba(59, 130, 246, 0.45), transparent 70%);
+  --kc-badge-border: rgba(96, 165, 250, 0.35);
   --kc-badge-bg: linear-gradient(140deg, rgba(255, 255, 255, 0.97), rgba(226, 239, 254, 0.95));
-  --kc-badge-shadow:
-    drop-shadow(0 8px 16px rgba(37, 99, 235, 0.28))
-    drop-shadow(0 0 12px rgba(56, 189, 248, 0.2));
   --kc-ico-color: #ffffff;
   --kc-ico-bg: linear-gradient(135deg, #0ea5e9, #2563eb);
   --kc-ico-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
@@ -939,21 +919,30 @@ html.light .hero-karya-showcase {
   --kc-accent: linear-gradient(90deg, transparent, #2563eb);
 }
 
-/* === SHOWCASE CARD — panel kaca utama (skewX: 5deg desktop, 4deg mobile) === */
+/* Light mode: aksen garis cyan di badge ikut dilembutkan supaya tidak
+   tampil sebagai garis lepas di background terang. */
+html.light .hero-karya-showcase .badge-accent {
+  opacity: 0.35;
+}
+
+/* === SHOWCASE CARD — kartu utama.
+   MINIMALIST: 1px solid border netral + soft shadow (Notion/Linear/
+   Stripe). Tanpa transform/skew → seluruh sisi border sejajar sumbu
+   (lurus & tajam). */
 .hero-karya-showcase .showcase-card {
   box-sizing: border-box;
   border-radius: 16px;
-  border: 1.5px solid var(--kc-card-border);
-  background-color: var(--kc-card-bg);
-  transform: skewX(5deg);
+  border: 1px solid var(--kc-card-border);
+  background: var(--kc-card-bg);
   box-shadow: var(--kc-card-shadow);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-@media (max-width: 1023px) {
-  .hero-karya-showcase .showcase-card { transform: skewX(4deg); }
-}
-@media (max-width: 640px) {
-  .hero-karya-showcase .showcase-card { transform: skewX(4deg); }
+/* JAMINAN: gambar slide SELALU terlihat di kedua tema — tidak pernah
+   tersangkut di state shimmer (opacity 0) yang membuat card tampak
+   kosong/abu-navy. Load state ditangani browser secara alami. */
+.hero-karya-showcase .smart-img {
+  opacity: 1;
 }
 
 /* === REFLEKSI KACA kilau diagonal tipis di seluruh isi slide (gelap solid; light mode tampak tipis — tidak diubah) === */
@@ -969,60 +958,24 @@ html.light .hero-karya-showcase {
   mix-blend-mode: screen;
 }
 
-/* === FRAME BELAKANG PARALLELOGRAM — sudut terpotong + skew (panel HUD) === */
-.hero-karya-showcase .showcase-rear {
-  position: absolute;
-  inset: 0;
-  border: 1.5px solid var(--kc-rear-border);
-  background: var(--kc-rear-bg);
-  transform: skewX(5deg);
-  clip-path: polygon(
-    0 28px,
-    14px 0,
-    calc(100% - 14px) 0,
-    100% 28px,
-    100% calc(100% - 28px),
-    calc(100% - 14px) 100%,
-    14px 100%,
-    0 calc(100% - 28px)
-  );
-  filter: var(--kc-rear-shadow);
-}
-
-.hero-karya-showcase .showcase-rear::after {
-  content: "";
-  position: absolute;
-  inset: 7px;
-  border: 1px solid var(--kc-rear-after-border);
-  clip-path: polygon(
-    0 20px,
-    10px 0,
-    calc(100% - 10px) 0,
-    100% 20px,
-    100% calc(100% - 20px),
-    calc(100% - 10px) 100%,
-    10px 100%,
-    0 calc(100% - 20px)
-  );
-}
-
-.hero-karya-showcase .showcase-rear-back { transform: translate(18px, 15px) skewX(5deg); }
-.hero-karya-showcase .showcase-rear-mid   { transform: translate(9px, 7.5px) skewX(5deg); }
-
-@media (max-width: 1023px) {
-  .hero-karya-showcase .showcase-rear-back { transform: translate(13px, 11px) skewX(4deg); }
-  .hero-karya-showcase .showcase-rear-mid   { transform: translate(6.5px, 5.5px) skewX(4deg); }
-}
+/* Mobile: beri padding kiri-kanan agar stack (dan frame dekoratif
+   104%/108% yang mengintip di luar card) tidak terpotong tepi layar
+   dan margin KIRI-KANAN SEIMBANG (tanpa overflow horizontal).
+   Panah navigasi ABSOLUTE relatif ke .hero-karya-showcase ikut
+   bergeser menyatu dengan card — tetap proporsional, tidak nabrak
+   tepi viewport. */
 @media (max-width: 640px) {
-  .hero-karya-showcase .showcase-rear-back { transform: translate(9px, 8px) skewX(4deg); }
-  .hero-karya-showcase .showcase-rear-mid   { transform: translate(4.5px, 4px) skewX(4deg); }
+  .hero-karya-showcase {
+    padding-inline: 16px;
+  }
 }
 
 /* === BADGE HOLOGRAM (floating HUD chip) — tema sama (light/dark), hanya token berubah === */
 .hero-karya-showcase .badge-aura {
-  position: absolute; inset: -7px; z-index: -1; border-radius: 50%;
+  position: absolute; inset: -8px; z-index: -1; border-radius: 50%;
   background: var(--kc-aura);
-  filter: blur(6px);
+  filter: blur(8px);
+  transform: translateZ(0);
   animation: karta-badge-aura 3.6s ease-in-out infinite;
 }
 
@@ -1035,7 +988,9 @@ html.light .hero-karya-showcase {
   border: 1px solid var(--kc-badge-border);
   background: var(--kc-badge-bg);
   clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
-  filter: var(--kc-badge-shadow);
+  /* PENTING: TIDAK memakai filter/drop-shadow di sini — filter pada panel
+     berisi teks + animasi scale/rotate membuat teks dilukis ulang tiap frame
+     (buram). Glow HANYA lewat badge-aura di belakang. */
 }
 
 /* Inner highlight halus di tepi atas panel (gelap). */
@@ -1081,6 +1036,9 @@ html.light .hero-karya-showcase {
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--kc-value-color);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .hero-karya-showcase .badge-label {
@@ -1094,6 +1052,9 @@ html.light .hero-karya-showcase {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--kc-label-color);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Aksen garis cyan di sisi kanan panel — dekorasi HUD. */
@@ -1193,13 +1154,13 @@ html.light .hero-karya-showcase {
     transform: translate(0, 0) rotate(-1deg) scale(1);
   }
   25% {
-    transform: translate(1px, -4px) rotate(-1.8deg) scale(1.02);
+    transform: translate(1px, -4px) rotate(-1.8deg) scale(1.015);
   }
   50% {
-    transform: translate(0, -9px) rotate(0.6deg) scale(1.045);
+    transform: translate(0, -9px) rotate(0.6deg) scale(1.03);
   }
   75% {
-    transform: translate(-1px, -3px) rotate(1.6deg) scale(1.02);
+    transform: translate(-1px, -3px) rotate(1.6deg) scale(1.015);
   }
 }
 
@@ -1209,13 +1170,13 @@ html.light .hero-karya-showcase {
     transform: translate(0, 0) rotate(1deg) scale(1);
   }
   25% {
-    transform: translate(2px, -3px) rotate(1.9deg) scale(1.02);
+    transform: translate(2px, -3px) rotate(1.9deg) scale(1.015);
   }
   50% {
-    transform: translate(3px, -8px) rotate(-0.7deg) scale(1.05);
+    transform: translate(3px, -8px) rotate(-0.7deg) scale(1.035);
   }
   75% {
-    transform: translate(1px, -2px) rotate(-1.8deg) scale(1.02);
+    transform: translate(1px, -2px) rotate(-1.8deg) scale(1.015);
   }
 }
 
@@ -1225,7 +1186,7 @@ html.light .hero-karya-showcase {
     transform: translate(0, 0) rotate(0deg) scale(1);
   }
   50% {
-    transform: translate(1px, -7px) rotate(1.2deg) scale(1.04);
+    transform: translate(1px, -7px) rotate(1.2deg) scale(1.025);
   }
 }
 
@@ -1235,13 +1196,13 @@ html.light .hero-karya-showcase {
     transform: translate(0, 0) rotate(-1deg) scale(1);
   }
   25% {
-    transform: translate(-2px, 3px) rotate(-1.9deg) scale(1.02);
+    transform: translate(-2px, 3px) rotate(-1.9deg) scale(1.015);
   }
   50% {
-    transform: translate(-3px, -9px) rotate(0.7deg) scale(1.05);
+    transform: translate(-3px, -9px) rotate(0.7deg) scale(1.035);
   }
   75% {
-    transform: translate(-1px, -2px) rotate(1.8deg) scale(1.02);
+    transform: translate(-1px, -2px) rotate(1.8deg) scale(1.015);
   }
 }
 

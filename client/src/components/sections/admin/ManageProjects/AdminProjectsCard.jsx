@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { Clock, CheckCircle2, XCircle, Eye, Heart, Calendar, Tag, Globe, Pencil, Trash2, Star, Crown, Lock, Plus, MonitorPlay } from "lucide-react"
-import { imageUrl } from "../../../../utils/imageUrl"
+import { imageUrl, buildSrcSet } from "../../../../utils/imageUrl"
 import toast from "../../../../utils/toast"
 import SmartImage from "../../../ui/SmartImage"
 import UserAvatar from "../../../ui/UserAvatar"
@@ -132,6 +132,8 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
       >
         <SmartImage
           src={imageUrl(project.thumbnail)}
+          srcSet={buildSrcSet(project.thumbnail, [320, 640, 1024])}
+          sizes="(min-width: 1100px) 33vw, (min-width: 530px) 50vw, 92vw"
           alt={project.title}
           className="h-full w-full object-cover transition-all duration-500"
         />
@@ -140,14 +142,14 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
 
         {project.featured_slot && (
           <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 rounded-full border border-amber-300/50 bg-gradient-to-r from-amber-500/90 to-yellow-400/90 px-2 py-1 text-[10px] font-bold text-amber-950 shadow-md backdrop-blur-sm">
-            <Crown className="hidden min-[720px]:block" size={11} />
-            <span className="hidden min-[720px]:inline">Unggulan {project.featured_slot}</span>
-            <span className="inline min-[720px]:hidden">#{project.featured_slot}</span>
+            <Crown className="hidden min-[340px]:max-[529px]:block min-[740px]:block" size={11} />
+            <span className="hidden min-[340px]:max-[529px]:inline min-[740px]:inline">Unggulan {project.featured_slot}</span>
+            <span className="inline min-[340px]:max-[529px]:hidden min-[740px]:hidden">#{project.featured_slot}</span>
           </span>
         )}
 
         {slideshowActive && (
-          <span className="absolute top-[2.6rem] left-2.5 hidden min-[720px]:inline-flex items-center gap-1 rounded-full border border-emerald-300/50 bg-gradient-to-r from-emerald-500/90 to-teal-400/90 px-2 py-1 text-[10px] font-bold text-emerald-950 shadow-md backdrop-blur-sm">
+          <span className="absolute top-[2.6rem] left-2.5 hidden min-[340px]:max-[529px]:inline-flex min-[740px]:inline-flex items-center gap-1 rounded-full border border-emerald-300/50 bg-gradient-to-r from-emerald-500/90 to-teal-400/90 px-2 py-1 text-[10px] font-bold text-emerald-950 shadow-md backdrop-blur-sm">
             <MonitorPlay size={11} />
             <span>Slideshow</span>
           </span>

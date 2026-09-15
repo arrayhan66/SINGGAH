@@ -25,9 +25,9 @@ import prabowoImg from "../../assets/images/prabowo.webp"
 import gibranImg from "../../assets/images/gibran.webp"
 import posterutama from "../../assets/images/posterutama.png"
 
-// Poster banner hall utama (1983x339, aspect 5.85:1), dipasang di frame
-// hitam 16x2.4 dengan proporsi asli dipertahankan (fit height).
-const POSTER_W = 2.4 * (1983 / 339)
+// Poster banner hall utama (1600x240, aspect 6.67:1), dipasang setara
+// dengan bingkai hitam 16x2.4 agar tidak ada area hitam kiri-kanan.
+const POSTER_W = 2.4 * (1600 / 240)
 
 import {
   Plant,

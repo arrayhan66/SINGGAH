@@ -187,7 +187,7 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 min-[500px]:grid-cols-2 min-[1100px]:grid-cols-3 gap-5 md:gap-6">
+              <div className="grid grid-cols-1 min-[530px]:grid-cols-2 min-[1100px]:grid-cols-3 gap-5 md:gap-6">
                 {group.projects.map((project, i) => (
                   <div key={project.id} className="h-full animate-fade-in-up" style={{ animationDelay: `${i * 30}ms` }}>
                     <AdminProjectsCard

@@ -1,5 +1,8 @@
 import * as THREE from "three"
+import { useLayoutEffect, useMemo, useRef } from "react"
 import { Plant, PlantInfoIcon } from "./Props"
+import { RealBook } from "./HomeDecor"
+import { getRandomUniqueBookKeys } from "../utils/bookCovers"
 import {
   LOUNGE_LAYOUT,
   LOUNGE_RADIUS,
@@ -13,70 +16,17 @@ import {
 const WOOD = "#5a4028"
 const FABRIC = "#3f5a7f"
 
-// --- Echeveria Succulent (Tanaman Pot Kecil Meja Lounge) --------------------------------
-// Daun tebal, gemuk, membulat di ujung (spoon-like). Rosette berlapis dari luar ke dalam.
-// Gradasi hijau segar ke pink/ungu tipis di tepi daun via canvas texture prosedural.
-function succulentLeafShape() {
-  const s = new THREE.Shape()
-  const len = 0.16
-  const hw = 0.058
-  s.moveTo(0, 0)
-  s.bezierCurveTo(hw * 1.3, len * 0.2, hw * 1.5, len * 0.6, hw * 0.45, len * 0.9)
-  s.bezierCurveTo(hw * 0.2, len * 1.02, -hw * 0.2, len * 1.02, -hw * 0.45, len * 0.9)
-  s.bezierCurveTo(-hw * 1.5, len * 0.6, -hw * 1.3, len * 0.2, 0, 0)
-  return s
-}
-
-const SUCC_LEAF_GEO = new THREE.ShapeGeometry(succulentLeafShape(), 6)
-
-const SUCC_LEAF_TEX = (() => {
-  const w = 128
-  const h = 256
-  const c = document.createElement("canvas")
-  c.width = w
-  c.height = h
-  const ctx = c.getContext("2d")
-
-  const grad = ctx.createLinearGradient(0, h, 0, 0)
-  grad.addColorStop(0, "#426b48")
-  grad.addColorStop(0.4, "#699e6b")
-  grad.addColorStop(0.75, "#a6cf98")
-  grad.addColorStop(1, "#dfa4b4") // soft blush pink/purple rim
-  ctx.fillStyle = grad
-  ctx.fillRect(0, 0, w, h)
-
-  for (let i = 0; i < 90; i++) {
-    const x = Math.random() * w
-    const y = Math.random() * h
-    const r = 2 + Math.random() * 8
-    ctx.fillStyle = Math.random() > 0.5 ? "rgba(255,255,255,0.08)" : "rgba(30,70,40,0.08)"
-    ctx.beginPath()
-    ctx.arc(x, y, r, 0, Math.PI * 2)
-    ctx.fill()
-  }
-
-  const vein = ctx.createLinearGradient(w * 0.5, h * 0.95, w * 0.5, h * 0.1)
-  vein.addColorStop(0, "rgba(200,230,190,0.3)")
-  vein.addColorStop(1, "rgba(255,255,255,0)")
-  ctx.strokeStyle = vein
-  ctx.lineWidth = 3
-  ctx.beginPath()
-  ctx.moveTo(w * 0.5, h * 0.92)
-  ctx.lineTo(w * 0.5, h * 0.2)
-  ctx.stroke()
-
-  const tex = new THREE.CanvasTexture(c)
-  tex.colorSpace = THREE.SRGBColorSpace
-  tex.anisotropy = 2
-  return tex
-})()
-
-const SUCC_MAT = new THREE.MeshStandardMaterial({
-  map: SUCC_LEAF_TEX,
-  roughness: 0.6,
-  metalness: 0.05,
-  side: THREE.DoubleSide,
-})
+// --- Pothos Mini (Epipremnum aureum) — Tanaman Pot Kecil Meja Lounge -------------------------
+// STRUKTUR & PENDEKATAN SAMA PERSIS dengan Rubber Plant yang berhasil:
+//   • tiap daun = 1 geometri plane low-poly dengan lipatan halus di sepanjang urat tengah
+//     (base pinned y=0, tip di +Y = 1); dipasang lewat instancedMesh.
+//   • tiap daun INDIVIDUAL menempel di SATU titik pada KETINGGIAN masing-masing di sepanjang
+//     batang pendek (BUKAN radial/rosette mengelilingi 1 titik — beda dari succulent).
+//   • tekstur daun di-bake di canvas: bentuk oval-HATI (panjang:lebar ≈ 1.2:1, hampir bulat),
+//     ujung sedikit meruncing.
+//   • mayoritas daun hijau segar #4A8C5C; 2-3 daun variegated bermotif kuning-hijau pucat.
+//   • batang pendek & tipis, hijau kecoklatan, 5 titik tumbuh; daun pangkal lebih besar → pucuk
+//     lebih kecil. Semua pangkal daun berada di atas rim pot (tidak menembus dinding pot).
 
 const SOIL_TEX = (() => {
   const s = 128
@@ -106,27 +56,253 @@ const SOIL_MAT = new THREE.MeshStandardMaterial({
   roughness: 0.85,
 })
 
-const ECHEVERIA_LEAVES = [
-  { y: 0.01, rx: 1.35, ry: 0, s: 1.05 },
-  { y: 0.01, rx: 1.35, ry: 1.26, s: 1.0 },
-  { y: 0.01, rx: 1.35, ry: 2.51, s: 1.02 },
-  { y: 0.01, rx: 1.35, ry: 3.77, s: 1.0 },
-  { y: 0.01, rx: 1.35, ry: 5.03, s: 1.03 },
-  { y: 0.03, rx: 0.95, ry: 0.63, s: 0.85 },
-  { y: 0.03, rx: 0.95, ry: 1.88, s: 0.82 },
-  { y: 0.03, rx: 0.95, ry: 3.14, s: 0.85 },
-  { y: 0.03, rx: 0.95, ry: 4.40, s: 0.82 },
-  { y: 0.05, rx: 0.45, ry: 1.0, s: 0.55 },
-  { y: 0.05, rx: 0.45, ry: 3.09, s: 0.52 },
-  { y: 0.05, rx: 0.45, ry: 5.18, s: 0.55 },
-]
+// Helai daun pothos: oval-hati (panjang:lebar ≈ 1.2:1, hampir bulat), pangkal agak
+// terbelah, ujung runcing halus. Digambar di canvas (alphaTest, seperti Rubber Plant).
+// variegated = true → motif marmer kuning-hijau pucat, false → hijau solid #4A8C5C.
+function drawPothosTile(variegated) {
+  const W = 256
+  const H = 300
+  const c = document.createElement("canvas")
+  c.width = W
+  c.height = H
+  const ctx = c.getContext("2d")
+  const cx = 128
 
-const ECHEVERIA_INFO = {
-  title: "Succulent (Echeveria)",
-  text: "Tanaman hias kecil dengan daun tebal menyerupai kelopak bunga, dikenal sangat tahan kekeringan. Melambangkan kesederhanaan, ketahanan, dan efisiensi — cocok sebagai simbol kerja cerdas yang tidak butuh banyak sumber daya untuk tetap bertumbuh.",
+  // Siluet heart-ovate: ujung di atas (y kecil), pangkal terbelah lembut di bawah.
+  const silhouette = () => {
+    ctx.beginPath()
+    ctx.moveTo(cx, 22)
+    ctx.bezierCurveTo(cx + 66, 34, cx + 112, 114, cx + 106, 168)
+    ctx.bezierCurveTo(cx + 100, 212, cx + 64, 244, cx + 48, 256)
+    ctx.quadraticCurveTo(cx, 250, cx - 48, 256)
+    ctx.bezierCurveTo(cx - 64, 244, cx - 100, 212, cx - 106, 168)
+    ctx.bezierCurveTo(cx - 112, 114, cx - 66, 34, cx, 22)
+    ctx.closePath()
+  }
+
+  silhouette()
+  if (variegated) {
+    const g = ctx.createLinearGradient(0, 22, 0, 262)
+    g.addColorStop(0, "#4c945e")
+    g.addColorStop(0.45, "#478a58")
+    g.addColorStop(1, "#3f7d50")
+    ctx.fillStyle = g
+    ctx.fill()
+
+    ctx.save()
+    silhouette()
+    ctx.clip()
+    // Bercak marmer kuning-hijau pucat yang lembut; posisi deterministik (natural namun stabil).
+    const blobs = [
+      [44, 120, 55],
+      [150, 96, 48],
+      [126, 196, 66],
+      [186, 150, 38],
+      [30, 190, 34],
+    ]
+    for (let i = 0; i < blobs.length; i++) {
+      const [bx, by, br] = blobs[i]
+      const rg = ctx.createRadialGradient(bx, by, br * 0.1, bx, by, br)
+      rg.addColorStop(0, "rgba(222,238,180,0.95)")
+      rg.addColorStop(1, "rgba(214,232,168,0)")
+      ctx.fillStyle = rg
+      ctx.fillRect(0, 18, W, H - 18)
+    }
+    ctx.restore()
+  } else {
+    const g = ctx.createLinearGradient(0, 22, 0, 262)
+    g.addColorStop(0, "#52a05f")
+    g.addColorStop(0.45, "#4a8c5c")
+    g.addColorStop(1, "#3e7d4f")
+    ctx.fillStyle = g
+    ctx.fill()
+  }
+
+  ctx.save()
+  silhouette()
+  ctx.clip()
+
+  // Kilau lilin lembut di satu sisi.
+  const gl = ctx.createLinearGradient(cx - 60, 0, cx + 44, 0)
+  gl.addColorStop(0, "rgba(255,255,255,0)")
+  gl.addColorStop(0.48, "rgba(255,255,255,0.14)")
+  gl.addColorStop(1, "rgba(255,255,255,0)")
+  ctx.fillStyle = gl
+  ctx.fillRect(cx - 90, 20, 180, H - 40)
+
+  // Urat tengah melengkung halus, hijau tua (bukan merah).
+  ctx.strokeStyle = "rgba(46,105,66,0.5)"
+  ctx.lineCap = "round"
+  ctx.lineWidth = 4
+  ctx.beginPath()
+  ctx.moveTo(cx, 256)
+  ctx.quadraticCurveTo(cx + 4, 150, cx + 3, 50)
+  ctx.quadraticCurveTo(cx - 4, 150, cx, 256)
+  ctx.stroke()
+
+  // Urat lateral sangat samar.
+  ctx.strokeStyle = "rgba(46,105,66,0.22)"
+  ctx.lineWidth = 2
+  for (let i = 1; i <= 5; i++) {
+    const vy = 70 + i * 38
+    const len = 40 + (i % 2) * 12
+    for (const sgn of [-1, 1]) {
+      ctx.beginPath()
+      ctx.moveTo(cx, vy)
+      ctx.quadraticCurveTo(cx + sgn * len * 0.5, vy - 6, cx + sgn * len, vy + 12)
+      ctx.stroke()
+    }
+  }
+
+  ctx.restore()
+  return c
+}
+
+const POTHOS_TEX = (() => {
+  const tex = new THREE.CanvasTexture(drawPothosTile(false))
+  tex.colorSpace = THREE.SRGBColorSpace
+  tex.anisotropy = 4
+  return tex
+})()
+
+const POTHOS_VAR_TEX = (() => {
+  const tex = new THREE.CanvasTexture(drawPothosTile(true))
+  tex.colorSpace = THREE.SRGBColorSpace
+  tex.anisotropy = 4
+  return tex
+})()
+
+const POTHOS_MAT = new THREE.MeshStandardMaterial({
+  map: POTHOS_TEX,
+  alphaTest: 0.5,
+  roughness: 0.52,
+  metalness: 0.03,
+  side: THREE.DoubleSide,
+  emissive: new THREE.Color("#113a1e"),
+  emissiveIntensity: 0.15,
+})
+
+const POTHOS_VAR_MAT = new THREE.MeshStandardMaterial({
+  map: POTHOS_VAR_TEX,
+  alphaTest: 0.5,
+  roughness: 0.5,
+  metalness: 0.03,
+  side: THREE.DoubleSide,
+  emissive: new THREE.Color("#113a1e"),
+  emissiveIntensity: 0.15,
+})
+
+const POTHOS_TRUNK_MAT = new THREE.MeshStandardMaterial({ color: "#6f7a4c", roughness: 0.85 })
+
+const POTHOS_LEAF_GEO = (() => {
+  const len = 1.0
+  const geo = new THREE.PlaneGeometry(0.84, len, 6, 16)
+  const pos = geo.attributes.position
+  for (let i = 0; i < pos.count; i++) {
+    const y = pos.getY(i)
+    const t = (y + len / 2) / len // 0 at base .. 1 at tip
+    pos.setY(i, y + len / 2)
+    pos.setZ(i, Math.sin(Math.PI * t) * -0.045) // lembut trough/fold di urat tengah
+  }
+  geo.computeVertexNormals()
+  return geo
+})()
+
+// Copy pendekatan leafQuat Rubber Plant: sejajarkan bidang helai ke arah daun,
+// lalu putar tipis secara acak supaya tiap daun tidak seragam persis.
+function leafQuat(leafDir, radial, spinJit) {
+  const up = new THREE.Vector3(0, 1, 0)
+  const q0 = new THREE.Quaternion().setFromUnitVectors(up, leafDir)
+  const fn0 = new THREE.Vector3(0, 0, 1).applyQuaternion(q0)
+  const faceTarget = radial.clone().multiplyScalar(0.92).add(up.clone().multiplyScalar(0.39)).normalize()
+  const t = faceTarget.clone().addScaledVector(leafDir, -faceTarget.dot(leafDir))
+  if (t.lengthSq() > 1e-6) t.normalize()
+  const cross = new THREE.Vector3().crossVectors(fn0, t)
+  const faceSpin = Math.atan2(cross.dot(leafDir), fn0.dot(t))
+  return q0.multiply(new THREE.Quaternion().setFromAxisAngle(up, faceSpin + spinJit))
+}
+
+// Layout daun pothos — struktur identik buildRubberLayout: tiap daun menempel di
+// SATU titik pada ketinggiannya sendiri di sepanjang batang (BUKAN radial rosette).
+// Batang pendek & tipis (variasi mini). 5 titik tumbuh → total 9 daun: pangkal lebih
+// besar, pucuk lebih kecil; orientasi acak-natural (ada yang menghadap atas, ada
+// menyamping). Semua pangkal daun di atas permukaan tanah (tidak menembus pot).
+function buildPothosLayout(h) {
+  const j = (seed) => {
+    const x = Math.sin((h % 1000) * 0.31 + seed * 12.9898) * 43758.5453
+    return x - Math.floor(x)
+  }
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v))
+  const up = new THREE.Vector3(0, 1, 0)
+  const horizontal = (yaw) => new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw)).normalize()
+
+  // Batang pendek & tipis; pangkal telak di permukaan tanah kerikil (di atas rim pot).
+  const trunkBase = new THREE.Vector3(0, 0.125, 0)
+  const top = new THREE.Vector3((j(350) - 0.5) * 0.035, 0.3 + (j(351) - 0.5) * 0.03, (j(352) - 0.5) * 0.035)
+  const trunkMid = trunkBase
+    .clone()
+    .lerp(top, 0.5)
+    .add(new THREE.Vector3((j(353) - 0.5) * 0.02, 0, (j(354) - 0.5) * 0.02))
+  const trunkCurve = new THREE.QuadraticBezierCurve3(trunkBase, trunkMid, top)
+  const trunkR = 0.028
+
+  // 5 titik tumbuh; jumlah daun per node 2,2,2,2,1 = 9 daun total.
+  const nodeT = [0.14, 0.33, 0.5, 0.68, 0.87]
+  const nodeCounts = [2, 2, 2, 2, 1]
+  const solid = []
+  const vareg = []
+  const attachLeaf = (list, tNode, yawAt, openness, scale) => {
+    const P = trunkCurve.getPoint(tNode)
+    const radial = horizontal(yawAt)
+    const baseP = P.clone().addScaledVector(radial, trunkR * 0.7)
+    const dir = up.clone().multiplyScalar(Math.cos(openness)).addScaledVector(radial, Math.sin(openness)).normalize()
+    const quat = leafQuat(dir, radial, (j(401 + list.length) - 0.5) * 0.55)
+    list.push({ pos: baseP, quat, scale, wa: 0.97 + j(421 + list.length) * 0.06, cup: 1.0 })
+  }
+
+  let printed = 0
+  for (let i = 0; i < nodeT.length; i++) {
+    const tNode = clamp(nodeT[i] + (j(355 + i) - 0.5) * 0.04, 0.06, 0.96)
+    const jitterYaw = (j(365 + i) - 0.5) * 0.4
+    for (let k = 0; k < nodeCounts[i]; k++) {
+      const yaw = jitterYaw + k * (Math.PI * (0.5 + 0.45 * j(375 + i))) + (j(385 + i) - 0.5) * 2.6
+      const openness = clamp(1.28 - 0.62 * (i / (nodeT.length - 1)) + (j(395 + i * 3 + k) - 0.5) * 0.32, 0.48, 1.45)
+      const scale = 0.3 - 0.13 * (i / (nodeT.length - 1)) + (j(405 + i * 3 + k) - 0.5) * 0.03
+      const target = printed === 2 || printed === 5 || printed === 8 ? vareg : solid
+      attachLeaf(target, tNode, yaw, openness, scale)
+      printed++
+    }
+  }
+
+  return { trunkCurve, trunkR, solid, vareg }
+}
+
+const POTHOS_INFO = {
+  title: "Pothos (Epipremnum aureum)",
+  text: "Tanaman hias populer yang sangat mudah dirawat dan tahan di berbagai kondisi cahaya. Melambangkan keberuntungan, pertumbuhan, dan daya tahan — sering disebut 'tanaman uang' karena dipercaya membawa kemakmuran bagi pemiliknya.",
 }
 
 function TablePlant() {
+  const solidRef = useRef()
+  const varRef = useRef()
+  const layout = useMemo(() => buildPothosLayout(17), [])
+
+  useLayoutEffect(() => {
+    const dummy = new THREE.Object3D()
+    const apply = (list, ref) => {
+      list.forEach((l, i) => {
+        dummy.position.copy(l.pos)
+        dummy.quaternion.copy(l.quat)
+        dummy.scale.set(l.wa * l.scale, l.scale, l.cup)
+        dummy.updateMatrix()
+        ref.current.setMatrixAt(i, dummy.matrix)
+      })
+      ref.current.instanceMatrix.needsUpdate = true
+    }
+    apply(layout.solid, solidRef)
+    apply(layout.vareg, varRef)
+  }, [layout])
+
   return (
     <group position={[0, 0.88, 0]}>
       <mesh castShadow>
@@ -137,20 +313,15 @@ function TablePlant() {
         <cylinderGeometry args={[0.1, 0.1, 0.02, 16]} />
         <primitive object={SOIL_MAT} attach="material" />
       </mesh>
-      <group position={[0, 0.125, 0]}>
-        {ECHEVERIA_LEAVES.map((l, i) => (
-          <mesh
-            key={i}
-            geometry={SUCC_LEAF_GEO}
-            material={SUCC_MAT}
-            position={[0, l.y, 0]}
-            rotation={[l.rx, l.ry, 0]}
-            scale={l.s}
-            castShadow
-          />
-        ))}
-      </group>
-      <PlantInfoIcon info={ECHEVERIA_INFO} position={[0, 0.35, 0]} />
+      {/* Batang pendek & tipis, hijau kecoklatan */}
+      <mesh castShadow>
+        <tubeGeometry args={[layout.trunkCurve, 5, layout.trunkR, 5, false]} />
+        <primitive object={POTHOS_TRUNK_MAT} attach="material" />
+      </mesh>
+      {/* Daun individual menempel di 1 titik tiap ketinggian batang (bukan rosette) */}
+      <instancedMesh ref={solidRef} args={[POTHOS_LEAF_GEO, POTHOS_MAT, layout.solid.length]} castShadow />
+      <instancedMesh ref={varRef} args={[POTHOS_LEAF_GEO, POTHOS_VAR_MAT, layout.vareg.length]} castShadow />
+      <PlantInfoIcon info={POTHOS_INFO} position={[0, 0.55, 0]} />
     </group>
   )
 }
@@ -175,6 +346,7 @@ function TableLamp() {
 }
 
 function Table({ lamp = false }) {
+  const [b1, b2] = useMemo(() => getRandomUniqueBookKeys(2), [])
   return (
     <group>
       <mesh position={[0, 0.8, 0]} castShadow>
@@ -189,6 +361,8 @@ function Table({ lamp = false }) {
         <cylinderGeometry args={[0.5, 0.55, 0.09, 24]} />
         <meshStandardMaterial color={WOOD} roughness={0.55} />
       </mesh>
+      <RealBook coverKey={b1} w={0.14} x={0.2} y={0.85} z={-0.16} rot={0.12} />
+      <RealBook coverKey={b2} w={0.12} x={-0.2} y={0.852} z={0.12} rot={-0.18} />
       {lamp ? <TableLamp /> : <TablePlant />}
     </group>
   )

@@ -4,8 +4,6 @@ import {
   BOOKCASE_RING,
   PLANT_RING,
   PLANT_RING_JITTER,
-  LAMP_ACCENT_ANGLES,
-  LAMP_ACCENT_RADIUS,
   OTTOMAN_CIRCLE,
   ringAngle,
   ringPosition,
@@ -142,12 +140,6 @@ function roomFurnitureColliders() {
           ringAngle(i, PLANT_RING.count, PLANT_RING.phase) + PLANT_RING_JITTER.angle[i]
         const [x, z] = ringPosition(cx, PLANT_RING.radius + PLANT_RING_JITTER.radius[i], a)
         out.push({ x, z, radius: 0.45, level })
-      }
-
-      // Floor-lamp accents outside the plants
-      for (const a of LAMP_ACCENT_ANGLES) {
-        const [x, z] = ringPosition(cx, LAMP_ACCENT_RADIUS, a)
-        out.push({ x, z, radius: 0.35, level })
       }
 
       // Ottoman seats gathered on the carpet at the centre

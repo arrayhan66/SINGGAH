@@ -206,9 +206,6 @@ export const PLANT_RING_JITTER = {
   angle: [0.1, -0.07, 0.05, 0.12, -0.1, 0.06, -0.05, 0.09, -0.08, 0.04],
   radius: [0, 0.5, -0.4, 0.3, -0.5, 0.45, -0.3, 0.35, -0.45, 0.25],
 }
-// Reading-nook accents (floor lamp + round rug) just outside the plant ring.
-export const LAMP_ACCENT_ANGLES = [Math.PI / 4, (Math.PI * 3) / 4, (-Math.PI * 3) / 4, -Math.PI / 4]
-export const LAMP_ACCENT_RADIUS = 12.3
 // Ottoman seats gathered on the carpet at the centre of the bookcase ring,
 // each one facing the middle of the circle.
 export const OTTOMAN_CIRCLE = { radius: 2.2, count: 6 }

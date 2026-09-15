@@ -18,6 +18,8 @@ function SmartImage({
   onLoad,
   onError,
   style,
+  srcSet,
+  sizes,
   ...rest
 }) {
   const initialSrc = imageUrl(src);
@@ -30,10 +32,14 @@ function SmartImage({
   }, [initialSrc]);
 
   const finalSrc = fallback && failed ? FALLBACK_IMAGE : initialSrc;
+  const finalSrcSet =
+    fallback && failed ? undefined : srcSet || undefined;
 
   return (
     <img
       src={finalSrc}
+      srcSet={finalSrcSet}
+      sizes={sizes || undefined}
       alt={alt}
       loading={eager ? "eager" : "lazy"}
       onLoad={(e) => {

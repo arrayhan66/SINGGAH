@@ -8,7 +8,7 @@ import {
   Layers,
 } from "lucide-react";
 import api from "../../../services/api";
-import { imageUrl } from "../../../utils/imageUrl";
+import { imageUrl, buildSrcSet } from "../../../utils/imageUrl";
 import { useTheme } from "../../../context/ThemeContext";
 import SmartImage from "../../ui/SmartImage";
 import { SLIDESHOW_MAX_ITEMS } from "../../../constants/slideshow";
@@ -310,15 +310,12 @@ function HeroKaryaShowcase({ variant }) {
         className={`pointer-events-none absolute -bottom-12 -left-14 z-0 h-64 w-64 animate-karta-pulse-slow rounded-full blur-[100px] md:h-80 md:w-80 ${cls.blobB}`}
       />
 
-      <div className="relative z-20 [perspective:1600px]">
-        {/* TUMPUKAN 3 KARTU — LAYER 3 (BACK) & LAYER 2 (MIDDLE) di belakang,
-            keduanya digeser kanan-bawah sehingga terlihat jelas & merata. */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0">
-          <div className="showcase-rear showcase-rear-back" />
-          <div className="showcase-rear showcase-rear-mid" />
-        </div>
-
-        {/* LAYER 1 — MAIN CARD, centered di depan. */}
+      <div className="relative z-20">
+        {/* Ruang 3D HANYA untuk tumpukan kartu (rear + main). Badge hologram
+            & tombol navigasi dibiarkan FLAT (di luar perspektif) agar teks
+            kecil di dalamnya tidak dilukis ulang oleh rasterizer 3D → tajam/HD. */}
+        <div className="relative z-0">
+                  {/* LAYER 1 — MAIN CARD, centered di depan. */}
         <div className="group/img relative z-10 transition-transform duration-700 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.02]">
           {loading || !preview ? (
             <div className="showcase-card relative overflow-hidden rounded-2xl" style={CARD_HEIGHT_STYLE}>
@@ -334,6 +331,8 @@ function HeroKaryaShowcase({ variant }) {
               <div className="showcase-card relative overflow-hidden rounded-2xl" style={CARD_HEIGHT_STYLE}>
                 <SmartImage
                   src={imageUrl(preview.thumbnail)}
+                  srcSet={buildSrcSet(preview.thumbnail)}
+                  sizes="(min-width: 768px) 640px, 92vw"
                   alt={preview.title}
                   eager
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover/img:scale-105"
@@ -368,6 +367,8 @@ function HeroKaryaShowcase({ variant }) {
             </div>
           )}
         </div>
+        </div>
+        {/* End ruang perspektif 3D kartu — badge & navigasi FLAT setelah ini. */}
 
         {/* TIGA BADGE HOLOGRAM — melayang di sudut kiri-atas, kanan-atas &
             kanan-bawah kartu utama (DI LUAR tepi kartu). Kiri-bawah kosong

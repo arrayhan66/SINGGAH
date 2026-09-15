@@ -767,7 +767,10 @@ const DRINK_RENDER = {
   mixue: Mixue,
 }
 
-function SideTable({ position, rotationY = 0, drink = "coffee", book1 = "atomic", book2 = "teras", drinks }) {
+function SideTable({ position, rotationY = 0, drink = "coffee", book1, book2, drinks }) {
+  const [b1, b2] = useMemo(() => getRandomUniqueBookKeys(2), [])
+  const finalB1 = book1 || b1
+  const finalB2 = book2 || b2
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
       <mesh position={[0, 0.03, 0]} castShadow>
@@ -788,14 +791,13 @@ function SideTable({ position, rotationY = 0, drink = "coffee", book1 = "atomic"
             const Comp = DRINK_RENDER[d] || Mug
             return <Comp key={i} position={[i === 1 ? 0 : i === 0 ? -0.17 : 0.17, 0.61, -0.04]} />
           })}
-          <RealBook coverKey={book1} w={0.16} x={0.2} y={0.624} z={-0.22} rot={0.15} />
-          <RealBook coverKey={book2} w={0.14} x={-0.2} y={0.622} z={-0.22} rot={-0.15} />
+          <RealBook coverKey={finalB1} w={0.16} x={0.2} y={0.624} z={-0.22} rot={0.15} />
+          <RealBook coverKey={finalB2} w={0.14} x={-0.2} y={0.622} z={-0.22} rot={-0.15} />
         </>
       ) : (
         <>
-          <RealBook coverKey={book1} w={0.16} x={0.14} y={0.626} z={0.08} rot={0.15} />
-          <RealBook coverKey={book2} w={0.14} x={-0.14} y={0.624} z={-0.08} rot={-0.25} />
-          {drink === "icedTea" ? <IcedTea position={[-0.22, 0.61, 0.14]} /> : <Mug position={[-0.22, 0.61, 0.14]} />}
+          <RealBook coverKey={finalB1} w={0.16} x={0.14} y={0.626} z={0.08} rot={0.15} />
+          <RealBook coverKey={finalB2} w={0.14} x={-0.14} y={0.624} z={-0.08} rot={-0.25} />
           {drink === "icedTea" ? <IcedTea position={[-0.22, 0.61, 0.14]} /> : <Mug position={[-0.22, 0.61, 0.14]} />}
         </>
       )}
@@ -806,6 +808,7 @@ function SideTable({ position, rotationY = 0, drink = "coffee", book1 = "atomic"
 function RoundTable({ position, rotationY = 0, radius = 0.9, height = 0.76, books = true }) {
   const top = height
   const topY = top + 0.03
+  const [b1, b2] = useMemo(() => getRandomUniqueBookKeys(2), [])
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
       <mesh position={[0, 0.045, 0]} castShadow>
@@ -826,8 +829,8 @@ function RoundTable({ position, rotationY = 0, radius = 0.9, height = 0.76, book
       </mesh>
       {books && (
         <>
-          <RealBook coverKey="laskar" x={0.2} y={topY + 0.016} z={-0.18} rot={0.3} />
-          <RealBook coverKey="teras" x={-0.18} y={topY + 0.015} z={0.16} rot={-0.25} />
+          <RealBook coverKey={b1} x={0.2} y={topY + 0.016} z={-0.18} rot={0.3} />
+          <RealBook coverKey={b2} x={-0.18} y={topY + 0.015} z={0.16} rot={-0.25} />
           <Mug position={[-0.28, topY + 0.02, -0.1]} />
         </>
       )}

@@ -3,6 +3,7 @@ import { useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
 import { useWalkStore, EYE, INTERACT_RANGE } from "../hooks/useWalk"
 import { usePlantInfoStore } from "../hooks/usePlantInfo"
+import { useBookInfoStore } from "../hooks/useBookInfo"
 import { useTransitionStore } from "../hooks/useTransition"
 import { getWalls, portals, findRoom, resolveHeight, FLOOR2_Y } from "../rooms/museumLayout"
 import { resolveCollision, resolveObjectCollision, resolveAABBs } from "../utils/collision"
@@ -121,6 +122,8 @@ function LookControls({ bounds, onSelectProject }) {
       onSelectProject(action.project)
     } else if (action.type === "info") {
       usePlantInfoStore.getState().setInfo(action.info)
+    } else if (action.type === "bookInfo") {
+      useBookInfoStore.getState().openBook(action.coverKey)
     } else if (action.type === "teleport") {
       teleportTo(action.point, action.yaw)
     } else if (action.type === "sit") {
@@ -326,6 +329,7 @@ function LookControls({ bounds, onSelectProject }) {
       const action = findAction(hit.object)
       if (action.type === "project" && !withinRange(hit.point, INTERACT_RANGE)) return
       if (action.type === "info" && !withinRange(hit.point, INTERACT_RANGE)) return
+      if (action.type === "bookInfo" && !withinRange(hit.point, INTERACT_RANGE)) return
       if (action.type === "teleport" && !withinRange(hit.point, TELEPORT_RANGE)) return
       handleAction(action, hit.point, hit.object)
     }

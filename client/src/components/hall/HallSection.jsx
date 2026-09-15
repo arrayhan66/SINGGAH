@@ -9,6 +9,7 @@ import LoadingOverlay from "./LoadingOverlay"
 import PortalTransitionOverlay from "./PortalTransitionOverlay"
 import ProjectDetailModal from "./ProjectDetailModal"
 import PlantInfoModal from "./PlantInfoModal"
+import BookInfoModal from "./BookInfoModal"
 import { preloadTexture } from "../../three/utils/useDownscaledTexture"
 import logo from "../../assets/icons/logo.webp"
 import exitImg from "../../assets/images/exit.jpg"
@@ -74,6 +75,7 @@ export default function HallSection() {
       )}
 
       <PlantInfoModal />
+      <BookInfoModal />
     </div>
   )
 }

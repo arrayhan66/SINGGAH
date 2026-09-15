@@ -41,7 +41,7 @@ export async function fetchGoogleBookData(coverKey, manualMeta) {
   if (cached) {
     try {
       return JSON.parse(cached)
-    } catch (e) {
+    } catch {
       // ignore
     }
   }
@@ -70,7 +70,7 @@ export async function fetchGoogleBookData(coverKey, manualMeta) {
       localStorage.setItem(cacheKey, JSON.stringify(result))
       return result
     }
-  } catch (e) {
+  } catch {
     // Network or CORS error - fallback to manual
   }
   return manualMeta

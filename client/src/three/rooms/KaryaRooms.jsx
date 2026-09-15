@@ -24,7 +24,7 @@ import prabowoImg from "../../assets/images/prabowo.webp"
 import gibranImg from "../../assets/images/gibran.webp"
 import pkkmbImg from "../../assets/images/pkkmb.webp"
 import { useDownscaledTexture } from "../utils/useDownscaledTexture"
-import { Plant, WallSconce } from "../components/Props"
+import { Plant, TULIP_INFO, WallSconce } from "../components/Props"
 import { textures } from "../utils/textures"
 import {
   rooms,
@@ -48,8 +48,6 @@ import {
   BOOKCASE_RING,
   PLANT_RING,
   PLANT_RING_JITTER,
-  LAMP_ACCENT_ANGLES,
-  LAMP_ACCENT_RADIUS,
   OTTOMAN_CIRCLE,
   ringAngle,
   ringPosition,
@@ -58,6 +56,11 @@ import {
 
 const H = MUSEUM.height
 const FEATURED_ON_PODIUM = 2
+
+const MONSTERA_INFO = {
+  title: "Monstera (Monstera deliciosa)",
+  text: "Monstera (Monstera deliciosa) — Tanaman hias tropis dengan daun besar berlubang khas yang unik. Melambangkan kelimpahan, kehormatan, dan pertumbuhan yang terus berkembang — populer sebagai simbol kemewahan alami dalam desain interior modern.",
+}
 
 // Pilih karya unggulan untuk podium: prioritas project yang ditandai admin
 // lewat featured_slot (1 & 2). Kalau belum ada yang ditandai, fallback ke
@@ -131,9 +134,8 @@ function PoufOttoman({ position, rotationY = 0, fabric = POUF_FABRICS[0] }) {
 // Central reading circle shared by both storeys: a ring of low bookcases
 // facing radially outward around one grand round carpet, with a round table
 // at the centre and sittable pouf ottomans gathered around it, plus a
-// greenery ring outside the bookcases and warm floor-lamp accents beyond.
-// Positions come from museumLayout so the collision circles in
-// objectColliders.js always match the visuals.
+// greenery ring outside the bookcases. Positions come from museumLayout so
+// the collision circles in objectColliders.js always match the visuals.
 function ReadingRing({ room, y = 0 }) {
   const cx = (room.x[0] + room.x[1]) / 2
   const rugMap = useMemo(() => textures.roundRug(), [])
@@ -154,16 +156,14 @@ function ReadingRing({ room, y = 0 }) {
         const a =
           ringAngle(i, PLANT_RING.count, PLANT_RING.phase) + PLANT_RING_JITTER.angle[i]
         const [x, z] = ringPosition(cx, PLANT_RING.radius + PLANT_RING_JITTER.radius[i], a)
-        return { key: i, x, z, variant: ["tall", "topiary", "flower"][i % 3] }
-      }),
-    [cx],
-  )
-
-  const lamps = useMemo(
-    () =>
-      LAMP_ACCENT_ANGLES.map((a, i) => {
-        const [x, z] = ringPosition(cx, LAMP_ACCENT_RADIUS, a)
-        return { key: i, x, z }
+        const base = ["tall", "topiary", "flower"][i % 3]
+        return {
+          key: i,
+          x,
+          z,
+          variant: "monstera",
+          monsteraVariant: base === "flower" ? "kecil" : "besar",
+        }
       }),
     [cx],
   )
@@ -195,16 +195,21 @@ function ReadingRing({ room, y = 0 }) {
 
       {/* Greenery ring just outside the bookcases */}
       {plants.map((p) => (
-        <Plant key={p.key} position={[p.x, y, p.z]} variant={p.variant} flowerColor="#7dd3fc" />
-      ))}
-
-      {/* Warm floor-lamp accents outside the plants */}
-      {lamps.map((l) => (
-        <FloorLamp key={l.key} position={[l.x, y, l.z]} rotationY={0.6} />
+        <Plant
+          key={p.key}
+          position={[p.x, y, p.z]}
+          variant={p.variant}
+          monsteraVariant={p.monsteraVariant}
+          flowerColor="#7dd3fc"
+          info={MONSTERA_INFO}
+        />
       ))}
 
       {/* Round table at the centre of the carpet */}
       <RoundTable position={[cx, y, ROOM_CENTER_Z]} rotationY={0.4} radius={1.5} height={0.42} />
+
+      {/* Tiang lampu tunggal di atas meja tengah lingkaran ottoman */}
+      <FloorLamp position={[cx, y + 0.45, ROOM_CENTER_Z]} rotationY={0.6} />
 
       {/* Sittable poufs around the table, each facing the centre */}
       {poufs.map((p) => (
@@ -357,8 +362,16 @@ function Stairs({ room }) {
       {/* Welcome mat at the bottom of the stairs */}
       <RectRug position={[xc, 0.015, STAIR_Z0 - 0.55]} rotationY={0} w={2.0} d={0.8} map={rugRectMap} />
 
-      {/* White potted flowers at the entrance before the left turn, right of the KARYA DOSEN wall (rear) */}
-      <Plant position={[x0 + STAIR_WIDTH + 1.2, 0, STAIR_Z0 - 0.6]} variant="flower" flowerColor="#f8fafc" />
+      {/* White potted tulips at the entrance before the left turn, right of the KARYA DOSEN wall (rear) */}
+      <Plant
+        position={[x0 + STAIR_WIDTH + 1.2, 0, STAIR_Z0 - 0.6]}
+        variant="flower"
+        flowerColor="#f8fafc"
+        flowerType="tulip"
+        flowerScale={0.68}
+        potStyle="ceramic"
+        info={TULIP_INFO}
+      />
 
       {/* Hanging plant above the top of the stairs */}
       <HangingPlant position={[xc, H - 0.2, STAIR_Z1 - 0.6]} drop={1.1} />
@@ -478,10 +491,27 @@ function RoomDecorGround({ room, projects }) {
     <group key={`decor-ground-${room.id}`}>
       <FloorLabel position={[cx + 1.3, 0.06, 36]} text="LANTAI 1 · KARYA MAHASISWA" />
 
-      <Plant position={[x1 - 2.5, 0, 36]} variant="flower" flowerColor="#60a5fa" />
-      <Plant position={[x0 + STAIR_WIDTH + 1.2, 0, STAIR_Z0 - 3.4]} variant="flower" flowerColor="#f8fafc" />
+      <Plant
+        position={[x0 + STAIR_WIDTH + 1.2, 0, STAIR_Z0 - 3.4]}
+        variant="flower"
+        flowerColor="#f8fafc"
+        flowerType="tulip"
+        potStyle="ceramic"
+        info={TULIP_INFO}
+      />
 
       <ReadingRing room={room} y={0} />
+
+      {/* Pot tanaman leafy (Rubber Plant) di samping rak buku rendah
+          (depan kanan ring) — hanya di ruang website (ruang 0). */}
+      {room.id === "website" && (
+        <Plant
+          position={[-123.85, 0, 46.23]}
+          rotationY={7.069}
+          variant="leafy"
+          info={MONSTERA_INFO}
+        />
+      )}
 
       <FeaturedWork position={[cx + 9.5, 0, 32]} rotationY={-0.46} projects={pickFeatured(projects)} />
 

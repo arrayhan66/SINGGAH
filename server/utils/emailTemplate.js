@@ -168,19 +168,10 @@ ${FOOTER_TEXT}`
 
 function welcomeEmail({ name, username, tipe }) {
   const tipeLabel = TIPE_LABELS[tipe] || null
-  const approvalNote = tipeLabel
-    ? `
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:14px;">
-          <tr>
-            <td align="center" style="background-color:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px;">
-              <div style="font-size:13px;color:#92400e;line-height:1.6;">
-                Permintaan verifikasi akun <strong>${tipeLabel}</strong> Anda sedang
-                ditinjau oleh admin. Anda akan diberi tahu lewat email begitu ada hasilnya.
-              </div>
-            </td>
-          </tr>
-        </table>`
-    : ""
+
+  const greeting = tipeLabel
+    ? `Email Anda telah diverifikasi, namun permintaan verifikasi akun <strong>${tipeLabel}</strong> Anda masih menunggu persetujuan admin. Sampai disetujui, akun Anda belum dapat mengunggah karya.`
+    : `Email Anda telah diverifikasi dan akun <strong>${BRAND_NAME}</strong> Anda sudah aktif. Kini Anda dapat mengunggah karya, mengikuti pameran, dan menjelajahi inovasi digital civitas akademika.`
 
   const contentHtml = `
     <tr>
@@ -196,9 +187,7 @@ function welcomeEmail({ name, username, tipe }) {
           Selamat Bergabung, ${escapeHtml(name)}!
         </h1>
         <p style="margin:0 0 22px;font-size:14px;color:${TEXT_BODY};line-height:1.7;">
-          Email Anda telah diverifikasi dan akun <strong>${BRAND_NAME}</strong> Anda
-          sudah aktif. Kini Anda dapat mengunggah karya, mengikuti pameran, dan
-          menjelajahi inovasi digital civitas akademika.
+          ${greeting}
         </p>
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
           <tr>
@@ -208,7 +197,6 @@ function welcomeEmail({ name, username, tipe }) {
             </td>
           </tr>
         </table>
-        ${approvalNote}
         <p style="margin:20px 0 0;font-size:13px;color:${TEXT_MUTED};line-height:1.6;">
           Sampai jumpa di pameran digital ${BRAND_NAME} &mdash; selamat berkarya!
         </p>
@@ -218,16 +206,13 @@ function welcomeEmail({ name, username, tipe }) {
 
   const contentText = `Halo ${name},
 
-Selamat bergabung di ${BRAND_NAME}! Email Anda telah diverifikasi dan akun Anda sudah aktif.
+Selamat bergabung di ${BRAND_NAME}! ${tipeLabel
+    ? `Email Anda telah diverifikasi, namun permintaan verifikasi akun ${tipeLabel} Anda masih menunggu persetujuan admin. Sampai disetujui, akun Anda belum dapat mengunggah karya.`
+    : `Email Anda telah diverifikasi dan akun Anda sudah aktif.`
+}
 
 Username akun Anda: ${username}
-${
-  tipeLabel
-    ? `
-Permintaan verifikasi akun ${tipeLabel} Anda sedang ditinjau oleh admin. Anda akan diberi tahu lewat email begitu ada hasilnya.
-`
-    : ""
-}Kini Anda dapat mengunggah karya, mengikuti pameran, dan menjelajahi inovasi digital civitas akademika.
+${tipeLabel ? "" : "Kini Anda dapat mengunggah karya, mengikuti pameran, dan menjelajahi inovasi digital civitas akademika."}
 
 ${FOOTER_TEXT}`
 

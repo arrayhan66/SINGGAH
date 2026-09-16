@@ -294,7 +294,12 @@ export function resolveHeight(x, z, level = 0) {
   if (!room || room.floor === "marble") return { height: 0, level: 0 }
   if (onStairs(room, x, z)) {
     const height = stairHeight(x, z)
-    const newLevel = (level === 1 && height > 1.0) || height >= FLOOR2_Y - 0.05 ? 1 : 0
+    // Commit to the upper level as soon as the climb clearly engages the
+    // stairs (rather than only in a thin sliver at the very top), so a walk
+    // substep can never jump from "level 0" straight past the top edge and
+    // snap the camera back down to the ground floor. Descending keeps the
+    // same boundary: the level holds until the player drops below 1.0.
+    const newLevel = height > 1.0 ? 1 : 0
     return { height, level: newLevel }
   }
   if (level === 1 && z >= room.z[0] && z <= room.z[1] && x >= room.x[0] && x <= room.x[1]) {
@@ -406,8 +411,8 @@ for (let i = 0; i < N; i++) {
 // `dir` tells the packing direction along the wall (+1 = pack from `from` edge,
 // -1 = pack from `to` edge). `endPad` reserves a bare margin at the far end of
 // the packing run (used so frames never get flush against the exit portal).
-function wallDef(axis, at, from, to, face, y = 2.75, dir = 1, endPad = 0) {
-  return { axis, at, from, to, face, y, dir, endPad }
+function wallDef(axis, at, from, to, face, y = 2.75, dir = 1, endPad = 0, noRail = false) {
+  return { axis, at, from, to, face, y, dir, endPad, noRail }
 }
 
 // Bare stretch left empty around the exit portal so frames don't hug the door.
@@ -456,7 +461,9 @@ for (let i = 0; i < N; i++) {
   // "KARYA DOSEN" sign — and then grows toward the back-left end of the room
   // as more works are added. Only when that wall is full does the row spill
   // onto the back wall, then the front wall beside the portal, then the
-  // short right-side wall.
+  // short right-side wall. (Filling positions are unchanged; only the ORDER
+  // of the works is reversed — see layoutPaintings — so the oldest work keeps
+  // its slot at the start and newcomers appear later along the same walls.)
   paintingWalls[id] = {
     ground: [
       wallDef("x", x0, STAIR_Z1, ROW_Z1, "+x", GROUND_Y),
@@ -467,13 +474,25 @@ for (let i = 0; i < N; i++) {
     upper: [
       wallDef("x", x0, STAIR_Z1, ROW_Z1, "+x", UPPER_Y),
       wallDef("z", ROW_Z1, x0, x1, "-z", UPPER_Y),
-      // Front wall split around the PKKMB poster zone: two segments packing
-      // from the room corners toward the poster, each stopping at the clear
-      // band so no frame touches the poster.
+      // Front wall split around the PKKMB poster zone:
+      //  - segmen depan-kanan (sebelah kanan poster): REL
+      //    (frame berhenti di sini, sebelum poster)
+      //  - segmen depan-kiri (sebelah kiri poster): TANPA rel
+      //    (tulip putih jadi ujung rel dari tembok kiri, tidak perlu ke sana)
+      // Front wall split around the PKKMB poster zone:
+      //  - segmen DEPAN-KANAN poster (si===1): rail (frame berhenti
+      //    di sini, sebelum poster)
+      //  - segmen DEPAN-KIRI poster (si===0): NO rail (tulip putih
+      //    sudah jadi awal rel dari tembok kiri, tidak perlu ke sana).
       ...carve(x0, x1, [{ a: cx - POSTER_CLEAR_HALF, b: cx + POSTER_CLEAR_HALF }]).map(
-        ([a, b], si) => wallDef("z", ROW_Z0, a, b, "+z", UPPER_Y, si > 0 ? -1 : 1, 0),
+        ([a, b], si) => wallDef("z", ROW_Z0, a, b, "+z", UPPER_Y, si > 0 ? -1 : 1, 0, si === 1 ? false : true),
       ),
+      // Tembok KANAN (x1) rail penuh (belakang + depan): rel menyusur
+      // dari tulip putih (sudut kiri-depan) → belakang → ke depan lagi
+      // → berbelok di sudut kanan → ke segmen depan-kanan → BERHENTI
+      // di sebelah kanan poster PKKMB (frame rel lantai 2).
       wallDef("x", x1, STAIR_Z1, ROW_Z1, "-x", UPPER_Y),
+      wallDef("x", x1, ROW_Z0, STAIR_Z1, "-x", UPPER_Y),
     ],
   }
 }
@@ -491,7 +510,6 @@ for (let i = 0; i < N; i++) {
   const [x0, x1] = roomX(i)
   const id = cat.slug
   const GROUND_Y = GROUND_PAINT_Y
-  const UPPER_Y = FLOOR2_Y + UPPER_PAINT_OFFSET
 
   roomRails[id] = {
     ground: [
@@ -502,10 +520,11 @@ for (let i = 0; i < N; i++) {
       wallDef("x", x1, STAIR_Z0, ROW_Z1, "-x", GROUND_Y),
     ],
     upper: [
-      // Both side walls run a full continuous rail on the upper floor: nothing
-      // cuts through up there (no stair passage), so the rail never breaks.
-      wallDef("x", x0, ROW_Z0, STAIR_Z1, "+x", UPPER_Y),
-      wallDef("x", x1, ROW_Z0, STAIR_Z1, "-x", UPPER_Y),
+      // Lantai 2 (dosen): rel HANYA mengikuti jalur karya yang sebenarnya —
+      // mulai dari sudut tulip putih (STAIR_Z1) menyusuri tembok kiri,
+      // belakang, dan kanan (rail segmen tsb di-render dari paintingWalls).
+      // Stretch depan (ROW_Z0 → STAIR_Z1) dihapus TOTAL supaya rel tidak
+      // menjangkau area poster PKKMB di depan.
     ],
   }
 }
@@ -534,7 +553,11 @@ const FRAME_EDGE_PAD = 0.5
 
 export function layoutPaintings(roomId, projects, level = "ground") {
   const wallsDef = paintingWalls[roomId]?.[level] || []
-  const list = projects || []
+  // Stable ordering: place the OLDEST work first (anchored on the right, since
+  // the walls above are mirrored). New/additions (newest works) always append
+  // AFTER the existing ones, so old works keep their exact slots and never
+  // shift when a new work arrives.
+  const list = [...(projects || [])].reverse()
   if (!list.length) return []
 
   const placed = []

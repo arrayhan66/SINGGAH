@@ -303,17 +303,27 @@ function LookControls({ bounds, onSelectProject }) {
         const actionable =
           isMoveAction
             ? action
-            : action && withinRange(hits[0].point, INTERACT_RANGE)
+            : action && withinRange(hits.length ? hits[0].point : null, INTERACT_RANGE)
               ? action
               : null
-        useWalkStore.getState().setHoverFloor(actionable?.type === "floor" || actionable?.type === "walk")
+        // Area jalan sah = RING LANTAI muncul (ada mesh lantai di bawah kursor),
+        // bukan harus hit pertama. Ini membuat kolong meja / rak buku — kursor
+        // kena kaki/penyangga furnitur (tanpa aksi) tapi lantainya bisa
+        // berdiri — tetap bisa diklik untuk berjalan (cek standable tetap
+        // dijalankan saat klik, jadi kolong tertutup plinth tetap ditolak).
+        const floorHover =
+          floorMeshesRef.current.length > 0 &&
+          floorRaycaster.current.intersectObjects(floorMeshesRef.current, false).length > 0
+        useWalkStore.getState().setHoverFloor(floorHover)
         // Lantai pakai crosshair (bukan pointer panah) + ring 3D menyala;
         // objek interaktif tetap pointer.
         document.body.style.cursor = actionable
           ? isMoveAction
             ? "crosshair"
             : "pointer"
-          : "default"
+          : floorHover
+            ? "crosshair"
+            : "default"
       }
     }
 
@@ -331,6 +341,23 @@ function LookControls({ bounds, onSelectProject }) {
       if (action.type === "info" && !withinRange(hit.point, INTERACT_RANGE)) return
       if (action.type === "bookInfo" && !withinRange(hit.point, INTERACT_RANGE)) return
       if (action.type === "teleport" && !withinRange(hit.point, TELEPORT_RANGE)) return
+      // Jalan-dengan-klik hanya diperbolehkan saat kursor berada di area jalan
+      // yang sah (ring/crosshair hover tampil). Tanpa itu — misal kursor tepat
+      // di tiang/pilar/pagar — klik TIDAK boleh membuat pemain berjalan, karena
+      // raycast bisa tembus ke lantai di belakang objek yang tidak punya aksi.
+      if (
+        (action.type === "floor" || action.type === "walk") &&
+        !useWalkStore.getState().hoverFloor
+      ) return
+      // Jangan izinkan jalan-dengan-klik ke titik yang tertutup/di atas model
+      // 3D (mis. kolong kursi, meja, pouf, kios, tanaman). Kalau titik itu
+      // di-rollout oleh collider furniture, pemain sebenarnya tidak bisa
+      // berdiri di sana — tolak biar tidak "menabrak" terus saat berjalan.
+      if (action.type === "floor" || action.type === "walk") {
+        const level = useWalkStore.getState().level
+        const standable = resolveObjectCollision(hit.point, getObjectColliders(), level)
+        if (standable.distanceTo(hit.point) > 0.001) return
+      }
       handleAction(action, hit.point, hit.object)
     }
 

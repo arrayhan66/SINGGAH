@@ -5,6 +5,10 @@
    diganti biru tua primer. Dark mode tidak tersentuh.
    ============================================================ */
 
+html.light {
+  color-scheme: light;
+}
+
 html.light body {
   background-color: #f2f6fb;
 }

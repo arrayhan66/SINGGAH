@@ -50,7 +50,7 @@ function LightModeHero() {
       {/* HERO SECTION */}
       <section
         id="hero"
-        className="relative min-h-[100dvh] overflow-hidden bg-paper"
+        className="relative lg:min-h-[100dvh] overflow-hidden bg-paper"
       >
         {/* Soft light decorative background pattern */}
         <div
@@ -61,7 +61,7 @@ function LightModeHero() {
           }}
         />
 
-        <div className="relative z-10 mx-auto flex min-h-screen max-w-[1700px] flex-col lg:flex-row lg:flex-wrap lg:content-center items-center justify-between px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-[calc(var(--navbar-h,80px)+24px)] pb-12">
+        <div className="relative z-10 mx-auto flex lg:min-h-screen max-w-[1700px] flex-col lg:flex-row lg:flex-wrap lg:content-center items-center lg:justify-between px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-[calc(var(--navbar-h,80px)+24px)] pb-6 lg:pb-12">
           <div className="flex w-full flex-col items-center text-center md:max-w-2xl md:mx-auto lg:max-w-xl 2xl:max-w-2xl lg:mx-0 lg:items-start lg:text-left lg:-mt-20">
             <div className="inline-flex items-center gap-2 min-[350px]:gap-3 rounded-full border border-blue-300 bg-white px-3 min-[350px]:px-4 py-2 shadow-sm backdrop-blur-md">
               <SmartImage
@@ -134,7 +134,7 @@ function LightModeHero() {
           </div>
 
           {/* Unified 4-stats row full-width, langsung di bawah showcase */}
-          <div className="w-full lg:basis-full mt-10">
+          <div className="w-full lg:basis-full mt-6 lg:mt-10">
             <LightModeHeroStats />
           </div>
         </div>

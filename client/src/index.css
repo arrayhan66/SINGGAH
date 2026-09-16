@@ -867,10 +867,10 @@ html.light .emoji-pop-preview-text {
 
 /* ============================================================
    HERO SHOWCASE — floating digital exhibit
-   MINIMALIST (Notion/Linear/Stripe): 1 card, 1 border, 1 shadow.
-   - Kartu utama : LANDSCAPE 16:9, rounded-2xl, 1px solid border
-     netral + soft box-shadow. TANPA transform/skew (border sejajar
-     sumbu, lurus & tajam). Tanpa rear-frame/glow/pulse.
+   - Kartu utama : LANDSCAPE 16:9, rounded-2xl, HANYA 1 lapisan.
+     Border asimetris (::before gradient ring 2px, terang kiri-atas →
+     transparent kanan-bawah, tanpa transform = tajam). Warna per
+     tema: dark = cyan #22d3ee, light = biru #1c52e1.
    - 4 badge hologram mengambang di sudut kartu (panel kaca
      angular + aura neon + ikon bercahaya + label uppercase).
    - Z-axis: background → main card → badge → arrow.
@@ -883,9 +883,10 @@ html.light .emoji-pop-preview-text {
                    between breakpoints (tokens are identical).
    ============================================================ */
 .hero-karya-showcase {
-  --kc-card-border: rgba(255, 255, 255, 0.1);
+  --kc-frame-a: rgba(34, 211, 238, 0.7);
+  --kc-frame-b: rgba(34, 211, 238, 0.2);
   --kc-card-bg: #072747;
-  --kc-card-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
+  --kc-card-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.65);
   --kc-glass-stop1: rgba(255, 255, 255, 0.12);
   --kc-glass-stop2: rgba(255, 255, 255, 0.05);
   --kc-glass-stop3: rgba(140, 170, 255, 0.07);
@@ -905,10 +906,11 @@ html.light .hero-karya-showcase {
      bg card = satu keluarga dgn body (kontras rendah), definisi dari tepi
      biru lembut di rentang opacity yg sama (0.25 ring border²), rear stack
      jelas bertumpuk, aura + drop gelap tipis. Dark mode tidak disentuh. */
-   --kc-card-border: rgba(0, 0, 0, 0.08);
-   --kc-card-bg: linear-gradient(180deg, #f5f9fd, #e5edf7);
-   --kc-card-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.15);
-   --kc-aura: radial-gradient(closest-side, rgba(59, 130, 246, 0.45), transparent 70%);
+   --kc-frame-a: rgba(28, 82, 225, 0.8);
+  --kc-frame-b: rgba(28, 82, 225, 0.35);
+  --kc-card-bg: linear-gradient(180deg, #f5f9fd, #e5edf7);
+  --kc-card-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.19);
+  --kc-aura: radial-gradient(closest-side, rgba(59, 130, 246, 0.45), transparent 70%);
   --kc-badge-border: rgba(96, 165, 250, 0.35);
   --kc-badge-bg: linear-gradient(140deg, rgba(255, 255, 255, 0.97), rgba(226, 239, 254, 0.95));
   --kc-ico-color: #ffffff;
@@ -926,16 +928,47 @@ html.light .hero-karya-showcase .badge-accent {
 }
 
 /* === SHOWCASE CARD — kartu utama.
-   MINIMALIST: 1px solid border netral + soft shadow (Notion/Linear/
-   Stripe). Tanpa transform/skew → seluruh sisi border sejajar sumbu
-   (lurus & tajam). */
+   1 BORDER SAJA (tidak ada rear/echo layer). Border ASIMETRIS yang
+   mengalir: ::before = ring 2px dari linear-gradient (mask padding-box),
+   terang di kiri-atas → meluruh jadi transparent di kanan-bawah. Elemen
+   TANPA transform/skew → garis border tetap sejajar sumbu = TAJAM/blur-free.
+   Warna per tema: dark = cyan #22d3ee, light = biru #1c52e1.
+   Box-shadow soft minimalist dipertahankan. */
 .hero-karya-showcase .showcase-card {
   box-sizing: border-box;
+  border: 0;
   border-radius: 16px;
-  border: 1px solid var(--kc-card-border);
   background: var(--kc-card-bg);
   box-shadow: var(--kc-card-shadow);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Ring border asimetris — mask padding-box, ketebalan 2px solid, warna
+   gradient TUNGGAL (bukan 2 frame). z-index 5 => di atas isi card,
+   di bawah tombol klik (z-10). */
+/* Pass ini: tebal 3px + opacity ≥0.85 agar PASTI terlihat jelas
+   (testing incremental), lalu tinggal diturunkan bila terlalu mencolok. */
+.hero-karya-showcase .showcase-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  box-sizing: border-box;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(
+    135deg,
+    var(--kc-frame-a) 0%,
+    var(--kc-frame-b) 45%,
+    transparent 68%,
+    transparent 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 /* JAMINAN: gambar slide SELALU terlihat di kedua tema — tidak pernah
@@ -958,12 +991,10 @@ html.light .hero-karya-showcase .badge-accent {
   mix-blend-mode: screen;
 }
 
-/* Mobile: beri padding kiri-kanan agar stack (dan frame dekoratif
-   104%/108% yang mengintip di luar card) tidak terpotong tepi layar
-   dan margin KIRI-KANAN SEIMBANG (tanpa overflow horizontal).
-   Panah navigasi ABSOLUTE relatif ke .hero-karya-showcase ikut
-   bergeser menyatu dengan card — tetap proporsional, tidak nabrak
-   tepi viewport. */
+/* Mobile: beri padding kiri-kanan agar card (plus border gold yang
+   mengalir) tidak mepet ke tepi layar dan margin KIRI-KANAN SEIMBANG
+   (tanpa overflow horizontal). Panah navigasi ABSOLUTE relatif ke
+   .hero-karya-showcase ikut bergeser menyatu dengan card. */
 @media (max-width: 640px) {
   .hero-karya-showcase {
     padding-inline: 16px;
@@ -1074,6 +1105,69 @@ html.light .hero-karya-showcase .badge-accent {
   .hero-karya-showcase .badge-ico   { width: 22px; height: 22px; }
   .hero-karya-showcase .badge-value { max-width: 115px; font-size: 11px; }
   .hero-karya-showcase .badge-label { font-size: 8px; }
+}
+
+/* ≤330px — badge ikut mengecil biar tidak kesannya "ngambang besar" di
+   atas card sempit. Teks value dipotong (ellipsis), float ikut dijinakkan
+   supaya tidak overhang keluar tepi card. */
+@media (max-width: 330px) {
+  .hero-karya-showcase .badge-shell { gap: 0.3rem; padding: 0.2rem 0.4rem 0.2rem 0.2rem; }
+  .hero-karya-showcase .badge-ico { width: 14px; height: 14px; }
+  .hero-karya-showcase .badge-ico svg { width: 10px; height: 10px; }
+  .hero-karya-showcase .badge-value { max-width: 70px; font-size: 9px; }
+  .hero-karya-showcase .badge-label { font-size: 6.5px; letter-spacing: 0.1em; }
+  .hero-karya-showcase .badge-accent { right: 4px; bottom: 3px; width: 9px; height: 1.5px; }
+  .hero-karya-showcase .badge-aura { inset: -4px; }
+
+  /* ≤330px card terlalu sempit — badge kanan-atas DIHAPUS agar tidak menumpuk */
+  .hero-karya-showcase .karta-bpos-tr { display: none; }
+  .hero-karya-showcase .karta-bpos-tl { left: 4px; top: 6px; }
+  .hero-karya-showcase .karta-bpos-br { right: 4px; bottom: 6px; }
+
+  .hero-karya-showcase .karta-float-a { animation-duration: 2.8s; }
+  .hero-karya-showcase .karta-float-b { animation-duration: 2.4s; }
+  .hero-karya-showcase .karta-float-c { animation-duration: 2.6s; }
+  .hero-karya-showcase .karta-float-d { animation-duration: 3.2s; }
+}
+
+/* Judul & eyebrow KARYA UNGGULAN — ukuran BERJENJANG tiap breakpoint
+   (900→300) sehingga judul menyusut terus dan TIDAK pernah sampai 3 baris.
+   Line-clamp 2 baris = jaring pengaman terakhir: judul over-panjang akan
+   dipotong "..." setelah baris ke-2. */
+.hero-karya-showcase h3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .hero-karya-showcase h3 { font-size: 19px; }
+  .hero-karya-showcase .karta-eyebrow { font-size: 8.5px; }
+}
+@media (max-width: 800px) {
+  .hero-karya-showcase h3 { font-size: 18px; }
+  .hero-karya-showcase .karta-eyebrow { font-size: 8px; }
+}
+@media (max-width: 700px) {
+  .hero-karya-showcase h3 { font-size: 17px; }
+  .hero-karya-showcase .karta-eyebrow { font-size: 8px; }
+}
+@media (max-width: 600px) {
+  .hero-karya-showcase h3 { font-size: 15px; }
+  .hero-karya-showcase .karta-eyebrow { font-size: 7.5px; }
+}
+@media (max-width: 500px) {
+  .hero-karya-showcase h3 { font-size: 13.5px; }
+  .hero-karya-showcase .karta-eyebrow { font-size: 7.5px; letter-spacing: 0.18em; }
+}
+@media (max-width: 400px) {
+  .hero-karya-showcase h3 { font-size: 12.5px; }
+  .hero-karya-showcase .karta-eyebrow { font-size: 7px; letter-spacing: 0.18em; }
+}
+@media (max-width: 300px) {
+  .hero-karya-showcase h3 { font-size: 11px; }
+  .hero-karya-showcase .karta-eyebrow { font-size: 6.5px; letter-spacing: 0.16em; }
 }
 
 

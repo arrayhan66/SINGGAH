@@ -19,7 +19,7 @@ import {
   Hourglass,
 } from "lucide-react";
 import api from "../../../../services/api";
-import GoogleLogin from "../../../ui/GoogleLoginButton";
+
 import SmartImage from "../../../ui/SmartImage";
 import PopupToast from "../../../ui/PopupToast";
 
@@ -398,28 +398,6 @@ function RegisterForm() {
                 </label>
               ))}
             </div>
-
-            {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
-              <div className="mt-0">
-                <div className="flex items-center gap-3">
-                  <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/15 to-white/5" />
-                  <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-slate-500 min-[350px]:text-xs">
-                    <span className="h-1 w-1 rounded-full bg-cyan-400/70" />
-                    atau daftar dengan
-                    <span className="h-1 w-1 rounded-full bg-cyan-400/70" />
-                  </span>
-                  <span className="h-px flex-1 bg-gradient-to-l from-transparent via-white/15 to-white/5" />
-                </div>
-                <div className="mt-6 sm:mt-7 md:mt-8">
-                  <GoogleLogin onError={setError} />
-                  <p className="mt-2 text-center text-[11px] leading-4 text-slate-400 sm:text-xs">
-                    Daftar 1-klik dengan Google. Akun baru otomatis menjadi tipe{" "}
-                    <strong className="text-slate-300">Umum</strong> — kamu bisa
-                    upgrade ke Mahasiswa/Dosen nanti lewat halaman profil.
-                  </p>
-                </div>
-              </div>
-            )}
             </>
           )}
 

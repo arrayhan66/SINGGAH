@@ -24,6 +24,7 @@ function KaryaProjectGallery({
   activeImage,
   setActiveImage,
   projectTitle,
+  showBack = true,
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -84,18 +85,20 @@ function KaryaProjectGallery({
       onMouseLeave={() => setPaused(false)}
     >
       {/* Tombol Kembali */}
-      <button
-        onClick={handleBack}
-        className="gallery-back group absolute left-2 top-2 z-20 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-brand-dark/90 p-1.5 text-[11px] font-medium text-slate-100 shadow-lg shadow-black/30 backdrop-blur-md transition-colors duration-300 hover:border-cyan-400/50 hover:bg-brand-navy hover:text-cyan-300 cursor-pointer sm:left-4 sm:top-4 sm:gap-2 sm:p-2 sm:py-2 sm:pl-3 sm:pr-4 sm:text-sm"
-      >
-        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/10 transition-colors duration-300 group-hover:bg-cyan-400/20 sm:h-6 sm:w-6">
-          <ArrowLeft
-            size={12}
-            className="transition-transform duration-300 group-hover:-translate-x-0.5 sm:size-3.5"
-          />
-        </span>
-        <span className="hidden sm:inline">{fromHall ? "Kembali ke Hall 3D" : "Kembali"}</span>
-      </button>
+      {showBack && (
+        <button
+          onClick={handleBack}
+          className="gallery-back group absolute left-2 top-2 z-20 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-brand-dark/90 p-1.5 text-[11px] font-medium text-slate-100 shadow-lg shadow-black/30 backdrop-blur-md transition-colors duration-300 hover:border-cyan-400/50 hover:bg-brand-navy hover:text-cyan-300 cursor-pointer sm:left-4 sm:top-4 sm:gap-2 sm:p-2 sm:py-2 sm:pl-3 sm:pr-4 sm:text-sm"
+        >
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/10 transition-colors duration-300 group-hover:bg-cyan-400/20 sm:h-6 sm:w-6">
+            <ArrowLeft
+              size={12}
+              className="transition-transform duration-300 group-hover:-translate-x-0.5 sm:size-3.5"
+            />
+          </span>
+          <span className="hidden sm:inline">{fromHall ? "Kembali ke Hall 3D" : "Kembali"}</span>
+        </button>
+      )}
 
       {/* Slideshow stage */}
       <div className="gallery-stage relative w-full overflow-hidden">

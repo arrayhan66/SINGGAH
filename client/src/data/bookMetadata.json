@@ -2,7 +2,7 @@
   "aku": {
     "judul": "Aku",
     "penulis": "Sjuman Djaya",
-    "sinopsis": "Novel biografi Chairil Anwar karya Sjuman Djaya yang mengisahkan perjalanan hidup sang penyair ternama Indonesia."
+    "sinopsis": "Buku karya Sjuman Djaya yang merangkum perjalanan hidup dramatis penyair legendaris Chairil Anwar, dari jiwa pemberontak dan gairah seninya hingga perjuangannya melawan kemiskinan di masa kemerdekaan Indonesia."
   },
   "ATMOICHABITS": {
     "judul": "Atomic Habits",
@@ -10,14 +10,14 @@
     "sinopsis": "Perubahan kecil yang memberikan hasil luar biasa. Cara mudah dan terbukti untuk membentuk kebiasaan baik dan menghilangkan kebiasaan buruk."
   },
   "buku pemrograman c++": {
-    "judul": "Pemrograman C++",
-    "penulis": "(isi manual)",
-    "sinopsis": "Panduan lengkap mempelajari bahasa pemrograman C++ dari konsep dasar hingga pemrograman berorientasi objek."
+    "judul": "Belajar Pemrograman Lanjut dengan C++",
+    "penulis": "Muhammad Taufik Dwi Putra dkk.",
+    "sinopsis": "Panduan mempelajari konsep lanjut pemrograman C++ mulai dari fungsi, pointer, pengurutan, pencarian, hingga pengelolaan berkas yang disajikan secara praktis."
   },
   "bukupython": {
-    "judul": "Python untuk Pemula",
-    "penulis": "(isi manual)",
-    "sinopsis": "Panduan praktis belajar bahasa pemrograman Python dari dasar hingga tingkat lanjut untuk pemula."
+    "judul": "Pemrograman Python Untuk Pemula",
+    "penulis": "Sugeng Winardi",
+    "sinopsis": "Panduan praktis belajar bahasa pemrograman Python dari konsep dasar hingga teknik pemrograman untuk pemula."
   },
   "Christopher-Paolini-Eragon": {
     "judul": "Eragon",
@@ -30,8 +30,8 @@
     "sinopsis": "Petualangan seru tiga sahabat menjelajahi dunia paralel penuh misteri dan keajaiban bersama Klan Bulan dan Matahari."
   },
   "dasar-dasarpemrograman": {
-    "judul": "Dasar Dasar Pemrograman",
-    "penulis": "(isi manual)",
+    "judul": "Buku Dasar-Dasar Pemrograman",
+    "penulis": "Dr. Adli Abdillah Nababan, M.Kom. dkk.",
     "sinopsis": "Konsep fundamental ilmu komputer dan algoritma pemrograman untuk membangun fondasi logika coding yang kuat."
   },
   "demoninthewood": {
@@ -47,32 +47,32 @@
   "filosofi teras": {
     "judul": "Filosofi Teras",
     "penulis": "Henry Manampiring",
-    "sinopsis": "Filsafat Yunani-Romawi kuno Stoicism untuk mental tangguh menghadapi hiruk-pikuk dunia modern."
+    "sinopsis": "Penerapan filsafat Stoikisme Yunani-Romawi kuno sebagai panduan latihan mental agar tidak gampang galau dan tangguh menghadapi dunia modern."
   },
   "gadisjalanan": {
-    "judul": "Gadis Jalanan",
-    "penulis": "(isi manual)",
-    "sinopsis": "Kisah dramatis mengenai perjuangan hidup di jalanan kota besar penuh tantangan dan pelajaran moral."
+    "judul": "Maggie: Si Gadis Jalanan",
+    "penulis": "Stephen Crane",
+    "sinopsis": "Kisah realis dan dramatis mengenai perjuangan tragis seorang gadis yang tumbuh di lingkungan kumuh kota besar."
   },
   "gahzi": {
-    "judul": "Gahzi",
-    "penulis": "(isi manual)",
-    "sinopsis": "Novel inspiratif penuh makna mengenai keteguhan prinsip dan pencarian jati diri."
+    "judul": "The Chronicles of Ghazi",
+    "penulis": "Felix Y. Siauw & Sayf Muhammad Isa",
+    "sinopsis": "Novel sejarah peradaban Islam yang mengisahkan perjuangan para ksatria Ghazi dalam menaklukkan wilayah dan menegakkan keadilan."
   },
   "gustirabykatakokoh": {
-    "judul": "Gusti Raby Kata Kokoh",
-    "penulis": "(isi manual)",
-    "sinopsis": "Refleksi spiritual dan filosofis kehidupan yang mendalam tentang kebijaksanaan lokal."
+    "judul": "Gustira",
+    "penulis": "Eko Ivano Winata",
+    "sinopsis": "Kisah anak-anak persembahan KKPK yang menyajikan refleksi dan petualangan penuh nilai moral kebaikan."
   },
   "kisah tanah jawa": {
     "judul": "Kisah Tanah Jawa",
-    "penulis": "Tim Kisah Tanah Jawa",
-    "sinopsis": "Penelusuran misteri, sejarah mistis, dan cerita angker di berbagai sudut pulau Jawa berdasarkan investigasi mendalam."
+    "penulis": "Bonaventura D. Genta, Dapoer Tjerita, & Mada Zidan (Mbah KJ)",
+    "sinopsis": "Penelusuran misteri, sejarah mistis, dan lokasi angker di pulau Jawa berdasarkan investigasi serta penuturan metafisika."
   },
-  "knhilafah": {
+  "khilafah": {
     "judul": "Khilafah",
-    "penulis": "(isi manual)",
-    "sinopsis": "Kajian historis dan pemikiran seputar sistem tata kelola pemerintahan dalam sejarah peradaban."
+    "penulis": "Felix Y. Siauw",
+    "sinopsis": "Kajian kepemimpinan dan gambaran kejayaan peradaban Islam yang tidak hanya mengandalkan figur amanah tetapi juga kepemimpinan sistemik."
   },
   "laskar-pelangi": {
     "judul": "Laskar Pelangi",
@@ -80,29 +80,29 @@
     "sinopsis": "Kisah inspiratif sekelompok anak Belitung yang berjuang menempuh pendidikan di tengah keterbatasan."
   },
   "makanyamikir": {
-    "judul": "Makan Ya Mikir",
-    "penulis": "(isi manual)",
-    "sinopsis": "Esai ringan namun tajam mengenai pentingnya berpikir kritis dan logis dalam menyikapi fenomena sehari-hari."
+    "judul": "Makanya, Mikir!",
+    "penulis": "Abigail Limuria & Cania Citta",
+    "sinopsis": "Kumpulan kerangka berpikir kritis dan studi kasus harian untuk membantu pembaca hidup lebih bijak dan bahagia."
   },
   "mohammadattauntuknegeriku": {
-    "judul": "Mohammad Hatta Untuk Negeriku",
-    "penulis": "(isi manual)",
-    "sinopsis": "Biografi pemikiran ekonomi dan perjuangan politik Bung Hatta demi kemerdekaan dan kedaulatan bangsa Indonesia."
+    "judul": "Untuk Negeriku: Sebuah Biografi Muhammad Hatta",
+    "penulis": "Taufik Abdullah",
+    "sinopsis": "Biografi rekam jejak perjuangan politik, integritas moral, dan pemikiran ekonomi Bung Hatta bagi kedaulatan Indonesia."
   },
   "pemrograman berbasis kecerdansan buatan": {
-    "judul": "Pemrograman Berbasis Kecerdasan Buatan",
-    "penulis": "(isi manual)",
-    "sinopsis": "Pengantar penerapan algoritma Artificial Intelligence dan Machine Learning dalam pengembangan aplikasi modern."
+    "judul": "Pemrograman Web Berbasis Kecerdasan Buatan",
+    "penulis": "Anita Sindar Ros Maryana Sinaga, Murni Marbun, & Arjon Samuel Sitio",
+    "sinopsis": "Pengantar praktis integrasi teknologi web dengan algoritma Kecerdasan Buatan (AI) untuk membangun aplikasi modern."
   },
   "saat ananda bertanya islam": {
     "judul": "Saat Ananda Bertanya Islam",
-    "penulis": "(isi manual)",
-    "sinopsis": "Panduan orang tua dalam menjawab pertanyaan mendasar anak-anak seputar akidah, ibadah, dan nilai keislaman."
+    "penulis": "Deden Mubarok Ruhiat, Lc.",
+    "sinopsis": "Panduan ringkas dan bijak bagi orang tua dalam menjawab pertanyaan anak seputar ketuhanan dan Islam berbasis Al-Qur'an serta logika."
   },
   "samuel": {
     "judul": "Samuel",
-    "penulis": "(isi manual)",
-    "sinopsis": "Kisah fiksi menarik tentang dinamika persahabatan, cinta, dan pencarian tujuan hidup."
+    "penulis": "ItaKrn",
+    "sinopsis": "Kisah Samuel Erlangga yang tampak tegas di luar namun menyimpan trauma masa lalu dan sisi personal yang kontras."
   },
   "sherlock holmes": {
     "judul": "Sherlock Holmes",
@@ -110,13 +110,13 @@
     "sinopsis": "Kumpulan misteri detektif paling brilian di dunia dengan metode deduksi logis bersama Dr. John Watson."
   },
   "stephenking": {
-    "judul": "Stephen King",
+    "judul": "IT",
     "penulis": "Stephen King",
-    "sinopsis": "Kumpulan karya horor dan thriller psikologis karya master cerita menegangkan dunia."
+    "sinopsis": "Novel horor legendaris tentang teror badut mistis Pennywise yang mengancam anak-anak Kota Derry setiap 27 tahun sekali."
   },
   "udahputusin aja": {
     "judul": "Udah Putusin Aja!",
     "penulis": "Felix Y. Siauw",
-    "sinopsis": "Motivasi Islami mengenai pentingnya menjaga kehormatan diri dan memilih jalan hubungan yang diridhoi."
+    "sinopsis": "Panduan dan motivasi Islami mengenai pentingnya menghindari pergaulan bebas/pacaran demi menjaga kehormatan diri."
   }
 }

@@ -5,7 +5,6 @@ import logo from "../../../../assets/icons/logo.webp";
 import api from "../../../../services/api";
 import { useAuth } from "../../../../context/AuthContext";
 import FormAlert from "../../../ui/FormAlert";
-import GoogleLogin from "../../../ui/GoogleLoginButton";
 import SmartImage from "../../../ui/SmartImage";
 import { getRedirectFrom } from "../../../../utils/redirectFrom";
 
@@ -276,21 +275,6 @@ function LoginForm() {
           </Link>
         </p>
       </form>
-
-      {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
-        <div className="-mt-5">
-          <div className="mb-4 flex items-center gap-3 sm:mb-5">
-            <span className="auth-divider-line h-px flex-1 bg-gradient-to-r from-transparent via-white/30 to-white/15" />
-            <span className="auth-divider-label flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-slate-400 min-[350px]:text-xs">
-              <span className="h-1 w-1 rounded-full bg-cyan-400/70" />
-              atau
-              <span className="h-1 w-1 rounded-full bg-cyan-400/70" />
-            </span>
-            <span className="auth-divider-line h-px flex-1 bg-gradient-to-l from-transparent via-white/30 to-white/15" />
-          </div>
-          <GoogleLogin label="Login dengan Google" onError={setGeneralError} />
-        </div>
-      )}
     </div>
   );
 }

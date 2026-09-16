@@ -2,11 +2,11 @@ import { HALL_PILLARS, rooms } from "../rooms/museumLayout"
 import {
   ROOM_CENTER_Z,
   BOOKCASE_RING,
-  PLANT_RING,
-  PLANT_RING_JITTER,
   OTTOMAN_CIRCLE,
   ringAngle,
   ringPosition,
+  STAIR_WIDTH,
+  STAIR_Z0,
 } from "../rooms/museumLayout"
 import {
   LOUNGE_LAYOUT,
@@ -135,10 +135,9 @@ function roomFurnitureColliders() {
       }
 
       // Greenery ring outside the bookcases
-      for (let i = 0; i < PLANT_RING.count; i++) {
-        const a =
-          ringAngle(i, PLANT_RING.count, PLANT_RING.phase) + PLANT_RING_JITTER.angle[i]
-        const [x, z] = ringPosition(cx, PLANT_RING.radius + PLANT_RING_JITTER.radius[i], a)
+      for (let i = 0; i < BOOKCASE_RING.count; i++) {
+        const a = ringAngle(i, BOOKCASE_RING.count, BOOKCASE_RING.phase)
+        const [x, z] = ringPosition(cx, BOOKCASE_RING.radius + 0.85, a)
         out.push({ x, z, radius: 0.45, level })
       }
 
@@ -159,6 +158,10 @@ function roomFurnitureColliders() {
 
       // Featured work podium on right side
       out.push({ x: cx + 9.5, z: 32, radius: 2.8, level })
+
+      // White potted tulips flanking the room's own staircase
+      out.push({ x: room.x[0] + STAIR_WIDTH + 1.2, z: STAIR_Z0 - 0.6, radius: 0.42, level })
+      out.push({ x: room.x[0] + STAIR_WIDTH + 1.2, z: STAIR_Z0 - 3.4, radius: 0.42, level })
     }
 
     // Wall cover over middle portal space on floor 2

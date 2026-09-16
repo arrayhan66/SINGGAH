@@ -1,11 +1,9 @@
-import { Component, Suspense, useMemo, useRef, useState } from "react"
+import { Component, Suspense, useMemo } from "react"
 import { Text } from "@react-three/drei"
-import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js"
 import { textures } from "../utils/textures"
 import { getAnisotropy, useLiteMode } from "../hooks/useQuality"
-import { useWalkStore, INTERACT_RANGE } from "../hooks/useWalk"
 import { useDownscaledTexture } from "../utils/useDownscaledTexture"
 import { PAINTING_SIZE } from "../rooms/museumLayout"
 import { CATEGORY_COLORS } from "../../utils/hallHelpers"
@@ -27,9 +25,10 @@ const GEO_MAT = new THREE.PlaneGeometry(W - 0.02, H - 0.02)
 const GEO_GLOW = new THREE.PlaneGeometry(W + 0.56, H + 0.56)
 const GEO_LIGHT_BOX = new THREE.BoxGeometry(FRAME_W + 0.06, 0.08, 0.22)
 const GEO_LIGHT_PLANE = new THREE.PlaneGeometry(W + 0.2, 0.55)
-const GEO_CONE = new THREE.ConeGeometry(W * 0.62, 1.5, 24, 1, true)
 const GEO_PLAQUE = new THREE.PlaneGeometry(FRAME_W - 0.04, 0.72)
-const GEO_STRIPE = new THREE.PlaneGeometry(FRAME_W + 0.08, 0.035)
+// Thin steel rim behind the plaque (regular works only): understated elegance,
+// clearly less ornate than the featured work's navy-gold plaque.
+const GEO_PLAQUE_RIM = new THREE.PlaneGeometry(FRAME_W - 0.01, 0.76)
 const GEO_WIRE = new THREE.CylinderGeometry(0.008, 0.008, 1, 6)
 
 const BAR_Y = FRAME_H / 2 - BAR_T / 2
@@ -49,15 +48,6 @@ const GEO_GOLD_BARS = (() => {
   )
 })()
 
-// The two gold stripes under the plaque merge into one draw call.
-const GEO_GOLD_STRIPES = (() => {
-  const s1 = GEO_STRIPE.clone()
-  s1.translate(0, -H / 2 - 0.4, 0)
-  const s2 = GEO_STRIPE.clone()
-  s2.translate(0, -H / 2 - 0.8, 0)
-  return mergeGeometries([s1, s2], false)
-})()
-
 // Hanging wires (both same length) merge into one unit-height geometry that is
 // scaled per painting by the wire length.
 const GEO_WIRE_PAIR = (() => {
@@ -73,10 +63,10 @@ const GOLD_MAT = new THREE.MeshStandardMaterial({
   metalness: 0.85,
   roughness: 0.28,
 })
-const GOLD_STRIPE_MAT = new THREE.MeshStandardMaterial({
-  map: textures.goldFrame(),
+const PLAQUE_RIM_MAT = new THREE.MeshStandardMaterial({
+  color: "#9fb0c8",
   metalness: 0.85,
-  roughness: 0.3,
+  roughness: 0.25,
 })
 const BEVEL_MAT = new THREE.MeshStandardMaterial({
   color: "#232e3c",
@@ -95,9 +85,9 @@ const PLAQUE_GOLD_MAT = new THREE.MeshStandardMaterial({
   metalness: 0.2,
 })
 const PLAQUE_DARK_MAT = new THREE.MeshStandardMaterial({
-  color: "#16222f",
-  roughness: 0.45,
-  metalness: 0.35,
+  color: "#1a2a3c",
+  roughness: 0.4,
+  metalness: 0.3,
 })
 const WIRE_MAT = new THREE.MeshStandardMaterial({
   color: "#2a3d5f",
@@ -346,61 +336,6 @@ function getCategoryColor(project) {
   return CATEGORY_COLORS[slug] || "#60a5fa"
 }
 
-// Efek hover desktop yang hidup ala artstep: lukisan terangkat halus sambil
-// membesar dengan spring, menunduk pelan ke arah pemain, dan glow/sorotan
-// bernapas. Hanya dipasang saat hover aktif — lukisan lain & mobile idle
-// tidak membayar apa pun.
-function HoverFX({ innerGroupRef, glowRef, coneRef }) {
-  const t = useRef(0)
-  useFrame((_, delta) => {
-    t.current += delta
-    const g = innerGroupRef.current
-    if (g) {
-      g.scale.x = THREE.MathUtils.damp(g.scale.x, 1.06, 8, delta)
-      g.scale.y = THREE.MathUtils.damp(g.scale.y, 1.06, 8, delta)
-      g.scale.z = THREE.MathUtils.damp(g.scale.z, 1.06, 8, delta)
-      g.position.y = THREE.MathUtils.damp(g.position.y, 0.12, 8, delta)
-      g.rotation.x = -0.05 + Math.sin(t.current * 1.7) * 0.04
-    }
-    if (glowRef.current) {
-      glowRef.current.material.opacity = 0.5 + Math.sin(t.current * 3.4) * 0.22
-    }
-    if (coneRef.current) {
-      coneRef.current.material.opacity = 0.22 + Math.sin(t.current * 3.4 + 1) * 0.08
-    }
-  })
-  return null
-}
-
-// Panel info yang muncul saat hover desktop — menarik tapi tetap murah
-// (3 mesh + 1 troika text, hanya ada saat di-hover).
-function HoverBadge() {
-  return (
-    <group position={[0, -H / 2 - 1.12, 0.08]}>
-      <mesh>
-        <planeGeometry args={[3.7, 0.62]} />
-        <meshBasicMaterial color="#0b1220" transparent opacity={0.82} depthWrite={false} />
-      </mesh>
-      <mesh position={[0, 0.43, 0.015]}>
-        <planeGeometry args={[3.7, 0.05]} />
-        <meshBasicMaterial color="#38bdf8" transparent opacity={0.95} depthWrite={false} />
-      </mesh>
-      <Text
-        position={[0, 0, 0.03]}
-        fontSize={0.16}
-        color="#a5e3ff"
-        anchorX="center"
-        anchorY="middle"
-        letterSpacing={0.06}
-        raycast={() => null}
-        font="/fonts/Poppins-SemiBold.ttf"
-      >
-        KLIK UNTUK LIHAT DETAIL
-      </Text>
-    </group>
-  )
-}
-
 function Painting({
   project,
   position = [0, 0, 0],
@@ -409,11 +344,7 @@ function Painting({
   railY = null,
   goldPlaque = false,
 }) {
-  const [hovered, setHovered] = useState(false)
   const lite = useLiteMode()
-  const innerGroupRef = useRef(null)
-  const glowRef = useRef(null)
-  const coneRef = useRef(null)
 
   const accent = isDosen ? "#22d3ee" : getCategoryColor(project)
   const title = project.title || "Karya"
@@ -424,28 +355,12 @@ function Painting({
   const railLen =
     railY != null ? Math.max(0.05, railY - position[1] - FRAME_H / 2 - 0.03) : 0
 
-  // Only allow hover/glow once the player is close enough to actually reach
-  // the work — otherwise distant frames flicker on every look-away.
-  const inRange = () => {
-    const p = useWalkStore.getState().position
-    const dx = p.x - position[0]
-    const dz = p.z - position[2]
-    return Math.hypot(dx, dz) <= INTERACT_RANGE
-  }
-
   return (
     <group
       position={position}
       rotation={[0, rotationY, 0]}
       scale={1}
       userData={{ action: { type: "project", project } }}
-      onPointerOver={() => {
-        if (inRange()) setHovered(true)
-      }}
-      onPointerMove={() => {
-        if (!inRange()) setHovered(false)
-      }}
-      onPointerOut={() => setHovered(false)}
     >
 {/* Wires tetap menempel ke rel (tidak ikut terangkat saat hover) */}
       {!lite && railY != null && (
@@ -457,16 +372,16 @@ function Painting({
         />
       )}
 
-      {/* Group dalam: animasi hover (angkat/condong/membesar) diputar di sini,
-          event & aksi tetap di group luar supaya posisi klik stabil. */}
-      <group ref={innerGroupRef} raycast={() => null}>
+      {/* Group dalam: identik dengan frame luar; event & aksi tetap di group luar
+          supaya posisi klik stabil. */}
+      <group raycast={() => null}>
         {/* Soft glow behind (category tinted) */}
       {!lite && (
-        <mesh ref={glowRef} geometry={GEO_GLOW} position={[0, 0, -0.012]}>
+        <mesh geometry={GEO_GLOW} position={[0, 0, -0.012]}>
           <meshBasicMaterial
             color={goldPlaque ? "#f3cf82" : accent}
             transparent
-            opacity={hovered ? 0.5 : goldPlaque ? 0.3 : 0.24}
+            opacity={goldPlaque ? 0.3 : 0.24}
           />
         </mesh>
       )}
@@ -529,49 +444,37 @@ function Painting({
             <meshStandardMaterial
               color="#94a3b8"
               emissive="#bfe3ff"
-              emissiveIntensity={hovered ? 2.8 : 1.7}
+              emissiveIntensity={1.7}
               metalness={0.6}
               roughness={0.3}
             />
           </mesh>
           <mesh geometry={GEO_LIGHT_PLANE} position={[0, H / 2 - 0.14, 0.1]}>
-            <meshBasicMaterial color="#cfe9ff" transparent opacity={hovered ? 0.5 : 0.26} />
+            <meshBasicMaterial color="#cfe9ff" transparent opacity={0.26} />
           </mesh>
         </>
       )}
 
-      {/* Light cone on hover */}
-      {hovered && !lite && (
-        <mesh ref={coneRef} geometry={GEO_CONE} position={[0, H / 2 - 0.55, 0.2]} rotation={[Math.PI, 0, 0]}>
-          <meshBasicMaterial
-            color="#cfe9ff"
-            transparent
-            opacity={0.16}
-            side={THREE.DoubleSide}
-            depthWrite={false}
-          />
-        </mesh>
+      {/* Plaque (info board). Karya unggulan: papan navy-gold ornamen. Karya biasa:
+        papan gelap lebih kaya + rim baja tipis, tanpa garis di atas/bawah judul. */}
+      {!goldPlaque && (
+        <mesh geometry={GEO_PLAQUE_RIM} material={PLAQUE_RIM_MAT} position={[0, -H / 2 - 0.58, 0.04]} />
       )}
-
-      {/* Plaque (info board, no text) */}
       <mesh
         geometry={GEO_PLAQUE}
         material={goldPlaque ? PLAQUE_GOLD_MAT : PLAQUE_DARK_MAT}
         position={[0, -H / 2 - 0.58, 0.045]}
       />
-      {!goldPlaque && (
-        <mesh geometry={GEO_GOLD_STRIPES} material={GOLD_STRIPE_MAT} position={[0, 0, 0.06]} />
-      )}
 
       <Text
         position={[0, -H / 2 - (goldPlaque ? 0.48 : 0.46), 0.08]}
         fontSize={0.115}
-        color={goldPlaque ? "#f2d492" : "#f1f5f9"}
+        color={goldPlaque ? "#f2d492" : "#f8fafc"}
         anchorX="center"
         anchorY="middle"
         maxWidth={FRAME_W - 0.12}
         lineHeight={1.15}
-        letterSpacing={goldPlaque ? 0.02 : 0}
+        letterSpacing={goldPlaque ? 0.02 : 0.012}
         raycast={() => null}
         font="/fonts/Poppins-SemiBold.ttf"
       >
@@ -580,23 +483,17 @@ function Painting({
       <Text
         position={[0, -H / 2 - (goldPlaque ? 0.70 : 0.66), 0.08]}
         fontSize={0.09}
-        color={goldPlaque ? "#cdb072" : "#93c5fd"}
+        color={goldPlaque ? "#cdb072" : accent}
         anchorX="center"
         anchorY="middle"
         maxWidth={FRAME_W - 0.12}
-        letterSpacing={goldPlaque ? 0.015 : 0}
+        letterSpacing={goldPlaque ? 0.015 : 0.008}
         raycast={() => null}
         font="/fonts/Poppins-Medium.ttf"
       >
         {authorName}
       </Text>
 
-      {/* Efek hover desktop (terangkat halus + menjurk pelan + glow bernapas) */}
-        {/* Cuma aktif saat hover & bukan lite → tidak membebani perangkat mobile */}
-        {hovered && !lite && (
-          <HoverFX innerGroupRef={innerGroupRef} glowRef={glowRef} coneRef={coneRef} />
-        )}
-        {hovered && !lite && <HoverBadge />}
       </group>
     </group>
   )

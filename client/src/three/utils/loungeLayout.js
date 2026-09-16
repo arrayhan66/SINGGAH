@@ -3,9 +3,9 @@
 export const LOUNGE_RADIUS = 8.6
 export const LOUNGE_LAYOUT = [
   { angle: Math.PI / 7, lamp: false },
-  { angle: Math.PI - Math.PI / 7, lamp: true },
+  { angle: Math.PI - Math.PI / 7, lamp: false },
   { angle: Math.PI + Math.PI / 7, lamp: false },
-  { angle: -Math.PI / 7, lamp: true },
+  { angle: -Math.PI / 7, lamp: false },
 ]
 
 // Chair offsets along the group's local tangent, facing each other across the table.

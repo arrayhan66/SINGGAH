@@ -1,5 +1,34 @@
 import bookMetadata from "../../data/bookMetadata.json"
 
+// Buku di scene memakai kunci alias (mis. "atomic", "bintang", "golang",
+// "fullstack", "sherlock", "cpp") sementara bookMetadata.json memakai kunci
+// file canonical ("ATMOICHABITS", dst). Resolusi ini memastikan sinopsis/
+// penulis manual di JSON tetap dipakai walau kunci yang diklik adalah alias.
+// Kunci harus lowercase; "knhilafah" (kunci file lama) dipetakan ke "khilafah".
+const BOOK_META_ALIASES = {
+  atomic: "ATMOICHABITS",
+  atmoichabits: "ATMOICHABITS",
+  cpp: "buku pemrograman c++",
+  python: "bukupython",
+  eragon: "Christopher-Paolini-Eragon",
+  bintang: "cover-novel-bintang-karya-tere-liye",
+  dasar: "dasar-dasarpemrograman",
+  golang: "dasar-dasarpemrograman",
+  demon: "demoninthewood",
+  einstein: "einsteinwalterisaacson",
+  teras: "filosofi teras",
+  gus: "gustirabykatakokoh",
+  atta: "mohammadattauntuknegeriku",
+  sherlock: "sherlock holmes",
+  fullstack: "pemrograman berbasis kecerdansan buatan",
+  ai: "pemrograman berbasis kecerdansan buatan",
+  ananda: "saat ananda bertanya islam",
+  putusin: "udahputusin aja",
+  knhilafah: "khilafah",
+  laskar: "laskar-pelangi",
+  tanahjawa: "kisah tanah jawa",
+}
+
 export function formatTitleFromKey(key) {
   if (!key) return "Buku Tanpa Judul"
   // Clean extension if present, replace dashes/underscores with spaces
@@ -20,12 +49,11 @@ export function getBookMeta(coverKey) {
     }
   }
 
-  // Exact match or case-insensitive match
-  const foundKey = Object.keys(bookMetadata).find(
-    (k) => k.toLowerCase() === coverKey.toLowerCase()
-  )
-
-  const meta = foundKey ? bookMetadata[foundKey] : null
+  // Exact match / case-insensitive / resolusi alias ke kunci canonical.
+  const lower = coverKey.toLowerCase()
+  const foundKey = Object.keys(bookMetadata).find((k) => k.toLowerCase() === lower)
+  const resolvedKey = foundKey || BOOK_META_ALIASES[lower]
+  const meta = resolvedKey ? bookMetadata[resolvedKey] : null
   const formattedTitle = formatTitleFromKey(coverKey)
 
   return {
@@ -36,6 +64,14 @@ export function getBookMeta(coverKey) {
 }
 
 export async function fetchGoogleBookData(coverKey, manualMeta) {
+  // Data manual (bookMetadata.json) adalah sumber utama. Kalau sinopsis sudah
+  // diisi manual, jangan pernah timpa dengan API Google maupun cache lama di
+  // localStorage — cache lama dari pencarian sebelumnya justru mengalahkan
+  // perubahan manual di JSON.
+  const isManualComplete =
+    !!manualMeta.sinopsis && manualMeta.sinopsis !== "Sinopsis belum tersedia."
+  if (isManualComplete) return manualMeta
+
   const cacheKey = `book_meta_cache_${coverKey}`
   const cached = localStorage.getItem(cacheKey)
   if (cached) {

@@ -11,13 +11,10 @@ import HaloPendant from "../components/HaloPendant"
 import KaryaCeiling from "../components/KaryaCeiling"
 import {
   Bookcase,
-  FloorLamp,
   WallClock,
-  WallFrames,
   PresidentPortrait,
   RoundRug,
   RoundTable,
-  HangingPlant,
   RectRug,
 } from "../components/HomeDecor"
 import prabowoImg from "../../assets/images/prabowo.webp"
@@ -46,8 +43,6 @@ import {
   PORTAL_W,
   ROOM_CENTER_Z,
   BOOKCASE_RING,
-  PLANT_RING,
-  PLANT_RING_JITTER,
   OTTOMAN_CIRCLE,
   ringAngle,
   ringPosition,
@@ -152,10 +147,9 @@ function ReadingRing({ room, y = 0 }) {
 
   const plants = useMemo(
     () =>
-      Array.from({ length: PLANT_RING.count }, (_, i) => {
-        const a =
-          ringAngle(i, PLANT_RING.count, PLANT_RING.phase) + PLANT_RING_JITTER.angle[i]
-        const [x, z] = ringPosition(cx, PLANT_RING.radius + PLANT_RING_JITTER.radius[i], a)
+      Array.from({ length: BOOKCASE_RING.count }, (_, i) => {
+        const a = ringAngle(i, BOOKCASE_RING.count, BOOKCASE_RING.phase)
+        const [x, z] = ringPosition(cx, BOOKCASE_RING.radius + 0.85, a)
         const base = ["tall", "topiary", "flower"][i % 3]
         return {
           key: i,
@@ -207,9 +201,6 @@ function ReadingRing({ room, y = 0 }) {
 
       {/* Round table at the centre of the carpet */}
       <RoundTable position={[cx, y, ROOM_CENTER_Z]} rotationY={0.4} radius={1.5} height={0.42} />
-
-      {/* Tiang lampu tunggal di atas meja tengah lingkaran ottoman */}
-      <FloorLamp position={[cx, y + 0.45, ROOM_CENTER_Z]} rotationY={0.6} />
 
       {/* Sittable poufs around the table, each facing the centre */}
       {poufs.map((p) => (
@@ -347,18 +338,6 @@ function Stairs({ room }) {
         <WallSconce key={`sconce-${i}`} position={[x0 + STAIR_WIDTH - 0.12, y, z]} rotationY={-Math.PI / 2} />
       ))}
 
-      {/* Framed art climbing the left wall alongside the stairs, each at eye height for its step */}
-      <WallFrames
-        position={[x0 + 0.16, 0, STAIR_Z0]}
-        rotationY={Math.PI / 2}
-        variants={[
-          { pos: [-2.25, 3.7, 0], size: [0.62, 0.85], tilt: 0.02 },
-          { pos: [-4.25, 5.1, 0], size: [0.7, 0.95], tilt: -0.02 },
-          { pos: [-6.25, 6.4, 0], size: [0.62, 0.85], tilt: 0.02 },
-          { pos: [-8.25, 7.5, 0], size: [0.7, 0.95], tilt: -0.02 },
-        ]}
-      />
-
       {/* Welcome mat at the bottom of the stairs */}
       <RectRug position={[xc, 0.015, STAIR_Z0 - 0.55]} rotationY={0} w={2.0} d={0.8} map={rugRectMap} />
 
@@ -372,9 +351,6 @@ function Stairs({ room }) {
         potStyle="ceramic"
         info={TULIP_INFO}
       />
-
-      {/* Hanging plant above the top of the stairs */}
-      <HangingPlant position={[xc, H - 0.2, STAIR_Z1 - 0.6]} drop={1.1} />
     </group>
   )
 }
@@ -496,22 +472,12 @@ function RoomDecorGround({ room, projects }) {
         variant="flower"
         flowerColor="#f8fafc"
         flowerType="tulip"
+        flowerScale={0.68}
         potStyle="ceramic"
         info={TULIP_INFO}
       />
 
       <ReadingRing room={room} y={0} />
-
-      {/* Pot tanaman leafy (Rubber Plant) di samping rak buku rendah
-          (depan kanan ring) — hanya di ruang website (ruang 0). */}
-      {room.id === "website" && (
-        <Plant
-          position={[-123.85, 0, 46.23]}
-          rotationY={7.069}
-          variant="leafy"
-          info={MONSTERA_INFO}
-        />
-      )}
 
       <FeaturedWork position={[cx + 9.5, 0, 32]} rotationY={-0.46} projects={pickFeatured(projects)} />
 
@@ -744,9 +710,11 @@ export function KaryaRooms({ groups, marbleMap, archways }) {
               const placed = layoutPaintings(room.id, list, level)
               return (
                 <group key={level}>
-                  {wallDefs.map((wd, i) => (
-                    <PaintingRail key={`r-${level}-${i}`} wall={wd} />
-                  ))}
+                  {wallDefs.map((wd, i) =>
+                    wd.noRail ? null : (
+                      <PaintingRail key={`r-${level}-${i}`} wall={wd} />
+                    ),
+                  )}
                   {extraRails.map((wd, i) => (
                     <PaintingRail key={`xr-${level}-${i}`} wall={wd} />
                   ))}

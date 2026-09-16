@@ -3,61 +3,66 @@ import { useNavigate, useLocation } from "react-router-dom"
 import {
   X,
   ExternalLink,
-  Eye,
-  Heart,
-  GraduationCap,
-  User,
   ArrowRight,
-  Users,
-  FileText,
-  CalendarDays,
-  CheckCircle2,
+  MessageCircle,
+  Check,
+  Send,
+  Share2,
+  Link2,
 } from "lucide-react"
 import { useAuth } from "../../context/AuthContext"
+import { useTheme } from "../../context/ThemeContext"
 import { saveHallReturn } from "../../three/hooks/useWalk"
 import api from "../../services/api"
-import { toEmbedUrl } from "../../utils/videoUrl"
-import { openDocument } from "../../utils/projectDocument"
+import { imageUrl } from "../../utils/imageUrl"
+import GlassCard from "../ui/GlassCard"
 import SmartImage from "../ui/SmartImage"
+import KaryaProjectGallery from "../sections/karya/detail/KaryaProjectGallery"
+import KaryaProjectHeader from "../sections/karya/detail/KaryaProjectHeader"
+import KaryaProjectContent from "../sections/karya/detail/KaryaProjectContent"
 
 function ProjectDetailModal({ project, categoryTitle, onClose }) {
   const navigate = useNavigate()
   const location = useLocation()
   const { user } = useAuth()
+  const { theme } = useTheme()
+  const isLight = theme === "light"
   const isLoggedIn = Boolean(user)
-  const isDosen = project.authorType === "dosen"
-  const authorName = project.User?.name || project.author?.[0] || "Kreator"
   const categorySlug = project.Category?.slug || project.category
-  const coverImage = project.thumbnail || project.image || "https://placehold.co/800x500/0f172a/38bdf8?text=Preview"
-  const description = project.description || project.desc || ""
-  const technologies = Array.isArray(project.technologies) ? project.technologies : []
-  const links = Array.isArray(project.links) ? project.links : []
-  const members = Array.isArray(project.members) ? project.members : []
-  const documents = Array.isArray(project.documents) ? project.documents : []
-  const videos = Array.isArray(project.videos) ? project.videos : []
-  const year = project.year || "-"
-  const status = project.status || "published"
 
+  const links = Array.isArray(project.links) ? project.links : []
+
+  const [activeImage, setActiveImage] = useState(0)
   const [isLiked, setIsLiked] = useState(Boolean(project.isLiked))
   const [likeCount, setLikeCount] = useState(project.likesCount || 0)
-  const [viewsCount, setViewsCount] = useState(project.viewsCount || 0)
+  const [isBookmarked, setIsBookmarked] = useState(Boolean(project.bookmarked))
+  const [showShareModal, setShowShareModal] = useState(false)
+  const [isCopied, setIsCopied] = useState(false)
 
   useEffect(() => {
     if (!project.id) return
-    api.post(`/projects/${project.id}/view`)
-      .then((res) => {
-        const { viewsCount: count } = res.data.data || {}
-        if (typeof count === "number") setViewsCount(count)
-      })
-      .catch((err) => {
-        console.error("Failed to record view:", err)
-      })
+    api.post(`/projects/${project.id}/view`).catch((err) => {
+      console.error("Failed to record view:", err)
+    })
   }, [project.id])
+
+  const gallery = Array.from(
+    new Set([
+      project.thumbnail,
+      ...(Array.isArray(project.images) ? project.images : []).map(
+        (img) => img.image_url,
+      ),
+    ]),
+  ).filter(Boolean)
+
+  const detailPath = `/karya/${categorySlug}/${project.slug || project.id}`
+  const shareLink = `${window.location.origin}${detailPath}`
+  const shareImage = imageUrl(gallery[0] || project.thumbnail)
 
   function openDetail() {
     saveHallReturn()
     onClose()
-    navigate(`/karya/${categorySlug}/${project.slug || project.id}`, { state: { fromHall: true } })
+    navigate(detailPath, { state: { fromHall: true } })
   }
 
   function handleLike() {
@@ -77,218 +82,250 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
       })
   }
 
-  const statusLabel =
-    status === "draft"
-      ? "Draft"
-      : status === "pending"
-        ? "Menunggu Review"
-        : "Dipublikasikan"
+  function handleBookmark() {
+    if (!isLoggedIn) {
+      onClose()
+      navigate("/login", { state: { from: location } })
+      return
+    }
+    api.post(`/projects/${project.id}/bookmark`)
+      .then((res) => {
+        setIsBookmarked(Boolean(res.data.data?.bookmarked))
+      })
+      .catch((err) => {
+        console.error("Failed to update bookmark:", err)
+      })
+  }
 
-  const statusColor =
-    status === "draft"
-      ? "bg-amber-500/20 text-amber-300 border-amber-400/40"
-      : status === "pending"
-        ? "bg-orange-500/20 text-orange-300 border-orange-400/40"
-        : "bg-emerald-500/20 text-emerald-300 border-emerald-400/40"
+  const shareToWhatsApp = () => {
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent("Lihat karya ini: " + shareLink)}`
+    window.open(waUrl, "_blank")
+    setShowShareModal(false)
+  }
 
-  const techLabel = (tech) => (typeof tech === "string" ? tech : tech?.name || "")
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(shareLink)
+      setIsCopied(true)
+      setTimeout(() => {
+        setIsCopied(false)
+        setShowShareModal(false)
+      }, 2000)
+    } catch (err) {
+      console.error("Gagal menyalin", err)
+    }
+  }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6">
+      {/* Backdrop */}
       <div
-        onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-sky-700/60 bg-gradient-to-b from-sky-950 via-slate-950 to-sky-950 p-6 md:p-8 space-y-6 shadow-2xl relative"
-      >
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 w-10 h-10 rounded-full bg-sky-900/60 hover:bg-sky-800 border border-sky-700/50 flex items-center justify-center text-white transition-colors cursor-pointer"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        onClick={onClose}
+        className={`absolute inset-0 ${isLight ? "bg-slate-900/70" : "bg-black/80"} backdrop-blur-md`}
+      />
 
-        {/* Badges */}
-        <div className="flex flex-wrap items-center gap-3 pr-12">
-          <span
-            className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1 rounded-full border ${
-              isDosen
-                ? "bg-sky-500/20 text-sky-300 border-sky-400/40"
-                : "bg-indigo-600/20 text-indigo-300 border-indigo-500/40"
+      {/* Container modal — class karya-projectdetail-page mengaktifkan semua
+          override dark/light detail-light.css seperti halaman KaryaProjectDetail */}
+      <div className="karya-projectdetail-page relative w-full max-w-3xl max-h-[92vh] overflow-y-auto animate-fade-in">
+        <GlassCard className="overflow-hidden p-0 shadow-2xl">
+          {/* Tombol close (di atas galeri) */}
+          <button
+            onClick={onClose}
+            aria-label="Tutup detail karya"
+            className={`absolute right-3 top-3 z-30 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border backdrop-blur-md transition-colors duration-300 ${
+              isLight
+                ? "border-slate-300 bg-white/80 text-slate-700 hover:bg-slate-200"
+                : "border-white/20 bg-brand-dark/90 text-slate-100 hover:bg-brand-navy hover:text-cyan-300"
             }`}
           >
-            {isDosen ? <GraduationCap className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
-            <span>{isDosen ? "Karya Dosen" : "Karya Mahasiswa"}</span>
-          </span>
-          <span className="inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1 rounded-full border border-sky-700/40 bg-sky-900/40 text-sky-200">
-            <CalendarDays className="w-3.5 h-3.5" />
-            <span>{year}</span>
-          </span>
-          <span className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1 rounded-full border ${statusColor}`}>
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>{statusLabel}</span>
-          </span>
-        </div>
+            <X className="h-5 w-5" />
+          </button>
 
-        <h3 className="text-2xl md:text-3xl font-extrabold text-white">{project.title}</h3>
-
-        <div className="rounded-2xl overflow-hidden border border-sky-800/60 bg-black/50 flex items-center justify-center">
-          <SmartImage
-            src={coverImage}
-            alt={project.title}
-            className="w-full max-h-72 object-contain"
+          <KaryaProjectGallery
+            slug={categorySlug}
+            gallery={gallery}
+            activeImage={activeImage}
+            setActiveImage={setActiveImage}
+            projectTitle={project.title}
+            showBack={false}
           />
-        </div>
 
-        <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-sky-300">Deskripsi Karya</h4>
-          <p className="text-sm text-slate-100/80 leading-relaxed">{description}</p>
-        </div>
-
-        <div className="bg-sky-900/30 border border-sky-800/50 rounded-xl p-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-sky-600/30 flex items-center justify-center text-sky-300 font-bold">
-              {authorName[0]}
-            </div>
-            <div>
-              <div className="text-sm font-bold text-white">{authorName}</div>
-              <div className="text-xs text-sky-300/70">
-                {isDosen ? "Dosen / Peneliti" : "Mahasiswa"} • {project.Category?.name || categoryTitle}
-              </div>
-            </div>
+          <div className="p-4 sm:p-8 lg:p-10">
+            <KaryaProjectHeader
+              project={project}
+              isLiked={isLiked}
+              likeCount={likeCount}
+              handleLike={handleLike}
+              isBookmarked={isBookmarked}
+              handleBookmark={handleBookmark}
+              handleShare={() => setShowShareModal(true)}
+            />
+            <KaryaProjectContent project={project} />
           </div>
 
-          <div className="flex items-center space-x-4 text-xs text-sky-300/80">
-            <span className="flex items-center space-x-1">
-              <Eye className="w-4 h-4 text-sky-400" />
-              <span>{viewsCount}</span>
-            </span>
+          {/* Footer aksi */}
+          <div className="flex flex-wrap items-center justify-end gap-3 border-t border-white/10 px-4 pb-4 pt-4 sm:px-8 sm:pb-8 sm:pt-6 lg:px-10">
+            {links[0]?.url && (
+              <a
+                href={links[0].url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white"
+              >
+                <span>Kunjungi Demo</span>
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            )}
+
             <button
-              onClick={handleLike}
-              title={isLoggedIn ? (isLiked ? "Batalkan suka" : "Sukai karya ini") : "Masuk untuk menyukai karya"}
-              className={`flex items-center space-x-1 transition-transform cursor-pointer ${isLoggedIn ? "hover:scale-110 active:scale-95" : ""}`}
+              onClick={openDetail}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-400 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-sky-500/20 transition-all hover:from-sky-500 hover:to-cyan-300"
             >
-              <Heart
-                className={`w-4 h-4 transition-colors ${
-                  isLiked ? "fill-red-500 text-red-500" : "text-red-400"
-                } ${isLoggedIn ? "" : "opacity-70"}`}
-              />
-              <span>{likeCount}</span>
+              <span>Lihat Detail Lengkap</span>
+              <ArrowRight className="h-4 w-4" />
             </button>
           </div>
-        </div>
-
-        {members.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold text-sky-300 flex items-center space-x-2">
-              <Users className="w-4 h-4" />
-              <span>Tim Pengembang</span>
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {members.map((m, i) => (
-                <span
-                  key={m.id || i}
-                  className="text-xs bg-sky-900/60 border border-sky-700/50 px-3 py-1.5 rounded-lg text-sky-100"
-                >
-                  {m.name}
-                  {m.role && <span className="ml-1.5 text-sky-400/70">({m.role})</span>}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {technologies.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold text-sky-300">Teknologi Digunakan</h4>
-            <div className="flex flex-wrap gap-2">
-              {technologies.map((tech, i) => (
-                <span
-                  key={i}
-                  className="text-xs bg-sky-900/60 border border-sky-700/50 px-3 py-1 rounded-lg text-sky-200"
-                >
-                  {techLabel(tech)}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {links.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold text-sky-300">Tautan</h4>
-            <div className="flex flex-wrap gap-2">
-              {links.map((link, i) => (
-                <a
-                  key={link.id || i}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs bg-sky-900/60 border border-sky-700/50 px-3 py-1.5 rounded-lg text-sky-200 hover:bg-sky-800 hover:border-sky-500 flex items-center space-x-1.5 transition-colors cursor-pointer"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  <span>{link.label || "Kunjungi"}</span>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {documents.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold text-sky-300">Dokumen Pendukung</h4>
-            <div className="flex flex-wrap gap-2">
-              {documents.map((doc, i) => (
-                <button
-                  key={doc.id || i}
-                  type="button"
-                  onClick={() => openDocument(doc)}
-                  className="text-xs bg-sky-900/60 border border-sky-700/50 px-3 py-1.5 rounded-lg text-sky-200 hover:bg-sky-800 hover:border-sky-500 flex items-center space-x-1.5 transition-colors cursor-pointer"
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>{doc.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {videos.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold text-sky-300">Video Demo</h4>
-            {videos.map((vid, i) => (
-              <div key={vid.id || i} className="aspect-video w-full overflow-hidden rounded-xl border border-sky-800/60">
-                <iframe
-                  src={toEmbedUrl(vid.video_url)}
-                  title="Video Demo"
-                  className="h-full w-full border-0"
-                  allowFullScreen
-                />
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div className="pt-4 border-t border-sky-900/80 flex items-center justify-end gap-3 flex-wrap">
-          {links[0]?.url && (
-            <a
-              href={links[0].url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-5 py-2.5 rounded-xl bg-sky-900 hover:bg-sky-800 border border-sky-700 text-sm font-semibold text-sky-100 flex items-center space-x-2 transition-colors cursor-pointer"
-            >
-              <span>Kunjungi Demo</span>
-              <ExternalLink className="w-4 h-4" />
-            </a>
-          )}
-
-          <button
-            onClick={openDetail}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-400 hover:from-sky-500 hover:to-cyan-300 text-sm font-bold text-white flex items-center space-x-2 shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
-          >
-            <span>Lihat Detail Lengkap</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
+        </GlassCard>
       </div>
+
+      {/* Modal bagikan — markup identik dengan halaman KaryaProjectDetail */}
+      {showShareModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-0">
+          <div
+            className="share-modal-backdrop absolute inset-0"
+            onClick={() => setShowShareModal(false)}
+          ></div>
+
+          <div className="share-modal relative w-full max-w-md overflow-hidden p-6 sm:p-8">
+            <div className="mb-5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="share-modal-badge flex h-10 w-10 items-center justify-center rounded-2xl">
+                  <Share2 size={18} />
+                </span>
+                <div>
+                  <h3 className="share-modal-title text-xl font-bold leading-tight">
+                    Bagikan Karya
+                  </h3>
+                  <p className="share-modal-sub mt-0.5 text-xs">
+                    Sebarkan karya ini ke temanmu
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="share-modal-close flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors duration-200"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Preview kartu karya */}
+            <div className="share-preview mb-6">
+              <div className="share-preview-media">
+                <SmartImage
+                  src={shareImage}
+                  alt={project.title}
+                  className="h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+                <span className="share-preview-tag absolute left-3 top-3">
+                  {project.Category?.name || categoryTitle || "Karya"}
+                </span>
+              </div>
+              <div className="share-preview-body">
+                <p className="share-preview-title truncate">{project.title}</p>
+                <p className="share-preview-meta">
+                  Karya SinggaH{project.year ? ` · ${project.year}` : ""}
+                </p>
+              </div>
+            </div>
+
+            {/* Aksi bagikan */}
+            <div className="mb-6 grid grid-cols-4 gap-3 sm:gap-4">
+              <button
+                onClick={shareToWhatsApp}
+                className="share-soc group flex cursor-pointer flex-col items-center gap-2"
+              >
+                <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-social-whatsapp/10 text-social-whatsapp transition group-hover:bg-social-whatsapp group-hover:text-white sm:h-14 sm:w-14">
+                  <MessageCircle size={24} />
+                </div>
+                <span className="share-soc-label text-xs font-medium">
+                  WhatsApp
+                </span>
+              </button>
+
+              <button
+                onClick={() =>
+                  window.open(
+                    `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareLink)}&text=Lihat%20karya%20menarik%20ini!`,
+                    "_blank",
+                  )
+                }
+                className="share-soc group flex cursor-pointer flex-col items-center gap-2"
+              >
+                <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white/10 text-slate-200 transition group-hover:bg-black group-hover:text-white sm:h-14 sm:w-14">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                </div>
+                <span className="share-soc-label text-xs font-medium">
+                  X
+                </span>
+              </button>
+
+              <button
+                onClick={() =>
+                  window.open(
+                    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}`,
+                    "_blank",
+                  )
+                }
+                className="share-soc group flex cursor-pointer flex-col items-center gap-2"
+              >
+                <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-social-facebook/10 text-social-facebook transition group-hover:bg-social-facebook group-hover:text-white sm:h-14 sm:w-14">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                  </svg>
+                </div>
+                <span className="share-soc-label text-xs font-medium">
+                  Facebook
+                </span>
+              </button>
+
+              <button
+                onClick={() =>
+                  window.open(
+                    `https://t.me/share/url?url=${encodeURIComponent(shareLink)}&text=Lihat%20karya%20menarik%20ini!`,
+                    "_blank",
+                  )
+                }
+                className="share-soc group flex cursor-pointer flex-col items-center gap-2"
+              >
+                <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-social-telegram/10 text-social-telegram transition group-hover:bg-social-telegram group-hover:text-white sm:h-14 sm:w-14">
+                  <Send size={24} />
+                </div>
+                <span className="share-soc-label text-xs font-medium">
+                  Telegram
+                </span>
+              </button>
+            </div>
+
+            {/* Salin link */}
+            <div className="share-copylink flex items-center justify-between p-1.5 pl-4">
+              <div className="share-copylink-url mr-3 overflow-hidden text-ellipsis whitespace-nowrap text-sm">
+                {shareLink}
+              </div>
+              <button
+                onClick={copyToClipboard}
+                className="share-copylink-btn flex shrink-0 cursor-pointer items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors duration-300"
+              >
+                {isCopied ? <Check size={16} /> : <Link2 size={16} />}
+                {isCopied ? "Tersalin!" : "Salin"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -1,11 +1,14 @@
 import { NavLink } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
+import { useAuth } from "../../context/AuthContext";
 import SmartImage from "../ui/SmartImage";
 import logo from "../../assets/icons/logo.webp";
 
 function Footer() {
   const { theme } = useTheme();
+  const { user } = useAuth();
   const isDark = theme === "dark";
+  const tipe = user?.tipe || "umum";
 
   return (
     <footer className={`mt-auto w-full ${isDark ? "border-t border-white/10 bg-night-deep" : "border-t border-neutral-400 bg-white shadow-sm"}`}>
@@ -35,6 +38,12 @@ function Footer() {
           <NavLink to="/karya" className={`transition ${isDark ? "hover:text-cyan-300" : "hover:text-blue-600"}`}>
             Karya
           </NavLink>
+
+          {tipe !== "umum" && (
+            <NavLink to="/upload" className={`transition ${isDark ? "hover:text-cyan-300" : "hover:text-blue-600"}`}>
+              Upload Karya
+            </NavLink>
+          )}
 
           <NavLink to="/about" className={`transition ${isDark ? "hover:text-cyan-300" : "hover:text-blue-600"}`}>
             Tentang

@@ -1,5 +1,5 @@
 import { useLayoutEffect, useMemo, useRef } from "react"
-import { Billboard, Text } from "@react-three/drei"
+import { Billboard, Text, useGLTF } from "@react-three/drei"
 import * as THREE from "three"
 import { useQualityStore, isMobile } from "../hooks/useQuality"
 
@@ -366,20 +366,6 @@ function leafQuat(leafDir, radial, spinJit) {
   const cross = new THREE.Vector3().crossVectors(fn0, t)
   const faceSpin = Math.atan2(cross.dot(leafDir), fn0.dot(t))
   return q0.multiply(new THREE.Quaternion().setFromAxisAngle(up, faceSpin + spinJit))
-}
-
-// Orientasi daun tulip: BIDANG lebar daun selalu menghadap ke arah kamera
-// (atas-depan), sehingga dari depan daun terbaca LEBAR (lanset), bukan EDGE-ON
-// tipis seperti helai rumput. Sumbu panjang mengikuti arah ujung daun.
-function tulipLeafQuat(leafDir, spinJit = 0) {
-  const cam = new THREE.Vector3(0, 0.55, 0.85).normalize()
-  let width = new THREE.Vector3().crossVectors(cam, leafDir)
-  if (width.lengthSq() < 1e-6) width.set(0, 0, 1)
-  width.normalize()
-  const normal = new THREE.Vector3().crossVectors(leafDir, width).normalize()
-  const m = new THREE.Matrix4().makeBasis(width, leafDir, normal)
-  const quat = new THREE.Quaternion().setFromRotationMatrix(m)
-  return spinJit === 0 ? quat : quat.multiply(new THREE.Quaternion().setFromAxisAngle(leafDir, spinJit))
 }
 
 export const POT_STYLES = [
@@ -1300,235 +1286,46 @@ function MonsteraMini({ h, variant = "besar" }) {
 }
 
 // ---- Tulip (bunga tulip) ----
-// Struktur mengikuti tanaman yang sudah terbukti (Rubber/Pothos/Monstera):
-// batang tegak ramping + daun LANSET individual menempel di batang (bukan
-// piringan/radial). Bunga = CUP/MANGKUK tertutup dari 6 kelopak oval memanjang
-// yang saling tumpang tindih di pangkal dan sedikit membuka di atas — TANPA
-// piringan/disc tengah (tidak ada elemen lingkaran presisi yang pernah dobel).
-// Setiap kelopak adalah ellipsoid volume 3D solid (tidak ada face sebidang
-// tipis → tidak mungkin dobel/terbelah). Warna solid merah #C41E3A dengan
-// emisive ringan supaya tidak gelap kena pencahayaan scene.
+// VERSI MODEL 3D: menggantikan tulip prosedural dengan model GLB terkompresi
+// (public/model/tulip.glb, turunan OBJ 10MB → GLB ~500KB tanpa simplify).
+// Model Z-up: pangkal batang di z≈0.07, kelopak sampai z≈17. Di-render dengan
+// rotasi -90° X agar tegak di sumbu Y scene, skalanya diset sehingga tinggi
+// total sepadan dengan tulip lama (±1.3 di atas soil pot y=0.42). Warna kelopak
+// mengikuti prop flowerColor dari Plant (default putih #f8fafc).
 export const TULIP_INFO = {
   title: "Tulip",
   text: "Bunga hias asal Eropa yang identik dengan musim semi. Melambangkan cinta sempurna, keberuntungan, dan kebangkitan baru — sering dijadikan simbol awal yang segar dan penuh harapan.",
 }
 
-const TULIP_LEAF_TEX = makeLeafCanvas({ base: "#2f6c24", tip: "#8ecb43", vein: "rgba(18,52,10,0.75)", boldVeins: false, seed: 41, lance: true, lanceW: 0.32 })
-const MAT_TULIP_LEAF = new THREE.MeshStandardMaterial({ map: TULIP_LEAF_TEX, alphaTest: 0.5, roughness: 0.6, side: THREE.DoubleSide, emissive: new THREE.Color("#14300a"), emissiveIntensity: 0.12 })
-const MAT_TULIP_STEM = new THREE.MeshStandardMaterial({ color: "#4e7d35", roughness: 0.8 })
-// Kelopak tulip: MERAH dengan vertex-color gradasi — merah tua di pangkal ke
-// merah cerah di ujung — plus flatShading agar lipatan kecil (ruffle) terbaca.
-const MAT_TULIP_PETAL = new THREE.MeshStandardMaterial({ color: "#ffffff", vertexColors: true, roughness: 0.35, flatShading: true, emissive: new THREE.Color("#4a060c"), emissiveIntensity: 0.18, side: THREE.DoubleSide })
-const TULIP_CALYX_GEO = new THREE.CylinderGeometry(0.045, 0.09, 0.16, 8)
+const TULIP_MODEL_URL = "/model/tulip.glb"
+// Model tulip: sumbu Z = arah tinggi (pangkal z≈0.068, puncak kelopak z≈16.96).
+// Dirender Z-up → rotasi -90° X agar jadi Y-up, lalu dikecilkan supaya tinggi
+// total sepadan dengan tulip prosedural lama (puncak ±1.7 dari dasar pot).
+// Warna kelopak bisa di-override lewat prop color (dipakai flowerColor dari Plant).
+const TULIP_MODEL_SCALE = 0.076
 
-// Kelopak ruffle "JAMBUL AYAM": piring/lembar vertikal yang naik dari pangkal
-// sempit dan lebarnya melebar ke arah atas, dengan:
-//  - TEPI ATAS berombak/gigi banyak (comb crest) → ujung tidak rapi membundar.
-//  - Lewat tengah, sisi-sisi ikut berombak (wide ruffle) → bergelombang tidak
-//    beraturan seperti jambul, bukan cup simetris yang halus.
-//  - Permukaan dilipat (z-wave) + twist kecil + flatShading → tekstur berlipat.
-//  - Gradasi warna per-vertex: merah tua di pangkal → merah cerah di ujung.
-// Geometri unit: tinggi ~1.0, lebar maks ~0.44 (sisi lebar menghadap sumbu X).
-function makeRufflePetalSeed(seed) {
-  const segX = LITE ? 8 : 12
-  const segY = LITE ? 8 : 10
-  const rnd = (s) => {
-    const x = Math.sin(s * 12.9898) * 43758.5453
-    return x - Math.floor(x)
-  }
-  const ph = rnd(seed * 3.7 + 1) * Math.PI * 2
-  const crestAmp = 0.12 + rnd(seed * 7.3 + 2) * 0.1
-  const wig = 0.14 + rnd(seed * 5.1 + 3) * 0.08
-  const bow = 0.04 + rnd(seed * 9.2 + 4) * 0.05
-  const tw = 0.15 + rnd(seed * 4.9 + 5) * 0.25
-  const hwCrest = 0.2 + rnd(seed * 6.7 + 6) * 0.05
-
-  const pos = []
-  const uv = []
-  const col = []
-  const idx = []
-  const cBase = new THREE.Color("#6e0d18")
-  const cTip = new THREE.Color("#e2433f")
-
-  for (let iy = 0; iy <= segY; iy++) {
-    const v = iy / segY
-    const bell = Math.pow(v, 0.85)
-    for (let ix = 0; ix <= segX; ix++) {
-      const u = (ix / segX) * 2 - 1
-      // ruffle dimulai di separuh atas: sisi pinggir ikut berbelit tidak rata.
-      const upRamp = v > 0.45 ? (v - 0.45) / 0.55 : 0
-      const hw = (0.035 + hwCrest * v * v) * (1 + wig * upRamp * Math.sin(u * Math.PI * 3.5 + ph))
-      const cr = v > 0.4 ? Math.pow((v - 0.4) / 0.6, 2) : 0
-      const crestH = 1 + crestAmp * cr * Math.sin(u * Math.PI * 6 + ph * 1.7)
-      const x0 = u * hw
-      const y = v * crestH
-      const zFold = bow * (1 - u * u) * v + 0.03 * Math.sin(u * Math.PI * 2 + v * Math.PI * 2 + ph)
-      const c = Math.cos(tw * v)
-      const s = Math.sin(tw * v)
-      pos.push(x0 * c - zFold * s, y, x0 * s + zFold * c)
-      uv.push(ix / segX, v)
-      const cj = cBase.clone().lerp(cTip, bell)
-      cj.offsetHSL(0, 0, (rnd(seed * 13.1 + ix * 7 + iy * 3) - 0.5) * 0.07)
-      col.push(cj.r, cj.g, cj.b)
-    }
-  }
-  for (let iy = 0; iy < segY; iy++) {
-    for (let ix = 0; ix < segX; ix++) {
-      const a = iy * (segX + 1) + ix
-      const b = a + segX + 1
-      idx.push(a, b, a + 1)
-      idx.push(b, b + 1, a + 1)
-    }
-  }
-  const geo = new THREE.BufferGeometry()
-  geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3))
-  geo.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2))
-  geo.setAttribute("color", new THREE.Float32BufferAttribute(col, 3))
-  geo.setIndex(idx)
-  geo.computeVertexNormals()
-  return geo
-}
-
-// 6 lembar kelopak ruffle dengan fasa/bentuk berbeda → jambul terlihat acak/organik.
-const TULIP_RUFFLE_GEOS = Array.from({ length: 6 }, (_, i) => makeRufflePetalSeed(11 + i))
-
-// Daun lanset: ramping meruncing (bukan ovale lebar sunflower). Pin base di
-// y=0, ujung di y=1 — konvensi atlas sama seperti daun Rubber/sunflower.
-const TULIP_LEAF_GEO = (() => {
-  const geo = new THREE.PlaneGeometry(0.34, 1.0, LITE ? 2 : 3, LITE ? 8 : 14)
-  const pos = geo.attributes.position
-  for (let i = 0; i < pos.count; i++) {
-    const y = pos.getY(i)
-    pos.setY(i, y + 0.5)
-    pos.setZ(i, Math.sin(Math.PI * (y + 0.5)) * -0.05)
-  }
-  geo.computeVertexNormals()
-  return geo
-})()
-
-function buildTulipLayout(h) {
-  const j = (seed) => {
-    const x = Math.sin((h % 1000) * 0.31 + seed * 12.9898) * 43758.5453
-    return x - Math.floor(x)
-  }
-  const clamp = (v, a, b) => Math.min(b, Math.max(a, v))
-  const up = new THREE.Vector3(0, 1, 0)
-  const horizontal = (yaw) => new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw)).normalize()
-
-  // Batang TEGAK ramping (tulip lebih tipis dari batang sunflower), pangkal di
-  // atas rim pot semua gaya (y=0.5), pucuk sedikit condong ke arah penonton (+z)
-  // — lengkung alami, bukan menoleh kaku ke samping.
-  const trunkBase = new THREE.Vector3(0, 0.5, 0)
-  const top = new THREE.Vector3((j(801) - 0.5) * 0.05, 1.3 + j(802) * 0.1, 0.07 + (j(803) - 0.5) * 0.05)
-  const trunkMid = trunkBase.clone().lerp(top, 0.5).add(new THREE.Vector3((j(804) - 0.5) * 0.04, 0, (j(805) - 0.5) * 0.04))
-  const trunkCurve = new THREE.QuadraticBezierCurve3(trunkBase, trunkMid, top)
-  const trunkR = 0.032
-
-  // 2-3 daun lanset dari PANGKAL batang, mengarah ke atas/menyamping mengikuti
-  // arah batang (tidak mendatar tegak lurus seperti sunflower).
-  const leaves = []
-  const nLeaves = 2 + (j(806) > 0.5 ? 1 : 0)
-  const baseYaw = j(807) * Math.PI * 2
-  for (let i = 0; i < nLeaves; i++) {
-    const tNode = 0.16 + i * 0.16
-    const yaw = baseYaw + (i / nLeaves) * Math.PI * 2 + (j(808 + i) - 0.5) * 0.5
-    const openness = clamp(1.0 + (j(811 + i) - 0.5) * 0.22, 0.85, 1.22)
-    const P = trunkCurve.getPoint(tNode)
-    const radial = horizontal(yaw)
-    const baseP = P.clone().addScaledVector(radial, trunkR * 0.9)
-    const dir = up.clone().multiplyScalar(Math.cos(openness)).addScaledVector(radial, Math.sin(openness)).normalize()
-    const quat = tulipLeafQuat(dir, (j(816 + i) - 0.5) * 0.35)
-    const scale = 0.6 - i * 0.05
-    leaves.push({ pos: baseP, quat, scale, wa: 1.0, cup: 1.0 })
-  }
-
-  // KUNTUM di puncak batang: miring TIPIS ke atas/samping (tulip berdiri tegak).
-  const flower = {
-    pos: top.clone().addScaledVector(horizontal((j(820) - 0.5) * 0.4), 0.02),
-    yaw: (j(821) - 0.5) * 0.35,
-    tilt: 0.1 + j(822) * 0.09,
-    petalTip: 0.36 + j(823) * 0.08,
-  }
-
-  return { trunkCurve, trunkR, leaves, flower }
-}
-
-// Kuntum tulip bergaya JAMBUL AYAM: 6 lembar kelopak ruffle yang pangkalnya
-// menyatu di titik dasar, ujung-ujung bergigi/berombak menjulang ke atas dan
-// sedikit terbuka/acak — bukan cup simetris rapi. Tumpang-tindih antar lembar
-// membentuk gumpalan bertekstur seperti jambul.
-function TulipFlower({ flower }) {
-  const j = (seed) => {
-    const x = Math.sin((Math.round(flower.yaw * 1000) % 1000) * 0.31 + seed * 12.9898) * 43758.5453
-    return x - Math.floor(x)
-  }
-  const petals = []
-  const up = new THREE.Vector3(0, 1, 0)
-  const base = new THREE.Vector3(0, 0.0, 0)
-  for (let i = 0; i < 6; i++) {
-    const a = (i / 6) * Math.PI * 2 + (j(830 + i) - 0.5) * 0.16
-    const radial = new THREE.Vector3(Math.sin(a), 0, Math.cos(a))
-    const tip = 0.38 + (j(833 + i) - 0.5) * 0.16
-    const axis = up.clone().multiplyScalar(Math.cos(tip)).addScaledVector(radial, Math.sin(tip)).normalize()
-    const len = 0.8 + (j(836 + i) - 0.5) * 0.1
-    const rise = base.clone().addScaledVector(radial, 0.06 + j(839 + i) * 0.05).clone().addScaledVector(axis, len * 0.06)
-    const quat = new THREE.Quaternion().setFromUnitVectors(up, axis)
-    // putar acak sepanjang sumbu kelopak supaya gigi jambul tidak sejajar rapi.
-    const twist = new THREE.Quaternion().setFromAxisAngle(axis, (j(840 + i) - 0.5) * 0.9)
-    petals.push({
-      key: i,
-      geo: TULIP_RUFFLE_GEOS[i],
-      pos: rise,
-      quat: quat.multiply(twist),
-      scale: len,
+function TulipModel({ color = "#f8fafc" }) {
+  const { scene } = useGLTF(TULIP_MODEL_URL)
+  const model = useMemo(() => {
+    const clone = scene.clone(true)
+    clone.traverse((o) => {
+      if (o.isMesh) {
+        o.castShadow = true
+        if (o.material?.name === "petal") {
+          o.material = o.material.clone()
+          o.material.color.set(color)
+        }
+      }
     })
-  }
-
-  return (
-    <group position={flower.pos} rotation={[flower.tilt, flower.yaw, 0]}>
-      {/* kelopak dasar hijau penutup sambungan batang */}
-      <mesh geometry={TULIP_CALYX_GEO} position={[0, 0.03, 0]}>
-        <primitive object={MAT_TULIP_STEM} attach="material" />
-      </mesh>
-      {petals.map((p) => (
-        <mesh key={p.key} geometry={p.geo} position={p.pos} quaternion={p.quat} scale={p.scale}>
-          <primitive object={MAT_TULIP_PETAL} attach="material" />
-        </mesh>
-      ))}
-    </group>
-  )
+    clone.rotation.x = -Math.PI / 2
+    clone.scale.setScalar(TULIP_MODEL_SCALE)
+    // Pangkal model (z≈0.068 → y≈0.005 setelah rotasi+skala) duduk di atas soil pot.
+    clone.position.set(0, 0.42 - 0.068 * TULIP_MODEL_SCALE, 0)
+    return clone
+  }, [scene, color])
+  return <primitive object={model} />
 }
 
-function TulipPlant({ h }) {
-  const leafRef = useRef()
-  const layout = useMemo(() => buildTulipLayout(h), [h])
-
-  useLayoutEffect(() => {
-    const dummy = new THREE.Object3D()
-    layout.leaves.forEach((l, i) => {
-      dummy.position.copy(l.pos)
-      dummy.quaternion.copy(l.quat)
-      dummy.scale.set(l.wa * l.scale, l.scale, l.cup)
-      dummy.updateMatrix()
-      leafRef.current.setMatrixAt(i, dummy.matrix)
-    })
-    leafRef.current.instanceMatrix.needsUpdate = true
-  }, [layout])
-
-  return (
-    <group>
-      {/* Batang tegak ramping */}
-      <mesh castShadow>
-        <tubeGeometry args={[layout.trunkCurve, LITE ? 5 : 8, layout.trunkR, LITE ? 5 : 8, false]} />
-        <primitive object={MAT_TULIP_STEM} attach="material" />
-      </mesh>
-      {/* Daun lanset individual di-instance */}
-      <instancedMesh ref={leafRef} args={[TULIP_LEAF_GEO, MAT_TULIP_LEAF, layout.leaves.length]} castShadow />
-      {/* Satu kuntum cup di puncak */}
-      <TulipFlower flower={layout.flower} />
-    </group>
-  )
-}
 
 // ---- Rubber Plant (Ficus elastica) ----
 // Satu batang tegak organik (coklat-kehijauan, cukup tebal) dengan daun
@@ -1882,8 +1679,8 @@ flowerType,
       {variant === "flower" &&
         (ftype === "tulip" ? (
           <group scale={flowerScale}>
-            <TulipPlant h={h} />
-            {info && <PlantInfoIcon info={info} position={[0, 1.6, 0]} />}
+            <TulipModel color={flowerColor} />
+            {info && <PlantInfoIcon info={info} position={[0, 2.35, 0]} />}
           </group>
         ) : ftype === "sunflower" ? (
           <SunflowerPlant h={h} />
@@ -1981,7 +1778,10 @@ flowerType,
       )}
 
       {variant === "monstera" && info && (
-        <PlantInfoIcon info={info} position={[0, 1.4, 0]} />
+        <PlantInfoIcon
+          info={info}
+          position={[0, monsteraVariant === "besar" ? 2.1 : 1.4, 0]}
+        />
       )}
     </group>
   )

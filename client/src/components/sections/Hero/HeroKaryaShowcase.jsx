@@ -288,7 +288,7 @@ function HeroKaryaShowcase({ variant }) {
     title:
       "[text-shadow:0_1px_0_rgba(0,0,0,0.9),0_2px_10px_rgba(1,10,25,0.95)] text-white",
     nav: isLight
-      ? "border-blue-300/70 bg-white/90 text-blue-700 shadow-[0_6px_20px_-6px_rgba(37,99,235,0.45),0_0_10px_rgba(56,189,248,0.3)] hover:border-blue-400 hover:text-blue-800 hover:shadow-[0_6px_24px_-6px_rgba(37,99,235,0.6)]"
+      ? "border-blue-400/50 bg-gradient-to-br from-white via-blue-50 to-blue-100 text-blue-600 shadow-[0_8px_22px_-8px_rgba(37,99,235,0.5),0_0_14px_rgba(56,189,248,0.25)] ring-1 ring-blue-200/60 hover:scale-110 hover:border-blue-500 hover:from-blue-50 hover:via-blue-100 hover:to-blue-200 hover:text-blue-700 hover:shadow-[0_10px_26px_-8px_rgba(37,99,235,0.65),0_0_18px_rgba(56,189,248,0.35)] hover:ring-blue-300/70"
       : "border-cyan-300/40 bg-[#041d38]/75 text-cyan-300 shadow-[0_6px_20px_-6px_rgba(2,12,32,0.8),0_0_12px_rgba(34,211,238,0.4)] hover:border-cyan-300/70 hover:text-cyan-200",
     dotActive: "bg-blue-600",
     dotIdle: "bg-[#6B7280]",
@@ -351,7 +351,7 @@ function HeroKaryaShowcase({ variant }) {
                 {/* Judul — area aman di kiri-bawah, tidak bertabrakan badge. */}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 pb-3 pl-3 pr-32 sm:pb-4 sm:pl-5 sm:pr-36 lg:pb-5 lg:pl-6 lg:pr-40">
                   <span
-                    className={`text-[9px] font-black uppercase tracking-[0.22em] lg:text-[10px] ${cls.eyebrow}`}
+                    className={`karta-eyebrow text-[9px] font-black uppercase tracking-[0.22em] lg:text-[10px] ${cls.eyebrow}`}
                     style={{ color: "#67e8f9" }}
                   >
                     Karya Unggulan

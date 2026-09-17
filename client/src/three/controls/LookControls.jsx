@@ -8,7 +8,7 @@ import { useTransitionStore } from "../hooks/useTransition"
 import { getWalls, portals, findRoom, resolveHeight, FLOOR2_Y } from "../rooms/museumLayout"
 import { resolveCollision, resolveObjectCollision, resolveAABBs } from "../utils/collision"
 import { getObjectColliders } from "../utils/objectColliders"
-import { getCollidableAABBs } from "../utils/sceneColliders"
+import { getCollidableAABBs, getSceneRevision } from "../utils/sceneColliders"
 
 const SPEED = 6
 const DRAG_THRESHOLD = 6
@@ -46,21 +46,37 @@ function withinRange(point, range) {
 // and only refreshed when the culler toggles room visibility — hover casts
 // (already throttled) then skip the full-scene walk most of the time.
 let VISIBLE_CACHE = null
+let VISIBLE_FLOOR_CACHE = []
 let VISIBLE_CACHE_AT = 0
 function visibleObjects(root, now) {
   if (VISIBLE_CACHE && now - VISIBLE_CACHE_AT < 200) return VISIBLE_CACHE
   const out = []
+  const floors = []
   const stack = []
   for (const c of root.children) stack.push(c)
   while (stack.length) {
     const o = stack.pop()
     if (!o.visible) continue
     out.push(o)
+    const a = findAction(o)
+    if (a && (a.type === "floor" || a.type === "walk")) floors.push(o)
     for (const c of o.children) stack.push(c)
   }
   VISIBLE_CACHE = out
+  VISIBLE_FLOOR_CACHE = floors
   VISIBLE_CACHE_AT = now
   return out
+}
+
+// Floor meshes are a small subset of the visible scene. Re-deriving them from
+// the same 200ms visible traversal (instead of a one-time snapshot) keeps the
+// list in sync with room culling: the upper-floor slab only becomes
+// hover/click-walkable once its storey is actually shown, and drops away
+// cleanly when the room hides. The per-pointermove floor raycast stays against
+// a tiny list either way.
+function visibleFloorMeshes(root, now) {
+  visibleObjects(root, now)
+  return VISIBLE_FLOOR_CACHE
 }
 
 function pickVisible(raycaster, scene, now) {
@@ -68,22 +84,6 @@ function pickVisible(raycaster, scene, now) {
   const hits = raycaster.intersectObjects(objects, false)
   hits.sort((a, b) => a.distance - b.distance)
   return hits
-}
-
-// Hanya mesh lantai / area jalan (aksi "floor"/"walk"). Ujung tombak untuk
-// ring kursor: jumlahnya sedikit dan statis, jadi raycast tiap pointermove
-// tetap murah (tanpa throttle seperti hover umum).
-function collectFloorMeshes(root) {
-  const out = []
-  const stack = []
-  for (const c of root.children) stack.push(c)
-  while (stack.length) {
-    const o = stack.pop()
-    if (!o.visible) continue
-    if (findAction(o)?.type === "floor" || findAction(o)?.type === "walk") out.push(o)
-    for (const c of o.children) stack.push(c)
-  }
-  return out
 }
 
 function LookControls({ bounds, onSelectProject }) {
@@ -100,13 +100,13 @@ function LookControls({ bounds, onSelectProject }) {
   })
   const raycaster = useRef(new THREE.Raycaster())
   const floorRaycaster = useRef(new THREE.Raycaster())
-  const floorMeshesRef = useRef([])
   const mouse = useRef(new THREE.Vector2())
   const euler = useRef(new THREE.Euler(0, 0, 0, "YXZ"))
   const stuckRef = useRef(0)
   const lastCast = useRef(0)
   const modelCollidersRef = useRef([])
   const modelColliderBuilt = useRef(false)
+  const sceneRevisionRef = useRef(-1)
   const camYRef = useRef(0)
   const camYInit = useRef(false)
   const bobPhaseRef = useRef(0)
@@ -281,11 +281,26 @@ function LookControls({ bounds, onSelectProject }) {
       } else {
         // Ring kursor mengikuti lantai TANPA throttle (raycast ringan ke mesh
         // lantai saja) supaya posisinya selalu segar dan animasi terasa hidup.
-        if (floorMeshesRef.current.length) {
+        const floors = visibleFloorMeshes(scene, performance.now())
+        let floorHit = null
+        if (floors.length) {
           floorRaycaster.current.setFromCamera(mouse.current, camera)
-          const hits = floorRaycaster.current.intersectObjects(floorMeshesRef.current, false)
-          const p = hits.length ? hits[0].point : null
-          useWalkStore.getState().setPointerPosition(p)
+          const hits = floorRaycaster.current.intersectObjects(floors, false)
+          if (hits.length) {
+            const p = hits[0].point
+            // Floor meshes are flat sheets at ground level, so a raycast over the
+            // staircase hits the floor BENEATH it. Snap the ring to the height
+            // field instead, so hovering the treads/sign base shows the ring ON
+            // the stair surface, not sunk under it. The y actually walked is
+            // resolved by the same field in moveWithCollision.
+            p.y = resolveHeight(p.x, p.z, useWalkStore.getState().level).height
+            useWalkStore.getState().setPointerPosition(p)
+            floorHit = hits[0]
+          } else {
+            useWalkStore.getState().setPointerPosition(null)
+          }
+        } else {
+          useWalkStore.getState().setPointerPosition(null)
         }
 
         // Hover raycasts are expensive on a scene this dense — throttle them
@@ -311,9 +326,7 @@ function LookControls({ bounds, onSelectProject }) {
         // kena kaki/penyangga furnitur (tanpa aksi) tapi lantainya bisa
         // berdiri — tetap bisa diklik untuk berjalan (cek standable tetap
         // dijalankan saat klik, jadi kolong tertutup plinth tetap ditolak).
-        const floorHover =
-          floorMeshesRef.current.length > 0 &&
-          floorRaycaster.current.intersectObjects(floorMeshesRef.current, false).length > 0
+        const floorHover = !!floorHit
         useWalkStore.getState().setHoverFloor(floorHover)
         // Lantai pakai crosshair (bukan pointer panah) + ring 3D menyala;
         // objek interaktif tetap pointer.
@@ -391,15 +404,23 @@ function LookControls({ bounds, onSelectProject }) {
   }, [])
 
   useFrame((state, delta) => {
-    // Build the model collider cache once the scene is fully mounted, then
-    // rebuild once more shortly after (catches late-mounted props / textures).
+    // Build the model-collider cache once the scene has mounted, then rebuild
+    // whenever a late subtree mounts (lazy category rooms bump the revision) or
+    // shortly after the first build (catches late-mounted props / textures).
+    // Floor meshes are NOT snapshotted: they are re-derived from the current
+    // visible set every pointermove (see visibleFloorMeshes), so they stay in
+    // sync with room culling on both storeys.
+    const revision = getSceneRevision()
     if (!modelColliderBuilt.current) {
       modelCollidersRef.current = getCollidableAABBs(scene)
-      floorMeshesRef.current = collectFloorMeshes(scene)
+      sceneRevisionRef.current = revision
       modelColliderBuilt.current = 1
+    } else if (revision !== sceneRevisionRef.current) {
+      modelCollidersRef.current = getCollidableAABBs(scene)
+      sceneRevisionRef.current = revision
+      modelColliderBuilt.current = 2
     } else if (modelColliderBuilt.current === 1 && state.clock.elapsedTime > 1.5) {
       modelCollidersRef.current = getCollidableAABBs(scene)
-      floorMeshesRef.current = collectFloorMeshes(scene)
       modelColliderBuilt.current = 2
     }
 

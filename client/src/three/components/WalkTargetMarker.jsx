@@ -12,6 +12,14 @@ import { useWalkStore } from "../hooks/useWalk"
 const UP = new THREE.Vector3(0, 1, 0)
 const BEAM_H = 0.9
 
+// Clearance above the floor. Floor overlays (navy "LANTAI .." strips + glyph
+// Text) rise to ~+0.107 above the slab on BOTH storeys; a marker parked lower
+// sinks under / z-fights with them. Park the beam line and the marker base at
+// +0.10/+0.14 so the waypoint always reads as ON TOP of any floor texture on
+// every level (pedoman sama dengan FloorHoverMarker: HOVER_MARKER_Y = 0.14).
+const WALK_LINE_Y = 0.1
+const WALK_MARKER_Y = 0.14
+
 // Segmen rendah sudah cukup: objek kecil & semi-transparan, tak terlihat burik.
 const LINE_GEO = new THREE.CylinderGeometry(0.04, 0.04, 1, 6, 1, true)
 const BEAM_GEO = new THREE.CylinderGeometry(0.05, 0.09, 1, 6, 1, true)
@@ -23,6 +31,7 @@ const LINE_MAT = new THREE.MeshBasicMaterial({
   transparent: true,
   opacity: 0.4,
   depthWrite: false,
+  renderOrder: 100,
 })
 const BEAM_MAT = new THREE.MeshBasicMaterial({
   color: "#38bdf8",
@@ -32,6 +41,7 @@ const BEAM_MAT = new THREE.MeshBasicMaterial({
   side: THREE.DoubleSide,
   depthWrite: false,
   toneMapped: false,
+  renderOrder: 100,
 })
 const RING_MAT = new THREE.MeshBasicMaterial({
   color: "#a5d8ff",
@@ -39,14 +49,22 @@ const RING_MAT = new THREE.MeshBasicMaterial({
   opacity: 0.85,
   side: THREE.DoubleSide,
   depthWrite: false,
+  polygonOffset: true,
+  polygonOffsetFactor: -2,
+  polygonOffsetUnits: -2,
   toneMapped: false,
+  renderOrder: 100,
 })
 const CORE_MAT = new THREE.MeshBasicMaterial({
   color: "#e0f2fe",
   transparent: true,
   opacity: 0.9,
   depthWrite: false,
+  polygonOffset: true,
+  polygonOffsetFactor: -2,
+  polygonOffsetUnits: -2,
   toneMapped: false,
+  renderOrder: 100,
 })
 
 // Temp per-frame (module scope) — tidak satu pun alokasi Vector saat berjalan.
@@ -70,17 +88,17 @@ function MarkerInner() {
     }
 
     // Titik di level kaki pemain/tujuan (target.y = ketinggian lantai tujuan).
-    // Garis direndahkan dekat lantai (0.035) supaya tidak melayang terlalu
-    // tinggi di depan mata.
-    start.set(s.position.x, s.position.y + 0.035, s.position.z)
-    end.set(t.x, t.y + 0.035, t.z)
+    // Garis dijaga sedikit di atas lapisan lantai (WALK_LINE_Y) supaya tidak
+    // tenggelam oleh strip label/carpet di lantai.
+    start.set(s.position.x, s.position.y + WALK_LINE_Y, s.position.z)
+    end.set(t.x, t.y + WALK_LINE_Y, t.z)
     dir.subVectors(end, start)
     const len = dir.length()
     if (len < 0.15) {
       // Sudah tiba: sorot marker saja, garis menyusut ikut pemain.
       lineRef.current.visible = false
       markerRef.current.visible = true
-      markerRef.current.position.set(t.x, t.y + 0.045, t.z)
+      markerRef.current.position.set(t.x, t.y + WALK_MARKER_Y, t.z)
       return
     }
 
@@ -95,7 +113,7 @@ function MarkerInner() {
     line.scale.set(1, len, 1)
 
     markerRef.current.visible = true
-    markerRef.current.position.set(t.x, t.y + 0.045, t.z)
+    markerRef.current.position.set(t.x, t.y + WALK_MARKER_Y, t.z)
   })
 
   return (

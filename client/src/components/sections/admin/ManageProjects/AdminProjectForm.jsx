@@ -147,8 +147,11 @@ function AdminProjectForm() {
       await approveProject(existing.id, approveNote)
       setActionSuccess({ type: "approve", message: "Karya disetujui & diterbitkan!" })
       setTimeout(() => navigate("/admin/karya"), 2000)
-    } catch {
-      showNotification("Gagal menyetujui karya. Coba lagi.", "error")
+    } catch (err) {
+      showNotification(
+        err.response?.data?.message || "Gagal menyetujui karya. Coba lagi.",
+        "error",
+      )
     } finally {
       setSavingStatus(false)
     }

@@ -9,6 +9,11 @@ import { BOOK_COVER_FILES, DEFAULT_COVER_KEY, getRandomUniqueBookKeys } from "..
 import logo from "../../assets/icons/logo.webp"
 import bajupraktek from "../../assets/images/bajupraktekelktro.jpg"
 
+// Rak low (lingkaran baca) diisi BUKU SAJA — tanpa tumpukan/ornamen (≈6-20
+// mesh per rak). Rak-rak tinggi hall & ruang unggulan tetap penuh ornamen.
+// Menghemat ribuan draw call dari ratusan bookcase ring tanpa mengubah wajah
+// lingkaran baca (rak tetap penuh & rapi).
+
 const WOOD = "#2a3d5f"
 const WOOD_DARK = "#1f2f4e"
 const FABRIC = "#3f5a7f"
@@ -289,7 +294,7 @@ function ShelfObject({ type, x, y, z = -0.04, rand }) {
   }
 }
 
-function ShelfContent({ y, seed, z = -0.04 }) {
+function ShelfContent({ y, seed, z = -0.04, simple = false }) {
   const items = useMemo(() => {
     const spines = textures.bookSpines()
     const rand = mulberry32(seed >>> 0)
@@ -300,6 +305,17 @@ function ShelfContent({ y, seed, z = -0.04 }) {
     while (x < half && guard < 48) {
       guard++
       const r = rand()
+      // Mode ringkas (rak low lingkaran baca): isi buku saja agar draw call
+      // turun drastis; tumpukan & ornamen hanya di rak tinggi/full.
+      if (simple) {
+        const bw = 0.065 + rand() * 0.045
+        if (x + bw > half) break
+        const bh = 0.3 + rand() * 0.08
+        const s = spines[(rand() * spines.length) | 0]
+        arr.push({ t: "book", x: x + bw / 2, w: bw, h: bh, c: s.cloth, tex: s.tex })
+        x += bw + 0.012
+        continue
+      }
       if (r < 0.8) {
         const bw = 0.065 + rand() * 0.045
         if (x + bw > half) break
@@ -323,7 +339,7 @@ function ShelfContent({ y, seed, z = -0.04 }) {
       }
     }
     return arr
-  }, [seed])
+  }, [seed, simple])
 
   const books = useMemo(() => items.filter((it) => it.t === "book"), [items])
 
@@ -377,6 +393,7 @@ function Bookcase({ position, rotationY = 0, variant = 0, low = false }) {
           key={i}
           y={sy + 0.0225}
           seed={(variant + 1) * 10007 + i + 1}
+          simple={low}
         />
       ))}
 

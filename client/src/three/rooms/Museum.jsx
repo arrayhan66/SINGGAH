@@ -168,8 +168,8 @@ function Museum({ hallData }) {
     const dosen = {}
     const mhs = {}
     for (const c of categories) {
-      dosen[c.slug] = enriched.filter((p) => (p.category || p.Category?.slug) === c.slug && p.authorType === "dosen").slice(0, 4)
-      mhs[c.slug] = enriched.filter((p) => (p.category || p.Category?.slug) === c.slug && p.authorType === "mahasiswa").slice(0, 12)
+      dosen[c.slug] = enriched.filter((p) => (p.category || p.Category?.slug) === c.slug && p.authorType === "dosen")
+      mhs[c.slug] = enriched.filter((p) => (p.category || p.Category?.slug) === c.slug && p.authorType === "mahasiswa")
     }
     return { dosen, mhs }
   }, [categories, projects])

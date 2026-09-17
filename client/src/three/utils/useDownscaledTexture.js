@@ -1,6 +1,6 @@
 import { use } from "react"
 import * as THREE from "three"
-import { getAnisotropy } from "../hooks/useQuality"
+import { getAnisotropy, textureBudgetFactor } from "../hooks/useQuality"
 
 // Decode + downscale an image once per URL and share the texture app-wide.
 // Using createImageBitmap's resizeWidth keeps the GPU memory low for textures
@@ -64,6 +64,10 @@ function decodeViaBitmap(url, maxWidth) {
 }
 
 function loadImage(url, maxWidth) {
+  // Sesuaikan maxWidth dengan budget tier (HP ringan dapat tekstur lebih kecil
+  // -> RAM GPU & waktu decode turun drastis, tetap tajam di layar kecil).
+  const factor = textureBudgetFactor()
+  if (factor !== 1) maxWidth = Math.max(192, Math.round(maxWidth * factor))
   let promise = cache.get(url)
   if (promise) return promise
   const canBitmap = typeof createImageBitmap === "function"

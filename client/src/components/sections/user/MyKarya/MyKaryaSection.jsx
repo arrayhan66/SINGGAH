@@ -12,6 +12,7 @@ import { useAuth } from "../../../../context/AuthContext"
 import PopupToast from "../../../ui/PopupToast"
 import api from "../../../../services/api"
 import { useTheme } from "../../../../context/ThemeContext"
+import { keepScrollOnExpand } from "../../../../utils/preserveScrollOnExpand"
 
 const INITIAL_VISIBLE_COUNT = 6
 
@@ -164,7 +165,12 @@ function MyKaryaSection() {
 
               {!showAll && visibleData.length < filteredData.length && (
                 <div className="mt-6 flex justify-center sm:mt-8 2xl:mt-12 3xl:mt-16 4xl:mt-20">
-                  <OutlineButton onClick={() => setShowAll(true)}>
+                  <OutlineButton
+                    onClick={() => {
+                      keepScrollOnExpand()
+                      setShowAll(true)
+                    }}
+                  >
                     Tampilkan Semua
                   </OutlineButton>
                 </div>

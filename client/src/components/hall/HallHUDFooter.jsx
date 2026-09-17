@@ -14,7 +14,7 @@ export default function HallHUDFooter() {
         </span>
         <span className="hidden sm:flex items-center space-x-1.5">
           <DoorOpen className="w-4 h-4 text-sky-400" />
-          <span>Jalan lewat portal biru untuk pindah ruang</span>
+          <span>Jalan lewat portal putih untuk pindah ruang</span>
         </span>
         <span className="hidden md:flex items-center space-x-1.5">
           <Frame className="w-4 h-4 text-sky-400" />

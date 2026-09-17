@@ -7,6 +7,20 @@ const FLAT_THRESHOLD = 0.22
 const tmpBox = new THREE.Box3()
 const tmpSize = new THREE.Vector3()
 
+// The controls cache the "walkable floor" meshes and the collidable AABBs once
+// the scene mounts. Category rooms arrive later (lazy chunk behind Suspense),
+// so they would stay invisible to floor hovering / collision. Late subtrees
+// bump this revision and the controls rebuild their caches on the next frame.
+let sceneRevision = 0
+
+export function markSceneDirty() {
+  sceneRevision++
+}
+
+export function getSceneRevision() {
+  return sceneRevision
+}
+
 // Collect world-space AABBs of every solid 3D mesh in the scene so the player
 // can never walk through a model. Filtered out automatically:
 //  - meshes flagged noCollide (self or any ancestor): portals, flush doors,

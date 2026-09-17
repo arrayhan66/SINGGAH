@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Text } from "@react-three/drei"
 import * as THREE from "three"
 import Painting from "./Painting"
-import { useQualityStore } from "../hooks/useQuality"
+import { useQualityStore, useLiteMode } from "../hooks/useQuality"
 import { PAINTING_SIZE } from "../rooms/museumLayout"
 import { textures } from "../utils/textures"
 
@@ -77,12 +77,9 @@ function Stanchion({ x, z }) {
 
 function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
   const tier = useQualityStore((s) => s.tier)
+  const lite = useLiteMode()
   const group = useRef()
   const spot = useRef()
-  const warmSpot = useRef()
-  const plaqueSpot = useRef()
-  const warmWorkTarget = useMemo(() => new THREE.Object3D(), [])
-  const plaqueLightTarget = useMemo(() => new THREE.Object3D(), [])
   const list = (projects || []).slice(0, 2)
   const slots = list.length === 2 ? [-(HALF_FRAME + FRAME_GAP), HALF_FRAME + FRAME_GAP] : [0]
 
@@ -108,9 +105,7 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
       spot.current.target = group.current
       spot.current.target.updateMatrixWorld()
     }
-    if (warmSpot.current) warmSpot.current.target = warmWorkTarget
-    if (plaqueSpot.current) plaqueSpot.current.target = plaqueLightTarget
-  }, [tier, warmWorkTarget, plaqueLightTarget])
+  }, [tier])
 
   // Decorative gold filigree flanking the title, fitted to the measured
   // plaque width so the lines always hug the text edges (kept within the
@@ -373,43 +368,20 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
         KARYA UNGGULAN
       </Text>
 
-      {/* ==== Spotlight: only on high quality to keep the light count low ==== */}
-      {tier === "tinggi" && (
-        <>
-          {/* Cyan accent spotlight (kept as existing aksen) */}
-          <spotLight
-            ref={spot}
-            position={[0, 6.5, 0]}
-            angle={0.65}
-            penumbra={0.6}
-            intensity={340}
-            distance={16}
-            color="#e6f4ff"
-          />
-          {/* Warm gold key light aimed at the works/screens */}
-          <spotLight
-            ref={warmSpot}
-            position={[2.6, 7.8, 1.9]}
-            angle={0.5}
-            penumbra={0.55}
-            intensity={300}
-            distance={22}
-            color="#ffdba3"
-          />
-          {/* Warm gold accent aimed at the "KARYA UNGGULAN" plaque */}
-          <spotLight
-            ref={plaqueSpot}
-            position={[-2.6, 4.6, 2.3]}
-            angle={0.42}
-            penumbra={0.45}
-            intensity={170}
-            distance={15}
-            color="#ffe3ae"
-          />
-          {/* Target anchors for the warm spotlights (must stay in the scene) */}
-          <primitive object={warmWorkTarget} position={[0, 3.3, -0.5]} />
-          <primitive object={plaqueLightTarget} position={[0, 0.85, 0.75]} />
-        </>
+      {/* ==== Spotlight: Satu aksen cyan per booth (bukan 3). 16 booth × 3 lampu
+            = 48 spotlight ikut dalam loop shading per-fragmen meshStandardMaterial,
+            biang utama lag di desktop. Satu aksen saja + fill directional tetap
+            bikin booth terbaca, tampilan tak jauh berubah. Mobile mati total. ==== */}
+      {!lite && tier === "tinggi" && (
+        <spotLight
+          ref={spot}
+          position={[0, 6.5, 0]}
+          angle={0.65}
+          penumbra={0.6}
+          intensity={360}
+          distance={16}
+          color="#e6f4ff"
+        />
       )}
     </group>
   )

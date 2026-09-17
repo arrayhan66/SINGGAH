@@ -1,4 +1,4 @@
-import { Component, Suspense, useMemo } from "react"
+import { Component, Suspense, useCallback, useMemo, useState } from "react"
 import { Text } from "@react-three/drei"
 import * as THREE from "three"
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js"
@@ -352,6 +352,15 @@ function Painting({
   const thumbnail = project.thumbnail || project.image
   const hasImage = Boolean(thumbnail)
 
+  // Ukur tinggi sebenarnya blok teks judul (bisa 1/2/3 baris jika judul panjang
+  // atau berisi enter), supaya nama pembuat selalu berada di bawah judul dengan
+  // margin tetap berapapun tinggi judulnya.
+  const [titleH, setTitleH] = useState(0.14)
+  const handleTitleSync = useCallback((mesh) => {
+    const b = mesh.textRenderInfo?.blockBounds
+    if (b) setTitleH(Math.max(0.14, b[3] - b[1]))
+  }, [])
+
   const railLen =
     railY != null ? Math.max(0.05, railY - position[1] - FRAME_H / 2 - 0.03) : 0
 
@@ -466,12 +475,19 @@ function Painting({
         position={[0, -H / 2 - 0.58, 0.045]}
       />
 
+      {/* Judul: selalu center — textAlign="center" membuat tiap baris (juga saat
+          wrap 2-3 baris / ada enter) rata tengah di dalam area maxWidth, bukan rata
+          kiri. Area maxWidth sudah center (position X = 0, anchorX="center").
+          Nama pembuat ditekan ke bawah oleh tinggi judul sebenarnya + margin
+          0.14, jadi tidak pernah nempel judul. */}
       <Text
+        onSync={handleTitleSync}
         position={[0, -H / 2 - (goldPlaque ? 0.48 : 0.46), 0.08]}
         fontSize={0.115}
         color={goldPlaque ? "#f2d492" : "#f8fafc"}
         anchorX="center"
         anchorY="middle"
+        textAlign="center"
         maxWidth={FRAME_W - 0.12}
         lineHeight={1.15}
         letterSpacing={goldPlaque ? 0.02 : 0.012}
@@ -481,11 +497,12 @@ function Painting({
         {title}
       </Text>
       <Text
-        position={[0, -H / 2 - (goldPlaque ? 0.70 : 0.66), 0.08]}
+        position={[0, -H / 2 - (goldPlaque ? 0.48 : 0.46) - titleH / 2 - 0.14, 0.08]}
         fontSize={0.09}
         color={goldPlaque ? "#cdb072" : accent}
         anchorX="center"
         anchorY="middle"
+        textAlign="center"
         maxWidth={FRAME_W - 0.12}
         letterSpacing={goldPlaque ? 0.015 : 0.008}
         raycast={() => null}

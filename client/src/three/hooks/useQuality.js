@@ -56,13 +56,14 @@ const BUDGET_RENDAH = 1_600_000
 
 export const DPR_FOR = {
   rendah: [1.25, dprCapFor(1.5, BUDGET_RENDAH)],
-  sedang: [1.25, dprCapFor(2, BUDGET_SEDANG)],
-  tinggi: [1.25, dprCapFor(2.5, BUDGET_TINGGI)],
+  sedang: [1.25, dprCapFor(1.75, BUDGET_SEDANG)],
+  tinggi: [1.25, dprCapFor(1.8, BUDGET_TINGGI)],
 }
 export const SHADOW_FOR = { rendah: 512, sedang: 512, tinggi: 1024 }
 // Anisotropy tinggi = lantai marmer & dinding tetap tajam dilihat dari
-// sudut rendah (khas museum) — murah di GPU modern, hasilnya jelas terlihat
-export const ANISO_FOR = { rendah: 2, sedang: 8, tinggi: 16 }
+// sudut rendah (khas museum). Di GPU menengah/iGPU sampling 16x nyaris tak
+// terlihat namun membayar lumayan; 8 sudah sangat tajam untuk kasus ini.
+export const ANISO_FOR = { rendah: 2, sedang: 8, tinggi: 8 }
 
 export function getAnisotropy() {
   return ANISO_FOR[useQualityStore.getState().tier]
@@ -78,10 +79,22 @@ export function isMobile() {
 
 // Mobile rendering preset. HP layar Retina tinggi (DPR 2.5-3): render di
 // resolusi penuh -> fill-rate meledak dan HP panas. Tapi resolusi terlalu
-// rendah (<=1.0) terlihat burik. Karena di HP kita MATIKAN shadow + semua
-// light dekoratif (budget GPU terhemat besar), resolusi bisa dinaikkan ke
-// 1.25-1.75 — jauh lebih tajam, tetap sangat ringan.
-export const DPR_LITE = [1.25, 1.75]
+// rendah (<=1.0) terlihat burik. Cap DPR diturunkan ke 1.5 (dari 1.75):
+// fill-rate turun ~27% — HP lebih dingin/reaktif, hasil tetap tajam
+// (1.5x css-px masih jauh di atas 1.0 yang burik).
+export const DPR_LITE = [1.25, 1.5]
+
+// Budget ukuran tekstur unduhan (sideal untuk HP RAM kecil). useDownscaledTexture
+// mengalikan maxWidth dengan faktor ini. Desktop/laptop tetap 1.0 (HD penuh);
+// HP dikencangkan 0.75 (thumbnail lukisan 1024 -> ~768px, tak terlihat beda di
+// layar HP karena area tayangnya kecil); tier rendah turun lebih dalam (0.6 ->
+// ~614px) untuk HP 2GB yang paling kencang budgetnya. Ram & waktu decode turun
+// drastis, hasil tetap tajam.
+export function textureBudgetFactor() {
+  const tier = useQualityStore.getState().tier
+  if (tier === "rendah") return 0.6
+  return detectMobile() ? 0.75 : 1
+}
 
 // Aktifkan preset ringan untuk HP (dan tablet layar kecil), atau jika
 // kualitas device tergolong "rendah".

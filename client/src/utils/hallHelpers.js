@@ -10,8 +10,6 @@ export const CATEGORY_COLORS = {
 }
 
 const DOSEN_MARKERS = ["dr.", "prof.", "dra.", "h."]
-const MAX_DOSEN = 4
-const MAX_MAHASISWA = 12
 
 export function classify(project) {
   const tipe = project.User?.tipe || project.authorType
@@ -34,8 +32,8 @@ export function getCategoryStats(projects = [], categories = []) {
   const enriched = enrichProjects(projects)
   return categories.reduce((acc, cat) => {
     const list = enriched.filter((p) => (p.category || p.Category?.slug) === cat.slug)
-    const dosenList = list.filter((p) => p.authorType === "dosen").slice(0, MAX_DOSEN)
-    const mhsList = list.filter((p) => p.authorType === "mahasiswa").slice(0, MAX_MAHASISWA)
+    const dosenList = list.filter((p) => p.authorType === "dosen")
+    const mhsList = list.filter((p) => p.authorType === "mahasiswa")
     acc[cat.slug] = {
       total: dosenList.length + mhsList.length,
       dosen: dosenList.length,

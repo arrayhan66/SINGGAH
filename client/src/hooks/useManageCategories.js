@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import api from "../services/api"
 import { slugify } from "../utils/categoryHelpers"
+import { keepScrollOnExpand } from "../utils/preserveScrollOnExpand"
 
 export const INITIAL_VISIBLE = 9
 
@@ -176,6 +177,12 @@ export default function useManageCategories() {
     setDeleteTarget(null)
   }
 
+  const toggleShowAll = (next) => {
+    const expanding = Boolean(next) && !showAll
+    if (expanding) keepScrollOnExpand()
+    setShowAll(next)
+  }
+
   return {
     categories,
     loading,
@@ -193,7 +200,7 @@ export default function useManageCategories() {
     formDesc,
     setFormDesc,
     showAll,
-    setShowAll,
+    setShowAll: toggleShowAll,
     deleteTarget,
     setDeleteTarget,
     isOpen,

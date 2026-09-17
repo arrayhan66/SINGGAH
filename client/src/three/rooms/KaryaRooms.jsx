@@ -1,9 +1,11 @@
-import { Suspense, useCallback, useMemo, useState, useRef } from "react"
+import { Suspense, useCallback, useEffect, useMemo, useState, useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import { Text } from "@react-three/drei"
 import * as THREE from "three"
 import { useWalkStore } from "../hooks/useWalk"
+import { useLiteMode } from "../hooks/useQuality"
 import InstancedMeshes from "../utils/InstancedMeshes"
+import { markSceneDirty } from "../utils/sceneColliders"
 import Painting from "../components/Painting"
 import Portal from "../components/Portal"
 import FeaturedWork from "../components/FeaturedWork"
@@ -44,6 +46,7 @@ import {
   ROOM_CENTER_Z,
   BOOKCASE_RING,
   OTTOMAN_CIRCLE,
+  ringBudget,
   ringAngle,
   ringPosition,
   ringRotationY,
@@ -134,21 +137,22 @@ function PoufOttoman({ position, rotationY = 0, fabric = POUF_FABRICS[0] }) {
 function ReadingRing({ room, y = 0 }) {
   const cx = (room.x[0] + room.x[1]) / 2
   const rugMap = useMemo(() => textures.roundRug(), [])
+  const budget = useMemo(() => ringBudget(), [])
 
   const bookcases = useMemo(
     () =>
-      Array.from({ length: BOOKCASE_RING.count }, (_, i) => {
-        const a = ringAngle(i, BOOKCASE_RING.count, BOOKCASE_RING.phase)
+      Array.from({ length: budget.bookcase }, (_, i) => {
+        const a = ringAngle(i, budget.bookcase, BOOKCASE_RING.phase)
         const [x, z] = ringPosition(cx, BOOKCASE_RING.radius, a)
         return { key: i, x, z, rotY: ringRotationY(a), variant: i % 3 }
       }),
-    [cx],
+    [cx, budget],
   )
 
   const plants = useMemo(
     () =>
-      Array.from({ length: BOOKCASE_RING.count }, (_, i) => {
-        const a = ringAngle(i, BOOKCASE_RING.count, BOOKCASE_RING.phase)
+      Array.from({ length: budget.plant }, (_, i) => {
+        const a = ringAngle(i, budget.plant, BOOKCASE_RING.phase)
         const [x, z] = ringPosition(cx, BOOKCASE_RING.radius + 0.85, a)
         const base = ["tall", "topiary", "flower"][i % 3]
         return {
@@ -159,13 +163,13 @@ function ReadingRing({ room, y = 0 }) {
           monsteraVariant: base === "flower" ? "kecil" : "besar",
         }
       }),
-    [cx],
+    [cx, budget],
   )
 
   const poufs = useMemo(() => {
     const items = []
-    for (let i = 0; i < OTTOMAN_CIRCLE.count; i++) {
-      const a = (i / OTTOMAN_CIRCLE.count) * Math.PI * 2 + Math.PI / OTTOMAN_CIRCLE.count
+    for (let i = 0; i < budget.pouf; i++) {
+      const a = (i / budget.pouf) * Math.PI * 2 + Math.PI / budget.pouf
       items.push({
         key: i,
         x: cx + Math.cos(a) * OTTOMAN_CIRCLE.radius,
@@ -175,7 +179,7 @@ function ReadingRing({ room, y = 0 }) {
       })
     }
     return items
-  }, [cx])
+  }, [cx, budget])
 
   return (
     <group>
@@ -308,7 +312,10 @@ function Stairs({ room }) {
   }
 
   return (
-    <group userData={{ noCollide: true }}>
+    // The staircase is walkable (noCollide) and clickable: clicking a visible
+    // tread targets that exact step, then resolveHeight in moveWithCollision
+    // lifts the player as they climb to the upper floor.
+    <group userData={{ noCollide: true, action: { type: "floor" } }}>
       {/* Steps: wood treads, dark risers, brass nosings, navy runner + gold trim */}
       <InstancedMeshes geometry={STAIR_TREAD_GEO} material={STAIR_TREAD_MAT} transforms={treads} colors={treadTint} count={n} castShadow />
       <InstancedMeshes geometry={STAIR_RISER_GEO} material={STAIR_RISER_MAT} transforms={risers} colors={riserTint} count={n} />
@@ -316,18 +323,6 @@ function Stairs({ room }) {
       <InstancedMeshes geometry={STAIR_CARPET_GEO} material={STAIR_CARPET_MAT} transforms={carpets} count={n} />
       <InstancedMeshes geometry={STAIR_TRIM_GEO} material={STAIR_TRIM_MAT} transforms={trimL} count={n} />
       <InstancedMeshes geometry={STAIR_TRIM_GEO} material={STAIR_TRIM_MAT} transforms={trimR} count={n} />
-
-      {/* Brass cap rail on top of the stair panel */}
-      <mesh
-        position={[
-          x0 + STAIR_WIDTH + 0.04,
-          FLOOR2_Y + 1.2 + 0.08,
-          (STAIR_Z0 + STAIR_Z1) / 2,
-        ]}
-      >
-        <boxGeometry args={[0.06, 0.06, STAIR_Z1 - STAIR_Z0]} />
-        <meshStandardMaterial color="#c9a35e" metalness={0.7} roughness={0.35} />
-      </mesh>
 
       {/* Glowing wall sconces climbing the panel side */}
       {[
@@ -416,18 +411,30 @@ function DosenStairSign({ room, y = 3.2 }) {
   )
 }
 
+// Slab atas mengkloning peta marble per potongan (repeat beda per ukuran).
+// Tanpa cache, 8 ruang × 3 slab = 24 upload tekstur 512px dobel ke GPU.
+// Cache per tanda repeat → potongan sesama ukuran berbagi 1 tekstur saja.
+const SLAB_MAP_CACHE = new Map()
+
+function upperSlabMaps(floorMap, pieces) {
+  const out = []
+  for (const [x0, z0, x1, z1] of pieces) {
+    const key = `${(x1 - x0).toFixed(2)}x${(z1 - z0).toFixed(2)}`
+    let m = SLAB_MAP_CACHE.get(key)
+    if (!m) {
+      m = floorMap.clone()
+      m.repeat.set((x1 - x0) / 4, (z1 - z0) / 6)
+      m.needsUpdate = true
+      SLAB_MAP_CACHE.set(key, m)
+    }
+    out.push(m)
+  }
+  return out
+}
+
 function UpperSlab({ room, floorMap }) {
   const pieces = useMemo(() => upperSlabPieces(room), [room])
-  const maps = useMemo(
-    () =>
-      pieces.map(([x0, z0, x1, z1]) => {
-        const m = floorMap.clone()
-        m.repeat.set((x1 - x0) / 4, (z1 - z0) / 6)
-        m.needsUpdate = true
-        return m
-      }),
-    [pieces, floorMap],
-  )
+  const maps = useMemo(() => upperSlabMaps(floorMap, pieces), [pieces, floorMap])
   return (
     <group userData={{ noCollide: true }}>
       {pieces.map(([x0, z0, x1, z1], i) => (
@@ -443,6 +450,7 @@ function UpperSlab({ room, floorMap }) {
             rotation={[-Math.PI / 2, 0, 0]}
             position={[(x0 + x1) / 2, FLOOR2_Y + 0.01, (z0 + z1) / 2]}
             receiveShadow
+            userData={{ action: { type: "floor" } }}
           >
             <planeGeometry args={[x1 - x0, z1 - z0]} />
             <meshStandardMaterial
@@ -589,13 +597,13 @@ function RoomDecorUpper({ room, projects }) {
 
       <FloorLabel position={[cx + 1.3, Y + 0.06, 42]} text="LANTAI 2 · KARYA DOSEN" />
 
-      <Plant position={[x1 - 2.5, Y, 42]} variant="flower" flowerColor="#60a5fa" />
-      <Plant position={[x0 + 4.5, Y, 42]} variant="flower" flowerColor="#f8fafc" />
+      <Plant position={[x1 - 2.5, Y, 42]} variant="flower" flowerType="tulip" flowerScale={0.68} potStyle="ceramic" flowerColor="#60a5fa" info={TULIP_INFO} />
+      <Plant position={[x0 + 4.5, Y, 42]} variant="flower" flowerType="tulip" flowerScale={0.68} potStyle="ceramic" flowerColor="#f8fafc" info={TULIP_INFO} />
 
       <ReadingRing room={room} y={Y} />
 
       {projects.length > 0 && (
-        <FeaturedWork position={[cx + 9.5, Y, 32]} rotationY={-0.46} projects={pickFeatured(projects)} />
+        <FeaturedWork position={[cx + 9.5, Y, 36]} rotationY={-0.46} projects={pickFeatured(projects)} />
       )}
 
       <WallClock position={[cx, Y + 5.6, room.z[1] - 0.45]} rotationY={Math.PI} scale={1.3} />
@@ -613,18 +621,25 @@ function RoomDecorUpper({ room, projects }) {
 const CULL_REGISTRY = {}
 const CULL_SHOW_DIST = 45
 const CULL_HIDE_DIST = 60
+// HP/device lemah: sembunyikan ruang lebih jauh lebih cepat -> jauh lebih
+// sedikit objek + material + text yang dirender/disimpan sekaligus.
+const CULL_SHOW_DIST_LITE = 30
+const CULL_HIDE_DIST_LITE = 42
 
 function RoomCuller({ rooms }) {
   const visibleRef = useRef({})
+  const lite = useLiteMode()
   useFrame(() => {
     const p = useWalkStore.getState().position
+    const showDist = lite ? CULL_SHOW_DIST_LITE : CULL_SHOW_DIST
+    const hideDist = lite ? CULL_HIDE_DIST_LITE : CULL_HIDE_DIST
     for (const room of rooms) {
       if (room.id === "hall") continue
       const cx = (room.x[0] + room.x[1]) / 2
       const cz = (room.z[0] + room.z[1]) / 2
       const dist = Math.hypot(p.x - cx, p.z - cz)
       const prev = visibleRef.current[room.id]
-      const visible = prev ? dist < CULL_HIDE_DIST : dist < CULL_SHOW_DIST
+      const visible = prev ? dist < hideDist : dist < showDist
       visibleRef.current[room.id] = visible
       for (const type of ["storey", "paint", "room-title"]) {
         const g = CULL_REGISTRY[`${type}-${room.id}`]
@@ -642,6 +657,14 @@ export function KaryaRooms({ groups, marbleMap, archways }) {
     },
     [],
   )
+
+  // This module is lazy-loaded, so it mounts well after LookControls built its
+  // floor/collider caches. Bump the scene revision so those caches include the
+  // category floors (otherwise click-to-walk has no floor to hit). Project art
+  // that arrives later is flat and/or covered by objectColliders.js.
+  useEffect(() => {
+    markSceneDirty()
+  }, [])
 
   return (
     <group>

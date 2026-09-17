@@ -3,6 +3,7 @@ import {
   ROOM_CENTER_Z,
   BOOKCASE_RING,
   OTTOMAN_CIRCLE,
+  ringBudget,
   ringAngle,
   ringPosition,
   STAIR_WIDTH,
@@ -127,24 +128,28 @@ function roomFurnitureColliders() {
     const cx = (room.x[0] + room.x[1]) / 2
 
     for (const level of [0, 1]) {
+      // Budget ring (sama dengan ReadingRing: mobile/rendah pakai lebih sedikit
+      // furnitur) supaya collider tetap pas dengan yang dirender.
+      const rb = ringBudget()
+
       // Central circular bookcase ring around the reading carpet
-      for (let i = 0; i < BOOKCASE_RING.count; i++) {
-        const a = ringAngle(i, BOOKCASE_RING.count, BOOKCASE_RING.phase)
+      for (let i = 0; i < rb.bookcase; i++) {
+        const a = ringAngle(i, rb.bookcase, BOOKCASE_RING.phase)
         const [x, z] = ringPosition(cx, BOOKCASE_RING.radius, a)
         out.push({ x, z, radius: 0.95, level })
       }
 
       // Greenery ring outside the bookcases
-      for (let i = 0; i < BOOKCASE_RING.count; i++) {
-        const a = ringAngle(i, BOOKCASE_RING.count, BOOKCASE_RING.phase)
+      for (let i = 0; i < rb.plant; i++) {
+        const a = ringAngle(i, rb.plant, BOOKCASE_RING.phase)
         const [x, z] = ringPosition(cx, BOOKCASE_RING.radius + 0.85, a)
         out.push({ x, z, radius: 0.45, level })
       }
 
       // Ottoman seats gathered on the carpet at the centre
-      for (let i = 0; i < OTTOMAN_CIRCLE.count; i++) {
+      for (let i = 0; i < rb.pouf; i++) {
         const a =
-          (i / OTTOMAN_CIRCLE.count) * Math.PI * 2 + Math.PI / OTTOMAN_CIRCLE.count
+          (i / rb.pouf) * Math.PI * 2 + Math.PI / rb.pouf
         out.push({
           x: cx + Math.cos(a) * OTTOMAN_CIRCLE.radius,
           z: ROOM_CENTER_Z + Math.sin(a) * OTTOMAN_CIRCLE.radius,
@@ -156,12 +161,21 @@ function roomFurnitureColliders() {
       // Round table at the centre of the carpet
       out.push({ x: cx, z: ROOM_CENTER_Z, radius: 1.65, level })
 
-      // Featured work podium on right side
-      out.push({ x: cx + 9.5, z: 32, radius: 2.8, level })
+      // Featured work podium on right side (booth ground di z=32, upper di
+      // z=36; pusat collider digeser sedikit ke belakang supaya lorong di
+      // antara booth dan karya dinding depan tetap lega).
+      out.push({
+        x: cx + 9.5,
+        z: level === 0 ? 32.6 : 36.6,
+        radius: 2.35,
+        level,
+      })
 
-      // White potted tulips flanking the room's own staircase
-      out.push({ x: room.x[0] + STAIR_WIDTH + 1.2, z: STAIR_Z0 - 0.6, radius: 0.42, level })
-      out.push({ x: room.x[0] + STAIR_WIDTH + 1.2, z: STAIR_Z0 - 3.4, radius: 0.42, level })
+      // Ground-floor white potted tulips flanking the staircase
+      if (level === 0) {
+        out.push({ x: room.x[0] + STAIR_WIDTH + 1.2, z: STAIR_Z0 - 0.6, radius: 0.42, level: 0 })
+        out.push({ x: room.x[0] + STAIR_WIDTH + 1.2, z: STAIR_Z0 - 3.4, radius: 0.42, level: 0 })
+      }
     }
 
     // Wall cover over middle portal space on floor 2

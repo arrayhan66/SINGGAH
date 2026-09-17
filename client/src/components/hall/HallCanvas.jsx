@@ -59,7 +59,7 @@ export default function HallCanvas({
         dpr={isLite ? DPR_LITE : DPR_FOR[tier]}
         gl={{
           powerPreference: isLite ? "default" : "high-performance",
-          antialias: !isLite && tier !== "rendah",
+          antialias: tier === "tinggi",
         }}
         frameloop={frameloop}
         camera={{ position: [0, 1.7, 0], fov: 70, near: 0.1, far: 220 }}

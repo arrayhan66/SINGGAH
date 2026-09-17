@@ -1955,7 +1955,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
                 "Drag untuk melihat-lihat",
                 "Tekan WASD / klik lantai untuk berjalan",
                 "Klik lukisan untuk detail karya",
-                "Lewati portal biru untuk pindah kategori",
+                "Lewati portal putih untuk pindah kategori",
               ]
                 .map((item) => `•  ${item}`)
                 .join("\n")}
@@ -2029,7 +2029,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
               "Selamat datang di SINGGAH",
               "Virtual Exhibition",
               "karya Dosen & Mahasiswa.",
-              "Masuki portal biru untuk",
+              "Masuki portal putih untuk",
               "menjelajahi setiap kategori.",
             ].map((line, i) => (
               <Text

@@ -6,6 +6,7 @@ import AdminBeritaCard from "./AdminBeritaCard"
 import AdminBeritaDeleteModal from "./AdminBeritaDeleteModal"
 import ShowMoreButton from "../../../ui/ShowMoreButton"
 import { AdminNewsListSkeleton } from "../../../ui/PageSkeletons"
+import { keepScrollOnExpand } from "../../../../utils/preserveScrollOnExpand"
 
 const INITIAL_VISIBLE = 6
 
@@ -113,7 +114,10 @@ function AdminBeritaList({ search, statusFilter }) {
             label="Lihat Semua Berita"
             total={filteredBerita.length}
             showAll={showAll}
-            onToggle={() => setShowAll((prev) => !prev)}
+            onToggle={() => {
+              if (!showAll) keepScrollOnExpand()
+              setShowAll((prev) => !prev)
+            }}
           />
         )}
       </div>

@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { keepScrollOnExpand } from "../utils/preserveScrollOnExpand"
 
 function useSearchAndExpand(data, initialCount = 6) {
   const [search, setSearch] = useState("")
@@ -17,13 +18,19 @@ function useSearchAndExpand(data, initialCount = 6) {
     setShowAll(false)
   }
 
+  const toggleShowAll = (next) => {
+    const expanding = Boolean(next) && !showAll
+    if (expanding) keepScrollOnExpand()
+    setShowAll(next)
+  }
+
   return {
     search,
     handleSearchChange,
     visibleData,
     filteredData,
     showAll,
-    setShowAll,
+    setShowAll: toggleShowAll,
   }
 }
 

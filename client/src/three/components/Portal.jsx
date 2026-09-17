@@ -79,21 +79,17 @@ function ExitIcon() {
 function ExitSign({ width }) {
   return (
     <>
-      <mesh position={[0, RIFT_H + FRAME_T + 0.29, 0.16]} castShadow>
+      <mesh position={[0, RIFT_H + FRAME_T + 0.29, 0.16]} castShadow material={EXIT_RED_MAT}>
         <boxGeometry args={[width + 0.4, 0.5, 0.06]} />
-        <meshStandardMaterial color={EXIT_RED} roughness={0.6} metalness={0.15} />
       </mesh>
-      <mesh position={[0, RIFT_H + FRAME_T + 0.54, 0.16]}>
+      <mesh position={[0, RIFT_H + FRAME_T + 0.54, 0.16]} material={EXIT_RED_DARK_MAT}>
         <boxGeometry args={[width + 0.4, 0.05, 0.06]} />
-        <meshStandardMaterial color={EXIT_RED_DARK} roughness={0.6} />
       </mesh>
-      <mesh position={[0, RIFT_H + FRAME_T + 0.29, 0.22]}>
+      <mesh position={[0, RIFT_H + FRAME_T + 0.29, 0.22]} material={EXIT_SIGN_DEEP_MAT}>
         <boxGeometry args={[width + 0.2, 0.34, 0.05]} />
-        <meshStandardMaterial color="#991b1b" roughness={0.6} />
       </mesh>
-      <mesh position={[0, RIFT_H + FRAME_T + 0.12, 0.22]}>
+      <mesh position={[0, RIFT_H + FRAME_T + 0.12, 0.22]} material={GLOW_MAT_HI}>
         <boxGeometry args={[width + 0.2, 0.03, 0.04]} />
-        {glowMat(1.4)}
       </mesh>
       <Text
         position={[0, RIFT_H + FRAME_T + 0.31, 0.25]}
@@ -111,18 +107,34 @@ function ExitSign({ width }) {
   )
 }
 
-const navyMat = (edge = false) => (
-  <meshStandardMaterial color={edge ? NAVY_EDGE : NAVY} roughness={0.75} metalness={0.15} />
-)
-const exitMat = (dark = false) => (
-  <meshStandardMaterial color={dark ? EXIT_RED_DARK : EXIT_RED} roughness={0.6} metalness={0.15} />
-)
-const glowMat = (intensity = 1.1) => (
-  <meshStandardMaterial color={GLOW_LIGHT} emissive={GLOW} emissiveIntensity={intensity} />
-)
-const exitGlowMat = (intensity = 1.1) => (
-  <meshStandardMaterial color={EXIT_RED} emissive={EXIT_RED} emissiveIntensity={intensity} />
-)
+// Material instance BERSAMA (sebelumnya dibuat baru per portal → puluhan
+// material unik). Semua portal berbagi set kecil ini sehingga shader/program
+// dikompilasi sekali dan state penggantian material jauh lebih sedikit.
+const NAVY_MAT = new THREE.MeshStandardMaterial({ color: NAVY, roughness: 0.75, metalness: 0.15 })
+const NAVY_EDGE_MAT = new THREE.MeshStandardMaterial({ color: NAVY_EDGE, roughness: 0.75, metalness: 0.15 })
+const EXIT_RED_MAT = new THREE.MeshStandardMaterial({ color: EXIT_RED, roughness: 0.6, metalness: 0.15 })
+const EXIT_RED_DARK_MAT = new THREE.MeshStandardMaterial({ color: EXIT_RED_DARK, roughness: 0.6, metalness: 0.15 })
+const EXIT_SIGN_DEEP_MAT = new THREE.MeshStandardMaterial({ color: "#991b1b", roughness: 0.6 })
+const GLOW_MAT = new THREE.MeshStandardMaterial({ color: GLOW_LIGHT, emissive: GLOW, emissiveIntensity: 1.1 })
+const GLOW_MAT_MED = new THREE.MeshStandardMaterial({ color: GLOW_LIGHT, emissive: GLOW, emissiveIntensity: 1.2 })
+const GLOW_MAT_HI = new THREE.MeshStandardMaterial({ color: GLOW_LIGHT, emissive: GLOW, emissiveIntensity: 1.4 })
+const EXIT_GLOW_MAT = new THREE.MeshStandardMaterial({ color: EXIT_RED, emissive: EXIT_RED, emissiveIntensity: 1.1 })
+const RIFT_NAVY_MAT = new THREE.MeshStandardMaterial({
+  color: "#1a4a7f",
+  emissive: "#ffffff",
+  emissiveIntensity: 0.9,
+  roughness: 0.5,
+  metalness: 0.1,
+  side: THREE.DoubleSide,
+})
+const RIFT_EXIT_MAT = new THREE.MeshStandardMaterial({
+  color: EXIT_RED_DARK,
+  emissive: "#ffffff",
+  emissiveIntensity: 0.9,
+  roughness: 0.5,
+  metalness: 0.1,
+  side: THREE.DoubleSide,
+})
 
 // Poppins is wider than the previous default font, so long category names
 // wrapped onto two lines on the nameplate. Measure the laid-out text and
@@ -158,7 +170,7 @@ function BoardTitle({ position, width, children }) {
 function Portal({ position, rotationY, width, title, action }) {
   const hw = width / 2
   const frameW = width + FRAME_T * 2
-  const frameMat = title ? navyMat() : exitMat()
+  const frameMat = title ? NAVY_MAT : EXIT_RED_MAT
 
   return (
     <group
@@ -168,18 +180,15 @@ function Portal({ position, rotationY, width, title, action }) {
     >
       {/* ==== Bingkai seragam: kiri / kanan / atas / bawah (sama tebal) ==== */}
       {[-1, 1].map((s) => (
-        <mesh key={s} position={[s * (hw + FRAME_T / 2), RIFT_H / 2, 0]} castShadow>
+        <mesh key={s} position={[s * (hw + FRAME_T / 2), RIFT_H / 2, 0]} castShadow material={frameMat}>
           <boxGeometry args={[FRAME_T, RIFT_H, DEPTH]} />
-          {frameMat}
         </mesh>
       ))}
-      <mesh position={[0, RIFT_H + FRAME_T / 2, 0]} castShadow>
+      <mesh position={[0, RIFT_H + FRAME_T / 2, 0]} castShadow material={frameMat}>
         <boxGeometry args={[frameW, FRAME_T, DEPTH]} />
-        {frameMat}
       </mesh>
-      <mesh position={[0, FRAME_T / 2, 0]} castShadow>
+      <mesh position={[0, FRAME_T / 2, 0]} castShadow material={frameMat}>
         <boxGeometry args={[frameW, FRAME_T, DEPTH]} />
-        {frameMat}
       </mesh>
 
       {/* ==== Tengah portal: logo SINGGAH (masuk) / icon EXIT merah (keluar) ==== */}
@@ -214,63 +223,51 @@ function Portal({ position, rotationY, width, title, action }) {
       {[-1, 1].map((s) => (
         <mesh key={s} position={[s * (hw - 0.02), RIFT_H / 2, 0.08]}>
           <boxGeometry args={[0.05, RIFT_H - 0.1, 0.1]} />
-          {title ? navyMat(true) : exitMat(true)}
+          <primitive object={title ? NAVY_EDGE_MAT : EXIT_RED_DARK_MAT} attach="material" />
         </mesh>
       ))}
       {[-1, 1].map((s) => (
         <mesh key={s} position={[s * (hw - 0.02), RIFT_H / 2, 0.16]}>
           <boxGeometry args={[0.04, RIFT_H - 0.12, 0.05]} />
-          {title ? glowMat() : exitGlowMat()}
+          <primitive object={title ? GLOW_MAT : EXIT_GLOW_MAT} attach="material" />
         </mesh>
       ))}
       <mesh position={[0, RIFT_H - 0.02, 0.08]}>
         <boxGeometry args={[width + 0.08, 0.05, 0.1]} />
-        {title ? navyMat(true) : exitMat(true)}
+        <primitive object={title ? NAVY_EDGE_MAT : EXIT_RED_DARK_MAT} attach="material" />
       </mesh>
       <mesh position={[0, RIFT_H - 0.02, 0.16]}>
         <boxGeometry args={[width + 0.04, 0.04, 0.05]} />
-        {title ? glowMat() : exitGlowMat()}
+        <primitive object={title ? GLOW_MAT : EXIT_GLOW_MAT} attach="material" />
       </mesh>
       <mesh position={[0, FRAME_T + 0.03, 0.08]}>
         <boxGeometry args={[width + 0.08, 0.05, 0.1]} />
-        {title ? navyMat(true) : exitMat(true)}
+        <primitive object={title ? NAVY_EDGE_MAT : EXIT_RED_DARK_MAT} attach="material" />
       </mesh>
       <mesh position={[0, FRAME_T + 0.03, 0.16]}>
         <boxGeometry args={[width + 0.04, 0.04, 0.05]} />
-        {title ? glowMat() : exitGlowMat()}
+        <primitive object={title ? GLOW_MAT : EXIT_GLOW_MAT} attach="material" />
       </mesh>
 
       {/* ==== Rift ==== */}
-      <mesh position={[0, RIFT_H / 2, 0]}>
+      <mesh position={[0, RIFT_H / 2, 0]} material={title ? RIFT_NAVY_MAT : RIFT_EXIT_MAT}>
         <planeGeometry args={[width, RIFT_H]} />
-        <meshStandardMaterial
-          color={title ? "#1a4a7f" : EXIT_RED_DARK}
-          emissive="#ffffff"
-          emissiveIntensity={0.9}
-          roughness={0.5}
-          metalness={0.1}
-          side={THREE.DoubleSide}
-        />
       </mesh>
 
       {/* ==== Papan nama di atas lintel: judul kategori (masuk) / EXIT (keluar) ==== */}
       {title ? (
         <>
-          <mesh position={[0, RIFT_H + FRAME_T + 0.29, 0.16]} castShadow>
+          <mesh position={[0, RIFT_H + FRAME_T + 0.29, 0.16]} castShadow material={NAVY_MAT}>
             <boxGeometry args={[width + 0.4, 0.5, 0.06]} />
-            {navyMat()}
           </mesh>
-          <mesh position={[0, RIFT_H + FRAME_T + 0.54, 0.16]}>
+          <mesh position={[0, RIFT_H + FRAME_T + 0.54, 0.16]} material={NAVY_EDGE_MAT}>
             <boxGeometry args={[width + 0.4, 0.05, 0.06]} />
-            {navyMat(true)}
           </mesh>
-          <mesh position={[0, RIFT_H + FRAME_T + 0.29, 0.22]}>
+          <mesh position={[0, RIFT_H + FRAME_T + 0.29, 0.22]} material={NAVY_MAT}>
             <boxGeometry args={[width + 0.2, 0.34, 0.05]} />
-            {navyMat()}
           </mesh>
-          <mesh position={[0, RIFT_H + FRAME_T + 0.12, 0.22]}>
+          <mesh position={[0, RIFT_H + FRAME_T + 0.12, 0.22]} material={GLOW_MAT_MED}>
             <boxGeometry args={[width + 0.2, 0.03, 0.04]} />
-            {glowMat(1.2)}
           </mesh>
           <BoardTitle position={[0, RIFT_H + FRAME_T + 0.31, 0.25]} width={width + 0.1}>
             {title}

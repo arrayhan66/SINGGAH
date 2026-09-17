@@ -7,6 +7,7 @@ import AdminUserTipeModal from "./AdminUserTipeModal"
 import ShowMoreButton from "../../../ui/ShowMoreButton"
 import UserAvatar from "../../../ui/UserAvatar"
 import { AdminUsersSkeleton } from "../../../ui/PageSkeletons"
+import { keepScrollOnExpand } from "../../../../utils/preserveScrollOnExpand"
 
 const INITIAL_VISIBLE = 10
 
@@ -306,7 +307,10 @@ function AdminUserList({ search, statusFilter }) {
             label="Lihat Semua User"
             total={filteredUsers.length}
             showAll={showAll}
-            onToggle={() => setShowAll((prev) => !prev)}
+            onToggle={() => {
+              if (!showAll) keepScrollOnExpand()
+              setShowAll((prev) => !prev)
+            }}
           />
         )}
       </div>

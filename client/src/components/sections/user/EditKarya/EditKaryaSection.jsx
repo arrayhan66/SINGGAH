@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { AlertCircle } from "lucide-react"
+import { AlertCircle, Info } from "lucide-react"
 import GlowBackground from "../../../ui/GlowBackground"
 import DustBackground from "../../../ui/DustBackground"
 import UploadThumbnail from "../Upload/UploadThumbnail"
@@ -14,7 +14,46 @@ import api from "../../../../services/api"
 import { useProjects } from "../../../../context/ProjectContext"
 import { useAuth } from "../../../../context/AuthContext"
 import SubmitSuccessModal from "../../../ui/SubmitSuccessModal"
+import PopupToast from "../../../ui/PopupToast"
 import { EditKaryaFormSkeleton } from "../../../ui/PageSkeletons"
+
+function normalizeList(list) {
+  return (Array.isArray(list) ? list : [])
+    .map((v) => (typeof v === "string" ? v.trim() : JSON.stringify(v)))
+    .filter(Boolean)
+    .sort()
+    .join("|")
+}
+
+// Sebelum submit (yang memicu verifikasi ke admin bila mahasiswa), pastikan
+// benar-benar ada yang berubah. Kalau tidak ada perubahan sama sekali, submit
+// dibatalkan dan muncul popup "Tidak ada perubahan".
+function hasNoChanges(formData, existing, original) {
+  const norm = (v) => String(v ?? "").trim()
+
+  if (norm(formData.title) !== norm(original.title)) return false
+  if (norm(formData.description) !== norm(original.description)) return false
+  if (norm(formData.category_id) !== norm(original.category_id)) return false
+  if (norm(formData.year) !== norm(original.year)) return false
+  if (norm(formData.videoUrl) !== norm(original.videoUrl)) return false
+  if (normalizeList(formData.technologies) !== normalizeList(original.technologies)) return false
+  if (normalizeList(formData.members) !== normalizeList(original.members)) return false
+  if (normalizeList(formData.links) !== normalizeList(original.links)) return false
+
+  // Thumbnail: file baru ditambah, atau thumbnail lama dihapus/diganti.
+  if (formData.thumbnail) return false
+  if (existing.existingThumbnail !== original.thumbnail) return false
+
+  // Galeri & dokumen: ada file baru, ada yang dihapus, atau urutan lama berubah.
+  if (formData.images.length > 0) return false
+  if (existing.removedImages.length > 0) return false
+  if (normalizeList(existing.existingImages) !== normalizeList(original.images)) return false
+  if (formData.documents.length > 0) return false
+  if (existing.removedDocuments.length > 0) return false
+  if (normalizeList(existing.existingDocuments) !== normalizeList(original.documents)) return false
+
+  return true
+}
 
 function EditKaryaSection({ redirectPath = "/my-karya" }) {
   const { slug } = useParams()
@@ -27,6 +66,8 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState(null)
   const [successOpen, setSuccessOpen] = useState(false)
+  const [noChangeOpen, setNoChangeOpen] = useState(false)
+  const originalRef = useRef(null)
 
   const [formData, setFormData] = useState({
     title: "",
@@ -54,46 +95,64 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
         const res = await api.get(`/projects/${slug}`)
         const project = res.data.data || res.data
 
+        const technologies = project.technologies
+          ? (typeof project.technologies === "string"
+              ? JSON.parse(project.technologies)
+              : project.technologies
+            )
+              .map((t) => (typeof t === "string" ? t : t?.name || ""))
+              .filter(Boolean)
+          : []
+        const members = project.members
+          ? (typeof project.members === "string"
+              ? JSON.parse(project.members)
+              : project.members)
+          : []
+        const links = project.links
+          ? (typeof project.links === "string"
+              ? JSON.parse(project.links)
+              : project.links)
+          : []
+        const videoUrl = project.videos
+          ? (typeof project.videos === "string"
+              ? JSON.parse(project.videos)?.[0]?.video_url || ""
+              : project.videos?.[0]?.video_url || "")
+          : ""
+
         setFormData({
           title: project.title || "",
           description: project.description || "",
           category_id: project.category_id?.toString() || "",
           thumbnail: null,
           images: [],
-          technologies: project.technologies
-            ? (typeof project.technologies === "string"
-                ? JSON.parse(project.technologies)
-                : project.technologies
-              )
-                .map((t) => (typeof t === "string" ? t : t?.name || ""))
-                .filter(Boolean)
-            : [],
-          members: project.members
-            ? (typeof project.members === "string"
-                ? JSON.parse(project.members)
-                : project.members)
-            : [],
-          links: project.links
-            ? (typeof project.links === "string"
-                ? JSON.parse(project.links)
-                : project.links)
-            : [],
+          technologies,
+          members,
+          links,
           documents: [],
-          videoUrl: project.videos
-            ? (typeof project.videos === "string"
-                ? JSON.parse(project.videos)?.[0]?.video_url || ""
-                : project.videos?.[0]?.video_url || "")
-            : "",
+          videoUrl,
           year: project.year?.toString() || "",
         })
 
+        const images = Array.isArray(project.images) ? project.images : []
+        const docs = Array.isArray(project.documents) ? project.documents : []
+
         setExistingThumbnail(project.thumbnail || "")
+        setExistingImages(images)
+        setExistingDocuments(docs)
 
-        const images = project.images || []
-        setExistingImages(Array.isArray(images) ? images : [])
-
-        const docs = project.documents || []
-        setExistingDocuments(Array.isArray(docs) ? docs : [])
+        originalRef.current = {
+          title: project.title || "",
+          description: project.description || "",
+          category_id: project.category_id?.toString() || "",
+          year: project.year?.toString() || "",
+          videoUrl,
+          technologies,
+          members,
+          links,
+          thumbnail: project.thumbnail || "",
+          images,
+          documents: docs,
+        }
       } catch (err) {
         setFetchError(err.response?.data?.message || "Gagal memuat data karya.")
       } finally {
@@ -118,6 +177,19 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
   }
 
   async function handleSubmit() {
+    const original = originalRef.current
+
+    if (original && hasNoChanges(formData, {
+      existingThumbnail,
+      existingImages,
+      removedImages,
+      existingDocuments,
+      removedDocuments,
+    }, original)) {
+      setNoChangeOpen(true)
+      return
+    }
+
     setSubmitting(true)
     setSubmitError(null)
 
@@ -262,6 +334,40 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
         tipe={user?.tipe || "umum"}
         onClose={() => setSuccessOpen(false)}
       />
+
+      <PopupToast
+        show={noChangeOpen}
+        position="center"
+        autoDismiss={false}
+        onClose={() => setNoChangeOpen(false)}
+      >
+        <div className="px-4 py-3.5">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-500/10">
+              <Info className="h-4.5 w-4.5 text-cyan-300" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="pt-1 text-sm font-semibold text-white">
+                Tidak Ada Perubahan
+              </h3>
+              <p className="mt-0.5 text-xs text-slate-400 leading-relaxed">
+                Semua isian masih sama dengan data sebelumnya, jadi tidak ada
+                yang disimpan. Tidak ada pengajuan verifikasi yang dikirim ke
+                admin karena tidak ada yang berubah.
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setNoChangeOpen(false)}
+              className="cursor-pointer rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-2 text-xs font-semibold text-white shadow-lg shadow-cyan-500/25"
+            >
+              Tutup
+            </button>
+          </div>
+        </div>
+      </PopupToast>
     </section>
   )
 }

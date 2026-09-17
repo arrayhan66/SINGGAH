@@ -1,3 +1,5 @@
+import { useQualityStore } from "../hooks/useQuality"
+
 export const DEFAULT_CATEGORIES = [
   { slug: "website", title: "Website" },
   { slug: "mobile-app", title: "Mobile App" },
@@ -210,6 +212,17 @@ export const PLANT_RING_JITTER = {
 // each one facing the middle of the circle.
 export const OTTOMAN_CIRCLE = { radius: 2.2, count: 6 }
 
+// Jumlah furnitur ring sesuai budget perangkat. Dipakai BERSAMA oleh
+// KaryaRooms.jsx (visual) dan objectColliders.js (collision) jadi keduanya
+// selalu sinkron. Ring dipatok GENAP & simetris (10/5) di semua tier non-rendah
+// — penghematan draw call besar (16 ring × puluhan mesh per rak) dengan
+// tampilan lingkaran baca tetap utuh. RAM 2GB dipangkas lebih dalam (8/8/4).
+export function ringBudget() {
+  const tier = useQualityStore.getState().tier
+  if (tier === "rendah") return { bookcase: 8, plant: 8, pouf: 4 }
+  return { bookcase: 10, plant: 10, pouf: 5 }
+}
+
 export function ringAngle(i, count, phase) {
   return phase + (i * Math.PI * 2) / count
 }
@@ -415,16 +428,21 @@ function wallDef(axis, at, from, to, face, y = 2.75, dir = 1, endPad = 0, noRail
   return { axis, at, from, to, face, y, dir, endPad, noRail }
 }
 
-// Bare stretch left empty around the exit portal so frames don't hug the door.
-const PORTAL_MARGIN = 3.0
+// Segmen depan diisi mulai dari bukaan pintu keluar lalu menjauh ke sudut,
+// jadi karya benar-benar rapat di sisi pintu (gap kecil "potongan" saja).
+const PORTAL_MARGIN = 1.0
 
-// Carve the front wall around the portal into two segments that each pack from
-// the room's outer corner toward the door, both reserving PORTAL_MARGIN beside
-// the opening — so the row ends neatly aligned with, but not flush against,
-// the exit portal.
+// Carve the front wall around the portal into two segments. Each packs its
+// works from the END FARTHEST from the door (the outer corner) back toward the
+// portal opening, always reserving PORTAL_MARGIN beside the door — so the room
+// circuit keeps counting UP around the room and the numbers next to the exit
+// door continue normally (right segment ends at the door, left segment starts
+// there) instead of appearing reversed on either side of the exit.
 function portalWallDefs(axis, at, from, to, face, center, w, y = 2.75) {
   const segs = carve(from, to, [{ a: center - w / 2, b: center + w / 2 }])
-  return segs.map(([a, b], i) => wallDef(axis, at, a, b, face, y, i > 0 ? -1 : 1, PORTAL_MARGIN))
+  return segs.map(([a, b]) =>
+    wallDef(axis, at, a, b, face, y, -1, PORTAL_MARGIN),
+  )
 }
 
 // Lower the whole painting row + picture rail together (frames, wires, info
@@ -456,43 +474,49 @@ for (let i = 0; i < N; i++) {
   const UPPER_Y = FLOOR2_Y + UPPER_PAINT_OFFSET
 
   // Wall order = fill order: one wall is fully populated before the next
-  // begins. The stair-side (left) wall is filled FIRST so every room's row of
-  // works starts at the corner where the staircase ends — right beside the
-  // "KARYA DOSEN" sign — and then grows toward the back-left end of the room
-  // as more works are added. Only when that wall is full does the row spill
-  // onto the back wall, then the front wall beside the portal, then the
-  // short right-side wall. (Filling positions are unchanged; only the ORDER
-  // of the works is reversed — see layoutPaintings — so the oldest work keeps
-  // its slot at the start and newcomers appear later along the same walls.)
+  // begins.
+  //   Lantai 1 (mahasiswa): stair-side (left) wall FIRST — every room's row of
+  //   works starts at the corner where the staircase ends (right beside the
+  //   "KARYA DOSEN" sign) and grows toward the back-left of the room, then the
+  //   back wall (left→right), then the RIGHT wall packed from the back-right
+  //   corner toward the front, then the front wall beside the portal (right
+  //   segment before the left one).
+  //   Lantai 2 (dosen): cerminannya — mulai dari sudut depan-KANAN menyusur ke
+  //   belakang, belakang kanan→kiri, kiri belakang→depan, lalu depan kiri→kanan
+  //   berakhir di segmen kanan poster. (Filling positions are unchanged; only
+  //   the ORDER of the works is reversed — see layoutPaintings — so the oldest
+  //   work keeps its slot at the start and newcomers appear later along the
+  //   same walls.)
   paintingWalls[id] = {
     ground: [
       wallDef("x", x0, STAIR_Z1, ROW_Z1, "+x", GROUND_Y),
       wallDef("z", ROW_Z1, x0, x1, "-z", GROUND_Y),
-      ...portalWallDefs("z", ROW_Z0, x0, x1, "+z", cx, PORTAL_W, GROUND_Y),
-      wallDef("x", x1, ROW_Z0, STAIR_Z0, "-x", GROUND_Y),
+      // Dinding KANAN lantai 1 rel + karya FULL sepanjang tembok (ROW_Z0 → ROW_Z1),
+      // diisi dari sudut belakang-kanan ke depan. Pintu keluar tidak diberi margin
+      // lebar — segmen depan berhenti alami karena bukaan pintu memotong jalur
+      // rel (PORTAL_MARGIN kecil).
+      wallDef("x", x1, ROW_Z0, ROW_Z1, "-x", GROUND_Y, -1),
+      ...portalWallDefs("z", ROW_Z0, x0, x1, "+z", cx, PORTAL_W, GROUND_Y).reverse(),
     ],
     upper: [
+      // Lantai 2 (dosen) mengikuti sirkuit lantai 1: mulai dari DEPAN-KIRI
+      // (dinding kiri di ujung tangga) → belakang → kanan → lalu dinding depan
+      // diisi dari segmen KIRI poster dulu dan berakhir di segmen KANAN poster
+      // ("mulai dari kiri, ke belakang, kalau belakang habis ke kanan, kalau
+      // kanan habis ke depan yang di sebelah kanan poster").
       wallDef("x", x0, STAIR_Z1, ROW_Z1, "+x", UPPER_Y),
       wallDef("z", ROW_Z1, x0, x1, "-z", UPPER_Y),
-      // Front wall split around the PKKMB poster zone:
-      //  - segmen depan-kanan (sebelah kanan poster): REL
-      //    (frame berhenti di sini, sebelum poster)
-      //  - segmen depan-kiri (sebelah kiri poster): TANPA rel
-      //    (tulip putih jadi ujung rel dari tembok kiri, tidak perlu ke sana)
-      // Front wall split around the PKKMB poster zone:
-      //  - segmen DEPAN-KANAN poster (si===1): rail (frame berhenti
-      //    di sini, sebelum poster)
-      //  - segmen DEPAN-KIRI poster (si===0): NO rail (tulip putih
-      //    sudah jadi awal rel dari tembok kiri, tidak perlu ke sana).
-      ...carve(x0, x1, [{ a: cx - POSTER_CLEAR_HALF, b: cx + POSTER_CLEAR_HALF }]).map(
-        ([a, b], si) => wallDef("z", ROW_Z0, a, b, "+z", UPPER_Y, si > 0 ? -1 : 1, 0, si === 1 ? false : true),
-      ),
-      // Tembok KANAN (x1) rail penuh (belakang + depan): rel menyusur
-      // dari tulip putih (sudut kiri-depan) → belakang → ke depan lagi
-      // → berbelok di sudut kanan → ke segmen depan-kanan → BERHENTI
-      // di sebelah kanan poster PKKMB (frame rel lantai 2).
-      wallDef("x", x1, STAIR_Z1, ROW_Z1, "-x", UPPER_Y),
-      wallDef("x", x1, ROW_Z0, STAIR_Z1, "-x", UPPER_Y),
+      // Dinding KANAN lantai 2 dibuat SATU jalur utuh (ROW_Z0 → ROW_Z1) supaya
+      // jarak antar karya seragam tanpa celah di zona tulip biru (z≈42).
+      wallDef("x", x1, ROW_Z0, ROW_Z1, "-x", UPPER_Y, -1),
+      // Front wall split around the PKKMB poster: segmen KANAN poster diisi
+      // DULU (lanjut natural dari dinding kanan yang berakhir di sudut depan-
+      // kanan), lalu segmen KIRI poster (dekat tangga) menyusul. Keduanya
+      // diberi rel kuning dan dikemas menjauh dari poster (dir -1: kanan
+      // mulai dari sudut, kiri mulai dari tepi poster).
+      ...carve(x0, x1, [{ a: cx - POSTER_CLEAR_HALF, b: cx + POSTER_CLEAR_HALF }])
+        .reverse()
+        .map(([a, b]) => wallDef("z", ROW_Z0, a, b, "+z", UPPER_Y, -1, 0, false)),
     ],
   }
 }
@@ -507,17 +531,15 @@ export const roomRails = {}
 
 for (let i = 0; i < N; i++) {
   const cat = DEFAULT_CATEGORIES[i]
-  const [x0, x1] = roomX(i)
   const id = cat.slug
-  const GROUND_Y = GROUND_PAINT_Y
 
   roomRails[id] = {
     ground: [
-      // Stair-side (left) wall keeps a bare rail on the short stretch in front
-      // of the staircase (its back stretch carries the works); the opposite
-      // wall (right) runs straight through with a continuous rail.
-      wallDef("x", x0, ROW_Z0, STAIR_Z0, "+x", GROUND_Y),
-      wallDef("x", x1, STAIR_Z0, ROW_Z1, "-x", GROUND_Y),
+      // Semua rail lantai 1 kini di-render dari paintingWalls:
+      //   - KIRI dari STAIR_Z1 ke belakang (area tangga depan tidak ada rel)
+      //   - BELAKANG, DEPAN (dengan margin pintu keluar PORTAL_MARGIN)
+      //   - KANAN dari STAIR_Z1 ke belakang (band depan dikosongkan)
+      // Tidak ada lagi extra-rail yang menumpuk di dinding KANAN.
     ],
     upper: [
       // Lantai 2 (dosen): rel HANYA mengikuti jalur karya yang sebenarnya —
@@ -549,14 +571,18 @@ export const RAIL_OFFSET = 1.08
 // spreading), so a room always fills one complete wall first, then continues on
 // the next one.
 const FRAME_GAP = 0.9
-const FRAME_EDGE_PAD = 0.5
+// Margin dari UJUNG TEMBOK/sudut ruangan ke tepi BINGKAI, disamakan dengan
+// jarak antarbingkai karya (ritme visual antar papan tetap konsisten). Bingkai
+// lebih lebar dari canvas (+0.34), jadi jarak bersih bingkai-ke-bingkai =
+// FRAME_GAP - 0.34. Margin diukur ke sisi luar bingkai (bukan canvas).
+const FRAME_OUTER_W = PAINT_W + 0.34
+const FRAME_HALF = FRAME_OUTER_W / 2
+const FRAME_EDGE_PAD = FRAME_GAP - (FRAME_OUTER_W - PAINT_W)
 
 export function layoutPaintings(roomId, projects, level = "ground") {
   const wallsDef = paintingWalls[roomId]?.[level] || []
-  // Stable ordering: place the OLDEST work first (anchored on the right, since
-  // the walls above are mirrored). New/additions (newest works) always append
-  // AFTER the existing ones, so old works keep their exact slots and never
-  // shift when a new work arrives.
+  // Tempatkan karya TERTUA lebih dulu (karya = slot-tetap): yang lama di
+  // depan-kiri, yang baru menyusul di akhir sirkuit — sama untuk semua lantai.
   const list = [...(projects || [])].reverse()
   if (!list.length) return []
 
@@ -566,22 +592,24 @@ export function layoutPaintings(roomId, projects, level = "ground") {
     const wd = wallsDef[wi]
     const edgePad = wd.endPad + FRAME_EDGE_PAD
 
-    let cursor = wd.dir === -1
-      ? wd.to - edgePad
-      : wd.from + edgePad
+    // Batas awal/akhir PUSAT papan, diset sedemikian rupa sehingga sisi luar
+    // bingkai (FRAME_HALF) selalu berjarak >= edgePad dari kedua ujung segmen
+    // tembok/sudut ruangan.
+    const lo = wd.from + edgePad + FRAME_HALF
+    const hi = wd.to - edgePad - FRAME_HALF
+
+    let center = wd.dir === -1 ? hi : lo
 
     while (pi < list.length) {
-      const p = list[pi]
-      const halfW = PAINT_W / 2
-      const t = cursor + (wd.dir === -1 ? -halfW : halfW)
-      if (t < wd.from + edgePad || t > wd.to - edgePad) break
+      if (center < lo || center > hi) break
 
+      const p = list[pi]
       let fx, fz
       if (wd.axis === "x") {
         fx = wd.at + faceOffset(wd.face)
-        fz = t
+        fz = center
       } else {
-        fx = t
+        fx = center
         fz = wd.at + faceOffset(wd.face)
       }
       placed.push({
@@ -594,7 +622,7 @@ export function layoutPaintings(roomId, projects, level = "ground") {
         key: `${pi}-${p.id}`,
       })
       pi++
-      cursor += (wd.dir === -1 ? -1 : 1) * (PAINT_W + FRAME_GAP)
+      center += (wd.dir === -1 ? -1 : 1) * (PAINT_W + FRAME_GAP)
     }
     if (pi >= list.length) break
   }

@@ -13,6 +13,7 @@ import {
   Gamepad2,
   Layers,
 } from "lucide-react"
+import { keepScrollOnExpand } from "../../utils/preserveScrollOnExpand"
 import SearchBar from "../ui/SearchBar"
 import api from "../../services/api"
 
@@ -176,7 +177,10 @@ function LightModeKaryaSection() {
         {!showAll && filteredCategories.length > initialCount && (
           <div className="mt-6 flex justify-center sm:mt-8 2xl:mt-12 3xl:mt-16 4xl:mt-20">
             <button
-              onClick={() => setShowAll(true)}
+              onClick={() => {
+                keepScrollOnExpand()
+                setShowAll(true)
+              }}
               className="cursor-pointer rounded-xl border border-blue-200 bg-blue-50 px-5 py-2.5 text-xs font-semibold text-blue-600 transition duration-300 hover:bg-blue-100 sm:rounded-2xl sm:px-6 sm:py-3 sm:text-sm md:px-7 md:py-3.5 md:text-sm lg:text-base 3xl:px-8 3xl:py-4 3xl:text-base 4xl:px-10 4xl:py-5 4xl:text-lg"
             >
               Lihat Lebih Banyak

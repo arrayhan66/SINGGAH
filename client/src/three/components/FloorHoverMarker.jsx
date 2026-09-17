@@ -11,6 +11,12 @@ import { useWalkStore } from "../hooks/useWalk"
 const RING_HOVER_GEO = new THREE.RingGeometry(0.42, 0.56, 32)
 const CORE_HOVER_GEO = new THREE.CircleGeometry(0.15, 24)
 
+// Clearance above the FLOOR. Floor overlays (navy "LANTAI .." strips + ihre
+// glyph Text) top out at ~+0.107 above the slab on BOTH storeys (label group
+// at +0.06/+7.06, text depth +0.047). The ring is parked at +0.14 so it clears
+// the tallest glyph with a real margin — never sinks under labels/rugs/marks.
+const HOVER_MARKER_Y = 0.14
+
 const RING_HOVER_MAT = new THREE.MeshBasicMaterial({
   color: "#4cd3ff",
   transparent: true,
@@ -18,6 +24,10 @@ const RING_HOVER_MAT = new THREE.MeshBasicMaterial({
   blending: THREE.AdditiveBlending,
   side: THREE.DoubleSide,
   depthWrite: false,
+  polygonOffset: true,
+  polygonOffsetFactor: -2,
+  polygonOffsetUnits: -2,
+  renderOrder: 100,
   toneMapped: false,
 })
 
@@ -27,6 +37,10 @@ const CORE_HOVER_MAT = new THREE.MeshBasicMaterial({
   opacity: 0.65,
   blending: THREE.AdditiveBlending,
   depthWrite: false,
+  polygonOffset: true,
+  polygonOffsetFactor: -2,
+  polygonOffsetUnits: -2,
+  renderOrder: 100,
   toneMapped: false,
 })
 
@@ -45,7 +59,7 @@ function FloorHoverMarker() {
 
     t.current += delta
     const p = s.pointerPosition
-    g.position.set(p.x, p.y + 0.035, p.z)
+    g.position.set(p.x, p.y + HOVER_MARKER_Y, p.z)
     const pulse = 1 + Math.sin(t.current * 4.2) * 0.07
     g.scale.setScalar(pulse)
     spinRef.current.rotation.y = t.current * 0.5

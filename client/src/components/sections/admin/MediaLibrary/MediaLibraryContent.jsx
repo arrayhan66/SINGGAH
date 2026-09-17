@@ -3,6 +3,7 @@ import { Image, Upload, Loader2 } from "lucide-react"
 import MediaCard from "./MediaCard"
 import ShowMoreButton from "../../../ui/ShowMoreButton"
 import { AdminMediaSkeleton } from "../../../ui/PageSkeletons"
+import { keepScrollOnExpand } from "../../../../utils/preserveScrollOnExpand"
 
 const INITIAL_VISIBLE = 12
 
@@ -111,7 +112,10 @@ export default function MediaLibraryContent({
             label="Lihat Semua File"
             total={filtered.length}
             showAll={showAll}
-            onToggle={() => setShowAll((prev) => !prev)}
+            onToggle={() => {
+              if (!showAll) keepScrollOnExpand()
+              setShowAll((prev) => !prev)
+            }}
             className="mt-6"
           />
         )}
@@ -167,7 +171,10 @@ export default function MediaLibraryContent({
             label="Lihat Semua File"
             total={filtered.length}
             showAll={showAll}
-            onToggle={() => setShowAll((prev) => !prev)}
+            onToggle={() => {
+              if (!showAll) keepScrollOnExpand()
+              setShowAll((prev) => !prev)
+            }}
             className="mt-6"
           />
         )}

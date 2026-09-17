@@ -40,7 +40,7 @@ function UploadGallery({ value, onChange, existingItems, onRemoveExisting }) {
           existingItems.map((img, index) => {
             const src = imageUrl(typeof img === "string" ? img : img.image_url || img.url)
             return (
-              <div key={`existing-${index}`} className="relative aspect-square">
+              <div key={`existing-${index}`} className="relative aspect-video">
                 <SmartImage
                   src={src}
                   alt={`Existing ${index + 1}`}
@@ -60,7 +60,7 @@ function UploadGallery({ value, onChange, existingItems, onRemoveExisting }) {
         {value.map((file, index) => {
           const previewUrl = URL.createObjectURL(file)
           return (
-            <div key={`new-${index}`} className="relative aspect-square">
+            <div key={`new-${index}`} className="relative aspect-video">
               <SmartImage
                 src={previewUrl}
                 alt={`New ${index + 1}`}
@@ -80,7 +80,7 @@ function UploadGallery({ value, onChange, existingItems, onRemoveExisting }) {
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-slate-200 bg-white text-slate-600 transition-colors hover:border-cyan-400 hover:bg-cyan-50 hover:text-cyan-600"
+          className="flex aspect-video cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-slate-200 bg-white text-slate-600 transition-colors hover:border-cyan-400 hover:bg-cyan-50 hover:text-cyan-600"
         >
           <ImagePlus className="h-4 w-4 min-[280px]:h-5 min-[280px]:w-5 text-cyan-400 2xl:h-6 2xl:w-6 3xl:h-7 3xl:w-7 4xl:h-8 4xl:w-8" />
           <span className="text-[10px] min-[280px]:text-[11px] min-[350px]:text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">

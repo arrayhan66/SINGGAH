@@ -1,3 +1,5 @@
+import { useLayoutEffect, useMemo, useRef } from "react"
+import * as THREE from "three"
 import { FLOOR2_Y, upperSlabPieces } from "../rooms/museumLayout"
 
 const COFFER = 6
@@ -11,6 +13,69 @@ const GROUND_PLASTER = "#dbe6f2"
 const MOLD = "#c7d5ea"
 const INNER_INSET = 0.55
 
+// Satu instance material dipakai semua room (sebelumnya setiap mesh membuat
+// material sendiri -> ratusan material unik + kompilasi shader per room).
+const PLASTER_MAT = new THREE.MeshStandardMaterial({ color: PLASTER, roughness: 0.95 })
+const PANEL_MAT = new THREE.MeshStandardMaterial({ color: PANEL, roughness: 0.95 })
+const BEAM_MAT = new THREE.MeshStandardMaterial({ color: BEAM, roughness: 0.55 })
+const BEAM_DARK_MAT = new THREE.MeshStandardMaterial({ color: BEAM_DARK, roughness: 0.55 })
+const GROUND_PLASTER_MAT = new THREE.MeshStandardMaterial({ color: GROUND_PLASTER, roughness: 0.9 })
+const MOLD_MAT = new THREE.MeshStandardMaterial({ color: MOLD, roughness: 0.9 })
+
+// Grid coffer untuk satu room (panjang grid + garis pembagi). Digunakan lantai
+// atas (panel cekung) dan lantai bawah (garis molding) sekaligus.
+function cofferGrid(room) {
+  const x0 = room.x[0]
+  const x1 = room.x[1]
+  const z0 = room.z[0]
+  const z1 = room.z[1]
+  const w = x1 - x0
+  const d = z1 - z0
+  const nx = Math.max(2, Math.round(w / COFFER))
+  const nz = Math.max(2, Math.round(d / COFFER))
+  const xs = Array.from({ length: nx + 1 }, (_, i) => x0 + (w * i) / nx)
+  const zs = Array.from({ length: nz + 1 }, (_, i) => z0 + (d * i) / nz)
+  return { xs, zs }
+}
+
+// Semua panel cekung dirender sebagai SATU InstancedMesh (1 draw call vs 54).
+function InstancedPanels({ height, xs, zs }) {
+  const ref = useRef()
+  const n = (xs.length - 1) * (zs.length - 1)
+  const geometry = useMemo(() => {
+    const pw = xs[1] - xs[0] - INNER_INSET * 2
+    const pd = zs[1] - zs[0] - INNER_INSET * 2
+    return new THREE.PlaneGeometry(pw, pd)
+  }, [xs, zs])
+  const panels = useMemo(() => {
+    const out = []
+    for (let j = 0; j < zs.length - 1; j++) {
+      for (let i = 0; i < xs.length - 1; i++) {
+        const cx = (xs[i] + xs[i + 1]) / 2
+        const cz = (zs[j] + zs[j + 1]) / 2
+        out.push([cx, height - 0.1, cz])
+      }
+    }
+    return out
+  }, [xs, zs, height])
+
+  useLayoutEffect(() => {
+    const mesh = ref.current
+    if (!mesh) return
+    const dummy = new THREE.Object3D()
+    panels.forEach(([x, y, z], i) => {
+      dummy.position.set(x, y, z)
+      dummy.rotation.set(Math.PI / 2, 0, 0)
+      dummy.updateMatrix()
+      mesh.setMatrixAt(i, dummy.matrix)
+    })
+    mesh.instanceMatrix.needsUpdate = true
+    mesh.count = panels.length
+  }, [panels])
+
+  return <instancedMesh ref={ref} args={[geometry, PANEL_MAT, n]} />
+}
+
 function TopCeiling({ room, height }) {
   const x0 = room.x[0]
   const x1 = room.x[1]
@@ -20,83 +85,55 @@ function TopCeiling({ room, height }) {
   const cz = (z0 + z1) / 2
   const w = x1 - x0
   const d = z1 - z0
-  const H = height
-
-  const nx = Math.max(2, Math.round(w / COFFER))
-  const nz = Math.max(2, Math.round(d / COFFER))
-  const xs = Array.from({ length: nx + 1 }, (_, i) => x0 + (w * i) / nx)
-  const zs = Array.from({ length: nz + 1 }, (_, i) => z0 + (d * i) / nz)
+  const { xs, zs } = useMemo(() => cofferGrid(room), [room])
 
   return (
     <group>
       {/* Plaster ceiling */}
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[cx, H, cz]}>
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[cx, height, cz]} material={PLASTER_MAT}>
         <planeGeometry args={[w, d]} />
-        <meshStandardMaterial color={PLASTER} roughness={0.95} />
       </mesh>
 
-      {/* Recessed plaster panel inside every coffer (stepped coffered look) */}
-      {Array.from({ length: nz }).map((_, j) =>
-        Array.from({ length: nx }).map((_, i) => {
-          const p0 = [xs[i] + INNER_INSET, zs[j] + INNER_INSET]
-          const p1 = [xs[i + 1] - INNER_INSET, zs[j + 1] - INNER_INSET]
-          if (p1[0] - p0[0] <= 0 || p1[1] - p0[1] <= 0) return null
-          return (
-            <mesh
-              key={`p-${i}-${j}`}
-              rotation={[Math.PI / 2, 0, 0]}
-              position={[(p0[0] + p1[0]) / 2, H - 0.1, (p0[1] + p1[1]) / 2]}
-            >
-              <planeGeometry args={[p1[0] - p0[0], p1[1] - p0[1]]} />
-              <meshStandardMaterial color={PANEL} roughness={0.95} />
-            </mesh>
-          )
-        }),
-      )}
+      {/* Recessed plaster panel inside every coffer (one instanced mesh) */}
+      <InstancedPanels height={height} xs={xs} zs={zs} />
 
       {/* Coffered beams spanning X (at each z) */}
       {zs.map((z, i) => (
-        <mesh key={`bx-${i}`} position={[cx, H - BEAM_H / 2, z]} castShadow>
+        <mesh
+          key={`bx-${i}`}
+          position={[cx, height - BEAM_H / 2, z]}
+          castShadow
+          material={i === 0 || i === zs.length - 1 ? BEAM_DARK_MAT : BEAM_MAT}
+        >
           <boxGeometry args={[w, BEAM_H, BEAM_W]} />
-          <meshStandardMaterial
-            color={i === 0 || i === zs.length - 1 ? BEAM_DARK : BEAM}
-            roughness={0.55}
-          />
         </mesh>
       ))}
 
       {/* Coffered beams spanning Z (at each x) */}
       {xs.map((x, i) => (
-        <mesh key={`bz-${i}`} position={[x, H - BEAM_H / 2, cz]} castShadow>
+        <mesh
+          key={`bz-${i}`}
+          position={[x, height - BEAM_H / 2, cz]}
+          castShadow
+          material={i === 0 || i === xs.length - 1 ? BEAM_DARK_MAT : BEAM_MAT}
+        >
           <boxGeometry args={[BEAM_W, BEAM_H, d]} />
-          <meshStandardMaterial
-            color={i === 0 || i === xs.length - 1 ? BEAM_DARK : BEAM}
-            roughness={0.55}
-          />
         </mesh>
       ))}
-
     </group>
   )
 }
 
 // Ceiling of lantai 1 (the underside of the upper slab, carved around the open
-// staircase): plaster planes plus a fine molding grid.
+// staircase): plaster planes plus a fine molding grid. Semua material dishare.
 function GroundCeiling({ room }) {
   const x0 = room.x[0]
   const x1 = room.x[1]
   const z0 = room.z[0]
   const z1 = room.z[1]
-  const w = x1 - x0
-  const d = z1 - z0
   const y = FLOOR2_Y - 0.32
   const pieces = upperSlabPieces(room)
-
-  // Grid mirrors the upper coffer grid so both storeys share one structure.
-  const nx = Math.max(2, Math.round(w / COFFER))
-  const nz = Math.max(2, Math.round(d / COFFER))
-  const xs = Array.from({ length: nx + 1 }, (_, i) => x0 + (w * i) / nx)
-  const zs = Array.from({ length: nz + 1 }, (_, i) => z0 + (d * i) / nz)
+  const { xs, zs } = useMemo(() => cofferGrid(room), [room])
 
   // Clip a line against the slab pieces so nothing floats over the stair void.
   const xRun = (xg) => {
@@ -128,26 +165,24 @@ function GroundCeiling({ room }) {
           key={i}
           rotation={[Math.PI / 2, 0, 0]}
           position={[(px0 + px1) / 2, y, (pz0 + pz1) / 2]}
+          material={GROUND_PLASTER_MAT}
         >
           <planeGeometry args={[px1 - px0, pz1 - pz0]} />
-          <meshStandardMaterial color={GROUND_PLASTER} roughness={0.9} />
         </mesh>
       ))}
 
       {/* Fine molding grid (inner lines only) */}
       {xs.slice(1, -1).map((xg, i) =>
         xRun(xg).map(([a, b], k) => (
-          <mesh key={`vx-${i}-${k}`} position={[xg, y - 0.05, (a + b) / 2]}>
+          <mesh key={`vx-${i}-${k}`} position={[xg, y - 0.05, (a + b) / 2]} material={MOLD_MAT}>
             <boxGeometry args={[0.16, 0.1, b - a]} />
-            <meshStandardMaterial color={MOLD} roughness={0.9} />
           </mesh>
         )),
       )}
       {zs.slice(1, -1).map((zg, j) =>
         zRun(zg).map(([a, b], k) => (
-          <mesh key={`hz-${j}-${k}`} position={[(a + b) / 2, y - 0.05, zg]}>
+          <mesh key={`hz-${j}-${k}`} position={[(a + b) / 2, y - 0.05, zg]} material={MOLD_MAT}>
             <boxGeometry args={[b - a, 0.1, 0.16]} />
-            <meshStandardMaterial color={MOLD} roughness={0.9} />
           </mesh>
         )),
       )}

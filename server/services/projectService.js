@@ -22,6 +22,71 @@ const cache = require("../utils/cache")
 
 const SLIDESHOW_MAX_ITEMS = 6
 
+// Batas tampilan karya mahasiswa per kategori di Hall 3D (lantai 1).
+// Lantai 1 menampung maksimal 48 karya per kategori. Karya selain dosen
+// (mahasiswa/admin/umum) diklasifikasikan ke grup mahasiswa oleh hall,
+// sehingga ikut mengisi slot ini.
+const CATEGORY_MAHASISWA_LIMIT = 48
+
+// Batas tampilan karya dosen per kategori di Hall 3D (lantai 2). Dinding
+// lantai 2 menampung maksimal 48 karya (2 unggulan di podium + sisanya di
+// dinding), jadi karya dosen per kategori juga dibatasi 48.
+const CATEGORY_DOSEN_LIMIT = 48
+
+async function countMahasiswaSlots(categoryId, excludeId = null) {
+  const where = { category_id: categoryId, status: "published" }
+  if (excludeId !== null) {
+    where.id = { [Op.ne]: excludeId }
+  }
+  return Project.count({
+    where,
+    include: [
+      {
+        model: User,
+        attributes: [],
+        where: { tipe: { [Op.ne]: "dosen" } },
+      },
+    ],
+  })
+}
+
+async function assertMahasiswaSlot(categoryId, excludeId = null) {
+  const used = await countMahasiswaSlots(categoryId, excludeId)
+  if (used >= CATEGORY_MAHASISWA_LIMIT) {
+    throw new AppError(
+      `Karya pada kategori ini sudah mencapai limit (${CATEGORY_MAHASISWA_LIMIT} karya mahasiswa) di Hall. Tidak ada slot kosong — hapus salah satu karya mahasiswa dulu agar karya baru bisa dipublikasikan.`,
+      409,
+    )
+  }
+}
+
+async function countDosenSlots(categoryId, excludeId = null) {
+  const where = { category_id: categoryId, status: "published" }
+  if (excludeId !== null) {
+    where.id = { [Op.ne]: excludeId }
+  }
+  return Project.count({
+    where,
+    include: [
+      {
+        model: User,
+        attributes: [],
+        where: { tipe: "dosen" },
+      },
+    ],
+  })
+}
+
+async function assertDosenSlot(categoryId, excludeId = null) {
+  const used = await countDosenSlots(categoryId, excludeId)
+  if (used >= CATEGORY_DOSEN_LIMIT) {
+    throw new AppError(
+      `Karya dosen pada kategori ini sudah mencapai limit (${CATEGORY_DOSEN_LIMIT} karya dosen) di Hall. Tidak ada slot kosong — hapus salah satu karya dosen dulu agar karya baru bisa dipublikasikan.`,
+      409,
+    )
+  }
+}
+
 // ---- Shape bersama agar response project konsisten dengan kebutuhan hall 3D ----
 const PROJECT_COUNT_ATTRIBUTES = [
   [
@@ -294,7 +359,10 @@ exports.getProjects = async (query = {}, currentUserId = null, userRole = null) 
       IMAGES_INCLUDE,
       TECHNOLOGIES_INCLUDE,
     ],
-    order: [["created_at", "DESC"]],
+    order: [
+      ["created_at", "DESC"],
+      ["id", "DESC"],
+    ],
     limit: currentLimit,
     offset,
     distinct: true,
@@ -328,7 +396,10 @@ exports.getPendingProjects = async () => {
 
 exports.updateProjectStatus = async (id, status, reason = "") => {
   const where = /^\d+$/.test(String(id)) ? { id: Number(id) } : { slug: id }
-  const project = await Project.findOne({ where })
+  const project = await Project.findOne({
+    where,
+    include: [{ model: User, attributes: ["id", "tipe"] }],
+  })
 
   if (!project) {
     throw new AppError("Project tidak ditemukan", 404)
@@ -336,6 +407,16 @@ exports.updateProjectStatus = async (id, status, reason = "") => {
 
   if (!["pending", "published", "rejected"].includes(status)) {
     throw new AppError("Status tidak valid", 400)
+  }
+
+  // Publikasi ke Hall dibatasi per kategori: lantai 1 hanya sampai 48 karya
+  // mahasiswa, lantai 2 hanya sampai 48 karya dosen.
+  if (status === "published") {
+    if (project.User?.tipe === "dosen") {
+      await assertDosenSlot(project.category_id, project.id)
+    } else {
+      await assertMahasiswaSlot(project.category_id, project.id)
+    }
   }
 
   const note = String(reason || "").trim()
@@ -590,12 +671,21 @@ exports.createProject = async (data, user, imageUrls = [], documentUrls = []) =>
     throw new AppError("Kategori tidak ditemukan", 404)
   }
 
-  // User umum tidak boleh upload
-  if (user.tipe === "umum") {
+  // User umum tidak boleh upload — kecuali akun admin (admin memakai tipe
+  // "umum") yang memang ditugaskan menambah karya mahasiswa.
+  if (user.tipe === "umum" && user.role !== "admin") {
     throw new AppError(
       "Pengguna umum tidak memiliki izin untuk mengunggah project",
       403,
     )
+  }
+
+  // Karya dosen & karya lain ditampilkan di Hall dengan kapasitas 48 per
+  // kategori. Kalau sudah penuh, karya baru ditolak dengan pemberitahuan.
+  if (user.tipe === "dosen") {
+    await assertDosenSlot(category_id)
+  } else {
+    await assertMahasiswaSlot(category_id)
   }
 
   // Parse & validasi relasi SEBELUM menulis ke database
@@ -667,7 +757,10 @@ exports.createProject = async (data, user, imageUrls = [], documentUrls = []) =>
 
 exports.updateProject = async (id, data, user) => {
   const where = /^\d+$/.test(String(id)) ? { id: Number(id) } : { slug: id }
-  const project = await Project.findOne({ where })
+  const project = await Project.findOne({
+    where,
+    include: [{ model: User, attributes: ["id", "tipe"] }],
+  })
 
   if (!project) {
     throw new AppError("Project tidak ditemukan", 404)
@@ -711,6 +804,13 @@ exports.updateProject = async (id, data, user) => {
     project.category_id = category_id ?? project.category_id
 
     if (user.role === "admin") {
+      if (status === "published") {
+        if (project.User?.tipe === "dosen") {
+          await assertDosenSlot(project.category_id, project.id)
+        } else {
+          await assertMahasiswaSlot(project.category_id, project.id)
+        }
+      }
       project.status = status ?? project.status
     }
 
@@ -841,7 +941,10 @@ exports.getHallProjects = async (currentUserId = null) => {
       VIDEOS_INCLUDE,
       LINKS_INCLUDE,
     ],
-    order: [["created_at", "DESC"]],
+    order: [
+      ["created_at", "DESC"],
+      ["id", "DESC"],
+    ],
     distinct: true,
   })
 

@@ -41,10 +41,7 @@ function wrap(contentHtml) {
               </tr>
               ${contentHtml}
               <tr>
-                <td style="background-color:#f8fafc;padding:20px 32px;text-align:center;border-top:1px solid #e2e8f0;">
-                  <p style="margin:0 0 8px;font-size:13px;color:${TEXT_MUTED};line-height:1.6;">
-                    ${BRAND_NAME} &mdash; ${BRAND_TAGLINE}
-                  </p>
+                <td style="background-color:#f8fafc;padding:16px 32px;text-align:center;border-top:1px solid #e2e8f0;">
                   <p style="margin:0;font-size:12px;color:#94a3b8;line-height:1.6;">
                     Email ini dikirim otomatis. Jika Anda tidak melakukan permintaan ini, abaikan email ini.
                   </p>

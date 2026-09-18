@@ -6,7 +6,7 @@ info:
   description: REST API SINGGAH
 
 servers:
-  - url: http://localhost:5000/api
+  - url: /api
 
 paths:
   /auth/login:

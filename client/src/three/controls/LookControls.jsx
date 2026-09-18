@@ -326,6 +326,17 @@ function LookControls({ bounds, onSelectProject }) {
       : floorHit
         ? "crosshair"
         : "default"
+
+    // Ring lantai tidak boleh "menembus" objek: saat pointer di atas objek
+    // interaktif (buku, tanaman, karya, kursi), raycast lantai tetap kena
+    // lantai di BALIK objek itu dan membuat ring jalan di sana. Padahal kursor
+    // sebenarnya sedang di objek. Ring hanya untuk area lantai yang benar-benar
+    // bisa dijadikan titik jalan/belok (aksi move), jadi di sini dimatikan —
+    // objek interaktif cukup ditandai oleh highlight + pointer panah.
+    if (action && !isMoveAction) {
+      useWalkStore.getState().setPointerPosition(null)
+      useWalkStore.getState().setHoverFloor(false)
+    }
   }
 
   useEffect(() => {

@@ -110,11 +110,14 @@ function ExitSign({ width }) {
 // Material instance BERSAMA (sebelumnya dibuat baru per portal → puluhan
 // material unik). Semua portal berbagi set kecil ini sehingga shader/program
 // dikompilasi sekali dan state penggantian material jauh lebih sedikit.
-const NAVY_MAT = new THREE.MeshStandardMaterial({ color: NAVY, roughness: 0.75, metalness: 0.15 })
-const NAVY_EDGE_MAT = new THREE.MeshStandardMaterial({ color: NAVY_EDGE, roughness: 0.75, metalness: 0.15 })
-const EXIT_RED_MAT = new THREE.MeshStandardMaterial({ color: EXIT_RED, roughness: 0.6, metalness: 0.15 })
-const EXIT_RED_DARK_MAT = new THREE.MeshStandardMaterial({ color: EXIT_RED_DARK, roughness: 0.6, metalness: 0.15 })
-const EXIT_SIGN_DEEP_MAT = new THREE.MeshStandardMaterial({ color: "#991b1b", roughness: 0.6 })
+// Semua material bingkai diberi emissive kecil supaya portal tetap terlihat
+// berjejer rapi (bukan tampak hitam) ketika lampu ruangan dipangkas di mode
+// ringan HP/device lemah.
+const NAVY_MAT = new THREE.MeshStandardMaterial({ color: NAVY, emissive: NAVY, emissiveIntensity: 0.45, roughness: 0.75, metalness: 0.15 })
+const NAVY_EDGE_MAT = new THREE.MeshStandardMaterial({ color: NAVY_EDGE, emissive: NAVY_EDGE, emissiveIntensity: 0.5, roughness: 0.75, metalness: 0.15 })
+const EXIT_RED_MAT = new THREE.MeshStandardMaterial({ color: EXIT_RED, emissive: EXIT_RED, emissiveIntensity: 0.45, roughness: 0.6, metalness: 0.15 })
+const EXIT_RED_DARK_MAT = new THREE.MeshStandardMaterial({ color: EXIT_RED_DARK, emissive: EXIT_RED_DARK, emissiveIntensity: 0.45, roughness: 0.6, metalness: 0.15 })
+const EXIT_SIGN_DEEP_MAT = new THREE.MeshStandardMaterial({ color: "#991b1b", emissive: "#991b1b", emissiveIntensity: 0.4, roughness: 0.6 })
 const GLOW_MAT = new THREE.MeshStandardMaterial({ color: GLOW_LIGHT, emissive: GLOW, emissiveIntensity: 1.1 })
 const GLOW_MAT_MED = new THREE.MeshStandardMaterial({ color: GLOW_LIGHT, emissive: GLOW, emissiveIntensity: 1.2 })
 const GLOW_MAT_HI = new THREE.MeshStandardMaterial({ color: GLOW_LIGHT, emissive: GLOW, emissiveIntensity: 1.4 })
@@ -203,7 +206,10 @@ function Portal({ position, rotationY, width, title, action }) {
           <Text
             position={[0, TEXT_Y, 0.03]}
             fontSize={0.24}
-            color={NAVY}
+            color={GLOW_LIGHT}
+            outlineWidth={0.02}
+            outlineColor="#0b1220"
+            outlineOpacity={0.9}
             anchorX="center"
             anchorY="middle"
             letterSpacing={0.08}

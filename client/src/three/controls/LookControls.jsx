@@ -13,6 +13,10 @@ import { getCollidableAABBs, getSceneRevision } from "../utils/sceneColliders"
 const SPEED = 6
 const DRAG_THRESHOLD = 6
 const TELEPORT_RANGE = 4
+// Touch look sensitivity: sedikit lebih tinggi dari mouse (0.0035 di useWalk)
+// supaya geseran di HP terasa sedikit lebih cepat, dan diproses per sub-event
+// (coalesced) supaya halus tanpa lompatan antar frame.
+const TOUCH_LOOK_SENS = 0.0045
 
 function findAction(object) {
   let node = object
@@ -247,12 +251,26 @@ function LookControls({ bounds, onSelectProject }) {
 
     const onPointerDown = (e) => {
       if (e.button !== 0 || !e.isPrimary) return
+      // Bawa koordinat raycast langsung dari sentuhan pertama — di layar sentuh
+      // tap tidak selalu membangkitkan pointermove, jadi menghindari memakai
+      // koordinat basi dari gestur sebelumnya.
+      const elRect = el.getBoundingClientRect()
+      mouse.current.x = ((e.clientX - elRect.left) / elRect.width) * 2 - 1
+      mouse.current.y = -((e.clientY - elRect.top) / elRect.height) * 2 + 1
       dragRef.current.active = true
+      dragRef.current.pointerType = e.pointerType
       dragRef.current.lastX = e.clientX
       dragRef.current.lastY = e.clientY
       dragRef.current.startX = e.clientX
       dragRef.current.startY = e.clientY
       useWalkStore.getState().setDragMoved(false)
+      // Ring kursor hanya untuk hover mouse/pen. Di layar sentuh tidak ada
+      // fase hover, jadi ring dihapus dari awal gestur — mencegah "mark
+      // lingkaran" menggantung di posisi basi saat tap spam / usai berjalan.
+      if (e.pointerType === "touch") {
+        useWalkStore.getState().setPointerPosition(null)
+        useWalkStore.getState().setHoverFloor(false)
+      }
       try {
         el.setPointerCapture(e.pointerId)
       } catch {
@@ -267,18 +285,44 @@ function LookControls({ bounds, onSelectProject }) {
       mouse.current.y = -((e.clientY - elRect.top) / elRect.height) * 2 + 1
 
       if (dragRef.current.active) {
-        const dx = e.clientX - dragRef.current.lastX
-        const dy = e.clientY - dragRef.current.lastY
-        dragRef.current.lastX = e.clientX
-        dragRef.current.lastY = e.clientY
-        useWalkStore.getState().look(dx, dy)
+        // Coalesced pointer events: browser bisa mengirim beberapa posisi sentuh
+        // sekaligus per frame. Memproses semuanya (bukan hanya delta final)
+        // membuat geseran jauh lebih halus, terutama swipe cepat di HP.
+        const isTouch = e.pointerType === "touch"
+        if (isTouch && typeof e.getCoalescedEvents === "function") {
+          const merged = e.getCoalescedEvents()
+          for (const ce of merged) {
+            const dx = ce.clientX - dragRef.current.lastX
+            const dy = ce.clientY - dragRef.current.lastY
+            dragRef.current.lastX = ce.clientX
+            dragRef.current.lastY = ce.clientY
+            useWalkStore.getState().look(dx, dy, TOUCH_LOOK_SENS)
+          }
+        } else {
+          const dx = e.clientX - dragRef.current.lastX
+          const dy = e.clientY - dragRef.current.lastY
+          dragRef.current.lastX = e.clientX
+          dragRef.current.lastY = e.clientY
+          useWalkStore.getState().look(dx, dy, isTouch ? TOUCH_LOOK_SENS : undefined)
+        }
         const moved =
           Math.hypot(
             e.clientX - dragRef.current.startX,
             e.clientY - dragRef.current.startY,
           ) > DRAG_THRESHOLD
         useWalkStore.getState().setDragMoved(moved)
+        // Saat sedang drag/lihat, ring hover tidak relevan — sembunyikan
+        // supaya tidak membeku & menempel di titik pelacakan terakhir.
+        useWalkStore.getState().setPointerPosition(null)
+        useWalkStore.getState().setHoverFloor(false)
       } else {
+        // Ring kursor hanya untuk hover mouse/pen; di layar sentuh ring tidak
+        // muncul sama sekali agar tak membeku (tap tidak membangkitkan hover).
+        if (e.pointerType === "touch" || dragRef.current.pointerType === "touch") {
+          useWalkStore.getState().setPointerPosition(null)
+          useWalkStore.getState().setHoverFloor(false)
+          return
+        }
         // Ring kursor mengikuti lantai TANPA throttle (raycast ringan ke mesh
         // lantai saja) supaya posisinya selalu segar dan animasi terasa hidup.
         const floors = visibleFloorMeshes(scene, performance.now())
@@ -358,9 +402,14 @@ function LookControls({ bounds, onSelectProject }) {
       // yang sah (ring/crosshair hover tampil). Tanpa itu — misal kursor tepat
       // di tiang/pilar/pagar — klik TIDAK boleh membuat pemain berjalan, karena
       // raycast bisa tembus ke lantai di belakang objek yang tidak punya aksi.
+      // Di layar sentuh tidak ada fase "hover": tap dibolehkan langsung (cek
+      // standable di bawah tetap menjaga kolong furnitur/pilar tidak dilangkahi).
+      const isTouch =
+        e.pointerType === "touch" || dragRef.current.pointerType === "touch"
       if (
         (action.type === "floor" || action.type === "walk") &&
-        !useWalkStore.getState().hoverFloor
+        !useWalkStore.getState().hoverFloor &&
+        !isTouch
       ) return
       // Jangan izinkan jalan-dengan-klik ke titik yang tertutup/di atas model
       // 3D (mis. kolong kursi, meja, pouf, kios, tanaman). Kalau titik itu
@@ -507,15 +556,10 @@ function LookControls({ bounds, onSelectProject }) {
 
           const setState = {}
           if (!res.teleported) setState.position = resolved
-          if (moved >= 0.01 && !dragRef.current.active && !res.teleported) {
-            const desiredYaw = Math.atan2(-move.x, -move.z)
-            let yaw = store.yaw
-            let diff = desiredYaw - yaw
-            while (diff > Math.PI) diff -= Math.PI * 2
-            while (diff < -Math.PI) diff += Math.PI * 2
-            yaw += diff * Math.min(1, dt * 6)
-            setState.yaw = yaw
-          }
+          // Kamera TIDAK di-putar otomatis mengikuti arah berjalan — pemain
+          // bebas melirik (drag) ke mana saja sambil terus berjalan menuju
+          // target, termasuk di mobile. Tanpa auto-yaw, sudut pandang tetap
+          // persis seperti ditinggalkan pemain.
           useWalkStore.setState(setState)
         }
       }

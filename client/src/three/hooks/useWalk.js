@@ -6,7 +6,7 @@ const EYE_HEIGHT = 1.7
 
 // How close the player must be before a work (painting) becomes hoverable and
 // clickable. Shared by the painting highlight and the cursor/click gates.
-export const INTERACT_RANGE = 4
+export const INTERACT_RANGE = 2.5
 
 const HALL_RETURN_KEY = "singgah_hall_return"
 

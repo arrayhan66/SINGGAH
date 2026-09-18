@@ -115,7 +115,7 @@ function AdminBeritaList({ search, statusFilter }) {
             total={filteredBerita.length}
             showAll={showAll}
             onToggle={() => {
-              if (!showAll) keepScrollOnExpand()
+              keepScrollOnExpand()
               setShowAll((prev) => !prev)
             }}
           />

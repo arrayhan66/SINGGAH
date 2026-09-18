@@ -3,13 +3,13 @@ import { Canvas, useThree } from "@react-three/fiber"
 import { PerformanceMonitor, usePerformanceMonitor } from "@react-three/drei"
 import VirtualExhibition from "../../three/scenes/VirtualExhibition"
 import CanvasErrorBoundary from "./CanvasErrorBoundary"
-import { DPR_FOR, DPR_LITE, useLiteMode, isMobile } from "../../three/hooks/useQuality"
+import { DPR_FOR, useLiteMode, isMobile } from "../../three/hooks/useQuality"
 import { attachWebGLContextGuard } from "../../three/utils/webglGuard"
 
 // Turunkan pixel-ratio render secara adaptif saat FPS ambles (HP panas).
 // Faktor dari PerformanceMonitor memangkas beban fill-rate tanpa menyentuh
-// asset 3D. Floor dipatok tinggi (0.85) sehingga hasil tetap tajam/HD,
-// hanya turun halus kalau device benar-benar kepayahan.
+// asset 3D. Floor dipatok tinggi (0.92) agar hasil tetap tajam/HD — turun
+// hanya sedikit kalau device benar-benar kepayahan, tidak sampai buram.
 function AutoDpr() {
   const gl = useThree((s) => s.gl)
   const setDpr = useThree((s) => s.setDpr)
@@ -17,13 +17,13 @@ function AutoDpr() {
   usePerformanceMonitor({
     onChange: ({ factor }) => {
       if (!base.current) base.current = gl.getPixelRatio()
-      const factorAt = Math.max(0.85, factor)
+      const factorAt = Math.max(0.92, factor)
       if (Math.abs(gl.getPixelRatio() - base.current * factorAt) > 0.05) {
         setDpr(base.current * factorAt)
       }
     },
     onIncline: () => base.current && setDpr(base.current),
-    onFallback: () => base.current && setDpr(Math.max(0.7, base.current * 0.8)),
+    onFallback: () => base.current && setDpr(Math.max(1.25, base.current * 0.9)),
   })
   return null
 }
@@ -56,7 +56,7 @@ export default function HallCanvas({
         key={epoch}
         onCreated={({ gl }) => attachWebGLContextGuard(gl, remount)}
         shadows={shadows}
-        dpr={isLite ? DPR_LITE : DPR_FOR[tier]}
+        dpr={DPR_FOR[tier]}
         gl={{
           powerPreference: isLite ? "default" : "high-performance",
           antialias: tier === "tinggi",

@@ -291,7 +291,11 @@ function HeroKaryaShowcase({ variant }) {
       ? "border-blue-400/50 bg-gradient-to-br from-white via-blue-50 to-blue-100 text-blue-600 shadow-[0_8px_22px_-8px_rgba(37,99,235,0.5),0_0_14px_rgba(56,189,248,0.25)] ring-1 ring-blue-200/60 hover:scale-110 hover:border-blue-500 hover:from-blue-50 hover:via-blue-100 hover:to-blue-200 hover:text-blue-700 hover:shadow-[0_10px_26px_-8px_rgba(37,99,235,0.65),0_0_18px_rgba(56,189,248,0.35)] hover:ring-blue-300/70"
       : "border-cyan-300/40 bg-[#041d38]/75 text-cyan-300 shadow-[0_6px_20px_-6px_rgba(2,12,32,0.8),0_0_12px_rgba(34,211,238,0.4)] hover:border-cyan-300/70 hover:text-cyan-200",
     dotActive: "bg-blue-600",
-    dotIdle: "bg-[#6B7280]",
+    // Light: titik non-aktif putih lembut (tidak putih pekat) + border tipis
+    // supaya tetap kelihatan di atas latar paper (#f3f5f8). Dark: tetap abu.
+    dotIdle: isLight
+      ? "bg-white/80 border border-slate-500"
+      : "bg-[#6B7280]",
   };
 
   return (

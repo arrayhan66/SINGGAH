@@ -503,7 +503,7 @@ function PKKMPoster({ position, rotationY = 0 }) {
   const img = useMemo(() => {
     const t = tex.clone()
     t.colorSpace = THREE.SRGBColorSpace
-    t.anisotropy = 8
+    t.anisotropy = 16
     return t
   }, [tex])
   const iw = tex.image?.width || 1

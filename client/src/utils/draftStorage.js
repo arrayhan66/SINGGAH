@@ -1,3 +1,6 @@
+export const UPLOAD_FIELDS_KEY = "singgah-upload-fields"
+export const UPLOAD_FILES_KEY = "singgah-upload-files"
+
 const DB_NAME = "singgah"
 const DB_VERSION = 1
 const STORE = "drafts"
@@ -65,8 +68,21 @@ export async function clearDraft(key) {
       tx.objectStore(STORE).delete(key)
       tx.oncomplete = () => resolve()
       tx.onerror = () => reject(tx.error)
+      tx.onabort = () => reject(tx.error)
     })
   } catch {
     // abaikan
   }
+}
+
+// Hapus seluruh draft form upload karya (sessionStorage + IndexedDB).
+// Dipanggil saat logout / setelah submit, supaya form upload tidak "turun
+// temurun" membawa galeri & dokumen milik user sebelumnya.
+export async function clearUploadDraft() {
+  try {
+    sessionStorage.removeItem(UPLOAD_FIELDS_KEY)
+  } catch {
+    // abaikan
+  }
+await clearDraft(UPLOAD_FILES_KEY)
 }

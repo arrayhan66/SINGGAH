@@ -12,10 +12,16 @@ import { useAuth } from "../../../../context/AuthContext"
 import GlowBackground from "../../../ui/GlowBackground"
 import DustBackground from "../../../ui/DustBackground"
 import SubmitSuccessModal from "../../../ui/SubmitSuccessModal"
-import { clearDraft, getDraft, putDraft } from "../../../../utils/draftStorage"
+import {
+  clearUploadDraft,
+  getDraft,
+  putDraft,
+  UPLOAD_FIELDS_KEY,
+  UPLOAD_FILES_KEY,
+} from "../../../../utils/draftStorage"
 
-const DRAFT_FIELDS_KEY = "singgah-upload-fields"
-const DRAFT_FILES_KEY = "singgah-upload-files"
+const DRAFT_FIELDS_KEY = UPLOAD_FIELDS_KEY
+const DRAFT_FILES_KEY = UPLOAD_FILES_KEY
 
 const steps = [
   { icon: Image, label: "Thumbnail" },
@@ -174,7 +180,7 @@ function UploadForm() {
       await addProject(fd)
 
       sessionStorage.removeItem(DRAFT_FIELDS_KEY)
-      await clearDraft(DRAFT_FILES_KEY)
+      await clearUploadDraft()
 
       setSuccessOpen(true)
     } catch (err) {

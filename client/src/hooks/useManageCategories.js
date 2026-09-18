@@ -178,8 +178,7 @@ export default function useManageCategories() {
   }
 
   const toggleShowAll = (next) => {
-    const expanding = Boolean(next) && !showAll
-    if (expanding) keepScrollOnExpand()
+    keepScrollOnExpand()
     setShowAll(next)
   }
 

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import api from "../services/api"
+import { clearUploadDraft } from "../utils/draftStorage"
 
 const AuthContext = createContext(null)
 
@@ -50,6 +51,7 @@ export function AuthProvider({ children }) {
     }
     setUser(null)
     localStorage.removeItem("admin-sidebar-collapsed")
+    await clearUploadDraft()
     navigate("/login")
   }, [navigate])
 

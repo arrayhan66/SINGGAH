@@ -1,7 +1,7 @@
 import { useLayoutEffect, useMemo, useRef } from "react"
 import { Billboard, Text, useGLTF } from "@react-three/drei"
 import * as THREE from "three"
-import { useQualityStore, isMobile } from "../hooks/useQuality"
+import { useQualityStore, isMobile, getAnisotropy } from "../hooks/useQuality"
 
 // Mode ringan (HP/layar kecil atau device rendah): daun & potongan dedaunan
 // memakai geometri dan sampling lebih hemat tapi tetap tajam, karena jumlah
@@ -178,7 +178,7 @@ function makeLeafCanvas({ base, tip, vein, variegate = false, variegateRGB = "21
 
   const tex = new THREE.CanvasTexture(canvas)
   tex.colorSpace = THREE.SRGBColorSpace
-  tex.anisotropy = LITE ? 2 : 4
+  tex.anisotropy = getAnisotropy()
   return tex
 }
 
@@ -287,7 +287,7 @@ const RUBBER_ATLAS = (() => {
   ctx.drawImage(drawRubberTile("young"), 256, 0)
   const tex = new THREE.CanvasTexture(c)
   tex.colorSpace = THREE.SRGBColorSpace
-  tex.anisotropy = LITE ? 2 : 4
+  tex.anisotropy = getAnisotropy()
   return tex
 })()
 
@@ -432,7 +432,7 @@ const PERSIAN_POT_MAP = (() => {
   ctx.fillRect(0, 0, w, h)
   const tex = new THREE.CanvasTexture(c)
   tex.colorSpace = THREE.SRGBColorSpace
-  tex.anisotropy = 2
+  tex.anisotropy = getAnisotropy()
   return tex
 })()
 const MAT_PERSIAN_POT = new THREE.MeshStandardMaterial({ map: PERSIAN_POT_MAP, roughness: 0.4, metalness: 0.05 })
@@ -864,7 +864,7 @@ function drawSunflowerHeadTile() {
 const SUNFLO_HEAD_TEX = (() => {
   const t = new THREE.CanvasTexture(drawSunflowerHeadTile())
   t.colorSpace = THREE.SRGBColorSpace
-  t.anisotropy = LITE ? 2 : 4
+  t.anisotropy = getAnisotropy()
   return t
 })()
 const MAT_SUNFLO_HEAD = new THREE.MeshStandardMaterial({ map: SUNFLO_HEAD_TEX, alphaTest: 0.5, roughness: 0.45, side: THREE.DoubleSide, emissive: new THREE.Color("#6b4200"), emissiveIntensity: LITE ? 0.35 : 0.5 })
@@ -1140,13 +1140,13 @@ function drawMonsteraTile(mode) {
 const MONSTERA_MATURE_TEX = (() => {
   const t = new THREE.CanvasTexture(drawMonsteraTile("mature"))
   t.colorSpace = THREE.SRGBColorSpace
-  t.anisotropy = LITE ? 2 : 4
+  t.anisotropy = getAnisotropy()
   return t
 })()
 const MONSTERA_YOUNG_TEX = (() => {
   const t = new THREE.CanvasTexture(drawMonsteraTile("young"))
   t.colorSpace = THREE.SRGBColorSpace
-  t.anisotropy = LITE ? 2 : 4
+  t.anisotropy = getAnisotropy()
   return t
 })()
 const MAT_MONSTERA_MATURE = new THREE.MeshStandardMaterial({ map: MONSTERA_MATURE_TEX, alphaTest: 0.5, roughness: 0.28, metalness: 0.08, side: THREE.DoubleSide, emissive: new THREE.Color("#0d2414"), emissiveIntensity: 0.16 })
@@ -1611,7 +1611,7 @@ const INFO_ICON_TEX = (() => {
   ctx.fillRect(r - s * 0.045, r - s * 0.03, s * 0.09, s * 0.28)
   const tex = new THREE.CanvasTexture(c)
   tex.colorSpace = THREE.SRGBColorSpace
-  tex.anisotropy = 2
+  tex.anisotropy = getAnisotropy()
   return tex
 })()
 

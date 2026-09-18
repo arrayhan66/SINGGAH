@@ -19,8 +19,7 @@ function useSearchAndExpand(data, initialCount = 6) {
   }
 
   const toggleShowAll = (next) => {
-    const expanding = Boolean(next) && !showAll
-    if (expanding) keepScrollOnExpand()
+    keepScrollOnExpand()
     setShowAll(next)
   }
 

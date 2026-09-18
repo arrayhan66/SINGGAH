@@ -72,6 +72,18 @@ function WallBox({ wall, wallMap }) {
     return s
   }, [mitered, at, from, to, t])
 
+  // Skala UV per-dinding: satu ulangan tekstur tiap ~2.5m (lebar & tinggi),
+  // bukan repeat tetap 2x untuk semua ukuran dinding (dinding 54m jadi buram
+  // parah karena hanya ~9 texel/meter). Tekstur di-clone, dan clone berbagi
+  // source GPU yang sama di three.js sehingga memori tidak bertambah.
+  const boxMap = useMemo(() => {
+    if (mitered) return wallMap
+    const m = wallMap.clone()
+    m.needsUpdate = true
+    m.repeat.set(Math.max(1, len / 2.5), Math.max(1, hh / 2.5))
+    return m
+  }, [wallMap, mitered, len, hh])
+
   const overlay = (thick, y, h, color) => {
     const o = t + thick
     const ln = len - 2 * inset
@@ -95,7 +107,7 @@ function WallBox({ wall, wallMap }) {
       ) : (
         <mesh position={center} receiveShadow castShadow>
           <boxGeometry args={size} />
-          <meshStandardMaterial map={wallMap} color="#dfe9f4" roughness={0.9} />
+          <meshStandardMaterial map={boxMap} color="#dfe9f4" roughness={0.9} />
         </mesh>
       )}
       {topMold && overlay(0.12, H - 0.11, 0.2, "#e4eef9")}

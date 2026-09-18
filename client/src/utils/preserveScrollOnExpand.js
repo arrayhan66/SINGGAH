@@ -1,9 +1,11 @@
 // Mencegah lompatan scroll saat tombol "Lihat Semua / Lihat Lebih Banyak"
-// melebarkan grid. Browser scroll-anchoring (dan layout yang bergeser) akan
-// ikut mendorong halaman ke bawah mengikuti tombol yang pindah; di sini posisi
-// scroll dibekukan ulang setelah setiap tahap layout hingga list selesai
-// dirender, supaya pengguna yang scroll sendiri ke bawah.
-const TICKS_MS = [40, 120, 300, 800, 2000]
+// melebarkan/menutup grid. Browser scroll-anchoring akan ikut mendorong halaman
+// (ke bawah saat list melebar, ke atas saat menyusut) mengikuti tombol yang
+// bergeser. Posisi scroll dipatok ulang SEKALI setelah React selesai
+// commit+layout (rAF + satu delay singkat), lalu anchoring dibiarkan normal —
+// tidak boleh menahan gestur scroll user selama beberapa detik.
+const RESTORE_MS = 50
+const RELEASE_MS = 120
 
 function scrollToY(y) {
   try {
@@ -16,14 +18,24 @@ function scrollToY(y) {
 export function keepScrollOnExpand() {
   const y = Math.max(0, window.scrollY || 0)
 
-  // Nonaktifkan scroll anchoring untuk sementara selama list melebar.
+  // Nonaktifkan scroll anchoring hanya selama pemindahan awal, supaya browser
+  // tidak ikut menarik viewport mengikuti tombol yang pindah posisi.
   const html = document.documentElement
   const prev = html.style.overflowAnchor
   html.style.overflowAnchor = "none"
+
+  let active = true
   const release = () => {
-    if (html.style.overflowAnchor === "none") html.style.overflowAnchor = prev || ""
+    if (!active) return
+    active = false
+    html.style.overflowAnchor = prev || ""
+  }
+  const restore = () => {
+    if (!active) return
+    scrollToY(y)
   }
 
-  for (const ms of TICKS_MS) window.setTimeout(() => scrollToY(y), ms)
-  window.setTimeout(release, TICKS_MS[TICKS_MS.length - 1] + 200)
+  requestAnimationFrame(restore)
+  setTimeout(restore, RESTORE_MS)
+  setTimeout(release, RELEASE_MS)
 }

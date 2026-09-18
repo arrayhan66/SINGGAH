@@ -308,7 +308,7 @@ function AdminUserList({ search, statusFilter }) {
             total={filteredUsers.length}
             showAll={showAll}
             onToggle={() => {
-              if (!showAll) keepScrollOnExpand()
+              keepScrollOnExpand()
               setShowAll((prev) => !prev)
             }}
           />

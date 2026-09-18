@@ -161,14 +161,14 @@ function drawPothosTile(variegated) {
 const POTHOS_TEX = (() => {
   const tex = new THREE.CanvasTexture(drawPothosTile(false))
   tex.colorSpace = THREE.SRGBColorSpace
-  tex.anisotropy = 4
+  tex.anisotropy = 16
   return tex
 })()
 
 const POTHOS_VAR_TEX = (() => {
   const tex = new THREE.CanvasTexture(drawPothosTile(true))
   tex.colorSpace = THREE.SRGBColorSpace
-  tex.anisotropy = 4
+  tex.anisotropy = 16
   return tex
 })()
 

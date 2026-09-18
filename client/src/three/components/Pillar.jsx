@@ -12,7 +12,7 @@ const SHAFT_MAT = new THREE.MeshStandardMaterial({ color: STONE, roughness: 0.85
 
 function Pillar({ position }) {
   return (
-    <group position={position}>
+    <group position={position} userData={{ pillar: true }}>
       {/* Simple minimalist base plinth */}
       <mesh geometry={PLINTH_GEO} material={STONE_MAT} position={[0, 0.12, 0]} castShadow />
 

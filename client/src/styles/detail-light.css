@@ -109,6 +109,15 @@ html.light
   object-position: 50% 50%;
 }
 
+/* HP landscape: 16/9 dari lebar layar bisa lebih tinggi dari viewport →
+   galeri dipatok ~46dvH agar artikel & footer tetap terlihat/digulir. */
+@media (max-width: 640px) and (orientation: landscape) {
+  .karya-projectdetail-page .gallery-image {
+    aspect-ratio: auto;
+    height: 46dvh;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════
    DARK MODE — Slideshow
    ═══════════════════════════════════════════════════════════════ */

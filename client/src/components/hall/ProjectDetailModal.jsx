@@ -117,16 +117,19 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6">
+    <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain">
       {/* Backdrop */}
       <div
         onClick={onClose}
-        className={`absolute inset-0 ${isLight ? "bg-slate-900/70" : "bg-black/80"} backdrop-blur-md`}
+        className={`fixed inset-0 ${isLight ? "bg-slate-900/70" : "bg-black/80"} backdrop-blur-md`}
       />
 
       {/* Container modal — class karya-projectdetail-page mengaktifkan semua
-          override dark/light detail-light.css seperti halaman KaryaProjectDetail */}
-      <div className="karya-projectdetail-page relative w-full max-w-3xl max-h-[92vh] overflow-y-auto animate-fade-in">
+          override dark/light detail-light.css seperti halaman KaryaProjectDetail.
+          Ops: wrapper luar bisa scroll (biar modal besar tak pernah terpotong) &
+          tinggi memakai dvh (dynamic) supaya pas di viewport browser HP. */}
+      <div className="relative flex min-h-full items-center justify-center p-3 sm:p-6">
+        <div className="karya-projectdetail-page relative w-full max-w-3xl max-h-[92dvh] overflow-y-auto overscroll-contain animate-fade-in">
         <GlassCard className="overflow-hidden p-0 shadow-2xl">
           {/* Tombol close (di atas galeri) */}
           <button
@@ -163,14 +166,15 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
             <KaryaProjectContent project={project} />
           </div>
 
-          {/* Footer aksi */}
-          <div className="flex flex-wrap items-center justify-end gap-3 border-t border-white/10 px-4 pb-4 pt-4 sm:px-8 sm:pb-8 sm:pt-6 lg:px-10">
+          {/* Footer aksi — di HP tombol full-width (mudah disentuh), di layar
+              besar rapat ke kanan */}
+          <div className="flex flex-col gap-3 border-t border-white/10 px-4 pb-4 pt-4 sm:flex-row sm:items-center sm:justify-end sm:px-8 sm:pb-8 sm:pt-6 lg:px-10">
             {links[0]?.url && (
               <a
                 href={links[0].url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white"
+                className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white sm:w-auto sm:py-2.5"
               >
                 <span>Kunjungi Demo</span>
                 <ExternalLink className="h-4 w-4" />
@@ -179,7 +183,7 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
 
             <button
               onClick={openDetail}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-400 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-sky-500/20 transition-all hover:from-sky-500 hover:to-cyan-300"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-400 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-sky-500/20 transition-all hover:from-sky-500 hover:to-cyan-300 sm:w-auto sm:py-2.5"
             >
               <span>Lihat Detail Lengkap</span>
               <ArrowRight className="h-4 w-4" />
@@ -187,16 +191,18 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
           </div>
         </GlassCard>
       </div>
+      </div>
 
       {/* Modal bagikan — markup identik dengan halaman KaryaProjectDetail */}
       {showShareModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-0">
+        <div className="fixed inset-0 z-[60] overflow-y-auto overscroll-contain">
           <div
-            className="share-modal-backdrop absolute inset-0"
+            className="share-modal-backdrop fixed inset-0"
             onClick={() => setShowShareModal(false)}
           ></div>
 
-          <div className="share-modal relative w-full max-w-md overflow-hidden p-6 sm:p-8">
+          <div className="relative flex min-h-full items-center justify-center p-4">
+            <div className="share-modal relative w-full max-w-md overflow-y-auto overscroll-contain p-6 sm:p-8">
             <div className="mb-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <span className="share-modal-badge flex h-10 w-10 items-center justify-center rounded-2xl">
@@ -324,7 +330,8 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
               </button>
             </div>
           </div>
-        </div>
+          </div>
+          </div>
       )}
     </div>
   )

@@ -1,6 +1,13 @@
 import { MousePointerClick, DoorOpen, Frame, Eye } from "lucide-react"
+import useIsDesktop from "../../hooks/useIsDesktop"
 
 export default function HallHUDFooter() {
+  // Petunjuk ini khusus interaksi desktop (drag + WASD/klik). Di mobile
+  // sembunyikan penuh — kontrolnya sentuh (geser untuk melihat, tap untuk
+  // berjalan) dan instruksi WASD malah membingungkan.
+  const isDesktop = useIsDesktop(1024)
+  if (!isDesktop) return null
+
   return (
     <footer className="absolute bottom-4 left-0 right-0 z-20 flex justify-center px-4 pointer-events-none">
       <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 rounded-2xl border border-night-border bg-black/50 px-5 py-2.5 text-[11px] md:text-xs text-night-muted backdrop-blur-md shadow-xl">

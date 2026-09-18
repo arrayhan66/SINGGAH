@@ -113,7 +113,7 @@ export default function MediaLibraryContent({
             total={filtered.length}
             showAll={showAll}
             onToggle={() => {
-              if (!showAll) keepScrollOnExpand()
+              keepScrollOnExpand()
               setShowAll((prev) => !prev)
             }}
             className="mt-6"
@@ -172,7 +172,7 @@ export default function MediaLibraryContent({
             total={filtered.length}
             showAll={showAll}
             onToggle={() => {
-              if (!showAll) keepScrollOnExpand()
+              keepScrollOnExpand()
               setShowAll((prev) => !prev)
             }}
             className="mt-6"

@@ -908,7 +908,7 @@ function createClockFaceTexture() {  const size = 512
 
   const texture = new THREE.CanvasTexture(canvas)
   texture.colorSpace = THREE.SRGBColorSpace
-  texture.anisotropy = 8
+  texture.anisotropy = 16
   return texture
 }
 
@@ -1448,7 +1448,7 @@ function PortraitFallback() {
     ctx.fillText("FOTO RESMI", c.width / 2, c.height * 0.94)
     const t = new THREE.CanvasTexture(c)
     t.colorSpace = THREE.SRGBColorSpace
-    t.anisotropy = 8
+    t.anisotropy = 16
     return t
   }, [])
   return (
@@ -1478,7 +1478,7 @@ function PortraitPhoto({ image }) {
   const img = useMemo(() => {
     const t = tex.clone()
     t.colorSpace = THREE.SRGBColorSpace
-    t.anisotropy = 8
+    t.anisotropy = 16
     return t
   }, [tex])
   return (

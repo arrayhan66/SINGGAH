@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react"
 import { useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
-import { useWalkStore, EYE, INTERACT_RANGE } from "../hooks/useWalk"
+import { useWalkStore, EYE, INTERACT_RANGE, PROJECT_RANGE } from "../hooks/useWalk"
 import { usePlantInfoStore } from "../hooks/usePlantInfo"
 import { useBookInfoStore } from "../hooks/useBookInfo"
 import { useTransitionStore } from "../hooks/useTransition"
@@ -34,6 +34,17 @@ function findActionNode(object) {
     node = node.parent
   }
   return null
+}
+
+// Tiang/kolom solid (userData.pillar) bersifat opaque terhadap klik-ke-lantai:
+// kursor yang tepat di badan tiang tidak boleh menembus ke lantai di belakangnya.
+function findPillar(object) {
+  let node = object
+  while (node) {
+    if (node.userData?.pillar) return true
+    node = node.parent
+  }
+  return false
 }
 
 function withinRange(point, range) {
@@ -108,6 +119,8 @@ function LookControls({ bounds, onSelectProject }) {
   const euler = useRef(new THREE.Euler(0, 0, 0, "YXZ"))
   const stuckRef = useRef(0)
   const lastCast = useRef(0)
+  const lastHoverRefresh = useRef(0)
+  const pointerInside = useRef(false)
   const modelCollidersRef = useRef([])
   const modelColliderBuilt = useRef(false)
   const sceneRevisionRef = useRef(-1)
@@ -246,11 +259,81 @@ function LookControls({ bounds, onSelectProject }) {
     return p
   }
 
+  // Hover + kursor dipakai bersama oleh pointermove (mouse bergerak) DAN
+  // useFrame (kamera/pemain bergerak walau mouse diam). Tanpa refresh per-frame
+  // kursor bisa "nyangkut" jadi pointer setelah objek interaktif keluar dari
+  // crosshair (mis. pemain jalan menjauh) padahal mouse tidak disentuh.
+  const refreshHover = (now) => {
+    if (dragRef.current.active || !pointerInside.current) return
+    if (useWalkStore.getState().locked) return
+
+    // Ring lantai: raycast ringan ke daftar mesh lantai saja (tanpa throttle
+    // supaya posisinya selalu segar). Ikut ter-refresh saat kamera bergerak.
+    const floors = visibleFloorMeshes(scene, now)
+    let floorHit = false
+    if (floors.length) {
+      floorRaycaster.current.setFromCamera(mouse.current, camera)
+      const fh = floorRaycaster.current.intersectObjects(floors, false)
+      if (fh.length) {
+        const p = fh[0].point
+        // Floor meshes are flat sheets at ground level, so a raycast over the
+        // staircase hits the floor BENEATH it. Snap the ring to the height
+        // field instead, so hovering the treads/sign base shows the ring ON
+        // the stair surface, not sunk under it. The y actually walked is
+        // resolved by the same field in moveWithCollision.
+        p.y = resolveHeight(p.x, p.z, useWalkStore.getState().level).height
+        useWalkStore.getState().setPointerPosition(p)
+        floorHit = true
+      } else {
+        useWalkStore.getState().setPointerPosition(null)
+      }
+    } else {
+      useWalkStore.getState().setPointerPosition(null)
+    }
+    useWalkStore.getState().setHoverFloor(floorHit)
+
+    // Hover raycasts are expensive on a scene this dense — throttle them
+    // so a fast mouse sweep only samples a few times per frame.
+    if (now - lastCast.current < 150) return
+    lastCast.current = now
+    raycaster.current.setFromCamera(mouse.current, camera)
+    const hits = pickVisible(raycaster.current, scene, now)
+    const action = hits.length ? findAction(hits[0].object) : null
+    // Movement actions (walk / floor) work at any distance; interactions
+    // (project, teleport) need the player close enough to reach them.
+    const isMoveAction =
+      action && (action.type === "floor" || action.type === "walk")
+    // Pintu (teleport) boleh aktif dari lebih jauh daripada interaksi biasa —
+    // disamakan dengan validasi klik (TELEPORT_RANGE) supaya pointer yang
+    // muncul benar-benar bisa diklik, bukan aktif di 3m lalu ditolak di 3-4m.
+    const interactRange =
+      action?.type === "teleport"
+        ? TELEPORT_RANGE
+        : action?.type === "project"
+          ? PROJECT_RANGE
+          : INTERACT_RANGE
+    const actionable = isMoveAction
+      ? action
+      : action && withinRange(hits.length ? hits[0].point : null, interactRange)
+        ? action
+        : null
+    // Lantai pakai crosshair (bukan pointer panah) + ring 3D menyala;
+    // objek interaktif tetap pointer.
+    document.body.style.cursor = actionable
+      ? isMoveAction
+        ? "crosshair"
+        : "pointer"
+      : floorHit
+        ? "crosshair"
+        : "default"
+  }
+
   useEffect(() => {
     const el = gl.domElement
 
     const onPointerDown = (e) => {
       if (e.button !== 0 || !e.isPrimary) return
+      pointerInside.current = true
       // Bawa koordinat raycast langsung dari sentuhan pertama — di layar sentuh
       // tap tidak selalu membangkitkan pointermove, jadi menghindari memakai
       // koordinat basi dari gestur sebelumnya.
@@ -280,6 +363,7 @@ function LookControls({ bounds, onSelectProject }) {
     }
 
     const onPointerMove = (e) => {
+      pointerInside.current = true
       const elRect = el.getBoundingClientRect()
       mouse.current.x = ((e.clientX - elRect.left) / elRect.width) * 2 - 1
       mouse.current.y = -((e.clientY - elRect.top) / elRect.height) * 2 + 1
@@ -323,67 +407,11 @@ function LookControls({ bounds, onSelectProject }) {
           useWalkStore.getState().setHoverFloor(false)
           return
         }
-        // Ring kursor mengikuti lantai TANPA throttle (raycast ringan ke mesh
-        // lantai saja) supaya posisinya selalu segar dan animasi terasa hidup.
-        const floors = visibleFloorMeshes(scene, performance.now())
-        let floorHit = null
-        if (floors.length) {
-          floorRaycaster.current.setFromCamera(mouse.current, camera)
-          const hits = floorRaycaster.current.intersectObjects(floors, false)
-          if (hits.length) {
-            const p = hits[0].point
-            // Floor meshes are flat sheets at ground level, so a raycast over the
-            // staircase hits the floor BENEATH it. Snap the ring to the height
-            // field instead, so hovering the treads/sign base shows the ring ON
-            // the stair surface, not sunk under it. The y actually walked is
-            // resolved by the same field in moveWithCollision.
-            p.y = resolveHeight(p.x, p.z, useWalkStore.getState().level).height
-            useWalkStore.getState().setPointerPosition(p)
-            floorHit = hits[0]
-          } else {
-            useWalkStore.getState().setPointerPosition(null)
-          }
-        } else {
-          useWalkStore.getState().setPointerPosition(null)
-        }
-
-        // Hover raycasts are expensive on a scene this dense — throttle them
-        // so a fast mouse sweep only samples a few times per frame.
-        const now = performance.now()
-        if (now - lastCast.current < 150) return
-        lastCast.current = now
-        raycaster.current.setFromCamera(mouse.current, camera)
-        const hits = pickVisible(raycaster.current, scene, now)
-        const action = hits.length ? findAction(hits[0].object) : null
-        // Movement actions (walk / floor) work at any distance; interactions
-        // (project, teleport) need the player close enough to reach them.
-        const isMoveAction =
-          action && (action.type === "floor" || action.type === "walk")
-        const actionable =
-          isMoveAction
-            ? action
-            : action && withinRange(hits.length ? hits[0].point : null, INTERACT_RANGE)
-              ? action
-              : null
-        // Area jalan sah = RING LANTAI muncul (ada mesh lantai di bawah kursor),
-        // bukan harus hit pertama. Ini membuat kolong meja / rak buku — kursor
-        // kena kaki/penyangga furnitur (tanpa aksi) tapi lantainya bisa
-        // berdiri — tetap bisa diklik untuk berjalan (cek standable tetap
-        // dijalankan saat klik, jadi kolong tertutup plinth tetap ditolak).
-        const floorHover = !!floorHit
-        useWalkStore.getState().setHoverFloor(floorHover)
-        // Lantai pakai crosshair (bukan pointer panah) + ring 3D menyala;
-        // objek interaktif tetap pointer.
-        document.body.style.cursor = actionable
-          ? isMoveAction
-            ? "crosshair"
-            : "pointer"
-          : floorHover
-            ? "crosshair"
-            : "default"
+        // Ring kursor mengikuti lantai & hover dihitung di satu tempat yang
+        // sama dengan refresh per-frame (lihat refreshHover).
+        refreshHover(performance.now())
       }
     }
-
     const onPointerUp = (e) => {
       if (e.button !== 0) return
       dragRef.current.active = false
@@ -394,7 +422,7 @@ function LookControls({ bounds, onSelectProject }) {
       const hit = hits.find((h) => findAction(h.object))
       if (!hit) return
       const action = findAction(hit.object)
-      if (action.type === "project" && !withinRange(hit.point, INTERACT_RANGE)) return
+      if (action.type === "project" && !withinRange(hit.point, PROJECT_RANGE)) return
       if (action.type === "info" && !withinRange(hit.point, INTERACT_RANGE)) return
       if (action.type === "bookInfo" && !withinRange(hit.point, INTERACT_RANGE)) return
       if (action.type === "teleport" && !withinRange(hit.point, TELEPORT_RANGE)) return
@@ -416,6 +444,15 @@ function LookControls({ bounds, onSelectProject }) {
       // di-rollout oleh collider furniture, pemain sebenarnya tidak bisa
       // berdiri di sana — tolak biar tidak "menabrak" terus saat berjalan.
       if (action.type === "floor" || action.type === "walk") {
+        // Tiang/kolom solid tidak boleh "diklik menembus": jika hit terdekat di
+        // piksel tersebut tepat di badan tiang (lebih dekat dari lantai hasil
+        // tembus), batalkan — jangan pilih lantai yang tersembunyi di baliknya.
+        const near = hits[0]
+        if (
+          near &&
+          findPillar(near.object) &&
+          near.distance < hit.distance - 0.05
+        ) return
         const level = useWalkStore.getState().level
         const standable = resolveObjectCollision(hit.point, getObjectColliders(), level)
         if (standable.distanceTo(hit.point) > 0.001) return
@@ -425,6 +462,20 @@ function LookControls({ bounds, onSelectProject }) {
 
     const onPointerCancel = () => {
       dragRef.current.active = false
+    }
+
+    const onPointerEnter = () => {
+      pointerInside.current = true
+    }
+
+    // Kursor keluar canvas (ke HUD/modal/jendela lain): jangan biarkan status
+    // pointer/crosshair menempel di body.
+    const onPointerLeave = () => {
+      pointerInside.current = false
+      dragRef.current.active = false
+      document.body.style.cursor = "default"
+      useWalkStore.getState().setPointerPosition(null)
+      useWalkStore.getState().setHoverFloor(false)
     }
 
     const onKeyDown = (e) => {
@@ -438,6 +489,8 @@ function LookControls({ bounds, onSelectProject }) {
     el.addEventListener("pointermove", onPointerMove)
     el.addEventListener("pointerup", onPointerUp)
     el.addEventListener("pointercancel", onPointerCancel)
+    el.addEventListener("pointerenter", onPointerEnter)
+    el.addEventListener("pointerleave", onPointerLeave)
     window.addEventListener("keydown", onKeyDown)
     window.addEventListener("keyup", onKeyUp)
 
@@ -446,8 +499,12 @@ function LookControls({ bounds, onSelectProject }) {
       el.removeEventListener("pointermove", onPointerMove)
       el.removeEventListener("pointerup", onPointerUp)
       el.removeEventListener("pointercancel", onPointerCancel)
+      el.removeEventListener("pointerenter", onPointerEnter)
+      el.removeEventListener("pointerleave", onPointerLeave)
       window.removeEventListener("keydown", onKeyDown)
       window.removeEventListener("keyup", onKeyUp)
+      // Jangan tinggalkan kursor "pointer" nyangkut saat komponen unmount.
+      if (document.body.style.cursor) document.body.style.cursor = ""
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -593,6 +650,15 @@ function LookControls({ bounds, onSelectProject }) {
     camera.position.set(cur.position.x, camYRef.current + bob, cur.position.z)
     euler.current.set(cur.pitch, cur.yaw, 0)
     camera.quaternion.setFromEuler(euler.current)
+
+    // Refresh hover/kursor walau mouse tidak bergerak: pemain/kamera bisa
+    // bergerak sehingga objek interaktif keluar dari crosshair. Tanpa ini
+    // kursor bisa tetap "pointer" (basi) sampai mouse disentuh lagi.
+    const hoverNow = performance.now()
+    if (hoverNow - lastHoverRefresh.current > 180) {
+      lastHoverRefresh.current = hoverNow
+      refreshHover(hoverNow)
+    }
   })
 
   return null

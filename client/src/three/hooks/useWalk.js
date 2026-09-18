@@ -6,7 +6,11 @@ const EYE_HEIGHT = 1.7
 
 // How close the player must be before a work (painting) becomes hoverable and
 // clickable. Shared by the painting highlight and the cursor/click gates.
-export const INTERACT_RANGE = 2.5
+export const INTERACT_RANGE = 3
+// Karya (lukisan/proyek — mahasiswa maupun dosen): pengunjung HARUS benar-benar
+// dekat (1 m) untuk membuka detail. Dipakai juga oleh penanda hover
+// seminar/plakat rumah (project alias "karya").
+export const PROJECT_RANGE = 1
 
 const HALL_RETURN_KEY = "singgah_hall_return"
 

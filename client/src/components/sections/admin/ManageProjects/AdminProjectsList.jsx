@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from "react"
 import { FolderX, FolderOpen, AlertTriangle } from "lucide-react"
+import ShowMoreButton from "../../../ui/ShowMoreButton"
 import PopupToast from "../../../ui/PopupToast"
 import { useNavigate } from "react-router-dom"
 import { useProjects } from "../../../../context/ProjectContext"
@@ -20,11 +21,13 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deletedTitle, setDeletedTitle] = useState(null)
   const [slideshowUnpublishTarget, setSlideshowUnpublishTarget] = useState(null)
+  const [expandedGroups, setExpandedGroups] = useState(() => ({}))
 
   const filterKey = `${search}|${statusFilter}|${categoryFilter}`
   const [activeFilter, setActiveFilter] = useState(filterKey)
   if (filterKey !== activeFilter) {
     setActiveFilter(filterKey)
+    setExpandedGroups({})
   }
 
   const filteredProjects = useMemo(() => {
@@ -176,62 +179,84 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
             </div>
           </div>
         ) : (
-          groupedProjects.map((group) => (
-            <div key={group.id} className="flex flex-col gap-4">
-              <div className="category-group-divider flex items-center gap-2.5 border-b border-white/10 pb-3">
-                <div className="category-group-icon flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30">
-                  <FolderOpen size={15} strokeWidth={2.2} />
-                </div>
-                <h3 className="text-base font-bold text-white tracking-wide">
-                  {group.name} <span className="ml-1 text-xs font-normal text-slate-400">({group.projects.length})</span>
-                </h3>
-              </div>
+          groupedProjects.map((group) => {
+            const isExpanded = Boolean(expandedGroups[group.id])
+            const visibleProjects = isExpanded
+              ? group.projects
+              : group.projects.slice(0, 3)
+            const hasMore = group.projects.length > 3
 
-              <div className="grid grid-cols-1 min-[530px]:grid-cols-2 min-[1100px]:grid-cols-3 gap-5 md:gap-6">
-                {group.projects.map((project, i) => (
-                  <div key={project.id} className="h-full animate-fade-in-up" style={{ animationDelay: `${i * 30}ms` }}>
-                    <AdminProjectsCard
-                      project={project}
-                      onViewDetail={handleViewDetail}
-                      onQuickApprove={handleApproveClick}
-                      onQuickReject={handleRejectClick}
-                      onEdit={handleEditClick}
-                      onDelete={handleDeleteClick}
-                      onSetFeatured={(p, slot) => {
-                         // Melepas unggulan pada karya yang sedang tampil di
-                         // slideshow otomatis menonaktifkannya dari slideshow.
-                         if (!slot && p.is_shown_in_slideshow) {
-                           setSlideshowUnpublishTarget(p)
-                           return
-                         }
-                         doSetFeatured(p, slot)
-                       }}
-                      onToggleSlideshow={(p, visible) => {
-                        setSlideshowVisible(p.id, visible)
-                          .then(() => {
-                            toast.success(
-                              visible
-                                ? `Karya "${p.title}" kini tampil di slideshow beranda`
-                                : `Karya "${p.title}" tidak lagi tampil di slideshow beranda`,
-                            )
-                          })
-                          .catch((err) => {
-                            toast.error(
-                              err?.response?.data?.message ||
-                                (visible
-                                  ? "Gagal menampilkan karya di slideshow beranda"
-                                  : "Gagal menyembunyikan karya dari slideshow beranda"),
-                            )
-                          })
-                      }}
-                      featuredBySlot={featuredBySlot}
-                      slideshowCount={slideshowCount}
-                    />
+            return (
+              <div key={group.id} className="flex flex-col gap-4">
+                <div className="category-group-divider flex items-center gap-2.5 border-b border-white/10 pb-3">
+                  <div className="category-group-icon flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30">
+                    <FolderOpen size={15} strokeWidth={2.2} />
                   </div>
-                ))}
+                  <h3 className="text-base font-bold text-white tracking-wide">
+                    {group.name} <span className="ml-1 text-xs font-normal text-slate-400">({group.projects.length})</span>
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 min-[530px]:grid-cols-2 min-[1100px]:grid-cols-3 gap-5 md:gap-6">
+                  {visibleProjects.map((project, i) => (
+                    <div key={project.id} className="h-full animate-fade-in-up" style={{ animationDelay: `${i * 30}ms` }}>
+                      <AdminProjectsCard
+                        project={project}
+                        onViewDetail={handleViewDetail}
+                        onQuickApprove={handleApproveClick}
+                        onQuickReject={handleRejectClick}
+                        onEdit={handleEditClick}
+                        onDelete={handleDeleteClick}
+                        onSetFeatured={(p, slot) => {
+                          // Melepas unggulan pada karya yang sedang tampil di
+                          // slideshow otomatis menonaktifkannya dari slideshow.
+                          if (!slot && p.is_shown_in_slideshow) {
+                            setSlideshowUnpublishTarget(p)
+                            return
+                          }
+                          doSetFeatured(p, slot)
+                        }}
+                        onToggleSlideshow={(p, visible) => {
+                          setSlideshowVisible(p.id, visible)
+                            .then(() => {
+                              toast.success(
+                                visible
+                                  ? `Karya "${p.title}" kini tampil di slideshow beranda`
+                                  : `Karya "${p.title}" tidak lagi tampil di slideshow beranda`,
+                              )
+                            })
+                            .catch((err) => {
+                              toast.error(
+                                err?.response?.data?.message ||
+                                  (visible
+                                    ? "Gagal menampilkan karya di slideshow beranda"
+                                    : "Gagal menyembunyikan karya dari slideshow beranda"),
+                              )
+                            })
+                        }}
+                        featuredBySlot={featuredBySlot}
+                        slideshowCount={slideshowCount}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {hasMore && (
+                  <ShowMoreButton
+                    label="Lihat Semua"
+                    total={group.projects.length}
+                    showAll={isExpanded}
+                    onToggle={() =>
+                      setExpandedGroups((prev) => ({
+                        ...prev,
+                        [group.id]: !isExpanded,
+                      }))
+                    }
+                  />
+                )}
               </div>
-            </div>
-          ))
+            )
+          })
         )}
       </div>
 

@@ -1,5 +1,7 @@
-import { ArrowLeft, Frame, MapPin } from "lucide-react"
+import { ArrowLeft, MapPin } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import logo from "../../assets/icons/logo.webp"
+import SmartImage from "../ui/SmartImage"
 
 export default function HallHUDHeader({ area }) {
   const navigate = useNavigate()
@@ -8,8 +10,8 @@ export default function HallHUDHeader({ area }) {
     <header className="absolute top-0 left-0 right-0 z-20 flex items-start justify-between pl-4 py-4 pr-4 md:pr-6 pointer-events-none">
       <div className="pointer-events-auto flex flex-col items-start gap-2">
         <div className="flex items-center space-x-3 rounded-2xl border border-night-border bg-black/50 px-4 py-2.5 backdrop-blur-md shadow-xl">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 to-sky-400 flex items-center justify-center shadow-lg shadow-blue-900/40">
-            <Frame className="w-5 h-5 text-night-text" />
+          <div className="h-9 w-9 overflow-hidden rounded-xl bg-gradient-to-tr from-blue-700 to-sky-400 flex items-center justify-center shadow-lg shadow-blue-900/40">
+            <SmartImage src={logo} alt="SINGGAH Logo" eager className="h-full w-full object-contain" />
           </div>
           <div>
             <h1 className="text-sm font-bold leading-tight text-sky-300">

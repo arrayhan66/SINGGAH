@@ -27,11 +27,4 @@ export default defineConfig([
       'react-refresh/only-export-components': 'warn',
     },
   },
-  // File Node / Playwright (e2e + konfigurasi) butuh global node (process, dsb).
-  {
-    files: ['e2e/**/*.js', 'playwright.config.js', 'eslint.config.js'],
-    languageOptions: {
-      globals: { ...globals.browser, ...globals.node },
-    },
-  },
 ])

@@ -4,9 +4,7 @@ import { useTheme } from "../../context/ThemeContext"
 import { usePlantInfoStore } from "../../three/hooks/usePlantInfo"
 import { useWalkStore } from "../../three/hooks/useWalk"
 
-// Popup info tanaman — mengikuti tema: kartu gelap saat dark mode, kartu
-// terang saat light mode (lewat token `light` di <html>). Terbuka saat ikon
-// "i" di dekat pot diklik; tertutup via X, klik backdrop, atau Escape.
+
 function PlantInfoModal() {
   const { theme } = useTheme()
   const isDark = theme === "dark"

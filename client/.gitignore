@@ -12,13 +12,6 @@ dist
 dist-ssr
 *.local
 
-# Playwright (E2E testing)
-.env.test
-test-results/
-playwright-report/
-blob-report/
-playwright/.cache/
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -3,9 +3,7 @@ import { createContext, useContext, useState, useEffect } from "react"
 const ThemeContext = createContext()
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("singgah-theme") || "light"
-  })
+  const [theme, setTheme] = useState("light")
 
   useEffect(() => {
     const root = document.documentElement
@@ -14,7 +12,6 @@ export function ThemeProvider({ children }) {
     } else {
       root.classList.remove("light")
     }
-    localStorage.setItem("singgah-theme", theme)
   }, [theme])
 
   const toggleTheme = () => {

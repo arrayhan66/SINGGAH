@@ -30,10 +30,10 @@ Thumbs.db
 # Temporary
 *.tmp
 
-# PID file & skrip dev lokal (bukan bagian repo)
+# PID file lokal (jangan ikut commit)
 *.pid
-start-dev.bat
-start-tunnel.bat
+# start-dev.bat & start-tunnel.bat sekarang di-track (tidak berisi secret,
+# hanya menjalankan npm dev + cloudflared tunnel lokal).
 # Sisa file media era penyimpanan lokal (sudah tidak dipakai lagi,
 # media sekarang tersimpan di Cloudinary). Dibuat agar tidak ikut dicommit.
 server/uploads/

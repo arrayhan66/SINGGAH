@@ -35,6 +35,7 @@ function hasNoChanges(formData, existing, original) {
   if (norm(formData.description) !== norm(original.description)) return false
   if (norm(formData.category_id) !== norm(original.category_id)) return false
   if (norm(formData.year) !== norm(original.year)) return false
+  if (norm(formData.author_tipe) !== norm(original.author_tipe)) return false
   if (norm(formData.videoUrl) !== norm(original.videoUrl)) return false
   if (normalizeList(formData.technologies) !== normalizeList(original.technologies)) return false
   if (normalizeList(formData.members) !== normalizeList(original.members)) return false
@@ -73,6 +74,7 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
     title: "",
     description: "",
     category_id: "",
+    author_tipe: "",
     thumbnail: null,
     images: [],
     technologies: [],
@@ -119,10 +121,17 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
               : project.videos?.[0]?.video_url || "")
           : ""
 
+        const authorTipe =
+          project.author_tipe ||
+          (["mahasiswa", "dosen"].includes(project.User?.tipe)
+            ? project.User.tipe
+            : "")
+
         setFormData({
           title: project.title || "",
           description: project.description || "",
           category_id: project.category_id?.toString() || "",
+          author_tipe: authorTipe,
           thumbnail: null,
           images: [],
           technologies,
@@ -145,6 +154,7 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
           description: project.description || "",
           category_id: project.category_id?.toString() || "",
           year: project.year?.toString() || "",
+          author_tipe: authorTipe,
           videoUrl,
           technologies,
           members,
@@ -223,6 +233,10 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
         fd.append("videos", JSON.stringify([{ video_url: formData.videoUrl.trim() }]))
       }
 
+      if (user?.role === "admin" && formData.author_tipe) {
+        fd.append("author_tipe", formData.author_tipe)
+      }
+
       if (removedImages.length > 0) {
         fd.append("removedImages", JSON.stringify(removedImages))
       }
@@ -288,7 +302,11 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
         />
 
         {/* Informasi */}
-        <UploadInformation formData={formData} updateField={updateField} />
+        <UploadInformation
+          formData={formData}
+          updateField={updateField}
+          showAuthorType={user?.role === "admin"}
+        />
 
         {/* Teknologi */}
         <UploadTechnology
@@ -322,6 +340,7 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
           submitting={submitting}
           apiError={submitError}
           isEdit={true}
+          requireAuthorType={user?.role === "admin"}
         />
       </div>
 

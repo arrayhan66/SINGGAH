@@ -1293,8 +1293,9 @@ function MonsteraMini({ h, variant = "besar" }) {
 // total sepadan dengan tulip lama (±1.3 di atas soil pot y=0.42). Warna kelopak
 // mengikuti prop flowerColor dari Plant (default putih #f8fafc).
 export const TULIP_INFO = {
-  title: "Tulip",
-  text: "Bunga hias asal Eropa yang identik dengan musim semi. Melambangkan cinta sempurna, keberuntungan, dan kebangkitan baru — sering dijadikan simbol awal yang segar dan penuh harapan.",
+  title: "Bunga Tulip",
+  category: "Bunga",
+  text: "Bunga adalah bagian reproduksi dari tanaman yang berbunga (angiospermae), biasanya memiliki mahkota berwarna menarik dan wangi yang berfungsi menarik penyerbuk seperti serangga dan burung. Bunga juga sering digunakan sebagai hiasan, simbol kasih sayang, dan memiliki beragam makna budaya di berbagai belahan dunia.",
 }
 
 const TULIP_MODEL_URL = "/model/tulip.glb"

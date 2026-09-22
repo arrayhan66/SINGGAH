@@ -54,7 +54,7 @@ function AnnouncementModal({ onSend, onClose, isSending, error, success }) {
             </div>
           </div>
           <div className="mt-3">
-            <button type="button" onClick={handleClose} className="w-full rounded-xl bg-gradient-to-r from-cyan-400 to-cyan-600 px-4 py-2 text-xs font-semibold text-brand-dark shadow-lg shadow-cyan-500/25 cursor-pointer">
+            <button type="button" onClick={handleClose} className="announce-submit w-full cursor-pointer rounded-xl bg-gradient-to-r from-cyan-400 to-cyan-600 px-4 py-2 text-xs font-semibold text-brand-dark shadow-lg shadow-cyan-500/25">
               Selesai
             </button>
           </div>

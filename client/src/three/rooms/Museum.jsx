@@ -41,6 +41,7 @@ import {
   MUSEUM,
   HALL_PILLARS,
   LAYOUT,
+  layoutVersion,
 } from "./museumLayout"
 const KaryaRooms = lazy(() => import("./KaryaRooms").then((m) => ({ default: m.KaryaRooms })))
 import { enrichProjects, getCategoryStats } from "../../utils/hallHelpers"
@@ -371,7 +372,7 @@ function Museum({ hallData }) {
           book2="putusin"
         />
 
-        <WallGuard />
+        <WallGuard key={layoutVersion} />
       </group>
 
       <pointLight position={[0, HALL_H - 1.6, 0]} intensity={22} distance={20} color="#cfe9ff" />

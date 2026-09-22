@@ -25,6 +25,10 @@ function carveGaps(from, to, cuts) {
 // collision already keeps the player out, this just makes the boundary visible.
 // Openings are carved around the hall side portals so teleports stay clear.
 function WallGuard() {
+  // Hitung sekali saat mount. Komponen di-mount ulang oleh pemakai memakai
+  // key={layoutVersion}, jadi saat layout hall dibangun lagi (admin menambah /
+  // menonaktifkan kategori) celah pagar ikut dihitung ulang tanpa biaya per
+  // render.
   const segments = useMemo(() => {
     const [hx0, hx1] = LAYOUT.hallX
     const [hz0, hz1] = LAYOUT.hallZ
@@ -34,7 +38,7 @@ function WallGuard() {
         .filter((p) => Math.sign(p.at) === Math.sign(at))
         .map((p) => ({ a: p.from, b: p.to }))
 
-    const out = []
+    const list = []
     for (const [axis, at, from, to] of [
       ["x", hx0, hz0, hz1],
       ["x", hx1, hz0, hz1],
@@ -43,10 +47,10 @@ function WallGuard() {
     ]) {
       const open = axis === "x" ? cutsFor(at) : []
       for (const [a, b] of carveGaps(from, to, open)) {
-        out.push({ axis, at, from: a, to: b })
+        list.push({ axis, at, from: a, to: b })
       }
     }
-    return out
+    return list
   }, [])
 
   return (

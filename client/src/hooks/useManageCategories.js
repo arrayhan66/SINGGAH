@@ -5,6 +5,12 @@ import { keepScrollOnExpand } from "../utils/preserveScrollOnExpand"
 
 export const INITIAL_VISIBLE = 9
 
+// Batas kategori aktif yang muat tampil di hall 3D (harus sama dengan
+// MAX_ACTIVE_CATEGORIES di server/service/categoryService).
+export const MAX_CATEGORIES = 10
+
+const LIMIT_MESSAGE = `Jumlah kategori aktif telah mencapai batas maksimal ${MAX_CATEGORIES}. Nonaktifkan atau hapus kategori lain terlebih dahulu.`
+
 export const stateTabs = [
   { value: "all", label: "Semua" },
   { value: "used", label: "Berisi Karya" },
@@ -28,6 +34,7 @@ export default function useManageCategories() {
   const [notification, setNotification] = useState(null)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [togglingId, setTogglingId] = useState(null)
   const buttonRef = useRef(null)
   const panelRef = useRef(null)
 
@@ -90,6 +97,7 @@ export default function useManageCategories() {
 
   const stateCounts = useMemo(() => ({
     all: categories.length,
+    active: categories.filter((c) => c.is_active).length,
     used: categories.filter((c) => c.projectCount > 0).length,
     empty: categories.filter((c) => c.projectCount === 0).length,
   }), [categories])
@@ -144,6 +152,11 @@ export default function useManageCategories() {
         })
         notify("Kategori berhasil diperbarui", "success")
       } else {
+        const activeCount = categories.filter((c) => c.is_active).length
+        if (activeCount >= MAX_CATEGORIES) {
+          notify(LIMIT_MESSAGE, "error")
+          return
+        }
         await api.post("/categories", {
           name: formName.trim(),
           slug: slugify(formName.trim()),
@@ -158,6 +171,33 @@ export default function useManageCategories() {
       notify(message, "error")
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleToggleActive(cat) {
+    const target = !cat.is_active
+    if (target) {
+      const activeCount = categories.filter((c) => c.is_active).length
+      if (activeCount >= MAX_CATEGORIES) {
+        notify(LIMIT_MESSAGE, "error")
+        return
+      }
+    }
+    setTogglingId(cat.id)
+    try {
+      await api.put(`/categories/${cat.id}`, { is_active: target })
+      notify(
+        target
+          ? `${cat.name} diaktifkan dan tampil di hall`
+          : `${cat.name} dinonaktifkan dari hall`,
+        "success",
+      )
+      await fetchCategories()
+    } catch (err) {
+      const message = err.response?.data?.message || "Gagal memperbarui status kategori"
+      notify(message, "error")
+    } finally {
+      setTogglingId(null)
     }
   }
 
@@ -209,6 +249,7 @@ export default function useManageCategories() {
     setNotification,
     saving,
     deleting,
+    togglingId,
     buttonRef,
     panelRef,
     filtered,
@@ -221,6 +262,7 @@ export default function useManageCategories() {
     handleOpenEdit,
     handleCloseForm,
     handleSave,
+    handleToggleActive,
     handleConfirmDelete,
   }
 }

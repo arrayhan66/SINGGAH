@@ -72,7 +72,9 @@ function VirtualExhibition({ onArea, onSelectProject, onReady, hallData }) {
       if (currentRoom.id === "hall") return
       useWalkStore.getState().reset(MUSEUM.spawn.position, MUSEUM.spawn.yaw)
     }
-  }, [categorySlug])
+    // hallData re-runs this after the (possibly async) layout rebuild so a
+    // deep-link into a brand-new category still resolves to its room.
+  }, [categorySlug, hallData])
 
   useReadySignal(onReady)
 

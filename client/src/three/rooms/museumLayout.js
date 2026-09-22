@@ -1,4 +1,5 @@
 import { useQualityStore } from "../hooks/useQuality"
+import { markSceneDirty } from "../utils/sceneColliders"
 
 export const DEFAULT_CATEGORIES = [
   { slug: "website", title: "Website" },
@@ -10,6 +11,28 @@ export const DEFAULT_CATEGORIES = [
   { slug: "ui-ux-design", title: "UI/UX Design" },
   { slug: "game-development", title: "Game Development" },
 ]
+
+// Persisted copy of the last applied category list, so a fresh page load starts
+// from the real /hall state instead of the 8 seeded defaults. Without this, the
+// first paint (and any network hiccup) would briefly show the default layout
+// size even after the admin deleted/added categories.
+const CATEGORIES_STORAGE_KEY = "singgah:hallCategories:v1"
+
+function storedCategories() {
+  try {
+    const raw = typeof localStorage !== "undefined" ? localStorage.getItem(CATEGORIES_STORAGE_KEY) : null
+    if (!raw) return null
+    const list = JSON.parse(raw)
+    if (!Array.isArray(list) || !list.length) return null
+    return list.map((c) => ({
+      slug: c.slug,
+      title: c.name || c.title || c.slug,
+      color: c.color || null,
+    }))
+  } catch {
+    return null
+  }
+}
 
 const T = 0.25
 const H = 14
@@ -48,9 +71,6 @@ const STAIR_STEPS = 20
 // Where a player spawns inside a category building after crossing a portal.
 const ENTRY_DEPTH = 3
 
-const N = DEFAULT_CATEGORIES.length
-const ROW_X0 = -(N * ROOM_W) / 2
-const ROW_X1 = ROW_X0 + N * ROOM_W
 // Buildings sit flush behind the hall's front wall (front wall at z = +HALL_HALF_Z).
 export const ROW_Z0 = HALL_HALF_Z + T
 const ROW_Z1 = ROW_Z0 + ROOM_DEPTH
@@ -83,6 +103,23 @@ const UPPER_BANDS = [
   [0.1, FLOOR2_Y + 0.62, 1.25, "#7b93ad"],
   [0.12, FLOOR2_Y + 1.32, 0.06, "#38bdf8"],
 ]
+
+// ---- Dynamic layout state ----
+// The physical hall is rebuilt from the active category list (from /hall),
+// so admin-added categories automatically get a building + portal. These are
+// the values consumers hold references to, so they are mutated IN PLACE (never
+// reassigned) to keep every importer (LookControls, collision caches, …) in
+// sync without re-importing.
+let curCategories = storedCategories() || DEFAULT_CATEGORIES.map((c) => ({ slug: c.slug, title: c.title, color: null }))
+let layoutKey = curCategories.map((c) => `${c.slug}|${c.title}`).join("\u0001")
+let N = curCategories.length
+let ROW_X0 = -(N * ROOM_W) / 2
+let ROW_X1 = ROW_X0 + N * ROOM_W
+let kLeft = Math.ceil(N / 2)
+let kRight = Math.floor(N / 2)
+let leftZ = kLeft === 1 ? [0] : Array.from({ length: kLeft }, (_, i) => -18 + (i * 36) / (kLeft - 1))
+let rightZ = kRight === 1 ? [0] : Array.from({ length: kRight }, (_, i) => -18 + (i * 36) / (kRight - 1))
+export let HALL_PORTAL_Z = leftZ
 
 const roomCx = (i) => ROW_X0 + i * ROOM_W + ROOM_W / 2
 const roomX = (i) => [ROW_X0 + i * ROOM_W, ROW_X0 + i * ROOM_W + ROOM_W]
@@ -121,73 +158,25 @@ function addWall(axis, at, from, to, openings = [], yRange = { y0: 0, y1: H }, p
   }
 }
 
-// ---- Hall shell ----
-// Distribute N categories exclusively across side walls (none on the straight front path)
-const kLeft = Math.ceil(N / 2)
-const kRight = Math.floor(N / 2)
-const leftZ = kLeft === 1 ? [0] : Array.from({ length: kLeft }, (_, i) => -18 + (i * 36) / (kLeft - 1))
-const rightZ = kRight === 1 ? [0] : Array.from({ length: kRight }, (_, i) => -18 + (i * 36) / (kRight - 1))
+// ---- Rooms (floors + ceilings + area labels) ----
+export const rooms = [
+  {
+    id: "hall",
+    x: [-HALL_HALF_X, HALL_HALF_X],
+    z: [-HALL_HALF_Z, HALL_HALF_Z],
+    zFloor: [-HALL_HALF_Z, HALL_HALF_Z],
+    floor: "marble",
+    label: "Hall Utama",
+  },
+]
 
-export const HALL_PORTAL_Z = leftZ
+export const roomCategories = {}
 
-addWall(
-  "x",
-  -HALL_HALF_X,
-  -HALL_HALF_Z,
-  HALL_HALF_Z,
-  leftZ.map((z) => ({ c: z, w: PORTAL_W, h: PORTAL_H })),
-  { y0: 0, y1: HALL_H },
-  { hall: true },
-)
-addWall(
-  "x",
-  HALL_HALF_X,
-  -HALL_HALF_Z,
-  HALL_HALF_Z,
-  rightZ.map((z) => ({ c: z, w: PORTAL_W, h: PORTAL_H })),
-  { y0: 0, y1: HALL_H },
-  { hall: true },
-)
-// Back wall (solid, banner hangs here)
-addWall("z", -HALL_HALF_Z, -HALL_HALF_X, HALL_HALF_X, [], { y0: 0, y1: HALL_H }, { hall: true })
-// Front wall (solid, no portals on the straight path)
-addWall("z", HALL_HALF_Z, ROW_X0, ROW_X1, [], { y0: 0, y1: HALL_H }, { hall: true })
-
-// ---- Room row (behind the hall front wall) ----
-addWall("x", ROW_X0, ROW_Z0, ROW_Z1, [], {}, { upperBands: UPPER_BANDS })
-addWall("x", ROW_X1, ROW_Z0, ROW_Z1, [], {}, { upperBands: UPPER_BANDS })
-for (let i = 1; i < N; i++) {
-  addWall("x", ROW_X0 + i * ROOM_W, ROW_Z0, ROW_Z1, [], {}, { upperBands: UPPER_BANDS })
-}
-
-for (let i = 0; i < N; i++) {
-  const [x0, x1] = roomX(i)
-  const cx = roomCx(i)
-  // Return portal (front wall), solid back wall. The front wall's covering bands
-  // are inset from each end so they never collide with the side walls' bands.
-  addWall("z", ROW_Z0, x0, x1, [{ c: cx, w: PORTAL_W, h: PORTAL_H }], { y0: 0, y1: H }, { bandInset: 0.35, upperBands: UPPER_BANDS })
-  addWall("z", ROW_Z1, x0, x1, [], {}, { upperBands: UPPER_BANDS })
-  // Solid panel along the open side of the staircase (right of the stairs),
-  // covering the full stair void. Its ends are mitered to sharp points that
-  // tuck into the closing walls, and its covering bands stop short of both
-  // ends so they never run into the bands of the perpendicular walls.
-  addWall("x", x0 + STAIR_WIDTH + 0.04, STAIR_Z0 - T / 2, STAIR_Z1 + T / 2, [], { y0: 0, y1: STAIR_PANEL_H }, { bandInset: STAIR_PANEL_BAND_INSET, miterFront: true, miterBack: true, noCover: true })
-  // Guard railing on floor 2 in front of the stair void. Its +x end is tucked
-  // inside the panel so the butt end never shows, and its +z face is set back
-  // slightly from the panel's front miter face (z = STAIR_Z0 - T/2) so it never
-  // sits coplanar with it. The railing is left plain white (no covering bands):
-  // the theme stripes belong on ground-level walls, putting them on a floor-2
-  // railing would only look like blue floating high in the air.
-  addWall("z", STAIR_Z0 - T / 2 - 0.03, x0 + T / 2, x0 + STAIR_WIDTH + 0.04, [], { y0: FLOOR2_Y - 0.01, y1: FLOOR2_Y + 1.19 })
-  // Wall sealing the back of the stair void at ground level (prevents ground
-  // players approaching the top of the stairs from behind; floor-2 walkers at
-  // feet y=FLOOR2_Y pass over it because its top stays just below FLOOR2_Y). Its
-  // -z face is flush with the mitered panel's back point, its +x end tucks
-  // inside the panel. Collision is limited to a low band (collideY) and the
-  // mesh is flagged noCollide so climbers nearing the top of the stairs step
-  // over it instead of hitting an invisible wall — the tall render stays for
-  // looks.
-  addWall("z", STAIR_Z1 + T / 2, x0 + T / 2, x0 + STAIR_WIDTH + 0.04, [], { y0: 0, y1: FLOOR2_Y - 0.01 }, { bandInset: 0.05, collideY: [0, 2], noCollide: true })
+export function findRoom(x, z) {
+  for (const r of rooms) {
+    if (x >= r.x[0] && x <= r.x[1] && z >= r.z[0] && z <= r.z[1]) return r
+  }
+  return rooms[0]
 }
 
 export function getWalls() {
@@ -234,42 +223,6 @@ export function ringPosition(cx, radius, angle) {
 export function ringRotationY(angle) {
   return Math.PI / 2 - angle
 }
-
-// ---- Rooms (floors + ceilings + area labels) ----
-export const rooms = [
-  {
-    id: "hall",
-    x: [-HALL_HALF_X, HALL_HALF_X],
-    z: [-HALL_HALF_Z, HALL_HALF_Z],
-    zFloor: [-HALL_HALF_Z, HALL_HALF_Z],
-    floor: "marble",
-    label: "Hall Utama",
-  },
-]
-
-for (let i = 0; i < N; i++) {
-  const cat = DEFAULT_CATEGORIES[i]
-  const x = roomX(i)
-  rooms.push({
-    id: cat.slug,
-    x,
-    z: [ROW_Z0, ROW_Z1],
-    zFloor: [ROW_Z0, ROW_Z1],
-    floor: "wood",
-    label: cat.title,
-  })
-}
-
-export function findRoom(x, z) {
-  for (const r of rooms) {
-    if (x >= r.x[0] && x <= r.x[1] && z >= r.z[0] && z <= r.z[1]) return r
-  }
-  return rooms[0]
-}
-
-export const roomCategories = Object.fromEntries(
-  rooms.filter((r) => r.id !== "hall").map((r) => [r.id, r.id]),
-)
 
 // ---- Stair footprint helpers (house stairs against the left wall) ----
 function stairRange(room) {
@@ -342,13 +295,7 @@ export function upperSlabPieces(room) {
 }
 
 // ---- Portals (teleport rifts) ----
-const hallPortals = []
-for (let i = 0; i < kLeft; i++) {
-  hallPortals.push({ axis: "x", at: -HALL_HALF_X, zc: leftZ[i] })
-}
-for (let i = 0; i < kRight; i++) {
-  hallPortals.push({ axis: "x", at: HALL_HALF_X, zc: rightZ[i] })
-}
+export const portals = []
 
 // building -> hall (returns you to the portal you came in from)
 function returnPoint(hp) {
@@ -356,69 +303,10 @@ function returnPoint(hp) {
   return { x: hp.at - 2.5, z: hp.zc, yaw: Math.PI / 2 }
 }
 
-export const portals = []
-
-for (let i = 0; i < hallPortals.length; i++) {
-  const hp = hallPortals[i]
-  const cx = roomCx(i)
-  const roomZ = ROW_Z0 + ENTRY_DEPTH
-
-  portals.push({
-    axis: hp.axis,
-    at: hp.at,
-    from: hp.zc - PORTAL_W / 2,
-    to: hp.zc + PORTAL_W / 2,
-    target: [cx, roomZ],
-    yaw: Math.PI,
-    level: 0,
-  })
-  portals.push({
-    axis: "z",
-    at: ROW_Z0,
-    from: cx - PORTAL_W / 2,
-    to: cx + PORTAL_W / 2,
-    target: [returnPoint(hp).x, returnPoint(hp).z],
-    yaw: returnPoint(hp).yaw,
-    level: 0,
-  })
-}
-
 // ---- Archways (for rendering) ----
 export const archways = []
 
 const NO_ANIMATED_SLUG = "game-development"
-
-for (let i = 0; i < N; i++) {
-  const hp = hallPortals[i]
-  const cat = DEFAULT_CATEGORIES[i]
-  const cx = roomCx(i)
-  const rotY = hp.at < 0 ? Math.PI / 2 : -Math.PI / 2
-  const pos = [hp.at, 0, hp.zc]
-  const rp = returnPoint(hp)
-  const animated = cat.slug !== NO_ANIMATED_SLUG
-  archways.push({
-    kind: "portal",
-    pos,
-    rotY,
-    width: PORTAL_W,
-    title: cat.title,
-    slug: cat.slug,
-    animated,
-    target: [cx, ROW_Z0 + ENTRY_DEPTH],
-    yaw: Math.PI,
-  })
-  archways.push({
-    kind: "portal",
-    pos: [cx, 0, ROW_Z0],
-    rotY: 0,
-    width: PORTAL_W,
-    title: null,
-    slug: cat.slug,
-    animated,
-    target: [rp.x, rp.z],
-    yaw: rp.yaw,
-  })
-}
 
 // ---- Painting walls per room id (ground = student, upper = lecturer) ----
 // `dir` tells the packing direction along the wall (+1 = pack from `from` edge,
@@ -465,91 +353,7 @@ const POSTER_CLEAR_HALF = 5.0
 
 export const paintingWalls = {}
 
-for (let i = 0; i < N; i++) {
-  const cat = DEFAULT_CATEGORIES[i]
-  const [x0, x1] = roomX(i)
-  const cx = roomCx(i)
-  const id = cat.slug
-  const GROUND_Y = GROUND_PAINT_Y
-  const UPPER_Y = FLOOR2_Y + UPPER_PAINT_OFFSET
-
-  // Wall order = fill order: one wall is fully populated before the next
-  // begins.
-  //   Lantai 1 (mahasiswa): stair-side (left) wall FIRST — every room's row of
-  //   works starts at the corner where the staircase ends (right beside the
-  //   "KARYA DOSEN" sign) and grows toward the back-left of the room, then the
-  //   back wall (left→right), then the RIGHT wall packed from the back-right
-  //   corner toward the front, then the front wall beside the portal (right
-  //   segment before the left one).
-  //   Lantai 2 (dosen): cerminannya — mulai dari sudut depan-KANAN menyusur ke
-  //   belakang, belakang kanan→kiri, kiri belakang→depan, lalu depan kiri→kanan
-  //   berakhir di segmen kanan poster. (Filling positions are unchanged; only
-  //   the ORDER of the works is reversed — see layoutPaintings — so the oldest
-  //   work keeps its slot at the start and newcomers appear later along the
-  //   same walls.)
-  paintingWalls[id] = {
-    ground: [
-      wallDef("x", x0, STAIR_Z1, ROW_Z1, "+x", GROUND_Y),
-      wallDef("z", ROW_Z1, x0, x1, "-z", GROUND_Y),
-      // Dinding KANAN lantai 1 rel + karya FULL sepanjang tembok (ROW_Z0 → ROW_Z1),
-      // diisi dari sudut belakang-kanan ke depan. Pintu keluar tidak diberi margin
-      // lebar — segmen depan berhenti alami karena bukaan pintu memotong jalur
-      // rel (PORTAL_MARGIN kecil).
-      wallDef("x", x1, ROW_Z0, ROW_Z1, "-x", GROUND_Y, -1),
-      ...portalWallDefs("z", ROW_Z0, x0, x1, "+z", cx, PORTAL_W, GROUND_Y).reverse(),
-    ],
-    upper: [
-      // Lantai 2 (dosen) mengikuti sirkuit lantai 1: mulai dari DEPAN-KIRI
-      // (dinding kiri di ujung tangga) → belakang → kanan → lalu dinding depan
-      // diisi dari segmen KIRI poster dulu dan berakhir di segmen KANAN poster
-      // ("mulai dari kiri, ke belakang, kalau belakang habis ke kanan, kalau
-      // kanan habis ke depan yang di sebelah kanan poster").
-      wallDef("x", x0, STAIR_Z1, ROW_Z1, "+x", UPPER_Y),
-      wallDef("z", ROW_Z1, x0, x1, "-z", UPPER_Y),
-      // Dinding KANAN lantai 2 dibuat SATU jalur utuh (ROW_Z0 → ROW_Z1) supaya
-      // jarak antar karya seragam tanpa celah di zona tulip biru (z≈42).
-      wallDef("x", x1, ROW_Z0, ROW_Z1, "-x", UPPER_Y, -1),
-      // Front wall split around the PKKMB poster: segmen KANAN poster diisi
-      // DULU (lanjut natural dari dinding kanan yang berakhir di sudut depan-
-      // kanan), lalu segmen KIRI poster (dekat tangga) menyusul. Keduanya
-      // diberi rel kuning dan dikemas menjauh dari poster (dir -1: kanan
-      // mulai dari sudut, kiri mulai dari tepi poster).
-      ...carve(x0, x1, [{ a: cx - POSTER_CLEAR_HALF, b: cx + POSTER_CLEAR_HALF }])
-        .reverse()
-        .map(([a, b]) => wallDef("z", ROW_Z0, a, b, "+z", UPPER_Y, -1, 0, false)),
-    ],
-  }
-}
-
-// ---- Extra gallery rails filling the wall stretches that carry no paintings,
-// so every wall in a room gets a continuous rail ("jalur karya"). On the ground
-// floor the rail is cut at the staircase band (STAIR_Z0..STAIR_Z1) on the
-// stair-side wall only, because the staircase foot cuts through that stretch.
-// On the upper floor no passage crosses the stair band, so both side walls get
-// a full continuous rail. ----
 export const roomRails = {}
-
-for (let i = 0; i < N; i++) {
-  const cat = DEFAULT_CATEGORIES[i]
-  const id = cat.slug
-
-  roomRails[id] = {
-    ground: [
-      // Semua rail lantai 1 kini di-render dari paintingWalls:
-      //   - KIRI dari STAIR_Z1 ke belakang (area tangga depan tidak ada rel)
-      //   - BELAKANG, DEPAN (dengan margin pintu keluar PORTAL_MARGIN)
-      //   - KANAN dari STAIR_Z1 ke belakang (band depan dikosongkan)
-      // Tidak ada lagi extra-rail yang menumpuk di dinding KANAN.
-    ],
-    upper: [
-      // Lantai 2 (dosen): rel HANYA mengikuti jalur karya yang sebenarnya —
-      // mulai dari sudut tulip putih (STAIR_Z1) menyusuri tembok kiri,
-      // belakang, dan kanan (rail segmen tsb di-render dari paintingWalls).
-      // Stretch depan (ROW_Z0 → STAIR_Z1) dihapus TOTAL supaya rel tidak
-      // menjangkau area poster PKKMB di depan.
-    ],
-  }
-}
 
 function rotationYFor(face) {
   if (face === "+x") return Math.PI / 2
@@ -654,16 +458,357 @@ export const LAYOUT = {
   rowZ1: ROW_Z1,
 }
 
-export const HALL_PILLARS = (() => {
+export const HALL_PILLARS = []
+
+// Bumped on every layout rebuild so components that memoize derived geometry
+// (e.g. WallGuard's portal gaps) can key their useMemo on it. The scene
+// re-renders from the useHall state change, so reading this during that render
+// recomputes anything that depends on the current category layout.
+export let layoutVersion = 0
+
+function clearObj(obj) {
+  for (const k of Object.keys(obj)) delete obj[k]
+}
+
+// ---- Geometry rebuild ----
+// The exported mutable containers (walls/rooms/portals/archways/paintingWalls/
+// roomRails/HALL_PILLARS/… and the MUSEUM/LAYOUT bounds) are cleared and
+// repopulated IN PLACE so every module that already imported them keeps seeing
+// the current layout without re-importing.
+function buildWalls() {
+  walls.length = 0
+
+  // Distribute N categories exclusively across side walls (none on the straight front path)
+  addWall(
+    "x",
+    -HALL_HALF_X,
+    -HALL_HALF_Z,
+    HALL_HALF_Z,
+    leftZ.map((z) => ({ c: z, w: PORTAL_W, h: PORTAL_H })),
+    { y0: 0, y1: HALL_H },
+    { hall: true },
+  )
+  addWall(
+    "x",
+    HALL_HALF_X,
+    -HALL_HALF_Z,
+    HALL_HALF_Z,
+    rightZ.map((z) => ({ c: z, w: PORTAL_W, h: PORTAL_H })),
+    { y0: 0, y1: HALL_H },
+    { hall: true },
+  )
+  // Back wall (solid, banner hangs here)
+  addWall("z", -HALL_HALF_Z, -HALL_HALF_X, HALL_HALF_X, [], { y0: 0, y1: HALL_H }, { hall: true })
+  // Front wall (solid, no portals on the straight path)
+  addWall("z", HALL_HALF_Z, ROW_X0, ROW_X1, [], { y0: 0, y1: HALL_H }, { hall: true })
+
+  // ---- Room row (behind the hall front wall) ----
+  addWall("x", ROW_X0, ROW_Z0, ROW_Z1, [], {}, { upperBands: UPPER_BANDS })
+  addWall("x", ROW_X1, ROW_Z0, ROW_Z1, [], {}, { upperBands: UPPER_BANDS })
+  for (let i = 1; i < N; i++) {
+    addWall("x", ROW_X0 + i * ROOM_W, ROW_Z0, ROW_Z1, [], {}, { upperBands: UPPER_BANDS })
+  }
+
+  for (let i = 0; i < N; i++) {
+    const [x0, x1] = roomX(i)
+    const cx = roomCx(i)
+    // Return portal (front wall), solid back wall. The front wall's covering bands
+    // are inset from each end so they never collide with the side walls' bands.
+    addWall("z", ROW_Z0, x0, x1, [{ c: cx, w: PORTAL_W, h: PORTAL_H }], { y0: 0, y1: H }, { bandInset: 0.35, upperBands: UPPER_BANDS })
+    addWall("z", ROW_Z1, x0, x1, [], {}, { upperBands: UPPER_BANDS })
+    // Solid panel along the open side of the staircase (right of the stairs),
+    // covering the full stair void. Its ends are mitered to sharp points that
+    // tuck into the closing walls, and its covering bands stop short of both
+    // ends so they never run into the bands of the perpendicular walls.
+    addWall("x", x0 + STAIR_WIDTH + 0.04, STAIR_Z0 - T / 2, STAIR_Z1 + T / 2, [], { y0: 0, y1: STAIR_PANEL_H }, { bandInset: STAIR_PANEL_BAND_INSET, miterFront: true, miterBack: true, noCover: true })
+    // Guard railing on floor 2 in front of the stair void. Its +x end is tucked
+    // inside the panel so the butt end never shows, and its +z face is set back
+    // slightly from the panel's front miter face (z = STAIR_Z0 - T/2) so it never
+    // sits coplanar with it. The railing is left plain white (no covering bands):
+    // the theme stripes belong on ground-level walls, putting them on a floor-2
+    // railing would only look like blue floating high in the air.
+    addWall("z", STAIR_Z0 - T / 2 - 0.03, x0 + T / 2, x0 + STAIR_WIDTH + 0.04, [], { y0: FLOOR2_Y - 0.01, y1: FLOOR2_Y + 1.19 })
+    // Wall sealing the back of the stair void at ground level (prevents ground
+    // players approaching the top of the stairs from behind; floor-2 walkers at
+    // feet y=FLOOR2_Y pass over it because its top stays just below FLOOR2_Y). Its
+    // -z face is flush with the mitered panel's back point, its +x end tucks
+    // inside the panel. Collision is limited to a low band (collideY) and the
+    // mesh is flagged noCollide so climbers nearing the top of the stairs step
+    // over it instead of hitting an invisible wall — the tall render stays for
+    // looks.
+    addWall("z", STAIR_Z1 + T / 2, x0 + T / 2, x0 + STAIR_WIDTH + 0.04, [], { y0: 0, y1: FLOOR2_Y - 0.01 }, { bandInset: 0.05, collideY: [0, 2], noCollide: true })
+  }
+}
+
+function buildRooms() {
+  rooms.length = 0
+  rooms.push({
+    id: "hall",
+    x: [-HALL_HALF_X, HALL_HALF_X],
+    z: [-HALL_HALF_Z, HALL_HALF_Z],
+    zFloor: [-HALL_HALF_Z, HALL_HALF_Z],
+    floor: "marble",
+    label: "Hall Utama",
+  })
+
+  for (let i = 0; i < N; i++) {
+    const cat = curCategories[i]
+    const x = roomX(i)
+    rooms.push({
+      id: cat.slug,
+      x,
+      z: [ROW_Z0, ROW_Z1],
+      zFloor: [ROW_Z0, ROW_Z1],
+      floor: "wood",
+      label: cat.title,
+    })
+  }
+
+  clearObj(roomCategories)
+  for (const r of rooms) {
+    if (r.id === "hall") continue
+    roomCategories[r.id] = r.id
+  }
+}
+
+function buildPortalsAndArchways() {
+  portals.length = 0
+  archways.length = 0
+
+  const hallPortals = []
+  for (let i = 0; i < kLeft; i++) {
+    hallPortals.push({ axis: "x", at: -HALL_HALF_X, zc: leftZ[i] })
+  }
+  for (let i = 0; i < kRight; i++) {
+    hallPortals.push({ axis: "x", at: HALL_HALF_X, zc: rightZ[i] })
+  }
+
+  for (let i = 0; i < hallPortals.length; i++) {
+    const hp = hallPortals[i]
+    const cx = roomCx(i)
+    const roomZ = ROW_Z0 + ENTRY_DEPTH
+
+    portals.push({
+      axis: hp.axis,
+      at: hp.at,
+      from: hp.zc - PORTAL_W / 2,
+      to: hp.zc + PORTAL_W / 2,
+      target: [cx, roomZ],
+      yaw: Math.PI,
+      level: 0,
+    })
+    portals.push({
+      axis: "z",
+      at: ROW_Z0,
+      from: cx - PORTAL_W / 2,
+      to: cx + PORTAL_W / 2,
+      target: [returnPoint(hp).x, returnPoint(hp).z],
+      yaw: returnPoint(hp).yaw,
+      level: 0,
+    })
+  }
+
+  for (let i = 0; i < N; i++) {
+    const hp = hallPortals[i]
+    const cat = curCategories[i]
+    const cx = roomCx(i)
+    const rotY = hp.at < 0 ? Math.PI / 2 : -Math.PI / 2
+    const pos = [hp.at, 0, hp.zc]
+    const rp = returnPoint(hp)
+    const animated = cat.slug !== NO_ANIMATED_SLUG
+    archways.push({
+      kind: "portal",
+      pos,
+      rotY,
+      width: PORTAL_W,
+      title: cat.title,
+      slug: cat.slug,
+      animated,
+      target: [cx, ROW_Z0 + ENTRY_DEPTH],
+      yaw: Math.PI,
+    })
+    archways.push({
+      kind: "portal",
+      pos: [cx, 0, ROW_Z0],
+      rotY: 0,
+      width: PORTAL_W,
+      title: null,
+      slug: cat.slug,
+      animated,
+      target: [rp.x, rp.z],
+      yaw: rp.yaw,
+    })
+  }
+}
+
+function buildPaintingWalls() {
+  clearObj(paintingWalls)
+
+  for (let i = 0; i < N; i++) {
+    const cat = curCategories[i]
+    const [x0, x1] = roomX(i)
+    const cx = roomCx(i)
+    const id = cat.slug
+    const GROUND_Y = GROUND_PAINT_Y
+    const UPPER_Y = FLOOR2_Y + UPPER_PAINT_OFFSET
+
+    // Wall order = fill order: one wall is fully populated before the next
+    // begins.
+    //   Lantai 1 (mahasiswa): stair-side (left) wall FIRST — every room's row of
+    //   works starts at the corner where the staircase ends (right beside the
+    //   "KARYA DOSEN" sign) and grows toward the back-left of the room, then the
+    //   back wall (left→right), then the RIGHT wall packed from the back-right
+    //   corner toward the front, then the front wall beside the portal (right
+    //   segment before the left one).
+    //   Lantai 2 (dosen): cerminannya — mulai dari sudut depan-KANAN menyusur ke
+    //   belakang, belakang kanan→kiri, kiri belakang→depan, lalu depan kiri→kanan
+    //   berakhir di segmen kanan poster. (Filling positions are unchanged; only
+    //   the ORDER of the works is reversed — see layoutPaintings — so the oldest
+    //   work keeps its slot at the start and newcomers appear later along the
+    //   same walls.)
+    paintingWalls[id] = {
+      ground: [
+        wallDef("x", x0, STAIR_Z1, ROW_Z1, "+x", GROUND_Y),
+        wallDef("z", ROW_Z1, x0, x1, "-z", GROUND_Y),
+        // Dinding KANAN lantai 1 rel + karya FULL sepanjang tembok (ROW_Z0 → ROW_Z1),
+        // diisi dari sudut belakang-kanan ke depan. Pintu keluar tidak diberi margin
+        // lebar — segmen depan berhenti alami karena bukaan pintu memotong jalur
+        // rel (PORTAL_MARGIN kecil).
+        wallDef("x", x1, ROW_Z0, ROW_Z1, "-x", GROUND_Y, -1),
+        ...portalWallDefs("z", ROW_Z0, x0, x1, "+z", cx, PORTAL_W, GROUND_Y).reverse(),
+      ],
+      upper: [
+        // Lantai 2 (dosen) mengikuti sirkuit lantai 1: mulai dari DEPAN-KIRI
+        // (dinding kiri di ujung tangga) → belakang → kanan → lalu dinding depan
+        // diisi dari segmen KIRI poster dulu dan berakhir di segmen KANAN poster
+        // ("mulai dari kiri, ke belakang, kalau belakang habis ke kanan, kalau
+        // kanan habis ke depan yang di sebelah kanan poster").
+        wallDef("x", x0, STAIR_Z1, ROW_Z1, "+x", UPPER_Y),
+        wallDef("z", ROW_Z1, x0, x1, "-z", UPPER_Y),
+        // Dinding KANAN lantai 2 dibuat SATU jalur utuh (ROW_Z0 → ROW_Z1) supaya
+        // jarak antar karya seragam tanpa celah di zona tulip biru (z≈42).
+        wallDef("x", x1, ROW_Z0, ROW_Z1, "-x", UPPER_Y, -1),
+        // Front wall split around the PKKMB poster: segmen KANAN poster diisi
+        // DULU (lanjut natural dari dinding kanan yang berakhir di sudut depan-
+        // kanan), lalu segmen KIRI poster (dekat tangga) menyusul. Keduanya
+        // diberi rel kuning dan dikemas menjauh dari poster (dir -1: kanan
+        // mulai dari sudut, kiri mulai dari tepi poster).
+        ...carve(x0, x1, [{ a: cx - POSTER_CLEAR_HALF, b: cx + POSTER_CLEAR_HALF }])
+          .reverse()
+          .map(([a, b]) => wallDef("z", ROW_Z0, a, b, "+z", UPPER_Y, -1, 0, false)),
+      ],
+    }
+  }
+
+  // ---- Extra gallery rails filling the wall stretches that carry no paintings,
+  // so every wall in a room gets a continuous rail ("jalur karya"). On the ground
+  // floor the rail is cut at the staircase band (STAIR_Z0..STAIR_Z1) on the
+  // stair-side wall only, because the staircase foot cuts through that stretch.
+  // On the upper floor no passage crosses the stair band, so both side walls get
+  // a full continuous rail. ----
+  clearObj(roomRails)
+
+  for (let i = 0; i < N; i++) {
+    const cat = curCategories[i]
+    const id = cat.slug
+
+    roomRails[id] = {
+      ground: [
+        // Semua rail lantai 1 kini di-render dari paintingWalls:
+        //   - KIRI dari STAIR_Z1 ke belakang (area tangga depan tidak ada rel)
+        //   - BELAKANG, DEPAN (dengan margin pintu keluar PORTAL_MARGIN)
+        //   - KANAN dari STAIR_Z1 ke belakang (band depan dikosongkan)
+        // Tidak ada lagi extra-rail yang menumpuk di dinding KANAN.
+      ],
+      upper: [
+        // Lantai 2 (dosen): rel HANYA mengikuti jalur karya yang sebenarnya —
+        // mulai dari sudut tulip putih (STAIR_Z1) menyusuri tembok kiri,
+        // belakang, dan kanan (rail segmen tsb di-render dari paintingWalls).
+        // Stretch depan (ROW_Z0 → STAIR_Z1) dihapus TOTAL supaya rel tidak
+        // menjangkau area poster PKKMB di depan.
+      ],
+    }
+  }
+}
+
+function buildHallPillars() {
+  HALL_PILLARS.length = 0
   const allZ = [-HALL_HALF_Z, ...leftZ, HALL_HALF_Z]
   const pillarX = HALL_HALF_X - 5.5
   const portalZ = [...leftZ, ...rightZ]
-  const out = []
   for (let i = 0; i < allZ.length - 1; i++) {
     const zm = (allZ[i] + allZ[i + 1]) / 2
     const shifted = portalZ.some((z) => Math.abs(z - zm) < 0.1) ? zm + 2.5 : zm
-    out.push({ position: [-pillarX, 0, shifted] })
-    out.push({ position: [pillarX, 0, shifted] })
+    HALL_PILLARS.push({ position: [-pillarX, 0, shifted] })
+    HALL_PILLARS.push({ position: [pillarX, 0, shifted] })
   }
-  return out
-})()
+}
+
+function buildLayout() {
+  N = curCategories.length
+  ROW_X0 = -(N * ROOM_W) / 2
+  ROW_X1 = ROW_X0 + N * ROOM_W
+  kLeft = Math.ceil(N / 2)
+  kRight = Math.floor(N / 2)
+  leftZ = kLeft === 1 ? [0] : Array.from({ length: kLeft }, (_, i) => -18 + (i * 36) / (kLeft - 1))
+  rightZ = kRight === 1 ? [0] : Array.from({ length: kRight }, (_, i) => -18 + (i * 36) / (kRight - 1))
+  HALL_PORTAL_Z = leftZ
+
+  MUSEUM.bounds.minX = ROW_X0 - 4
+  MUSEUM.bounds.maxX = ROW_X1 + 4
+  MUSEUM.bounds.minZ = -HALL_HALF_Z - 4
+  MUSEUM.bounds.maxZ = ROW_Z1 + 4
+
+  LAYOUT.rowX[0] = ROW_X0
+  LAYOUT.rowX[1] = ROW_X1
+
+  buildWalls()
+  buildRooms()
+  buildPortalsAndArchways()
+  buildPaintingWalls()
+  buildHallPillars()
+
+  layoutVersion++
+}
+
+// Optionally expose the current room count / slugs for diagnostics.
+export function getLayoutCategories() {
+  return curCategories
+}
+
+// Rebuild the physical hall layout from a live category list (e.g. /hall).
+// Mutates the exported layout in place so all importer modules stay in sync;
+// bumps the scene revision so LookControls rebuilds its collision caches.
+export function setHallCategories(categories = []) {
+  const list = (Array.isArray(categories) ? categories : [])
+    .filter((c) => c && c.slug)
+    .map((c) => ({ slug: c.slug, title: c.name || c.title || c.slug, color: c.color || null }))
+
+  // List kosong dari server = SEMUA kategori nonaktif/terhapus → hall dibangun
+  // kosong, bukan diisi ulang DEFAULT_CATEGORIES (mencegah "gedung hantu").
+  const cats = list
+
+  const key = cats.map((c) => `${c.slug}|${c.title}`).join("\u0001")
+  if (key === layoutKey) return false
+
+  layoutKey = key
+  curCategories = cats
+  buildLayout()
+  markSceneDirty()
+
+  // Remember the live list so the next page load seeds the hall at the correct
+  // size immediately (no flash of the 8 seeded defaults).
+  try {
+    localStorage.setItem(
+      CATEGORIES_STORAGE_KEY,
+      JSON.stringify(cats.map((c) => ({ slug: c.slug, name: c.title, color: c.color }))),
+    )
+  } catch {
+    // storage unavailable — the in-memory rebuild above is still correct
+  }
+  return true
+}
+
+// Initial default layout (8 seeded categories) so anything importing the layout
+// straight away (spawn, bounds, useWalk, …) sees a coherent hall.
+buildLayout()

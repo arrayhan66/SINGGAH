@@ -6,6 +6,13 @@ const CATEGORIES_TTL = 60 * 1000
 const CATEGORIES_KEY = "categories:list"
 const CATEGORIES_ALL_KEY = `${CATEGORIES_KEY}:all`
 
+// Batas kategori yang boleh tampil di hall 3D sekaligus. Kategori nonaktif
+// tidak dihitung, jadi admin bisa menonaktifkan/menghapus satu untuk
+// membuka slot baru.
+const MAX_ACTIVE_CATEGORIES = 10
+
+const limitError = `Jumlah kategori aktif telah mencapai batas maksimal ${MAX_ACTIVE_CATEGORIES}. Nonaktifkan atau hapus kategori lain terlebih dahulu.`
+
 // Hitung karya per kategori. Default hanya karya published (dipakai halaman
 // publik/Hall). Saat allStatuses=true, menghitung semua status — dipakai halaman
 // admin Kelola Kategori agar sinkron dengan jumlah di Kelola Karya.
@@ -70,6 +77,14 @@ exports.createCategory = async (data) => {
 
   if (!name || !slug) {
     throw new AppError("Nama dan slug wajib diisi", 400)
+  }
+
+  // Kategori baru default aktif; tolak jika hall sudah penuh (10 aktif).
+  if (is_active !== false) {
+    const activeCount = await Category.count({ where: { is_active: true } })
+    if (activeCount >= MAX_ACTIVE_CATEGORIES) {
+      throw new AppError(limitError, 400)
+    }
   }
 
   const nameExists = await Category.findOne({
@@ -137,6 +152,15 @@ exports.updateCategory = async (id, data) => {
 
     if (exists) {
       throw new AppError("Slug sudah digunakan", 400)
+    }
+  }
+
+  // Mengaktifkan kategori nonaktif juga memakai slot hall — tolak kalau penuh.
+  const becomesActive = is_active !== undefined && Boolean(is_active) && !category.is_active
+  if (becomesActive) {
+    const activeCount = await Category.count({ where: { is_active: true } })
+    if (activeCount >= MAX_ACTIVE_CATEGORIES) {
+      throw new AppError(limitError, 400)
     }
   }
 

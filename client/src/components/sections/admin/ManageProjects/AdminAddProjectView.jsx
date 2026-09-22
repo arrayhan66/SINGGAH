@@ -51,6 +51,7 @@ const initialFormData = {
   categoryName: "",
   userName: "",
   userNim: "",
+  author_tipe: "",
   thumbnail: null,
   images: [],
   technologies: [],
@@ -133,6 +134,10 @@ function AdminAddProjectView() {
         fd.append("videos", JSON.stringify([{ video_url: formData.videoUrl.trim() }]))
       }
 
+      if (formData.author_tipe) {
+        fd.append("author_tipe", formData.author_tipe)
+      }
+
       await addProject(fd)
       setSuccessOpen(true)
     } catch (err) {
@@ -149,7 +154,7 @@ function AdminAddProjectView() {
       <div className="user-page">
         <UploadHero
           headingLabel="Tambah"
-          subtitle="Tambahkan karya mahasiswa ke SINGGAH. Karya akan langsung dipublikasikan ke Hall."
+          subtitle="Tambahkan karya ke SINGGAH. Pilih tipe penulis (mahasiswa/dosen) agar karya langsung masuk kelompok yang tepat di Hall."
           ptClass="pt-6 sm:pt-8 2xl:pt-10"
         />
 
@@ -168,6 +173,7 @@ function AdminAddProjectView() {
             <UploadInformation
               formData={formData}
               updateField={updateField}
+              showAuthorType
             />
 
             <StepDivider step={steps[2]} currentIndex={2} />
@@ -198,6 +204,7 @@ function AdminAddProjectView() {
               submitting={submitting}
               apiError={error}
               submitLabel="Publikasikan"
+              requireAuthorType
             />
           </div>
         </section>

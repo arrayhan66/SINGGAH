@@ -60,15 +60,16 @@ const MONSTERA_INFO = {
   text: "Monstera (Monstera deliciosa) — Tanaman hias tropis dengan daun besar berlubang khas yang unik. Melambangkan kelimpahan, kehormatan, dan pertumbuhan yang terus berkembang — populer sebagai simbol kemewahan alami dalam desain interior modern.",
 }
 
-// Pilih karya unggulan untuk podium: prioritas project yang ditandai admin
-// lewat featured_slot (1 & 2). Kalau belum ada yang ditandai, fallback ke
-// perilaku lama (2 project terakhir).
+// Pilih karya unggulan untuk podium: HANYA project yang ditandai admin lewat
+// featured_slot (1 & 2), diurutkan sesuai slot. Tanpa fallback otomatis — karya
+// baru yang belum ditandai TIDAK boleh muncul di podium ("KARYA UNGGULAN"),
+// supaya perilaku konsisten di semua kategori (seperti yang sudah punya
+// unggulan). Kalau belum ada yang ditandai, podium tidak dirender sama sekali.
 const pickFeatured = (list) => {
-  const flagged = list
+  return list
     .filter((p) => p.featured_slot === 1 || p.featured_slot === 2)
     .sort((a, b) => a.featured_slot - b.featured_slot)
-  if (flagged.length > 0) return flagged.slice(0, FEATURED_ON_PODIUM)
-  return list.slice(-FEATURED_ON_PODIUM)
+    .slice(0, FEATURED_ON_PODIUM)
 }
 
 // Project untuk dinding: buang yang sedang dipajang di podium.
@@ -487,7 +488,9 @@ function RoomDecorGround({ room, projects }) {
 
       <ReadingRing room={room} y={0} />
 
-      <FeaturedWork position={[cx + 9.5, 0, 32]} rotationY={-0.46} projects={pickFeatured(projects)} />
+      {pickFeatured(projects).length > 0 && (
+        <FeaturedWork position={[cx + 9.5, 0, 32]} rotationY={-0.46} projects={pickFeatured(projects)} />
+      )}
 
       <WallClock position={[cx, 5.6, room.z[1] - 0.45]} rotationY={Math.PI} scale={1.3} />
       <PresidentPortrait position={[cx + 2.0, 5.5, room.z[1] - 0.45]} rotationY={Math.PI} image={prabowoImg} />
@@ -602,7 +605,7 @@ function RoomDecorUpper({ room, projects }) {
 
       <ReadingRing room={room} y={Y} />
 
-      {projects.length > 0 && (
+      {pickFeatured(projects).length > 0 && (
         <FeaturedWork position={[cx + 9.5, Y, 36]} rotationY={-0.46} projects={pickFeatured(projects)} />
       )}
 

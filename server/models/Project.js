@@ -40,6 +40,15 @@ const Project = sequelize.define(
       allowNull: true,
       defaultValue: null,
     },
+    // Tipe penulis karya (mahasiswa/dosen). Dipakai klasifikasi hall 3D dan
+    // pembagian slot per kategori. Admin memilih field ini saat menambah karya
+    // atas nama mahasiswa/dosen. null berarti mengikuti tipe akun pembuat
+    // (User.tipe).
+    author_tipe: {
+      type: DataTypes.ENUM("mahasiswa", "dosen"),
+      allowNull: true,
+      defaultValue: null,
+    },
     // Karya unggulan di podium hall 3D. Hanya ada 2 slot (1 & 2),
     // null berarti project tidak menjadi karya unggulan.
     featured_slot: {

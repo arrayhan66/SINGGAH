@@ -3,6 +3,8 @@ import { useWalkStore } from "../three/hooks/useWalk"
 import { useQualityStore } from "../three/hooks/useQuality"
 import api from "../services/api"
 import DEFAULT_HALL_DATA from "../constants/hallDefaults"
+import { setHallCategories } from "../three/rooms/museumLayout"
+import { seedCategoryColors } from "../utils/hallHelpers"
 
 export default function useHall() {
   const [area, setArea] = useState("Hall Utama")
@@ -15,7 +17,13 @@ export default function useHall() {
     api.get("/hall")
       .then((res) => {
         const data = res.data.data
-        if (data && data.categories && data.categories.length > 0) {
+        if (data && data.categories) {
+          // Rebuild the physical hall from the live category list BEFORE the
+          // scene re-renders, so newly-added categories get their own building
+          // and deactivated/deleted ones disappear (list kosong diterapkan
+          // juga — hall jadi kosong, tanpa "gedung hantu").
+          setHallCategories(data.categories)
+          seedCategoryColors(data.categories)
           setHallData(data)
         }
       })

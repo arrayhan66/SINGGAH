@@ -58,7 +58,7 @@ function PlantInfoModal() {
             isDark ? "text-sky-400/90" : "text-sky-600"
           }`}
         >
-          Tentang Tanaman
+          {info.category ? `Tentang ${info.category}` : "Tentang Tanaman"}
         </p>
 
         <h3

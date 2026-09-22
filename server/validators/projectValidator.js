@@ -28,6 +28,11 @@ exports.createProjectValidator = [
     .withMessage("Kategori wajib diisi")
     .isInt()
     .withMessage("Kategori tidak valid"),
+
+  body("author_tipe")
+    .optional({ values: "falsy" })
+    .isIn(["mahasiswa", "dosen"])
+    .withMessage("Tipe penulis tidak valid"),
 ]
 
 exports.updateProjectValidator = [
@@ -49,6 +54,11 @@ exports.updateProjectValidator = [
     .optional()
     .isIn(["pending", "published", "rejected"])
     .withMessage("Status tidak valid"),
+
+  body("author_tipe")
+    .optional({ values: "falsy" })
+    .isIn(["mahasiswa", "dosen"])
+    .withMessage("Tipe penulis tidak valid"),
 ]
 
 exports.updateProjectStatusValidator = [

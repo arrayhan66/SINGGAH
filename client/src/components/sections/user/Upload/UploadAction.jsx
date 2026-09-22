@@ -2,7 +2,7 @@ import { useEffect } from "react"
 import { Send } from "lucide-react"
 import toast from "../../../../utils/toast"
 
-function validateForm(formData, isEdit = false) {
+function validateForm(formData, isEdit = false, requireAuthorType = false) {
   const errors = []
 
   if (!formData.title.trim()) errors.push("Judul karya wajib diisi")
@@ -15,11 +15,13 @@ function validateForm(formData, isEdit = false) {
     const y = parseInt(formData.year, 10)
     if (isNaN(y) || y < 1900 || y > 2100) errors.push("Tahun tidak valid (1900-2100)")
   }
+  if (requireAuthorType && !formData.author_tipe)
+    errors.push("Tipe penulis wajib dipilih")
 
   return errors
 }
 
-function UploadAction({ formData, onSubmit, submitting, apiError, isEdit = false, submitLabel }) {
+function UploadAction({ formData, onSubmit, submitting, apiError, isEdit = false, submitLabel, requireAuthorType = false }) {
   useEffect(() => {
     if (typeof apiError === "string" && apiError) {
       toast.error(apiError)
@@ -27,7 +29,7 @@ function UploadAction({ formData, onSubmit, submitting, apiError, isEdit = false
   }, [apiError])
 
   function handleSubmit() {
-    const errors = validateForm(formData, isEdit)
+    const errors = validateForm(formData, isEdit, requireAuthorType)
 
     if (errors.length > 0) {
       toast.error(errors.join(", "))

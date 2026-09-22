@@ -3,7 +3,7 @@ import { Plus, X, Link2, Video, Info } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
 import api from "../../../../services/api"
 
-function UploadInformation({ formData, updateField }) {
+function UploadInformation({ formData, updateField, showAuthorType = false }) {
   const [categories, setCategories] = useState([])
 
   useEffect(() => {
@@ -115,6 +115,41 @@ function UploadInformation({ formData, updateField }) {
             ))}
           </select>
         </div>
+
+        {/* Tipe Penulis (khusus admin) */}
+        {showAuthorType && (
+          <div className="flex flex-col gap-1 min-[280px]:gap-1.5">
+            <div className="flex items-center gap-2">
+              <label className="text-[11px] min-[280px]:text-sm font-medium text-slate-300 2xl:text-base 3xl:text-lg 4xl:text-xl">
+                Tipe Penulis <span className="text-red-400">*</span>
+              </label>
+              <span className="rounded-full border border-red-400/30 bg-red-400/10 px-1.5 min-[280px]:px-2 py-0.5 text-[9px] min-[280px]:text-[11px] font-medium text-red-400 2xl:text-xs 3xl:text-sm">
+                Wajib
+              </span>
+            </div>
+            <select
+              value={formData.author_tipe}
+              onChange={(e) => updateField("author_tipe", e.target.value)}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1.5 min-[280px]:px-4 min-[280px]:py-2.5 text-xs min-[280px]:text-sm text-slate-900 focus:border-cyan-400 focus:bg-white focus:outline-none 2xl:text-base 2xl:px-5 2xl:py-3 3xl:text-lg 3xl:px-6 3xl:py-3.5 4xl:text-xl 4xl:px-7 4xl:py-4"
+            >
+              <option value="" className="bg-white">
+                Pilih tipe penulis
+              </option>
+              <option value="mahasiswa" className="bg-white">
+                Mahasiswa
+              </option>
+              <option value="dosen" className="bg-white">
+                Dosen
+              </option>
+            </select>
+            {!formData.author_tipe && (
+              <p className="text-[10px] text-amber-400 2xl:text-xs">
+                Pilih tipe ini agar karya masuk kelompok mahasiswa/dosen yang
+                benar di Hall.
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Deskripsi */}
         <div className="flex flex-col gap-1 min-[280px]:gap-1.5">

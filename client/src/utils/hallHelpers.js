@@ -11,7 +11,22 @@ export const CATEGORY_COLORS = {
 
 const DOSEN_MARKERS = ["dr.", "prof.", "dra.", "h."]
 
+// Merges admin-set category colors (from /hall) into the static palette so
+// newly-added categories also get their configured accent color in the hall.
+export function seedCategoryColors(categories = []) {
+  for (const c of categories) {
+    if (c && c.slug && c.color) CATEGORY_COLORS[c.slug] = c.color
+  }
+}
+
 export function classify(project) {
+  // Admin bisa menetapkan tipe penulis secara eksplisit (author_tipe) saat
+  // menambah karya atas nama mahasiswa/dosen — ini menang bahkan jika akun
+  // admin bermacam "umum" atau "mahasiswa".
+  const declared = project.author_tipe
+  if (declared === "dosen") return "dosen"
+  if (declared === "mahasiswa") return "mahasiswa"
+
   const tipe = project.User?.tipe || project.authorType
   if (tipe === "dosen") return "dosen"
   if (tipe === "mahasiswa") return "mahasiswa"

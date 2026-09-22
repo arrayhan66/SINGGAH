@@ -33,21 +33,32 @@ const CATEGORY_MAHASISWA_LIMIT = 48
 // dinding), jadi karya dosen per kategori juga dibatasi 48.
 const CATEGORY_DOSEN_LIMIT = 48
 
+// Penghitungan slot harus konsisten dengan klasifikasi hall: sebuah karya
+// masuk grup dosen jika author_tipe = 'dosen' ATAU pemiliknya bertipe dosen
+// (untuk karya lama tanpa author_tipe). Sisanya dihitung sebagai mahasiswa.
+// Ini membuat karya yang diupload admin atas nama dosen terhitung ke slot
+// dosen, bukan slot mahasiswa.
 async function countMahasiswaSlots(categoryId, excludeId = null) {
-  const where = { category_id: categoryId, status: "published" }
-  if (excludeId !== null) {
-    where.id = { [Op.ne]: excludeId }
-  }
-  return Project.count({
-    where,
-    include: [
-      {
-        model: User,
-        attributes: [],
-        where: { tipe: { [Op.ne]: "dosen" } },
-      },
-    ],
-  })
+  return Number(
+    (
+      await sequelize.query(
+        `SELECT COUNT(*) AS total
+           FROM projects p
+           JOIN users u ON u.id = p.user_id
+          WHERE p.category_id = :categoryId
+            AND p.status = 'published'
+            ${excludeId !== null ? "AND p.id != :excludeId" : ""}
+            AND COALESCE(p.author_tipe, u.tipe) != 'dosen'`,
+        {
+          replacements: {
+            categoryId,
+            ...(excludeId !== null ? { excludeId } : {}),
+          },
+          type: sequelize.QueryTypes.SELECT,
+        },
+      )
+    )[0].total,
+  )
 }
 
 async function assertMahasiswaSlot(categoryId, excludeId = null) {
@@ -61,20 +72,26 @@ async function assertMahasiswaSlot(categoryId, excludeId = null) {
 }
 
 async function countDosenSlots(categoryId, excludeId = null) {
-  const where = { category_id: categoryId, status: "published" }
-  if (excludeId !== null) {
-    where.id = { [Op.ne]: excludeId }
-  }
-  return Project.count({
-    where,
-    include: [
-      {
-        model: User,
-        attributes: [],
-        where: { tipe: "dosen" },
-      },
-    ],
-  })
+  return Number(
+    (
+      await sequelize.query(
+        `SELECT COUNT(*) AS total
+           FROM projects p
+           JOIN users u ON u.id = p.user_id
+          WHERE p.category_id = :categoryId
+            AND p.status = 'published'
+            ${excludeId !== null ? "AND p.id != :excludeId" : ""}
+            AND COALESCE(p.author_tipe, u.tipe) = 'dosen'`,
+        {
+          replacements: {
+            categoryId,
+            ...(excludeId !== null ? { excludeId } : {}),
+          },
+          type: sequelize.QueryTypes.SELECT,
+        },
+      )
+    )[0].total,
+  )
 }
 
 async function assertDosenSlot(categoryId, excludeId = null) {
@@ -412,7 +429,8 @@ exports.updateProjectStatus = async (id, status, reason = "") => {
   // Publikasi ke Hall dibatasi per kategori: lantai 1 hanya sampai 48 karya
   // mahasiswa, lantai 2 hanya sampai 48 karya dosen.
   if (status === "published") {
-    if (project.User?.tipe === "dosen") {
+    const authorTipe = project.author_tipe || project.User?.tipe
+    if (authorTipe === "dosen") {
       await assertDosenSlot(project.category_id, project.id)
     } else {
       await assertMahasiswaSlot(project.category_id, project.id)
@@ -680,9 +698,17 @@ exports.createProject = async (data, user, imageUrls = [], documentUrls = []) =>
     )
   }
 
+  // Admin dapat menentukan tipe penulis karya (mahasiswa/dosen) lewat field
+  // author_tipe. Untuk selain admin, tipe penulis mengikuti tipe akun pembuat.
+  const declaredAuthorTipe = ["mahasiswa", "dosen"].includes(data.author_tipe)
+    ? data.author_tipe
+    : null
+  const authorTipe =
+    user.role === "admin" && declaredAuthorTipe ? declaredAuthorTipe : user.tipe
+
   // Karya dosen & karya lain ditampilkan di Hall dengan kapasitas 48 per
   // kategori. Kalau sudah penuh, karya baru ditolak dengan pemberitahuan.
-  if (user.tipe === "dosen") {
+  if (authorTipe === "dosen") {
     await assertDosenSlot(category_id)
   } else {
     await assertMahasiswaSlot(category_id)
@@ -706,6 +732,7 @@ exports.createProject = async (data, user, imageUrls = [], documentUrls = []) =>
         category_id,
         status: projectStatus,
         user_id: user.id,
+        author_tipe: user.role === "admin" ? declaredAuthorTipe : null,
       },
       { transaction: t },
     )
@@ -804,8 +831,17 @@ exports.updateProject = async (id, data, user) => {
     project.category_id = category_id ?? project.category_id
 
     if (user.role === "admin") {
+      // Admin bisa mengatur tipe penulis (mahasiswa/dosen) lewat author_tipe.
+      if (data.author_tipe !== undefined && data.author_tipe !== null && data.author_tipe !== "") {
+        if (!["mahasiswa", "dosen"].includes(data.author_tipe)) {
+          throw new AppError("Tipe penulis tidak valid", 400)
+        }
+        project.author_tipe = data.author_tipe
+      }
+
       if (status === "published") {
-        if (project.User?.tipe === "dosen") {
+        const authorTipe = project.author_tipe || project.User?.tipe
+        if (authorTipe === "dosen") {
           await assertDosenSlot(project.category_id, project.id)
         } else {
           await assertMahasiswaSlot(project.category_id, project.id)

@@ -29,6 +29,7 @@ export default function CategorySection() {
     setNotification,
     saving,
     deleting,
+    togglingId,
     buttonRef,
     panelRef,
     filtered,
@@ -39,6 +40,7 @@ export default function CategorySection() {
     handleOpenEdit,
     handleCloseForm,
     handleSave,
+    handleToggleActive,
     handleConfirmDelete,
   } = useManageCategories()
 
@@ -94,6 +96,8 @@ export default function CategorySection() {
           onShowAllToggle={() => setShowAll((prev) => !prev)}
           onEdit={handleOpenEdit}
           onDelete={(cat) => setDeleteTarget(cat)}
+          onToggleActive={handleToggleActive}
+          togglingId={togglingId}
         />
       </div>
 

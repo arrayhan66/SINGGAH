@@ -14,6 +14,8 @@ export default function CategoryContent({
   onShowAllToggle,
   onEdit,
   onDelete,
+  onToggleActive,
+  togglingId,
 }) {
   if (loading) {
     return <AdminCategoriesSkeleton />
@@ -51,6 +53,8 @@ export default function CategoryContent({
             cat={cat}
             onEdit={onEdit}
             onDelete={onDelete}
+            onToggleActive={onToggleActive}
+            toggling={togglingId === cat.id}
           />
         ))}
       </div>

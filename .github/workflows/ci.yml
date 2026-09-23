@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Env Publik yang sama untuk semua job
+env:
+  JWT_SECRET: ci_jwt_secret_key_123
+  EMAIL_USER: ci@singgah.test
+  EMAIL_PASSWORD: ci_email_pass_placeholder
+  CLOUDINARY_CLOUD_NAME: ci_placeholder
+  CLOUDINARY_API_KEY: "123456789012345"
+  CLOUDINARY_API_SECRET: ci_cloudinary_secret_placeholder
+
+jobs:
+  server:
+    name: Server (unit & integration test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    # Test memakai SQLite in-memory; var DB_* hanya agar config/env.js mau load.
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: "3306"
+      DB_NAME: singgah_ci
+      DB_USER: ci
+      DB_PASSWORD: ci
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install dependensi
+        # Konflik peer lama (multer-storage-cloudinary vs cloudinary) butuh legacy.
+        run: npm ci --legacy-peer-deps
+
+      - name: Test (Jest, SQLite in-memory)
+        run: npm test
+
+  client:
+    name: Client (lint & build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependensi
+        run: npm ci --no-audit --no-fund
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build

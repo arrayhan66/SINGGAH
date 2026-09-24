@@ -151,6 +151,12 @@ const USER_INCLUDE = {
   attributes: ["id", "name", "username", "nim_nip", "avatar", "tipe"],
 }
 
+// Tipe penulis efektif sebuah karya: field author_tipe (yang diatur admin)
+// menang; jika kosong, ikuti tipe akun pembuat. Konsisten dengan pengelompokan
+// hall (COALESCE(author_tipe, user.tipe)) di mana non-dosen = mahasiswa.
+const resolveAuthorType = (project) =>
+  (project.author_tipe || project.User?.tipe) === "dosen" ? "dosen" : "mahasiswa"
+
 const IMAGES_INCLUDE = {
   model: ProjectImage,
   as: "images",
@@ -492,11 +498,10 @@ exports.updateProjectStatus = async (id, status, reason = "") => {
 }
 
 // Set / hapus slot karya unggulan (1 atau 2) sebuah project.
-// Slot unggulan bersifat PER PORTAL (per kategori): satu portal hanya punya
-// slot 1 & 2. Satu slot hanya boleh ditempati satu project dalam kategori
-// yang sama, apa pun jenis authornya (mahasiswa/dosen), jadi begitu slot 2
-// sebuah portal terisi, karya lain di portal yang sama tidak bisa mengisinya
-// lagi sampai dilepas dulu.
+// Slot unggulan bersifat PER PORTAL (per kategori) DAN PER TIPE PENULIS:
+// satu portal punya slot 1 & 2 untuk karya mahasiswa, plus slot 1 & 2 untuk
+// karya dosen → hingga 4 karya unggulan per portal (2 mahasiswa + 2 dosen).
+// Slots mahasiswa tampil di podium lantai 1, slots dosen di lantai 2.
 exports.setProjectFeatured = async (id, slot = null) => {
   const where = /^\d+$/.test(String(id)) ? { id: Number(id) } : { slug: id }
   const project = await Project.findOne({
@@ -527,20 +532,30 @@ exports.setProjectFeatured = async (id, slot = null) => {
     throw new AppError("Slot unggulan harus 1 atau 2", 400)
   }
 
+  const authorTipe = resolveAuthorType(project)
+
   await sequelize.transaction(async (t) => {
     if (normalizedSlot !== null) {
-      const occupant = await Project.findOne({
+      const candidates = await Project.findAll({
         where: {
           featured_slot: normalizedSlot,
           category_id: project.category_id,
           id: { [Op.ne]: project.id },
         },
+        include: [{ model: User, attributes: ["id", "tipe"] }],
         transaction: t,
       })
 
+      // Satu slot per tipe penulis: karya dosen tidak bertabrakan dengan slot
+      // mahasiswa (dan sebaliknya), sehingga 2 dosen + 2 mahasiswa dapat
+      // menjadi unggulan dalam portal yang sama.
+      const occupant = candidates.find(
+        (p) => resolveAuthorType(p) === authorTipe,
+      )
+
       if (occupant) {
         throw new AppError(
-          `Slot ${normalizedSlot} pada portal kategori ini sudah terisi oleh karya "${occupant.title}". Lepas dulu karya tersebut dari unggulan sebelum mengisi slot ${normalizedSlot}.`,
+          `Slot ${normalizedSlot} untuk karya ${authorTipe} pada portal kategori ini sudah terisi oleh karya "${occupant.title}". Lepas dulu karya tersebut dari unggulan sebelum mengisi slot ${normalizedSlot}.`,
           409,
         )
       }

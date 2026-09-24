@@ -11,6 +11,13 @@ import DeleteConfirmModal from "../../../ui/DeleteConfirmModal"
 import ProjectDeletedModal from "../../../ui/ProjectDeletedModal"
 import toast from "../../../../utils/toast"
 
+// Tipe penulis efektif sebuah karya untuk cakupan slot unggulan:
+// author_tipe (diatur admin) menang; jika kosong ikuti tipe akun pembuat.
+const authorType = (p) =>
+  String(p.author_tipe || p.User?.tipe) === "dosen" ? "dosen" : "mahasiswa"
+const featuredScopeKey = (p) =>
+  `${String(p.category_id ?? p.Category?.id ?? "")}::${authorType(p)}`
+
 function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
   const navigate = useNavigate()
   const { projects, approveProject, rejectProject, deleteProject, setFeaturedSlot, setSlideshowVisible } = useProjects()
@@ -73,11 +80,11 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
     return groups
   }, [filteredProjects])
 
-  // Peta slot unggulan per PORTAL (kategori). Satu portal punya slot 1 & 2.
-// Dipakai untuk memblokir slot yang sudah terisi karya lain (harus dilepas
-// dulu). Hanya karya published yang dianggap mengisi slot, supaya karya yang
-// di-unpublish/ditolak tidak "menyandera" slot unggulan selamanya.
-  const featuredScopeKey = (p) => String(p.category_id ?? p.Category?.id ?? "")
+  // Peta slot unggulan per PORTAL (kategori) DAN PER TIPE PENULIS. Satu portal
+  // punya slot 1 & 2 untuk karya mahasiswa, plus slot 1 & 2 untuk karya dosen.
+  // Dipakai untuk memblokir slot yang sudah terisi karya lain (harus dilepas
+  // dulu). Hanya karya published yang dianggap mengisi slot, supaya karya yang
+  // di-unpublish/ditolak tidak "menyandera" slot unggulan selamanya.
 
   const featuredBySlot = useMemo(() => {
     const map = {}

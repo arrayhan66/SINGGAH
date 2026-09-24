@@ -49,8 +49,10 @@ const Project = sequelize.define(
       allowNull: true,
       defaultValue: null,
     },
-    // Karya unggulan di podium hall 3D. Hanya ada 2 slot (1 & 2),
-    // null berarti project tidak menjadi karya unggulan.
+    // Karya unggulan di podium hall 3D. Ada 2 slot (1 & 2) PER TIPE PENULIS
+    // dalam satu kategori → tiap portal bisa punya hingga 4 karya unggulan
+    // (2 mahasiswa + 2 dosen). Slot mahasiswa tampil di podium lantai 1,
+    // slot dosen di podium lantai 2. null berarti bukan karya unggulan.
     featured_slot: {
       type: DataTypes.TINYINT.UNSIGNED,
       allowNull: true,

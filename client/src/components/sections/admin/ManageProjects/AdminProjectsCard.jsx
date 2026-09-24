@@ -58,19 +58,27 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
   const StatusIcon = status.icon
   const categoryName = project.Category?.name || ""
 
-  // Slot unggulan bersifat per PORTAL (kategori): okupasi dihitung dari semua
-  // karya dalam kategori yang sama, apa pun jenis author (mahasiswa/dosen).
-  const scopeKey = String(project.category_id ?? project.Category?.id ?? "")
+  // Slot unggulan bersifat per PORTAL (kategori) DAN PER TIPE PENULIS:
+  // okupasi dihitung dari karya dengan tipe yang sama (mahasiswa/dosen)
+  // dalam kategori yang sama, sehingga tiap portal bisa punya 2 unggulan
+  // mahasiswa + 2 unggulan dosen (maks 4).
+  const authorType = String(project.author_tipe || project.User?.tipe) === "dosen" ? "dosen" : "mahasiswa"
+  const scopeKey = `${String(project.category_id ?? project.Category?.id ?? "")}::${authorType}`
   const scopedFeatured = featuredBySlot?.[scopeKey] || {}
 
   const PANEL_WIDTH = 224
 
-  function computeMenuPos(ref = starBtnRef) {
+  function computeMenuPos(ref = starBtnRef, width = PANEL_WIDTH) {
     const rect = ref.current?.getBoundingClientRect()
     if (!rect) return null
+    const vw = window.innerWidth || document.documentElement.clientWidth
     return {
       top: Math.max(8, rect.bottom + 8),
-      left: Math.max(8, rect.right - PANEL_WIDTH + 14),
+      // Jaga panel tetap di dalam layar (di layar kecil 260px maupun besar 4K)
+      left: Math.max(
+        8,
+        Math.min(rect.right + 8, Math.max(8, vw - width - 8)),
+      ),
     }
   }
 
@@ -190,7 +198,7 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
                       }}
                     />
                     <div
-                      className="card-featured-menu card-featured-menu-portal fixed w-56 overflow-hidden rounded-2xl border border-cyan-400/25 bg-gradient-to-b from-[#0d1f3c] via-[#0b1628] to-[#081020] shadow-[0_18px_50px_-12px_rgba(34,211,238,0.35),0_12px_32px_-14px_rgba(0,0,0,0.85)] ring-1 ring-white/5 backdrop-blur-xl"
+                      className="card-featured-menu card-featured-menu-portal fixed w-[min(14rem,calc(100vw-2.5rem))] overflow-hidden rounded-2xl border border-cyan-400/25 bg-gradient-to-b from-[#0d1f3c] via-[#0b1628] to-[#081020] shadow-[0_18px_50px_-12px_rgba(34,211,238,0.35),0_12px_32px_-14px_rgba(0,0,0,0.85)] ring-1 ring-white/5 backdrop-blur-xl"
                       onMouseDown={(e) => e.stopPropagation()}
                       onClick={(e) => e.stopPropagation()}
                       style={{
@@ -207,11 +215,9 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
                           Karya Unggulan
                         </p>
                       </div>
-                      {categoryName && (
-                        <span className="max-w-[108px] truncate rounded-full border border-white/5 bg-white/5 px-2 py-0.5 text-[9px] font-semibold text-slate-300">
-                          {categoryName}
-                        </span>
-                      )}
+                      <span className={`shrink-0 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${authorType === "dosen" ? "border border-blue-400/30 bg-blue-500/15 text-blue-300" : "border border-emerald-400/30 bg-emerald-500/15 text-emerald-300"}`}>
+                        {authorType}
+                      </span>
                     </div>
                     <div className="mx-3 h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent" />
                     <div className="py-1">
@@ -232,7 +238,7 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
                             setFeaturedMenuOpen(false)
                             if (occupiedByOther) {
                               toast.show(
-                                `Slot ${slot} portal ini sudah terisi karya "${occupant.title}". Lepas dulu karya tersebut dari unggulan sebelum mengisi slot ${slot}.`,
+                                `Slot ${slot} untuk karya ${authorType} portal ini sudah terisi karya "${occupant.title}". Lepas dulu karya tersebut dari unggulan sebelum mengisi slot ${slot}.`,
                                 "error",
                               )
                               return
@@ -254,7 +260,7 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
                           }`}
                           title={
                             occupiedByOther
-                              ? `Slot ${slot} portal ini sudah terisi oleh "${occupant.title}". Lepas dulu karya tersebut dari unggulan untuk mengisi slot ${slot}.`
+                              ? `Slot ${slot} untuk karya ${authorType} portal ini sudah terisi oleh "${occupant.title}". Lepas dulu karya tersebut dari unggulan untuk mengisi slot ${slot}.`
                               : isCurrentSlot
                                 ? "Karya ini sedang menjadi unggulan slot ini"
                                 : `Jadikan karya ini unggulan slot ${slot}`
@@ -312,9 +318,9 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
                         String(scopedFeatured[slot].id) !== String(project.id),
                     ) && (
                       <p className="border-t border-blue-500/30 px-3 py-2 text-[10px] leading-relaxed text-red-300/90">
-                        Slot 1 &amp; 2 portal ini sudah penuh. Buka karya
-                        pengisi slot lalu pilih "Lepas dari Unggulan" untuk
-                        mengosongkannya.
+                        Slot 1 &amp; 2 karya {authorType} portal ini sudah
+                        penuh. Buka karya pengisi slot lalu pilih "Lepas dari
+                        Unggulan" untuk mengosongkannya.
                       </p>
                     )}
                     {project.featured_slot && (

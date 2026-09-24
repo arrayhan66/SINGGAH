@@ -1,0 +1,325 @@
+/* ===== MY KARYA STATS CARDS — DARK MODE (khas & hidup) ===== */
+/* Atur ulang kartu GlassCard pada grid statistik agar tampil lebih
+   hidup: slab bawah, glasir gradasi status di tepi, dan bukan
+   sekadar kotak biasa. */
+.user-page div.mt-8.grid.grid-cols-1.gap-4 {
+  position: relative;
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl {
+  position: relative;
+  overflow: hidden;
+  background-color: #0e2740;
+  background-image: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.02) 50%,
+    rgba(6, 182, 212, 0.04) 100%
+  );
+  border-color: #4a7ab5;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 14px 30px -12px rgba(0, 0, 0, 0.45);
+  transition:
+    transform 0.35s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 20px 36px -14px rgba(0, 0, 0, 0.5);
+  border-color: #5c90c8;
+}
+
+/* Glare di kanan atas kartu stat (sentuhan "kaca" agar tidak doyong) */
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 46%;
+  height: 100%;
+  background: radial-gradient(
+    120% 90% at 100% 0%,
+    rgba(34, 211, 238, 0.1) 0%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Pita aksen status di tepi atas kartu + watermark ikon besar */
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div.rounded-3xl .stats-accent {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  border-radius: 9999px 9999px 0 0;
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div:nth-child(1) .stats-accent {
+  background: linear-gradient(90deg, #22d3ee, #2563eb);
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div:nth-child(2) .stats-accent {
+  background: linear-gradient(90deg, #fbbf24, #d97706);
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div:nth-child(3) .stats-accent {
+  background: linear-gradient(90deg, #34d399, #059669);
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div:nth-child(4) .stats-accent {
+  background: linear-gradient(90deg, #f87171, #dc2626);
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 > div.rounded-3xl .stats-watermark {
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 64px;
+  height: 64px;
+}
+
+
+/* Kotak ikon status — tile transparan lembut (DARK MODE).
+   Supaya terlihat alami & mahal: latar tipis warna status + ikon
+   berwarna lembut, tanpa gradasi keras yang terkesan "buatan AI". */
+.user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(1) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 {
+  background-color: rgba(6, 182, 212, 0.12);
+  background-image: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(2) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 {
+  background-color: rgba(251, 191, 36, 0.12);
+  background-image: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(3) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 {
+  background-color: rgba(52, 211, 153, 0.12);
+  background-image: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(4) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 {
+  background-color: rgba(248, 113, 113, 0.12);
+  background-image: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Watermark ikon: warna status sesuai kartu, tampil lebih jelas */
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(1) div.rounded-3xl .stats-watermark {
+  color: #0891b2;
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(2) div.rounded-3xl .stats-watermark {
+  color: #b45309;
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(3) div.rounded-3xl .stats-watermark {
+  color: #047857;
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(4) div.rounded-3xl .stats-watermark {
+  color: #b91c1c;
+}
+
+/* ===== MY KARYA STATS CARDS — LIGHT MODE ===== */
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 > div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl {
+  background-color: #ffffff;
+  background-image: linear-gradient(
+    145deg,
+    #ffffff 0%,
+    #f4f9ff 55%,
+    #eef5ff 100%
+  );
+  border-color: #c7dcfc;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    0 16px 32px -14px rgba(30, 64, 175, 0.28);
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 > div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    0 22px 40px -16px rgba(30, 64, 175, 0.32);
+  border-color: #a9c8f5;
+}
+
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 > div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl::after {
+  background: radial-gradient(
+    120% 90% at 100% 0%,
+    rgba(34, 211, 238, 0.12) 0%,
+    rgba(255, 255, 255, 0) 60%
+  );
+}
+
+/* Teks stat di light mode: angka & label gelap agar terbaca di kartu putih */
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div.rounded-3xl p.font-extrabold {
+  color: #0f172a;
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div.rounded-3xl p.font-semibold {
+  color: #334155;
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div.rounded-3xl p.text-slate-500 {
+  color: #64748b;
+}
+
+/* ===== MY KARYA STATS ICON COLOR ACCENTS (LIGHT MODE ONLY) ===== */
+/* Tile ikon transparan lembut warna status, senada theme terang.
+   Ikon warna status gelap pekat agar kontras di latar putih. */
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(1) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 {
+  background-image: none;
+  background-color: rgba(6, 182, 212, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(2) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 {
+  background-image: none;
+  background-color: rgba(251, 191, 36, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(3) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 {
+  background-image: none;
+  background-color: rgba(52, 211, 153, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(4) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 {
+  background-image: none;
+  background-color: rgba(248, 113, 113, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+/* Ikon pakai warna status pekat agar tetap terbaca di light mode */
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(1) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 svg {
+  color: #0891b2 !important;
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(2) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 svg {
+  color: #b45309 !important;
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(3) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 svg {
+  color: #047857 !important;
+}
+html.light .user-page div.mt-8.grid.grid-cols-1.gap-4 div:nth-child(4) .flex.h-10.w-10.shrink-0.items-center.justify-center.rounded-xl.bg-white\/5 svg {
+  color: #b91c1c !important;
+}
+
+/* ===== EDIT KARYA TITLE GRADIENT SINGLE COLOR FIX (LIGHT MODE ONLY) ===== */
+html.light .user-page h1 span.bg-gradient-to-r.from-cyan-300 {
+  color: #404040;
+}
+
+/* Kartu daftar karya (MyKaryaCard) di light mode: 3D slab */
+html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl {
+  background-image:
+    linear-gradient(135deg, rgba(6, 182, 212, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%),
+    linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%);
+  background-color: #ffffff;
+  border-color: #c7dcfc;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    0 7px 0 #7fb1f5,
+    0 12px 26px -10px rgba(30, 64, 175, 0.35),
+    0 22px 44px -18px rgba(37, 99, 235, 0.28);
+}
+
+/* Tombol Edit & Hapus di MyKaryaCard (Light Mode -> Flat) */
+html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.rounded-xl {
+  background-image: none !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: none !important;
+}
+html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.rounded-xl::before {
+  display: none !important;
+}
+html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.rounded-xl:hover {
+  background-color: #f1f5f9 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Tombol Edit MyKaryaCard di Light Mode -> gradasi biru-cyan
+   selaras dengan tombol "Upload Karya Baru" (bukan flat putih). */
+html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.bg-white {
+  background-color: transparent !important;
+  background-image: linear-gradient(90deg, #2563eb, #0ea5e9, #2563eb) !important;
+  background-size: 200% 100% !important;
+  background-position: 0 0 !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.22), 0 4px 6px -4px rgba(37, 99, 235, 0.14) !important;
+}
+html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.bg-white:hover {
+  background-position: 100% 0 !important;
+  border-color: transparent !important;
+  box-shadow: 0 14px 24px -6px rgba(37, 99, 235, 0.35), 0 4px 8px -4px rgba(37, 99, 235, 0.22) !important;
+}
+
+/* Tombol Hapus khusus merah di Light Mode (Flat) */
+html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.bg-red-500 {
+  background-image: none !important;
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.bg-red-500::before {
+  display: none !important;
+}
+html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.bg-red-500:hover {
+  background-color: #dc2626 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+html.light .user-page .focus-within\:shadow-cyan-400\/30:focus-within {
+  box-shadow:
+    0 14px 28px -10px rgba(37, 99, 235, 0.38),
+    0 6px 12px -6px rgba(37, 99, 235, 0.22) !important;
+}
+html.light .user-page .group:focus-within svg {
+  color: #2563eb;
+}
+html.light .user-page .group:focus-within button.bg-red-500 svg {
+  color: #ffffff;
+}
+
+/* ===== FILTER KARYA SAYA (cari + status) DI HEADER — LIGHT ===== */
+/* Search bar & dropdown status diubah jadi putih/terang di light mode */
+html.light .user-page div.group.flex.flex-1 {
+  background-color: #ffffff !important;
+  border-color: #dbe3ee !important;
+  box-shadow:
+    inset 0 1px 2px rgba(15, 23, 42, 0.04),
+    0 4px 16px -8px rgba(15, 23, 42, 0.12);
+}
+html.light .user-page div.group.flex.flex-1 input {
+  color: #1b2a4a;
+}
+html.light .user-page div.group.flex.flex-1 input::placeholder {
+  color: #94a3b8;
+}
+/* Tombol dropdown status (filter) di light mode */
+html.light .user-page div.relative.min-w-0 button.rounded-xl.border-2.border-white\/60.bg-white\/90 {
+  background-color: #ffffff !important;
+  border-color: #dbe3ee !important;
+  color: #1b2a4a;
+  box-shadow:
+    inset 0 1px 2px rgba(15, 23, 42, 0.04),
+    0 4px 16px -8px rgba(15, 23, 42, 0.12);
+}
+html.light .user-page div.relative.min-w-0 button.rounded-xl.border-2.border-white\/60.bg-white\/90 svg {
+  color: #64748b;
+}
+/* Menu dropdown status (popup) di light mode -> putih */
+html.light .user-page div.absolute.left-0.z-30.mt-2.w-\[220px\].overflow-hidden.rounded-xl.border-2.border-white\/10.bg-slate-900\/95 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 20px 40px -14px rgba(30, 64, 175, 0.28);
+}
+html.light .user-page div.absolute.left-0.z-30.mt-2.w-\[220px\].overflow-hidden.rounded-xl.border-2.border-white\/10.bg-slate-900\/95 button.text-slate-300 {
+  color: #475569;
+}
+html.light .user-page div.absolute.left-0.z-30.mt-2.w-\[220px\].overflow-hidden.rounded-xl.border-2.border-white\/10.bg-slate-900\/95 button.text-slate-300:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+html.light .user-page div.absolute.left-0.z-30.mt-2.w-\[220px\].overflow-hidden.rounded-xl.border-2.border-white\/10.bg-slate-900\/95 button.bg-cyan-400\/10 {
+  color: #0891b2;
+}
+html.light .user-page .focus-within\:border-cyan-400:focus-within {
+  border-color: #93c5fd !important;
+}
+

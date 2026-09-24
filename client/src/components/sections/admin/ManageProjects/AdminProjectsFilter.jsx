@@ -72,7 +72,7 @@ function AdminProjectsFilter({
 
   return (
     <>
-      <div className="relative w-full min-[600px]:hidden">
+      <div className="relative w-full md:w-80 min-[900px]:hidden">
         <button
           ref={buttonRef}
           type="button"
@@ -151,7 +151,7 @@ function AdminProjectsFilter({
           )}
       </div>
 
-      <div className="hidden min-[600px]:grid w-full grid-cols-2 gap-1.5 rounded-xl border border-white/10 bg-white/5 p-1.5 min-[630px]:flex min-[630px]:w-fit min-[630px]:flex-wrap min-[630px]:items-center min-[630px]:gap-1 min-[630px]:p-1">
+      <div className="hidden min-[900px]:flex min-[900px]:w-fit min-[900px]:flex-wrap min-[900px]:items-center min-[900px]:gap-1 min-[900px]:p-1 rounded-xl border border-white/10 bg-white/5">
         {tabs.map((tab) => {
           const Icon = tab.icon
           const isActive = statusFilter === tab.value
@@ -162,22 +162,22 @@ function AdminProjectsFilter({
               key={tab.value}
               type="button"
               onClick={() => onStatusChange(tab.value)}
-              className={`inline-flex min-w-0 cursor-pointer items-center justify-between gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-cyan-400/40 focus-visible:outline-none min-[630px]:justify-center min-[630px]:gap-1.5 min-[630px]:px-3 min-[630px]:py-1.5 min-[630px]:text-xs ${
+              className={`inline-flex min-w-0 cursor-pointer items-center justify-between gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-cyan-400/40 focus-visible:outline-none min-[900px]:justify-center min-[900px]:gap-1.5 min-[900px]:px-3 min-[900px]:py-1.5 min-[900px]:text-xs ${
                 isActive
                   ? "bg-gradient-to-r from-cyan-500/25 to-blue-500/25 text-white shadow-sm ring-1 ring-cyan-400/30"
                   : "text-slate-400 hover:bg-white/[0.06] hover:text-white"
               }`}
               aria-pressed={isActive}
             >
-              <span className="flex min-w-0 items-center gap-2 min-[630px]:gap-1.5">
+              <span className="flex min-w-0 items-center gap-2 min-[900px]:gap-1.5">
                 <Icon
-                  className={`h-4 w-4 shrink-0 transition-colors duration-200 min-[630px]:h-3.5 min-[630px]:w-3.5 ${isActive ? "text-cyan-300" : "text-slate-500"}`}
+                  className={`h-4 w-4 shrink-0 transition-colors duration-200 min-[900px]:h-3.5 min-[900px]:w-3.5 ${isActive ? "text-cyan-300" : "text-slate-500"}`}
                 />
                 {tab.label}
               </span>
               {count !== undefined && (
                 <span
-                  className={`rounded-full px-2 py-0.5 text-[11px] tabular-nums min-[630px]:px-1.5 min-[630px]:text-[10px] ${
+                  className={`rounded-full px-2 py-0.5 text-[11px] tabular-nums min-[900px]:px-1.5 min-[900px]:text-[10px] ${
                     isActive
                       ? "bg-cyan-500/25 text-cyan-300"
                       : "bg-white/[0.07] text-slate-400"

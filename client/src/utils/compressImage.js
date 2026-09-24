@@ -1,17 +1,22 @@
 export async function compressImage(file, { maxWidth = 800, maxHeight = 800, quality = 0.85, maxSize = 2 * 1024 * 1024 } = {}) {
   if (!file || !file.type || !file.type.startsWith("image/")) return file
 
-  if (file.size <= maxSize) {
-    const isSmallEnough =
-      file.type === "image/jpeg" ||
-      file.type === "image/png" ||
-      file.type === "image/webp"
-    if (isSmallEnough) return file
-  }
-
   try {
     const bitmap = await createImageBitmap(file)
     const { width, height } = bitmap
+
+    if (
+      width <= maxWidth &&
+      height <= maxHeight &&
+      file.size <= maxSize &&
+      (file.type === "image/jpeg" ||
+        file.type === "image/png" ||
+        file.type === "image/webp")
+    ) {
+      bitmap.close()
+      return file
+    }
+
     const scale = Math.min(1, maxWidth / width, maxHeight / height)
     const w = Math.max(1, Math.round(width * scale))
     const h = Math.max(1, Math.round(height * scale))

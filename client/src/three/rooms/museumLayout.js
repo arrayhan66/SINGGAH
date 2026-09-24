@@ -1,17 +1,6 @@
 import { useQualityStore } from "../hooks/useQuality"
 import { markSceneDirty } from "../utils/sceneColliders"
 
-export const DEFAULT_CATEGORIES = [
-  { slug: "website", title: "Website" },
-  { slug: "mobile-app", title: "Mobile App" },
-  { slug: "iot", title: "IoT" },
-  { slug: "artificial-intelligence", title: "Artificial Intelligence" },
-  { slug: "data-science", title: "Data Science" },
-  { slug: "cyber-security", title: "Cyber Security" },
-  { slug: "ui-ux-design", title: "UI/UX Design" },
-  { slug: "game-development", title: "Game Development" },
-]
-
 // Persisted copy of the last applied category list, so a fresh page load starts
 // from the real /hall state instead of the 8 seeded defaults. Without this, the
 // first paint (and any network hiccup) would briefly show the default layout
@@ -110,7 +99,7 @@ const UPPER_BANDS = [
 // the values consumers hold references to, so they are mutated IN PLACE (never
 // reassigned) to keep every importer (LookControls, collision caches, …) in
 // sync without re-importing.
-let curCategories = storedCategories() || DEFAULT_CATEGORIES.map((c) => ({ slug: c.slug, title: c.title, color: null }))
+let curCategories = storedCategories() || []
 let layoutKey = curCategories.map((c) => `${c.slug}|${c.title}`).join("\u0001")
 let N = curCategories.length
 let ROW_X0 = -(N * ROOM_W) / 2
@@ -785,7 +774,7 @@ export function setHallCategories(categories = []) {
     .map((c) => ({ slug: c.slug, title: c.name || c.title || c.slug, color: c.color || null }))
 
   // List kosong dari server = SEMUA kategori nonaktif/terhapus → hall dibangun
-  // kosong, bukan diisi ulang DEFAULT_CATEGORIES (mencegah "gedung hantu").
+  // kosong, bukan diisi ulang dari daftar default (mencegah "gedung hantu").
   const cats = list
 
   const key = cats.map((c) => `${c.slug}|${c.title}`).join("\u0001")
@@ -797,7 +786,7 @@ export function setHallCategories(categories = []) {
   markSceneDirty()
 
   // Remember the live list so the next page load seeds the hall at the correct
-  // size immediately (no flash of the 8 seeded defaults).
+  // size immediately (no flash of a stale default).
   try {
     localStorage.setItem(
       CATEGORIES_STORAGE_KEY,
@@ -809,6 +798,7 @@ export function setHallCategories(categories = []) {
   return true
 }
 
-// Initial default layout (8 seeded categories) so anything importing the layout
-// straight away (spawn, bounds, useWalk, …) sees a coherent hall.
+// Initial layout built from the persisted category list (empty until /hall
+// responds) so anything importing the layout straight away (spawn, bounds,
+// useWalk, …) sees a coherent hall.
 buildLayout()

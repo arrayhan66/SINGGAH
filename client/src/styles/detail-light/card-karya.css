@@ -1,0 +1,257 @@
+/* ===== CARD KARYA (KaryaProjectCard) =====
+   Nuansa 3D fisik senada card kategori di menu Karya:
+   muka putih, slab bawah biru, highlight tepi atas, bayangan
+   arah-cahaya (sedikit asimetris -> terlihat natural/fotografis).
+   ANIMASI = PERSIS DARK MODE: transisi bawaan utilitas Tailwind
+   (duration-300 + hover:-translate-y-3) tidak dioverride sama sekali,
+   di sini hanya muka warna & bayangan yang diganti */
+
+/* Muka card: permukaan putih dengan gradasi halus + slab bawah.
+   Bayangan utama digeser sedikit ke kanan-bawah + bayangan sekunder
+   lembut di kiri (cahaya dari kiri-atas) supaya tidak kaku seragam */
+html.light
+  .karya-detail-page
+  div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl.group {
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f5f9fe 100%);
+  border-color: #d3e2f8;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    0 6px 0 #a9caf7,
+    14px 20px 36px -18px rgba(30, 64, 175, 0.34),
+    -8px 12px 26px -18px rgba(15, 23, 42, 0.12);
+}
+
+/* Hover: hanya warna border + bayangan yang menguat; terangkatnya
+   tetap dari utilitas hover:-translate-y-3 yang sama dengan dark mode */
+html.light
+  .karya-detail-page
+  div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl.group:hover {
+  background-color: #ffffff;
+  border-color: #b7d3fa;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    0 9px 0 #86b5f4,
+    18px 28px 46px -20px rgba(30, 64, 175, 0.42),
+    -10px 16px 32px -18px rgba(15, 23, 42, 0.14);
+}
+
+/* Gambar project: TATA LETAK PERSIS DARK MODE (full-bleed menempel
+   ke tepi card, tanpa margin/bingkai) — hanya overlay di bawah yang
+   dinetralkan warnanya agar tidak muram di atas card putih */
+html.light
+  .karya-detail-page
+  div.rounded-3xl.border-white\/10.bg-white\/5.backdrop-blur-xl.group
+  > div.relative.overflow-hidden
+  > div.absolute.inset-0.bg-gradient-to-t {
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 62%,
+    rgba(37, 99, 235, 0.1) 100%
+  );
+}
+
+/* Badge kategori di atas gambar: gradasi cyan -> biru + teks putih,
+   senada tombol "Lihat Karya" */
+html.light .karya-detail-page span.rounded-full.bg-brand-navy\/80.text-cyan-300 {
+  background-color: #2563eb;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+}
+
+/* Tombol bookmark di atas gambar: gradasi sama + ikon putih */
+html.light .karya-detail-page button.rounded-full.bg-brand-navy\/80.text-slate-200 {
+  background-color: #2563eb;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+}
+/* Hover bookmark jelas terlihat: gradasi meredup, terangkat + glow biru */
+html.light .karya-detail-page button.rounded-full.bg-brand-navy\/80.hover\:border-cyan-400\/30:hover {
+  border-color: rgba(255, 255, 255, 0.85);
+  background-color: #1d4ed8;
+  background-image: linear-gradient(to bottom right, #06b6d4, #1d4ed8);
+  box-shadow: 0 8px 18px -6px rgba(37, 99, 235, 0.6);
+  transform: translateY(-1px) scale(1.07);
+}
+html.light .karya-detail-page button.rounded-full.bg-brand-navy\/80.hover\:text-cyan-300:hover {
+  color: #ffffff;
+}
+/* State tersimpan: ikon putih penuh biar jelas di atas gradasi */
+html.light .karya-detail-page button.rounded-full.bg-brand-navy\/80 svg.text-cyan-400 {
+  color: #ffffff;
+  fill: #ffffff;
+}
+
+/* Nama project di card: hitam lembut #404040 persis judul
+   "SINGGAH SEJENAK" & nama kategori di menu Karya.
+   Ditaruh setelah rule h3.text-white .detail-page agar menang. */
+html.light .karya-detail-page h3.text-white {
+  background-image: none;
+  color: #404040;
+}
+
+/* Garis pemisah statistik (like/komentar/views): tipis kebiruan,
+   menyatu dengan border bingkai gambar */
+html.light .karya-detail-page .border-t.border-slate-700\/50 {
+  border-color: #b8c7de;
+}
+
+/* Garis pemisah antar section card project detail (Tim Pengembang,
+   Teknologi yang Digunakan, dst.) -> dipertegas supaya jelas
+   terlihat di atas permukaan putih */
+html.light .karya-projectdetail-page .border-t.border-white\/10 {
+  border-color: #b3c6e0;
+}
+/* Garis di bawah tombol aksi (Suka / Bagikan / Simpan) -> dipertegas */
+html.light .karya-projectdetail-page .border-b.border-white\/10 {
+  border-color: #a8c0e0;
+}
+/* Card Komentar: tepi biru lebih tegas sebagai pembatas antar section */
+html.light .karya-projectdetail-page #komentar {
+  border-color: #a2c1e9;
+}
+
+/* Tombol "Lihat Detail": DATAR dengan WARNA ASLI (gradasi cyan ->
+   biru persis tombol "Lihat Karya"). Animasi smooth: gradasi hover
+   di-crossfade lewat ::before dengan timing 0.3s = duration-300
+   Tailwind supaya karakter geraknya sama seperti dark mode */
+html.light .karya-detail-page a.bg-white.text-slate-900 {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: #2563eb;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  color: #ffffff;
+}
+html.light .karya-detail-page a.bg-white.text-slate-900::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(to bottom right, #06b6d4, #1d4ed8);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+html.light .karya-detail-page a.hover\:bg-slate-200:hover {
+  background-color: transparent;
+  color: #ffffff;
+}
+html.light .karya-detail-page a.hover\:bg-slate-200:hover::before {
+  opacity: 1;
+}
+
+/* Tombol "Lihat Lebih Banyak": slab mini PERSIS tombol "Lihat Detail"
+   supaya bawah grid menyatu dengan bahasa 3D card */
+/* Dicegah: rule dark-mode global-light me-recolor tombol outline memberi
+   border biru teks biru; DI SINI dark mode justru mau muka putih seperti
+   "Lihat Lebih Banyak" di halaman Karya. Ditaruh NON-light scoped
+   .karya-detail-page biar menang di dark mode juga. */
+.karya-detail-page
+  button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10 {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: transparent;
+  background-color: transparent;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+  color: #0f172a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 3px 0 #02111f,
+    0 10px 18px -10px rgba(2, 8, 23, 0.55);
+  transition:
+    transform 0.35s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.35s cubic-bezier(0.33, 1, 0.68, 1);
+}
+.karya-detail-page
+  button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(180deg, #f1f5f9 0%, #cbd5e1 100%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.karya-detail-page
+  button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 5px 0 #02111f,
+    0 14px 22px -10px rgba(2, 8, 23, 0.6);
+}
+.karya-detail-page
+  button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10:hover::before {
+  opacity: 1;
+}
+.karya-detail-page
+  button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10:active {
+  transform: translateY(1px);
+  transition-duration: 0.12s;
+  box-shadow:
+    inset 0 2px 4px rgba(2, 8, 23, 0.45),
+    0 1px 0 #02111f,
+    0 4px 10px -6px rgba(2, 8, 23, 0.5);
+}
+html.light
+  .karya-detail-page
+  button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10 {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: transparent;
+  background-color: transparent;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  color: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 3px 0 #1d4ed8,
+    0 9px 16px -8px rgba(29, 78, 216, 0.45);
+  transition:
+    transform 0.35s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.35s cubic-bezier(0.33, 1, 0.68, 1);
+}
+html.light
+  .karya-detail-page
+  button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(to bottom right, #06b6d4, #1d4ed8);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+html.light
+  .karya-detail-page
+  button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10:hover {
+  background-color: transparent;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 5px 0 #1d4ed8,
+    0 14px 22px -10px rgba(29, 78, 216, 0.55);
+}
+html.light
+  .karya-detail-page
+  button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10:hover::before {
+  opacity: 1;
+}
+html.light
+  .karya-detail-page
+  button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10:active {
+  transform: translateY(1px);
+  transition-duration: 0.12s;
+  box-shadow:
+    inset 0 2px 4px rgba(29, 78, 216, 0.35),
+    0 1px 0 #1d4ed8,
+    0 4px 10px -6px rgba(29, 78, 216, 0.4);
+}
+

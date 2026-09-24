@@ -1,0 +1,140 @@
+/* ===== LONCENG/MODAL NOTIFIKASI ===== */
+/* Tombol aksi utama modal detail notif: gradasi biru + teks putih
+   di light mode (dark mode tetap teks brand-dark di atas cyan) */
+html.light .notification-detail-cta {
+  color: #ffffff;
+}
+
+/* Tile ikon tipe notifikasi di light mode:
+   gaya dark (gradasi + ring + glow) diganti permukaan putih besih
+   agar tidak "bawa gaya dark" ke mode terang. Ikon tetap berwarna. */
+html.light .notification-type-tile {
+  background: linear-gradient(160deg, #ffffff 0%, #eff5fc 100%);
+  border: 1px solid #dbe6f6;
+  box-shadow: 0 4px 12px -6px rgba(37, 99, 235, 0.22);
+}
+html.light .notification-type-tile svg {
+  filter: none;
+}
+
+/* ===== TINT STATUS (toast, badge, alert) ===== */
+html.light .bg-emerald-500\/10 {
+  background-color: #ecfdf5;
+}
+html.light .bg-emerald-500\/20 {
+  background-color: #d1fae5;
+}
+html.light .bg-red-500\/10 {
+  background-color: #fef2f2;
+}
+html.light .bg-red-500\/20 {
+  background-color: #fee2e2;
+}
+html.light .text-emerald-300,
+html.light .text-emerald-400 {
+  color: #047857;
+}
+html.light .border-emerald-500\/30 {
+  border-color: #a7f3d0;
+}
+/* Tombol pengumuman (admin) */
+html.light .bg-amber-400\/10 {
+  background-color: #fffbeb;
+}
+html.light .hover\:bg-amber-400\/20:hover {
+  background-color: #fef3c7;
+}
+html.light .text-amber-300 {
+  color: #b45309;
+}
+/* Fraksi amber/emerald/red lain (banner, tombol aksi admin, chip) */
+html.light .bg-amber-500\/10 {
+  background-color: #fffbeb;
+}
+html.light .bg-amber-500\/20 {
+  background-color: #fef3c7;
+}
+html.light .hover\:bg-amber-500\/30:hover {
+  background-color: #fde68a;
+}
+html.light .text-amber-100 {
+  color: #92400e;
+}
+html.light .bg-emerald-500\/5,
+html.light .bg-emerald-500\/\[0\.06\] {
+  background-color: #ecfdf5;
+}
+html.light .bg-emerald-500\/15 {
+  background-color: #d1fae5;
+}
+html.light .bg-red-500\/5,
+html.light .bg-red-500\/\[0\.06\] {
+  background-color: #fef2f2;
+}
+html.light .bg-red-500\/15 {
+  background-color: #fee2e2;
+}
+
+/* ===== PERMUKAAN TRANSLUCENT -> OFF-WHITE ===== */
+html.light .bg-white\/5 {
+  background-color: #fbfcfe;
+}
+html.light .bg-white\/10 {
+  background-color: #f4f8fd;
+}
+html.light .bg-white\/\[0\.02\],
+html.light .bg-white\/\[0\.03\],
+html.light .bg-white\/\[0\.04\],
+html.light .bg-white\/\[0\.05\],
+html.light .bg-white\/\[0\.06\],
+html.light .bg-white\/\[0\.07\],
+html.light .bg-white\/\[0\.08\],
+html.light .bg-white\/\[0\.09\] {
+  background-color: #f8fafc;
+}
+html.light .bg-white\/\[0\.1\] {
+  background-color: #f4f8fd;
+}
+html.light .focus\:bg-white\/\[0\.07\]:focus {
+  background-color: #ffffff;
+}
+html.light .hover\:bg-white\/\[0\.02\]:hover,
+html.light .hover\:bg-white\/\[0\.04\]:hover,
+html.light .hover\:bg-white\/\[0\.06\]:hover,
+html.light .hover\:bg-white\/\[0\.08\]:hover,
+html.light .hover\:bg-white\/\[0\.1\]:hover,
+html.light .hover\:bg-white\/5:hover {
+  background-color: #edf3fb;
+}
+html.light .hover\:bg-white\/10:hover {
+  background-color: #e7eff9;
+}
+html.light .bg-slate-800\/50,
+html.light .bg-slate-800\/60,
+html.light .bg-slate-800\/80 {
+  background-color: #fbfcfe;
+}
+html.light .bg-slate-900\/50,
+html.light .bg-slate-900\/60,
+html.light .bg-slate-900\/80,
+html.light .bg-black\/20,
+html.light .bg-black\/30 {
+  background-color: #f1f5fa;
+}
+
+/* ===== BORDER NETRAL ===== */
+html.light .border-white\/10 {
+  border-color: #e2e8f0;
+}
+html.light .border-white\/15,
+html.light .border-white\/20 {
+  border-color: #dce5f1;
+}
+html.light .border-white\/25,
+html.light .border-white\/30 {
+  border-color: #d6e0ef;
+}
+html.light .divide-white\/10 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #e9eff8;
+}
+

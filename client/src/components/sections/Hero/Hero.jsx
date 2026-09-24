@@ -26,7 +26,7 @@ function Hero() {
       <DustBackground color={isDark ? "#7dd3fc" : "#2563eb"} />
 
       {/* Class lg:items-start dihapus, jadi items-center berlaku untuk desktop juga biar sejajar */}
-      <div className="relative z-10 mx-auto flex lg:min-h-screen max-w-[1700px] w-full flex-col items-center px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-[calc(var(--navbar-h)+24px)] pb-6 lg:pb-12">
+      <div className="relative z-10 mx-auto flex lg:min-h-screen max-w-[1700px] w-full flex-col items-center px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+20px)] lg:pt-[calc(var(--navbar-h)+32px)] pb-6 lg:pb-12">
         <div className="flex w-full min-w-0 flex-none lg:flex-1 flex-col lg:flex-row lg:flex-wrap items-center lg:justify-between">
         <div className="flex w-full flex-col items-center text-center md:max-w-2xl md:mx-auto lg:max-w-xl 2xl:max-w-2xl lg:mx-0 lg:items-start lg:text-left lg:w-auto lg:flex-1 lg:min-w-0">
           <div className="inline-flex items-center gap-2 min-[350px]:gap-3 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 min-[350px]:px-4 py-2 backdrop-blur-md">
@@ -58,7 +58,7 @@ function Hero() {
             </p>
           </div>
 
-          <div className="hidden lg:block mt-10 w-full">
+          <div className="hidden lg:block mt-14 w-full">
             <button
               onClick={() => navigate("/hall")}
               className="group relative w-full cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-12 py-6 2xl:px-14 2xl:py-7 font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/50"
@@ -81,8 +81,8 @@ function Hero() {
           </div>
         </div>
 
-        <div className="mt-5 flex w-full max-w-lg md:max-w-2xl flex-col items-center gap-8 lg:hidden">
-          <div className="w-full max-w-sm md:max-w-md">
+        <div className="mt-8 flex w-full flex-col items-center gap-8 lg:hidden">
+            <div className="w-full">
             <button
               onClick={() => navigate("/hall")}
               className="group relative w-full cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-6 py-4 font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/50"
@@ -103,7 +103,7 @@ function Hero() {
       </div>
 
       {/* Unified 4-stats row full-width, langsung di bawah showcase */}
-      <div className="w-full mt-6 mb-0 lg:mb-5 flex justify-center">
+      <div className="w-full mt-10 lg:mt-14 mb-0 lg:mb-5 flex justify-center">
         <HeroStats />
       </div>
       </div>

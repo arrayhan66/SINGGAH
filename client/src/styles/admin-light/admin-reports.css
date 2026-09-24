@@ -1,0 +1,249 @@
+/* ============================================================
+   REPORTS / STATISTIK — LIGHT MODE OVERRIDES
+   Agar bar chart, sparkline, stat card, dan summary card
+   tetap tampil vibrant (warna dark mode) di light mode.
+   ============================================================ */
+
+/* ---- ReportsHero stat card: light mode putih + slab biru ---- */
+html.light .admin-page .reports-stat-card {
+  background-color: #ffffff !important;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%) !important;
+  border-color: #c7dcfc !important;
+  backdrop-filter: none !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    0 7px 0 #7fb1f5,
+    0 12px 26px -10px rgba(30, 64, 175, 0.3),
+    0 22px 44px -18px rgba(37, 99, 235, 0.22) !important;
+}
+html.light .admin-page .reports-stat-card:hover {
+  border-color: #9ec7fa !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    0 8px 0 #5b96ee,
+    0 14px 26px -12px rgba(30, 64, 175, 0.38),
+    0 20px 40px -20px rgba(37, 99, 235, 0.28) !important;
+}
+html.light .admin-page .reports-stat-card:active {
+  transform: translateY(0) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    0 3px 0 #7fb1f5,
+    0 8px 16px -10px rgba(30, 64, 175, 0.3) !important;
+}
+
+/* Stat card icon: solid gradient per warna di light mode (seperti dark, disesuaikan) */
+html.light .admin-page .reports-stat-icon {
+  background: linear-gradient(135deg, #22d3ee, #0e7490) !important;
+  box-shadow: 0 6px 16px -4px rgba(14, 165, 233, 0.45) !important;
+}
+html.light .admin-page .reports-stat-icon.reports-stat-cyan {
+  background: linear-gradient(135deg, #22d3ee, #0e7490) !important;
+  box-shadow: 0 6px 16px -4px rgba(6, 182, 212, 0.45) !important;
+}
+html.light .admin-page .reports-stat-icon.reports-stat-violet {
+  background: linear-gradient(135deg, #a78bfa, #6d28d9) !important;
+  box-shadow: 0 6px 16px -4px rgba(139, 92, 246, 0.45) !important;
+}
+html.light .admin-page .reports-stat-icon.reports-stat-emerald {
+  background: linear-gradient(135deg, #34d399, #047857) !important;
+  box-shadow: 0 6px 16px -4px rgba(16, 185, 129, 0.45) !important;
+}
+html.light .admin-page .reports-stat-icon.reports-stat-rose {
+  background: linear-gradient(135deg, #fb7185, #be123c) !important;
+  box-shadow: 0 6px 16px -4px rgba(244, 63, 94, 0.45) !important;
+}
+html.light .admin-page .reports-stat-icon.reports-stat-cyan:active,
+html.light .admin-page .reports-stat-icon.reports-stat-violet:active,
+html.light .admin-page .reports-stat-icon.reports-stat-emerald:active,
+html.light .admin-page .reports-stat-icon.reports-stat-rose:active {
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    0 3px 0 rgba(30, 64, 175, 0.35) !important;
+}
+html.light .admin-page .reports-stat-icon svg {
+  color: #ffffff !important;
+}
+
+/* Stat card value & label: teks gelap di light */
+html.light .admin-page .reports-stat-card .stat-value {
+  color: #1e293b !important;
+}
+html.light .admin-page .reports-stat-card .stat-label {
+  color: #64748b !important;
+}
+html.light .admin-page .reports-stat-card:hover .stat-label {
+  color: #2563eb !important;
+}
+
+/* Trend badge light mode */
+html.light .admin-page .reports-stat-card .trend-badge {
+  color: inherit !important;
+}
+html.light .admin-page .reports-stat-card .trend-badge.text-emerald-400 {
+  color: #059669 !important;
+}
+html.light .admin-page .reports-stat-card .trend-badge.text-rose-400 {
+  color: #e11d48 !important;
+}
+
+/* Sparkline tetap vibrant di light mode */
+html.light .admin-page .reports-stat-card .sparkline-stroke {
+  stroke-width: 1.8 !important;
+}
+
+/* ---- MonthlyBarChart card: light mode ---- */
+html.light .admin-page .reports-bar-card {
+  background-color: #ffffff !important;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%) !important;
+  border-color: #c7dcfc !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 8px 28px -12px rgba(30, 64, 175, 0.18) !important;
+}
+html.light .admin-page .reports-bar-card:hover {
+  border-color: #93c5fd !important;
+  box-shadow: 0 12px 32px -14px rgba(37, 99, 235, 0.25) !important;
+}
+
+/* Bar chart title & subtitle */
+html.light .admin-page .reports-bar-card .bar-title {
+  color: #1e293b !important;
+}
+html.light .admin-page .reports-bar-card .bar-subtitle {
+  color: #64748b !important;
+}
+
+/* Bar chart month labels */
+html.light .admin-page .reports-bar-card .bar-month {
+  color: #94a3b8 !important;
+}
+html.light .admin-page .reports-bar-card .bar-month-active {
+  color: #2563eb !important;
+  font-weight: 600 !important;
+}
+
+/* Bar chart value labels */
+html.light .admin-page .reports-bar-card .bar-value {
+  color: #475569 !important;
+}
+html.light .admin-page .reports-bar-card .bar-value-active {
+  color: #0891b2 !important;
+  font-weight: 600 !important;
+}
+
+/* Bar gradient tetap vibrant di light mode — tidak perlu override
+   karena Tailwind gradient classes sudah bekerja di kedua mode.
+   Glow effect juga tetap visible. */
+
+/* ============================================================
+   REPORTS "RINGKASAN CEPAT" — SUMMARY CARDS + PANEL (LIGHT MODE)
+   - Icon tile: solid gradient (seperti ReportsHero) + ikon putih,
+     beda hue per kartu (cyan/emerald/blue/amber).
+   - Border: biru lembut senada card Karya per Bulan.
+   - Wash gradient transparan per hue tetap sebagai pembeda.
+   ============================================================ */
+
+/* Container panel: latar netral hampir putih (override Tailwind) */
+html.light .admin-page .reports-summary-panel {
+  background: #f8fafd !important;
+  border-color: #c7dcfc !important;
+  box-shadow:
+    0 6px 20px -14px rgba(37, 99, 235, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: none !important;
+}
+html.light .admin-page .reports-summary-panel .panel-title {
+  color: #1e293b !important;
+}
+html.light .admin-page .reports-summary-panel .panel-desc {
+  color: #64748b !important;
+}
+
+/* Summary card base: putih + border senada card Karya per Bulan */
+html.light .admin-page .reports-summary-card {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid #c7dcfc !important;
+  box-shadow: 0 8px 28px -12px rgba(30, 64, 175, 0.18) !important;
+}
+html.light .admin-page .reports-summary-card:hover {
+  border-color: #93c5fd !important;
+  box-shadow: 0 12px 32px -14px rgba(37, 99, 235, 0.25) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Per-color gradient washes (pembeda hue utama) */
+html.light .admin-page .reports-summary-card.reports-summary-cyan {
+  background-image: linear-gradient(135deg, rgba(8, 145, 178, 0.32), rgba(8, 145, 178, 0.11) 55%, rgba(255, 255, 255, 0)) !important;
+  border-color: #67e8f9 !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-emerald {
+  background-image: linear-gradient(135deg, rgba(5, 150, 105, 0.3), rgba(5, 150, 105, 0.1) 55%, rgba(255, 255, 255, 0)) !important;
+  border-color: #6ee7b7 !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-blue {
+  background-image: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.1) 55%, rgba(255, 255, 255, 0)) !important;
+  border-color: #93c5fd !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-amber {
+  background-image: linear-gradient(135deg, rgba(217, 119, 6, 0.28), rgba(217, 119, 6, 0.1) 55%, rgba(255, 255, 255, 0)) !important;
+  border-color: #fcd34d !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-cyan:hover {
+  border-color: #22d3ee !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-emerald:hover {
+  border-color: #34d399 !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-blue:hover {
+  border-color: #60a5fa !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-amber:hover {
+  border-color: #fbbf24 !important;
+}
+
+/* Watermark icon: warna mengikuti hue kartu */
+html.light .admin-page .reports-summary-watermark {
+  opacity: 0.15 !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-cyan .reports-summary-watermark {
+  color: #0e7490 !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-emerald .reports-summary-watermark {
+  color: #047857 !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-blue .reports-summary-watermark {
+  color: #1d4ed8 !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-amber .reports-summary-watermark {
+  color: #b45309 !important;
+}
+
+/* Icon tile: solid gradient per hue + ikon putih (seperti ReportsHero) */
+html.light .admin-page .reports-summary-icon {
+  border: none !important;
+  box-shadow: 0 6px 16px -4px rgba(37, 99, 235, 0.45) !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-cyan .reports-summary-icon {
+  background: linear-gradient(135deg, #06b6d4, #0e7490) !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-emerald .reports-summary-icon {
+  background: linear-gradient(135deg, #10b981, #047857) !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-blue .reports-summary-icon {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+}
+html.light .admin-page .reports-summary-card.reports-summary-amber .reports-summary-icon {
+  background: linear-gradient(135deg, #f59e0b, #b45309) !important;
+}
+html.light .admin-page .reports-summary-card .reports-summary-icon svg {
+  color: #ffffff !important;
+}
+
+/* Value & label: gelap agar terbaca di latar putih (override Tailwind) */
+html.light .admin-page .reports-summary-card .summary-value {
+  color: #404040 !important;
+}
+html.light .admin-page .reports-summary-card .summary-label {
+  color: #64748b !important;
+}

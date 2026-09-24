@@ -254,21 +254,38 @@ function ProfileVerification() {
       ) : (
         <>
           {rejectedReason && (
-            <div className={`mt-5 rounded-xl border p-4 ${isDark ? "border-red-500/30 bg-red-500/10 text-red-200" : "border-red-200 bg-red-50 text-red-900"}`}>
-              <div className={`flex items-center gap-2 text-sm font-medium ${isDark ? "text-red-400" : "text-red-700"}`}>
-                <XCircle size={16} className="shrink-0 max-[389px]:hidden" />
-                Pengajuan sebelumnya ditolak
+            <div className={`mt-5 rounded-2xl border p-4 sm:p-5 ${
+              isDark ? "border-white/10 bg-white/[0.03]" : "border-slate-200 bg-slate-50/60"
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-red-400/25 bg-red-400/10">
+                  <XCircle className={`h-4.5 w-4.5 ${isDark ? "text-red-400" : "text-red-600"}`} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className={`text-sm leading-snug font-bold sm:text-base ${isDark ? "text-white" : "text-slate-900"}`}>
+                    Pengajuanmu ditolak
+                  </h3>
+                  <p className={`mt-0.5 text-[11px] sm:text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                    Kamu masih bisa mencoba lagi, kok.
+                  </p>
+                </div>
               </div>
-              <div className="mt-1.5 flex items-start gap-1.5">
-                <span className={`text-xs md:text-sm font-semibold ${isDark ? "text-red-300" : "text-red-700"}`}>
-                  Alasan:
-                </span>
-                <p className={`text-xs md:text-sm ${isDark ? "text-red-200" : "text-red-800"}`}>
+
+              <div className={`mt-3 rounded-xl border px-3.5 py-2.5 sm:mt-4 ${
+                isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-slate-50"
+              }`}>
+                <p className={`text-[11px] font-medium sm:text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                  Alasan penolakan
+                </p>
+                <p className={`mt-0.5 break-words text-xs font-semibold leading-relaxed sm:text-sm ${
+                  isDark ? "text-red-300" : "text-red-700"
+                }`}>
                   {rejectedReason}
                 </p>
               </div>
-              <p className={`mt-2 text-[11px] ${isDark ? "text-red-300/70" : "text-red-700/80"}`}>
-                Silakan ajukan ulang dengan dokumen yang valid.
+
+              <p className={`mt-3 text-[11px] leading-relaxed sm:text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                Persiapkan dokumen yang valid, lalu ajukan ulang di bawah.
               </p>
             </div>
           )}

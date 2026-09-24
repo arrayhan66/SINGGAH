@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import { useWalkStore } from "../three/hooks/useWalk"
 import { useQualityStore } from "../three/hooks/useQuality"
 import api from "../services/api"
-import DEFAULT_HALL_DATA from "../constants/hallDefaults"
 import { setHallCategories } from "../three/rooms/museumLayout"
 import { seedCategoryColors } from "../utils/hallHelpers"
 
@@ -10,7 +9,7 @@ export default function useHall() {
   const [area, setArea] = useState("Hall Utama")
   const [selectedProject, setSelectedProject] = useState(null)
   const [sceneReady, setSceneReady] = useState(false)
-  const [hallData, setHallData] = useState(DEFAULT_HALL_DATA)
+  const [hallData, setHallData] = useState({ categories: [], projects: [] })
   const tier = useQualityStore((s) => s.tier)
 
   useEffect(() => {

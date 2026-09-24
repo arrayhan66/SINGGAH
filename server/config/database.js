@@ -1,7 +1,7 @@
-const { Sequelize } = require("sequelize")
+const { Sequelize } = require("sequelize");
 
-const isTest = process.env.NODE_ENV === "test"
-const useSsl = process.env.DB_SSL !== "false" && process.env.DB_SSL !== "0"
+const isTest = process.env.NODE_ENV === "test";
+const useSsl = process.env.DB_SSL !== "false" && process.env.DB_SSL !== "0";
 
 const sequelize = isTest
   ? new Sequelize({
@@ -33,14 +33,12 @@ const sequelize = isTest
                 },
               }
             : {}),
-          // mysql2: timeout koneksi per-attempt & jaga koneksi tetap hidup agar
-          // koneksi warm dipakai ulang, bukan bikin TCP baru tiap request
-          // (mengurangi ENOTFOUND / ETIMEDOUT ke TiDB Cloud saat jaringan blip).
+
           connectTimeout: parseInt(process.env.DB_CONNECT_TIMEOUT) || 15000,
           enableKeepAlive: true,
           keepAliveInitialDelay: 5000,
         },
       },
-    )
+    );
 
-module.exports = sequelize
+module.exports = sequelize;

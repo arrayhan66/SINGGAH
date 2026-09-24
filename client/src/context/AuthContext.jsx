@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
-import api from "../services/api"
+import api, { setOnUnauthorized } from "../services/api"
 import { clearUploadDraft } from "../utils/draftStorage"
 
 const AuthContext = createContext(null)
@@ -9,6 +9,23 @@ export function AuthProvider({ children }) {
   const navigate = useNavigate()
   const [user, setUser] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+
+  // 401 selain /auth/me dialihkan lewat router (tanpa reload halaman) supaya
+  // form/draft tidak hilang. Arahkan balik ke halaman asal setelah login lagi.
+  useEffect(() => {
+    setOnUnauthorized((error) => {
+      const url = error?.config?.url || ""
+      const isLogout = url.includes("/auth/logout")
+      if (!isLogout && window.location.pathname !== "/login") {
+        setUser(null)
+        navigate("/login", {
+          replace: true,
+          state: { from: window.location.pathname + window.location.search },
+        })
+      }
+    })
+    return () => setOnUnauthorized(null)
+  }, [navigate])
 
   // Token & user disimpan di cookie HttpOnly sisi server, jadi di sini
   // cukup tanya ke /auth/me untuk tahu siapa yang login saat ini.

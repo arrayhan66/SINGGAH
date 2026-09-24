@@ -1,0 +1,348 @@
+/* ===== SHARE MODAL (PROJECT DETAIL + BERITA DETAIL) ===== */
+/* Lingkaran ikon X: default bg-white/10 text-slate-200 -> light mode lebih kontras */
+html.light .karya-projectdetail-page .rounded-full.bg-white\/10.text-slate-200,
+html.light .berita-detail-page .rounded-full.bg-white\/10.text-slate-200 {
+  background-color: #e2e8f0;
+  color: #334155;
+}
+html.light .karya-projectdetail-page .group:hover .group-hover\:bg-black,
+html.light .berita-detail-page .group:hover .group-hover\:bg-black {
+  background-color: #0f172a;
+  color: #ffffff;
+}
+/* Bayangan modal gelap kebiruan -> bayangan biru lembut senada tema */
+html.light .karya-projectdetail-page .shadow-cyan-900\/20,
+html.light .berita-detail-page .shadow-cyan-900\/20 {
+  box-shadow: 0 24px 48px -16px rgba(30, 64, 175, 0.25);
+}
+
+/* ===== JUDUL PROJECT DETAIL ===== */
+/* Judul project: hitam keabu #404040 PERSIS tulisan "SINGGAH"
+   (nama brand di header). Ditaruh setelah rule generik
+   .detail-page h1.text-white agar menang. */
+html.light .karya-projectdetail-page h1.text-white {
+  background-image: none;
+  color: #404040;
+}
+
+/* ===== TOMBOL LINK SOSMED (PROJECT DETAIL) ===== */
+/* ── DARK MODE — Link buttons: subtle white gradient hover ── */
+.karya-projectdetail-page a.rounded-xl.border-slate-200.bg-white {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.karya-projectdetail-page a.rounded-xl.border-slate-200.bg-white::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.14));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.karya-projectdetail-page a.rounded-xl.border-slate-200.bg-white:hover {
+  color: #0f172a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5);
+}
+.karya-projectdetail-page a.rounded-xl.border-slate-200.bg-white:hover::before {
+  opacity: 1;
+}
+.karya-projectdetail-page a.rounded-xl.border-slate-200.bg-white:active {
+  transform: translateY(0);
+  transition-duration: 0.12s;
+}
+
+/* ── LIGHT MODE — Link buttons ── */
+html.light .karya-projectdetail-page a.rounded-xl.border-slate-200.bg-white {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: transparent;
+  background-color: #2563eb;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  color: #ffffff;
+  transition:
+    transform 0.3s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.3s ease;
+}
+html.light
+  .karya-projectdetail-page
+  a.rounded-xl.border-slate-200.bg-white::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(to bottom right, #06b6d4, #1d4ed8);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+html.light
+  .karya-projectdetail-page
+  a.rounded-xl.border-slate-200.hover\:bg-slate-50:hover {
+  background-color: transparent;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -10px rgba(29, 78, 216, 0.6);
+}
+html.light
+  .karya-projectdetail-page
+  a.rounded-xl.border-slate-200.hover\:bg-slate-50:hover::before {
+  opacity: 1;
+}
+html.light
+  .karya-projectdetail-page
+  a.rounded-xl.border-slate-200.hover\:bg-slate-50:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px -8px rgba(29, 78, 216, 0.5);
+}
+
+/* ===== TOMBOL AKSI (SUKA / BAGIKAN / SIMPAN) ===== */
+/* Soft blue tint senada badge kategori: putih kebiruan, border biru
+   muda, teks & ikon biru. Hover: tint menguat sedikit */
+html.light
+  .karya-projectdetail-page
+  button.rounded-xl.border-white\/10.bg-white\/5 {
+  border-color: #bfdbfe;
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+html.light
+  .karya-projectdetail-page
+  button.rounded-xl.border-white\/10.hover\:bg-white\/10:hover {
+  border-color: #93c5fd;
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* State aktif "Suka" (rose): dipertegas agar terbaca di latar terang */
+html.light
+  .karya-projectdetail-page
+  button.rounded-xl.border-rose-500\/30.bg-rose-500\/10.text-rose-400 {
+  border-color: #fecdd3;
+  background-color: #fff1f2;
+  color: #e11d48;
+}
+html.light
+  .karya-projectdetail-page
+  button.rounded-xl.border-rose-500\/30.bg-rose-500\/10.text-rose-400
+  svg.fill-rose-400 {
+  fill: #e11d48;
+}
+
+/* State tersimpan "Simpan" (amber): sama, versi kuning gelap */
+html.light
+  .karya-projectdetail-page
+  button.rounded-xl.border-amber-500\/30.bg-amber-500\/10.text-amber-400 {
+  border-color: #fde68a;
+  background-color: #fffbeb;
+  color: #b45309;
+}
+html.light
+  .karya-projectdetail-page
+  button.rounded-xl.border-amber-500\/30.bg-amber-500\/10.text-amber-400
+  svg.fill-amber-400 {
+  fill: #d97706;
+}
+
+/* ===== TOMBOL DOKUMEN PENDUKUNG ===== */
+/* ── DARK MODE — Document buttons: subtle white gradient hover ── */
+.karya-projectdetail-page button.rounded-lg.border-slate-200.bg-white {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.karya-projectdetail-page button.rounded-lg.border-slate-200.bg-white::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.14));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.karya-projectdetail-page button.rounded-lg.border-slate-200.bg-white:hover {
+  color: #0f172a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5);
+}
+.karya-projectdetail-page button.rounded-lg.border-slate-200.bg-white:hover::before {
+  opacity: 1;
+}
+.karya-projectdetail-page button.rounded-lg.border-slate-200.bg-white:active {
+  transform: translateY(0);
+  transition-duration: 0.12s;
+}
+
+/* ── LIGHT MODE — Document buttons ── */
+html.light .karya-projectdetail-page button.rounded-lg.border-slate-200.bg-white {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: transparent;
+  background-color: #2563eb;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  color: #ffffff;
+  transition:
+    transform 0.3s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.3s ease;
+}
+html.light
+  .karya-projectdetail-page
+  button.rounded-lg.border-slate-200.bg-white::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(to bottom right, #06b6d4, #1d4ed8);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+html.light
+  .karya-projectdetail-page
+  button.rounded-lg.border-slate-200.hover\:bg-slate-50:hover {
+  background-color: transparent;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -10px rgba(29, 78, 216, 0.6);
+}
+html.light
+  .karya-projectdetail-page
+  button.rounded-lg.border-slate-200.hover\:bg-slate-50:hover::before {
+  opacity: 1;
+}
+html.light
+  .karya-projectdetail-page
+  button.rounded-lg.border-slate-200.hover\:bg-slate-50:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px -8px rgba(29, 78, 216, 0.5);
+}
+
+/* ===== CHIP TEKNOLOGI (Laravel, PHP, dst) ===== */
+/* Soft blue tint persis tombol Suka/Bagikan/Simpan */
+html.light
+  .karya-projectdetail-page
+  span.rounded-lg.border-white\/10.bg-white\/5.px-2\.5.py-1.text-xs {
+  border-color: #bfdbfe;
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+/* ===== JUDUL "KOMENTAR" ===== */
+/* Hitam keabu #404040 PERSIS tulisan "SINGGAH" */
+html.light .karya-projectdetail-page h3.text-lg.font-bold.text-white {
+  background-image: none;
+  color: #404040;
+}
+
+/* ===== JUDUL SECTION: TIM PENGEMBANG & TEKNOLOGI ===== */
+/* Hitam keabu #404040 PERSIS tulisan "SINGGAH" */
+html.light
+  .karya-projectdetail-page
+  h3.uppercase.tracking-wider.text-white {
+  background-image: none;
+  color: #404040;
+}
+
+/* ===== KOTAK PROMPT LOGIN & EMPTY STATE KOMENTAR ===== */
+/* Kontainer soft blue tint PERSIS kontainer chip teknologi:
+   latar #eff6ff + border biru muda #bfdbfe */
+html.light
+  .karya-projectdetail-page
+  div.rounded-2xl.border-white\/10.from-cyan-500\/5 {
+  border-color: #bfdbfe;
+  background-color: #eff6ff;
+  background-image: none;
+}
+html.light
+  .karya-projectdetail-page
+  div.rounded-2xl.border-dashed.border-white\/10.bg-white\/\[0\.02\] {
+  border-style: solid;
+  border-color: #bfdbfe;
+  background-color: #eff6ff;
+}
+
+/* ===== DARK MODE — Tombol Login putih ===== */
+.karya-projectdetail-page button.rounded-xl.bg-cyan-400 {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 4px 14px -4px rgba(0, 0, 0, 0.4);
+}
+.karya-projectdetail-page button.rounded-xl.bg-cyan-400::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.14));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.karya-projectdetail-page button.rounded-xl.bg-cyan-400:hover {
+  color: #0f172a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5);
+}
+.karya-projectdetail-page button.rounded-xl.bg-cyan-400:hover::before {
+  opacity: 1;
+}
+.karya-projectdetail-page button.rounded-xl.bg-cyan-400:active {
+  transform: translateY(0);
+  transition-duration: 0.12s;
+}
+
+/* Tombol "Login untuk Berkomentar": gradasi cyan -> biru dengan
+   TEKS PUTIH persis tombol link sosmed / dokumen.
+   Hover SMOOTH: gradasi lebih gelap di-crossfade lewat ::before
+   (bukan pindah instan), plus terangkat tipis + bayangan biru */
+html.light .karya-projectdetail-page button.rounded-xl.bg-cyan-400 {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: #2563eb;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  color: #ffffff;
+  transition:
+    transform 0.3s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.3s ease,
+    color 0.3s ease;
+}
+html.light
+  .karya-projectdetail-page
+  button.rounded-xl.bg-cyan-400::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(to bottom right, #06b6d4, #1d4ed8);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+html.light .karya-projectdetail-page button.rounded-xl.hover\:bg-cyan-300:hover {
+  background-color: transparent;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -10px rgba(29, 78, 216, 0.6);
+}
+html.light
+  .karya-projectdetail-page
+  button.rounded-xl.hover\:bg-cyan-300:hover::before {
+  opacity: 1;
+}
+html.light
+  .karya-projectdetail-page
+  button.rounded-xl.hover\:bg-cyan-300:active {
+  transform: translateY(0);
+  transition-duration: 0.12s;
+  box-shadow: 0 4px 12px -8px rgba(29, 78, 216, 0.5);
+}
+

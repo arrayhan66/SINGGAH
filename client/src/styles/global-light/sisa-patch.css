@@ -1,0 +1,190 @@
+/* ===== BORDER PUTIH SANGAT TIPIS -> BORDER TERLIHAT ===== */
+html.light .border-white\/5 {
+  border-color: #e6edf6;
+}
+html.light .border-white\/\[0\.04\],
+html.light .border-white\/\[0\.06\] {
+  border-color: #e0e8f3;
+}
+html.light .border-white\/\[0\.07\],
+html.light .border-white\/\[0\.08\] {
+  border-color: #dbe4f1;
+}
+html.light .border-white\/\[0\.1\],
+html.light .border-white\/\[0\.12\],
+html.light .border-white\/\[0\.14\] {
+  border-color: #c9d8ec;
+}
+html.light .hover\:border-white\/\[0\.12\]:hover,
+html.light .hover\:border-cyan-400\/50:hover {
+  border-color: #60a5fa;
+}
+
+/* ===== RING ===== */
+html.light .ring-white\/10,
+html.light .ring-white\/15 {
+  --tw-ring-color: rgba(37, 99, 235, 0.18);
+}
+html.light .ring-slate-700\/30 {
+  --tw-ring-color: rgba(37, 99, 235, 0.14);
+}
+
+/* ===== GARIS DIVIDER (h-px bg-white/20..30) ===== */
+html.light .bg-white\/20,
+html.light .bg-white\/30 {
+  background-color: #cfdaea;
+}
+
+/* ===== PERMUKAAN & BORDER SLATE GELAP TERSISA ===== */
+html.light .bg-slate-800\/40 {
+  background-color: #fbfcfe;
+}
+html.light .bg-slate-950\/40,
+html.light .bg-slate-950\/60 {
+  background-color: #f1f5fa;
+}
+html.light .bg-slate-950\/80 {
+  background-color: rgba(15, 23, 42, 0.45);
+}
+html.light .border-slate-700\/30,
+html.light .border-slate-700\/50,
+html.light .border-slate-800 {
+  border-color: #b9cbe4;
+}
+
+/* ===== TEKS STATUS TERANG -> VERSI GELAP BIAR KEBACA ===== */
+html.light .text-red-200 {
+  color: #991b1b;
+}
+html.light .text-red-300 {
+  color: #b91c1c;
+}
+html.light .text-red-400 {
+  color: #dc2626;
+}
+html.light .hover\:text-red-400:hover,
+html.light .group-hover\:text-red-400:hover,
+html.light .hover\:text-red-300:hover {
+  color: #dc2626;
+}
+/* Kecuali ikon aksi di atas chip gelap penutup foto -> tetap merah terang */
+html.light .bg-black\/50 .hover\:text-red-400:hover,
+html.light .bg-black\/60 .hover\:text-red-400:hover {
+  color: #fca5a5;
+}
+
+html.light .bg-red-500\/30 {
+  background-color: #fee2e2;
+}
+html.light .hover\:bg-red-500\/10:hover {
+  background-color: #fef2f2;
+}
+html.light .hover\:bg-red-500\/20:hover {
+  background-color: #fee2e2;
+}
+html.light .border-red-500\/30 {
+  border-color: #fecaca;
+}
+html.light .border-red-500\/20,
+html.light .border-red-500\/25,
+html.light .border-red-400\/20,
+html.light .border-red-400\/30 {
+  border-color: #fecaca;
+}
+html.light .border-emerald-400\/20,
+html.light .border-emerald-400\/30 {
+  border-color: #a7f3d0;
+}
+html.light .border-amber-400\/20,
+html.light .border-amber-400\/30,
+html.light .border-amber-500\/30 {
+  border-color: #fde68a;
+}
+
+html.light .text-emerald-200 {
+  color: #065f46;
+}
+html.light .text-amber-200 {
+  color: #92400e;
+}
+html.light .text-amber-400 {
+  color: #d97706;
+}
+html.light .text-yellow-300 {
+  color: #a16207;
+}
+html.light .text-purple-300 {
+  color: #7c3aed;
+}
+html.light .text-purple-400 {
+  color: #6d28d9;
+}
+html.light .text-orange-300,
+html.light .text-orange-400 {
+  color: #c2410c;
+}
+html.light .text-green-400 {
+  color: #059669;
+}
+html.light .text-cyan-100 {
+  color: #1e40af;
+}
+
+/* ===== CYAN FRAKSI YANG BELUM KE-COVER ===== */
+html.light .bg-cyan-500\/15 {
+  background-color: #eaf3ff;
+}
+html.light .bg-cyan-400\/25,
+html.light .bg-cyan-500\/25 {
+  background-color: #dbeafe;
+}
+
+/* ===== TOKEN NIGHT DI HALAMAN THEME (dashboard admin & auth) ===== */
+/* Kartu analitik dashboard */
+html.light .bg-night-elevated {
+  background-color: #ffffff;
+  box-shadow:
+    inset 0 0 0 1px #dde7f4,
+    0 12px 28px rgba(37, 99, 235, 0.08);
+}
+/* Tile quick action + kotak icon di dalamnya */
+html.light .hover\:bg-night-raised:hover {
+  background-color: #f0f6ff;
+}
+html.light .bg-night-raised {
+  background-color: #eff6ff;
+  box-shadow: inset 0 0 0 1px #dbeafe;
+}
+html.light .group-hover\:bg-night-focus:hover {
+  background-color: #dbeafe;
+}
+/* Chip branding halaman auth */
+html.light .bg-night-shade {
+  background-color: #e9f1fe;
+  border-color: #93c5fd;
+  box-shadow: 0 6px 18px -6px rgba(37, 99, 235, 0.35);
+}
+html.light .shadow-cyan-950\/20 {
+  box-shadow: 0 6px 18px -6px rgba(37, 99, 235, 0.35);
+}
+html.light .hover\:bg-night-shade-hover:hover {
+  background-color: #dbeafe;
+}
+html.light .bg-night-shade.hover\:text-white:hover {
+  color: #404040;
+}
+
+/* ===== GRADIENT KARTU PUTIH TRANSPARAN -> KARTU PUTIH SOLID ===== */
+/* CategoryCard, kartu dashboard, chart, empty state, dsb */
+html.light .bg-gradient-to-b.from-white\/\[0\.03\],
+html.light .bg-gradient-to-b.from-white\/\[0\.06\].to-white\/\[0\.02\],
+html.light .bg-gradient-to-b.from-white\/\[0\.08\].to-white\/\[0\.02\],
+html.light .bg-gradient-to-b.from-white\/\[0\.09\].to-white\/\[0\.04\],
+html.light .bg-gradient-to-b.from-white\/\[0\.09\].to-white\/\[0\.05\],
+html.light .bg-gradient-to-br.from-white\/\[0\.04\].to-white\/\[0\.01\],
+html.light .bg-gradient-to-br.from-white\/\[0\.06\].to-white\/\[0\.02\],
+html.light .bg-gradient-to-br.from-white\/\[0\.07\].to-white\/\[0\.02\],
+html.light .bg-gradient-to-b.from-white\/10.to-white\/5 {
+  background-image: linear-gradient(180deg, #ffffff 0%, #f5f8fc 100%);
+}
+

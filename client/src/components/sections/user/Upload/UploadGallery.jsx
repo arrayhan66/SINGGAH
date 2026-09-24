@@ -3,15 +3,19 @@ import { ImagePlus, X, Image } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
 import { imageUrl } from "../../../../utils/imageUrl"
 import SmartImage from "../../../ui/SmartImage"
+import { compressImage } from "../../../../utils/compressImage"
 
 function UploadGallery({ value, onChange, existingItems, onRemoveExisting }) {
   const inputRef = useRef(null)
   const hasExisting = Array.isArray(existingItems) && existingItems.length > 0
 
-  function handleFileChange(e) {
+  async function handleFileChange(e) {
     const files = Array.from(e.target.files || [])
     if (files.length === 0) return
-    onChange([...value, ...files])
+    const compressed = await Promise.all(
+      files.map((file) => compressImage(file, { maxSize: 5 * 1024 * 1024 }))
+    )
+    onChange([...value, ...compressed])
     if (inputRef.current) inputRef.current.value = ""
   }
 

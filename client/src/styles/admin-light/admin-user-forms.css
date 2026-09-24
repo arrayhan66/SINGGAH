@@ -1,0 +1,314 @@
+/* ============================================================
+   KELOLA USER: FORM TAMBAH/EDIT — PANEL LIGHT MODE
+   Panel form (.admin-user-form-panel) awalnya gradasi translucent
+   putih yang di light mode nyatu banget dengan kontainer. Dinamik
+   FORM UPLOAD KARYA (tanpa efek 3D slab): muka putih + border biru
+   muda + shadow lembut supaya kontras dengan kontainer.
+   ============================================================ */
+html.light .admin-page .admin-user-form-panel {
+  background-color: #ffffff;
+  background-image: linear-gradient(
+    135deg,
+    rgba(6, 182, 212, 0.05) 0%,
+    rgba(59, 130, 246, 0.05) 100%
+  );
+  border-color: #d5e2f2;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 10px 24px -16px rgba(30, 64, 175, 0.28),
+    0 20px 40px -20px rgba(37, 99, 235, 0.18);
+  backdrop-filter: none;
+}
+/* Header dan divider dalam panel dipertegas di light mode */
+html.light .admin-page .admin-user-form-panel h2,
+html.light .admin-page .admin-user-form-panel h3 {
+  color: #0f172a;
+}
+html.light .admin-page .admin-user-form-panel p.text-slate-400 {
+  color: #5b6b8c;
+}
+html.light .admin-page .admin-user-form-panel label.text-xs,
+html.light .admin-page .admin-user-form-panel .text-xs.text-slate-400 {
+  color: #64748b;
+}
+html.light .admin-page .admin-user-form-panel .border-t.border-white\/\[0\.06\] {
+  border-color: #e3ebf5;
+}
+html.light .admin-page .admin-user-form-panel input,
+html.light .admin-page .admin-user-form-panel textarea,
+html.light .admin-page .admin-user-form-panel select {
+  background-color: #f8fafc;
+  border-color: #d7e0ec;
+  color: #0f172a;
+}
+html.light .admin-page .admin-user-form-panel input::placeholder,
+html.light .admin-page .admin-user-form-panel textarea::placeholder {
+  color: #94a3b8;
+}
+html.light .admin-page .admin-user-form-panel input:focus,
+html.light .admin-page .admin-user-form-panel textarea:focus,
+html.light .admin-page .admin-user-form-panel select:focus {
+  background-color: #ffffff;
+  border-color: #2563eb;
+}
+html.light .admin-page [data-role-card] {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+}
+html.light .admin-page [data-role-card]:hover {
+  background-color: #e6f1fe;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+html.light .admin-page [data-role-card]:hover [class*="text-cyan-700"],
+html.light .admin-page [data-role-card]:hover .text-cyan-600 {
+  color: #1d4ed8;
+}
+html.light .admin-page [data-role-card].text-slate-800 {
+  color: #404040;
+}
+html.light .admin-page [data-role-card] .text-cyan-300,
+html.light .admin-page [data-role-card] [class*="text-cyan-300"] {
+  color: #1d4ed8;
+}
+html.light .admin-page [data-role-card] .text-cyan-500 {
+  color: #2563eb;
+}
+html.light .admin-page [data-role-card].border-cyan-400 {
+  border-color: #2563eb;
+  background: linear-gradient(150deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  box-shadow: 0 16px 34px -12px rgba(37, 99, 235, 0.6);
+  transform: scale(1.02);
+}
+html.light .admin-page [data-role-card].border-cyan-400 .text-cyan-300,
+html.light .admin-page [data-role-card].border-cyan-400 .text-cyan-500,
+html.light .admin-page [data-role-card].border-cyan-400 [class*="text-cyan-300"] {
+  color: #ffffff;
+}
+html.light .admin-page [data-role-card].border-cyan-400 .text-slate-800,
+html.light .admin-page [data-role-card].border-cyan-400 [class*="text-slate-800"] {
+  color: #ffffff;
+}
+
+html.light .admin-page [data-role-card].cursor-not-allowed {
+  pointer-events: none;
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  color: #94a3b8;
+}
+html.light .admin-page [data-role-card].cursor-not-allowed .text-cyan-500,
+html.light .admin-page [data-role-card].cursor-not-allowed [class*="text-cyan-300"] {
+  color: #94a3b8;
+}
+
+/* ============================================================
+   KELOLA USER: DETAIL USER — LIGHT MODE.
+   Kartu mengikuti gaya panel form tambah user: header gradasi biru
+   tua (konten dipaksa terang), body putih + border biru muda.
+   Dark mode & komposisi kartu tidak berubah.
+   ============================================================ */
+html.light .admin-page .admin-user-detail-card .admin-user-detail-hero {
+  background-color: #0c1f4d;
+  background-image: radial-gradient(720px 260px at 88% -10%, rgba(34, 211, 238, 0.35), transparent 60%),
+    radial-gradient(520px 240px at -10% 110%, rgba(99, 102, 241, 0.28), transparent 60%),
+    linear-gradient(135deg, #0b3d91 0%, #123a7d 42%, #0c1f4d 100%);
+}
+html.light .admin-page .admin-user-detail-card .admin-user-detail-hero h2,
+html.light .admin-page .admin-user-detail-card .admin-user-detail-hero .text-slate-200 {
+  color: #ffffff;
+}
+html.light .admin-page .admin-user-detail-card .admin-user-detail-hero p.text-slate-400 {
+  color: #c7d2e8;
+}
+html.light .admin-page .admin-user-detail-card
+  .admin-user-detail-hero
+  span.border-white\/10.bg-white\/5 {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+html.light .admin-page .admin-user-detail-card
+  .admin-user-detail-hero
+  span.border-white\/10.bg-white\/5
+  svg.text-cyan-400 {
+  color: #67e8f9;
+}
+html.light .admin-page .admin-user-detail-card .admin-user-detail-hero .border-emerald-400\/20 {
+  background-color: rgba(16, 185, 129, 0.22);
+  border-color: rgba(52, 211, 153, 0.55);
+  color: #6ee7b7;
+}
+html.light .admin-page .admin-user-detail-card .admin-user-detail-hero .border-amber-400\/20 {
+  background-color: rgba(245, 158, 11, 0.22);
+  border-color: rgba(251, 191, 36, 0.55);
+  color: #fcd34d;
+}
+html.light .admin-page .admin-user-detail-card .admin-user-detail-hero .border-red-400\/20 {
+  background-color: rgba(239, 68, 68, 0.22);
+  border-color: rgba(248, 113, 113, 0.55);
+  color: #fca5a5;
+}
+/* Body kartu: baris info disesuaikan agar terbaca di atas putih */
+html.light .admin-page .admin-user-detail-row {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+}
+html.light .admin-page .admin-user-detail-row-icon {
+  background-color: #eef3fa;
+  border-color: #e3ebf5;
+}
+html.light .admin-page .admin-user-detail-row p.text-slate-500 {
+  color: #64748b;
+}
+html.light .admin-page .admin-user-detail-row p.text-slate-200 {
+  color: #0f172a;
+}
+html.light .admin-page .admin-user-detail-row svg.text-slate-400,
+html.light .admin-page .admin-user-detail-row-icon svg.text-slate-400 {
+  color: #64748b;
+}
+/* Tombol aksi edit/hapus */
+html.light .admin-page .admin-user-detail-actions button.border-white\/\[0\.06\].bg-white\/\[0\.04\] {
+  background-color: #f8fafc;
+  border-color: #dfe6f0;
+  color: #0f172a;
+}
+html.light .admin-page .admin-user-detail-actions button.border-white\/\[0\.06\].bg-white\/\[0\.04\]:hover {
+  background-color: #eaf2fd;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+html.light .admin-page .admin-user-detail-actions button.border-red-500\/20.bg-red-500\/\[0\.04\] {
+  background-color: rgba(239, 68, 68, 0.07);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #dc2626;
+}
+html.light .admin-page .admin-user-detail-actions button.border-red-500\/20.bg-red-500\/\[0\.04\]:hover {
+  background-color: rgba(239, 68, 68, 0.12);
+  border-color: rgba(248, 113, 113, 0.6);
+  color: #b91c1c;
+}
+
+/* ---- Detail User: dekorasi "keren" ---- */
+/* Tile ikon baris info (dark mode: translucent + warna terang) */
+.admin-page .admin-user-detail-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+}
+.admin-page .admin-user-detail-icon-sm {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.4rem;
+}
+.admin-page .admin-user-detail-icon[data-accent="blue"] {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #7ea6f6;
+}
+.admin-page .admin-user-detail-icon[data-accent="cyan"] {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: rgba(6, 182, 212, 0.22);
+  color: #39d5ef;
+}
+.admin-page .admin-user-detail-icon[data-accent="purple"] {
+  background: rgba(168, 85, 247, 0.12);
+  border-color: rgba(168, 85, 247, 0.25);
+  color: #c084fc;
+}
+.admin-page .admin-user-detail-icon[data-accent="amber"] {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.25);
+  color: #fbbf24;
+}
+.admin-page .admin-user-detail-icon[data-accent="emerald"] {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.25);
+  color: #34d399;
+}
+.admin-page .admin-user-detail-icon[data-accent="indigo"] {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: rgba(99, 102, 241, 0.25);
+  color: #a5b4fc;
+}
+/* Grid dekoratif di header kartu (dark) */
+.admin-page .admin-user-detail-grid {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+  background-size: 34px 34px;
+  -webkit-mask-image: linear-gradient(115deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.55) 48%, transparent 82%);
+  mask-image: linear-gradient(115deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.55) 48%, transparent 82%);
+}
+/* Light mode: kartu lebih premium, ikon pastel + warna vivid, baris & foto ringan */
+html.light .admin-page .admin-user-detail-card {
+  background-color: #f6f9fd;
+  background-image: linear-gradient(160deg, #f8fbff 0%, #eef3fa 55%, #e9effa 100%);
+  border-color: #d5e2f2;
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 10px 24px -16px rgba(30, 64, 175, 0.28);
+}
+html.light .admin-page .admin-user-detail-icon {
+  background: #f4f7fd;
+  border-color: #dfe6f2;
+  color: #475569;
+}
+html.light .admin-page .admin-user-detail-icon[data-accent="blue"] {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #1d4ed8;
+}
+html.light .admin-page .admin-user-detail-icon[data-accent="cyan"] {
+  background: rgba(8, 145, 178, 0.1);
+  border-color: rgba(8, 145, 178, 0.28);
+  color: #0e7490;
+}
+html.light .admin-page .admin-user-detail-icon[data-accent="purple"] {
+  background: rgba(147, 51, 234, 0.1);
+  border-color: rgba(147, 51, 234, 0.28);
+  color: #7c3aed;
+}
+html.light .admin-page .admin-user-detail-icon[data-accent="amber"] {
+  background: rgba(217, 119, 6, 0.1);
+  border-color: rgba(217, 119, 6, 0.3);
+  color: #b45309;
+}
+html.light .admin-page .admin-user-detail-icon[data-accent="emerald"] {
+  background: rgba(5, 150, 105, 0.1);
+  border-color: rgba(5, 150, 105, 0.28);
+  color: #047857;
+}
+html.light .admin-page .admin-user-detail-icon[data-accent="indigo"] {
+  background: rgba(79, 70, 229, 0.1);
+  border-color: rgba(79, 70, 229, 0.28);
+  color: #4338ca;
+}
+html.light .admin-page .admin-user-detail-grid {
+  background-image: linear-gradient(rgba(148, 187, 255, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 187, 255, 0.18) 1px, transparent 1px);
+}
+html.light .admin-page .admin-user-detail-row:hover {
+  background-color: #fbfdff;
+  border-color: #dbe7f6;
+}
+html.light .admin-page .admin-user-detail-photo {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+}
+html.light .admin-page .admin-user-detail-actions button.border-white\/10.bg-white\/5 {
+  background-color: #ffffff;
+  border-color: #dbe7f6;
+}
+html.light .admin-page .admin-user-detail-actions button.border-white\/10.bg-white\/5:hover {
+  background-color: #eef5ff;
+  border-color: #a5c7ff;
+}
+

@@ -15,8 +15,6 @@ import {
 } from "lucide-react"
 import { useBerita } from "../../../context/BeritaContext"
 import { useTheme } from "../../../context/ThemeContext"
-import DustBackground from "../../ui/DustBackground"
-import PCBBackground from "../../ui/PCBBackground"
 import { BeritaDetailSkeleton } from "../../ui/PageSkeletons"
 import { imageUrl } from "../../../utils/imageUrl"
 import { processContentHtml } from "../../../utils/processContentHtml"
@@ -294,7 +292,6 @@ function BeritaDetail() {
   if (loading) {
     return (
       <section className="relative min-h-screen overflow-hidden bg-brand-dark pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-16 sm:pb-20">
-        <DustBackground />
         <div className="pt-6 sm:pt-8">
           <BeritaDetailSkeleton />
         </div>
@@ -326,8 +323,6 @@ function BeritaDetail() {
 
   return (
     <section className="relative overflow-hidden bg-brand-dark min-h-screen pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-16 sm:pb-20 lg:pb-24">
-      <PCBBackground />
-      <DustBackground />
 
       <div className="relative z-10 mx-auto max-w-4xl px-3 min-[350px]:px-5 sm:px-8 2xl:max-w-5xl">
         <div className="berita-article-card overflow-hidden border border-slate-700/60 rounded-2xl min-[350px]:rounded-3xl bg-brand-navy">

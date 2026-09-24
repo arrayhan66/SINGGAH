@@ -72,7 +72,7 @@ export default function CategorySection() {
         }}
       />
 
-      <div className="relative px-4 pb-8 md:px-6 md:pb-10 lg:px-8 lg:pb-12 mt-6 md:mt-8">
+      <div className="relative px-4 pb-8 md:px-6 md:pb-10 lg:px-8 lg:pb-12 mt-6 md:mt-8 4xl:pb-16">
         {showForm && (
           <CategoryForm
             editing={editing}

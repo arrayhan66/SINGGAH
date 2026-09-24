@@ -1,0 +1,359 @@
+/* ============================================================
+   MEDIA LIBRARY: KARTU GRID — SLAB 3D (DARK & LIGHT)
+   Mengadopsi bahasa "slab 3D" kartu berita/karya: muka gelap
+   dengan tepi bawah pekat di dark mode, muka putih + slab biru
+   #7fb1f5 di light mode. Menghilangkan look glassmorphism
+   transparan (terlihat "AI / hantu" dan gak keliatan di light).
+   ============================================================ */
+.admin-page .admin-media-card {
+  background-color: rgba(15, 23, 42, 0.9);
+  background-image: linear-gradient(180deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 7px 0 #02111f,
+    0 14px 28px -12px rgba(0, 0, 0, 0.55);
+}
+.admin-page .admin-media-card:hover {
+  transform: translateY(-0.25rem);
+  border-color: rgba(34, 211, 238, 0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 8px 0 #02111f,
+    0 18px 34px -16px rgba(0, 0, 0, 0.55);
+}
+.admin-page .admin-media-card:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 3px 0 #02111f,
+    0 8px 16px -10px rgba(0, 0, 0, 0.55);
+}
+.admin-page .admin-media-card .admin-media-thumb {
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+}
+html.light .admin-page .admin-media-card {
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%);
+  border-color: #c7dcfc;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    0 7px 0 #7fb1f5,
+    0 12px 26px -10px rgba(30, 64, 175, 0.35),
+    0 22px 44px -18px rgba(37, 99, 235, 0.28);
+}
+html.light .admin-page .admin-media-card:hover {
+  transform: translateY(-0.25rem);
+  border-color: #9ec7fa;
+  background-color: #ffffff;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    0 8px 0 #5b96ee,
+    0 14px 26px -12px rgba(30, 64, 175, 0.4),
+    0 20px 40px -20px rgba(37, 99, 235, 0.32);
+}
+html.light .admin-page .admin-media-card:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    0 3px 0 #7fb1f5,
+    0 8px 16px -10px rgba(30, 64, 175, 0.35);
+}
+html.light .admin-page .admin-media-card .admin-media-name {
+  color: #0f172a;
+}
+html.light .admin-page .admin-media-card .admin-media-type {
+  background-color: #eef4ff;
+  color: #1d4ed8;
+}
+html.light .admin-page .admin-media-card .admin-media-size {
+  color: #64748b;
+}
+
+/* ============================================================
+   MEDIA LIBRARY: CHIP TIPE FILE (.media-chip)
+   Polesan tipe file (PDF/PPT/DOC/XLS/ZIP/VIDEO) yang dipakai di
+   kartu grid, baris tabel, dan badge provinsi. Warna diatur per
+   kategori: gelap = tint translucen + warna terang; terang =
+   pastel solid + warna pekat. Dipakai oleh getFileThumbStyle().
+   ============================================================ */
+.admin-page .media-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 0.5rem;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 2px 10px -4px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+.admin-page .media-chip > span {
+  flex-shrink: 0;
+}
+.admin-page .admin-media-card .media-chip {
+  border-radius: 0.375rem;
+}
+.admin-page .media-chip-pdf {
+  background: rgba(190, 24, 51, 0.82);
+  color: #ffffff;
+}
+.admin-page .media-chip-ppt {
+  background: rgba(194, 65, 12, 0.82);
+  color: #ffffff;
+}
+.admin-page .media-chip-doc {
+  background: rgba(29, 78, 216, 0.82);
+  color: #ffffff;
+}
+.admin-page .media-chip-xls {
+  background: rgba(4, 120, 87, 0.82);
+  color: #ffffff;
+}
+.admin-page .media-chip-zip {
+  background: rgba(180, 83, 9, 0.85);
+  color: #ffffff;
+}
+.admin-page .media-chip-video {
+  background: rgba(162, 28, 175, 0.82);
+  color: #ffffff;
+}
+.admin-page .media-chip-file {
+  background: rgba(51, 65, 85, 0.85);
+  color: #ffffff;
+}
+html.light .admin-page .media-chip-pdf {
+  background: #ffe4e6;
+  color: #be123c;
+}
+html.light .admin-page .media-chip-ppt {
+  background: #ffedd5;
+  color: #c2410c;
+}
+html.light .admin-page .media-chip-doc {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+html.light .admin-page .media-chip-xls {
+  background: #d1fae5;
+  color: #047857;
+}
+html.light .admin-page .media-chip-zip {
+  background: #fef3c7;
+  color: #b45309;
+}
+html.light .admin-page .media-chip-video {
+  background: #fae8ff;
+  color: #a21caf;
+}
+html.light .admin-page .media-chip-file {
+  background: #e6edf6;
+  color: #475569;
+}
+html.light .admin-page .media-chip {
+  border-color: rgba(148, 163, 184, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+html.light .admin-page .admin-media-card .media-chip {
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.08);
+}
+
+/* ============================================================
+   MEDIA LIBRARY: JAGA TEKS PUTIH DI ATAS WARNA (LIGHT)
+   global-light.css mengganti .text-white jadi tinta gelap di
+   light mode. Di area media di atasnya ada permukaan BERGAMBAR
+   (tile tipe file, tombol aksi di thumb, ikon preview) teks
+   harus tetap putih agar terbaca di kedua mode.
+   ============================================================ */
+html.light .admin-page .admin-media-card [class*="from-red-500"] .text-white,
+html.light .admin-page .admin-media-card [class*="from-orange-500"] .text-white,
+html.light .admin-page .admin-media-card [class*="from-blue-500"] .text-white,
+html.light .admin-page .admin-media-card [class*="from-emerald-500"] .text-white,
+html.light .admin-page .admin-media-card [class*="from-green-500"] .text-white,
+html.light .admin-page .admin-media-card [class*="from-fuchsia-500"] .text-white,
+html.light .admin-page .admin-media-card [class*="from-amber-400"] .text-white,
+html.light .admin-page .admin-media-card [class*="from-slate-500"] .text-white,
+html.light .admin-page .admin-preview-modal [class*="from-red-500"] .text-white,
+html.light .admin-page .admin-preview-modal [class*="from-orange-500"] .text-white,
+html.light .admin-page .admin-preview-modal [class*="from-blue-500"] .text-white,
+html.light .admin-page .admin-preview-modal [class*="from-violet-500"] .text-white,
+html.light .admin-page .admin-preview-modal [class*="from-emerald-500"] .text-white,
+html.light .admin-page .admin-preview-modal [class*="from-green-500"] .text-white,
+html.light .admin-page .admin-preview-modal [class*="from-fuchsia-500"] .text-white,
+html.light .admin-page .admin-preview-modal [class*="from-amber-400"] .text-white,
+html.light .admin-page .admin-preview-modal [class*="from-slate-500"] .text-white {
+  color: #ffffff;
+}
+html.light .admin-page .admin-media-card .bg-black\/60 {
+  color: #ffffff;
+}
+html.light .admin-page .admin-media-card .bg-white\/15 {
+  color: #ffffff;
+}
+
+/* ===== PENGATURAN: IKON CHIP TETAP PUTIH (LIGHT) =====
+   global-light.css mengubah .text-white jadi tinta gelap di light
+   mode. Chip ikon Mode Maintenance pakai gradasi amber (tidak ada
+   di daftar pengecualian global), jadi dipaksa putih agar terbaca. */
+html.light .admin-page [class*="from-amber-400"] .text-white,
+html.light .admin-page [class*="from-amber-400"] .text-white\/90 {
+  color: #ffffff;
+}
+
+/* ============================================================
+   MEDIA LIBRARY: PREVIEW MODAL (.admin-preview-modal) — LIGHT
+   Panel modal sudah jadi gradasi putih via [class*=from-...].
+   Teks/permuakan dalam panel diarahkan ke tone gelap + border
+   biru muda agar seluruh isi terbaca di permukaan terang.
+   ============================================================ */
+/* Area preview gambar: latar "kertas gambar" berpola grid halus
+   (dark: garis tipis putih; light: garis biru lembut, di bawah) */
+.admin-page .admin-preview-checkerboard {
+  background-color: rgba(2, 17, 31, 0.55);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+.admin-page .admin-preview-pdf iframe {
+  background: var(--color-night-deep);
+}
+html.light .admin-page .admin-preview-modal {
+  border-color: #d5e2f2;
+  box-shadow: 0 24px 60px -20px rgba(30, 64, 175, 0.35);
+}
+html.light .admin-page .admin-preview-modal .border-white\/\[0\.06\] {
+  border-color: #e3ebf5;
+}
+html.light .admin-page .admin-preview-modal .text-white {
+  color: #0f172a;
+}
+html.light .admin-page .admin-preview-modal .text-slate-300 {
+  color: #475569;
+}
+html.light .admin-page .admin-preview-modal .text-slate-400 {
+  color: #64748b;
+}
+html.light .admin-page .admin-preview-modal .text-slate-500 {
+  color: #7d8bb0;
+}
+html.light .admin-page .admin-preview-modal .text-cyan-300\/90 {
+  color: #0369a1;
+}
+html.light .admin-page .admin-preview-modal a[class*="from-blue-600"] {
+  color: #ffffff;
+}
+html.light .admin-page .admin-preview-modal a[class*="from-blue-600"] svg {
+  color: #ffffff;
+}
+/* Tombol "Download File" (non-previewable) mengikuti warna tipe file:
+   teks & ikon dipaksa putih di light mode (mirip eksespi anchor di atas) */
+html.light .admin-page .admin-preview-modal .admin-preview-download,
+html.light .admin-page .admin-preview-modal .admin-preview-download svg {
+  color: #ffffff;
+}
+/* Tombol "Buka di Tab Baru" mengikuti warna tipe file:
+   teks & ikon dipaksa putih di light mode (mirip download). */
+html.light .admin-page .admin-preview-modal .admin-preview-open,
+html.light .admin-page .admin-preview-modal .admin-preview-open svg {
+  color: #ffffff;
+}
+html.light .admin-page .admin-preview-modal .bg-black\/20 {
+  background-color: #eef3fa;
+}
+html.light .admin-page .admin-preview-modal .bg-white\/5 {
+  background-color: #f6f9fd;
+}
+html.light .admin-page .admin-preview-modal button.border-white\/10,
+html.light .admin-page .admin-preview-modal a.border-white\/10 {
+  border-color: #d7e0ec;
+  background-color: #ffffff;
+  color: #475569;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+html.light .admin-page .admin-preview-modal button.border-white\/10:hover,
+html.light .admin-page .admin-preview-modal a.border-white\/10:hover {
+  background-color: #eef4ff;
+}
+html.light .admin-page .admin-preview-modal .admin-preview-checkerboard {
+  background-color: #e9f0fa;
+  background-image: linear-gradient(rgba(37, 99, 235, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.06) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+html.light .admin-page .admin-preview-modal .admin-preview-pdf iframe {
+  background: #ffffff;
+}
+html.light .admin-page .admin-preview-modal .admin-preview-pdf .bg-white\/5 {
+  background-color: rgba(255, 255, 255, 0.82);
+  border-color: #dbe6f6;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+/* ---- Kartu info (Tipe / Ukuran / Diupload) + bar URL ---- */
+.admin-page .admin-preview-meta-item {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.admin-page .admin-preview-meta-icon {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.admin-page .admin-preview-meta-item .bg-gradient-to-br svg {
+  color: #ffffff;
+}
+/* Icon tipe file di header preview selalu putih (di light mode pun
+   dikecualikan dari override .text-white -> #0f172a) */
+.admin-page .admin-preview-modal .admin-preview-head-icon {
+  color: #ffffff;
+}
+html.light .admin-page .admin-preview-modal .admin-preview-head-icon {
+  color: #ffffff !important;
+}
+.admin-page .admin-preview-meta-item:hover {
+  border-color: rgba(34, 211, 238, 0.3);
+}
+.admin-page .admin-preview-urlbar {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.admin-page .admin-preview-urlbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+.admin-page .admin-preview-urlbtn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #67e8f9;
+}
+.admin-page .admin-preview-urlbtn:active {
+  transform: scale(0.94);
+}
+html.light .admin-page .admin-preview-meta-item,
+html.light .admin-page .admin-preview-urlbar {
+  border-color: #dfe9f4;
+  background-color: #f6f9fd;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+html.light .admin-page .admin-preview-meta-item:hover {
+  border-color: #a9c8ee;
+}
+html.light .admin-page .admin-preview-urlbtn {
+  color: #64748b;
+}
+html.light .admin-page .admin-preview-urlbtn:hover {
+  background-color: #e4edf9;
+  color: #1d4ed8;
+}
+

@@ -1,0 +1,198 @@
+/* ============================================================
+   FILTER TAB (Semua / Published / Draft) — Kelola Berita
+   Posisi & ukuran sama persis seperti dark; hanya warna yang
+   disesuaikan agar tab aktif tetap terlihat di light mode.
+   ============================================================ */
+html.light .admin-page .admin-filter-tabs button {
+  color: #475569;
+}
+html.light .admin-page .admin-filter-tabs button:hover {
+  color: #0f172a;
+  background: #e9eef5;
+}
+html.light .admin-page .admin-filter-tabs button.bg-white\/10 {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 2px 8px -2px rgba(37, 99, 235, 0.45);
+}
+html.light .admin-page .admin-filter-tabs button.bg-emerald-400\/20 {
+  background: #d1fae5;
+  color: #047857;
+}
+html.light .admin-page .admin-filter-tabs button.bg-yellow-400\/20 {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+/* ============================================================
+   KARTU BERITA — LIGHT MODE
+   border-white/10 + bg-white/5 nyatu dengan body terang, jadi
+   kartu diberi latar putih + border biru abu jelas + shadow.
+   Pembatas baris aksi (border-t white/10) juga dipertegas.
+   ============================================================ */
+html.light .admin-page .admin-berita-card {
+  background: #ffffff;
+  border-color: #17294a;
+  border-width: 2px;
+  box-shadow: 0 14px 30px -22px rgba(37, 99, 235, 0.4);
+}
+html.light .admin-page .admin-berita-card div.border-t.border-white\/10 {
+  border-color: #e3ebf5;
+}
+/* Tombol HAPUS berita: LIGHT default = tint pastel + teks merah,
+   hover solid merah + teks putih (tenang, tanpa glow berlebih). */
+html.light .admin-page .admin-berita-card button.border-red-500\/30 {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #e11d48;
+}
+html.light .admin-page .admin-berita-card button.border-red-500\/30:hover {
+  background: #e11d48;
+  border-color: #e11d48;
+  color: #ffffff;
+  box-shadow: 0 8px 18px -10px rgba(225, 29, 72, 0.4);
+}
+/* Tombol HAPUS berita: DARK default = solid merah + teks putih
+   (seperti state hover yang diminta user). Hover dibuat kalem tapi
+   tetap terasa: merah lebih pekat + highlight atas + soft glow kecil,
+   tanpa nyala neon yang alay. */
+html:not(.light) .admin-page .admin-berita-card button.border-red-500\/30 {
+  background: #ef4444;
+  border-color: rgba(248, 113, 113, 0.55);
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+html:not(.light) .admin-page .admin-berita-card button.border-red-500\/30:hover {
+  background: #dc2626;
+  border-color: rgba(252, 165, 165, 0.75);
+  color: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 8px 20px -12px rgba(239, 68, 68, 0.45);
+}
+
+/* ============================================================
+   TAG BERITA (chip kategori) PADA KARTU — Satu struktur style
+   untuk dark & light sehingga mode tidak berubah-ubah.
+   Chip flat sederhana: latar lembut + border halus, tanpa
+   gradasi/titik/glow agar tidak terkesan buatan AI.
+   ============================================================ */
+.admin-page .admin-article-tag {
+  background: #1d3a5f;
+  border: 1px solid #4f86c4;
+  color: #bfe0ff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+html.light .admin-page .admin-article-tag {
+  background: #e8eef6;
+  border: 1px solid #b9c9db;
+  color: #1f3b5c;
+}
+
+/* ============================================================
+   ALASAN PENOLAKAN / CATATAN ADMIN (Detail & Modal Karya) — LIGHT
+   Teks reason memakai text-red-200/80 (disusun untuk latar gelap);
+   di light mode dipergelap agar terbaca di atas permukaan terang.
+   ============================================================ */
+html.light .admin-page .text-red-200\/80 {
+  color: #b91c1c;
+}
+html.light .admin-page .text-emerald-200\/80 {
+  color: #047857;
+}
+html.light .admin-page .text-cyan-200\/80 {
+  color: #0e7490;
+}
+
+/* Tile ikon di dalam container alasan/catatan: translucen-500/10 di atas
+   permukaan terang nyaris tak terlihat -> tint pastel solid supaya ikon
+   "Alasan Penolakan" / "Catatan Persetujuan" jelas (detail & modal). */
+html.light
+  .admin-page
+  .flex.h-8.w-8.shrink-0.items-center.justify-center.rounded-lg.bg-red-500\/10 {
+  background-color: #fee2e2;
+  box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.25);
+}
+html.light
+  .admin-page
+  .flex.h-8.w-8.shrink-0.items-center.justify-center.rounded-lg.bg-emerald-500\/10 {
+  background-color: #d1fae5;
+  box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.25);
+}
+html.light
+  .admin-page
+  .flex.h-8.w-8.shrink-0.items-center.justify-center.rounded-lg.bg-cyan-500\/10 {
+  background-color: #cffafe;
+  box-shadow: inset 0 0 0 1px rgba(6, 182, 212, 0.25);
+}
+
+/* ============================================================
+   EDITOR TOOLBAR (AdminBeritaToolbar) — LIGHT MODE
+   Toolbar default selalu bg-slate-900 (gelap) di semua mode.
+   Di light mode dibuat terang agar selaras kartu putih editor.
+   Dark mode tidak tersentuh.
+   ============================================================ */
+html.light .editor-toolbar {
+  background: linear-gradient(180deg, #ffffff 0%, #f1f6fd 100%);
+  border-bottom-color: #dfe9f9;
+}
+html.light .editor-toolbar button:not([class*="bg-cyan-600"]) {
+  background-color: #ffffff;
+  color: #475569;
+  border-color: #cfe0f7;
+}
+html.light .editor-toolbar button:not([class*="bg-cyan-600"]):hover {
+  background-color: #e6effb;
+  color: #1e3a8a;
+}
+html.light .editor-toolbar button:disabled {
+  background-color: #eef2f7;
+  color: #94a3b8;
+  border-color: #e2e8f0;
+  opacity: 0.6;
+}
+html.light .editor-toolbar select {
+  background-color: #ffffff;
+  color: #334155;
+  border-color: #cfe0f7;
+}
+html.light .editor-toolbar select:hover {
+  background-color: #eef4ff;
+}
+html.light .editor-toolbar .bg-slate-600 {
+  background-color: #cbd5e1;
+}
+html.light .editor-toolbar .text-slate-400 {
+  color: #64748b;
+}
+
+/* ============================================================
+   EDIT / TAMBAH BERTA — LATAR LIGHT DISERAGAMKAN
+   Latar halaman pakai gradasi #f7fafd -> #edf3fa + vignette biru,
+   sehingga tampak #eef4ff di atas tapi berubah jadi #eef4fa di
+   area bawah (pita sempit). Di halaman form berita, seluruh latar
+   dibuat FLAT #eef4ff dan vignette light disembunyikan supaya satu
+   warna penuh seperti header. Dark mode tidak tersentuh.
+   ============================================================ */
+html.light .admin-page .admin-berita-form-root {
+  background: #eef4ff;
+}
+html.light
+  .admin-page
+  .admin-berita-form-root
+  > div.pointer-events-none.absolute.inset-0 {
+  background: transparent !important;
+}
+
+/* ============================================================
+   FOOTER ADMIN (AdminFooter)
+   Dark mode memakai default (bg-night-deep + border putih),
+   light mode disesuaikan di sini agar selaras tema terang.
+   ============================================================ */
+
+html.light .admin-page footer.admin-footer {
+  background: #ffffff;
+  border-color: #cdd9e8;
+  box-shadow: inset 0 1px 0 rgba(37, 99, 235, 0.06);
+}
+

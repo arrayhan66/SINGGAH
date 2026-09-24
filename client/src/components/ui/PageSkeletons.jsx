@@ -137,7 +137,7 @@ export function KnownListSkeleton() {
   )
 }
 
-export function MyKaryaPageSkeleton({ stats = false }) {
+export function MyKaryaPageSkeleton() {
   return (
     <div className="relative mx-auto max-w-7xl 2xl:max-w-[1440px] 3xl:max-w-[1800px] 4xl:max-w-[2200px]">
       <div className="pt-8 2xl:pt-12 3xl:pt-14 4xl:pt-16">
@@ -685,30 +685,30 @@ export function AdminUserDetailSkeleton() {
 
 export function AdminCategoriesSkeleton() {
   return (
-    <div className="grid grid-cols-1 min-[750px]:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 animate-fade-in-up">
+    <div className="grid grid-cols-1 min-[750px]:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 2xl:gap-8 3xl:gap-10 4xl:gap-12 animate-fade-in-up">
       {Array.from({ length: 6 }, (_, i) => (
-        <FormShell key={i} className="overflow-hidden rounded-2xl p-5 sm:p-6">
+        <FormShell key={i} className="overflow-hidden rounded-2xl p-4 min-[300px]:p-5 sm:p-6 3xl:p-7 4xl:p-8">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent" />
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-4 min-w-0">
-              <Skeleton className="h-12 w-12 shrink-0 rounded-xl sm:h-14 sm:w-14" />
+          <div className="flex items-start justify-between gap-2 sm:gap-3">
+            <div className="flex min-w-0 items-center gap-3 min-[300px]:gap-4">
+              <Skeleton className="h-10 w-10 shrink-0 rounded-xl min-[300px]:h-12 min-[300px]:w-12 sm:h-14 sm:w-14 3xl:h-16 3xl:w-16 4xl:h-20 4xl:w-20" />
               <div className="min-w-0">
                 <Skeleton className="h-4 w-40 max-w-[14rem]" />
                 <Skeleton className="mt-2 h-3 w-24" />
               </div>
             </div>
-            <div className="hidden min-[400px]:flex gap-1">
+            <div className="hidden min-[400px]:flex shrink-0 gap-1">
               <Skeleton className="h-8 w-8 rounded-lg" />
               <Skeleton className="h-8 w-8 rounded-lg" />
             </div>
           </div>
-          <div className="mt-4 space-y-2">
+          <div className="mt-3 sm:mt-4 space-y-2">
             <Skeleton className="h-3.5 w-full" />
             <Skeleton className="h-3.5 w-2/3" />
           </div>
-          <div className="mt-5 flex items-center justify-between border-t border-white/[0.1] pt-4">
-            <Skeleton className="h-6 w-20 rounded-md" />
-            <Skeleton className="hidden h-3 w-14 min-[400px]:block" />
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-x-2 gap-y-3 border-t border-white/[0.1] pt-4 sm:mt-5 4xl:mt-6 4xl:pt-5">
+            <Skeleton className="h-6 w-20 shrink-0 rounded-md" />
+            <Skeleton className="h-3 w-14 sm:w-16" />
           </div>
         </FormShell>
       ))}
@@ -855,33 +855,58 @@ export function AdminReportsSkeleton() {
 
 export function AdminSettingsSkeleton() {
   return (
-    <div className="px-4 md:px-6 lg:px-8 pt-6 md:pt-8 pb-12 md:pb-16">
-      <div className="flex flex-col gap-3 min-[700px]:flex-row min-[700px]:items-center min-[700px]:gap-2 pb-5">
-        <Skeleton className="h-11 w-28 rounded-xl" />
-        <Skeleton className="h-11 w-32 rounded-xl" />
-        <Skeleton className="h-11 w-28 rounded-xl" />
-        <Skeleton className="ml-auto h-11 w-28 rounded-xl" />
-      </div>
-      <FormShell className="max-w-3xl p-5 sm:p-8">
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-40" />
-            <Skeleton className="h-11 w-full rounded-xl" />
-          </div>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-40" />
-            <Skeleton className="h-11 w-full rounded-xl" />
-          </div>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-40" />
-            <Skeleton className="h-24 w-full rounded-xl" />
-          </div>
-          <div className="flex justify-end">
-            <Skeleton className="h-11 w-36 rounded-xl" />
+    <>
+      <div className="px-4 min-[260px]:px-3 pt-5 min-[260px]:pt-5 md:px-6 md:pt-6">
+        <div className="flex flex-col items-center text-center sm:flex-row sm:text-left gap-[clamp(0.75rem,0.5rem+1vw,1rem)]">
+          <Skeleton className="h-14 w-14 shrink-0 rounded-2xl sm:h-16 sm:w-16" />
+          <div className="min-w-0 space-y-2">
+            <Skeleton className="h-6 w-52 sm:h-7" />
+            <Skeleton className="h-3.5 w-72 max-w-xs" />
           </div>
         </div>
-      </FormShell>
-    </div>
+      </div>
+
+      <div className="px-4 min-[260px]:px-3 pt-8 min-[260px]:pt-8 pb-5 min-[260px]:pb-5 md:px-6 md:pt-10 md:pb-6">
+        <div className="hidden flex-wrap gap-2 min-[800px]:flex">
+          <Skeleton className="h-9 w-28 rounded-xl" />
+          <Skeleton className="h-9 w-24 rounded-xl" />
+          <Skeleton className="h-9 w-32 rounded-xl" />
+          <Skeleton className="h-9 w-28 rounded-xl" />
+        </div>
+        <div className="min-[800px]:hidden">
+          <Skeleton className="h-11 w-full rounded-xl" />
+        </div>
+      </div>
+
+      <div className="px-4 min-[260px]:px-3 pb-12 md:px-6 md:pb-16 lg:px-8">
+        <div className="mx-auto mt-6 max-w-5xl md:mt-8">
+          <FormShell className="overflow-hidden p-6 md:p-8">
+            <div className="mb-7 flex items-center gap-3.5 border-b border-white/10 pb-5">
+              <Skeleton className="h-10 w-10 shrink-0 rounded-xl" />
+              <div className="min-w-0 space-y-1.5">
+                <Skeleton className="h-5 w-24" />
+                <Skeleton className="h-3.5 w-64 max-w-full" />
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-5 text-center">
+                <Skeleton className="h-12 w-12 rounded-xl" />
+                <div className="min-w-0 space-y-1.5">
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-3 w-64 max-w-full" />
+                </div>
+                <Skeleton className="h-6 w-11 shrink-0 rounded-full" />
+              </div>
+            </div>
+
+            <div className="mt-8 flex flex-col items-stretch gap-3 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+              <Skeleton className="h-11 w-44 rounded-xl" />
+            </div>
+          </FormShell>
+        </div>
+      </div>
+    </>
   )
 }
 

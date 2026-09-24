@@ -159,6 +159,7 @@ function AdminUserList({ search, statusFilter }) {
                     {visibleUsers.map((user, i) => {
                       const tipe = tipeConfig[user.role === "admin" ? "admin" : user.tipe] || tipeConfig.umum
                       const isPending = Boolean(user.pending_tipe)
+                      const canTipeVerify = isPending && user.status === "Aktif"
                       const pendingLabel = pendingTipeLabel[user.pending_tipe] || "Tipe Baru"
                       const projectCount = user.projectCount ?? 0
                       const hasProjects = projectCount > 0
@@ -213,7 +214,7 @@ function AdminUserList({ search, statusFilter }) {
                                 {tipe.label}
                               </span>
                               {isPending && (
-                                <span className="inline-flex items-center gap-1 rounded-md border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-[11px] font-semibold text-amber-300">
+                                <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-[11px] font-semibold text-amber-300">
                                   <Hourglass className="h-3 w-3" />
                                   Verifikasi {pendingLabel}
                                 </span>
@@ -246,7 +247,7 @@ function AdminUserList({ search, statusFilter }) {
                           </td>
                           <td className="px-4 py-3.5 text-right">
                             <div className="flex items-center justify-end gap-1.5">
-                              {isPending ? (
+                              {canTipeVerify ? (
                                 <>
                                   <button
                                     onClick={() => handleApproveClick(user)}

@@ -22,6 +22,7 @@ import api from "../../../../services/api";
 
 import SmartImage from "../../../ui/SmartImage";
 import PopupToast from "../../../ui/PopupToast";
+import { compressImage } from "../../../../utils/compressImage";
 
 function RegisterForm() {
   const navigate = useNavigate();
@@ -125,9 +126,11 @@ function RegisterForm() {
     if (e.key === "Enter") e.preventDefault();
   };
 
-  const handleFileChange = (e, setFileState, setPreview) => {
+  const handleFileChange = async (e, setFileState, setPreview) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
+      const file = await compressImage(e.target.files[0], {
+        maxSize: 2 * 1024 * 1024,
+      });
       setFileState(file);
       setPreview(URL.createObjectURL(file));
     }

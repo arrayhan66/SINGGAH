@@ -1,0 +1,393 @@
+/* ============================================================
+   MEDIA LIBRARY: BAR STATISTIK (Total File / Gambar / Dokumen /
+   Total Ukuran) — LIGHT MODE.
+   Pola tersebar lewat JSX: bg-gradient-to-br ringan per hue.
+   Light mode meminjam pola yang sama: dasar putih + wash gradient
+   transparan (bukan solid). Keempat kartu satu sistem desain,
+   bedanya hanya hue aksen (cyan/emerald/blue/violet).
+   ============================================================ */
+/* Kontainer stats: latar netral hampir putih agar semua kartu
+   tampil seimbang */
+html.light .admin-page .media-stats-bar {
+  background: #f8fafd;
+  border-color: #e3eaf5;
+  box-shadow:
+    0 6px 20px -14px rgba(37, 99, 235, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  backdrop-filter: none;
+}
+
+/* PATOKAN (light mode) — satu pola untuk keempat kartu:
+   DASAR PUTIH + WASH/GRADIENT transparan per hue (persis seperti
+   Total File & Gambar). Gradasi dari JSX dibiarkan bekerja di
+   atas putih, area putih tetap dominan. TIDAK ada background-color
+   solid sebagai warna kartu. Hue mengikuti class dari JSX:
+   cyan / emerald / blue / violet.
+   Draft: cyan & emerald sudah tampil begini; blue & violet ikut
+   pola yang sama — beda hue saja. */
+html.light .admin-page .media-stat-item {
+  background-color: #ffffff;
+  border: 1px solid #e9eef8;
+  box-shadow: 0 2px 10px -6px rgba(37, 99, 235, 0.18);
+}
+
+/* Border light mode: mengikuti warna icon/aksen masing-masing
+   kartu agar garisnya terlihat jelas */
+html.light .admin-page .media-stat-item.from-cyan-500\/20 {
+  border-color: #3aa9dd;
+}
+html.light .admin-page .media-stat-item.from-emerald-500\/20 {
+  border-color: #2fbf8f;
+}
+html.light .admin-page .media-stat-item.from-blue-500\/20 {
+  border-color: #4c8df1;
+}
+html.light .admin-page .media-stat-item.from-violet-500\/20 {
+  border-color: #8a6cf0;
+}
+
+/* Total File & Gambar menyesuaikan ke pola visual Dokumen/Total
+   Ukuran: cyan & emerald secara alami tampak lebih pucat daripada
+   blue & violet pada opasitas yang sama, jadi wash-nya diperkuat
+   sedikit agar "sekeliatan" Dokumen/Ungu — tetap wash transparan,
+   TANPA background solid, dasar putih tetap dominan. */
+html.light .admin-page .media-stat-item.from-cyan-500\/20 {
+  background-image: linear-gradient(
+    135deg,
+    rgba(8, 145, 178, 0.32),
+    rgba(8, 145, 178, 0.11) 55%,
+    rgba(255, 255, 255, 0)
+  );
+}
+html.light .admin-page .media-stat-item.from-emerald-500\/20 {
+  background-image: linear-gradient(
+    135deg,
+    rgba(5, 150, 105, 0.3),
+    rgba(5, 150, 105, 0.1) 55%,
+    rgba(255, 255, 255, 0)
+  );
+}
+
+/* Watermark ikon kanan atas: warna sama persis dengan ikon kiri
+   di dalam tile, agar dua ikon itu senada */
+html.light .admin-page .media-stat-watermark {
+  opacity: 0.15;
+}
+html.light .admin-page .media-stat-item .media-stat-watermark.text-cyan-300 {
+  color: #0e7490 !important;
+}
+html.light .admin-page .media-stat-item .media-stat-watermark.text-emerald-300 {
+  color: #047857 !important;
+}
+html.light .admin-page .media-stat-item .media-stat-watermark.text-blue-300 {
+  color: #1d4ed8 !important;
+}
+html.light .admin-page .media-stat-item .media-stat-watermark.text-violet-300 {
+  color: #6d28d9 !important;
+}
+
+/* Hover: shadow kebiruan halus, tidak abu-abu */
+html.light .admin-page .media-stat-item:hover {
+  box-shadow: 0 6px 20px -10px rgba(37, 99, 235, 0.28);
+}
+
+/* Ikon: tile pastel solid + ring per warna, ikon digelapkan */
+html.light .admin-page .media-stat-icon {
+  border: 1px solid;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+html.light .admin-page .media-stat-icon.bg-cyan-400\/15 {
+  background-color: #e0f2fe;
+  border-color: #7dd3fc;
+}
+html.light .admin-page .media-stat-icon.bg-emerald-400\/15 {
+  background-color: #d1fae5;
+  border-color: #6ee7b7;
+}
+html.light .admin-page .media-stat-icon.bg-blue-400\/15 {
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+}
+html.light .admin-page .media-stat-icon.bg-violet-400\/15 {
+  background-color: #ede9fe;
+  border-color: #c4b5fd;
+}
+
+/* Ikon per warna: gelap pekat agar kontras di tile pastel */
+html.light .admin-page .media-stat-icon .text-cyan-300 {
+  color: #0e7490;
+}
+html.light .admin-page .media-stat-icon .text-emerald-300 {
+  color: #047857;
+}
+html.light .admin-page .media-stat-icon .text-blue-300 {
+  color: #1d4ed8;
+}
+html.light .admin-page .media-stat-icon .text-violet-300 {
+  color: #6d28d9;
+}
+
+/* Nilai & label: gelap agar terbaca di latar putih */
+html.light .admin-page .media-stats-grid p.text-white {
+  color: #404040;
+}
+html.light .admin-page .media-stats-grid p.text-slate-400,
+html.light .admin-page .media-stats-grid p.text-slate-300\/80 {
+  color: #64748b;
+}
+
+/* ============================================================
+   USER PAGE: KARTU STATISTIK (Total User / Aktif / Nonaktif /
+   Menunggu Verifikasi) — LIGHT MODE.
+   Polanya sama persis dengan Media Library: dasar PUTIH + wash
+   gradient transparan per hue; border mengikuti warna ikon;
+   tile ikon pastel + glyph gelap; teks gelap. Bukan solid.
+   ============================================================ */
+html.light .admin-page .user-stat-item {
+  background-color: #ffffff;
+  border: 1px solid #e9eef8;
+  box-shadow: 0 2px 10px -6px rgba(37, 99, 235, 0.18);
+}
+
+/* Perkuat wash untuk hue terang (cyan/emerald/amber) supaya
+   setara dengan yang lain — tetap transparan di atas putih */
+html.light .admin-page .user-stat-item.from-cyan-500\/20 {
+  background-image: linear-gradient(
+    135deg,
+    rgba(8, 145, 178, 0.3),
+    rgba(8, 145, 178, 0.1) 55%,
+    rgba(255, 255, 255, 0)
+  );
+}
+html.light .admin-page .user-stat-item.from-emerald-500\/20 {
+  background-image: linear-gradient(
+    135deg,
+    rgba(5, 150, 105, 0.28),
+    rgba(5, 150, 105, 0.1) 55%,
+    rgba(255, 255, 255, 0)
+  );
+}
+html.light .admin-page .user-stat-item.from-amber-500\/20 {
+  background-image: linear-gradient(
+    135deg,
+    rgba(217, 119, 6, 0.3),
+    rgba(217, 119, 6, 0.1) 55%,
+    rgba(255, 255, 255, 0)
+  );
+}
+
+/* Border mengikuti warna ikon */
+html.light .admin-page .user-stat-item.from-cyan-500\/20 {
+  border-color: #3aa9dd;
+}
+html.light .admin-page .user-stat-item.from-emerald-500\/20 {
+  border-color: #2fbf8f;
+}
+html.light .admin-page .user-stat-item.from-red-500\/20 {
+  border-color: #e2574f;
+}
+html.light .admin-page .user-stat-item.from-amber-500\/20 {
+  border-color: #d98d1f;
+}
+
+/* Nilai & label: gelap agar terbaca di latar putih */
+html.light .admin-page .user-stat-item p.text-white {
+  color: #404040;
+}
+html.light .admin-page .user-stat-item p.text-slate-300\/80 {
+  color: #64748b;
+}
+
+/* Watermark: warna per hue, halus */
+html.light .admin-page .user-stat-watermark {
+  opacity: 0.15;
+}
+html.light .admin-page .user-stat-item .user-stat-watermark.text-cyan-300 {
+  color: #0e7490 !important;
+}
+html.light .admin-page .user-stat-item .user-stat-watermark.text-emerald-300 {
+  color: #047857 !important;
+}
+html.light .admin-page .user-stat-item .user-stat-watermark.text-red-300 {
+  color: #b91c1c !important;
+}
+html.light .admin-page .user-stat-item .user-stat-watermark.text-amber-300 {
+  color: #b45309 !important;
+}
+
+/* Tile ikon: pastel solid + ring per warna */
+html.light .admin-page .user-stat-icon {
+  border: 1px solid;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+html.light .admin-page .user-stat-icon.bg-cyan-400\/15 {
+  background-color: #e0f2fe;
+  border-color: #7dd3fc;
+}
+html.light .admin-page .user-stat-icon.bg-emerald-400\/15 {
+  background-color: #d1fae5;
+  border-color: #6ee7b7;
+}
+html.light .admin-page .user-stat-icon.bg-red-400\/15 {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+}
+html.light .admin-page .user-stat-icon.bg-amber-400\/15 {
+  background-color: #fef3c7;
+  border-color: #fcd34d;
+}
+
+/* Glyph ikon: gelap agar kontras di tile pastel */
+html.light .admin-page .user-stat-icon .text-cyan-300 {
+  color: #0e7490;
+}
+html.light .admin-page .user-stat-icon .text-emerald-300 {
+  color: #047857;
+}
+html.light .admin-page .user-stat-icon .text-red-300 {
+  color: #b91c1c;
+}
+html.light .admin-page .user-stat-icon .text-amber-300 {
+  color: #b45309;
+}
+
+/* ============================================================
+   MEDIA LIBRARY: TABEL TAMPILAN DAFTAR — HEADER LIGHT MODE.
+   Header dibuat menonjol: gradasi biru muda + teks gelap pekat,
+   kontainer putih dengan border & shadow biru lembut supaya
+   tabel "keliatan" di light mode.
+   ============================================================ */
+html.light .admin-page .admin-media-table {
+  background-color: #ffffff;
+  border-color: #d5e2f2;
+  box-shadow:
+    0 6px 20px -14px rgba(37, 99, 235, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  backdrop-filter: none;
+}
+html.light .admin-page .admin-media-table-head {
+  background-color: #1d4ed8;
+  background-image: none;
+  border-bottom-color: #1e40af;
+}
+html.light .admin-page .admin-media-table-head th {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* ============================================================
+   USER PAGE: TABEL DAFTAR USER — LIGHT MODE.
+   Mengambil pola tabel list Media Library: kontainer putih +
+   header biru #2563eb (dari .admin-media-table/-head yang sudah
+   dipakai di markup). Bagian ini hanya memoles sel/badge/aksi
+   agar rapi & terbaca di atas latar putih. Dark mode & layout
+   tidak berubah.
+   ============================================================ */
+/* Baris: pemisah halus + hover biru lembut */
+html.light .admin-page .admin-user-table tbody tr {
+  border-bottom-color: #eef3fa;
+}
+html.light .admin-page .admin-user-table tbody tr:hover {
+  background-color: #f5f9ff;
+}
+
+/* Nama user & email sudah ditangani token global (gelap) */
+
+/* Badge tipe user (mahasiswa/dosen/admin/umum): pastel + teks gelap */
+html.light .admin-page .admin-user-table .border-cyan-400\/20.bg-cyan-400\/10.text-cyan-300 {
+  background-color: #e0f2fe;
+  border-color: #7dd3fc;
+  color: #0e7490;
+}
+html.light .admin-page .admin-user-table .border-blue-400\/20.bg-blue-400\/10.text-blue-300 {
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+html.light .admin-page .admin-user-table .border-purple-400\/20.bg-purple-400\/10.text-purple-300 {
+  background-color: #ede9fe;
+  border-color: #c4b5fd;
+  color: #6d28d9;
+}
+html.light .admin-page .admin-user-table .border-slate-400\/20.bg-slate-400\/10.text-slate-300 {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+/* Badge status & verifikasi */
+html.light .admin-page .admin-user-table .border-emerald-400\/20.bg-emerald-400\/10.text-emerald-300 {
+  background-color: #d1fae5;
+  border-color: #6ee7b7;
+  color: #047857;
+}
+html.light .admin-page .admin-user-table .border-red-400\/20.bg-red-400\/10.text-red-300 {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+html.light .admin-page .admin-user-table .border-amber-400\/30.bg-amber-400\/10.text-amber-300 {
+  background-color: #fef3c7;
+  border-color: #fcd34d;
+  color: #b45309;
+}
+
+/* Chip jumlah karya */
+html.light .admin-page .admin-user-table .border-white\/\[0\.06\].bg-white\/\[0\.03\].text-slate-300 {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+  color: #475569;
+}
+html.light .admin-page .admin-user-table .border-white\/\[0\.06\].bg-white\/\[0\.03\].text-slate-300 .text-cyan-400 {
+  color: #2563eb;
+}
+
+/* Tombol aksi */
+html.light .admin-page .admin-user-table button.bg-white\/5.border-white\/10.text-slate-200 {
+  background-color: #f1f5f9;
+  border-color: #d5e2f2;
+  color: #334155;
+}
+html.light .admin-page .admin-user-table button.bg-white\/5.border-white\/10.text-slate-200:hover {
+  background-color: #e2e8f0;
+  color: #0f172a;
+}
+html.light .admin-page .admin-user-table button.bg-white\/5.border-white\/10.text-slate-300 {
+  background-color: #f1f5f9;
+  border-color: #d5e2f2;
+  color: #64748b;
+}
+html.light .admin-page .admin-user-table button.bg-white\/5.border-white\/10.text-slate-300:hover {
+  background-color: #e2e8f0;
+  color: #0f172a;
+}
+html.light .admin-page .admin-user-table button.border-emerald-500\/25.bg-emerald-500\/\[0\.06\].text-emerald-300 {
+  background-color: rgba(16, 185, 129, 0.12);
+  border-color: #34d399;
+  color: #047857;
+}
+html.light .admin-page .admin-user-table button.border-emerald-500\/25.bg-emerald-500\/\[0\.06\].text-emerald-300:hover {
+  background-color: rgba(16, 185, 129, 0.2);
+}
+html.light .admin-page .admin-user-table button.border-red-500\/25.bg-red-500\/\[0\.04\].text-red-400 {
+  background-color: rgba(239, 68, 68, 0.08);
+  border-color: #f87171;
+  color: #b91c1c;
+}
+html.light .admin-page .admin-user-table button.border-red-500\/25.bg-red-500\/\[0\.04\].text-red-400:hover {
+  background-color: rgba(239, 68, 68, 0.16);
+}
+/* Hover ikon edit/delete yang memakai cyan/merah */
+html.light .admin-page .admin-user-table .hover\:bg-cyan-500\/20:hover {
+  background-color: #dbeafe;
+}
+html.light .admin-page .admin-user-table .hover\:text-cyan-300:hover {
+  color: #1d4ed8;
+}
+html.light .admin-page .admin-user-table .hover\:bg-red-500\/20:hover {
+  background-color: #fee2e2;
+}
+html.light .admin-page .admin-user-table .hover\:text-red-400:hover {
+  color: #b91c1c;
+}
+

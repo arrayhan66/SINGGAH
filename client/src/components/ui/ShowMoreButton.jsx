@@ -6,7 +6,7 @@ function ShowMoreButton({ label, total, showAll, onToggle, className = "" }) {
       <button
         type="button"
         onClick={onToggle}
-        className="flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-5 py-2.5 text-sm font-medium text-slate-200 shadow-lg shadow-black/10 backdrop-blur-xl transition-all duration-[250ms] hover:-translate-y-0.5 hover:border-cyan-400/40 hover:bg-cyan-500/10 hover:text-cyan-200"
+        className="flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-5 py-2.5 text-sm font-medium text-slate-200 shadow-lg shadow-black/10 backdrop-blur-xl transition-all duration-[250ms] hover:-translate-y-0.5 hover:border-cyan-400/40 hover:bg-cyan-500/10 hover:text-cyan-200 3xl:px-6 3xl:py-3 3xl:text-base 4xl:px-7 4xl:py-3.5 4xl:text-lg"
       >
         {showAll ? (
           <>

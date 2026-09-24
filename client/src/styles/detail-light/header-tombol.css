@@ -1,0 +1,234 @@
+/* ===== TEKS ===== */
+html.light .detail-page h1.text-white,
+html.light .detail-page h2.text-white,
+html.light .detail-page h3.text-white {
+  color: #404040;
+}
+html.light .detail-page .text-slate-300 {
+  color: #475569;
+}
+html.light .detail-page .text-slate-400 {
+  color: #64748b;
+}
+html.light .detail-page .text-cyan-300 {
+  color: #2563eb;
+}
+
+/* ===== HEADER HALAMAN ===== */
+/* Judul nama kategori: NORMAL seperti dark mode (tanpa efek 3D),
+   warna hitam keabu #404040 PERSIS tulisan "SINGGAH SEJENAK" di beranda */
+html.light .karya-detail-page #karya-detail h2.text-white {
+  letter-spacing: -0.02em;
+  background-image: none;
+  color: #404040;
+  filter: none;
+}
+
+/* ===== PERMUKAAN & BORDER ===== */
+html.light .detail-page .bg-white\/5 {
+  background-color: #fbfcfe;
+}
+html.light .detail-page .bg-white\/10 {
+  background-color: #f4f8fd;
+}
+html.light .detail-page .border-white\/10 {
+  border-color: #e2e8f0;
+}
+html.light .detail-page .border-white\/20 {
+  border-color: #dbe4f2;
+}
+html.light .detail-page .divide-white\/10 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #e9eff8;
+}
+
+/* ===== BADGE / CHIP IKON ===== */
+html.light .detail-page .bg-cyan-400\/10.border-cyan-400\/30 {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+}
+html.light .detail-page .bg-cyan-400\/10.border-cyan-400\/30 svg {
+  color: #2563eb;
+}
+
+/* ===== SEARCH BAR ===== */
+/* Disamakan PERSIS dengan search bar halaman Karya:
+   permukaan putih natural + fokus border biru muda & glow biru */
+html.light .karya-detail-page .border-white\/60.bg-white\/90 {
+  background-color: #fbfcfe;
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 16px -8px rgba(15, 23, 42, 0.12);
+}
+html.light .karya-detail-page .focus-within\:border-cyan-400:focus-within {
+  border-color: #93c5fd;
+}
+html.light .karya-detail-page .focus-within\:shadow-cyan-400\/30:focus-within {
+  box-shadow:
+    0 14px 28px -10px rgba(37, 99, 235, 0.38),
+    0 6px 12px -6px rgba(37, 99, 235, 0.22);
+}
+
+/* ===== TOMBOL KEMBALI / AKSI ===== */
+/* Hanya dalam area konten (main). Navbar + dropdown notifikasi yang
+   punya warna ikon sendiri (bell, tile tipe, aksi) tidak boleh
+   disamakan jadi inherit agar warnanya tidak hilang. */
+html.light .detail-page main button svg {
+  color: inherit;
+}
+
+/* Tombol kembali (pill kiri atas): LIGHT MODE jadi gradasi cyan -> biru
+   senada badge kategori & tombol "Lihat Detail"; teks/ikon putih,
+   lingkaran ikon putih transparan.
+   Hover POLOS persis "Lihat Detail": hanya pertukaran warna gradasi,
+   tanpa gerakan/terangkat/kilau apapun. */
+html.light
+  .karya-detail-page
+  a.rounded-full.border-white\/10.bg-white\/5 {
+  border-color: rgba(255, 255, 255, 0.35);
+  background-color: #2563eb;
+  background-image: linear-gradient(135deg, #22d3ee 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+html.light
+  .karya-detail-page
+  a.rounded-full.border-white\/10.bg-white\/5:hover {
+  border-color: rgba(255, 255, 255, 0.75);
+  background-color: #1d4ed8;
+  background-image: linear-gradient(135deg, #06b6d4 0%, #1d4ed8 100%);
+}
+html.light
+  .karya-detail-page
+  a.rounded-full.border-white\/10.bg-white\/5
+  span.rounded-full.bg-white\/10 {
+  background-color: rgba(255, 255, 255, 0.22);
+}
+html.light
+  .karya-detail-page
+  a.rounded-full.border-white\/10.bg-white\/5.hover\:text-cyan-300:hover {
+  color: #ffffff;
+}
+
+/* ===== UKURAN TOMBOL KEMBALI ===== */
+/* Ukuran (tinggi ~42px, lebar +25%, ikon 28px) & hover polos sudah
+   diseragamkan langsung di JSX untuk dark & light -> tanpa override
+   ukuran di sini. CSS light hanya mengganti muka warna gradasi. */
+
+/* RESPONSIVE (<sm): teks "Kembali" tersembunyi -> kontainer luar
+   menyusut jadi LINGKARAN 40px dan isiannya dibuat KONTRAS supaya
+   terlihat PEMBUNGKUS DALAM PEMBUNGKUS (2 lingkaran jelas) */
+@media (max-width: 639px) {
+  .karya-detail-page
+    #karya-detail
+    a.rounded-full.border-white\/10.bg-white\/5 {
+    gap: 0;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+  }
+  /* Dark mode: inti lebih terang + tepi tegas */
+  .karya-detail-page
+    #karya-detail
+    a.rounded-full.border-white\/10.bg-white\/5
+    span.rounded-full.bg-white\/10 {
+    background-color: rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32);
+  }
+}
+/* Light mode: pembungkus luar gradasi cyan -> biru, INTI PUTIH dengan
+   panah biru -> dua lingkaran kontras jelas */
+@media (max-width: 639px) {
+  html.light
+    .karya-detail-page
+    #karya-detail
+    a.rounded-full.border-white\/10.bg-white\/5
+    span.rounded-full.bg-white\/10 {
+    background-color: #ffffff;
+    box-shadow:
+      inset 0 0 0 1px rgba(37, 99, 235, 0.25),
+      0 2px 6px -1px rgba(29, 78, 216, 0.4);
+  }
+  html.light
+    .karya-detail-page
+    #karya-detail
+    a.rounded-full.border-white\/10.bg-white\/5
+    span.rounded-full.bg-white\/10
+    svg {
+    color: #1d4ed8;
+  }
+}
+
+/* Tombol kembali galeri project: muka gradasi cyan -> biru PERSIS
+   pill kembali halaman kategori supaya konsisten.
+   Hover juga crossfade lewat ::before (sama seperti di atas) */
+html.light
+  .karya-projectdetail-page
+  button.rounded-full.border-white\/20.bg-brand-dark\/90.backdrop-blur-md {
+  isolation: isolate;
+  overflow: hidden;
+  border-color: rgba(255, 255, 255, 0.35);
+  background-color: #2563eb;
+  background-image: linear-gradient(135deg, #22d3ee 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 6px 16px -6px rgba(37, 99, 235, 0.55);
+}
+html.light
+  .karya-projectdetail-page
+  button.rounded-full.border-white\/20.bg-brand-dark\/90.backdrop-blur-md::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(135deg, #06b6d4 0%, #1d4ed8 100%);
+  opacity: 0;
+  transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+html.light
+  .karya-projectdetail-page
+  button.rounded-full.border-white\/20.bg-brand-dark\/90.backdrop-blur-md:hover::before {
+  opacity: 1;
+}
+html.light
+  .karya-projectdetail-page
+  button.rounded-full.border-white\/20.bg-brand-dark\/90.backdrop-blur-md
+  span.rounded-full.bg-white\/10 {
+  background-color: rgba(255, 255, 255, 0.22);
+}
+html.light
+  .karya-projectdetail-page
+  button.rounded-full.border-white\/20.bg-brand-dark\/90.backdrop-blur-md:hover {
+  border-color: rgba(255, 255, 255, 0.75);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 10px 22px -8px rgba(37, 99, 235, 0.65);
+}
+html.light
+  .karya-projectdetail-page
+  button.rounded-full.border-white\/20.bg-brand-dark\/90.backdrop-blur-md.hover\:text-cyan-300:hover {
+  color: #ffffff;
+}
+
+/* Tombol "Kembali ke Daftar Kategori" (state kategori tidak ditemukan):
+   gradasi cyan -> biru yang sama agar konsisten */
+html.light
+  .karya-detail-page
+  button.rounded-xl.border-slate-200.bg-white.text-slate-700 {
+  border-color: transparent;
+  background-color: #2563eb;
+  background-image: linear-gradient(135deg, #22d3ee 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 6px 16px -6px rgba(37, 99, 235, 0.55);
+}
+html.light
+  .karya-detail-page
+  button.rounded-xl.border-slate-200.hover\:bg-slate-50:hover {
+  background-color: #1d4ed8;
+  background-image: linear-gradient(135deg, #06b6d4 0%, #1d4ed8 100%);
+  color: #ffffff;
+}
+

@@ -1,0 +1,291 @@
+/* ============================================================
+   ICON KARTU KATEGORI (CategoryCard) — mengikuti tile menu aktif
+   sidebar: dark = gradasi cyan→biru solid + glow, ikon putih;
+   light = biru solid (#2563eb) + ikon putih + shadow lembut.
+   ============================================================ */
+.admin-page div.admin-category-icon {
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-color: transparent;
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 6px 18px -6px rgba(34, 211, 238, 0.5);
+}
+.admin-page div.admin-category-icon svg {
+  color: #ffffff;
+}
+html.light .admin-page div.admin-category-icon {
+  background-image: none;
+  background-color: #2563eb;
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 6px 18px -6px rgba(37, 99, 235, 0.45);
+}
+html.light .admin-page div.admin-category-icon svg {
+  color: #ffffff;
+}
+
+/* ===== WIREFRAME LOADING DASHBOARD ADMIN (LIGHT) =====
+   Blok loading di dashboard memakai .animate-pulse + bg-white/10 atau
+   bg-white/[0.04] (bukan utilitas .skeleton) sehingga di light mode
+   nyaris tidak terlihat di atas permukaan putih. Beri tint + border
+   biru yang jelas supaya wireframe terbaca. */
+html.light .admin-page .animate-pulse.bg-white\/10,
+html.light .admin-page .animate-pulse.bg-white\/\[0\.04\] {
+  background-color: rgba(37, 99, 235, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.45);
+}
+html.light .admin-page .animate-pulse.border-white\/\[0\.06\] {
+  border-color: rgba(37, 99, 235, 0.5);
+}
+html.light .admin-page .animate-pulse.bg-white\/\[0\.04\].rounded-lg {
+  background-color: rgba(37, 99, 235, 0.35);
+}
+
+/* ============================================================
+   DETAIL KARYA ADMIN (AdminProjectDetail) — LIGHT MODE
+   Halaman memakai komponen yang sama dengan KaryaProjectDetail
+   publik (gallery, konten, komentar) sehingga dipakai detail-light.css
+   lewat class .karya-projectdetail-page (di-import di halaman).
+   Bagian yang bersifat ADMIN (status banner, tombol kembali) perlu
+   penyelesaian khusus di sini. Dark mode tidak tersentuh.
+   ============================================================ */
+
+/* Spasi atas container: detail-light.css menambah padding navbar pada
+   #karya-project-detail utk halaman publik; di admin navbar AdminLayout
+   sudah menyediakan spasi, jadi dikembalikan ke pt-6 / sm:pt-8. */
+html.light
+  .admin-page
+  .karya-projectdetail-page
+  #karya-project-detail
+  > div.relative {
+  padding-top: 1.5rem;
+}
+@media (min-width: 640px) {
+  html.light
+    .admin-page
+    .karya-projectdetail-page
+    #karya-project-detail
+    > div.relative {
+    padding-top: 2rem;
+  }
+}
+
+/* ============================================================
+   STATUS BANNER ADMIN — Detail Karya (AdminProjectDetail)
+   Banner status (Menunggu Review / Dipublikasikan / Ditolak)
+   didesain ulang dengan bahasa "panel status" yang bersih:
+   rail aksen vertikal, ikon dalam tile, dot indikator (berdenyut
+   utk pending), dan tombol aksi yang tegas & konsisten di DARK
+   dan LIGHT. Tanpa glow neon, tanpa gradasi kelewat, tanpa template.
+   ============================================================ */
+
+/* ---- Warna aksen per status ---- */
+.admin-status-banner.pending {
+  --banner-color: #fbbf24;
+}
+.admin-status-banner.published {
+  --banner-color: #38bdf8;
+}
+.admin-status-banner.rejected {
+  --banner-color: #fb7185;
+}
+html.light .admin-status-banner.pending {
+  --banner-color: #b45309;
+}
+html.light .admin-status-banner.published {
+  --banner-color: #0284c7;
+}
+html.light .admin-status-banner.rejected {
+  --banner-color: #e11d48;
+}
+
+/* ---- DARK — kartu banner ---- */
+.admin-status-banner {
+  position: relative;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.045) 0%,
+    rgba(255, 255, 255, 0.015) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 16px 32px -18px rgba(0, 0, 0, 0.6);
+}
+.admin-status-banner .banner-accent {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.875rem;
+  width: 3px;
+  height: 2.25rem;
+  border-radius: 9999px;
+  background: var(--banner-color);
+}
+@media (min-width: 640px) {
+  .admin-status-banner .banner-accent {
+    top: 1.125rem;
+  }
+}
+.admin-status-banner .banner-icon {
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--banner-color);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.admin-status-banner .banner-icon-svg {
+  color: var(--banner-color);
+}
+.admin-status-banner .banner-dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: var(--banner-color);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+}
+/* Denyut halus utk status pending (senada dot status kartu karya) */
+.admin-status-banner.pending .banner-dot::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  background: var(--banner-color);
+  opacity: 0.45;
+  animation: banner-ring 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes banner-ring {
+  75%,
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+.admin-status-banner .banner-label {
+  color: #f1f5f9;
+}
+.admin-status-banner .banner-id {
+  color: #8ea3bd;
+  letter-spacing: 0.01em;
+}
+.admin-status-banner .banner-divider {
+  width: 1px;
+  height: 2rem;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ---- Tombol aksi (base) ---- */
+.admin-status-banner .banner-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  border-radius: 0.6rem;
+  padding: 0.5rem 0.9rem;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+@media (min-width: 820px) {
+  .admin-status-banner .banner-btn {
+    width: auto;
+  }
+}
+.admin-status-banner .banner-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+.admin-status-banner .banner-btn--primary {
+  background: #059669;
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 8px 18px -10px rgba(5, 150, 105, 0.7);
+}
+.admin-status-banner .banner-btn--primary:hover {
+  background: #047857;
+  border-color: rgba(16, 185, 129, 0.6);
+}
+.admin-status-banner .banner-btn--ghost {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.11);
+  color: #cbd5e1;
+}
+.admin-status-banner .banner-btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+.admin-status-banner .banner-btn--ghost.banner-btn--danger {
+  color: #fda4af;
+}
+.admin-status-banner .banner-btn--ghost.banner-btn--danger:hover {
+  background: rgba(244, 63, 94, 0.12);
+  border-color: rgba(244, 63, 94, 0.3);
+  color: #fecdd3;
+}
+
+/* ---- LIGHT — kartu banner ---- */
+html.light .admin-status-banner {
+  border-color: color-mix(in srgb, var(--banner-color) 32%, #dbe6f5);
+  background: linear-gradient(180deg, #ffffff 0%, #f6f9fe 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 12px 28px -16px rgba(30, 64, 175, 0.32);
+}
+html.light .admin-status-banner .banner-icon {
+  border-color: color-mix(in srgb, var(--banner-color) 26%, #dbe6f5);
+  background: color-mix(in srgb, var(--banner-color) 9%, #ffffff);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+html.light .admin-status-banner .banner-dot {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.85);
+}
+html.light .admin-status-banner .banner-label {
+  color: #1e293b;
+}
+html.light .admin-status-banner .banner-id {
+  color: #64748b;
+}
+html.light .admin-status-banner .banner-divider {
+  background: #dfe7f1;
+}
+html.light .admin-status-banner .banner-btn--primary {
+  background: #059669;
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 8px 18px -12px rgba(5, 150, 105, 0.6);
+}
+html.light .admin-status-banner .banner-btn--primary:hover {
+  background: #047857;
+}
+html.light .admin-status-banner .banner-btn--ghost {
+  background: #ffffff;
+  border-color: #d7e0ec;
+  color: #475569;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+html.light .admin-status-banner .banner-btn--ghost:hover {
+  background: #f5f8fc;
+  border-color: #b9cbe4;
+  color: #0f172a;
+}
+html.light .admin-status-banner .banner-btn--ghost.banner-btn--danger {
+  color: #e11d48;
+}
+html.light .admin-status-banner .banner-btn--ghost.banner-btn--danger:hover {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #be123c;
+}
+

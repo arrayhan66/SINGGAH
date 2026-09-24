@@ -2,6 +2,7 @@ import { useRef, useState } from "react"
 import { ImagePlus, X } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
 import SmartImage from "../../../ui/SmartImage"
+import { compressImage } from "../../../../utils/compressImage"
 
 function UploadThumbnail({ value, onChange, existingValue, onRemoveExisting }) {
   const inputRef = useRef(null)
@@ -14,7 +15,11 @@ function UploadThumbnail({ value, onChange, existingValue, onRemoveExisting }) {
 
   function handleFileChange(e) {
     const file = e.target.files?.[0]
-    if (file) onChange(file)
+    if (!file) return
+    compressImage(file, { maxSize: 5 * 1024 * 1024 }).then((compressed) =>
+      onChange(compressed)
+    )
+    if (inputRef.current) inputRef.current.value = ""
   }
 
   function handleDrop(e) {

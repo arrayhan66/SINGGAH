@@ -1,0 +1,215 @@
+.user-page #my-karya span.rounded-full.bg-brand-navy\/80.border-amber-400\/30 {
+  background: linear-gradient(180deg, #fff7ed 0%, #fde9c8 100%);
+  border-color: #f6c25c !important;
+  color: #9a5b00 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 4px 12px -4px rgba(217, 119, 6, 0.45);
+}
+.user-page #my-karya span.rounded-full.bg-brand-navy\/80.border-emerald-400\/30 {
+  background: linear-gradient(180deg, #ecfdf5 0%, #c8f0dd 100%);
+  border-color: #5fd2a0 !important;
+  color: #04653d !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 4px 12px -4px rgba(16, 185, 129, 0.45);
+}
+.user-page #my-karya span.rounded-full.bg-brand-navy\/80.border-red-400\/30 {
+  background: linear-gradient(180deg, #fef2f2 0%, #fcd9d9 100%);
+  border-color: #f59797 !important;
+  color: #a1121a !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 4px 12px -4px rgba(239, 68, 68, 0.45);
+}
+.user-page #my-karya span.rounded-full.bg-brand-navy\/80 svg {
+  color: inherit !important;
+  fill: none !important;
+  stroke: currentColor !important;
+}
+
+/* Chip teknologi di kartu */
+html.light .user-page .rounded-md.border-slate-700\/50.bg-slate-800\/50 {
+  border-color: #dbe7f7;
+  background-color: #f8fafc;
+}
+
+/* ===== TAG KATEGORI KARYA (MyKarya) ===== */
+/* Dark mode: chip cyan lebih tegas + border supaya tidak nyatu dgn
+   kartu gelap. */
+.user-page #my-karya span.rounded-md.bg-cyan-400\/10.text-cyan-300 {
+  background-color: rgba(34, 211, 238, 0.12);
+  border: 1px solid rgba(34, 211, 238, 0.4);
+  color: #7dd3fc;
+}
+/* Light mode: chip biru putih jelas di atas kartu putih (tidak nyatu),
+   teks biru tua senada tema light. */
+html.light .user-page #my-karya span.rounded-md.bg-cyan-400\/10.text-cyan-300 {
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+/* ===== TAG TEKNOLOGI / STACK (MyKarya) ===== */
+/* DARK MODE: pill gelap glassy dgn aksen cyan & glow halus, lebih
+   menarik dan konsisten dgn tema dark (cyan). */
+.user-page #my-karya span.rounded-md.border-slate-700\/50.bg-slate-800\/50 {
+  background: linear-gradient(180deg, rgba(34, 211, 238, 0.14), rgba(30, 41, 59, 0.9) 45%);
+  border-color: rgba(34, 211, 238, 0.35);
+  color: #a5f3fc;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* LIGHT MODE: tag stack TETAP pill biru gelap (hanya background
+   halaman yang terang). Selector html.light + #my-karya dibuat lebih
+   spesifik agar mengalahkan rule dark/default di atas dan rule light
+   umum lain. */
+html.light .user-page #my-karya span.rounded-md.border-slate-700\/50.bg-slate-800\/50 {
+  background: #0d47a1 !important;
+  border-color: rgba(96, 165, 250, 0.55) !important;
+  color: #ffffff !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 3px 10px -4px rgba(21, 101, 192, 0.45) !important;
+}
+
+/* ===== TOMBOL "AJUKAN SEBAGAI MAHASISWA/DOSEN" (LIGHT) ===== */
+/* Samakan dengan tombol "Lihat Karya" menu Karya: gradasi cyan ->
+   biru + teks putih, hover terangkat dengan crossfade gradasi. */
+html.light .user-page button.rounded-xl.bg-white.text-slate-900 {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  color: #ffffff;
+  transition:
+    transform 0.3s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.3s ease;
+}
+html.light .user-page button.rounded-xl.bg-white.text-slate-900::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(to bottom right, #06b6d4, #1d4ed8);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+html.light .user-page button.rounded-xl.bg-white.text-slate-900:hover {
+  background-color: transparent;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -10px rgba(29, 78, 216, 0.6);
+}
+html.light .user-page button.rounded-xl.bg-white.text-slate-900:hover::before {
+  opacity: 1;
+}
+html.light .user-page button.rounded-xl.bg-white.text-slate-900 svg {
+  color: #ffffff;
+}
+html.light .user-page button.rounded-xl.bg-white.text-slate-900:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px -8px rgba(29, 78, 216, 0.5);
+}
+
+/* ===== DROPDOWN STATUS FILTER ===== */
+html.light .user-page .rounded-xl.border-2.border-white\/10.bg-slate-900\/95 {
+  border-color: #e2e8f0;
+}
+
+/* ===== BANNER EMAIL PENDING (PROFIL) ===== */
+html.light .user-page .border-amber-500\/30.bg-amber-500\/10 {
+  background-color: #fffbeb;
+}
+html.light .user-page button.border-amber-500\/40.bg-amber-500\/20 {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+html.light .user-page button.hover\:bg-amber-500\/30:hover {
+  color: #78350f;
+}
+
+/* ===== DOT STATUS ONLINE NAVBAR USER ===== */
+/* Ring dot memakai border-brand-dark -> putih agar menyatu pill */
+html.light .user-page .border-brand-dark {
+  border-color: #ffffff;
+}
+
+/* ===== AVATAR FALLBACK ===== */
+html.light .user-page .rounded-full.bg-cyan-400\/10.border-cyan-400\/30 {
+  background-color: #eff6ff;
+}
+
+/* ===== MODAL SUKSES / KONFIRMASI ===== */
+html.light .user-page .bg-emerald-500.hover\:bg-emerald-600:hover {
+  background-color: #059669;
+}
+
+/* ============================================================
+   PATCH KONTRAS LIGHT MODE USER (finishing)
+   Menutup kelas yang masih memakai warna dark di atas permukaan
+   terang agar elemen konsisten dengan halaman user lain.
+   ============================================================ */
+
+/* ===== DROPDOWN & EMOJI PICKER (permukaan slate gelap) ===== */
+html.light .user-page .bg-slate-900\/95 {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 24px 48px -16px rgba(30, 64, 175, 0.18);
+}
+/* Opsi dropdown saat di-hover: soft blue jelas di atas panel putih */
+html.light .user-page .bg-slate-900\/95 .hover\:bg-white\/5:hover {
+  background-color: #eff6ff;
+}
+html.light .user-page .bg-slate-900\/95 .hover\:text-white:hover {
+  color: #0f172a;
+}
+/* Emoji picker: thumbnail scrollbar putih -> biru muda */
+html.light .user-page .scrollbar-thumb-white\/10 {
+  background-color: #bfdbfe;
+}
+
+/* ===== BADGE "OPSIONAL" (solid slate gelap) ===== */
+html.light .user-page .border-slate-600.bg-slate-800 {
+  border-color: #dbe7f7;
+  background-color: #eff6ff;
+  color: #475569;
+}
+
+/* ===== EMPTY STATE DASHED ===== */
+html.light .user-page .border-dashed.border-slate-700\/60.bg-slate-800\/20 {
+  background-color: #f8fafc;
+  border-color: #c7d6ee;
+}
+html.light .user-page .ring-slate-700\/50 {
+  --tw-ring-color: #dbeafe;
+}
+
+/* ===== STATUS EMAIL PENDING (amber-100 -> gelap) ===== */
+html.light .user-page .text-amber-100 {
+  color: #92400e;
+}
+/* Tombol "Verifikasi Email Baru" */
+html.light .user-page button.border-amber-500\/40.bg-amber-500\/20:hover {
+  background-color: #fde68a;
+}
+
+/* ===== AJUKAN SEBAGAI DOSEN (biru muda -> blue theme) ===== */
+html.light
+  .user-page
+  .border-blue-400\/30.bg-blue-400\/10.text-blue-200 {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+html.light .user-page .border-blue-400\/30.bg-blue-400\/10.text-blue-200:hover {
+  background-color: #dbeafe;
+}
+
+/* ===== HOVER ICON EYE GELAP -> TIDAK HILANG ===== */
+html.light .user-page .hover\:text-slate-200:hover,
+html.light .user-page .group-hover\:text-slate-200:hover {
+  color: #334155;
+}
+

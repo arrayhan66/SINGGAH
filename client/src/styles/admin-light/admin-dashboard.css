@@ -1,0 +1,473 @@
+/* ============================================================
+   DASHBOARD KARTU STATISTIK 3D SLAB + PANEL FLAT
+   - .dashboard-stat-card  : tetap slab 3D (ala Karya/GlassCard).
+   - .dashboard-panel      : FLAT (Menunggu Review, Disetujui,
+     Aktivitas, Berita Terbaru) tanpa slab 3D.
+   ============================================================ */
+
+/* ---- Dark mode: stat card slab gelap #02111f ---- */
+.admin-page .dashboard-stat-card {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 7px 0 #02111f,
+    0 14px 28px -12px rgba(0, 0, 0, 0.55);
+}
+.admin-page .dashboard-stat-card:hover {
+  transform: translateY(-0.25rem);
+  border-color: rgba(34, 211, 238, 0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 8px 0 #02111f,
+    0 18px 34px -16px rgba(0, 0, 0, 0.55);
+}
+.admin-page .dashboard-stat-card:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 3px 0 #02111f,
+    0 8px 16px -10px rgba(0, 0, 0, 0.55);
+}
+
+/* ---- Dark mode: panel bawah FLAT (tanpa slab 3D) ---- */
+.admin-page .dashboard-panel {
+  box-shadow: 0 14px 30px -16px rgba(0, 0, 0, 0.5);
+}
+.admin-page .dashboard-panel:hover {
+  border-color: rgba(34, 211, 238, 0.35);
+  box-shadow: 0 18px 36px -18px rgba(0, 0, 0, 0.55);
+}
+
+/* ---- Light mode: stat card putih + slab biru ---- */
+html.light .admin-page .dashboard-stat-card {
+  background-color: #ffffff !important;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%) !important;
+  border-color: #c7dcfc !important;
+  backdrop-filter: none !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    0 7px 0 #7fb1f5,
+    0 12px 26px -10px rgba(30, 64, 175, 0.35),
+    0 22px 44px -18px rgba(37, 99, 235, 0.28) !important;
+}
+html.light .admin-page .dashboard-stat-card:hover {
+  transform: translateY(-0.25rem) !important;
+  border-color: #9ec7fa !important;
+  background-color: #ffffff !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    0 8px 0 #5b96ee,
+    0 14px 26px -12px rgba(30, 64, 175, 0.4),
+    0 20px 40px -20px rgba(37, 99, 235, 0.32) !important;
+}
+html.light .admin-page .dashboard-stat-card:active {
+  transform: translateY(0) !important;
+  transition-duration: 0.1s;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    0 3px 0 #7fb1f5,
+    0 8px 16px -10px rgba(30, 64, 175, 0.35) !important;
+}
+
+/* ---- Light mode: panel bawah FLAT pastel biru ---- */
+html.light .admin-page .dashboard-panel {
+  background-color: #f9fbff !important;
+  background-image: linear-gradient(180deg, #fdfeff 0%, #f9fbff 100%) !important;
+  border-color: #cfe0f7 !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 10px 24px -14px rgba(37, 99, 235, 0.28) !important;
+}
+html.light .admin-page .dashboard-panel:hover {
+  border-color: #93c5fd !important;
+  box-shadow: 0 14px 30px -14px rgba(37, 99, 235, 0.38) !important;
+}
+html.light .admin-page .dashboard-panel:active {
+  background-color: #dbeafe !important;
+}
+
+/* ---- Teks & isi di dalam panel bawah (light mode) ----
+   Panel memakai teks putih / slate muda bawaan dark mode,
+   jadi dipaksa jadi gelap agar terbaca di permukaan terang. */
+html.light .admin-page .dashboard-panel h2 {
+  color: #1e293b !important;
+}
+html.light .admin-page .dashboard-panel p.text-white {
+  color: #1e293b !important;
+}
+html.light .admin-page .dashboard-panel p.text-slate-300 {
+  color: #334155 !important;
+}
+html.light .admin-page .dashboard-panel p.text-slate-400 {
+  color: #64748b !important;
+}
+html.light .admin-page .dashboard-panel p.text-slate-500,
+html.light .admin-page .dashboard-panel svg.text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+/* Baris item project/berita/aktivitas di dalam panel: tint pastel */
+html.light .admin-page .dashboard-panel .dashboard-activity-item.border-white\/10.bg-white\/\[0\.04\] {
+  background-color: #fdfeff !important;
+  border-color: #cfe0f7 !important;
+}
+html.light
+  .admin-page
+  .dashboard-panel
+  .dashboard-activity-item.border-white\/10.bg-white\/\[0\.04\]:hover {
+  background-color: #dbeafe !important;
+  border-color: #93c5fd !important;
+}
+
+/* ===== ITEM CARD 3D (Menunggu Review / Disetujui / Berita) =====
+   Mengikuti geometri "category card 3D" halaman Karya:
+   slab bawah + lift saat hover + tekan saat klik. */
+.admin-page .dashboard-pending-item,
+.admin-page .dashboard-approved-item,
+.admin-page .dashboard-news-item {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 5px 0 #02111f,
+    0 8px 18px -8px rgba(0, 0, 0, 0.45);
+}
+.admin-page .dashboard-pending-item:hover,
+.admin-page .dashboard-approved-item:hover,
+.admin-page .dashboard-news-item:hover {
+  transform: translateY(-0.25rem);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 6px 0 #02111f,
+    0 18px 30px -14px rgba(0, 0, 0, 0.5);
+}
+.admin-page .dashboard-pending-item:active,
+.admin-page .dashboard-approved-item:active,
+.admin-page .dashboard-news-item:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 2px 0 #02111f,
+    0 6px 12px -8px rgba(0, 0, 0, 0.45);
+}
+
+/* ---- Item card 3D LIGHT MODE: muka putih + slab biru (#7fb1f5) ---- */
+html.light .admin-page .dashboard-pending-item,
+html.light .admin-page .dashboard-approved-item,
+html.light .admin-page .dashboard-news-item {
+  background-color: #ffffff !important;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%) !important;
+  border-color: #c7dcfc !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    0 6px 0 #7fb1f5,
+    0 12px 26px -10px rgba(30, 64, 175, 0.35),
+    0 22px 44px -18px rgba(37, 99, 235, 0.28) !important;
+}
+html.light .admin-page .dashboard-pending-item:hover,
+html.light .admin-page .dashboard-approved-item:hover,
+html.light .admin-page .dashboard-news-item:hover {
+  transform: translateY(-0.25rem) !important;
+  border-color: #9ec7fa !important;
+  background-color: #ffffff !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    0 7px 0 #5b96ee,
+    0 14px 26px -12px rgba(30, 64, 175, 0.4),
+    0 20px 40px -20px rgba(37, 99, 235, 0.32) !important;
+}
+html.light .admin-page .dashboard-pending-item:active,
+html.light .admin-page .dashboard-approved-item:active,
+html.light .admin-page .dashboard-news-item:active {
+  transform: translateY(0) !important;
+  transition-duration: 0.1s;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    0 2px 0 #7fb1f5,
+    0 8px 16px -10px rgba(30, 64, 175, 0.35) !important;
+}
+
+/* ===== TOMBOL PENGUMUMAN & PROFIL (navbar) LIGHT =====
+   Pengumuman: biru (sesuai tema light), selalu tampil seperti state hover,
+   Profil: pil putih-kebiruan + border & bayangan agar menonjol. */
+html.light .admin-page .announcement-btn {
+  border-color: #93c5fd !important;
+  background-color: #eff6ff !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 6px 16px -8px rgba(37, 99, 235, 0.4) !important;
+}
+html.light .admin-page .announcement-btn:hover {
+  border-color: #60a5fa !important;
+  background-color: #dbeafe !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 10px 22px -10px rgba(37, 99, 235, 0.5) !important;
+}
+html.light .admin-page .profile-btn {
+  border-color: #c7d9f6 !important;
+  background-image: linear-gradient(180deg, #ffffff 0%, #eef6ff 100%) !important;
+  background-color: #f4f9ff !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 4px 14px -8px rgba(30, 64, 175, 0.45) !important;
+}
+html.light .admin-page .profile-btn:hover {
+  border-color: #93c5fd !important;
+  background-image: linear-gradient(180deg, #ffffff 0%, #dbeafe 100%) !important;
+  box-shadow: 0 8px 20px -8px rgba(30, 64, 175, 0.4) !important;
+}
+html.light .admin-page .announcement-btn .announcement-label {
+  color: #1d4ed8 !important;
+}
+html.light .admin-page .announcement-btn .announcement-icon {
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 3px 8px -3px rgba(37, 99, 235, 0.55);
+}
+html.light .admin-page .profile-name {
+  color: #0f172a;
+}
+html.light .admin-page .profile-btn .profile-chevron {
+  color: #64748b;
+}
+html.light .admin-page .profile-btn:hover .profile-chevron,
+html.light .admin-page .profile-chevron.text-cyan-300 {
+  color: #0891b2 !important;
+}
+
+/* ===== SIDEBAR ADMIN: ITEM MENU DROPDOWN (style sendiri) ===== */
+/* Kartu item: putih + border biru lembut agar jejak di permukaan terang */
+html.light .admin-page aside .sidebar-menu-item {
+  background-color: #ffffff;
+  border-color: #d6e2f6;
+  box-shadow: inset 0 0 0 1px #dbe6f7;
+}
+html.light .admin-page aside .sidebar-menu-item:hover {
+  background-color: #eef5ff;
+  border-color: #93c5fd;
+  box-shadow: inset 0 0 0 1px #bfdbfe;
+}
+html.light .admin-page aside .sidebar-menu-item .sidebar-menu-item-label {
+  color: #1f3a63;
+}
+html.light .admin-page aside .sidebar-menu-item:hover .sidebar-menu-item-label {
+  color: #1d4ed8;
+}
+html.light .admin-page aside .sidebar-menu-item .sidebar-menu-subtitle {
+  color: #64748b;
+}
+
+/* Aktif = tampil seperti saat hover, agar mencolok & konsisten */
+html.light .admin-page aside .sidebar-menu-item.border-cyan-400\/30 {
+  background-color: #eef5ff;
+  border-color: #93c5fd;
+  box-shadow: inset 0 0 0 1px #bfdbfe;
+}
+html.light .admin-page aside .sidebar-menu-item.border-cyan-400\/30 .sidebar-menu-item-label {
+  color: #1d4ed8;
+}
+
+/* ===== TOMBOL "CIUTKAN" LIGHT: teks pakai tone gelap khas SINGGAH ===== */
+html.light .admin-page aside button span.text-\[12px\] {
+  color: #404040;
+}
+
+/* ===== TOMBOL "CIUTKAN" LIGHT: teks pakai tone gelap khas SINGGAH ===== */
+html.light .admin-page aside button span.text-\[12px\] {
+  color: #404040;
+}
+
+/* ===== TOMBOL KIRIM PENGUMUMAN (modal) LIGHT ===== */
+html.light .admin-page .announce-submit {
+  color: #ffffff !important;
+}
+html.light .admin-page .announce-submit .border-t-brand-dark {
+  border-color: rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+}
+
+/* ===== FORM PENGUMUMAN DARK: field putih-off + placeholder abu gelap ===== */
+html:not(.light) .admin-page .announce-field {
+  background-color: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+html:not(.light) .admin-page .announce-field::placeholder {
+  color: #64748b;
+}
+html:not(.light) .admin-page .announce-field:focus {
+  border-color: rgba(34, 211, 238, 0.7);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15);
+}
+
+/* ============================================================
+   DASHBOARD HERO & STAT CARDS — ikon sapaan "Selamat Pagi" &
+   kartu statistik Project/Berita/User (mengikuti ikon halaman
+   Karya: kotak kaca cyan di dark / gradasi cyan->biru + ikon
+   putih di light).
+   ============================================================ */
+
+/* ===== IKON SAPAAN "SELAMAT PAGI" =====
+   Light mode disamakan header halaman Karya: kotak gradasi
+   cyan -> biru, ikon putih, bayangan biru lembut. Dark mode
+   tetap kotak kaca cyan (sudah sesuai header Karya). */
+html.light .admin-page .dashboard-hero-icon {
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: 0 10px 24px -8px rgba(37, 99, 235, 0.45);
+}
+html.light .admin-page .dashboard-hero-icon svg {
+  color: #ffffff;
+}
+
+/* ===== KARTU STATISTIK & QUICK ACTION (ikon) =====
+   Ikon dibuat BEDA antara dark & light:
+   - DARK : kotak gradasi cyan -> biru + ikon putih (gaya Karya).
+   - LIGHT: kotak biru SOLID (#2563eb) + ikon putih — beda dari
+     dark, dan jelas terlihat di atas kartu putih.
+   Di light, global-light.css meratakan gradient jadi biru polos,
+   sengaja dipakai sebagai dasar solid biru (bukan dipulihkan
+   ke cyan->biru agar kedua mode bisa dibedakan). */
+html.light .admin-page .dashboard-stat-card .stat-icon,
+html.light .admin-page .dashboard-quickaction-card .quickaction-icon {
+  background-image: none;
+  background-color: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 6px 18px -6px rgba(37, 99, 235, 0.4);
+}
+html.light .admin-page .dashboard-stat-card .stat-icon svg,
+html.light .admin-page .dashboard-quickaction-card .quickaction-icon svg {
+  color: #ffffff;
+}
+
+/* Nilai statistik: hitam lembut SINGGAH #404040 (bukan #0f172a
+   yang terlalu pekat), senada judul "SINGGAH" di beranda */
+html.light .admin-page .dashboard-stat-card .stat-value {
+  color: #404040;
+}
+
+/* Label statistik: gelap & jelas supaya tidak nyatu dengan kartu
+   putih; saat hover berubah biru agar sisi kanan ikut responsif */
+html.light .admin-page .dashboard-stat-card .stat-label {
+  color: #475569;
+}
+html.light .admin-page .dashboard-stat-card:hover .stat-label {
+  color: #2563eb;
+}
+.admin-page .dashboard-stat-card:hover .stat-label {
+  color: #67e8f9;
+}
+
+/* Sparkline: garis cyan muda di permukaan putih kurang terbaca ->
+   dipindah ke biru primer agar jelas */
+html.light .admin-page .dashboard-stat-card .sparkline path[stroke] {
+  stroke: #2563eb;
+}
+
+/* Judul item di panel bawah (project pending/approved, berita):
+   teks putih dark -> jadi hitam lembut SINGGAH #404040 di light,
+   bukan #0f172a yang terlalu pekat */
+html.light .admin-page .dashboard-pending-item p.text-white,
+html.light .admin-page .dashboard-approved-item p.text-white,
+html.light .admin-page .dashboard-news-item p.text-white {
+  color: #404040;
+}
+
+/* List "karya menunggu review" di beranda admin: saat hover (light)
+   latar kartunya jadi biru muda #edf5ff (menggantikan bg-white yang
+   nyaris tak terlihat), border ikut dipertegas */
+html.light .admin-page .dashboard-pending-item:hover {
+  background-color: #edf5ff;
+  border-color: #c8dcf8;
+}
+
+/* ===== TOMBOL "REVIEW" di list Menunggu Review =====
+   Gaya kalem & terkesan manual (tidak template AI): tanpa gradasi,
+   tanpa glow & tanpa terangkat. Cukup tint lembut + border yang
+   dipertegas + ikon bergeser; teks tetap berwarna, tidak menyala. */
+.admin-page .dashboard-pending-item .dashboard-review-btn {
+  border-color: rgba(34, 211, 238, 0.3);
+  color: #67e8f9;
+}
+.admin-page .dashboard-pending-item .dashboard-review-btn:hover {
+  background-color: rgba(34, 211, 238, 0.1);
+  border-color: rgba(34, 211, 238, 0.55);
+  color: #ffffff;
+}
+.admin-page .dashboard-pending-item .dashboard-review-btn:active {
+  transform: scale(0.96);
+}
+html.light .admin-page .dashboard-pending-item .dashboard-review-btn {
+  border-color: #c6dcf7;
+  background-color: #ffffff;
+  color: #1d4ed8;
+}
+html.light .admin-page .dashboard-pending-item .dashboard-review-btn:hover {
+  background-color: #edf5ff;
+  border-color: #93c5fd;
+  color: #1d3a8a;
+}
+
+/* ===== QUICK ACTION TILE (Project / Berita / User) =====
+   Kartu FLAT (bukan 3D): dark = kaca translucen; light = putih
+   datar + border biru muda. Hover cukup border + tint + glow,
+   tanpa slab yang membuatnya terkesan 3D. */
+.admin-page .dashboard-quickaction-card:hover {
+  border-color: rgba(34, 211, 238, 0.45);
+  background-color: transparent;
+  background-image: linear-gradient(
+    180deg,
+    rgba(34, 211, 238, 0.1) 0%,
+    rgba(34, 211, 238, 0.02) 100%
+  );
+  box-shadow: 0 10px 26px -14px rgba(34, 211, 238, 0.35);
+}
+.admin-page .dashboard-quickaction-card:active {
+  background-color: rgba(34, 211, 238, 0.06);
+}
+html.light .admin-page .dashboard-quickaction-card {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border-color: #d6e4fb !important;
+  box-shadow: 0 4px 16px -6px rgba(37, 99, 235, 0.14) !important;
+  backdrop-filter: none !important;
+}
+html.light .admin-page .dashboard-quickaction-card:hover {
+  background-color: #eff6ff !important;
+  border-color: #93c5fd !important;
+  box-shadow: 0 10px 22px -10px rgba(37, 99, 235, 0.32) !important;
+}
+html.light .admin-page .dashboard-quickaction-card:active {
+  background-color: #dbeafe !important;
+}
+
+/* Label quick action: hitam lembut SINGGAH #404040 di light mode
+   (menggantikan #0f172a dari .text-white), berubah biru saat hover
+   di light / cyan di dark agar konsisten dengan aksen dashboard */
+html.light .admin-page .dashboard-quickaction-card .quickaction-label {
+  color: #404040;
+}
+.admin-page .dashboard-quickaction-card:hover .quickaction-label {
+  color: #67e8f9;
+}
+html.light .admin-page .dashboard-quickaction-card:hover .quickaction-label {
+  color: #2563eb;
+}
+
+/* ===== PANAH (quick action: Project / Berita / User) =====
+   Lingkaran panah: base = ring tipis slate; saat hover berubah
+   jadi lingkaran gradasi cyan->biru (dark) / biru solid (light)
+   + panah putih, meluncur ke kanan & "membalik" lewat easing
+   overshoot supaya terasa hidup. */
+.admin-page .dashboard-quickaction-card:hover .quickaction-arrow {
+  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 8px 18px -8px rgba(34, 211, 238, 0.5);
+  transform: translateX(4px) scale(1.15);
+}
+html.light .admin-page .dashboard-quickaction-card:hover .quickaction-arrow {
+  background-image: none;
+  background-color: #2563eb;
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 8px 18px -8px rgba(37, 99, 235, 0.5);
+  transform: translateX(4px) scale(1.15);
+}
+.admin-page .dashboard-quickaction-card:active .quickaction-arrow {
+  transform: translateX(4px) scale(0.95);
+}
+

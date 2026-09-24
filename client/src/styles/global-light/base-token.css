@@ -1,0 +1,262 @@
+/* ============================================================
+   GLOBAL LIGHT MODE — berlaku untuk SEMUA halaman (visitor,
+   auth, user, admin dashboard) saat ThemeContext = light.
+   Tema: off-white + biru tua (#2563EB). Semua aksen cyan
+   diganti biru tua primer. Dark mode tidak tersentuh.
+   ============================================================ */
+
+html.light {
+  color-scheme: light;
+}
+
+html.light body {
+  background-color: #f2f6fb;
+}
+
+/* ===== SECTION / LAYOUT BACKGROUND ===== */
+html.light .bg-brand-dark {
+  background: linear-gradient(180deg, #f7fafd 0%, #edf3fa 100%);
+}
+html.light .bg-brand-dark\/90,
+html.light .bg-brand-dark\/95 {
+  background-color: rgba(247, 250, 253, 0.92);
+}
+html.light .bg-brand-dark\/80,
+html.light .bg-brand-dark\/85 {
+  background-color: rgba(244, 248, 253, 0.94);
+}
+html.light .bg-brand-navy {
+  background-color: #eef3fa;
+}
+html.light .bg-brand-navy\/80,
+html.light .bg-brand-navy\/90,
+html.light .bg-brand-navy\/95 {
+  background-color: #eef3fa;
+}
+html.light .bg-\[\#02111f\] {
+  background-color: #eef3fa;
+}
+
+/* ===== DROPDOWN MENU HAMBURGER ===== */
+/* Permukaan abu senada footer light mode (khusus wadah hamburger,
+   bukan dropdown profil/notifikasi) */
+html.light .max-w-\[1700px\].bg-brand-dark\/95 {
+  background: linear-gradient(180deg, #eaedf2 0%, #e0e4ea 100%);
+  border-color: #d6dbe2;
+}
+
+/* ===== TEKS PUTIH DI ATAS ELEMEN BERWARNA TETAP PUTIH ===== */
+/* Exception dari token .text-white di atas: tombol primer, avatar,
+   badge angka, dsb yang duduk di atas background biru/merah/hijau solid
+   atau gradasi biru-cyan tidak boleh ikut menjadi gelap */
+html.light [class*="bg-blue-600"] .text-white,
+html.light [class*="bg-blue-500"] .text-white,
+html.light [class*="bg-cyan-600"] .text-white,
+html.light [class*="bg-cyan-500"] .text-white,
+html.light [class*="bg-red-500"] .text-white,
+html.light [class*="bg-emerald-600"] .text-white,
+html.light [class*="bg-emerald-500"] .text-white,
+html.light [class*="from-blue-600"] .text-white,
+html.light [class*="from-cyan-400"] .text-white,
+html.light [class*="from-cyan-500"] .text-white,
+html.light [class*="from-red-500"] .text-white,
+html.light [class*="from-rose-600"] .text-white,
+html.light [class*="from-red-600"] .text-white,
+html.light [class*="from-red-700"] .text-white,
+html.light [class*="from-emerald-500"] .text-white,
+html.light [class*="from-emerald-600"] .text-white,
+html.light [class*="to-teal-600"] .text-white,
+html.light [class*="to-red-700"] .text-white,
+html.light [class*="to-red-800"] .text-white,
+html.light [class*="to-blue-600"] .text-white,
+html.light [class*="to-rose-600"] .text-white {
+  color: #ffffff;
+}
+html.light [class*="bg-blue-600"][class*="text-white"],
+html.light [class*="bg-blue-500"][class*="text-white"],
+html.light [class*="bg-cyan-600"][class*="text-white"],
+html.light [class*="bg-cyan-500"][class*="text-white"],
+html.light [class*="bg-red-500"][class*="text-white"],
+html.light [class*="bg-emerald-600"][class*="text-white"],
+html.light [class*="bg-emerald-500"][class*="text-white"],
+html.light [class*="from-blue-600"][class*="text-white"],
+html.light [class*="from-cyan-400"][class*="text-white"],
+html.light [class*="from-cyan-500"][class*="text-white"],
+html.light [class*="from-red-500"][class*="text-white"],
+html.light [class*="from-rose-600"][class*="text-white"],
+html.light [class*="from-red-600"][class*="text-white"],
+html.light [class*="from-red-700"][class*="text-white"],
+html.light [class*="from-emerald-500"][class*="text-white"],
+html.light [class*="from-emerald-600"][class*="text-white"],
+html.light [class*="to-teal-600"][class*="text-white"],
+html.light [class*="to-red-700"][class*="text-white"],
+html.light [class*="to-red-800"][class*="text-white"],
+html.light [class*="to-blue-600"][class*="text-white"],
+html.light [class*="to-rose-600"][class*="text-white"] {
+  color: #ffffff;
+}
+
+/* ===== TEKS DASAR ===== */
+html.light .text-white {
+  color: #0f172a;
+}
+html.light .text-white\/90 {
+  color: #0f172a;
+}
+html.light .text-white\/80 {
+  color: #1e293b;
+}
+html.light .text-white\/70 {
+  color: #334155;
+}
+html.light .text-white\/60 {
+  color: #475569;
+}
+html.light .text-white\/50,
+html.light .text-white\/40 {
+  color: #64748b;
+}
+html.light .text-slate-100 {
+  color: #1e293b;
+}
+html.light .text-slate-200 {
+  color: #334155;
+}
+html.light .text-slate-300 {
+  color: #475569;
+}
+html.light .text-slate-400,
+html.light .text-slate-500 {
+  color: #64748b;
+}
+
+/* ===== JUDUL & HEADING -> HITAM ===== */
+/* Semua heading yang tadinya putih jadi hitam keabu #404040
+   (persis tulisan "SINGGAH"), berlaku global termasuk admin */
+html.light h1.text-white,
+html.light h2.text-white,
+html.light h3.text-white,
+html.light h4.text-white,
+html.light h5.text-white,
+html.light h6.text-white,
+html.light h3.text-white\/90,
+html.light h4.text-white\/90 {
+  color: #404040;
+}
+
+/* ===== CYAN -> BIRU TUA (teks) ===== */
+html.light .text-cyan-200,
+html.light .text-cyan-300,
+html.light .text-cyan-400,
+html.light .text-cyan-500 {
+  color: #2563eb;
+}
+html.light .text-cyan-600 {
+  color: #1d4ed8;
+}
+html.light .text-blue-400 {
+  color: #2563eb;
+}
+html.light .text-blue-700 {
+  color: #1d4ed8;
+}
+
+/* ===== CYAN -> BIRU TUA (background solid) ===== */
+html.light .bg-cyan-400,
+html.light .bg-cyan-500,
+html.light .bg-cyan-600 {
+  background-color: #2563eb;
+}
+
+/* ===== CYAN -> BIRU TUA (box/chip translucent) ===== */
+html.light .bg-cyan-400\/10,
+html.light .bg-cyan-500\/10,
+html.light .bg-blue-500\/10,
+html.light .bg-cyan-50,
+html.light .bg-blue-50 {
+  background-color: #eff6ff;
+}
+html.light .bg-cyan-400\/20,
+html.light .bg-cyan-500\/20 {
+  background-color: #dbeafe;
+}
+html.light .hover\:bg-cyan-400\/10:hover,
+html.light .hover\:bg-cyan-500\/10:hover,
+html.light .hover\:bg-cyan-400\/20:hover {
+  background-color: #dbeafe;
+}
+
+/* ===== CYAN -> BIRU TUA (border) ===== */
+html.light .border-cyan-400\/20,
+html.light .border-cyan-400\/30,
+html.light .border-cyan-500\/20,
+html.light .border-cyan-500\/30 {
+  border-color: #bfdbfe;
+}
+html.light .border-cyan-400\/40,
+html.light .border-cyan-400\/50,
+html.light .border-cyan-400 {
+  border-color: #93c5fd;
+}
+html.light .hover\:border-cyan-400\/40:hover,
+html.light .hover\:border-cyan-400\/50:hover {
+  border-color: #60a5fa;
+}
+
+/* ===== CYAN -> BIRU TUA (focus input/ring) ===== */
+html.light .focus\:border-cyan-400:focus,
+html.light .focus\:border-cyan-500:focus {
+  border-color: #2563eb;
+}
+html.light .focus\:border-cyan-400\/50:focus,
+html.light .focus\:border-cyan-400\/60:focus,
+html.light .focus\:border-cyan-400\/70:focus {
+  border-color: #2563eb;
+}
+html.light .focus\:ring-cyan-400:focus,
+html.light .focus\:ring-cyan-500:focus {
+  --tw-ring-color: rgba(37, 99, 235, 0.25);
+}
+html.light .focus\:ring-cyan-400\/10:focus,
+html.light .focus\:ring-cyan-400\/20:focus,
+html.light .focus\:ring-cyan-500\/20:focus,
+html.light .focus\:ring-cyan-500\/30:focus,
+html.light .focus\:ring-cyan-500\/40:focus {
+  --tw-ring-color: rgba(37, 99, 235, 0.25);
+}
+html.light .focus-within\:text-cyan-400:focus-within {
+  color: #2563eb;
+}
+html.light .hover\:text-cyan-300:hover,
+html.light .hover\:text-cyan-400:hover,
+html.light .hover\:text-cyan-500:hover,
+html.light .hover\:text-cyan-600:hover {
+  color: #2563eb;
+}
+html.light .ring-cyan-400\/30,
+html.light .ring-cyan-400\/40 {
+  --tw-ring-color: rgba(37, 99, 235, 0.2);
+}
+
+/* ===== GRADASI CYAN -> BIRU TUA (tombol/aksen gradient) ===== */
+html.light .from-cyan-400,
+html.light .from-cyan-500 {
+  --tw-gradient-from: #2563eb;
+}
+html.light .to-cyan-400,
+html.light .to-cyan-500 {
+  --tw-gradient-to: #1d4ed8;
+}
+/* Stop tengah via-cyan-500 pada gradasi CTA -> biru tengah */
+html.light .via-cyan-500 {
+  --tw-gradient-via: #1d4ed8;
+}
+html.light .from-cyan-400\/20,
+html.light .from-cyan-500\/20 {
+  --tw-gradient-from: #dbeafe;
+}
+html.light .to-cyan-400\/20,
+html.light .to-cyan-500\/20 {
+  --tw-gradient-to: #dbeafe;
+}
+

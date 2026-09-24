@@ -1,12 +1,13 @@
 const request = require("supertest")
 const app = require("../server")
-const { User, Category, Project, ProjectLike, ProjectView } = require("../models")
+const { User, Category, Project, ProjectLike, ProjectView, SiteVisit } = require("../models")
 
 describe("Reports & Activity Logs Endpoints", () => {
   let adminToken = ""
   let userToken = ""
 
   beforeAll(async () => {
+    await SiteVisit.destroy({ where: {} })
     await ProjectView.destroy({ where: {} })
     await ProjectLike.destroy({ where: {} })
     await Project.destroy({ where: {} })
@@ -70,6 +71,10 @@ describe("Reports & Activity Logs Endpoints", () => {
 
     await ProjectLike.create({ project_id: project.id, user_id: adminUser.id })
     await ProjectView.create({ project_id: project.id, user_id: user.id })
+    await SiteVisit.create({
+      ip_address: "10.0.0.7",
+      visit_date: new Date().toISOString().slice(0, 10),
+    })
   })
 
   it("should forbid non-admin from accessing reports", async () => {

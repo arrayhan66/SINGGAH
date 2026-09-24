@@ -1,4 +1,4 @@
-const { Project, User, ProjectView, ProjectLike, sequelize } = require("../models")
+const { Project, User, ProjectView, ProjectLike, SiteVisit, sequelize } = require("../models")
 const { Op } = require("sequelize")
 
 const MONTHS = [
@@ -26,7 +26,7 @@ exports.getReports = async (query = {}) => {
   const yearEnd = new Date(Date.UTC(year + 1, 0, 1))
   const actualMonthStart = new Date(Date.UTC(actualYear, actualMonth, 1))
 
-  const [projects, views, usersInYear] = await Promise.all([
+  const [projects, views, visits, usersInYear] = await Promise.all([
     Project.findAll({
       where: {
         created_at: { [Op.gte]: yearStart, [Op.lt]: yearEnd },
@@ -50,6 +50,13 @@ exports.getReports = async (query = {}) => {
       attributes: ["created_at"],
       raw: true,
     }),
+    SiteVisit.findAll({
+      where: {
+        created_at: { [Op.gte]: yearStart, [Op.lt]: yearEnd },
+      },
+      attributes: ["created_at"],
+      raw: true,
+    }),
     User.findAll({
       where: {
         created_at: { [Op.gte]: yearStart, [Op.lt]: yearEnd },
@@ -64,6 +71,7 @@ exports.getReports = async (query = {}) => {
     monthLabel: MONTHS[i],
     projects: 0,
     likes: 0,
+    views: 0,
     visitors: 0,
     users: 0,
   }))
@@ -79,6 +87,13 @@ exports.getReports = async (query = {}) => {
 
   views.forEach((view) => {
     const monthIndex = new Date(view.created_at).getUTCMonth()
+    if (monthly[monthIndex]) {
+      monthly[monthIndex].views += 1
+    }
+  })
+
+  visits.forEach((visit) => {
+    const monthIndex = new Date(visit.created_at).getUTCMonth()
     if (monthly[monthIndex]) {
       monthly[monthIndex].visitors += 1
     }

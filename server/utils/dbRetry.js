@@ -10,26 +10,23 @@ function isConnectionError(error) {
       error.code === "ETIMEDOUT" ||
       error.code === "ECONNRESET" ||
       error.code === "ENOTFOUND")
-  )
+  );
 }
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Ulangi query sekali-dua kali jika gagal karena koneksi DB sempat putus
-// (ENOTFOUND / ETIMEDOUT / ECONNRESET ke TiDB Cloud). Blip singkat nggak
-// langsung bikin request gagal.
 async function withDbRetry(fn, { retries = 2, delay = 300 } = {}) {
-  let lastError
+  let lastError;
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     try {
-      return await fn()
+      return await fn();
     } catch (error) {
-      lastError = error
-      if (!isConnectionError(error) || attempt === retries) break
-      await sleep(delay * (attempt + 1))
+      lastError = error;
+      if (!isConnectionError(error) || attempt === retries) break;
+      await sleep(delay * (attempt + 1));
     }
   }
-  throw lastError
+  throw lastError;
 }
 
-module.exports = { isConnectionError, withDbRetry }
+module.exports = { isConnectionError, withDbRetry };

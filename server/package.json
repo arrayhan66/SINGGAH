@@ -10,9 +10,7 @@
     "seed:hall": "node scripts/seedHall.js",
     "lowercase:usernames": "node scripts/lowercaseUsernames.js",
     "sync:db": "node scripts/syncDb.js",
-    "indexes:add": "node scripts/addIndexes.js",
-    "migrate:media": "node scripts/migrateLegacyUploads.js",
-    "migrate:media:dry": "node scripts/migrateLegacyUploads.js --dry-run"
+    "indexes:add": "node scripts/addIndexes.js"
   },
   "keywords": [],
   "author": "",

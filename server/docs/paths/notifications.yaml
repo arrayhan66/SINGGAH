@@ -2,475 +2,192 @@ collection:
   get:
     tags:
       - Notifications
-
-    summary: Ambil daftar notifikasi milik user yang login
-
-    description: |
-      Mengambil daftar notifikasi milik user yang sedang login, dengan pagination.
-
+    summary: 'Ambil daftar notifikasi milik user yang login'
+    description: "Mengambil daftar notifikasi milik user yang sedang login, dengan pagination.\n"
     security:
-      - BearerAuth: []
-
+      -
+        BearerAuth: []
     parameters:
-      - name: page
+      -
+        name: page
         in: query
         schema:
           type: integer
           default: 1
-
-      - name: limit
+      -
+        name: limit
         in: query
         schema:
           type: integer
           default: 10
-
     responses:
-
-      "200":
-        description: Berhasil mengambil notifikasi
+      '200':
+        description: 'Berhasil mengambil notifikasi'
         content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                success:
-                  type: boolean
-                  example: true
-                message:
-                  type: string
-                  example: Berhasil mengambil notifikasi
-                data:
-                  type: object
-                  properties:
-                    items:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          id:
-                            type: integer
-                            example: 1
-                          type:
-                            type: string
-                            example: project_approved
-                          title:
-                            type: string
-                            example: Project Disetujui
-                          message:
-                            type: string
-                            example: Project "SINGGAH" Anda telah disetujui admin.
-                          reference_type:
-                            type: string
-                            nullable: true
-                            example: project
-                          reference_id:
-                            type: integer
-                            nullable: true
-                            example: 5
-                          is_read:
-                            type: boolean
-                            example: false
-                    pagination:
-                      type: object
-                      properties:
-                        page:
-                          type: integer
-                          example: 1
-                        limit:
-                          type: integer
-                          example: 10
-                        total:
-                          type: integer
-                          example: 12
-                        totalPages:
-                          type: integer
-                          example: 2
-
+          application/json: {schema: {type: object, properties: {success: {type: boolean, example: true}, message: {type: string, example: 'Berhasil mengambil notifikasi'}, data: {type: object, properties: {items: {type: array, items: {type: object, properties: {id: {type: integer, example: 1}, type: {type: string, example: project_approved}, title: {type: string, example: 'Project Disetujui'}, message: {type: string, example: 'Project "SINGGAH" Anda telah disetujui admin.'}, reference_type: {type: string, nullable: true, example: project}, reference_id: {type: integer, nullable: true, example: 5}, is_read: {type: boolean, example: false}}}}, pagination: {type: object, properties: {page: {type: integer, example: 1}, limit: {type: integer, example: 10}, total: {type: integer, example: 12}, totalPages: {type: integer, example: 2}}}}}}}}
 markAllRead:
   patch:
     tags:
       - Notifications
-
-    summary: Tandai semua notifikasi sebagai sudah dibaca
-
+    summary: 'Tandai semua notifikasi sebagai sudah dibaca'
     security:
-      - BearerAuth: []
-
+      -
+        BearerAuth: []
     responses:
-
-      "200":
-        description: Semua notifikasi berhasil ditandai sudah dibaca
+      '200':
+        description: 'Semua notifikasi berhasil ditandai sudah dibaca'
         content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                success:
-                  type: boolean
-                  example: true
-                message:
-                  type: string
-                  example: Semua notifikasi ditandai sudah dibaca
-                data:
-                  type: object
-                  nullable: true
-                  example: null
-
+          application/json: {schema: {type: object, properties: {success: {type: boolean, example: true}, message: {type: string, example: 'Semua notifikasi ditandai sudah dibaca'}, data: {type: object, nullable: true, example: null}}}}
 markOneRead:
   patch:
     tags:
       - Notifications
-
-    summary: Tandai satu notifikasi sebagai sudah dibaca
-
+    summary: 'Tandai satu notifikasi sebagai sudah dibaca'
     security:
-      - BearerAuth: []
-
+      -
+        BearerAuth: []
     parameters:
-      - name: id
+      -
+        name: id
         in: path
         required: true
         schema:
           type: integer
         example: 1
-
     responses:
-
-      "200":
-        description: Notifikasi berhasil ditandai sudah dibaca
+      '200':
+        description: 'Notifikasi berhasil ditandai sudah dibaca'
         content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                success:
-                  type: boolean
-                  example: true
-                message:
-                  type: string
-                  example: Notifikasi ditandai sudah dibaca
-                data:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      example: 1
-                    type:
-                      type: string
-                      example: project_approved
-                    title:
-                      type: string
-                      example: Project Disetujui
-                    message:
-                      type: string
-                      example: Project "SINGGAH" Anda telah disetujui admin.
-                    is_read:
-                      type: boolean
-                      example: true
-
-      "404":
-        description: Notifikasi tidak ditemukan
-
+          application/json: {schema: {type: object, properties: {success: {type: boolean, example: true}, message: {type: string, example: 'Notifikasi ditandai sudah dibaca'}, data: {type: object, properties: {id: {type: integer, example: 1}, type: {type: string, example: project_approved}, title: {type: string, example: 'Project Disetujui'}, message: {type: string, example: 'Project "SINGGAH" Anda telah disetujui admin.'}, is_read: {type: boolean, example: true}}}}}}
+      '404':
+        description: 'Notifikasi tidak ditemukan'
 markOneUnread:
   patch:
     tags:
       - Notifications
-
-    summary: Tandai satu notifikasi sebagai belum dibaca
-
+    summary: 'Tandai satu notifikasi sebagai belum dibaca'
     security:
-      - BearerAuth: []
-
+      -
+        BearerAuth: []
     parameters:
-      - name: id
+      -
+        name: id
         in: path
         required: true
         schema:
           type: integer
         example: 1
-
     responses:
-
-      "200":
-        description: Notifikasi berhasil ditandai belum dibaca
+      '200':
+        description: 'Notifikasi berhasil ditandai belum dibaca'
         content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                success:
-                  type: boolean
-                  example: true
-                message:
-                  type: string
-                  example: Notifikasi ditandai belum dibaca
-                data:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      example: 1
-                    is_read:
-                      type: boolean
-                      example: false
-
-      "404":
-        description: Notifikasi tidak ditemukan
-
+          application/json: {schema: {type: object, properties: {success: {type: boolean, example: true}, message: {type: string, example: 'Notifikasi ditandai belum dibaca'}, data: {type: object, properties: {id: {type: integer, example: 1}, is_read: {type: boolean, example: false}}}}}}
+      '404':
+        description: 'Notifikasi tidak ditemukan'
 deleteOne:
   delete:
     tags:
       - Notifications
-
-    summary: Hapus satu notifikasi
-
+    summary: 'Hapus satu notifikasi'
     security:
-      - BearerAuth: []
-
+      -
+        BearerAuth: []
     parameters:
-      - name: id
+      -
+        name: id
         in: path
         required: true
         schema:
           type: integer
         example: 1
-
     responses:
-
-      "200":
-        description: Notifikasi berhasil dihapus
+      '200':
+        description: 'Notifikasi berhasil dihapus'
         content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                success:
-                  type: boolean
-                  example: true
-                message:
-                  type: string
-                  example: Notifikasi dihapus
-                data:
-                  type: object
-                  nullable: true
-                  example: null
-
-      "404":
-        description: Notifikasi tidak ditemukan
-
+          application/json: {schema: {type: object, properties: {success: {type: boolean, example: true}, message: {type: string, example: 'Notifikasi dihapus'}, data: {type: object, nullable: true, example: null}}}}
+      '404':
+        description: 'Notifikasi tidak ditemukan'
 deleteAll:
   delete:
     tags:
       - Notifications
-
-    summary: Hapus semua notifikasi milik user yang login
-
+    summary: 'Hapus semua notifikasi milik user yang login'
     security:
-      - BearerAuth: []
-
+      -
+        BearerAuth: []
     responses:
-
-      "200":
-        description: Semua notifikasi berhasil dihapus
+      '200':
+        description: 'Semua notifikasi berhasil dihapus'
         content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                success:
-                  type: boolean
-                  example: true
-                message:
-                  type: string
-                  example: Semua notifikasi dihapus
-                data:
-                  type: object
-                  nullable: true
-                  example: null
-
+          application/json: {schema: {type: object, properties: {success: {type: boolean, example: true}, message: {type: string, example: 'Semua notifikasi dihapus'}, data: {type: object, nullable: true, example: null}}}}
 bulkUpdate:
-  post:
-    tags:
-      - Notifications
-
-    summary: Perbarui status baca beberapa notifikasi sekaligus
-
-    description: |
-      Mengubah status `is_read` untuk banyak notifikasi sekaligus.
-      `action` dapat bernilai `read` atau `unread`.
-
-    security:
-      - BearerAuth: []
-
-    requestBody:
-      required: true
+  tags:
+    - Notifications
+  summary: 'Perbarui status baca beberapa notifikasi sekaligus'
+  description: "Mengubah status `is_read` untuk banyak notifikasi sekaligus.\n`action` dapat bernilai `read` atau `unread`.\n"
+  security:
+    -
+      BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [ids, action]
+          properties: {ids: {type: array, items: {type: integer}, example: [1, 2, 3]}, action: {type: string, enum: [read, unread], example: read}}
+  responses:
+    '200':
+      description: 'Notifikasi berhasil diperbarui'
       content:
         application/json:
-          schema:
-            type: object
-            required:
-              - ids
-              - action
-            properties:
-              ids:
-                type: array
-                items:
-                  type: integer
-                example: [1, 2, 3]
-              action:
-                type: string
-                enum: [read, unread]
-                example: read
-
-    responses:
-
-      "200":
-        description: Notifikasi berhasil diperbarui
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                success:
-                  type: boolean
-                  example: true
-                message:
-                  type: string
-                  example: Berhasil memperbarui 3 notifikasi
-                data:
-                  type: object
-                  properties:
-                    affected:
-                      type: integer
-                      example: 3
-
-      "400":
-        description: ids kosong atau action tidak valid
-
+          schema: {type: object, properties: {success: {type: boolean, example: true}, message: {type: string, example: 'Berhasil memperbarui 3 notifikasi'}, data: {type: object, properties: {affected: {type: integer, example: 3}}}}}
+    '400':
+      description: 'ids kosong atau action tidak valid'
 bulkDelete:
-  delete:
-    tags:
-      - Notifications
-
-    summary: Hapus beberapa notifikasi sekaligus
-
-    description: |
-      Menghapus notifikasi berdasarkan daftar `ids` milik user yang login.
-
-    security:
-      - BearerAuth: []
-
-    requestBody:
-      required: true
+  tags:
+    - Notifications
+  summary: 'Hapus beberapa notifikasi sekaligus'
+  description: "Menghapus notifikasi berdasarkan daftar `ids` milik user yang login.\n"
+  security:
+    -
+      BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [ids]
+          properties: {ids: {type: array, items: {type: integer}, example: [1, 2, 3]}}
+  responses:
+    '200':
+      description: 'Notifikasi berhasil dihapus'
       content:
         application/json:
-          schema:
-            type: object
-            required:
-              - ids
-            properties:
-              ids:
-                type: array
-                items:
-                  type: integer
-                example: [1, 2, 3]
-
-    responses:
-
-      "200":
-        description: Notifikasi berhasil dihapus
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                success:
-                  type: boolean
-                  example: true
-                message:
-                  type: string
-                  example: Berhasil menghapus 3 notifikasi
-                data:
-                  type: object
-                  properties:
-                    affected:
-                      type: integer
-                      example: 3
-
-      "400":
-        description: ids kosong
-
+          schema: {type: object, properties: {success: {type: boolean, example: true}, message: {type: string, example: 'Berhasil menghapus 3 notifikasi'}, data: {type: object, properties: {affected: {type: integer, example: 3}}}}}
+    '400':
+      description: 'ids kosong'
 announcements:
   post:
     tags:
       - Notifications
-
-    summary: Kirim pengumuman ke user (khusus admin)
-
-    description: |
-      Mengirim notifikasi tipe `announcement` kepada seluruh user atau
-      berdasarkan kelompok tipe (`all`, `mahasiswa`, `dosen`, `umum`).
-      User mahasiswa/dosen yang masih menunggu persetujuan tipe
-      (`pending_tipe`) juga ikut menerima pengumuman sesuai tipe yang
-      diajukan.
-
+    summary: 'Kirim pengumuman ke user (khusus admin)'
+    description: "Mengirim notifikasi tipe `announcement` kepada seluruh user atau\nberdasarkan kelompok tipe (`all`, `mahasiswa`, `dosen`, `umum`).\nUser mahasiswa/dosen yang masih menunggu persetujuan tipe\n(`pending_tipe`) juga ikut menerima pengumuman sesuai tipe yang\ndiajukan.\n"
     security:
-      - BearerAuth: []
-
+      -
+        BearerAuth: []
     requestBody:
       required: true
       content:
         application/json:
-          schema:
-            type: object
-            required:
-              - title
-              - message
-            properties:
-              title:
-                type: string
-                example: Maintenance Terjadwal
-              message:
-                type: string
-                example: Website akan dilakukan maintenance pada Minggu pukul 22.00 WITA.
-              audience:
-                type: string
-                enum: [all, mahasiswa, dosen, umum]
-                default: all
-                example: all
-              reference_type:
-                type: string
-                nullable: true
-                example: project
-              reference_id:
-                type: integer
-                nullable: true
-                example: 5
-
+          schema: {type: object, required: [title, message], properties: {title: {type: string, example: 'Maintenance Terjadwal'}, message: {type: string, example: 'Website akan dilakukan maintenance pada Minggu pukul 22.00 WITA.'}, audience: {type: string, enum: [all, mahasiswa, dosen, umum], default: all, example: all}, reference_type: {type: string, nullable: true, example: project}, reference_id: {type: integer, nullable: true, example: 5}}}
     responses:
-
-      "201":
-        description: Pengumuman berhasil dikirim
+      '201':
+        description: 'Pengumuman berhasil dikirim'
         content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                success:
-                  type: boolean
-                  example: true
-                message:
-                  type: string
-                  example: Pengumuman berhasil dikirim
-                data:
-                  type: object
-                  properties:
-                    affected:
-                      type: integer
-                      example: 42
-
-      "400":
-        description: Judul/pesan kosong atau audience tidak valid
-
-      "403":
-        description: Hanya admin yang dapat mengirim pengumuman
+          application/json: {schema: {type: object, properties: {success: {type: boolean, example: true}, message: {type: string, example: 'Pengumuman berhasil dikirim'}, data: {type: object, properties: {affected: {type: integer, example: 42}}}}}}
+      '400':
+        description: 'Judul/pesan kosong atau audience tidak valid'
+      '403':
+        description: 'Hanya admin yang dapat mengirim pengumuman'

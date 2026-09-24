@@ -34,16 +34,20 @@ paths:
     $ref: './paths/auth.yaml#/changePassword'
 
   /auth/me:
-    $ref: './paths/interactions.yaml#/me'
+    get:
+      $ref: './paths/interactions.yaml#/me'
 
   /auth/profile-stats:
-    $ref: './paths/interactions.yaml#/profileStats'
+    get:
+      $ref: './paths/interactions.yaml#/profileStats'
 
   /auth/profile:
-    $ref: './paths/interactions.yaml#/updateProfile'
+    put:
+      $ref: './paths/interactions.yaml#/updateProfile'
 
   /auth/account:
-    $ref: './paths/interactions.yaml#/deleteAccount'
+    delete:
+      $ref: './paths/interactions.yaml#/deleteAccount'
 
   /users:
     $ref: './paths/users.yaml#/collection'
@@ -64,10 +68,12 @@ paths:
     $ref: './paths/projects.yaml#/single'
 
   /projects/pending:
-    $ref: './paths/interactions.yaml#/pending'
+    get:
+      $ref: './paths/interactions.yaml#/pending'
 
   /projects/{id}/status:
-    $ref: './paths/interactions.yaml#/updateProjectStatus'
+    patch:
+      $ref: './paths/interactions.yaml#/updateProjectStatus'
 
   /projects/{id}/comments:
     get:
@@ -168,8 +174,7 @@ paths:
       $ref: './paths/interactions.yaml#/stats'
 
   /hall:
-    get:
-      $ref: './paths/hall.yaml#/overview'
+    $ref: './paths/hall.yaml#/overview'
 
   /news:
     $ref: './paths/news.yaml#/collection'
@@ -208,18 +213,13 @@ paths:
     $ref: './paths/notifications.yaml#/markOneUnread'
 
   /activity-logs:
-    get:
-      $ref: './paths/system.yaml#/activityLogs'
+    $ref: './paths/system.yaml#/activityLogs'
 
   /settings:
-    get:
-      $ref: './paths/system.yaml#/settings'
-    put:
-      $ref: './paths/system.yaml#/settings'
+    $ref: './paths/system.yaml#/settings'
 
   /reports:
-    get:
-      $ref: './paths/system.yaml#/reports'
+    $ref: './paths/system.yaml#/reports'
 
 components:
   securitySchemes:

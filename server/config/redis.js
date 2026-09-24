@@ -5,7 +5,6 @@ let client = null
 let healthy = false
 let lastHealthCheck = 0
 const HEALTH_WINDOW = 10_000
-const CONNECT_GRACE_MS = 1000
 
 function isEnabled() {
   return process.env.NODE_ENV !== "test" && Boolean(process.env.REDIS_URL)
@@ -73,7 +72,13 @@ async function isRedisReady() {
   // Tanpa ini, ping pertama bisa gagal dan merusak klien permanen
   // (enableOfflineQueue:false + maxRetriesPerRequest:1).
   if (redis.status !== "ready") {
-    await new Promise((resolve) => setTimeout(resolve, CONNECT_GRACE_MS))
+    // Tunggu sampai klien benar-benar siap (polling status), bukan tidur
+    // acak. Pada start pertama, klien bisa berada di fase connecting/reconnect
+    // dan ping akan ditolak (enableOfflineQueue:false).
+    const deadline = Date.now() + redis.options.connectTimeout + 1000
+    while (redis.status !== "ready" && Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 100))
+    }
   }
 
   try {

@@ -111,6 +111,37 @@ if (process.env.NODE_ENV !== "test") {
   )
 }
 
+// Endpoint kesehatan untuk platform hosting (Railway, Render, uptime monitor).
+//
+// WAJIB dipasang sebelum maintenanceMiddleware dan rate limiter, supaya:
+//   - tetap bisa dijawab saat mode maintenance menyala, kalau-kalau tidak
+//     sengaja menyalakan dan platform ikut-"mematikan" layanan.
+//   - tidak ikut kena rate limit, sehingga health check tidak bisa membuat
+//     layanan kena 429.
+//   - tidak memakai cache sama sekali, jadi selalu mengukur kondisi nyata.
+//
+// Query ke database sengaja dibuat satu kali saja (SELECT 1) supaya murah.
+app.get("/api/health", async (req, res) => {
+  const startedAt = process.hrtime.bigint()
+  let database = "ok"
+  let status = 200
+
+  try {
+    await sequelize.query("SELECT 1")
+  } catch (err) {
+    database = "gagal"
+    status = 503
+    logger.error(`Health check: database tidak bisa dihubungi - ${err.message}`)
+  }
+
+  res.status(status).json({
+    success: status === 200,
+    database,
+    uptimeSeconds: Math.round(process.uptime()),
+    responseMs: Number(process.hrtime.bigint() - startedAt) / 1e6,
+  })
+})
+
 app.use("/api", maintenanceMiddleware)
 
 // Jaring pengaman untuk request yang mengubah data. Harus dipasang SEBELUM

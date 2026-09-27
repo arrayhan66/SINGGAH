@@ -308,7 +308,7 @@ exports.apiWriteLimiter = rateLimit({
   max: effectiveMax(60),
   standardHeaders: true,
   legacyHeaders: false,
-  skip: () => isRateLimitDisabled,
+  skip: () => isRateLimitDisabled || process.env.NODE_ENV === "test",
   store: createStore("api-write"),
   message: {
     success: false,

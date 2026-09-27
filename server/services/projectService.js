@@ -12,6 +12,7 @@ const {
   ProjectView,
   Bookmark,
   Comment,
+  ProjectRevision,
   sequelize,
 } = require("../models")
 const AppError = require("../utils/AppError")
@@ -853,9 +854,9 @@ exports.createProject = async (data, user, imageUrls = [], documentUrls = []) =>
   // Parse & validasi relasi SEBELUM menulis ke database
   const relations = parseRelationFields(data)
 
-  // Tentukan status berdasarkan tipe user
+  // Tentukan status berdasarkan tipe user / author tipe
   const projectStatus =
-    user.role === "admin" || user.tipe === "dosen" ? "published" : "pending"
+    authorTipe === "mahasiswa" ? "pending" : "published"
 
   const project = await sequelize.transaction(async (t) => {
     const created = await Project.create(
@@ -918,7 +919,7 @@ exports.createProject = async (data, user, imageUrls = [], documentUrls = []) =>
   return await exports.getProjectById(project.id, user.id, user.role)
 }
 
-exports.updateProject = async (id, data, user) => {
+exports.updateProject = async (id, data, user, fileOps = {}) => {
   const where = /^\d+$/.test(String(id)) ? { id: Number(id) } : { slug: id }
   const project = await Project.findOne({
     where,
@@ -958,11 +959,78 @@ exports.updateProject = async (id, data, user) => {
     }
   }
 
+  if (user.role !== "admin" && project.status === "published") {
+    const finalThumbnail = fileOps.thumbnailUrl || thumbnail || project.thumbnail
+
+    const existingImages = await ProjectImage.findAll({ where: { project_id: project.id } })
+    const existingDocs = await ProjectDocument.findAll({ where: { project_id: project.id } })
+
+    const removedImagesSet = new Set(fileOps.removedImages || [])
+    const removedDocsSet = new Set(fileOps.removedDocuments || [])
+
+    const keptImages = existingImages
+      .filter(img => !removedImagesSet.has(img.id) && !removedImagesSet.has(img.image_url))
+      .map(img => img.image_url)
+
+    const allImages = [...keptImages, ...(fileOps.images || [])]
+
+    const keptDocs = existingDocs
+      .filter(doc => !removedDocsSet.has(doc.id) && !removedDocsSet.has(doc.file_url))
+      .map(doc => ({ name: doc.name, file_url: doc.file_url }))
+
+    const allDocs = [...keptDocs, ...(fileOps.documents || [])]
+
+    const payload = {
+      title: title ?? project.title,
+      slug: slug ?? project.slug,
+      description: description ?? project.description,
+      thumbnail: finalThumbnail,
+      year: year ?? project.year,
+      category_id: category_id ?? project.category_id,
+      author_tipe: project.author_tipe,
+      technologies: relations.technologies,
+      members: relations.members,
+      links: relations.links,
+      videos: relations.videos,
+      images: allImages,
+      documents: allDocs,
+    }
+
+    let revision = await ProjectRevision.findOne({
+      where: { project_id: project.id, status: "pending" },
+    })
+
+    if (revision) {
+      revision.payload = payload
+      await revision.save()
+    } else {
+      revision = await ProjectRevision.create({
+        project_id: project.id,
+        user_id: user.id,
+        status: "pending",
+        payload,
+      })
+    }
+
+    await notifyAdmins({
+      type: "project_revision",
+      title: "Pengajuan revisi karya",
+      message: `${user.name} mengajukan revisi untuk karya "${project.title}"`,
+      reference_type: "project",
+      reference_id: project.id,
+    }).catch(() => {})
+
+    return {
+      pendingReview: true,
+      revision,
+    }
+  }
+
   await sequelize.transaction(async (t) => {
     project.title = title ?? project.title
     project.slug = slug ?? project.slug
     project.description = description ?? project.description
-    project.thumbnail = thumbnail ?? project.thumbnail
+    project.thumbnail = fileOps.thumbnailUrl ?? thumbnail ?? project.thumbnail
     project.year = year ?? project.year
     project.category_id = category_id ?? project.category_id
 
@@ -984,11 +1052,54 @@ exports.updateProject = async (id, data, user) => {
         }
       }
       project.status = status ?? project.status
+    } else if (project.status === "rejected") {
+      project.status = "pending"
+      project.rejection_reason = null
     }
 
     await project.save({ transaction: t })
 
     await persistRelations(project, relations, { transaction: t })
+
+    if (fileOps.removedImages && fileOps.removedImages.length > 0) {
+      await ProjectImage.destroy({
+        where: {
+          project_id: project.id,
+          [Op.or]: [
+            { id: { [Op.in]: fileOps.removedImages.filter(id => !isNaN(id)) } },
+            { image_url: { [Op.in]: fileOps.removedImages } }
+          ]
+        },
+        transaction: t
+      })
+    }
+
+    if (fileOps.images && fileOps.images.length > 0) {
+      await ProjectImage.bulkCreate(
+        fileOps.images.map(url => ({ image_url: url, project_id: project.id })),
+        { transaction: t }
+      )
+    }
+
+    if (fileOps.removedDocuments && fileOps.removedDocuments.length > 0) {
+      await ProjectDocument.destroy({
+        where: {
+          project_id: project.id,
+          [Op.or]: [
+            { id: { [Op.in]: fileOps.removedDocuments.filter(id => !isNaN(id)) } },
+            { file_url: { [Op.in]: fileOps.removedDocuments } }
+          ]
+        },
+        transaction: t
+      })
+    }
+
+    if (fileOps.documents && fileOps.documents.length > 0) {
+      await ProjectDocument.bulkCreate(
+        fileOps.documents.map(doc => ({ name: doc.name, file_url: doc.file_url, project_id: project.id })),
+        { transaction: t }
+      )
+    }
   })
 
   await invalidateProjectListCaches()
@@ -1147,4 +1258,302 @@ const loadHallProjects = async () => {
 exports.getHallProjects = async (currentUserId = null) => {
   const items = await loadHallProjects()
   return applyUserFlags(items, currentUserId)
+}
+
+exports.getPendingRevisions = async (query = {}) => {
+  const { status, page, limit } = query
+
+  if (status && !["pending", "approved", "rejected"].includes(status)) {
+    throw new AppError("Status tidak valid", 400)
+  }
+
+  const { page: currentPage, limit: currentLimit, offset } = parsePagination(
+    { page, limit },
+    50,
+  )
+
+  const where = status ? { status } : {}
+
+  const { count, rows } = await ProjectRevision.findAndCountAll({
+    where,
+    include: [
+      {
+        model: Project,
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "name", "slug"],
+          },
+          USER_INCLUDE,
+        ],
+      },
+      {
+        model: User,
+        as: "reviewer",
+        attributes: ["id", "name", "username"],
+      },
+    ],
+    order: [
+      ["created_at", "DESC"],
+      ["id", "DESC"],
+    ],
+    limit: currentLimit,
+    offset,
+    distinct: true,
+  })
+
+  return {
+    revisions: rows,
+    total: count,
+    pagination: {
+      page: currentPage,
+      limit: currentLimit,
+      total: count,
+      totalPages: Math.ceil(count / currentLimit),
+    },
+  }
+}
+
+exports.getRevisionById = async (id, user) => {
+  const revision = await ProjectRevision.findByPk(id, {
+    include: [
+      {
+        model: Project,
+        include: [
+          {
+            model: Category,
+            attributes: [
+              "id",
+              "name",
+              "slug",
+              "description",
+              "icon",
+              "color",
+              "sort_order",
+              "is_active",
+            ],
+          },
+          USER_INCLUDE,
+          IMAGES_INCLUDE,
+          MEMBERS_INCLUDE,
+          TECHNOLOGIES_INCLUDE,
+          DOCUMENTS_INCLUDE,
+          VIDEOS_INCLUDE,
+          LINKS_INCLUDE,
+        ],
+      },
+      {
+        model: User,
+        as: "reviewer",
+        attributes: ["id", "name", "username"],
+      },
+    ],
+  })
+
+  if (!revision) {
+    throw new AppError("Revisi tidak ditemukan", 404)
+  }
+
+  const isOwner = user && (revision.user_id === user.id || revision.Project?.user_id === user.id)
+  const isAdmin = user && user.role === "admin"
+
+  if (!isAdmin && !isOwner) {
+    throw new AppError("Akses ditolak", 403)
+  }
+
+  const current = await exports.getProjectById(
+    revision.project_id,
+    user?.id || null,
+    user?.role || null,
+  )
+
+  return {
+    revision,
+    current,
+  }
+}
+
+exports.getPendingRevisionByProject = async (projectId, user) => {
+  const project = await Project.findByPk(projectId)
+  if (!project) {
+    throw new AppError("Project tidak ditemukan", 404)
+  }
+
+  if (user.role !== "admin" && project.user_id !== user.id) {
+    throw new AppError("Akses ditolak", 403)
+  }
+
+  const revision = await ProjectRevision.findOne({
+    where: {
+      project_id: projectId,
+      status: "pending",
+    },
+    include: [USER_INCLUDE],
+  })
+
+  return revision
+}
+
+exports.cancelRevision = async (id, user) => {
+  const revision = await ProjectRevision.findByPk(id, {
+    include: [{ model: Project, attributes: ["id", "user_id"] }],
+  })
+
+  if (!revision) {
+    throw new AppError("Revisi tidak ditemukan", 404)
+  }
+
+  if (revision.status !== "pending") {
+    throw new AppError("Revisi yang sudah diproses tidak dapat dibatalkan", 400)
+  }
+
+  const isOwner = user && (revision.user_id === user.id || revision.Project?.user_id === user.id)
+  const isAdmin = user && user.role === "admin"
+
+  if (!isAdmin && !isOwner) {
+    throw new AppError("Akses ditolak", 403)
+  }
+
+  await revision.destroy()
+
+  return revision
+}
+
+exports.approveRevision = async (id, note, user) => {
+  if (user.role !== "admin") {
+    throw new AppError("Akses ditolak", 403)
+  }
+
+  const revision = await ProjectRevision.findByPk(id, {
+    include: [{ model: Project }],
+  })
+
+  if (!revision) {
+    throw new AppError("Revisi tidak ditemukan", 404)
+  }
+
+  if (revision.status !== "pending") {
+    throw new AppError("Revisi ini sudah diproses", 400)
+  }
+
+  const project = revision.Project
+  if (!project) {
+    throw new AppError("Project tidak ditemukan", 404)
+  }
+
+  const payload = revision.payload || {}
+
+  await sequelize.transaction(async (t) => {
+    project.title = payload.title ?? project.title
+    project.slug = payload.slug ?? project.slug
+    project.description = payload.description ?? project.description
+    project.thumbnail = payload.thumbnail ?? project.thumbnail
+    project.year = payload.year ?? project.year
+    project.category_id = payload.category_id ?? project.category_id
+    if (payload.author_tipe !== undefined) {
+      project.author_tipe = payload.author_tipe
+    }
+
+    await project.save({ transaction: t })
+
+    const relationsToPersist = {
+      technologies: payload.technologies || [],
+      members: payload.members || [],
+      links: payload.links || [],
+      videos: payload.videos || [],
+    }
+
+    await persistRelations(project, relationsToPersist, { transaction: t })
+
+    if (payload.images && Array.isArray(payload.images)) {
+      await ProjectImage.destroy({ where: { project_id: project.id }, transaction: t })
+      if (payload.images.length > 0) {
+        await ProjectImage.bulkCreate(
+          payload.images.map(url => ({ image_url: url, project_id: project.id })),
+          { transaction: t }
+        )
+      }
+    }
+
+    if (payload.documents && Array.isArray(payload.documents)) {
+      await ProjectDocument.destroy({ where: { project_id: project.id }, transaction: t })
+      if (payload.documents.length > 0) {
+        await ProjectDocument.bulkCreate(
+          payload.documents.map(doc => ({ name: doc.name, file_url: doc.file_url, project_id: project.id })),
+          { transaction: t }
+        )
+      }
+    }
+
+    revision.status = "approved"
+    revision.approve_note = note ? String(note).trim() : null
+    revision.reviewed_by = user.id
+    revision.reviewed_at = new Date()
+    await revision.save({ transaction: t })
+
+    await createNotification(
+      {
+        user_id: project.user_id,
+        type: "project_revision_approved",
+        title: "Revisi karya disetujui",
+        message: note
+          ? `Perubahan pada karya "${project.title}" telah disetujui. Catatan admin: ${note}`
+          : `Perubahan pada karya "${project.title}" telah disetujui dan kini tayang.`,
+        reference_type: "project",
+        reference_id: project.id,
+      },
+      { transaction: t },
+    )
+  })
+
+  await invalidateProjectListCaches()
+
+  return await exports.getProjectById(project.id, user.id, user.role)
+}
+
+exports.rejectRevision = async (id, reason, user) => {
+  if (user.role !== "admin") {
+    throw new AppError("Akses ditolak", 403)
+  }
+
+  const revision = await ProjectRevision.findByPk(id, {
+    include: [{ model: Project, attributes: ["id", "title", "user_id"] }],
+  })
+
+  if (!revision) {
+    throw new AppError("Revisi tidak ditemukan", 404)
+  }
+
+  if (revision.status !== "pending") {
+    throw new AppError("Revisi ini sudah diproses", 400)
+  }
+
+  const cleanReason = String(reason || "").trim()
+  if (!cleanReason) {
+    throw new AppError("Alasan penolakan wajib diisi", 400)
+  }
+
+  await sequelize.transaction(async (t) => {
+    revision.status = "rejected"
+    revision.rejection_reason = cleanReason
+    revision.reviewed_by = user.id
+    revision.reviewed_at = new Date()
+    await revision.save({ transaction: t })
+
+    if (revision.Project) {
+      await createNotification(
+        {
+          user_id: revision.Project.user_id,
+          type: "project_revision_rejected",
+          title: "Revisi karya ditolak",
+          message: `Perubahan pada karya "${revision.Project.title}" ditolak oleh admin. Alasan: ${cleanReason}`,
+          reference_type: "project",
+          reference_id: revision.project_id,
+        },
+        { transaction: t },
+      )
+    }
+  })
+
+  return revision
 }

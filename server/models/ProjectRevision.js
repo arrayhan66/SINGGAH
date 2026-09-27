@@ -16,6 +16,14 @@ const sequelize = require("../config/database")
 const ProjectRevision = sequelize.define(
   "ProjectRevision",
   {
+    project_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     payload: {
       type: DataTypes.JSON,
       allowNull: false,

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { Plus, X, Link2, Video, Info } from "lucide-react"
 import GlassCard from "../../../ui/GlassCard"
+import { isCategoryActive } from "../../../../utils/categoryHelpers"
 import api from "../../../../services/api"
 
 function UploadInformation({ formData, updateField, showAuthorType = false }) {
@@ -12,7 +13,11 @@ function UploadInformation({ formData, updateField, showAuthorType = false }) {
       api
         .get("/categories")
         .then((res) => {
-          if (mounted) setCategories(res.data.data || res.data)
+          if (!mounted) return
+          const items = res.data.data || res.data
+          // Kategori nonaktif tidak tampil di halaman Karya, jadi tidak bisa
+          // dipilih sebagai kategori karya baru.
+          setCategories(items.filter(isCategoryActive))
         })
         .catch(() => {})
     load()

@@ -56,7 +56,7 @@ export default function CategoryHero({
 
       <div className="px-4 pt-6 pb-6 md:px-6 md:pt-7 md:pb-7 lg:px-8 3xl:pt-9 3xl:pb-9 4xl:pt-11 4xl:pb-11">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="relative flex-1 min-w-0 2xl:max-w-2xl 3xl:max-w-3xl 4xl:max-w-4xl">
+          <div className="relative flex-1 min-w-0">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 3xl:h-5 3xl:w-5 4xl:h-6 4xl:w-6" />
             <input
               type="text"

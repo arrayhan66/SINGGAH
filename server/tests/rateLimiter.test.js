@@ -24,8 +24,12 @@ describe("Rate Limiting", () => {
     await user.save()
   })
 
-  it("should allow up to 5 login attempts", async () => {
-    for (let i = 0; i < 5; i++) {
+  // Batas login mengikuti `max: effectiveMax(10)` di middlewares/rateLimiter.js,
+  // dan `skipSuccessfulRequests: true` sehingga hanya percobaan GAGAL yang
+  // memakai jatah. Test ini mengirim 10x password salah lalu memastikan
+  // percobaan ke-11 diblokir.
+  it("should allow up to 10 failed login attempts", async () => {
+    for (let i = 0; i < 10; i++) {
       const res = await request(app)
         .post("/api/auth/login")
         .send({ email: "limiter@example.com", password: "WrongPassword123!" })
@@ -34,7 +38,7 @@ describe("Rate Limiting", () => {
     }
   })
 
-  it("should rate-limit the 6th login attempt with 429", async () => {
+  it("should rate-limit the 11th login attempt with 429", async () => {
     const res = await request(app)
       .post("/api/auth/login")
       .send({ email: "limiter@example.com", password: "WrongPassword123!" })

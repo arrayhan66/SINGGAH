@@ -68,6 +68,11 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
   const [submitError, setSubmitError] = useState(null)
   const [successOpen, setSuccessOpen] = useState(false)
   const [noChangeOpen, setNoChangeOpen] = useState(false)
+  // Revisi yang masih menunggu verifikasi admin. Kalau ada, form di bawah
+  // menampilkan isinya, bukan data karya yang tayang — supaya mahasiswa
+  // menyunting perubahan yang sama, bukanSILANG edit dengan yang sudah
+  // disetujui admin.
+  const [pendingRevision, setPendingRevision] = useState(null)
   const originalRef = useRef(null)
 
   const [formData, setFormData] = useState({
@@ -290,6 +295,22 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
       <DustBackground />
 
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col gap-6 sm:gap-8 2xl:gap-10 3xl:gap-12 4xl:gap-14">
+        {pendingRevision && (
+          <div className="flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+            <div className="text-xs leading-relaxed text-amber-200">
+              <p className="font-semibold">
+                Perubahan ini sedang menunggu verifikasi admin.
+              </p>
+              <p className="mt-1 text-amber-200/80">
+                Karya yang tayang masih versi lama sampai admin menyetujui.
+                Form di bawah terisi dari perubahan yang sedang menunggu, jadi
+                simpan lagi untuk memperbarui pengajuan yang sama.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Thumbnail */}
         <UploadThumbnail
           value={formData.thumbnail}
@@ -371,8 +392,7 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
               </h3>
               <p className="mt-0.5 text-xs text-slate-400 leading-relaxed">
                 Semua isian masih sama dengan data sebelumnya, jadi tidak ada
-                yang disimpan. Tidak ada pengajuan verifikasi yang dikirim ke
-                admin karena tidak ada yang berubah.
+                yang disimpan dan tidak ada perubahan yang perlu diverifikasi.
               </p>
             </div>
           </div>

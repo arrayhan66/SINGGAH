@@ -171,9 +171,14 @@ function createStore(limiterName) {
 
 exports.loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: effectiveMax(5),
+  max: effectiveMax(10),
   standardHeaders: true,
   legacyHeaders: false,
+  // Hanya percobaan GAGAL yang dihitung. Tanpa ini login yang berhasil ikut
+  // memakai jatah, jadi user yang loginya benar tetap terkunci 429 setelah
+  // beberapa kali masuk — apalagi kalau banyak orang devs lewat IP/proxy yang
+  // sama di jaringan lokal. Batas tetap ada untuk menahan brute force.
+  skipSuccessfulRequests: true,
   skip: () => isRateLimitDisabled,
   store: createStore("login"),
   message: {

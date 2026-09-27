@@ -6,7 +6,6 @@ const {
   deleteImage,
   getPublicIdFromUrl,
 } = require("../utils/uploadToCloudinary")
-const { ProjectImage, ProjectDocument } = require("../models")
 const AppError = require("../utils/AppError")
 const { logActivity } = require("../services/activityLogService")
 
@@ -24,31 +23,6 @@ const parseRemoved = (value, label) => {
   }
 
   throw new AppError(`${label} tidak valid`, 400)
-}
-
-const removeAssets = async (rows, Model, urlField, projectId) => {
-  for (const item of rows) {
-    const url = typeof item === "string" ? item : item[urlField]
-    const id = typeof item === "string" ? null : item.id
-
-    let asset = null
-    if (id) {
-      asset = await Model.findOne({ where: { id, project_id: projectId } })
-    } else if (url) {
-      asset = await Model.findOne({
-        where: { [urlField]: url, project_id: projectId },
-      })
-    }
-
-    if (!asset) continue
-
-    const publicId = getPublicIdFromUrl(asset[urlField] || url)
-    if (publicId) {
-      await deleteImage(publicId).catch(() => {})
-    }
-
-    await asset.destroy()
-  }
 }
 
 exports.getProjects = asyncHandler(async (req, res) => {
@@ -227,19 +201,25 @@ exports.updateProject = asyncHandler(async (req, res) => {
     throw new AppError("Akses ditolak", 403)
   }
 
+  // File hasil upload dikumpulkan ke `fileOps`, TIDAK langsung ditulis ke
+  // `projects`. Alasannya: untuk mahasiswa, file ini nanti melekat ke revisi
+  // yang menunggu verifikasi — karya yang sudah tayang tidak boleh tersentuh
+  // sebelum admin menyetujui. Penulisan ke database cukup di satu tempat,
+  // yaitu applyProjectWrites() di service.
+  const fileOps = {
+    images: [],
+    documents: [],
+    removedImages: parseRemoved(req.body.removedImages, "Gambar"),
+    removedDocuments: parseRemoved(req.body.removedDocuments, "Dokumen"),
+  }
+
   if (req.files && req.files.thumbnail) {
-    const oldPublicId = getPublicIdFromUrl(existingProject.thumbnail)
-
-    if (oldPublicId) {
-      await deleteImage(oldPublicId)
-    }
-
     const result = await uploadImage(
       req.files.thumbnail[0].buffer,
       "singgah/thumbnails",
     )
 
-    req.body.thumbnail = result.secure_url
+    fileOps.thumbnailUrl = result.secure_url
   }
 
   if (req.files && req.files.images && req.files.images.length > 0) {
@@ -249,12 +229,7 @@ exports.updateProject = asyncHandler(async (req, res) => {
       ),
     )
 
-    await ProjectImage.bulkCreate(
-      uploadedImages.map((result) => ({
-        image_url: result.secure_url,
-        project_id: existingProject.id,
-      })),
-    )
+    fileOps.images = uploadedImages.map((result) => result.secure_url)
   }
 
   if (req.files && req.files.documents && req.files.documents.length > 0) {
@@ -266,47 +241,109 @@ exports.updateProject = asyncHandler(async (req, res) => {
       ),
     )
 
-    await ProjectDocument.bulkCreate(
-      uploadedDocuments.map((result, index) => ({
-        name: req.files.documents[index].originalname,
-        file_url: result.secure_url,
-        project_id: existingProject.id,
-      })),
-    )
+    fileOps.documents = uploadedDocuments.map((result, index) => ({
+      name: req.files.documents[index].originalname,
+      file_url: result.secure_url,
+    }))
   }
 
-  const removedImages = parseRemoved(req.body.removedImages, "Gambar")
-
-  if (removedImages.length > 0) {
-    await removeAssets(
-      removedImages,
-      ProjectImage,
-      "image_url",
-      existingProject.id,
-    )
-  }
-
-  const removedDocuments = parseRemoved(
-    req.body.removedDocuments,
-    "Dokumen",
-  )
-
-  if (removedDocuments.length > 0) {
-    await removeAssets(
-      removedDocuments,
-      ProjectDocument,
-      "file_url",
-      existingProject.id,
-    )
-  }
-
-  const project = await projectService.updateProject(
+  const result = await projectService.updateProject(
     req.params.id,
     req.body,
     req.user,
+    fileOps,
   )
 
-  success(res, project, "Project berhasil diperbarui")
+  // Mahasiswa: perubahan disimpan sebagai revisi, karya belum berubah.
+  if (result && result.pendingReview) {
+    await logActivity({
+      userId: req.user.id,
+      action: "project_revision_submitted",
+      targetType: "project",
+      targetId: existingProject.id,
+      description: `${req.user.name} mengajukan perubahan pada karya "${existingProject.title}" untuk diverifikasi admin`,
+    })
+
+    return success(
+      res,
+      result,
+      "Perubahan karya diajukan dan menunggu verifikasi admin",
+      202,
+    )
+  }
+
+  success(res, result, "Project berhasil diperbarui")
+})
+
+exports.getPendingRevisions = asyncHandler(async (req, res) => {
+  const data = await projectService.getPendingRevisions(req.query)
+
+  success(res, data, "Daftar revisi berhasil dimuat")
+})
+
+exports.getRevisionById = asyncHandler(async (req, res) => {
+  const data = await projectService.getRevisionById(req.params.id, req.user)
+
+  success(res, data, "Revisi berhasil dimuat")
+})
+
+exports.getProjectPendingRevision = asyncHandler(async (req, res) => {
+  const revision = await projectService.getPendingRevisionByProject(
+    req.params.id,
+    req.user,
+  )
+
+  success(res, revision, "Status revisi berhasil dimuat")
+})
+
+exports.cancelRevision = asyncHandler(async (req, res) => {
+  const revision = await projectService.cancelRevision(req.params.id, req.user)
+
+  await logActivity({
+    userId: req.user.id,
+    action: "project_revision_cancelled",
+    targetType: "project",
+    targetId: revision.project_id,
+    description: `${req.user.name} membatalkan pengajuan perubahan karya`,
+  })
+
+  success(res, revision, "Pengajuan perubahan dibatalkan")
+})
+
+exports.approveRevision = asyncHandler(async (req, res) => {
+  const project = await projectService.approveRevision(
+    req.params.id,
+    req.body.note,
+    req.user,
+  )
+
+  await logActivity({
+    userId: req.user.id,
+    action: "project_revision_approved",
+    targetType: "project",
+    targetId: project.id,
+    description: `${req.user.name} menyetujui perubahan karya "${project.title}"`,
+  })
+
+  success(res, project, "Perubahan karya disetujui dan sudah tayang")
+})
+
+exports.rejectRevision = asyncHandler(async (req, res) => {
+  const revision = await projectService.rejectRevision(
+    req.params.id,
+    req.body.reason,
+    req.user,
+  )
+
+  await logActivity({
+    userId: req.user.id,
+    action: "project_revision_rejected",
+    targetType: "project",
+    targetId: revision.project_id,
+    description: `${req.user.name} menolak perubahan karya${req.body.reason ? `: ${req.body.reason}` : ""}`,
+  })
+
+  success(res, revision, "Perubahan karya ditolak")
 })
 
 exports.deleteProject = asyncHandler(async (req, res) => {

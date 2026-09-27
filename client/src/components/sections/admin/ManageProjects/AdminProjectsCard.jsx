@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react"
 import { createPortal } from "react-dom"
-import { Clock, CheckCircle2, XCircle, Eye, Heart, Calendar, Tag, Globe, Pencil, Trash2, Star, Crown, Lock, Plus, MonitorPlay, Loader2 } from "lucide-react"
+import { Clock, CheckCircle2, XCircle, Eye, Heart, Calendar, Tag, Globe, Pencil, Trash2, Star, Crown, Lock, Plus, MonitorPlay, Loader2, GitPullRequestArrow } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 import { imageUrl, buildSrcSet } from "../../../../utils/imageUrl"
 import toast from "../../../../utils/toast"
 import SmartImage from "../../../ui/SmartImage"
@@ -29,6 +30,7 @@ const statusConfig = {
 }
 
 function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickReject, onEdit, onDelete, onSetFeatured, featuredBySlot = {}, onToggleSlideshow, slideshowCount = 0, busy = false }) {
+  const navigate = useNavigate()
   const [featuredMenuOpen, setFeaturedMenuOpen] = useState(false)
   const [featuredMenuPos, setFeaturedMenuPos] = useState(null)
   const starBtnRef = useRef(null)
@@ -163,6 +165,27 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
             <MonitorPlay size={11} />
             <span>Slideshow</span>
           </span>
+        )}
+
+
+        {(project.revisions?.length ?? 0) > 0 && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              navigate("/admin/karya?status=revisions")
+            }}
+            title="Ada perubahan dari mahasiswa yang menunggu persetujuan"
+            className="card-action-btn inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-cyan-400/40 bg-cyan-500/25 px-2.5 py-1.5 text-[10px] font-bold text-cyan-100 transition-colors hover:bg-cyan-500/40"
+          >
+            <GitPullRequestArrow size={11} />
+            <span className="hidden min-[340px]:max-[529px]:inline min-[740px]:inline">
+              Menunggu persetujuan
+            </span>
+            <span className="inline min-[340px]:max-[529px]:hidden min-[740px]:hidden">
+              Perub.
+            </span>
+          </button>
         )}
 
         <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5">

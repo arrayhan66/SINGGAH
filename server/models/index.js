@@ -2,6 +2,7 @@ const sequelize = require("../config/database")
 const User = require("./User")
 const Category = require("./Category")
 const Project = require("./Project")
+const ProjectRevision = require("./ProjectRevision")
 const ProjectImage = require("./ProjectImage")
 const ProjectMember = require("./ProjectMember")
 const ProjectDocument = require("./ProjectDocument")
@@ -95,6 +96,24 @@ Bookmark.belongsTo(Project, { foreignKey: "project_id" })
 Project.hasMany(Comment, { foreignKey: "project_id", onDelete: "CASCADE", as: "comments" })
 Comment.belongsTo(Project, { foreignKey: "project_id" })
 
+// Revisi edit yang menunggu verifikasi admin. Satu karya hanya boleh punya
+// SATU revisi pending (dijaga di service, bukan lewat unique index, karena
+// MySQL tidak bisa unique-bersyarat dan index parsial tidak ada di sana).
+Project.hasMany(ProjectRevision, {
+  foreignKey: "project_id",
+  onDelete: "CASCADE",
+  as: "revisions",
+})
+ProjectRevision.belongsTo(Project, { foreignKey: "project_id" })
+
+User.hasMany(ProjectRevision, { foreignKey: "user_id", onDelete: "CASCADE" })
+ProjectRevision.belongsTo(User, { foreignKey: "user_id" })
+
+// Admin pemroses revisi. onDelete SET NULL supaya riwayat approve/reject
+// tetap ada walau akun admin dihapus.
+User.hasMany(ProjectRevision, { foreignKey: "reviewed_by", onDelete: "SET NULL", as: "reviewed_revisions" })
+ProjectRevision.belongsTo(User, { foreignKey: "reviewed_by", as: "reviewer" })
+
 Comment.hasMany(CommentReply, { foreignKey: "comment_id", onDelete: "CASCADE", as: "replies" })
 CommentReply.belongsTo(Comment, { foreignKey: "comment_id" })
 
@@ -103,6 +122,7 @@ module.exports = {
   User,
   Category,
   Project,
+  ProjectRevision,
   ProjectImage,
   ProjectMember,
   ProjectDocument,

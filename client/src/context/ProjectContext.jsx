@@ -163,6 +163,7 @@ export function ProjectProvider({ children }) {
   const value = {
     projects,
     loading,
+    refreshProjects: fetchProjects,
     addProject,
     updateProject,
     deleteProject,

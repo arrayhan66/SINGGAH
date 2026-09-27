@@ -28,14 +28,13 @@ function SubmitSuccessModal({
   if (!isOpen) return null
 
   const headline = mode === "upload" ? "Karya Berhasil Diunggah" : "Karya Berhasil Diperbarui"
-  const langsungPublish = role === "admin" || tipe === "dosen"
-  const subtext = !langsungPublish
-    ? mode === "upload"
-      ? "Karya kamu akan diverifikasi oleh admin terlebih dahulu sebelum dipublikasikan."
-      : "Perubahan karya kamu akan diverifikasi oleh admin."
-    : mode === "upload"
+
+  const subtext =
+    mode === "upload"
       ? "Karya kamu langsung dipublikasikan dan tersedia di galeri."
-      : "Perubahan karyamu langsung dipublikasikan."
+      : "Perubahan karyamu langsung dipublikasikan tanpa perlu diverifikasi admin."
+
+  const noticeTone = "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
 
   return (
     <PopupToast show={isOpen} variant="success" onClose={onClose} duration={5000}>
@@ -49,8 +48,8 @@ function SubmitSuccessModal({
             <p className="mt-0.5 text-xs text-slate-400 min-w-0 break-words line-clamp-2">"{karyaTitle}"</p>
           </div>
         </div>
-        <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2">
-          <p className="text-[11px] font-medium text-amber-300">
+        <div className={`mt-3 rounded-lg border px-3 py-2 ${noticeTone}`}>
+          <p className="text-[11px] font-medium">
             {subtext}
           </p>
         </div>

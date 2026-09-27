@@ -355,8 +355,15 @@ function NavbarUser() {
                   <span className="absolute -bottom-0 -right-0 h-2.5 w-2.5 rounded-full bg-emerald-400" />
                 </div>
 
-                <div className="select-none text-left">
-                  <p className="text-[13px] font-medium leading-tight text-white">
+                {/* min-w-0 + max-w: nama panjang dipotong satu baris dengan
+                    ellipsis, bukan membungkus ke baris baru danrogenser tinggi
+                    navbar. Di bawah xl blok ini disembunyikan, jadi yang tampil
+                    hanya avatar. */}
+                <div className="min-w-0 select-none text-left">
+                  <p
+                    title={name}
+                    className="max-w-[9rem] truncate text-[13px] font-medium leading-tight text-white 2xl:max-w-[12rem] 3xl:max-w-[14rem] 4xl:max-w-[16rem]"
+                  >
                     {name}
                   </p>
                   <span

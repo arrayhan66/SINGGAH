@@ -1,27 +1,43 @@
-const { Resend } = require("resend");
 const { BRAND_NAME } = require("./emailTemplate");
 const logger = require("./logger");
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const SENDLIB_API_URL = "https://sendlib.samueltuoyo.com/api/send";
 
 const sendEmail = async ({ to, subject, html, text }) => {
   if (process.env.NODE_ENV === "test") {
     return Promise.resolve(true);
   }
 
-  const { data, error } = await resend.emails.send({
-    from: `${BRAND_NAME} <onboarding@resend.dev>`,
-    to,
-    subject,
-    html,
-    text,
-  });
-
-  if (error) {
-    throw new Error(error.message || "Gagal mengirim email");
+  if (!process.env.SENDLIB_API_KEY) {
+    throw new Error("SENDLIB_API_KEY belum diset");
   }
 
-  return data;
+  if (!process.env.SENDLIB_FROM_EMAIL) {
+    throw new Error("SENDLIB_FROM_EMAIL belum diset");
+  }
+
+  const response = await fetch(SENDLIB_API_URL, {
+    method: "POST",
+    headers: {
+      "x-api-key": process.env.SENDLIB_API_KEY,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: `"${BRAND_NAME}" <${process.env.SENDLIB_FROM_EMAIL}>`,
+      to,
+      subject,
+      html,
+      text,
+    }),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || "Gagal mengirim email");
+  }
+
+  return result;
 };
 
 const sendEmailAsync = (opts) => {
@@ -29,8 +45,6 @@ const sendEmailAsync = (opts) => {
     logger.error("Gagal mengirim email", {
       message: err.message,
       code: err.code,
-      response: err.response,
-      responseCode: err.responseCode,
     });
   });
 };

@@ -1,7 +1,7 @@
-const COOKIE_NAME = "singgah_token"
-const SESSION_MS = 6 * 60 * 60 * 1000
+const COOKIE_NAME = "singgah_token";
+const SESSION_MS = 6 * 60 * 60 * 1000;
 
-const isProduction = () => process.env.NODE_ENV === "production"
+const isProduction = () => process.env.NODE_ENV === "production";
 
 // Default "lax" karena frontend memanggil API lewat rewrite Vercel pada origin
 // yang sama (client/vercel.json), sehingga cookie-nya first-party dan tidak
@@ -12,13 +12,13 @@ const isProduction = () => process.env.NODE_ENV === "production"
 // cookie terkirim lintas origin, jadi harus memakai Secure, dan browser hanya
 // mengizinkan bila situsnya HTTPS.
 function sameSite() {
-  const raw = String(process.env.AUTH_COOKIE_SAMESITE || "lax").toLowerCase()
-  if (raw === "none" || raw === "strict" || raw === "lax") return raw
-  return "lax"
+  const raw = String(process.env.AUTH_COOKIE_SAMESITE || "none").toLowerCase();
+  if (raw === "none" || raw === "strict" || raw === "lax") return raw;
+  return "none";
 }
 
 function cookieOptions() {
-  const same = sameSite()
+  const same = sameSite();
   return {
     httpOnly: true,
     sameSite: same,
@@ -26,34 +26,34 @@ function cookieOptions() {
     secure: same === "none" ? true : isProduction(),
     path: "/",
     maxAge: SESSION_MS,
-  }
+  };
 }
 
 function setAuthCookie(res, token) {
-  res.cookie(COOKIE_NAME, token, cookieOptions())
+  res.cookie(COOKIE_NAME, token, cookieOptions());
 }
 
 function clearAuthCookie(res) {
-  const same = sameSite()
+  const same = sameSite();
   res.clearCookie(COOKIE_NAME, {
     httpOnly: true,
     sameSite: same,
     secure: same === "none" ? true : isProduction(),
     path: "/",
-  })
+  });
 }
 
 function getTokenFromCookie(req) {
-  const cookieHeader = req.headers.cookie || ""
-  if (!cookieHeader) return null
+  const cookieHeader = req.headers.cookie || "";
+  if (!cookieHeader) return null;
 
   const match = cookieHeader
     .split(";")
     .map((part) => part.trim())
-    .find((part) => part.startsWith(`${COOKIE_NAME}=`))
+    .find((part) => part.startsWith(`${COOKIE_NAME}=`));
 
-  if (!match) return null
-  return decodeURIComponent(match.slice(COOKIE_NAME.length + 1))
+  if (!match) return null;
+  return decodeURIComponent(match.slice(COOKIE_NAME.length + 1));
 }
 
 module.exports = {
@@ -62,4 +62,4 @@ module.exports = {
   setAuthCookie,
   clearAuthCookie,
   getTokenFromCookie,
-}
+};

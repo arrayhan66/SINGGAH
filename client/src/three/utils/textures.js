@@ -484,6 +484,32 @@ function goldFrameTexture() {
   return _goldFrame
 }
 
+let _posterFrame = null
+
+function posterFrameTexture() {
+  if (_posterFrame) return _posterFrame
+  const size = 128
+  const { ctx } = makeCanvas(size)
+  const grad = ctx.createLinearGradient(0, 0, 0, size)
+  grad.addColorStop(0, "#f6e6b4")
+  grad.addColorStop(0.18, "#dcb268")
+  grad.addColorStop(0.5, "#a87c3c")
+  grad.addColorStop(0.82, "#7c5a26")
+  grad.addColorStop(1, "#4e3914")
+  ctx.fillStyle = grad
+  ctx.fillRect(0, 0, size, size)
+  ctx.fillStyle = "rgba(255,248,214,0.22)"
+  ctx.fillRect(0, 2, size, 2)
+  ctx.fillStyle = "rgba(40,28,10,0.3)"
+  ctx.fillRect(0, size - 4, size, 4)
+  ctx.fillStyle = "rgba(255,250,220,0.05)"
+  for (let i = 0; i < 10; i++) {
+    ctx.fillRect(0, rand(0, size), size, rand(1, 2))
+  }
+  _posterFrame = toTexture(ctx.canvas, 1, 1)
+  return _posterFrame
+}
+
 let _bookSpines = null
 
 function bookSpineSet() {
@@ -1184,14 +1210,15 @@ function featuredInfoPlaqueTexture() {
 
 // Video texture for the main-hall TV. Falls back to the static canvas
 // artwork until the video file is actually playing (e.g. missing file).
-// Autoplay must start muted; the sound is switched on at the first user
-// gesture. dispose() fully stops audio and frees everything, so call it
-// when the TV unmounts to guarantee silence outside the 3D hall page.
+// The clip plays silent by design — the hall soundtrack lives in the
+// music box beside the TV (see useHallMusic), so the video never needs an
+// audio track. dispose() frees everything, so call it when the TV unmounts
+// to stop the decoder outside the 3D hall page.
 function tvScreenVideoTexture({ onReady } = {}) {
   const fallback = tvScreenTexture()
 
   const video = document.createElement("video")
-  video.src = "/videos/hall-tv.mp4"
+  video.src = "/videos/profile-poliban.mp4"
   video.loop = true
   video.muted = true
   video.defaultMuted = true
@@ -1215,14 +1242,6 @@ function tvScreenVideoTexture({ onReady } = {}) {
     if (disposed || !video.src) return
     video.play().catch(() => {})
   }
-  const enableSound = () => {
-    if (disposed || !video.src) return
-    video.muted = false
-    video.volume = 0.65
-    video.play().catch(() => {})
-    window.removeEventListener("pointerdown", enableSound)
-    window.removeEventListener("keydown", enableSound)
-  }
   const onPlaying = () => {
     window.removeEventListener("pointerdown", tryPlay)
     window.removeEventListener("keydown", tryPlay)
@@ -1232,8 +1251,6 @@ function tvScreenVideoTexture({ onReady } = {}) {
   // Muted autoplay is usually allowed, but retry on first interaction just in case.
   window.addEventListener("pointerdown", tryPlay)
   window.addEventListener("keydown", tryPlay)
-  window.addEventListener("pointerdown", enableSound)
-  window.addEventListener("keydown", enableSound)
   video.addEventListener("playing", onPlaying)
   // Even if autoplay gets blocked by the browser, buffered data alone means
   // the TV is as ready as it can be, so stop waiting. A missing/broken file
@@ -1257,8 +1274,6 @@ function tvScreenVideoTexture({ onReady } = {}) {
     disposed = true
     window.removeEventListener("pointerdown", tryPlay)
     window.removeEventListener("keydown", tryPlay)
-    window.removeEventListener("pointerdown", enableSound)
-    window.removeEventListener("keydown", enableSound)
     document.removeEventListener("visibilitychange", onVisibility)
     video.removeEventListener("playing", onPlaying)
     video.removeEventListener("canplaythrough", sendReady)
@@ -1283,6 +1298,7 @@ export const textures = {
   steel: steelTexture,
   steelFrame: steelFrameTexture,
   goldFrame: goldFrameTexture,
+  posterFrame: posterFrameTexture,
   hallGradient: hallGradientTexture,
   roundRug: roundRugTexture,
   rugRect: rugRectTexture,

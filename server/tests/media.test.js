@@ -12,7 +12,7 @@ jest.mock("../config/cloudinary", () => ({
 
 const request = require("supertest")
 const app = require("../server")
-const { User } = require("../models")
+const { User, MediaUsage } = require("../models")
 const cloudinary = require("../config/cloudinary")
 
 describe("Media Endpoints", () => {
@@ -187,6 +187,80 @@ describe("Media Endpoints", () => {
 
       expect(res.status).toBe(200)
       expect(res.body.success).toBe(true)
+    })
+  })
+
+  describe("POST /api/media/usage", () => {
+    it("should require authentication", async () => {
+      const res = await request(app)
+        .post("/api/media/usage")
+        .send({ publicId: "singgah/media/usage-test", type: "download" })
+
+      expect(res.status).toBe(401)
+    })
+
+    it("should forbid non-admin", async () => {
+      const res = await request(app)
+        .post("/api/media/usage")
+        .set("Authorization", `Bearer ${userToken}`)
+        .send({ publicId: "singgah/media/usage-test", type: "download" })
+
+      expect(res.status).toBe(403)
+    })
+
+    it("should reject a missing publicId", async () => {
+      const res = await request(app)
+        .post("/api/media/usage")
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send({ type: "download" })
+
+      expect(res.status).toBe(400)
+      expect(res.body.message).toMatch(/public_id wajib diisi/i)
+    })
+
+    it("should reject an unsupported interaction type", async () => {
+      const res = await request(app)
+        .post("/api/media/usage")
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send({ publicId: "singgah/media/usage-test", type: "hapus" })
+
+      expect(res.status).toBe(400)
+      expect(res.body.message).toMatch(/Tipe interaksi tidak valid/i)
+    })
+
+    it("should count downloads and views cumulatively", async () => {
+      const first = await request(app)
+        .post("/api/media/usage")
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send({ publicId: "singgah/media/usage-test", type: "download" })
+
+      expect(first.status).toBe(200)
+      expect(first.body.data).toMatchObject({
+        publicId: "singgah/media/usage-test",
+        downloads: 1,
+        views: 0,
+      })
+
+      const second = await request(app)
+        .post("/api/media/usage")
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send({ publicId: "singgah/media/usage-test", type: "download" })
+
+      expect(second.body.data.downloads).toBe(2)
+
+      const third = await request(app)
+        .post("/api/media/usage")
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send({ publicId: "singgah/media/usage-test", type: "view" })
+
+      expect(third.status).toBe(200)
+      expect(third.body.data).toMatchObject({ downloads: 2, views: 1 })
+
+      const row = await MediaUsage.findOne({
+        where: { public_id: "singgah/media/usage-test" },
+      })
+      expect(row.downloads).toBe(2)
+      expect(row.views).toBe(1)
     })
   })
 })

@@ -21,6 +21,12 @@ exports.getNewsById = asyncHandler(async (req, res) => {
   success(res, news)
 })
 
+exports.getNewsBySlug = asyncHandler(async (req, res) => {
+  const news = await newsService.getNewsBySlug(req.params.slug)
+
+  success(res, news)
+})
+
 exports.createNews = asyncHandler(async (req, res) => {
   const hasFile = req.files && req.files.headline_image
   const hasImageUrl =

@@ -7,6 +7,7 @@ import LookControls from "../controls/LookControls"
 import WalkTargetMarker from "../components/WalkTargetMarker"
 import FloorHoverMarker from "../components/FloorHoverMarker"
 import { useWalkStore, loadHallReturn, clearHallReturn } from "../hooks/useWalk"
+import { useHallMusicStore } from "../hooks/useHallMusic"
 import { MUSEUM, findRoom, rooms } from "../rooms/museumLayout"
 
 function useReadySignal(onReady) {
@@ -40,6 +41,16 @@ function AreaLabel({ onArea }) {
 
 function VirtualExhibition({ onArea, onSelectProject, onReady, hallData }) {
   const { categorySlug } = useParams()
+
+  // The music box beside the TV must already be glowing and playing the moment
+  // the visitor is in the hall. Held to a mount-level effect so a room change
+  // that re-runs the spawn effect below does not restart the track; it also
+  // stops the music again once the canvas goes away (leaving the hall or
+  // opening a project), so it never plays over the rest of the site.
+  useEffect(() => {
+    useHallMusicStore.getState().enterHall()
+    return () => useHallMusicStore.getState().leaveHall()
+  }, [])
 
   useEffect(() => {
     // Returning from a project detail page: drop the player back exactly where

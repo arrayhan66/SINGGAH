@@ -1,25 +1,7 @@
 import { useDownscaledTexture } from "../../utils/useDownscaledTexture"
 import bajupraktek from "../../../assets/images/bajupraktekelktro.jpg"
-import { BRASS, CREAM, WOOD, WOOD_DARK } from "./shared.jsx"
-
-function DeskLamp({ position }) {
-  return (
-    <group position={position}>
-      <mesh position={[0, 0.02, 0]}>
-        <cylinderGeometry args={[0.16, 0.18, 0.04, 20]} />
-        <meshStandardMaterial color={BRASS} metalness={0.6} roughness={0.35} />
-      </mesh>
-      <mesh position={[0, 0.42, 0]}>
-        <cylinderGeometry args={[0.025, 0.04, 0.78, 12]} />
-        <meshStandardMaterial color={BRASS} metalness={0.6} roughness={0.35} />
-      </mesh>
-      <mesh position={[0, 0.78, 0]}>
-        <cylinderGeometry args={[0.16, 0.2, 0.24, 16]} />
-        <meshStandardMaterial color={CREAM} emissive="#ffd98a" emissiveIntensity={0.9} />
-      </mesh>
-    </group>
-  )
-}
+import { BRASS, WOOD, WOOD_DARK } from "./shared.jsx"
+import MusicBox from "./musicbox.jsx"
 
 function PhotoFrame({ position, tilt = 0.05, image }) {
   const tex = useDownscaledTexture(image, 256)
@@ -82,7 +64,10 @@ function Console({ position, rotationY = 0, scale = 1 }) {
         <boxGeometry args={[4.4, 0.07, 0.55]} />
         <meshStandardMaterial color={WOOD} roughness={0.5} />
       </mesh>
-      <DeskLamp position={[-1.55, 0.9, 0]} />
+      {/* The lamp that used to sit here became the interactive music box that
+          drives the hall soundtrack (click to toggle). Nudged forward of centre:
+          clears the wall at the back while still leaving room at the front edge. */}
+      <MusicBox position={[-1.55, 0.9, 0.05]} />
       <PhotoFrame position={[1.6, 1.12, 0]} image={bajupraktek} />
     </group>
   )

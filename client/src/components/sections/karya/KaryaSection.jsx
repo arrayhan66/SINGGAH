@@ -9,9 +9,13 @@ import SearchBar from "../../ui/SearchBar"
 import OutlineButton from "../../ui/OutlineButton"
 import { KaryaPageSkeleton } from "../../ui/PageSkeletons"
 import KaryaCategoryCard from "./KaryaCategoryCard"
+import { isCategoryActive } from "../../../utils/categoryHelpers"
 import api from "../../../services/api"
 
-const DEFAULT_CATEGORIES = [
+// Hanya dipakai kalau API-nya gagal, bukan saat daftar kategori memang kosong.
+// KalauRespons kategori kosong, halaman harus tampil empty state — bukan
+// kategori palsu yang tidak ada di database.
+const FALLBACK_CATEGORIES = [
   { name: "Website", slug: "website", description: "Situs web modern dan responsif.", color: "#3b82f6" },
   { name: "Mobile App", slug: "mobile-app", description: "Aplikasi Android & iOS.", color: "#a78bfa" },
   { name: "IoT", slug: "iot", description: "Perangkat pintar dan sistem otomatis.", color: "#06b6d4" },
@@ -25,17 +29,19 @@ const DEFAULT_CATEGORIES = [
 function KaryaSection() {
   const navigate = useNavigate()
   const initialCount = 6
-  const [categories, setCategories] = useState(DEFAULT_CATEGORIES)
+  const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     api.get("/categories")
       .then((res) => {
         const items = res.data.data.items || res.data.data || []
-        if (items.length > 0) setCategories(items)
+        // Kategori nonaktif (tidak tampil di hall 3D) tidak ikut ditampilkan.
+        setCategories(items.filter(isCategoryActive))
       })
       .catch((err) => {
         console.error("Failed to fetch categories, using fallback:", err)
+        setCategories(FALLBACK_CATEGORIES)
       })
       .finally(() => setLoading(false))
   }, [])
@@ -118,12 +124,20 @@ function KaryaSection() {
                     </svg>
                   </div>
                   <h3 className="text-center text-lg font-bold text-slate-200 sm:text-xl 3xl:text-2xl 4xl:text-3xl">
-                    Kategori tidak ditemukan
+                    {search.trim()
+                      ? "Kategori tidak ditemukan"
+                      : "Belum ada kategori"}
                   </h3>
                   <p className="mt-2 max-w-sm text-center text-xs text-slate-400 sm:max-w-md sm:text-sm md:text-base lg:text-base 3xl:mt-3 3xl:text-lg 4xl:text-xl">
-                    Maaf, kami tidak menemukan kategori yang cocok dengan kata kunci{" "}
-                    <span className="font-semibold text-slate-300">&quot;{search}&quot;</span>
-                    . Coba gunakan istilah lain.
+                    {search.trim() ? (
+                      <>
+                        Maaf, kami tidak menemukan kategori yang cocok dengan kata kunci{" "}
+                        <span className="font-semibold text-slate-300">&quot;{search}&quot;</span>
+                        . Coba gunakan istilah lain.
+                      </>
+                    ) : (
+                      "Belum ada kategori karya yang dapat ditampilkan saat ini."
+                    )}
                   </p>
                 </div>
               )}

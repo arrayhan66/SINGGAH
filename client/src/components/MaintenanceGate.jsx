@@ -25,34 +25,24 @@ function MaintenanceGate({ children }) {
   useEffect(() => {
     let cancelled = false
 
+    // Dulu ada dua request /settings yang identik di dalam useEffect yang
+    // sama (satu lewat check(), satu inline). Cukup satu.
     const check = () =>
       api
         .get("/settings")
         .then((res) => {
           if (cancelled) return
-          setState((prev) => ({
-            ...prev,
+          setState({
+            loading: false,
             maintenance: Boolean(res.data.data?.maintenanceMode),
-          }))
+          })
         })
         .catch(() => {
           if (cancelled) return
-          setState((prev) => ({ ...prev, maintenance: false }))
+          setState({ loading: false, maintenance: false })
         })
 
-    api
-      .get("/settings")
-      .then((res) => {
-        if (cancelled) return
-        setState({
-          loading: false,
-          maintenance: Boolean(res.data.data?.maintenanceMode),
-        })
-      })
-      .catch(() => {
-        if (cancelled) return
-        setState({ loading: false, maintenance: false })
-      })
+    check()
 
     const onPop = () => check()
 

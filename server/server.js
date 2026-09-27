@@ -1,4 +1,4 @@
-require("dotenv").config()
+require("dotenv").config({ quiet: true })
 require("./config/env")
 
 const path = require("path")
@@ -7,6 +7,7 @@ const express = require("express")
 const cors = require("cors")
 const helmet = require("helmet")
 const morgan = require("morgan")
+const compression = require("compression")
 const logger = require("./utils/logger")
 
 const { sequelize } = require("./models")
@@ -35,16 +36,36 @@ const mediaRoutes = require("./routes/mediaRoutes")
 const reportRoutes = require("./routes/reportRoutes")
 const hallRoutes = require("./routes/hallRoutes")
 const maintenanceMiddleware = require("./middlewares/maintenanceMiddleware")
+const { apiWriteLimiter } = require("./middlewares/rateLimiter")
 const ensureGoogleIdColumn = require("./scripts/ensureGoogleIdColumn")
 const ensureSlideshowColumn = require("./scripts/ensureSlideshowColumn")
 
 const swaggerUi = require("swagger-ui-express")
 const loadSwagger = require("./config/swagger")
+const { isRedisReady } = require("./config/redis")
 
 const app = express()
 const PORT = process.env.PORT || 5000
 
-app.set("trust proxy", 1)
+// Catatan: di PM2 cluster mode, SETIAP worker tetap harus memanggil
+// app.listen(). Pembagian koneksi dilakukan modul cluster Node (hanya worker
+// pertama yang memegang socket, sisanya meneruskan). Yang tidak boleh dipakai
+// adalah http.createServer(app) + server.listen(), karena membuat server di
+// luar jalur cluster sehingga tiap worker merebut port dan gagal EADDRINUSE.
+
+// Jumlah proxy tepercaya di depan Express. WAJIB benar, karena semua limit
+// berbasis IP (rate limiter, log akses) membaca req.ip dari sini.
+//
+// Rantai di produksi:  browser -> Vercel (rewrite /api) -> nginx -> Node
+//   jadi ada 2 proxy tepercaya sebelum Node, bukan 1.
+// Kalau nilainya kurang, req.ip akan menjadi IP Vercel/nginx, sehingga SEMUA
+// pengguna terlihat satu IP dan rate limiter bisa salah throttle semuanya.
+// Kalau kelebihan, IP asli bisa dipalsukan client danumanng circumvent limit.
+//
+//   TRUST_PROXY=1  akses langsung (nginx -> Node, tanpa Vercel)
+//   TRUST_PROXY=2  produksi lewat Vercel  <- nilai yang dipakai di VPS
+const TRUST_PROXY = Number(process.env.TRUST_PROXY ?? 1)
+app.set("trust proxy", TRUST_PROXY)
 
 app.use(
   helmet({
@@ -71,7 +92,16 @@ app.use(
   }),
 )
 
-app.use(express.json({ limit: "10mb" }))
+// Response API (terutama /api/hall dan daftar berita) bisa berukuran
+// ratusan KB sampai MB. Tanpa compression, seluruh payload itu keluar
+// mentah lewat jaringan dan membaca event loop saat di-serialize.
+app.use(
+  compression({
+    threshold: 1024,
+  }),
+)
+
+app.use(express.json({ limit: "2mb" }))
 
 if (process.env.NODE_ENV !== "test") {
   app.use(
@@ -82,6 +112,33 @@ if (process.env.NODE_ENV !== "test") {
 }
 
 app.use("/api", maintenanceMiddleware)
+
+// Jaring pengaman untuk request yang mengubah data. Harus dipasang SEBELUM
+// router, kalau tidak akan dilewati karena router yang menjawab lebih dulu.
+//
+// Hanya berlaku untuk method menulis; GET/HEAD/OPTIONS dilewati supaya list
+// dan polling notifikasi tidak ikut dibatasi.
+//
+// Path di bawah sudah punya limiter sendiri yang lebih ketat, jadi DILEWATI.
+// Kalau limiter global ikut menghitung request yang sama, express-rate-limit
+// v8 melempar ERR_ERL_DOUBLE_COUNT dan limiter global diam-diam berhenti
+// increment untuk request itu.
+const ALREADY_LIMITED = [
+  /^\/auth/, // 7 limiter auth
+  /^\/projects\/[^/]+\/view\/?$/, // viewLimiter
+  /^\/stats\/visit\/?$/, // visitLimiter
+]
+
+app.use("/api", (req, res, next) => {
+  if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") {
+    return next()
+  }
+  if (ALREADY_LIMITED.some((pattern) => pattern.test(req.path))) {
+    return next()
+  }
+  return apiWriteLimiter(req, res, next)
+})
+
 app.use("/api/auth", authRoutes)
 app.use("/api/users", userRoutes)
 app.use("/api/categories", categoryRoutes)
@@ -135,6 +192,28 @@ const startServer = async () => {
     await sequelize.authenticate()
     logger.info("Database connected")
 
+    // Redis itu opsional secara fungsional (semua ada fallback ke memori),
+    // tapi JAUH lebih lambat dan tidak konsisten antar worker PM2. Di cluster
+    // mode, cache memori tiap worker terpisah sehingga cache hit rate anjlok
+    // di ~1/jumlahWorker dan rate limiter jadi longgar N kali lipat.
+    // Kalau Redis mati, pastikan itu terlihat di log, bukan diam-diam.
+    if (process.env.REDIS_URL) {
+      if (await isRedisReady()) {
+        logger.info("Redis ready")
+      } else {
+        logger.warn(
+          "Redis TIDAK bisa dihubungi meskipun REDIS_URL diset — memakai cache " +
+            "memori per worker. Jangan jalankan >1 worker PM2 dalam kondisi ini: " +
+            "rate limiter jadi longgar N kali dan cache tidak dibagi antar worker.",
+        )
+      }
+    } else {
+      logger.warn(
+        "REDIS_URL belum diset — memakai cache memori per worker. " +
+          "Single worker saja yang aman untuk rate limit.",
+      )
+    }
+
     // Buat tabel yang belum ada (tanpa mengubah tabel lama)
     if (process.env.NODE_ENV !== "test") {
       await ensureGoogleIdColumn()
@@ -161,8 +240,16 @@ const startServer = async () => {
     app.use(errorMiddleware)
 
     if (process.env.NODE_ENV !== "test") {
-      app.listen(PORT, () => {
-        logger.info(`Server running on port ${PORT}`)
+      // Backlog default Node cuma 511. Saat 1000 orang membuka beranda di
+      // detik yang sama, sisanya dapat ECONNREFUSED padahal server sehat
+      // (terukur: 2.685 koneksi ditolak saat uji beranda x1.000).
+      // Backlog HARUS lewat app.listen — kalau memakai
+      // http.createServer(app).listen(), jalur cluster PM2 terlewat sehingga
+      // tiap worker merebut port dan gagal EADDRINUSE.
+      const backlog = parseInt(process.env.SERVER_BACKLOG, 10) || 8192
+
+      app.listen(PORT, backlog, () => {
+        logger.info(`Server running on port ${PORT} (backlog ${backlog})`)
       })
     }
   } catch (err) {

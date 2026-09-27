@@ -92,4 +92,57 @@ describe("Category Endpoints", () => {
     expect(res.body.success).toBe(true)
     expect(res.body.data).toHaveProperty("name", "AI & Machine Learning")
   })
+
+  describe("GET /api/categories/:id", () => {
+    it("should get a single category publicly", async () => {
+      const res = await request(app).get(`/api/categories/${categoryId}`)
+
+      expect(res.status).toBe(200)
+      expect(res.body.success).toBe(true)
+      expect(res.body.data).toHaveProperty("id", categoryId)
+      expect(res.body.data).toHaveProperty("name", "AI & Machine Learning")
+    })
+
+    it("should return 404 for an unknown category", async () => {
+      const res = await request(app).get("/api/categories/999999")
+
+      expect(res.status).toBe(404)
+      expect(res.body.message).toMatch(/tidak ditemukan/i)
+    })
+  })
+
+  describe("DELETE /api/categories/:id", () => {
+    it("should require authentication", async () => {
+      const res = await request(app).delete(`/api/categories/${categoryId}`)
+
+      expect(res.status).toBe(401)
+    })
+
+    it("should forbid non-admin", async () => {
+      const res = await request(app)
+        .delete(`/api/categories/${categoryId}`)
+        .set("Authorization", `Bearer ${userToken}`)
+
+      expect(res.status).toBe(403)
+      expect(await Category.findByPk(categoryId)).not.toBeNull()
+    })
+
+    it("should return 404 for an unknown category", async () => {
+      const res = await request(app)
+        .delete("/api/categories/999999")
+        .set("Authorization", `Bearer ${adminToken}`)
+
+      expect(res.status).toBe(404)
+    })
+
+    it("should allow admin to delete a category", async () => {
+      const res = await request(app)
+        .delete(`/api/categories/${categoryId}`)
+        .set("Authorization", `Bearer ${adminToken}`)
+
+      expect(res.status).toBe(200)
+      expect(res.body.success).toBe(true)
+      expect(await Category.findByPk(categoryId)).toBeNull()
+    })
+  })
 })

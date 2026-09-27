@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import { createPortal } from "react-dom"
-import { Clock, CheckCircle2, XCircle, Eye, Heart, Calendar, Tag, Globe, Pencil, Trash2, Star, Crown, Lock, Plus, MonitorPlay } from "lucide-react"
+import { Clock, CheckCircle2, XCircle, Eye, Heart, Calendar, Tag, Globe, Pencil, Trash2, Star, Crown, Lock, Plus, MonitorPlay, Loader2 } from "lucide-react"
 import { imageUrl, buildSrcSet } from "../../../../utils/imageUrl"
 import toast from "../../../../utils/toast"
 import SmartImage from "../../../ui/SmartImage"
@@ -28,7 +28,7 @@ const statusConfig = {
   },
 }
 
-function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickReject, onEdit, onDelete, onSetFeatured, featuredBySlot = {}, onToggleSlideshow, slideshowCount = 0 }) {
+function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickReject, onEdit, onDelete, onSetFeatured, featuredBySlot = {}, onToggleSlideshow, slideshowCount = 0, busy = false }) {
   const [featuredMenuOpen, setFeaturedMenuOpen] = useState(false)
   const [featuredMenuPos, setFeaturedMenuPos] = useState(null)
   const starBtnRef = useRef(null)
@@ -84,6 +84,7 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
 
   function toggleFeaturedMenu(e) {
     e.stopPropagation()
+    if (busy) return
     if (featuredMenuOpen) {
       setFeaturedMenuOpen(false)
       return
@@ -98,6 +99,7 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
 
   function toggleSlideshowMenu(e) {
     e.stopPropagation()
+    if (busy) return
     if (slideshowMenuOpen) {
       setSlideshowMenuOpen(false)
       return
@@ -171,15 +173,25 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
                 ref={starBtnRef}
                 type="button"
                 onClick={toggleFeaturedMenu}
-                className={`card-action-btn card-star-btn flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border backdrop-blur-md transition-all shadow-lg ${
+                disabled={busy}
+                aria-busy={busy}
+                className={`card-action-btn card-star-btn flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border backdrop-blur-md transition-[background-color,border-color,color,transform,box-shadow] duration-200 shadow-lg disabled:cursor-progress disabled:hover:brightness-100 ${
                   project.featured_slot
                     ? "card-featured border-amber-400 bg-amber-500 text-amber-950 font-bold hover:bg-amber-400"
                     : "border-blue-400/40 bg-blue-950/90 text-white hover:bg-blue-900 hover:border-blue-300"
                 }`}
-                title="Karya Unggulan (podium hall 3D)"
+                title={
+                  busy
+                    ? "Menyimpan perubahan…"
+                    : "Karya Unggulan (podium hall 3D)"
+                }
                 aria-label="Atur karya unggulan"
               >
-                <Star className={`h-4 w-4 ${project.featured_slot ? "fill-current" : ""}`} />
+                {busy ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Star className={`h-4 w-4 ${project.featured_slot ? "fill-current" : ""}`} />
+                )}
               </button>
 
               {featuredMenuOpen &&
@@ -346,7 +358,9 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
               ref={slideshowBtnRef}
               type="button"
               onClick={toggleSlideshowMenu}
-              className={`card-action-btn card-slideshow-btn flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border backdrop-blur-md transition-all shadow-lg ${
+              disabled={busy}
+              aria-busy={busy}
+              className={`card-action-btn card-slideshow-btn flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border backdrop-blur-md transition-[background-color,border-color,color,transform,box-shadow] duration-200 shadow-lg disabled:cursor-progress disabled:hover:brightness-100 ${
                 slideshowActive
                   ? "card-featured border-emerald-400 bg-emerald-500 text-emerald-950 hover:bg-emerald-400"
                   : slideshowDisabled
@@ -354,16 +368,22 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
                     : "border-blue-400/40 bg-blue-950/90 text-white hover:bg-blue-900 hover:border-blue-300"
               }`}
               title={
-                slideshowDisabled
-                  ? slideshowBlockReason
-                  : slideshowActive
-                    ? "Slideshow beranda: aktif"
-                    : "Slideshow beranda: nonaktif"
+                busy
+                  ? "Menyimpan perubahan…"
+                  : slideshowDisabled
+                    ? slideshowBlockReason
+                    : slideshowActive
+                      ? "Slideshow beranda: aktif"
+                      : "Slideshow beranda: nonaktif"
               }
               aria-label="Atur tampil di slideshow beranda"
               aria-expanded={slideshowMenuOpen}
             >
-              <MonitorPlay className={`h-4 w-4 ${slideshowActive ? "fill-current" : ""}`} />
+              {busy ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <MonitorPlay className={`h-4 w-4 ${slideshowActive ? "fill-current" : ""}`} />
+              )}
             </button>
 
             {slideshowMenuOpen &&

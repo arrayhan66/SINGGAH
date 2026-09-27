@@ -10,7 +10,9 @@
     "seed:hall": "node scripts/seedHall.js",
     "lowercase:usernames": "node scripts/lowercaseUsernames.js",
     "sync:db": "node scripts/syncDb.js",
-    "indexes:add": "node scripts/addIndexes.js"
+    "indexes:add": "node scripts/addIndexes.js",
+    "test:load": "node tests/load/index.js",
+    "test:load:quick": "node tests/load/index.js --quick --users=200"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +22,7 @@
     "@apidevtools/swagger-parser": "^12.1.0",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^1.41.3",
+    "compression": "^1.8.2",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
@@ -40,6 +43,7 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "autocannon": "^8.0.0",
     "jest": "^30.4.2",
     "nodemon": "^3.1.14",
     "sqlite3": "^6.0.1",

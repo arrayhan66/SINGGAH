@@ -16,6 +16,7 @@ export default function CategoryContent({
   onDelete,
   onToggleActive,
   togglingId,
+  activeCount,
 }) {
   if (loading) {
     return <AdminCategoriesSkeleton />
@@ -46,6 +47,7 @@ export default function CategoryContent({
       <p className="text-xs text-slate-500 3xl:text-sm 4xl:text-base">
         Menampilkan {filtered.length} dari {total} kategori
       </p>
+
       <div className="grid grid-cols-1 gap-x-5 gap-y-5 min-[900px]:grid-cols-2 min-[1300px]:grid-cols-3 md:gap-x-7 md:gap-y-6 2xl:gap-x-9 2xl:gap-y-8 3xl:gap-x-11 3xl:gap-y-10 4xl:gap-x-14 4xl:gap-y-12">
         {visibleCategories.map((cat) => (
           <CategoryCard
@@ -55,6 +57,7 @@ export default function CategoryContent({
             onDelete={onDelete}
             onToggleActive={onToggleActive}
             toggling={togglingId === cat.id}
+            locked={activeCount <= 1}
           />
         ))}
       </div>

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import {
   ArrowLeft,
@@ -270,14 +270,46 @@ function NewsContent({ item }) {
 function BeritaDetail() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const { beritaList, loading } = useBerita()
+  const { beritaList, loading, fetchBeritaDetail } = useBerita()
   const { theme } = useTheme()
   const isDark = theme === "dark"
 
   const [isShareModalOpen, setIsShareModalOpen] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  const item = beritaList.find((b) => b.slug === slug)
+  // Daftar berita tidak lagi membawa contentHTML (bisa ratusan KB karena
+  // gambar editor tersimpan sebagai base64), jadi isi artikel diambil sendiri
+  // lewat /news/slug/:slug. Metadata ringkasan di bawah tetap diambil dari
+  // daftar supaya tidak ada kedipan saat detail masih dimuat.
+  const [detail, setDetail] = useState(null)
+  const [detailError, setDetailError] = useState(false)
+
+  const listItem = beritaList.find((b) => b.slug === slug)
+
+  useEffect(() => {
+    if (!slug) return undefined
+
+    let cancelled = false
+    setDetail(null)
+    setDetailError(false)
+
+    fetchBeritaDetail(slug)
+      .then((data) => {
+        if (!cancelled) setDetail(data)
+      })
+      .catch((err) => {
+        console.error("Failed to fetch news detail:", err)
+        if (!cancelled) setDetailError(true)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [slug, fetchBeritaDetail])
+
+  // Metadata cepat dari daftar; isi artikel dari request detail.
+  const item = listItem ? { ...listItem, ...(detail || {}) } : detail
+  // Berita terkait hanya butuh judul dan gambar, jadi cukup dari daftar.
   const relatedNews = beritaList.filter((b) => b.slug !== slug).slice(0, 3)
 
   const currentUrl = window.location.href
@@ -289,7 +321,7 @@ function BeritaDetail() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  if (loading) {
+  if (loading || (!detail && !detailError)) {
     return (
       <section className="relative min-h-screen overflow-hidden bg-brand-dark pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+24px)] pb-16 sm:pb-20">
         <div className="pt-6 sm:pt-8">

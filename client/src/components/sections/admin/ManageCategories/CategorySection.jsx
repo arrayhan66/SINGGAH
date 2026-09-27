@@ -98,6 +98,7 @@ export default function CategorySection() {
           onDelete={(cat) => setDeleteTarget(cat)}
           onToggleActive={handleToggleActive}
           togglingId={togglingId}
+          activeCount={stateCounts.active}
         />
       </div>
 

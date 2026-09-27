@@ -24,6 +24,19 @@ html.light .admin-page div.admin-category-icon svg {
   color: #ffffff;
 }
 
+/* ============================================================
+   ICON GEMBOK PADA SWITCH TERKUNCI (CategoryCard)
+   Kategori aktif terakhir tidak bisa dinonaktifkan. Ikonnya
+   dipaksa amber karena warna status hijau (emerald-300) terlalu
+   pucat di light mode.
+   ============================================================ */
+.admin-page .admin-category-lock {
+  color: #fbbf24;
+}
+html.light .admin-page .admin-category-lock {
+  color: #b45309;
+}
+
 /* ===== WIREFRAME LOADING DASHBOARD ADMIN (LIGHT) =====
    Blok loading di dashboard memakai .animate-pulse + bg-white/10 atau
    bg-white/[0.04] (bukan utilitas .skeleton) sehingga di light mode

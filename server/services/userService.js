@@ -8,6 +8,7 @@ const {
   tipeApprovalEmail,
 } = require("../utils/emailTemplate")
 const { deleteImage, getPublicIdFromUrl } = require("../utils/uploadToCloudinary")
+const { parsePagination } = require("../utils/pagination")
 
 const VALID_ROLES = ["admin", "user"]
 const VALID_TIPES = ["admin", "mahasiswa", "dosen", "umum"]
@@ -48,9 +49,12 @@ const deleteUserStoredAssets = async (userId) => {
 exports.getUsers = async (query = {}) => {
   const { page, limit, verification, username } = query
 
-  const currentPage = parseInt(page) || 1
-  const currentLimit = parseInt(limit) || 10
-  const offset = (currentPage - 1) * currentLimit
+  // Route /api/users hanya untuk admin, jadi boleh sampai 500 baris.
+  // UserContext di client mengambil per halaman 100, jadi ini cukup.
+  const { page: currentPage, limit: currentLimit, offset } = parsePagination(
+    { page, limit },
+    { defaultLimit: 10, maxLimit: 500 },
+  )
 
   const where = {}
 

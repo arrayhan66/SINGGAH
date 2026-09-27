@@ -33,3 +33,10 @@ export function slugify(text) {
     .replace(/-+/g, "-")
     .replace(/^-+|-+$/g, "")
 }
+
+// Kategori nonaktif tidak hanya hilang dari hall 3D, tapi juga dari halaman
+// Karya. `is_active` belum selalu ada di semua payload (mis. data fallback),
+// jadi hanya `false` yang dianggap nonaktif.
+export function isCategoryActive(category) {
+  return category?.is_active !== false
+}

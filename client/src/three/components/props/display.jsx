@@ -145,7 +145,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
               raycast={() => null}
               font="/fonts/Poppins-Medium.ttf"
             >
-              Cara Menjelajah Museum
+              Cara Menjelajah Hall
             </Text>
 
             <mesh position={[0, 0.42, 0.01]}>

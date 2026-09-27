@@ -13,7 +13,6 @@ import { useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { MailCheck } from "lucide-react"
 import { compressImage } from "../../../../utils/compressImage"
-import { useTheme } from "../../../../context/ThemeContext"
 
 const tipeConfig = {
   admin: { label: "Admin", icon: CreditCard, color: "amber" },
@@ -33,8 +32,6 @@ function ProfileInformation({
   onIdentitasRemove,
 }) {
   const navigate = useNavigate()
-  const { theme } = useTheme()
-  const isDark = theme === "dark"
   const tipe = tipeConfig[userTipe] || tipeConfig.umum
   const TipeIcon = tipe.icon
   const identitasInputRef = useRef(null)

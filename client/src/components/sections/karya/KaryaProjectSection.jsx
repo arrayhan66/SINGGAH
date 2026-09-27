@@ -9,6 +9,7 @@ import SearchBar from "../../ui/SearchBar"
 import OutlineButton from "../../ui/OutlineButton"
 import { KaryaProjectsPageSkeleton } from "../../ui/PageSkeletons"
 import KaryaProjectCard from "./KaryaProjectCard"
+import { isCategoryActive } from "../../../utils/categoryHelpers"
 import api from "../../../services/api"
 
 function KaryaProjectSection() {
@@ -26,7 +27,9 @@ function KaryaProjectSection() {
     api.get("/categories")
       .then(async (catRes) => {
         const cats = catRes.data.data.items || catRes.data.data || []
-        const found = cats.find((c) => c.slug === slug)
+        // Kategori nonaktif tidak ada lagi di halaman Karya, jadi link langsung
+        // ke slug-nya ikut dianggap tidak ditemukan.
+        const found = cats.find((c) => c.slug === slug && isCategoryActive(c))
         if (cancelled) return
         setCategory(found)
 

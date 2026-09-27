@@ -2,11 +2,10 @@ const { Notification, User } = require("../models")
 const { Op } = require("sequelize")
 const AppError = require("../utils/AppError")
 const { withDbRetry } = require("../utils/dbRetry")
+const { parsePagination } = require("../utils/pagination")
 
 exports.getMyNotifications = async (userId, query) => {
-  const page = parseInt(query.page) || 1
-  const limit = parseInt(query.limit) || 10
-  const offset = (page - 1) * limit
+  const { page, limit, offset } = parsePagination(query, { defaultLimit: 10 })
 
   const { count, rows } = await withDbRetry(() =>
     Notification.findAndCountAll({

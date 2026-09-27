@@ -2,6 +2,49 @@ const jwt = require("jsonwebtoken")
 const { User } = require("../models")
 const { getTokenFromCookie } = require("../utils/authCookie")
 const { isConnectionError, withDbRetry } = require("../utils/dbRetry")
+const cache = require("../utils/cache")
+const singleFlight = require("../utils/singleFlight")
+
+// authMiddleware berjalan di hampir setiap request terautentikasi. Tanpa cache,
+// satu User.findByPk per request hanya untuk cek role/status — itu jadi beban
+// database terbesar di aplikasi. Cache 60 detik + invalidasi lewat hook model
+// (models/User.js) supaya perubahan role/status tetap langsung berlaku.
+const AUTH_CACHE_TTL_MS = Number(process.env.AUTH_CACHE_TTL_MS) || 60_000
+const AUTH_CACHE_PREFIX = "auth:user:"
+
+function authUserCacheKey(id) {
+  return AUTH_CACHE_PREFIX + id
+}
+
+// Dipakai juga oleh maintenanceMiddleware, jadi diekspor.
+async function loadUser(id) {
+  const cacheKey = authUserCacheKey(id)
+
+  const cached = await cache.get(cacheKey)
+  if (cached) return cached
+
+  return singleFlight(cacheKey, async () => {
+    const afterWait = await cache.get(cacheKey)
+    if (afterWait) return afterWait
+
+    const user = await withDbRetry(() =>
+      User.findByPk(id, {
+        attributes: {
+          exclude: ["password"],
+        },
+      }),
+    )
+
+    if (user) {
+      // Simpan sebagai objek biasa (bukan instance Sequelize) supaya aman
+      // di-serialize ke Redis dan tidak ikut ter-save saat req.user
+      // dimodifikasi di handler.
+      await cache.set(cacheKey, user.get({ plain: true }), AUTH_CACHE_TTL_MS)
+    }
+
+    return user
+  })
+}
 
 async function authMiddleware(req, res, next) {
   try {
@@ -25,13 +68,7 @@ async function authMiddleware(req, res, next) {
 
     let user
     try {
-      user = await withDbRetry(() =>
-        User.findByPk(decoded.id, {
-          attributes: {
-            exclude: ["password"],
-          },
-        }),
-      )
+      user = await loadUser(decoded.id)
     } catch (error) {
       if (isConnectionError(error)) {
         return res.status(503).json({
@@ -93,13 +130,7 @@ async function optionalAuthMiddleware(req, res, next) {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-    const user = await withDbRetry(() =>
-      User.findByPk(decoded.id, {
-        attributes: {
-          exclude: ["password"],
-        },
-      }),
-    )
+    const user = await loadUser(decoded.id)
 
     if (user && user.status === "active" && user.is_verified) {
       req.user = user
@@ -118,3 +149,5 @@ async function optionalAuthMiddleware(req, res, next) {
 
 module.exports = authMiddleware
 module.exports.optionalAuthMiddleware = optionalAuthMiddleware
+module.exports.loadUser = loadUser
+module.exports.authUserCacheKey = authUserCacheKey

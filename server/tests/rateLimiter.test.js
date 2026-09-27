@@ -1,3 +1,5 @@
+const fs = require("fs")
+const path = require("path")
 const request = require("supertest")
 const app = require("../server")
 const { User } = require("../models")
@@ -70,5 +72,71 @@ describe("Rate Limiting", () => {
 
     expect(res.status).toBe(429)
     expect(res.body.success).toBe(false)
+  })
+})
+
+// Regression: store memori dulu memaksa jendela 60 detik dan mengabaikan
+// windowMs, sehingga setiap limiter jadi jauh lebih longgar dari yang
+// dideklarasikan begitu Redis tidak aktif (login 5/15m -> 5/1m = 300/jam).
+// Uji ini mengunci bahwa jendela fallback mengikuti windowMs masing-masing limiter.
+describe("Rate Limiter memory-store window (fallback tanpa Redis)", () => {
+  const src = fs.readFileSync(
+    path.join(__dirname, "..", "middlewares", "rateLimiter.js"),
+    "utf8",
+  )
+  const start = src.indexOf("const DEFAULT_WINDOW_MS")
+  const end = src.indexOf("function createStore")
+  const createMemoryStore = new Function(
+    src.slice(start, end) + "\nreturn createMemoryStore;",
+  )()
+  const MIN = 60 * 1000
+
+  it("mengikuti windowMs yang dideklarasikan, bukan default 60 detik", async () => {
+    const store = createMemoryStore()
+    const cases = [
+      ["login 15 menit", 15 * MIN],
+      ["register 1 jam", 60 * MIN],
+      ["view 1 menit", 1 * MIN],
+    ]
+
+    for (const [label, windowMs] of cases) {
+      store.init({ windowMs })
+      const res = await store.increment(`k-${label}`)
+      const gotMs = res.resetTime.getTime() - Date.now()
+      // toleransi 2 detik untuk selisih waktu eksekusi
+      expect(Math.abs(gotMs - windowMs)).toBeLessThanOrEqual(2000)
+    }
+  })
+
+  it("fallback aman ke 60 detik bila windowMs tidak valid", async () => {
+    const store = createMemoryStore()
+    for (const bad of [undefined, null, 0, -1, NaN, "abc"]) {
+      store.init({ windowMs: bad })
+      const res = await store.increment(`bad-${String(bad)}`)
+      const gotMs = res.resetTime.getTime() - Date.now()
+      expect(Math.abs(gotMs - 60 * 1000)).toBeLessThanOrEqual(2000)
+    }
+  })
+
+  it("jendela tetap stabil saat hit counter bertambah", async () => {
+    const store = createMemoryStore()
+    store.init({ windowMs: 15 * MIN })
+    const first = await store.increment("stabil")
+    await store.increment("stabil")
+    await store.increment("stabil")
+    const last = await store.increment("stabil")
+
+    expect(last.totalHits).toBe(4)
+    expect(last.resetTime.getTime()).toBe(first.resetTime.getTime())
+  })
+
+  it("resetKey mengembalikan hit counter ke nol", async () => {
+    const store = createMemoryStore()
+    store.init({ windowMs: 15 * MIN })
+    await store.increment("reset")
+    await store.increment("reset")
+    await store.resetKey("reset")
+    const res = await store.increment("reset")
+    expect(res.totalHits).toBe(1)
   })
 })

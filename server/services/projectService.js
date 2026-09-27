@@ -19,6 +19,39 @@ const { toEmbedUrl } = require("../utils/videoUrl")
 const { Op } = require("sequelize")
 const { createNotification, notifyAdmins } = require("./notificationService")
 const cache = require("../utils/cache")
+const { parsePagination, limitForRole } = require("../utils/pagination")
+const { countWithCache } = require("../utils/countCache")
+const singleFlight = require("../utils/singleFlight")
+const cacheEpoch = require("../utils/cacheEpoch")
+
+// Data hall 3D untuk seluruh project published, lengkap dengan semua relasi
+// yang dipakai modal detail. Satu request ini berat: tanpa limit, 8 include,
+// ~300 ms dan 128 KB. Halaman utama memintanya setiap kali dibuka, jadi
+// layak di-cache dan di-backfill lewat singleFlight supaya saat cache kosong
+// dan banyak orang datang bersamaan, database tidak dibanjiri query kembar.
+const HALL_CACHE_KEY = "hall:projects"
+const HALL_TTL_MS = 60_000
+const PROJECT_LIST_TTL = 30 * 1000
+const PROJECT_LIST_CACHE_PREFIX = "projects:list:"
+const PROJECT_COUNT_CACHE_PREFIX = "count:projects:"
+
+// Dipanggil setiap ada karya yang berubah. Selain cache kategori (yang sudah
+// ada sebelumnya), daftar, total, dan isi hall ikut basi kalau tidak dibersihkan.
+async function invalidateProjectListCaches() {
+  // Epoch naik dulu: request yang sedang membangun cache daftar/hall akan
+  // melihat epoch berubah dan membuang hasil basinya, bukan menimpanya kembali
+  // ke cache tepat sesudah purge di bawah.
+  cacheEpoch.bump()
+  await cache.delPrefix("categories:list")
+  await cache.delPrefix(PROJECT_LIST_CACHE_PREFIX)
+  await cache.delPrefix(PROJECT_COUNT_CACHE_PREFIX)
+  await cache.del(HALL_CACHE_KEY)
+}
+
+// Diekspor juga untuk categoryService: is_active kategori ikut menentukan isi
+// hall (karya dari kategori nonaktif tidak dimuat), jadi hall cache harus
+// di-purge setiap kategori aktif/nonaktif/diubah/dihapus.
+exports.invalidateProjectListCaches = invalidateProjectListCaches
 
 const SLIDESHOW_MAX_ITEMS = 6
 
@@ -338,11 +371,32 @@ exports.getProjects = async (query = {}, currentUserId = null, userRole = null) 
   const andConditions = []
 
   if (search) {
+    // Nama penulis tidak bisa memakai "$User.name$" di klausa where: begitu
+    // ada include hasMany (images/technologies), Sequelize beralih ke mode
+    // subQuery dan referensi itu gagal dengan
+    // "Unknown column 'user.name' in 'where clause'".
+    //
+    // Solusinya cari id penulis yang cocok dulu, lalu saring lewat user_id
+    // yang memang kolom biasa di tabel projects. Referensi "$Project.id$"
+    // juga tidak bisa dipakai karena suffer masalah yang sama di subQuery.
+    //
+    // Query User ini hanya jalan di jalur pencarian, bukan daftar biasa, dan
+    // tidak di-cache karena search menerima input bebas.
+    const authorIds = (
+      await User.findAll({
+        where: { name: { [Op.like]: `%${search}%` } },
+        attributes: ["id"],
+        raw: true,
+      })
+    ).map((row) => row.id)
+
     andConditions.push({
       [Op.or]: [
         { title: { [Op.like]: `%${search}%` } },
         { description: { [Op.like]: `%${search}%` } },
-        { "$User.name$": { [Op.like]: `%${search}%` } },
+        // [0] dipakai saat tidak ada yang cocok supaya SQL tidak jadi
+        // "IN ()" yang tidak valid di sebagian dialect.
+        { user_id: { [Op.in]: authorIds.length > 0 ? authorIds : [0] } },
       ],
     })
   }
@@ -367,11 +421,12 @@ exports.getProjects = async (query = {}, currentUserId = null, userRole = null) 
 
   const where = andConditions.length > 0 ? { [Op.and]: andConditions } : {}
 
-  const currentPage = parseInt(page) || 1
-  const currentLimit = parseInt(limit) || 10
-  const offset = (currentPage - 1) * currentLimit
+  const { page: currentPage, limit: currentLimit, offset } = parsePagination(
+    { page, limit },
+    limitForRole(userRole, 10),
+  )
 
-  const { count, rows } = await Project.findAndCountAll({
+  const rowQuery = {
     where,
     attributes: {
       include: PROJECT_COUNT_ATTRIBUTES,
@@ -388,18 +443,77 @@ exports.getProjects = async (query = {}, currentUserId = null, userRole = null) 
     ],
     limit: currentLimit,
     offset,
-    distinct: true,
+  }
+
+  const effectiveStatus = status || (userRole === "admin" ? "" : "published")
+  const slideshowOn = slideshow === "true" || slideshow === "1"
+  const countKey = `${category_id || "-"}:${effectiveStatus || "-"}:${slideshowOn ? "1" : "-"}:${year || "-"}`
+
+  const buildResult = async () => {
+    let total
+    let rows
+
+    if (search) {
+      // Jalur pencarian tetap memakai findAndCountAll karena hanya dia yang
+      // menerjemahkan "$User.name$" di klausa where dengan benar. Jalur ini
+      // tidak di-cache: search menerima input bebas sehingga jumlah key cache
+      // bisa meledak.
+      const counted = await Project.findAndCountAll({ ...rowQuery, distinct: true })
+      total = counted.count
+      rows = counted.rows
+    } else {
+      total = await countWithCache(`count:projects:${countKey}`, () =>
+        Project.count({ where, distinct: true, col: "id" }),
+      )
+      rows = await Project.findAll(rowQuery)
+    }
+
+    return {
+      items: rows.map(toProjectJSON),
+      pagination: {
+        page: currentPage,
+        limit: currentLimit,
+        total,
+        totalPages: Math.ceil(total / currentLimit),
+      },
+    }
+  }
+
+  // Tanpa pencarian, isi daftar sama untuk semua pengunjung dan hanya berubah
+  // saat ada karya yang dibuat/diubah/dihapus (sudah dipanggil lewat
+  // invalidateProjectListCaches). Query daftar mahal: 4 subquery korelasi
+  // untuk likes/views/bookmarks/comments plus 4 include, dan diukur hanya
+  // 64 q/s pada 200 koneksi konkuren, jauh di bawah 763 q/s untuk query tanpa
+  // include. Karena itu daftar di-cache.
+  //
+  // Yang di-cache adalah hasil sebelum flag per-user; liked/bookmark dihitung
+  // ulang tiap request di bawah.
+  if (search) {
+    const result = await buildResult()
+    return { ...result, items: await applyUserFlags(result.items, currentUserId) }
+  }
+
+  const listKey = `projects:list:${currentPage}:${currentLimit}:${userRole || "-"}:${countKey}`
+
+  const cached = await cache.get(listKey)
+  if (cached) {
+    return { ...cached, items: await applyUserFlags(cached.items, currentUserId) }
+  }
+
+  const epochAtStart = cacheEpoch.current()
+  const result = await singleFlight(listKey, async () => {
+    const afterWait = await cache.get(listKey)
+    if (afterWait) return afterWait
+
+    const built = await buildResult()
+    // Jangan tulis ke cache kalau epoch berubah selama query berjalan.
+    if (cacheEpoch.current() === epochAtStart) {
+      await cache.set(listKey, built, PROJECT_LIST_TTL)
+    }
+    return built
   })
 
-  return {
-    items: await applyUserFlags(rows.map(toProjectJSON), currentUserId),
-    pagination: {
-      page: currentPage,
-      limit: currentLimit,
-      total: count,
-      totalPages: Math.ceil(count / currentLimit),
-    },
-  }
+  return { ...result, items: await applyUserFlags(result.items, currentUserId) }
 }
 
 exports.getPendingProjects = async () => {
@@ -492,7 +606,7 @@ exports.updateProjectStatus = async (id, status, reason = "") => {
     }
   })
 
-  await cache.delPrefix("categories:list")
+  await invalidateProjectListCaches()
 
   return project
 }
@@ -570,6 +684,11 @@ exports.setProjectFeatured = async (id, slot = null) => {
     await project.save({ transaction: t })
   })
 
+  // Tanpa purge, cache projects:list (30 dtk) & hall:projects (60 dtk) masih
+  // menyimpan snapshot lama sehingga refetch klien langsung mengembalikan data
+  // basi dan tombol unggulan/slideshow tampak tidak berubah sampai refresh.
+  await invalidateProjectListCaches()
+
   return project
 }
 
@@ -620,6 +739,8 @@ exports.setProjectSlideshow = async (id, visible) => {
 
   project.is_shown_in_slideshow = isVisible
   await project.save()
+
+  await invalidateProjectListCaches()
 
   return project
 }
@@ -792,7 +913,7 @@ exports.createProject = async (data, user, imageUrls = [], documentUrls = []) =>
     return created
   })
 
-  await cache.delPrefix("categories:list")
+  await invalidateProjectListCaches()
 
   return await exports.getProjectById(project.id, user.id, user.role)
 }
@@ -870,7 +991,7 @@ exports.updateProject = async (id, data, user) => {
     await persistRelations(project, relations, { transaction: t })
   })
 
-  await cache.delPrefix("categories:list")
+  await invalidateProjectListCaches()
 
   // Admin mengubah karya milik user lain -> beri tahu pemilik.
   if (user.role === "admin" && project.user_id !== user.id) {
@@ -925,7 +1046,7 @@ exports.deleteProject = async (id, user) => {
     })
   })
 
-  await cache.delPrefix("categories:list")
+  await invalidateProjectListCaches()
 
   // Admin menghapus karya milik user lain -> beri tahu pemilik.
   if (user.role === "admin" && project.user_id !== user.id) {
@@ -972,32 +1093,58 @@ exports.getMyProjects = async (userId) => {
 
 // ---- Data project untuk hall 3D: seluruh project published dengan semua
 // relasi yang dipakai modal detail hall, dalam satu kali request. ----
-exports.getHallProjects = async (currentUserId = null) => {
-  const projects = await Project.findAll({
-    where: { status: "published" },
-    attributes: {
-      include: PROJECT_COUNT_ATTRIBUTES,
-    },
-    include: [
-      {
-        ...CATEGORY_INCLUDE,
-        required: true,
-        where: { is_active: true },
-      },
-      USER_INCLUDE,
-      IMAGES_INCLUDE,
-      MEMBERS_INCLUDE,
-      TECHNOLOGIES_INCLUDE,
-      DOCUMENTS_INCLUDE,
-      VIDEOS_INCLUDE,
-      LINKS_INCLUDE,
-    ],
-    order: [
-      ["created_at", "DESC"],
-      ["id", "DESC"],
-    ],
-    distinct: true,
-  })
 
-  return applyUserFlags(projects.map(toProjectJSON), currentUserId)
+// Querynya berat dan hasilnya sama untuk semua orang, jadi yang di-cache
+// adalah daftar proyek mentahnya. Flag liked/bookmark tidak ikut di-cache
+// karena itu berbeda per user; applyUserFlags dihitung ulang tiap request
+// dan tidak mengubah objek cache (memakai spread).
+const loadHallProjects = async () => {
+  const cached = await cache.get(HALL_CACHE_KEY)
+  if (cached) return cached
+
+  const epochAtStart = cacheEpoch.current()
+  return singleFlight(HALL_CACHE_KEY, async () => {
+    // Seseorang mungkin sudah mengisi cache selagi kita menunggu mutex.
+    const afterWait = await cache.get(HALL_CACHE_KEY)
+    if (afterWait) return afterWait
+
+    const projects = await Project.findAll({
+      where: { status: "published" },
+      attributes: {
+        include: PROJECT_COUNT_ATTRIBUTES,
+      },
+      include: [
+        {
+          ...CATEGORY_INCLUDE,
+          required: true,
+          where: { is_active: true },
+        },
+        USER_INCLUDE,
+        IMAGES_INCLUDE,
+        MEMBERS_INCLUDE,
+        TECHNOLOGIES_INCLUDE,
+        DOCUMENTS_INCLUDE,
+        VIDEOS_INCLUDE,
+        LINKS_INCLUDE,
+      ],
+      order: [
+        ["created_at", "DESC"],
+        ["id", "DESC"],
+      ],
+      distinct: true,
+    })
+
+    const items = projects.map(toProjectJSON)
+    // Sama seperti daftar: kalau ada perubahan saat query berjalan, jangan
+    // menimpanya ke cache (lihat utils/cacheEpoch.js).
+    if (cacheEpoch.current() === epochAtStart) {
+      await cache.set(HALL_CACHE_KEY, items, HALL_TTL_MS)
+    }
+    return items
+  })
+}
+
+exports.getHallProjects = async (currentUserId = null) => {
+  const items = await loadHallProjects()
+  return applyUserFlags(items, currentUserId)
 }

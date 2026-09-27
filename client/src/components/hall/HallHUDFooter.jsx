@@ -1,4 +1,4 @@
-import { MousePointerClick, DoorOpen, Frame, Eye } from "lucide-react";
+import { MousePointerClick, DoorOpen, Frame, Eye, Music } from "lucide-react";
 import useIsDesktop from "../../hooks/useIsDesktop";
 
 export default function HallHUDFooter() {
@@ -23,6 +23,10 @@ export default function HallHUDFooter() {
         <span className="hidden md:flex items-center space-x-1.5">
           <Frame className="w-4 h-4 text-sky-400" />
           <span>Klik lukisan untuk detail karya</span>
+        </span>
+        <span className="hidden md:flex items-center space-x-1.5">
+          <Music className="w-4 h-4 text-sky-400" />
+          <span>Klik box musik samping TV untuk hidup/mati musik</span>
         </span>
       </div>
     </footer>

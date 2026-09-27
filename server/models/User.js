@@ -1,5 +1,25 @@
-const { DataTypes } = require("sequelize")
+const { DataTypes, Op } = require("sequelize")
 const sequelize = require("../config/database")
+const cache = require("../utils/cache")
+
+// Prefix ini harus sama dengan yang dipakai middlewares/authMiddleware.js.
+const AUTH_CACHE_PREFIX = "auth:user:"
+
+// authMiddleware men-cache user 60 detik supaya tidak satu query database per
+// request. Invalidasi dilakukan lewat hook model, bukan edit manual di setiap
+// service: ada 6 titik user.save() sekarang dan bisa bertambah nanti, dan
+// yang paling penting userService.updateUser bisa mengubah role + status.
+//
+// utils/cache tidak punya dependensi ke models, jadi require di sini tidak
+// menimbulkan circular import.
+// Sengaja async: Sequelize menunggu hook yang mengembalikan Promise. Kalau
+// hanya memanggil cache.del tanpa await, save() bisa resolve sebelum Redis
+// selesai menghapus, sehingga request berikutnya masih membaca role lama.
+async function invalidateAuthCache(user) {
+  if (user && user.id) {
+    await cache.del(AUTH_CACHE_PREFIX + user.id)
+  }
+}
 
 const User = sequelize.define(
   "User",
@@ -93,6 +113,38 @@ User.beforeValidate((user) => {
   if (user.username) {
     user.username = String(user.username).trim().toLowerCase()
   }
+})
+
+User.afterSave(invalidateAuthCache)
+User.afterDestroy(invalidateAuthCache)
+User.afterBulkUpdate(async (options) => {
+  // Sequelize v6 memanggil hook bulk dengan SATU argumen `options`, bukan
+  // (instances, options). ID diambil dari options.where yang bisa berupa
+  // skalar, array, atau { [Op.eq]: nilai }.
+  //
+  // Hook ini sebelumnya ditulis dengan signature (users, options), sehingga
+  // `users` sebenarnya berisi options (bukan array) dan `options` undefined:
+  // ids selalu kosong dan cache tidak pernah ter-invalidasi. Akibatnya role/
+  // status hasil update massal masih terbaca dari cache selama TTL 60 detik.
+  const where = (options && options.where) || {}
+  const ids = new Set()
+
+  const collect = (value) => {
+    if (value === undefined || value === null) return
+    if (Array.isArray(value)) {
+      value.forEach(collect)
+      return
+    }
+    if (typeof value === "object") {
+      if (value[Op.eq] !== undefined) collect(value[Op.eq])
+      return
+    }
+    ids.add(value)
+  }
+
+  collect(where.id)
+
+  await Promise.all([...ids].map((id) => cache.del(AUTH_CACHE_PREFIX + id)))
 })
 
 module.exports = User

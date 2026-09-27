@@ -24,10 +24,7 @@ import {
 import prabowoImg from "../../assets/images/prabowo.webp"
 import gibranImg from "../../assets/images/gibran.webp"
 import posterutama from "../../assets/images/posterutama.png"
-
-// Poster banner hall utama (1600x240, aspect 6.67:1), dipasang setara
-// dengan bingkai hitam 16x2.4 agar tidak ada area hitam kiri-kanan.
-const POSTER_W = 2.4 * (1600 / 240)
+import HallPoster from "../components/HallPoster"
 
 import {
   Plant,
@@ -225,16 +222,7 @@ function Museum({ hallData }) {
           <meshBasicMaterial map={hallGradMap} transparent depthWrite={false} />
         </mesh>
 
-        <group position={[0, 6.4, HALL_Z0 + 0.15]}>
-          <mesh>
-            <planeGeometry args={[16, 2.4]} />
-            <meshStandardMaterial color="#1e293b" roughness={0.6} />
-          </mesh>
-          <mesh position={[0, 0, 0.02]}>
-            <planeGeometry args={[POSTER_W, 2.4]} />
-            <meshStandardMaterial map={posterTex} roughness={0.6} />
-          </mesh>
-        </group>
+        <HallPoster position={[0, 6.4, HALL_Z0 + 0.15]} map={posterTex} />
 
         <mesh position={[0, 0.135, 0]} receiveShadow>
           <cylinderGeometry args={[4.1, 4.1, 0.03, 48]} />

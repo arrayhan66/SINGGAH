@@ -60,7 +60,7 @@ function contentArrayToHTML(content) {
 function AdminBeritaForm() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const { getBeritaBySlug, addBerita, updateBerita, setTempPreviewData, tempPreviewData, loading } = useBerita()
+  const { getBeritaBySlug, addBerita, updateBerita, setTempPreviewData, tempPreviewData, loading, fetchBeritaDetail } = useBerita()
 
   const isEditMode = Boolean(slug)
   const [formData, setFormData] = useState(emptyForm)
@@ -69,29 +69,47 @@ function AdminBeritaForm() {
   const [pendingRedirect, setPendingRedirect] = useState(false)
 
   useEffect(() => {
-    if (isEditMode && !loading) {
-      const existing = getBeritaBySlug(slug)
-      if (existing) {
-        setFormData({
-          title: existing.title || "",
-          winner: existing.winner || "",
-          date: existing.date || "",
-          source: existing.source || "",
-          desc: existing.desc || "",
-          image: existing.headline_image || existing.image || null,
-          tags: existing.tags || [],
-          contentText:
-            existing.contentHTML || contentArrayToHTML(existing.content),
-          gallery: (existing.gallery || []).map((g) => ({
-            file: null,
-            url: g.url || "",
-            caption: g.caption || "",
-          })),
-          slug: existing.slug || "",
-          status: existing.status || "draft",
+    if (isEditMode) {
+      if (loading) return undefined
+
+      // Daftar berita tidak membawa contentHTML, jadi form edit harus
+      // mengambil beritanya sendiri. Tanpa ini, admin mengedit artikel yang
+      // isinya hilang lalu menimpanya dengan hasil contentArrayToHTML, yang
+      // membuang format dan gambar.
+      let cancelled = false
+
+      fetchBeritaDetail(slug)
+        .then((existing) => {
+          if (cancelled || !existing) return
+          setFormData({
+            title: existing.title || "",
+            winner: existing.winner || "",
+            date: existing.date || "",
+            source: existing.source || "",
+            desc: existing.desc || "",
+            image: existing.headline_image || existing.image || null,
+            tags: existing.tags || [],
+            contentText:
+              existing.contentHTML || contentArrayToHTML(existing.content),
+            gallery: (existing.gallery || []).map((g) => ({
+              file: null,
+              url: g.url || "",
+              caption: g.caption || "",
+            })),
+            slug: existing.slug || "",
+            status: existing.status || "draft",
+          })
         })
+        .catch((err) => {
+          console.error("Failed to load berita for editing:", err)
+        })
+
+      return () => {
+        cancelled = true
       }
-    } else if (!isEditMode && tempPreviewData) {
+    }
+
+    if (tempPreviewData) {
       setFormData({
         title: tempPreviewData.title || "",
         winner: tempPreviewData.winner || "",
@@ -110,11 +128,12 @@ function AdminBeritaForm() {
         status: tempPreviewData.status || "draft",
       })
       setTempPreviewData(null)
-    } else if (!isEditMode && !tempPreviewData) {
+    } else {
       setFormData(emptyForm)
     }
+    return undefined
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug, loading])
+  }, [slug, loading, isEditMode, tempPreviewData, fetchBeritaDetail])
 
   function showNotification(message, type) {
     setNotification({ message, type })

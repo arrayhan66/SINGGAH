@@ -41,6 +41,20 @@ html.light .user-page section h2 span.text-cyan-300 {
   background-clip: text;
   color: transparent;
 }
+/* ===== HERO "UPLOAD KARYA": samakan dengan "Karya Tersimpan" ===== */
+html.light .user-page .hero h1 {
+  color: #0f172a;
+}
+html.light .user-page .hero h1 span.text-cyan-300 {
+  background-image: linear-gradient(90deg, #2563eb, #0ea5e9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+html.light .user-page .hero p {
+  color: #475569;
+}
+
 /* ===== HERO "KARYA SAYA": teks jadi gelap di light mode ===== */
 html.light .user-page .hero h2 {
   color: #0f172a;

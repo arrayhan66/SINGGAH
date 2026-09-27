@@ -1,0 +1,40 @@
+# Redis untuk SINGGAH.
+#
+# Kenapa perlu: aplikasi berjalan di PM2 cluster 3 worker. Tanpa Redis,
+#   - cache terpecah 3x ( tiap worker punya cache sendiri di RAM)
+#   - rate limiter menjadi longgar 3x karena tiap worker menghitung sendiri
+# Dengan Redis, ketiganya jadi satu sumber kebenaran yang dibagi.
+#
+# Jalankan:  docker compose up -d
+# Cek:      docker compose exec redis redis-cli ping   -> harus jawab PONG
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: singgah-redis
+    restart: unless-stopped
+
+    # Cache boleh hilang saat restart (redis memang cache, bukan database),
+    # jadi tidak perlu AOF yang menambah disk & menurunkan throughput.
+    command: >
+      redis-server
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --save ""
+      --appendonly no
+
+    ports:
+      # Hanya localhost: Redis tidak boleh terbuka ke internet.
+      - "127.0.0.1:6379:6379"
+
+    volumes:
+      - redis-data:/data
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  redis-data:

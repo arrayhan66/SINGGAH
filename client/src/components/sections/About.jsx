@@ -74,7 +74,7 @@ function About() {
           <>
             <div>
               <h2 className="mt-8 text-3xl font-black leading-tight text-white sm:text-4xl lg:text-5xl 2xl:text-7xl 3xl:text-7xl 4xl:text-8xl">
-                Wadah <span className="text-cyan-300">Inovasi</span>
+                Wadah <span className="text-cyan-300">InovasI</span>
                 <br />
                 Mahasiswa
               </h2>

@@ -2,8 +2,32 @@ const { News, User } = require("../models")
 const AppError = require("../utils/AppError")
 const { Op } = require("sequelize")
 const cache = require("../utils/cache")
+const singleFlight = require("../utils/singleFlight")
+const { parsePagination } = require("../utils/pagination")
+const { countWithCache } = require("../utils/countCache")
 
 const NEWS_LIST_TTL = 60 * 1000
+const NEWS_TOTAL_KEY = "count:news:total"
+
+// Halaman daftar berita tidak menampilkan isi artikel, hanya judul, ringkasan,
+// dan gambar.(contentHTML tidak dikirim di daftar.)
+//
+// Field ini dikecualikan karena isinya bisa sangat besar: contentHTML menyimpan
+// HTML hasil editor yang bisa memuat gambar inline sebagai base64. Satu data
+// yang diukur punya contentHTML 956 KB, dan itu 99,6% di antaranya satu PNG
+// base64. Empat berita jadi 1,16 MB untuk satu respons daftar, dan
+// News.findAll mentok di 10 req/s hanya karena memindahkan data sebesar itu.
+//
+// Isi artikel diambil lewat /api/news/:id atau /api/news/slug/:slug.
+const LIST_EXCLUDED_ATTRIBUTES = ["contentHTML"]
+
+// Dipanggil setiap ada berita yang berubah. Selain daftar, total berita juga
+// ikut dibersihkan karena sekarang disimpan di cache terpisah.
+async function invalidateNewsCaches() {
+  await cache.delPrefix("news:list:")
+  await cache.delPrefix("news:detail:")
+  await cache.del(NEWS_TOTAL_KEY)
+}
 
 const parseJson = (value) => {
   if (value === null || value === undefined || value === "") return null
@@ -26,7 +50,6 @@ exports.getNews = async (query = {}) => {
   const { search, status, from, to, page, limit } = query
 
   const andConditions = []
-
   if (search) {
     andConditions.push({
       [Op.or]: [
@@ -51,20 +74,25 @@ exports.getNews = async (query = {}) => {
 
   const where = andConditions.length > 0 ? { [Op.and]: andConditions } : {}
 
-  const currentPage = parseInt(page) || 1
-  const currentLimit = parseInt(limit) || 10
-  const offset = (currentPage - 1) * currentLimit
+  // Route /api/news tidak memakai authMiddleware, jadi tidak ada role di
+  // sini. Batas publik (100) juga sudah cukup untuk halaman admin berita
+  // karena BeritaContext mengambil per halaman.
+  const { page: currentPage, limit: currentLimit, offset } = parsePagination(
+    { page, limit },
+    { defaultLimit: 10 },
+  )
 
   const isUnfiltered = !search && !status && !from && !to
+  const listKey = `news:list:${currentPage}:${currentLimit}`
 
   if (isUnfiltered) {
-    const cacheKey = `news:list:${currentPage}:${currentLimit}`
-    const cached = await cache.get(cacheKey)
+    const cached = await cache.get(listKey)
     if (cached) return cached
   }
 
-  const { count, rows } = await News.findAndCountAll({
+  const rowQuery = {
     where,
+    attributes: { exclude: LIST_EXCLUDED_ATTRIBUTES },
     include: [
       {
         model: User,
@@ -74,34 +102,64 @@ exports.getNews = async (query = {}) => {
     order: [["created_at", "DESC"]],
     limit: currentLimit,
     offset,
-    distinct: true,
+  }
+
+  const build = async () => {
+    let total
+    let rows
+
+    if (isUnfiltered) {
+      // Tanpa filter, total berita tidak perlu dihitung ulang tiap request.
+      //_findAll dipisah dari count supaya satu request hanya memakai satu
+      // koneksi database, bukan dua (lihat utils/countCache.js).
+      total = await countWithCache(NEWS_TOTAL_KEY, () => News.count())
+      rows = await News.findAll(rowQuery)
+    } else {
+      // Jalur berfilter tetap memakai findAndCountAll karena itu yang
+      // menerjemahkan "$User.name$" di klausa where dengan benar.
+      const counted = await News.findAndCountAll({ ...rowQuery, distinct: true })
+      total = counted.count
+      rows = counted.rows
+    }
+
+    const result = {
+      items: rows.map(toJSON),
+      pagination: {
+        page: currentPage,
+        limit: currentLimit,
+        total,
+        totalPages: Math.ceil(total / currentLimit),
+      },
+    }
+
+    if (isUnfiltered) {
+      await cache.set(listKey, result, NEWS_LIST_TTL)
+    }
+
+    return result
+  }
+
+  if (!isUnfiltered) return build()
+
+  // Single flight: saat cache baru saja kosong dan banyak orang membuka
+  // halaman berita bersamaan, tanpa ini satu ledakan query identik.
+  return singleFlight(listKey, async () => {
+    const afterWait = await cache.get(listKey)
+    if (afterWait) return afterWait
+    return build()
   })
-
-  const result = {
-    items: rows.map(toJSON),
-    pagination: {
-      page: currentPage,
-      limit: currentLimit,
-      total: count,
-      totalPages: Math.ceil(count / currentLimit),
-    },
-  }
-
-  if (isUnfiltered) {
-    await cache.set(`news:list:${currentPage}:${currentLimit}`, result, NEWS_LIST_TTL)
-  }
-
-  return result
 }
+
+const NEWS_DETAIL_INCLUDE = [
+  {
+    model: User,
+    attributes: ["id", "name", "username"],
+  },
+]
 
 exports.getNewsById = async (id) => {
   const news = await News.findByPk(id, {
-    include: [
-      {
-        model: User,
-        attributes: ["id", "name", "username"],
-      },
-    ],
+    include: NEWS_DETAIL_INCLUDE,
   })
 
   if (!news) {
@@ -109,6 +167,39 @@ exports.getNewsById = async (id) => {
   }
 
   return toJSON(news)
+}
+
+// Halaman detail berita bekerja dengan slug, bukan id, jadi perlu endpoint
+// berdasarkan slug. Ini yang mengambil contentHTML: field itu sengaja
+// dikecualikan dari daftar (/api/news) supaya daftar tidak ikut megabytes.
+//
+// Cache memakai TTL pendek karena satu berita bisa Diedit admin; 30 detik
+// kesalaan baru berlaku setelah perubahan.
+const NEWS_DETAIL_TTL = 30 * 1000
+
+exports.getNewsBySlug = async (slug) => {
+  if (!slug) {
+    throw new AppError("Slug berita tidak valid", 400)
+  }
+
+  const cacheKey = `news:detail:${slug}`
+
+  const cached = await cache.get(cacheKey)
+  if (cached) return cached
+
+  const news = await News.findOne({
+    where: { slug },
+    include: NEWS_DETAIL_INCLUDE,
+  })
+
+  if (!news) {
+    throw new AppError("News tidak ditemukan", 404)
+  }
+
+  const result = toJSON(news)
+  await cache.set(cacheKey, result, NEWS_DETAIL_TTL)
+
+  return result
 }
 
 const serialize = (value) => {
@@ -162,7 +253,7 @@ exports.createNews = async (data, userId) => {
     author_id: userId,
   })
 
-  await cache.delPrefix("news:list:")
+  await invalidateNewsCaches()
 
   return await exports.getNewsById(news.id)
 }
@@ -223,7 +314,7 @@ exports.updateNews = async (id, data) => {
 
   await news.save()
 
-  await cache.delPrefix("news:list:")
+  await invalidateNewsCaches()
 
   return exports.getNewsById(id)
 }
@@ -233,7 +324,7 @@ exports.deleteNews = async (id) => {
 
   await News.destroy({ where: { id } })
 
-  await cache.delPrefix("news:list:")
+  await invalidateNewsCaches()
 
   return news
 }

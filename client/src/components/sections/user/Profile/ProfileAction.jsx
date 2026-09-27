@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { useNavigate } from "react-router-dom"
-import { Save, X, CheckCircle } from "lucide-react"
+import { Save, CheckCircle } from "lucide-react"
 import api from "../../../../services/api"
 import { useAuth } from "../../../../context/AuthContext"
 import PopupToast from "../../../ui/PopupToast"
@@ -176,10 +176,6 @@ function ProfileAction({ profileData, passwordData, onResetPassword, identitasPh
       setSubmitting(false)
       setUploadProgress(null)
     }
-  }
-
-  function handleCancel() {
-    navigate("/")
   }
 
   return (

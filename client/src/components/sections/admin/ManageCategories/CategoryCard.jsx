@@ -1,11 +1,12 @@
 import { createElement, useEffect, useState } from "react"
-import { Pencil, Trash2 } from "lucide-react"
+import { Pencil, Trash2, Lock } from "lucide-react"
 import { getCategoryIcon } from "../../../../utils/categoryHelpers"
 import { toggleClass, getSwitchClass } from "../../../../utils/settingsHelpers"
+import { MIN_ACTIVE_TOOLTIP } from "../../../../hooks/useManageCategories"
 import { useTheme } from "../../../../context/ThemeContext"
 import Skeleton from "../../../ui/Skeleton"
 
-export default function CategoryCard({ cat, onEdit, onDelete, onToggleActive, toggling }) {
+export default function CategoryCard({ cat, onEdit, onDelete, onToggleActive, toggling, locked }) {
   const { theme } = useTheme()
   const isDark = theme === "dark"
 
@@ -19,8 +20,12 @@ export default function CategoryCard({ cat, onEdit, onDelete, onToggleActive, to
 
   const IconComponent = getCategoryIcon(cat.name)
 
+  // Kategori aktif terakhir terkunci: switch tetap diklik (bukan native
+  // disabled) supaya hook bisa membalas dengan toast alasannya.
+  const isLocked = Boolean(locked) && Boolean(cat.is_active)
+
   return (
-    <div className={`group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.14] bg-gradient-to-b from-white/[0.09] to-white/[0.05] p-4 min-[300px]:p-5 sm:p-6 3xl:p-7 4xl:p-8 shadow-lg shadow-black/20 backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-400/50 hover:bg-white/[0.1] hover:shadow-xl hover:shadow-cyan-500/10 ${cat.is_active ? "" : "opacity-70 saturate-50"}`}>
+    <div className={`group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.14] bg-gradient-to-b from-white/[0.09] to-white/[0.05] p-4 min-[300px]:p-5 sm:p-6 3xl:p-7 4xl:p-8 shadow-lg shadow-black/20 backdrop-blur-xl transition-[opacity,filter,border-color,background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:border-cyan-400/50 hover:bg-white/[0.1] hover:shadow-xl hover:shadow-cyan-500/10 ${cat.is_active ? "" : "opacity-70 saturate-50"}`}>
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-100" />
       <div className="flex items-start justify-between gap-2 sm:gap-3">
         <div className="flex min-w-0 items-center gap-3 min-[300px]:gap-4">
@@ -73,24 +78,36 @@ export default function CategoryCard({ cat, onEdit, onDelete, onToggleActive, to
           <span className={`h-1.5 w-1.5 rounded-full ${(cat.projectCount || 0) > 0 ? "bg-cyan-400" : "bg-slate-500"}`} />
           {cat.projectCount} Project
         </span>
-        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+        <div className="ml-auto flex shrink-0 flex-wrap items-center justify-end gap-2">
           <label
-            className={`${toggleClass} shrink-0 ${toggling ? "pointer-events-none opacity-60" : ""}`}
-            title={cat.is_active ? "Klik untuk menonaktifkan dari hall" : "Klik untuk menampilkan di hall"}
+            className={`${toggleClass} ${toggling ? "opacity-70" : ""} ${isLocked ? "cursor-not-allowed" : ""}`}
+            title={isLocked ? MIN_ACTIVE_TOOLTIP : cat.is_active ? "Klik untuk menonaktifkan dari hall" : "Klik untuk menampilkan di hall"}
           >
             <input
               type="checkbox"
               checked={cat.is_active}
               disabled={toggling}
+              aria-disabled={isLocked || undefined}
+              aria-busy={toggling}
               onChange={() => onToggleActive(cat)}
               className="peer sr-only"
             />
-            <div className={getSwitchClass(isDark)} />
+            <div className={`${getSwitchClass(isDark)} ${isLocked ? "opacity-50" : ""}`} />
           </label>
-          <span className={`shrink-0 text-[11px] font-semibold sm:text-xs ${
-            cat.is_active ? "text-emerald-300" : "text-slate-400"
-          }`}>
-            {cat.is_active ? "Aktif" : "Nonaktif"}
+          {/* Lebar tetap: "Aktif" dan "Nonaktif" punya panjang berbeda. Tanpa ini
+              grup ini melebar ke kiri dan tombol switch ikut bergeser sideways
+              setiap kali status berubah. */}
+          <span
+            aria-live="polite"
+            title={isLocked ? MIN_ACTIVE_TOOLTIP : undefined}
+            className={`flex w-[4rem] shrink-0 items-center gap-1 text-left text-[11px] font-semibold tabular-nums transition-colors duration-200 sm:w-[4.5rem] sm:text-xs ${
+              cat.is_active ? "text-emerald-300" : "text-slate-400"
+            }`}
+          >
+            {isLocked ? (
+              <Lock size={11} className="admin-category-lock shrink-0" />
+            ) : null}
+            <span className="truncate">{cat.is_active ? "Aktif" : "Nonaktif"}</span>
           </span>
           <div className="flex shrink-0 gap-1 min-[400px]:hidden">
             <button

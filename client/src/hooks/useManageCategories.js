@@ -9,7 +9,16 @@ export const INITIAL_VISIBLE = 9
 // MAX_ACTIVE_CATEGORIES di server/service/categoryService).
 export const MAX_CATEGORIES = 10
 
+// Kategori nonaktif hilang dari hall 3D sekaligus dari halaman Karya. Kalau
+// semuanya dinonaktifkan, dua tempat itu jadi kosong tanpa kategori, jadi
+// minimal satu kategori harus dibiarkan aktif.
+export const MIN_CATEGORIES = 1
+
 const LIMIT_MESSAGE = `Jumlah kategori aktif telah mencapai batas maksimal ${MAX_CATEGORIES}. Nonaktifkan atau hapus kategori lain terlebih dahulu.`
+
+export const MIN_ACTIVE_MESSAGE = `Minimal ${MIN_CATEGORIES} kategori harus tetap aktif. Aktifkan kategori lain terlebih dahulu sebelum menonaktifkan kategori ini.`
+
+export const MIN_ACTIVE_TOOLTIP = `Minimal ${MIN_CATEGORIES} kategori harus tetap aktif`
 
 export const stateTabs = [
   { value: "all", label: "Semua" },
@@ -176,13 +185,25 @@ export default function useManageCategories() {
 
   async function handleToggleActive(cat) {
     const target = !cat.is_active
+    const activeCount = categories.filter((c) => c.is_active).length
+
     if (target) {
-      const activeCount = categories.filter((c) => c.is_active).length
       if (activeCount >= MAX_CATEGORIES) {
         notify(LIMIT_MESSAGE, "error")
         return
       }
+    } else if (activeCount <= MIN_CATEGORIES) {
+      // Switch-nya sengaja tidak di-native-disable supaya klik ini tetap
+      // membalas dengan toast, bukan diam saja tanpa penjelasan.
+      notify(MIN_ACTIVE_MESSAGE, "error")
+      return
     }
+
+    // Optimistic update: switch langsung pindah begitu diklik, tidak menunggu
+    // PUT + refetch. Kalau server menolak, state dikembalikan lewat refetch.
+    setCategories((prev) =>
+      prev.map((c) => (c.id === cat.id ? { ...c, is_active: target } : c)),
+    )
     setTogglingId(cat.id)
     try {
       await api.put(`/categories/${cat.id}`, { is_active: target })
@@ -196,6 +217,7 @@ export default function useManageCategories() {
     } catch (err) {
       const message = err.response?.data?.message || "Gagal memperbarui status kategori"
       notify(message, "error")
+      await fetchCategories()
     } finally {
       setTogglingId(null)
     }

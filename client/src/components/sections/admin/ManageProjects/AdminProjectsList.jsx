@@ -28,7 +28,21 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deletedTitle, setDeletedTitle] = useState(null)
   const [slideshowUnpublishTarget, setSlideshowUnpublishTarget] = useState(null)
+  // Id karya yang PATCH-nya masih jalan. Menahan klik kedua mencegah dua
+  // request tumpang tindih yang saling membalikkan state.
+  const [pendingIds, setPendingIds] = useState(() => new Set())
   const [expandedGroups, setExpandedGroups] = useState(() => ({}))
+
+  const markPending = useCallback((id, on) => {
+    setPendingIds((prev) => {
+      const next = new Set(prev)
+      if (on) next.add(id)
+      else next.delete(id)
+      return next
+    })
+  }, [])
+
+  const isPending = useCallback((id) => pendingIds.has(id), [pendingIds])
 
   const filterKey = `${search}|${statusFilter}|${categoryFilter}`
   const [activeFilter, setActiveFilter] = useState(filterKey)
@@ -149,6 +163,8 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
   }, [rejectProject])
 
   const doSetFeatured = useCallback(async (p, slot) => {
+    if (isPending(p.id)) return
+    markPending(p.id, true)
     try {
       await setFeaturedSlot(p.id, slot)
       toast.success(
@@ -163,8 +179,10 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
             ? `Gagal memperbarui slot karya unggulan slot ${slot}`
             : "Gagal melepas karya dari unggulan"),
       )
+    } finally {
+      markPending(p.id, false)
     }
-  }, [setFeaturedSlot])
+  }, [setFeaturedSlot, isPending, markPending])
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pt-6 md:pt-8 pb-12 md:pb-16">
@@ -224,6 +242,8 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
                           doSetFeatured(p, slot)
                         }}
                         onToggleSlideshow={(p, visible) => {
+                          if (isPending(p.id)) return
+                          markPending(p.id, true)
                           setSlideshowVisible(p.id, visible)
                             .then(() => {
                               toast.success(
@@ -240,9 +260,11 @@ function AdminProjectsList({ search, statusFilter, categoryFilter = "all" }) {
                                     : "Gagal menyembunyikan karya dari slideshow beranda"),
                               )
                             })
+                            .finally(() => markPending(p.id, false))
                         }}
                         featuredBySlot={featuredBySlot}
                         slideshowCount={slideshowCount}
+                        busy={isPending(project.id)}
                       />
                     </div>
                   ))}

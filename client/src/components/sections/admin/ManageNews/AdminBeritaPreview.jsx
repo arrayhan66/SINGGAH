@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom"
 import {
   ArrowLeft,
@@ -16,14 +16,50 @@ function AdminBeritaPreview() {
   const { slug } = useParams()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { beritaList, getBeritaBySlug, tempPreviewData } = useBerita()
+  const { beritaList, tempPreviewData, fetchBeritaDetail } = useBerita()
   const { theme } = useTheme()
   const isDark = theme === "dark"
 
   const isTempPreview = String(slug) === "temp"
   const fromEditor = isTempPreview && searchParams.get("from") === "edit"
   const editSlug = searchParams.get("slug")
-  const item = isTempPreview ? tempPreviewData : getBeritaBySlug(slug)
+
+  // Pratinjau menampilkan artikel apa adanya, jadi butuh contentHTML. Daftar
+  // berita tidak lagi membawa field itu, jadi untuk slug yang sebenarnya
+  // beritanya diambil sendiri lewat /news/slug/:slug. Untuk pratinjau
+  // sementara, data sudah ada di memory sebagai tempPreviewData.
+  const [detail, setDetail] = useState(null)
+  const [detailLoaded, setDetailLoaded] = useState(false)
+
+  useEffect(() => {
+    if (isTempPreview || !slug) {
+      setDetail(null)
+      setDetailLoaded(true)
+      return undefined
+    }
+
+    let cancelled = false
+    setDetail(null)
+    setDetailLoaded(false)
+
+    fetchBeritaDetail(slug)
+      .then((data) => {
+        if (cancelled) return
+        setDetail(data)
+        setDetailLoaded(true)
+      })
+      .catch((err) => {
+        console.error("Failed to fetch news for preview:", err)
+        if (!cancelled) setDetailLoaded(true)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [slug, isTempPreview, fetchBeritaDetail])
+
+  const listItem = isTempPreview ? null : beritaList.find((b) => b.slug === slug)
+  const item = isTempPreview ? tempPreviewData : detail || listItem
   const relatedNews = isTempPreview ? [] : beritaList.filter((b) => b.slug !== slug).slice(0, 3)
 
   const backTarget = isTempPreview
@@ -36,6 +72,23 @@ function AdminBeritaPreview() {
     if (item.image instanceof File) return URL.createObjectURL(item.image)
     return null
   }, [item?.image])
+
+  if (!detailLoaded) {
+    return (
+      <section className="relative min-h-screen bg-brand-dark pt-16 pb-16">
+        <div className="relative z-10 mx-auto max-w-2xl px-4">
+          <div className="h-4 w-24 animate-pulse rounded bg-slate-700/60" />
+          <div className="mt-4 h-9 w-3/4 animate-pulse rounded bg-slate-700/60" />
+          <div className="mt-6 h-56 w-full animate-pulse rounded-2xl bg-slate-700/40" />
+          <div className="mt-6 space-y-3">
+            <div className="h-4 w-full animate-pulse rounded bg-slate-700/50" />
+            <div className="h-4 w-full animate-pulse rounded bg-slate-700/50" />
+            <div className="h-4 w-2/3 animate-pulse rounded bg-slate-700/50" />
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   if (!item) {
     return (

@@ -1,5 +1,13 @@
 const { Setting, sequelize } = require("../models")
 const AppError = require("../utils/AppError")
+const cache = require("../utils/cache")
+const singleFlight = require("../utils/singleFlight")
+
+// getSetting() dipanggil di setiap request /api lewat maintenanceMiddleware
+// dan di setiap request upload lewat uploadMiddleware. Tanpa cache itu satu
+// query database per request untuk nilai yang jarang berubah.
+const SETTING_TTL_MS = 30_000
+const SETTING_PREFIX = "setting:"
 
 const serialize = (value) => {
   if (value === null || value === undefined) return null
@@ -15,20 +23,45 @@ const deserialize = (stored) => {
   }
 }
 
+const ALL_SETTINGS_KEY = SETTING_PREFIX + "__all__"
+
 exports.getSettings = async () => {
-  const rows = await Setting.findAll()
+  const cached = await cache.get(ALL_SETTINGS_KEY)
+  if (cached) return cached
 
-  const settings = {}
-  rows.forEach((row) => {
-    settings[row.key] = deserialize(row.value)
+  return singleFlight(ALL_SETTINGS_KEY, async () => {
+    const afterWait = await cache.get(ALL_SETTINGS_KEY)
+    if (afterWait) return afterWait
+
+    const rows = await Setting.findAll()
+
+    const settings = {}
+    rows.forEach((row) => {
+      settings[row.key] = deserialize(row.value)
+    })
+
+    await cache.set(ALL_SETTINGS_KEY, settings, SETTING_TTL_MS)
+    return settings
   })
-
-  return settings
 }
 
 exports.getSetting = async (key) => {
-  const row = await Setting.findOne({ where: { key } })
-  return row ? deserialize(row.value) : null
+  const cacheKey = SETTING_PREFIX + key
+
+  const cached = await cache.get(cacheKey)
+  if (cached !== undefined) return cached
+
+  return singleFlight(cacheKey, async () => {
+    // Double-check: mungkin request lain sudah mengisi cache sambil
+    // menunggu promise ini.
+    const afterWait = await cache.get(cacheKey)
+    if (afterWait !== undefined) return afterWait
+
+    const row = await Setting.findOne({ where: { key } })
+    const value = row ? deserialize(row.value) : null
+    await cache.set(cacheKey, value, SETTING_TTL_MS)
+    return value
+  })
 }
 
 exports.updateSettings = async (data) => {
@@ -53,6 +86,10 @@ exports.updateSettings = async (data) => {
       }),
     )
   })
+
+  // Segera hapus cache supaya perubahan maintenanceMode / maxUploadSize
+  // langsung berlaku, tidak menunggu TTL 30 detik habis.
+  await cache.delPrefix(SETTING_PREFIX)
 
   return exports.getSettings()
 }

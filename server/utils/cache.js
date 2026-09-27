@@ -1,11 +1,24 @@
 // Cache layer: Redis bila REDIS_URL tersedia & sehat, fallback ke memori bila
 // Redis mati/offline. Dinonaktifkan saat mode test agar deterministik dan
 // tidak mencemari antar test file.
+//
+// Pengecekan dilakukan saat panggil (bukan sekali saat modul dimuat) supaya
+// test yang perlu menguji invalidasi cache bisa menyalakannya lewat
+// CACHE_IN_TEST=true tanpa harus mocking modul ini. Mocking berisiko membuat
+// models/User.js (yang memuat cache lebih dulu lewat tests/setup.js) dan
+// middleware memegang objek berbeda, sehingga hook invalidasi tidak berlaku
+// dan test justru berbohong.
 const { getRedis, isRedisReady } = require("../config/redis")
 
-const isTest = process.env.NODE_ENV === "test"
+const isTest = () =>
+  process.env.NODE_ENV === "test" && process.env.CACHE_IN_TEST !== "true"
 
-// In-memory fallback store
+// In-memory fallback store.
+// Dibatasi karena Map ini tidak pernah dibersihkan otomatis selain saat
+// dibaca setelah kedaluwarsa. Dengan key yang berasal dari query string
+// (mis. news:list:1:37, news:list:1:38, ...) jumlah key bisa tumbuh tanpa
+// batas dan menghabiskan memori sampai OOM.
+const MAX_MEMORY_ENTRIES = 500
 const store = new Map()
 
 const NOOP = "Cache disabled in test mode"
@@ -23,7 +36,18 @@ const memoryGet = (key) => {
 }
 
 const memorySet = (key, value, ttlMs) => {
+  // Hapus dulu supaya key yang di-refresh kembali jadi yang paling baru.
+  store.delete(key)
   store.set(key, { value, expiresAt: Date.now() + ttlMs })
+
+  // Map mempertahankan urutan insert, jadi kunci pertama adalah yang paling
+  // lama. Cukup untuk bounds; tidak perlu LRU penuh.
+  while (store.size > MAX_MEMORY_ENTRIES) {
+    const oldest = store.keys().next().value
+    if (oldest === undefined) break
+    store.delete(oldest)
+  }
+
   return value
 }
 
@@ -73,7 +97,7 @@ const redisDelPrefix = async (prefix) => {
 }
 
 exports.get = async (key) => {
-  if (isTest) return undefined
+  if (isTest()) return undefined
 
   if (await isRedisReady()) {
     const redis = getRedis()
@@ -96,7 +120,7 @@ exports.get = async (key) => {
 }
 
 exports.set = async (key, value, ttlMs = 60000) => {
-  if (isTest) return NOOP
+  if (isTest()) return NOOP
 
   memorySet(key, value, ttlMs)
 
@@ -115,7 +139,7 @@ exports.set = async (key, value, ttlMs = 60000) => {
 }
 
 exports.del = async (key) => {
-  if (isTest) return NOOP
+  if (isTest()) return NOOP
 
   memoryDel(key)
   await redisDel(key)
@@ -123,7 +147,7 @@ exports.del = async (key) => {
 }
 
 exports.delPrefix = async (prefix) => {
-  if (isTest) return NOOP
+  if (isTest()) return NOOP
 
   memoryDelPrefix(prefix)
   await redisDelPrefix(prefix)

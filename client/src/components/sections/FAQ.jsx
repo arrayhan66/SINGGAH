@@ -8,11 +8,17 @@ const faq = [
     question: <>Apa itu SINGGAH?</>,
     answer: (
       <>
-        SINGGAH adalah panggung digital tempat civitas akademika Politeknik
-        Negeri Banjarmasin, Teknik Elektro memamerkan karya terbaiknya di bidang
-        teknologi — mulai dari website, mobile app, IoT, sampai artificial
-        intelligence. Semuanya dikemas dalam exhibition hall virtual yang bisa
-        dijelajahi layaknya pameran sungguhan, tapi dari layar kamu sendiri.
+        <span className="font-semibold text-cyan-300">
+          Sistem Informasi Galeri Gagasan dan Hasil Karya
+        </span>{" "}
+        — itulah arti nama SINGGAH. Sebuah galeri digital tempat civitas
+        akademika Politeknik Negeri Banjarmasin, Jurusan Teknik Elektro,
+        memamerkan karya terbaiknya di bidang teknologi: mulai dari website,
+        mobile app, IoT, sampai artificial intelligence. Tidak ada yang perlu
+        diunduh atau diinstal — cukup buka halamannya, lalu jelajahi exhibition
+        hall virtual ini dengan berjalan menyusuri lorong, menyimak penjelasan
+        tiap karya, dan berpindah kategori lewat portal — seperti
+        jalan-jalan di pameran sungguhan.
       </>
     ),
   },

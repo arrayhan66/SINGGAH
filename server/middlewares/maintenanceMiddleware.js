@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken")
-const { User } = require("../models")
 const settingService = require("../services/settingService")
 const { getTokenFromCookie } = require("../utils/authCookie")
+const { loadUser } = require("./authMiddleware")
 
 const WHITELIST = [
   { method: "GET", path: "/api/settings" },
@@ -19,10 +19,10 @@ function isWhitelisted(req) {
 async function verifyAdminFromToken(token) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    const user = await User.findByPk(decoded.id, {
-      attributes: ["id", "role"],
-    })
-    return user && user.role === "admin"
+    // Pakai cache yang sama dengan authMiddleware supaya saat mode maintenance
+    // aktif (jalur paling sibuk) tidak menambah query database per request.
+    const user = await loadUser(decoded.id)
+    return Boolean(user && user.role === "admin")
   } catch {
     return false
   }

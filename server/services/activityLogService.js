@@ -1,5 +1,6 @@
 const { ActivityLog, User } = require("../models")
 const logger = require("../utils/logger")
+const { parsePagination } = require("../utils/pagination")
 
 // Dipanggil dari controller/service lain. Tidak pernah melempar error agar
 // tidak mengganggu alur utama sistem.
@@ -24,9 +25,11 @@ exports.logActivity = async ({
 }
 
 exports.getActivityLogs = async (query = {}) => {
-  const page = parseInt(query.page) || 1
-  const limit = parseInt(query.limit) || 20
-  const offset = (page - 1) * limit
+  // Route /api/activity-logs hanya untuk admin.
+  const { page, limit, offset } = parsePagination(query, {
+    defaultLimit: 20,
+    maxLimit: 500,
+  })
 
   const { count, rows } = await ActivityLog.findAndCountAll({
     include: [

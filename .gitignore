@@ -43,3 +43,8 @@ server/.env.cloudinary.bak
 
 .vercel
 .env*
+
+# ...tapi template env HARUS ikut commit, kalau tidak orang tidak punya contoh
+# nilai env yang perlu diisi saat deploy.
+!.env.example
+!**/.env.example

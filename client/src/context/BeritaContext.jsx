@@ -3,6 +3,11 @@ import api from "../services/api"
 
 const BeritaContext = createContext(null)
 
+// Dulu limit: 1000. Semua berita diambil utuh oleh SETIAP pengunjung
+// (context ini berada di atas router) termasuk yang cuma membuka halaman
+// depan. Batas server untuk user biasa adalah 100, admin 500.
+const NEWS_PAGE_SIZE = 100
+
 export function BeritaProvider({ children }) {
   const [beritaList, setBeritaList] = useState([])
   const [tempPreviewData, setTempPreviewData] = useState(null)
@@ -11,13 +16,17 @@ export function BeritaProvider({ children }) {
   const fetchNews = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await api.get("/news", { params: { limit: 1000 } })
+      const res = await api.get("/news", { params: { limit: NEWS_PAGE_SIZE } })
       const items = res.data.data.items || res.data.data || []
+      // contentHTML sengaja tidak ikut di sini. Field itu menyimpan HTML dari
+      // editor yang bisa memuat gambar inline sebagai base64; satu data yang
+      // diukur punya contentHTML 956 KB (99,6% di antaranya satu PNG base64),
+      // sehingga 4 berita jadi 1,16 MB untuk satu respons daftar. Isi artikel
+      // diambil sendiri lewat fetchBeritaDetail di bawah.
       const normalized = items.map((item) => ({
         ...item,
         image: item.image || item.headline_image || "",
         desc: item.desc || item.summary || "",
-        contentHTML: item.contentHTML || "",
       }))
       setBeritaList(normalized)
     } catch (err) {
@@ -31,6 +40,25 @@ export function BeritaProvider({ children }) {
   useEffect(() => {
     fetchNews()
   }, [fetchNews])
+
+  // Mengambil satu berita lengkap (dengan contentHTML) untuk halaman detail,
+  // form edit admin, dan pratinjau admin. Ketiganya butuh isi artikel, jadi
+  // lebih baik satu request tambahan daripada menarik seluruh isi artikel
+  // setiap kali halaman depan dibuka.
+  const fetchBeritaDetail = useCallback(async (slug) => {
+    if (!slug) return null
+
+    const res = await api.get(`/news/slug/${encodeURIComponent(slug)}`)
+    const item = res.data.data
+    if (!item) return null
+
+    return {
+      ...item,
+      image: item.image || item.headline_image || "",
+      desc: item.desc || item.summary || "",
+      contentHTML: item.contentHTML || "",
+    }
+  }, [])
 
   function toFormData(data) {
     const fd = new FormData()
@@ -94,6 +122,7 @@ export function BeritaProvider({ children }) {
     deleteBerita,
     getBeritaById,
     getBeritaBySlug,
+    fetchBeritaDetail,
     tempPreviewData,
     setTempPreviewData,
   }

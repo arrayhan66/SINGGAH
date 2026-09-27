@@ -14,10 +14,13 @@ export function ProjectProvider({ children }) {
   const fetchProjects = useCallback(async () => {
     setLoading(true)
     try {
-      // limit besar agar list & angka filter admin (Semua/Menunggu/
-      // Disetujui/Ditolak + per kategori) mencakup seluruh karya,
-      // bukan hanya 10 terbaru bawaan API.
-      const res = await api.get("/projects", { params: { limit: 500 } })
+      // Dulu limit: 500. Setiap pengunjung anonim langsung menarik 500 karya
+      // penuh, padahal yang tampil di layar cuma 9. Pada 1000 pengguna
+      // bersamaan itu 500.000 baris JSON untuk halaman yang sama.
+      // Batas server untuk user biasa adalah 100; admin boleh 500.
+      const res = await api.get("/projects", {
+        params: { limit: user?.role === "admin" ? 500 : 100 },
+      })
       const items = res.data.data.items || res.data.data || []
       setProjects(items)
     } catch (err) {
@@ -26,7 +29,7 @@ export function ProjectProvider({ children }) {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [user?.role])
 
   // Fetch baru setiap status login berubah (guest->member/admin, login/logout)
   // supaya data & hitungan filter tidak basi. Menunggu auth selesai dulu.
@@ -92,25 +95,62 @@ export function ProjectProvider({ children }) {
     }
   }, [fetchProjects])
 
-  const setFeaturedSlot = useCallback(async (id, slot) => {
-    try {
-      await api.patch(`/projects/${id}/featured`, { slot })
-      await fetchProjects()
-    } catch (err) {
-      console.error("Failed to set featured slot:", err)
-      throw err
-    }
-  }, [fetchProjects])
+  // Slot unggulan & slideshow: optimistis dulu supaya tombol langsung berubah,
+  // lalu pakai row terbaru yang dikembalikan endpoint PATCH (bukan refetch
+  // seluruh daftar). Refetch 500 karya itu berat (1-3 detik) dan selama itu
+  // tombol jadi mati, jadi admin harus klik berkali-kali baru terasa nyangkut.
+  const patchProjectLocally = useCallback((id, patch) => {
+    setProjects((prev) =>
+      prev.map((p) => (String(p.id) === String(id) ? { ...p, ...patch } : p)),
+    )
+  }, [])
 
-  const setSlideshowVisible = useCallback(async (id, visible) => {
-    try {
-      await api.patch(`/projects/${id}/slideshow`, { visible })
-      await fetchProjects()
-    } catch (err) {
-      console.error("Failed to set slideshow visibility:", err)
-      throw err
-    }
-  }, [fetchProjects])
+  const setFeaturedSlot = useCallback(
+    async (id, slot) => {
+      const normalized =
+        slot === null || slot === undefined || slot === "" ? null : Number(slot)
+      // Melepas unggulan juga otomatis menurunkan karya dari slideshow.
+      patchProjectLocally(id, {
+        featured_slot: normalized,
+        ...(normalized === null ? { is_shown_in_slideshow: false } : null),
+      })
+      try {
+        const res = await api.patch(`/projects/${id}/featured`, { slot })
+        const saved = res.data?.data
+        if (saved) {
+          patchProjectLocally(id, {
+            featured_slot: saved.featured_slot ?? null,
+            is_shown_in_slideshow: Boolean(saved.is_shown_in_slideshow),
+          })
+        }
+      } catch (err) {
+        console.error("Failed to set featured slot:", err)
+        await fetchProjects()
+        throw err
+      }
+    },
+    [fetchProjects, patchProjectLocally],
+  )
+
+  const setSlideshowVisible = useCallback(
+    async (id, visible) => {
+      patchProjectLocally(id, { is_shown_in_slideshow: Boolean(visible) })
+      try {
+        const res = await api.patch(`/projects/${id}/slideshow`, { visible })
+        const saved = res.data?.data
+        if (saved) {
+          patchProjectLocally(id, {
+            is_shown_in_slideshow: Boolean(saved.is_shown_in_slideshow),
+          })
+        }
+      } catch (err) {
+        console.error("Failed to set slideshow visibility:", err)
+        await fetchProjects()
+        throw err
+      }
+    },
+    [fetchProjects, patchProjectLocally],
+  )
 
   const getProjectById = useCallback((id) => {
     return projects.find((p) => String(p.id) === String(id))

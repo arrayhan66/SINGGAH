@@ -4,6 +4,7 @@ import Image from "@tiptap/extension-image"
 import Placeholder from "@tiptap/extension-placeholder"
 import { useEffect, useState, useRef } from "react"
 import { NodeSelection } from "@tiptap/pm/state"
+import api from "../../../../services/api"
 import "../../../../styles/tiptap.css"
 import Underline from "@tiptap/extension-underline"
 import Link from "@tiptap/extension-link"
@@ -108,13 +109,25 @@ const ResizableImage = Image.extend({
   },
 })
 
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result)
-    reader.onerror = reject
-    reader.readAsDataURL(file)
+// Gambar artikel tidak lagi disimpan sebagai base64 di contentHTML.
+// Base64 bikin satu artikel bisa sampai ~1 MB dan boros seluruh payload daftar.
+// Foto dikirim ke Cloudinary lewat /media, editor hanya menyimpan URL-nya.
+const UPLOAD_FIELD = "files"
+
+async function uploadImageToCloudinary(file) {
+  const formData = new FormData()
+  formData.append(UPLOAD_FIELD, file)
+
+  const res = await api.post("/media", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
   })
+
+  const uploaded = res?.data?.data
+  const item = Array.isArray(uploaded) ? uploaded[0] : uploaded
+  if (!item?.url) {
+    throw new Error("Server tidak mengembalikan URL untuk gambar")
+  }
+  return item.url
 }
 
 function AdminBeritaEditorMain({ formData, updateField, isEditMode }) {
@@ -126,6 +139,31 @@ function AdminBeritaEditorMain({ formData, updateField, isEditMode }) {
   const [selectedImagePos, setSelectedImagePos] = useState(null)
   const [imageCaptionInput, setImageCaptionInput] = useState("")
   const [resizeBarStyle, setResizeBarStyle] = useState(null)
+  const [uploading, setUploading] = useState(false)
+  const [uploadMsg, setUploadMsg] = useState("")
+
+  // Dipakai oleh tiga jalur sisip gambar: toolbar, drag-drop, dan paste.
+  // Kalau upload gagal, gambar tidak ikut disisipkan supaya contentHTML
+  // tidak pernah menyimpan base64 atau URL yang setengah jadi.
+  async function uploadAndInsert(editorInstance, file, insert) {
+    setUploading(true)
+    setUploadMsg(`Mengunggah ${file.name}...`)
+    try {
+      const url = await uploadImageToCloudinary(file)
+      insert(url)
+      setUploadMsg("")
+      return url
+    } catch (err) {
+      console.error("Gagal mengunggah gambar:", err)
+      setUploadMsg(
+        err?.response?.data?.message || `Gagal mengunggah ${file.name}`,
+      )
+      setTimeout(() => setUploadMsg(""), 6000)
+      return null
+    } finally {
+      setUploading(false)
+    }
+  }
 
   const editor = useEditor({
     extensions: [
@@ -138,7 +176,7 @@ function AdminBeritaEditorMain({ formData, updateField, isEditMode }) {
       Underline,
       ResizableImage.configure({
         inline: false,
-        allowBase64: true,
+        allowBase64: false,
       }),
       Link.configure({
         openOnClick: false,
@@ -159,24 +197,28 @@ function AdminBeritaEditorMain({ formData, updateField, isEditMode }) {
         ],
         async onDrop(editor, files, pos) {
           for (const file of files) {
-            const url = await fileToBase64(file)
-            editor
-              .chain()
-              .insertContentAt(pos, {
-                type: "image",
-                attrs: { src: url, alt: file.name, width: "100%", caption: "" },
-              })
-              .run()
+            const url = await uploadAndInsert(editor, file, (src) =>
+              editor
+                .chain()
+                .insertContentAt(pos, {
+                  type: "image",
+                  attrs: { src, alt: file.name, width: "100%", caption: "" },
+                })
+                .run(),
+            )
+            if (!url) break
           }
         },
         async onPaste(editor, files) {
           for (const file of files) {
-            const url = await fileToBase64(file)
-            editor
-              .chain()
-              .focus()
-              .setImage({ src: url, alt: file.name, width: "100%", caption: "" })
-              .run()
+            const url = await uploadAndInsert(editor, file, (src) =>
+              editor
+                .chain()
+                .focus()
+                .setImage({ src, alt: file.name, width: "100%", caption: "" })
+                .run(),
+            )
+            if (!url) break
           }
         },
       }),
@@ -253,12 +295,13 @@ function AdminBeritaEditorMain({ formData, updateField, isEditMode }) {
     input.onchange = async (event) => {
       const file = event.target.files?.[0]
       if (!file) return
-      const imageUrl = await fileToBase64(file)
-      editor
-        ?.chain()
-        .focus()
-        .setImage({ src: imageUrl, alt: file.name, width: "100%", caption: file.name })
-        .run()
+      await uploadAndInsert(editor, file, (src) =>
+        editor
+          ?.chain()
+          .focus()
+          .setImage({ src, alt: file.name, width: "100%", caption: file.name })
+          .run(),
+      )
     }
     input.click()
   }
@@ -389,6 +432,20 @@ function AdminBeritaEditorMain({ formData, updateField, isEditMode }) {
           insertImage={insertImage}
           insertLink={insertLink}
         />
+
+        {(uploading || uploadMsg) && (
+          <div
+            role="status"
+            aria-live="polite"
+            className={`mb-2 rounded-lg border px-3 py-2 text-xs ${
+              uploading
+                ? "border-cyan-700/60 bg-cyan-950/40 text-cyan-200"
+                : "border-rose-700/60 bg-rose-950/40 text-rose-200"
+            }`}
+          >
+            {uploadMsg}
+          </div>
+        )}
 
         <div ref={contentRef} className="overflow-auto relative min-h-[450px]">
           {/* Floating Image Resizer & Caption Bar (Level Dewa NodeSelection when image is clicked) */}

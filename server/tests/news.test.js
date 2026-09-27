@@ -85,6 +85,32 @@ describe("News Endpoints", () => {
     expect(res.body.data).toHaveProperty("title", "Pameran Inovasi 2026")
   })
 
+  describe("GET /api/news/slug/:slug", () => {
+    it("should get news by slug publicly", async () => {
+      const res = await request(app).get("/api/news/slug/pameran-inovasi-2026")
+
+      expect(res.status).toBe(200)
+      expect(res.body.success).toBe(true)
+      expect(res.body.data).toHaveProperty("slug", "pameran-inovasi-2026")
+      expect(res.body.data).toHaveProperty("id", newsId)
+    })
+
+    it("should return 404 for an unknown slug", async () => {
+      const res = await request(app).get("/api/news/slug/tidak-ada-slug-ini")
+
+      expect(res.status).toBe(404)
+      expect(res.body.message).toMatch(/tidak ditemukan/i)
+    })
+
+    it("should return the same news on repeated reads", async () => {
+      const first = await request(app).get("/api/news/slug/pameran-inovasi-2026")
+      const second = await request(app).get("/api/news/slug/pameran-inovasi-2026")
+
+      expect(second.status).toBe(200)
+      expect(second.body.data.id).toBe(first.body.data.id)
+    })
+  })
+
   it("should forbid non-admin from updating a news", async () => {
     const res = await request(app)
       .put(`/api/news/${newsId}`)

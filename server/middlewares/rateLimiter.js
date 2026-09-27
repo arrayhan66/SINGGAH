@@ -1,3 +1,54 @@
+// Store memori bersifat PER-PROCESS. Kalau aplikasi berjalan sebagai >1 worker
+// PM2 (cluster mode) tanpa Redis, tiap worker punya hitungan sendiri sehingga
+// batas efektif menjadi `max x jumlahWorker` (batas login 5 jadi 15).
+// Pelonggaran itu tidak disengaja dan sebelumnya tidak terlihat dari log.
+//
+// Catatan penting soal "bagi batas dengan jumlah worker": itu terdengar seperti
+// tightening yang aman, tapi untuk batas kecil (login max 5 di 3 worker -> 1 per
+// worker) justru mengunci user sah yang salah ketik 2x, karena request-nya
+// berputar antar worker. Trade-off-nya lebih buruk daripada batas yang agak
+// longgar. Jadi TIDAK dibagi secara default. Set RATE_LIMIT_SHARED_MAX=true
+// hanya kalau memang memilih tightening itu secara sadar.
+const isClustered = () => process.env.NODE_APP_INSTANCE !== undefined;
+
+function workerCount() {
+  const n = parseInt(process.env.PM2_INSTANCES, 10);
+  return Number.isInteger(n) && n > 0 ? n : null;
+}
+
+function redisConfigured() {
+  return Boolean(process.env.REDIS_URL);
+}
+
+// Batas yang benar-benar ditegakkan. Tanpa Redis di mode cluster, angka asli
+// tidak bisa dipertahankan secara akurat lintas worker.
+function effectiveMax(max) {
+  if (!isClustered() || redisConfigured()) return max;
+  if (process.env.RATE_LIMIT_SHARED_MAX !== "true") return max;
+  const workers = workerCount();
+  if (!workers || workers <= 1) return max;
+  return Math.max(1, Math.floor(max / workers));
+}
+
+function warnLooseLimitOnce() {
+  if (!isClustered() || redisConfigured()) return;
+  if (process.env.NODE_ENV === "test") return;
+  if (warnLooseLimitOnce.done) return;
+  warnLooseLimitOnce.done = true;
+
+  const workers = workerCount();
+  const detail = workers
+    ? `PM2_INSTANCES=${workers}`
+    : "PM2_INSTANCES belum diset, jumlah worker tidak diketahui";
+
+  console.warn(
+    `[rateLimiter] PERINGATAN: berjalan multi-worker PM2 tanpa Redis. ` +
+      `Rate limit memakai store memori per-process, jadi batas efektifnya ` +
+      `longgar sesuai jumlah worker (${detail}). Batas TIDAK dibagi otomatis. ` +
+      `Perbaikan: set REDIS_URL, atau jalankan PM2 dengan 1 instance.`,
+  );
+}
+
 const rateLimit = require("express-rate-limit");
 const { RedisStore } = require("rate-limit-redis");
 const { getRedis, isRedisReady } = require("../config/redis");
@@ -9,18 +60,37 @@ const isRateLimitDisabled = process.env.DISABLE_RATE_LIMIT === "true";
 // Fallback store dalam memori, menggunakan interface MODERN express-rate-limit
 // v8 (increment/decrement/resetKey). Store dengan method `incr` justru
 // ditafsirkan sebagai interface legacy callback-style dan akan hang.
+//
+// PENTING: jendela waktu harus mengikuti `windowMs` yang dideklarasikan tiap
+// limiter. Versi sebelumnya memaksa 60 detik (`resetMs = 60 * 1000`) dan
+// mengabaikan windowMs, sehingga kalau Redis mati semua limiter jadi jauh lebih
+// longgar dari yang dimaksud — batas login 5/15 menit efektif jadi 5/1 menit
+// (300 per jam, bukan 20). express-rate-limit v8 menaruh logika jendela di
+// dalam store, jadi store inilah yang harus memegang windowMs yang benar.
+const DEFAULT_WINDOW_MS = 60 * 1000;
+
 function createMemoryStore() {
   const hits = new Map();
-  const resetMs = 60 * 1000;
+  let windowMs = DEFAULT_WINDOW_MS;
 
   return {
+    // Dipanggil express-rate-limit lewat wrapper init() di createStore.
+    // Prioritaskan windowMs dari limiter; abaikan nilai tak masuk akal
+    // (0/NaN) supaya tidak pernah jadi 0 yang membuat semua request di-429.
+    init(options) {
+      const declared = Number(options?.windowMs);
+      windowMs = Number.isFinite(declared) && declared > 0
+        ? declared
+        : DEFAULT_WINDOW_MS;
+    },
+
     async increment(key) {
       const now = Date.now();
       const current = hits.get(key);
 
       if (!current || now > current.expiresAt) {
-        hits.set(key, { count: 1, expiresAt: now + resetMs });
-        return { totalHits: 1, resetTime: new Date(now + resetMs) };
+        hits.set(key, { count: 1, expiresAt: now + windowMs });
+        return { totalHits: 1, resetTime: new Date(now + windowMs) };
       }
 
       current.count += 1;
@@ -40,6 +110,7 @@ function createMemoryStore() {
 }
 
 function createStore(limiterName) {
+  warnLooseLimitOnce();
   const memoryStore = createMemoryStore();
   let redisStore = null;
 
@@ -55,6 +126,11 @@ function createStore(limiterName) {
 
   return {
     async init(options) {
+      // Selalu beri tahu memoryStore nilai windowMs, TERLEPAS apakah Redis
+      // hidup atau tidak. Jalur ini yang membuat jendela fallback memori sama
+      // dengan yang dideklarasikan limiter, bukandefault 60 detik.
+      memoryStore.init(options);
+
       if (redisStore && (await isRedisReady())) {
         const fn = redisStore.init?.bind(redisStore);
         return fn ? fn(options) : undefined;
@@ -95,7 +171,7 @@ function createStore(limiterName) {
 
 exports.loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: effectiveMax(5),
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => isRateLimitDisabled,
@@ -108,7 +184,7 @@ exports.loginLimiter = rateLimit({
 
 exports.verifyCodeLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: effectiveMax(10),
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => isRateLimitDisabled,
@@ -121,7 +197,7 @@ exports.verifyCodeLimiter = rateLimit({
 
 exports.checkEmailLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
-  max: 30,
+  max: effectiveMax(30),
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => isRateLimitDisabled,
@@ -134,7 +210,7 @@ exports.checkEmailLimiter = rateLimit({
 
 exports.registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 5,
+  max: effectiveMax(5),
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => isRateLimitDisabled,
@@ -147,7 +223,7 @@ exports.registerLimiter = rateLimit({
 
 exports.googleLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
-  max: 10,
+  max: effectiveMax(10),
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => isRateLimitDisabled,
@@ -160,7 +236,7 @@ exports.googleLimiter = rateLimit({
 
 exports.forgotPasswordLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 3,
+  max: effectiveMax(3),
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => isRateLimitDisabled,
@@ -174,7 +250,7 @@ exports.forgotPasswordLimiter = rateLimit({
 
 exports.resendCodeLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 3,
+  max: effectiveMax(3),
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => isRateLimitDisabled,
@@ -182,5 +258,55 @@ exports.resendCodeLimiter = rateLimit({
   message: {
     success: false,
     message: "Terlalu banyak permintaan kode. Coba lagi dalam 15 menit.",
+  },
+});
+
+// --- Limiter untuk endpoint tulis publik ---
+// POST /api/projects/:id/view dan POST /api/stats/visit tidak butuh login dan
+// sebelumnya tidak punya limiter sama sekali. Keduanya menulis ke database
+// (3-4 query per panggilan), jadi bot atau reload berkali-kali bisa menghabiskan
+// seluruh connection pool sebelum request asli pengguna dilayani.
+
+exports.viewLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: effectiveMax(30),
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => isRateLimitDisabled,
+  store: createStore("project-view"),
+  message: {
+    success: false,
+    message: "Terlalu banyak permintaan. Coba lagi sebentar.",
+  },
+});
+
+exports.visitLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: effectiveMax(10),
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => isRateLimitDisabled,
+  store: createStore("site-visit"),
+  message: {
+    success: false,
+    message: "Terlalu banyak permintaan. Coba lagi sebentar.",
+  },
+});
+
+// Cadangan untuk setiap POST/PUT/PATCH/DELETE di /api yang tidak punya
+// limiter sendiri. Dipasang SEBELUM router di server.js, jadi path yang sudah
+// punya limiter khusus (auth, project view, site visit) harus dilewati di
+// sana — kalau tidak, satu request terhitung dua kali dan v8 melempar
+// ERR_ERL_DOUBLE_COUNT.
+exports.apiWriteLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: effectiveMax(60),
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => isRateLimitDisabled,
+  store: createStore("api-write"),
+  message: {
+    success: false,
+    message: "Terlalu banyak permintaan. Coba lagi sebentar.",
   },
 });

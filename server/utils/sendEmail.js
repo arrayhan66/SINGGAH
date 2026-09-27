@@ -1,29 +1,27 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 const { BRAND_NAME } = require("./emailTemplate");
 const logger = require("./logger");
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  family: 4,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async ({ to, subject, html, text }) => {
   if (process.env.NODE_ENV === "test") {
     return Promise.resolve(true);
   }
-  await transporter.sendMail({
-    from: `"${BRAND_NAME}" <${process.env.EMAIL_USER}>`,
+
+  const { data, error } = await resend.emails.send({
+    from: `${BRAND_NAME} <onboarding@resend.dev>`,
     to,
     subject,
     html,
     text,
   });
+
+  if (error) {
+    throw new Error(error.message || "Gagal mengirim email");
+  }
+
+  return data;
 };
 
 const sendEmailAsync = (opts) => {
@@ -31,7 +29,6 @@ const sendEmailAsync = (opts) => {
     logger.error("Gagal mengirim email", {
       message: err.message,
       code: err.code,
-      command: err.command,
       response: err.response,
       responseCode: err.responseCode,
     });

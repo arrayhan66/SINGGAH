@@ -1,6 +1,6 @@
-const nodemailer = require("nodemailer")
-const { BRAND_NAME } = require("./emailTemplate")
-const logger = require("./logger")
+const nodemailer = require("nodemailer");
+const { BRAND_NAME } = require("./emailTemplate");
+const logger = require("./logger");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -8,11 +8,11 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD,
   },
-})
+});
 
 const sendEmail = async ({ to, subject, html, text }) => {
   if (process.env.NODE_ENV === "test") {
-    return Promise.resolve(true)
+    return Promise.resolve(true);
   }
   await transporter.sendMail({
     from: `"${BRAND_NAME}" <${process.env.EMAIL_USER}>`,
@@ -20,14 +20,20 @@ const sendEmail = async ({ to, subject, html, text }) => {
     subject,
     html,
     text,
-  })
-}
+  });
+};
 
 const sendEmailAsync = (opts) => {
   sendEmail(opts).catch((err) => {
-    logger.error("Gagal mengirim email:", err.message)
-  })
-}
+    logger.error("Gagal mengirim email", {
+      message: err.message,
+      code: err.code,
+      command: err.command,
+      response: err.response,
+      responseCode: err.responseCode,
+    });
+  });
+};
 
-module.exports = sendEmail
-module.exports.sendEmailAsync = sendEmailAsync
+module.exports = sendEmail;
+module.exports.sendEmailAsync = sendEmailAsync;

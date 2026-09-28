@@ -46,6 +46,10 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Test (Jest, SQLite in-memory)
+        # Sengaja hanya unit test. npm test sudah dikecualikan dari suite yang
+        # menyentuh hosting sungguhan (live/security/auth/idor), jadi runner CI
+        # tidak menembak Railway dan tidak menghabiskan rate limit login.
+        # Untuk smoke test produksi, jalankan `npm run test:hosted` manual.
         run: npm test
 
   client:

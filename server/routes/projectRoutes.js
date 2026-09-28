@@ -11,48 +11,7 @@ const {
   createProjectValidator,
   updateProjectValidator,
   updateProjectStatusValidator,
-  reviewRevisionValidator,
-  rejectRevisionValidator,
 } = require("../validators/projectValidator")
-
-// DAFTARANNYA harus sebelum "/:id", kalau tidak "revisions" akan tertangkap
-// sebagai nilai parameter id.
-router.get(
-  "/revisions",
-  authMiddleware,
-  roleMiddleware("admin"),
-  projectController.getPendingRevisions,
-)
-
-router.get(
-  "/revisions/:id",
-  authMiddleware,
-  projectController.getRevisionById,
-)
-
-router.patch(
-  "/revisions/:id/approve",
-  authMiddleware,
-  roleMiddleware("admin"),
-  reviewRevisionValidator,
-  validate,
-  projectController.approveRevision,
-)
-
-router.patch(
-  "/revisions/:id/reject",
-  authMiddleware,
-  roleMiddleware("admin"),
-  rejectRevisionValidator,
-  validate,
-  projectController.rejectRevision,
-)
-
-router.delete(
-  "/revisions/:id",
-  authMiddleware,
-  projectController.cancelRevision,
-)
 
 router.get("/", optionalAuthMiddleware, projectController.getProjects)
 
@@ -64,14 +23,6 @@ router.get(
 )
 
 router.get("/my", authMiddleware, projectController.getMyProjects)
-
-// Revisi milik karya ini (dipakai form edit mahasiswa untuk tahu apakah
-// masih ada pengajuan yang menunggu verifikasi).
-router.get(
-  "/:id/revision",
-  authMiddleware,
-  projectController.getProjectPendingRevision,
-)
 
 router.get("/:id", optionalAuthMiddleware, projectController.getProjectById)
 

@@ -247,103 +247,31 @@ exports.updateProject = asyncHandler(async (req, res) => {
     }))
   }
 
-  const result = await projectService.updateProject(
+  const updated = await projectService.updateProject(
     req.params.id,
     req.body,
     req.user,
     fileOps,
   )
 
-  // Mahasiswa: perubahan disimpan sebagai revisi, karya belum berubah.
-  if (result && result.pendingReview) {
+  // Pengajuan ulang karya yang ditolak: karya kembali ke antrean "Menunggu".
+  if (updated?.status === "pending" && existingProject.status === "rejected") {
     await logActivity({
       userId: req.user.id,
-      action: "project_revision_submitted",
+      action: "project_resubmitted",
       targetType: "project",
       targetId: existingProject.id,
-      description: `${req.user.name} mengajukan perubahan pada karya "${existingProject.title}" untuk diverifikasi admin`,
+      description: `${req.user.name} mengajukan ulang karya "${updated.title}" untuk diverifikasi admin`,
     })
 
     return success(
       res,
-      result,
-      "Perubahan karya diajukan dan menunggu verifikasi admin",
-      202,
+      updated,
+      "Karya diajukan ulang dan menunggu persetujuan admin",
     )
   }
 
-  success(res, result, "Project berhasil diperbarui")
-})
-
-exports.getPendingRevisions = asyncHandler(async (req, res) => {
-  const data = await projectService.getPendingRevisions(req.query)
-
-  success(res, data, "Daftar revisi berhasil dimuat")
-})
-
-exports.getRevisionById = asyncHandler(async (req, res) => {
-  const data = await projectService.getRevisionById(req.params.id, req.user)
-
-  success(res, data, "Revisi berhasil dimuat")
-})
-
-exports.getProjectPendingRevision = asyncHandler(async (req, res) => {
-  const revision = await projectService.getPendingRevisionByProject(
-    req.params.id,
-    req.user,
-  )
-
-  success(res, revision, "Status revisi berhasil dimuat")
-})
-
-exports.cancelRevision = asyncHandler(async (req, res) => {
-  const revision = await projectService.cancelRevision(req.params.id, req.user)
-
-  await logActivity({
-    userId: req.user.id,
-    action: "project_revision_cancelled",
-    targetType: "project",
-    targetId: revision.project_id,
-    description: `${req.user.name} membatalkan pengajuan perubahan karya`,
-  })
-
-  success(res, revision, "Pengajuan perubahan dibatalkan")
-})
-
-exports.approveRevision = asyncHandler(async (req, res) => {
-  const project = await projectService.approveRevision(
-    req.params.id,
-    req.body.note,
-    req.user,
-  )
-
-  await logActivity({
-    userId: req.user.id,
-    action: "project_revision_approved",
-    targetType: "project",
-    targetId: project.id,
-    description: `${req.user.name} menyetujui perubahan karya "${project.title}"`,
-  })
-
-  success(res, project, "Perubahan karya disetujui dan sudah tayang")
-})
-
-exports.rejectRevision = asyncHandler(async (req, res) => {
-  const revision = await projectService.rejectRevision(
-    req.params.id,
-    req.body.reason,
-    req.user,
-  )
-
-  await logActivity({
-    userId: req.user.id,
-    action: "project_revision_rejected",
-    targetType: "project",
-    targetId: revision.project_id,
-    description: `${req.user.name} menolak perubahan karya${req.body.reason ? `: ${req.body.reason}` : ""}`,
-  })
-
-  success(res, revision, "Perubahan karya ditolak")
+  success(res, updated, "Project berhasil diperbarui")
 })
 
 exports.deleteProject = asyncHandler(async (req, res) => {

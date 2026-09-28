@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useAuth } from "../../../../context/AuthContext"
+import { resolveAccountTipe } from "../../../../utils/resolveAccountTipe"
 import ProfileAvatar from "./ProfileAvatar"
 import ProfileInformation from "./ProfileInformation"
 import ProfileAccountInfo from "./ProfileAccountInfo"
@@ -86,7 +87,7 @@ function ProfileForm({ isAdmin = false }) {
         <ProfileInformation
           profileData={profileData}
           updateProfileField={updateProfileField}
-          userTipe={user?.tipe}
+          userTipe={resolveAccountTipe(user)}
           pendingEmail={user?.pending_email}
           identitasPhoto={identitasPhoto}
           identitasUrl={originalIdentitasUrl}
@@ -94,7 +95,10 @@ function ProfileForm({ isAdmin = false }) {
           onIdentitasRemove={handleIdentitasRemoved}
         />
 
-        <ProfileVerification />
+        {/* Verifikasi tipe akun hanya untuk akun yang masih bertipe "umum".
+            Admin tidak punya alur ini, jadi jangan tampilkan di profile
+            admin. */}
+        {!isAdmin && <ProfileVerification />}
 
         <ProfileAccountInfo />
 

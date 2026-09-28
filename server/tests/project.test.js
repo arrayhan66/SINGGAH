@@ -642,7 +642,7 @@ describe("Project Endpoints", () => {
       expect(res.status).toBe(400)
     })
 
-    it("should submit project update as a revision for student owner", async () => {
+    it("should apply a student edit directly to a published project", async () => {
       await request(app)
         .patch(`/api/projects/${targetId}/status`)
         .set("Authorization", `Bearer ${adminToken}`)
@@ -655,12 +655,13 @@ describe("Project Endpoints", () => {
         .field("description", "Deskripsi setelah diedit")
         .field("year", 2025)
 
-      expect(res.status).toBe(202)
+      expect(res.status).toBe(200)
       expect(res.body.success).toBe(true)
-      expect(res.body.data).toHaveProperty("pendingReview", true)
+      expect(res.body.data).toHaveProperty("title", "Karya Sudah Diedit")
 
       const row = await Project.findByPk(targetId)
-      expect(row.title).not.toBe("Karya Sudah Diedit")
+      expect(row.title).toBe("Karya Sudah Diedit")
+      expect(row.status).toBe("published")
     })
 
     it("should let an admin update any project", async () => {
@@ -760,82 +761,64 @@ describe("Project Endpoints", () => {
     })
   })
 
-  describe("Project Revisions", () => {
-    let revProjectId
-    let revId
-
-    beforeAll(async () => {
+  describe("Status karya mahasiswa vs dosen", () => {
+    it("should publish a dosen upload immediately", async () => {
       const res = await request(app)
+        .post("/api/projects")
+        .set("Authorization", `Bearer ${dosenToken}`)
+        .attach("thumbnail", Buffer.from("fake-image-bytes"), "thumbnail.jpg")
+        .field("title", "Karya Dosen Langsung Tayang")
+        .field("description", "Tanpa perlu ditinjau admin")
+        .field("category_id", categoryId)
+        .field("year", 2026)
+
+      expect(res.status).toBe(201)
+      expect(res.body.data).toHaveProperty("status", "published")
+    })
+
+    it("should move a rejected mahasiswa project back to pending on resubmit", async () => {
+      const created = await request(app)
         .post("/api/projects")
         .set("Authorization", `Bearer ${studentToken}`)
         .attach("thumbnail", Buffer.from("fake-image-bytes"), "thumbnail.jpg")
-        .field("title", "Karya Untuk Revisi")
+        .field("title", "Karya Untuk Diajukan Ulang")
         .field("description", "Deskripsi awal")
         .field("category_id", categoryId)
         .field("year", 2026)
-      revProjectId = res.body.data.id
 
-      await request(app)
-        .patch(`/api/projects/${revProjectId}/status`)
+      const id = created.body.data.id
+      expect(created.body.data).toHaveProperty("status", "pending")
+
+      const rejected = await request(app)
+        .patch(`/api/projects/${id}/status`)
         .set("Authorization", `Bearer ${adminToken}`)
-        .send({ status: "published" })
-    })
+        .send({ status: "rejected", reason: "Deskripsi kurang lengkap" })
 
-    it("should submit a revision when student updates project", async () => {
-      const res = await request(app)
-        .put(`/api/projects/${revProjectId}`)
+      expect(rejected.status).toBe(200)
+      expect((await Project.findByPk(id)).status).toBe("rejected")
+
+      const resubmit = await request(app)
+        .put(`/api/projects/${id}`)
         .set("Authorization", `Bearer ${studentToken}`)
-        .field("title", "Judul Revisi Mahasiswa")
-        .field("description", "Deskripsi revisi")
+        .field("title", "Karya Diajukan Ulang")
+        .field("description", "Deskripsi sudah dilengkapi")
         .field("year", 2026)
 
-      expect(res.status).toBe(202)
-      expect(res.body.data).toHaveProperty("pendingReview", true)
-      revId = res.body.data.revision.id
+      expect(resubmit.status).toBe(200)
+      expect(resubmit.body.data).toHaveProperty("status", "pending")
+
+      const row = await Project.findByPk(id)
+      expect(row.title).toBe("Karya Diajukan Ulang")
+      expect(row.status).toBe("pending")
+      expect(row.rejection_reason).toBeNull()
     })
 
-    it("should get pending revisions as admin", async () => {
+    it("should no longer expose the revision endpoints", async () => {
       const res = await request(app)
-        .get("/api/projects/revisions?status=pending&limit=1")
+        .get("/api/projects/revisions")
         .set("Authorization", `Bearer ${adminToken}`)
 
-      expect(res.status).toBe(200)
-      expect(res.body.success).toBe(true)
-      expect(res.body.data).toHaveProperty("revisions")
-      expect(res.body.data.revisions.length).toBeGreaterThan(0)
-    })
-
-    it("should get revision by id with current project", async () => {
-      const res = await request(app)
-        .get(`/api/projects/revisions/${revId}`)
-        .set("Authorization", `Bearer ${adminToken}`)
-
-      expect(res.status).toBe(200)
-      expect(res.body.data).toHaveProperty("revision")
-      expect(res.body.data).toHaveProperty("current")
-      expect(res.body.data.current.Category).toHaveProperty("name")
-    })
-
-    it("should get pending revision by project id", async () => {
-      const res = await request(app)
-        .get(`/api/projects/${revProjectId}/revision`)
-        .set("Authorization", `Bearer ${studentToken}`)
-
-      expect(res.status).toBe(200)
-      expect(res.body.data).toHaveProperty("id", revId)
-    })
-
-    it("should approve revision as admin", async () => {
-      const res = await request(app)
-        .patch(`/api/projects/revisions/${revId}/approve`)
-        .set("Authorization", `Bearer ${adminToken}`)
-        .send({ note: "Disetujui admin" })
-
-      expect(res.status).toBe(200)
-      expect(res.body.data).toHaveProperty("title", "Judul Revisi Mahasiswa")
-
-      const project = await Project.findByPk(revProjectId)
-      expect(project.title).toBe("Judul Revisi Mahasiswa")
+      expect(res.status).toBe(404)
     })
   })
 })

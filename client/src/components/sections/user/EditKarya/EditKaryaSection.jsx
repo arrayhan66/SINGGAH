@@ -13,6 +13,7 @@ import UploadAction from "../Upload/UploadAction"
 import api from "../../../../services/api"
 import { useProjects } from "../../../../context/ProjectContext"
 import { useAuth } from "../../../../context/AuthContext"
+import { useTheme } from "../../../../context/ThemeContext"
 import SubmitSuccessModal from "../../../ui/SubmitSuccessModal"
 import PopupToast from "../../../ui/PopupToast"
 import { EditKaryaFormSkeleton } from "../../../ui/PageSkeletons"
@@ -61,6 +62,8 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
   const navigate = useNavigate()
   const { updateProject } = useProjects()
   const { user } = useAuth()
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
 
   const [loading, setLoading] = useState(true)
   const [fetchError, setFetchError] = useState(null)
@@ -68,11 +71,10 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
   const [submitError, setSubmitError] = useState(null)
   const [successOpen, setSuccessOpen] = useState(false)
   const [noChangeOpen, setNoChangeOpen] = useState(false)
-  // Revisi yang masih menunggu verifikasi admin. Kalau ada, form di bawah
-  // menampilkan isinya, bukan data karya yang tayang — supaya mahasiswa
-  // menyunting perubahan yang sama, bukanSILANG edit dengan yang sudah
-  // disetujui admin.
-  const [pendingRevision, setPendingRevision] = useState(null)
+  // Status karya saat form dibuka. Dipakai untuk membedakan dua aksi:
+  // "Simpan Perubahan" untuk karya yang tayang, dan "Ajukan ulang karya"
+  // untuk karya yang ditolak admin (server akan mengembalikannya ke pending).
+  const [projectStatus, setProjectStatus] = useState(null)
   const originalRef = useRef(null)
 
   const [formData, setFormData] = useState({
@@ -101,6 +103,7 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
       try {
         const res = await api.get(`/projects/${slug}`)
         const project = res.data.data || res.data
+        setProjectStatus(project.status || null)
 
         const technologies = project.technologies
           ? (typeof project.technologies === "string"
@@ -194,7 +197,10 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
   async function handleSubmit() {
     const original = originalRef.current
 
-    if (original && hasNoChanges(formData, {
+    // Karya yang ditolak tetap boleh diajukan ulang tanpa wajib mengubah
+    // sesuatu: yang sedang diminta server adalah mengembalikannya ke antrean
+    // "Menunggu", bukan menyimpan perbedaan isian.
+    if (projectStatus !== "rejected" && original && hasNoChanges(formData, {
       existingThumbnail,
       existingImages,
       removedImages,
@@ -250,8 +256,11 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
         fd.append("removedDocuments", JSON.stringify(removedDocuments))
       }
 
-      await updateProject(slug, fd)
+      const updated = await updateProject(slug, fd)
 
+      // Karya yang ditolak dan diajukan ulang akan kembali jadi pending, jadi
+      // popup harus bilang menunggu persetujuan, bukan "sudah dipublikasikan".
+      if (updated?.status) setProjectStatus(updated.status)
       setSuccessOpen(true)
     } catch (err) {
       const msg =
@@ -289,23 +298,49 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
     )
   }
 
+  // Hanya untuk pemilik non-admin: admin mengedit lewat form sendiri dan
+  // memang boleh mengubah status secara langsung.
+  const isOwnerResubmitting = user?.role !== "admin" && projectStatus === "rejected"
+  const isOwnerPending = user?.role !== "admin" && projectStatus === "pending"
+
   return (
     <section className="relative overflow-hidden bg-brand-dark px-4 py-10 sm:py-12 md:px-8 lg:px-12 2xl:px-16 3xl:px-20 4xl:px-24">
       <GlowBackground />
       <DustBackground />
 
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col gap-6 sm:gap-8 2xl:gap-10 3xl:gap-12 4xl:gap-14">
-        {pendingRevision && (
-          <div className="flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
-            <div className="text-xs leading-relaxed text-amber-200">
-              <p className="font-semibold">
-                Perubahan ini sedang menunggu verifikasi admin.
+        {isOwnerResubmitting && (
+          <div
+            className={`flex items-start gap-3.5 rounded-2xl border px-4 py-4 ${
+              isDark
+                ? "border-amber-400/35 bg-amber-400/10"
+                : "border-amber-300 bg-amber-50"
+            }`}
+          >
+            <span
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${
+                isDark
+                  ? "bg-amber-400/15 text-amber-300"
+                  : "bg-amber-200/70 text-amber-700"
+              }`}
+            >
+              <Info className="h-4 w-4" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p
+                className={`text-sm leading-snug font-semibold ${
+                  isDark ? "text-amber-100" : "text-amber-900"
+                }`}
+              >
+                Karya ini ditolak admin dan belum tayang
               </p>
-              <p className="mt-1 text-amber-200/80">
-                Karya yang tayang masih versi lama sampai admin menyetujui.
-                Form di bawah terisi dari perubahan yang sedang menunggu, jadi
-                simpan lagi untuk memperbarui pengajuan yang sama.
+              <p
+                className={`mt-1 text-xs leading-relaxed ${
+                  isDark ? "text-amber-200/85" : "text-amber-800"
+                }`}
+              >
+                Perbaiki bagian yang salah lalu ajukan ulang. Setelah
+                diajukan, karya menunggu persetujuan admin sebelum tayang.
               </p>
             </div>
           </div>
@@ -361,6 +396,13 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
           submitting={submitting}
           apiError={submitError}
           isEdit={true}
+          submitLabel={
+            isOwnerResubmitting
+              ? "Ajukan ulang karya"
+              : isOwnerPending
+                ? "Perbarui Pengajuan"
+                : "Simpan Perubahan"
+          }
           requireAuthorType={user?.role === "admin"}
         />
       </div>
@@ -370,8 +412,7 @@ function EditKaryaSection({ redirectPath = "/my-karya" }) {
         karyaTitle={formData.title}
         redirectPath={redirectPath}
         mode="edit"
-        role={user?.role || "user"}
-        tipe={user?.tipe || "umum"}
+        status={projectStatus}
         onClose={() => setSuccessOpen(false)}
       />
 

@@ -38,11 +38,14 @@ export function ProjectProvider({ children }) {
     fetchProjects()
   }, [fetchProjects, authLoading, isAuthed])
 
+  // Kembalikan karya yang tersimpan supaya pemanggil bisa membaca status
+  // akhirnya (pending untuk mahasiswa, published untuk dosen) dan menampilkan
+  // popup yang sesuai, bukan asumsi "langsung tayang".
   const addProject = useCallback(async (formData) => {
     try {
       const res = await api.post("/projects", formData)
       await fetchProjects()
-      return res.data.data.id
+      return res.data.data
     } catch (err) {
       console.error("Failed to add project:", err)
       throw err
@@ -51,8 +54,9 @@ export function ProjectProvider({ children }) {
 
   const updateProject = useCallback(async (id, formData) => {
     try {
-      await api.put(`/projects/${id}`, formData)
+      const res = await api.put(`/projects/${id}`, formData)
       await fetchProjects()
+      return res.data.data
     } catch (err) {
       console.error("Failed to update project:", err)
       throw err

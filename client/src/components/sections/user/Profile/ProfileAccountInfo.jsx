@@ -1,4 +1,5 @@
 import { useAuth } from "../../../../context/AuthContext"
+import { resolveAccountTipe } from "../../../../utils/resolveAccountTipe"
 import GlassCard from "../../../ui/GlassCard"
 import {
   Shield,
@@ -17,7 +18,7 @@ const tipeConfig = {
   mahasiswa: { label: "Mahasiswa", icon: GraduationCap },
   dosen: { label: "Dosen", icon: Briefcase },
   umum: { label: "Umum", icon: Users },
-  admin: { label: "Admin", icon: Crown },
+  admin: { label: "Administrator", icon: Crown },
 }
 
 function formatDate(dateString) {
@@ -33,7 +34,10 @@ function formatDate(dateString) {
 function ProfileAccountInfo() {
   const { user } = useAuth()
 
-  const tipe = tipeConfig[user?.tipe] || tipeConfig.umum
+  // Admin yang masih bertipe "umum" tidak boleh tampil sebagai "Umum".
+  const effectiveTipe = resolveAccountTipe(user)
+
+  const tipe = tipeConfig[effectiveTipe] || tipeConfig.umum
   const TipeIcon = tipe.icon
 
   const pendingLabel = tipeConfig[user?.pending_tipe]?.label
@@ -53,10 +57,10 @@ function ProfileAccountInfo() {
       icon: Shield,
       iconColor: "text-blue-400",
     },
-    ...(user?.tipe === "mahasiswa" || user?.tipe === "dosen"
+    ...(effectiveTipe === "mahasiswa" || effectiveTipe === "dosen"
       ? [
           {
-            label: user?.tipe === "dosen" ? "Kartu Identitas" : "NIM",
+            label: effectiveTipe === "dosen" ? "Kartu Identitas" : "NIM",
             value: user?.nim_nip || "-",
             icon: CreditCard,
             iconColor: "text-cyan-400",

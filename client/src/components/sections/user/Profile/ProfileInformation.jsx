@@ -15,7 +15,7 @@ import { MailCheck } from "lucide-react"
 import { compressImage } from "../../../../utils/compressImage"
 
 const tipeConfig = {
-  admin: { label: "Admin", icon: CreditCard, color: "amber" },
+  admin: { label: "Administrator", icon: CreditCard, color: "amber" },
   mahasiswa: { label: "Mahasiswa", icon: GraduationCap, color: "cyan" },
   dosen: { label: "Dosen", icon: Briefcase, color: "blue" },
   umum: { label: "Umum", icon: Users, color: "slate" },

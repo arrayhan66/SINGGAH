@@ -60,12 +60,19 @@ function ProfileDangerZone() {
             <AlertTriangle className="h-4 w-4 text-white!" />
           </div>
           <div className="flex-1">
-            <h2 className="text-sm min-[350px]:text-base md:text-lg font-semibold text-white">Zona Bahaya</h2>
-            <p className="mt-1 text-xs md:text-sm text-slate-400">Menghapus akun akan menghapus semua data secara permanen.</p>
+            <h2 className={`text-sm min-[350px]:text-base md:text-lg font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>Zona Bahaya</h2>
+            <p className={`mt-1 text-xs md:text-sm ${isDark ? "text-slate-400" : "text-slate-600"}`}>Menghapus akun akan menghapus semua data secara permanen.</p>
           </div>
         </div>
-        <button type="button" onClick={handleOpen} className="mt-4 flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#fd6467] to-rose-600 px-5 py-2.5 text-sm font-medium text-white! shadow-lg shadow-[#fd6467]/30 transition-all hover:from-red-500 hover:to-rose-500 cursor-pointer">
-          <Trash2 size={16} /> Hapus Akun
+        {/* Gradient tidak bisa di-interpolasi mulus (from-* berubahnya
+            melompat), jadi haluskan lewat filter + transform yang memang
+            bisa dianimasikan. */}
+        <button
+          type="button"
+          onClick={handleOpen}
+          className="group mt-4 flex cursor-pointer items-center gap-2 rounded-xl bg-gradient-to-r from-[#fd6467] to-rose-600 px-5 py-2.5 text-sm font-medium text-white! shadow-md shadow-[#fd6467]/25 transition-[transform,filter,box-shadow] duration-300 ease-out hover:scale-[1.02] hover:brightness-110 hover:shadow-lg hover:shadow-[#fd6467]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fd6467]/60 focus-visible:ring-offset-2 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:scale-100"
+        >
+          <Trash2 size={16} className="transition-transform duration-300 ease-out group-hover:rotate-6" /> Hapus Akun
         </button>
       </GlassCard>
 
@@ -136,7 +143,7 @@ function ProfileDangerZone() {
                     type="button"
                     onClick={handleDelete}
                     disabled={!canSubmit || submitting}
-                    className="flex-1 rounded-xl bg-gradient-to-r from-[#fd6467] to-rose-600 px-4 py-2.5 text-xs font-bold text-white! shadow-lg shadow-[#fd6467]/30 hover:from-red-500 hover:to-rose-500 active:scale-[0.98] cursor-pointer transition-all disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
+                    className="flex-1 cursor-pointer rounded-xl bg-gradient-to-r from-[#fd6467] to-rose-600 px-4 py-2.5 text-xs font-bold text-white! shadow-md shadow-[#fd6467]/25 transition-[transform,filter,box-shadow] duration-300 ease-out hover:scale-[1.02] hover:brightness-110 hover:shadow-lg hover:shadow-[#fd6467]/40 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100 disabled:hover:brightness-100 motion-reduce:transition-none"
                   >
                     {submitting ? (
                       <span className="flex items-center justify-center gap-2">

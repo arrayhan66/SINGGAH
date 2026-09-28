@@ -74,22 +74,3 @@ exports.updateProjectStatusValidator = [
     .isLength({ max: 500 })
     .withMessage("Alasan maksimal 500 karakter"),
 ]
-
-exports.reviewRevisionValidator = [
-  body("note")
-    .optional({ values: "falsy" })
-    .trim()
-    .isLength({ max: 500 })
-    .withMessage("Catatan maksimal 500 karakter"),
-]
-
-// Alasan WAJIB saat menolak: mahasiswa harus tahu bagian mana yang salah
-// supaya bisa memperbaikinya, bukan cuma melihat "ditolak".
-exports.rejectRevisionValidator = [
-  body("reason")
-    .notEmpty()
-    .withMessage("Alasan wajib diisi")
-    .trim()
-    .isLength({ max: 500 })
-    .withMessage("Alasan maksimal 500 karakter"),
-]

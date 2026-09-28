@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { CheckCircle2, ArrowRight } from "lucide-react"
+import { CheckCircle2, ArrowRight, Clock } from "lucide-react"
 import PopupToast from "./PopupToast"
 
 const AUTO_REDIRECT_SECONDS = 5
@@ -10,8 +10,7 @@ function SubmitSuccessModal({
   karyaTitle = "",
   redirectPath = "/my-karya",
   mode = "edit",
-  role = "user",
-  tipe = "umum",
+  status,
   onClose,
 }) {
   const navigate = useNavigate()
@@ -27,21 +26,41 @@ function SubmitSuccessModal({
 
   if (!isOpen) return null
 
-  const headline = mode === "upload" ? "Karya Berhasil Diunggah" : "Karya Berhasil Diperbarui"
+  // Status "pending" hanya berlaku untuk mahasiswa. Dosen dan admin yang
+  // mengunggah karya langsung tayang, jadi popup tidak boleh menjanjikan
+  // "sudah dipublikasikan" untuk semua orang.
+  const awaitingReview = status === "pending"
 
-  const subtext =
-    mode === "upload"
-      ? "Karya kamu langsung dipublikasikan dan tersedia di galeri."
+  const headline = awaitingReview
+    ? "Karya Menunggu Persetujuan"
+    : mode === "upload"
+      ? "Karya Berhasil Diunggah"
+      : "Karya Berhasil Diperbarui"
+
+  const subtext = awaitingReview
+    ? "Karyamu sudah masuk antrean admin dan akan tayang setelah disetujui."
+    : mode === "upload"
+      ? "Karyamu langsung dipublikasikan dan tersedia di galeri."
       : "Perubahan karyamu langsung dipublikasikan tanpa perlu diverifikasi admin."
 
-  const noticeTone = "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+  const NoticeIcon = awaitingReview ? Clock : CheckCircle2
+
+  const noticeTone = awaitingReview
+    ? "border-amber-500/30 bg-amber-500/10 text-amber-200"
+    : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+
+  const iconTone = awaitingReview
+    ? "border-amber-400/30 bg-amber-500/10"
+    : "border-cyan-400/30 bg-cyan-500/10"
+
+  const iconColor = awaitingReview ? "text-amber-300" : "text-cyan-300"
 
   return (
     <PopupToast show={isOpen} variant="success" onClose={onClose} duration={5000}>
       <div className="px-4 py-3.5">
         <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-400/20 border border-cyan-400/30">
-            <CheckCircle2 className="h-4.5 w-4.5 text-cyan-300" />
+          <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${iconTone}`}>
+            <NoticeIcon className={`h-4.5 w-4.5 ${iconColor}`} />
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="pt-1 text-sm font-semibold text-white">{headline}</h3>

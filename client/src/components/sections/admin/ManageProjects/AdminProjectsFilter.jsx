@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect } from "react"
 import { createPortal } from "react-dom"
-import { Clock, CheckCircle2, XCircle, LayoutGrid, ChevronDown, Check, MonitorPlay, GitPullRequestArrow } from "lucide-react"
+import { Clock, CheckCircle2, XCircle, LayoutGrid, ChevronDown, Check, MonitorPlay } from "lucide-react"
 
 const tabs = [
   { value: "all", label: "Semua", icon: LayoutGrid },
   { value: "pending", label: "Menunggu", icon: Clock },
-  { value: "revisions", label: "Perubahan Karya", icon: GitPullRequestArrow },
   { value: "published", label: "Disetujui", icon: CheckCircle2 },
   { value: "rejected", label: "Ditolak", icon: XCircle },
   { value: "slideshow", label: "Slideshow Beranda", icon: MonitorPlay },

@@ -67,6 +67,7 @@ function AdminAddProjectView() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
   const [successOpen, setSuccessOpen] = useState(false)
+  const [submittedStatus, setSubmittedStatus] = useState(null)
   const [categories, setCategories] = useState([])
   const { addProject } = useProjects()
   const categoriesFetched = useRef(false)
@@ -138,7 +139,8 @@ function AdminAddProjectView() {
         fd.append("author_tipe", formData.author_tipe)
       }
 
-      await addProject(fd)
+      const created = await addProject(fd)
+      setSubmittedStatus(created?.status || null)
       setSuccessOpen(true)
     } catch (err) {
       const msg =
@@ -203,7 +205,11 @@ function AdminAddProjectView() {
               onSubmit={handleSubmit}
               submitting={submitting}
               apiError={error}
-              submitLabel="Publikasikan"
+              submitLabel={
+                formData.author_tipe === "mahasiswa"
+                  ? "Ajukan untuk Ditinjau"
+                  : "Publikasikan"
+              }
               requireAuthorType
             />
           </div>
@@ -214,7 +220,7 @@ function AdminAddProjectView() {
         karyaTitle={formData.title}
         redirectPath="/admin/karya"
         mode="upload"
-        role="admin"
+        status={submittedStatus}
         onClose={() => setSuccessOpen(false)}
       />
       </div>

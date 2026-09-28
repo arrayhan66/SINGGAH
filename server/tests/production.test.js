@@ -24,10 +24,6 @@ describe("Production API Smoke Test", () => {
     { name: "Projects", path: "/api/projects" },
     { name: "Stats", path: "/api/stats" },
     { name: "Hall", path: "/api/hall" },
-    {
-      name: "Project Revisions",
-      path: "/api/projects/revisions?status=pending&limit=1",
-    },
     { name: "Notifications", path: "/api/notifications" },
     { name: "Dashboard", path: "/api/dashboard" },
     { name: "Users", path: "/api/users" },

@@ -305,7 +305,29 @@ exports.register = async (data) => {
 
   const normalizedUsername = String(username).trim().toLowerCase()
 
-  const emailExists = await User.findOne({ where: { email } })
+  const normalizedEmail = String(email).trim().toLowerCase()
+
+  // Cek email DAN pending_email sekaligus, huruf kecil semua -- sama seperti
+  // updateProfile (baris ~863). Kalau hanya `email` yang dicek:
+  //   1. orang bisa mendaftar dengan email yang saat ini masih menjadi
+  //      pending_email milik akun lain, dan
+  //   2. saat akun lama memverifikasi perubahan emailnya, pending_email
+  //      dipromosikan ke `email` yang sudah unique -> constraint violation
+  //      -> 500 dan akun lama gagal verifikasi.
+  const emailExists = await User.findOne({
+    where: {
+      [Op.or]: [
+        sequelize.where(
+          sequelize.fn("LOWER", sequelize.col("email")),
+          normalizedEmail,
+        ),
+        sequelize.where(
+          sequelize.fn("LOWER", sequelize.col("pending_email")),
+          normalizedEmail,
+        ),
+      ],
+    },
+  })
   if (emailExists) {
     throw new AppError("Email sudah digunakan", 400)
   }

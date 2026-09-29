@@ -11,7 +11,7 @@ exports.getPublicStats = async () => {
   const [totalProject, totalCategory, totalUser, totalVisitors, totalViews] =
     await Promise.all([
       Project.count({ where: { status: "published" } }),
-      Category.count(),
+      Category.count({ where: { is_active: true } }),
       User.count(),
       SiteVisit.count(),
       ProjectView.count(),

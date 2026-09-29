@@ -12,6 +12,7 @@ const {
   forgotPasswordLimiter,
   resendCodeLimiter,
   verifyCodeLimiter,
+  resetPasswordLimiter,
   checkEmailLimiter,
 } = require("../middlewares/rateLimiter")
 const {
@@ -87,6 +88,11 @@ router.post(
 )
 router.post(
   "/reset-password",
+  // WAJIB: endpoint ini membandingkan kode reset langsung (authService.js:731+)
+  // dan kodenya cuma 6 digit. Tanpa limiter di sini, /verify-reset-code yang
+  // sudah dibatasi jadi tidak protecting apa-apa karena batasnya bisa
+  // dilewati lewat endpoint ini.
+  resetPasswordLimiter,
   resetPasswordValidator,
   validate,
   authController.resetPassword,

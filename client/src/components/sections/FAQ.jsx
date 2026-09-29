@@ -15,9 +15,9 @@ const faq = [
         akademika Politeknik Negeri Banjarmasin, Jurusan Teknik Elektro,
         memamerkan karya terbaiknya di bidang teknologi: mulai dari website,
         mobile app, IoT, sampai artificial intelligence. Tidak ada yang perlu
-        diunduh atau diinstal — cukup buka halamannya, lalu jelajahi exhibition
-        hall virtual ini dengan berjalan menyusuri lorong, menyimak penjelasan
-        tiap karya, dan berpindah kategori lewat portal — seperti
+        diunduh atau diinstal — cukup buka halamannya, lalu jelajahi gedung
+        virtual ini dengan berjalan menyusuri ruang pameran karya, menyimak
+        penjelasan tiap karya, dan berpindah kategori lewat portal — seperti
         jalan-jalan di pameran sungguhan.
       </>
     ),
@@ -25,12 +25,12 @@ const faq = [
   {
     question: "Bagaimana cara mengikuti pameran ini?",
     answer:
-      "Gampang! Cukup daftar dan unggah karya kamu lewat halaman registrasi. Tim kami akan meninjau karyamu sebentar, lalu karya langsung tayang di Gedung Virtual dan siap dilihat pengunjung dari mana saja.",
+      "Gampang! Daftar lewat halaman registrasi, lalu unggah karyamu di sini. Kalau kamu mahasiswa, karyamu ditinjau admin dulu sebelum tayang di ruang pameran karya. Kalau kamu dosen, karyamu langsung tayang tanpa perlu ditinjau.",
   },
   {
-    question: "Apakah masyarakat umum bisa melihat karya yang dipamerkan?",
+    question: "Apa itu gedung virtual SINGGAH?",
     answer:
-      "Bisa banget. Semua karya yang sudah tayang terbuka untuk siapa saja — mahasiswa, dosen, atau masyarakat umum — tanpa perlu login atau daftar akun dulu.",
+      "Gedung virtual adalah ruang 3D tempat seluruh karya civitas Teknik Elektro dipamerkan. Di dalamnya tersedia halaman utama dan ruang pameran karya untuk setiap kategori. Pengunjung dapat berjalan bebas, berpindah kategori lewat portal, serta naik ke lantai 2 untuk melihat karya dosen.",
   },
   {
     question: "Apakah karya yang dipamerkan bisa diunduh?",

@@ -191,7 +191,17 @@ function LookControls({ bounds, onSelectProject }) {
         : `MEMASUKI ${room.label.split(" — ")[0]}`
     useTransitionStore.getState().start(message)
     point.y = rh.height
-    useWalkStore.setState({ position: point.clone(), yaw, target: null, level: rh.level })
+    // isSitting ikut dibersihkan: kalau pengunjung masih duduk saat menekan
+    // portal, tanpa ini kita tiba di ruangan berikutnya dengan tinggi mata
+    // duduk sementara banner "Anda sedang duduk" masih tampil, dan state
+    // duduk itu bertahan sampai dia berdiri dulu.
+    useWalkStore.setState({
+      position: point.clone(),
+      yaw,
+      target: null,
+      level: rh.level,
+      isSitting: false,
+    })
     camYRef.current = point.y + EYE
     camYInit.current = true
     lastPosRef.current.copy(point)
@@ -501,6 +511,20 @@ function LookControls({ bounds, onSelectProject }) {
       keysRef.current[e.code] = false
     }
 
+    // "keyup" diterima window tempat fokus berada. Kalau pengguna alt-tab
+    // atau klik chrome browser sambil menekan W, keyup mendarat di window
+    // lain dan flag-nya menggantung selamanya -- useFrame tetap membaca
+    // KeyW = true, jadi pengunjung berjalan tanpa input dan checkPortalCross
+    // diam-diam memindahkan mereka antar-ruang. Bersihkan saat blur.
+    const clearKeys = () => {
+      keysRef.current = {}
+    }
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") clearKeys()
+    }
+    window.addEventListener("blur", clearKeys)
+    document.addEventListener("visibilitychange", onVisibilityChange)
+
     el.addEventListener("pointerdown", onPointerDown)
     el.addEventListener("pointermove", onPointerMove)
     el.addEventListener("pointerup", onPointerUp)
@@ -519,6 +543,9 @@ function LookControls({ bounds, onSelectProject }) {
       el.removeEventListener("pointerleave", onPointerLeave)
       window.removeEventListener("keydown", onKeyDown)
       window.removeEventListener("keyup", onKeyUp)
+      window.removeEventListener("blur", clearKeys)
+      document.removeEventListener("visibilitychange", onVisibilityChange)
+      clearKeys()
       // Jangan tinggalkan kursor "pointer" nyangkut saat komponen unmount.
       if (document.body.style.cursor) document.body.style.cursor = ""
     }

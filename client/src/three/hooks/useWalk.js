@@ -116,7 +116,20 @@ export function loadHallReturn() {
   try {
     const raw = localStorage.getItem(HALL_RETURN_KEY)
     if (!raw) return null
-    return JSON.parse(raw)
+    const snap = JSON.parse(raw)
+    // Snapshot ini langsung dipakai sebagai koordinat kamera, jadi bentuknya
+    // harus divalidasi. JSON yang tidak lengkap (mis. tulis terputus, atau
+    // field diganti nama di rilis berikutnya) akan menghasilkan NaN di
+    // THREE.Vector3 -- dan NaN tidak bisa dipulihkan: clamp/damp meneruskannya
+    // dan Math.hypot(NaN) selalu false, sehingga collision dan portal mati
+    // diam-diam tanpa jalan keluar selain reload.
+    if (!snap || typeof snap !== "object") return null
+    for (const key of ["x", "y", "z", "yaw"]) {
+      if (typeof snap[key] !== "number" || !Number.isFinite(snap[key])) return null
+    }
+    if (typeof snap.pitch !== "number" || !Number.isFinite(snap.pitch)) snap.pitch = 0
+    if (snap.level !== 0 && snap.level !== 1) snap.level = 0
+    return snap
   } catch {
     return null
   }

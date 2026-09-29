@@ -140,6 +140,12 @@ function DashboardPendingProjects() {
                     e.stopPropagation()
                     navigate(`/admin/karya/edit/${project.slug || project.id}`, { state: { from: "/admin" } })
                   }}
+                  onKeyDown={(e) => {
+                    // Baris induk memanggil preventDefault pada Enter/Space.
+                    // Tanpa stopPropagation di sini, tombol ini tidak pernah
+                    // ter-klik dan pengguna mendarat di halaman detail.
+                    e.stopPropagation()
+                  }}
                   className="dashboard-review-btn group/rev flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-95"
                 >
                   <Eye size={13} strokeWidth={2.5} className="transition-transform duration-300 group-hover/rev:-translate-x-0.5 group-hover/rev:scale-110" />

@@ -51,7 +51,13 @@ function VirtualExhibition({ onArea, onSelectProject, onReady, hallData }) {
   // Sekali saja: hallData di-refetch beberapa saat setelah masuk, dan efek
   // di bawah ikut jalan lagi saat itu — pengunjung tak boleh ditarik balik
   // ke spawn setelah sudah mulai berjalan.
-  const freshHallRef = useRef(freshHall)
+  //
+  // Ref ini menandai "spawn sudah dilakukan", bukan "flag sudah dipakai".
+  // Kalau flag justru dimatikan (ref.current = false), panggilan kedua dari
+  // React StrictMode akan lolos ke cabang loadHallReturn di bawah dan
+  // mengembalikan pengunjung ke snapshot lama — justru membatalkan spawn
+  // yang barusan dipaksakan.
+  const freshHallSpawnedRef = useRef(false)
 
   // The music box beside the TV must already be glowing and playing the moment
   // the visitor is in the hall. Held to a mount-level effect so a room change
@@ -66,11 +72,15 @@ function VirtualExhibition({ onArea, onSelectProject, onReady, hallData }) {
   useEffect(() => {
     // Mulai eksplorasi dari Beranda: selalu buka di titik awal di depan
     // hologram, bukan melanjutkan posisi terakhir dari kunjungan sebelumnya.
-    if (freshHallRef.current) {
-      freshHallRef.current = false
+    if (freshHall && !freshHallSpawnedRef.current) {
+      freshHallSpawnedRef.current = true
       resetToHallSpawn()
       return
     }
+    // Spawn sudah dipaksakan di atas. Efek ini tidak boleh melakukan apa pun
+    // lagi setelah itu — baik panggilan kedua StrictMode maupun re-run
+    // ketika hallData berubah.
+    if (freshHallSpawnedRef.current) return
 
     // Returning from a project detail page: drop the player back exactly where
     // they were (same room, same spot) instead of the default spawn.
@@ -104,7 +114,7 @@ function VirtualExhibition({ onArea, onSelectProject, onReady, hallData }) {
     }
     // hallData re-runs this after the (possibly async) layout rebuild so a
     // deep-link into a brand-new category still resolves to its room.
-  }, [categorySlug, hallData])
+  }, [categorySlug, hallData, freshHall])
 
   useReadySignal(onReady)
 

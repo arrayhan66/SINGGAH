@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 
 function PopupToast({
   children,
@@ -13,6 +13,14 @@ function PopupToast({
   const [visible, setVisible] = useState(false)
   const [closing, setClosing] = useState(false)
   const [progress, setProgress] = useState(100)
+  // Penutup "sedang menutup" harus hidup di ref, bukan di state. Kalau
+  // bergantung ke state, setClosing(true) mengubah identitas handleClose,
+  // yang memicu ulang efek di bawah, yang baris pertamanya setClosing(false)
+  // -- jadi flag-nya hilang di tick yang sama dan animasi keluar tidak pernah
+  // jalan (shown = visible && !closing selalu true).
+  const closingRef = useRef(false)
+  const closeTimerRef = useRef(null)
+  const handleCloseRef = useRef(null)
 
   const variantConfig = {
     default: {
@@ -32,24 +40,45 @@ function PopupToast({
   const config = variantConfig[variant] || variantConfig.default
 
   const handleClose = useCallback(() => {
-    if (closing) return
+    if (closingRef.current) return
+    closingRef.current = true
     setClosing(true)
-    setTimeout(() => onClose?.(), 250)
-  }, [closing, onClose])
+    closeTimerRef.current = setTimeout(() => onClose?.(), 250)
+  }, [onClose])
 
   useEffect(() => {
+    handleCloseRef.current = handleClose
+  }, [handleClose])
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+    }
+  }, [])
+
+  // Efek animasi masuk sengaja hanya bergantung ke `show`. Kalau
+  // handleClose ikut jadi dependensi dan pemanggilnya membuat fungsi inline
+  // (AnnouncementModal begitu), efek ini jalan ulang tiap render --
+  // termasuk tiap ketikan di dalam form -- dan memutar ulang animasi masuk
+  // di tengah pengguna mengetik.
+  useEffect(() => {
     if (!show) return
+    closingRef.current = false
     setClosing(false)
     setVisible(false)
     setProgress(100)
-    requestAnimationFrame(() => setVisible(true))
+    const raf = requestAnimationFrame(() => setVisible(true))
+    return () => cancelAnimationFrame(raf)
+  }, [show])
 
+  useEffect(() => {
+    if (!show) return
     const onKey = (e) => {
-      if (e.key === "Escape" && closeOnEscape) handleClose()
+      if (e.key === "Escape" && closeOnEscape) handleCloseRef.current?.()
     }
     document.addEventListener("keydown", onKey)
     return () => document.removeEventListener("keydown", onKey)
-  }, [show, closeOnEscape, handleClose])
+  }, [show, closeOnEscape])
 
   useEffect(() => {
     if (!show || position === "center" || !autoDismiss) return
@@ -61,11 +90,11 @@ function PopupToast({
       setProgress(remaining)
       if (remaining <= 0) {
         clearInterval(tick)
-        handleClose()
+        handleCloseRef.current?.()
       }
     }, 30)
     return () => clearInterval(tick)
-  }, [show, position, autoDismiss, duration, handleClose])
+  }, [show, position, autoDismiss, duration])
 
   if (!show) return null
 

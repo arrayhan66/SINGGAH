@@ -86,6 +86,42 @@ describe("Profile Email Change Flow", () => {
     expect(dupRes.body.message).toBe("Email sudah digunakan")
   })
 
+  it("should reject registration with an email already pending on another account", async () => {
+    // pendingdup@example.com saat ini adalah pending_email milik rival (test
+    // di atas). register dulu hanya mengecek kolom `email`, sehingga email ini
+    // bisa didaftarkan ulang; ketika rival memverifikasi, promosi pending_email
+    // ke email menabrak unique constraint dan akun lama gagal verifikasi.
+    const res = await request(app).post("/api/auth/register").send({
+      name: "Late User",
+      username: "lateuser",
+      email: "pendingdup@example.com",
+      password: "Password123!",
+      tipe: "umum",
+    })
+
+    expect(res.status).toBe(400)
+    expect(res.body.message).toBe("Email sudah digunakan")
+
+    const created = await User.findOne({
+      where: { email: "pendingdup@example.com" },
+    })
+    expect(created).toBeNull()
+  })
+
+  it("should return 400 (not 500) for an unexpected upload field", async () => {
+    // Multer melempar MulterError untuk field yang tidak dikenali. Tanpa
+    // pemetaan di errorMiddleware, error itu tidak punya statusCode dan
+    // seharusnya jatuh ke 500.
+    const res = await request(app)
+      .put("/api/auth/profile")
+      .set("Authorization", `Bearer ${changeToken}`)
+      .field("name", "Email Change User")
+      .field("username", "emailchangeuser")
+      .attach("unexpected_field", Buffer.from("x"), "x.jpg")
+
+    expect(res.status).toBe(400)
+  })
+
   it("should allow case-only email change without false duplicate error", async () => {
     const res = await request(app)
       .put("/api/auth/profile")

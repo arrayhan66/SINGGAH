@@ -145,7 +145,7 @@ function HeroStats() {
       labelColor: "text-cyan-300 light:text-blue-600",
       plus: "text-cyan-300 light:text-blue-600",
       glow: "bg-cyan-400/10 group-hover:bg-cyan-400/25",
-      desc: "Karya mahasiswa & dosen Elektro Poliban yang ditampilkan di galeri virtual.",
+      desc: "Karya mahasiswa & dosen Elektro Poliban yang ditampilkan di ruang pameran karya.",
       badge: (
         <span className={`${badgeCls} border-emerald-400/30 bg-emerald-400/10 text-emerald-300 ${badgeLight}`}>
           <ShieldCheck className="h-3 w-3" /> TERVERIFIKASI
@@ -160,7 +160,7 @@ function HeroStats() {
       labelColor: "text-cyan-300 light:text-blue-600",
       plus: "text-cyan-300 light:text-blue-600",
       glow: "bg-sky-400/10 group-hover:bg-sky-400/25",
-      desc: "Kategori karya yang dihadirkan dalam galeri virtual SINGGAH.",
+      desc: "Kategori karya yang dihadirkan dalam Halaman Utama SINGGAH.",
       badge: (
         <span className={`${badgeCls} border-emerald-400/30 bg-emerald-400/10 text-emerald-300 ${badgeLight}`}>
           <Tags className="h-3 w-3" /> TERINDEKS
@@ -175,7 +175,7 @@ function HeroStats() {
       labelColor: "text-cyan-300 light:text-blue-600",
       plus: "text-cyan-300 light:text-blue-600",
       glow: "bg-emerald-400/10 group-hover:bg-emerald-400/25",
-      desc: "Pengunjung yang telah singgah menikmati galeri virtual SINGGAH.",
+      desc: "Pengunjung yang telah singgah menikmati gedung virtual SINGGAH.",
       badge: (
         <span className={`${badgeCls} border-emerald-400/30 bg-emerald-400/10 text-emerald-300 ${badgeLight}`}>
           <Radio className="h-3 w-3" /> TERPANTAU

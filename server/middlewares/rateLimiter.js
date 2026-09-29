@@ -200,6 +200,34 @@ exports.verifyCodeLimiter = rateLimit({
   },
 });
 
+// Limiter untuk /reset-password.
+//
+// Endpoint ini membandingkan kode reset dengan plaintext secara langsung
+// (services/authService.js:731+), persis seperti /verify-reset-code. Sebelumnya
+// keduanya tidak punya limiter di sini, padahal /verify-reset-code sudah
+// dilindungi verifyCodeLimiter -- jadi proteksinya hanya ilusi. Kode reset
+// hanya 6 digit (utils/generateCode.js), jadi hanya ada 1 juta kombinasi.
+// Dengan batas 10/15 menit, menebak semua butuh sekitar 17 hari; tanpa batas,
+// penyerang bisa exhausting dalam hitungan jam.
+//
+// Batas dan jendela waktunya sama dengan verifyCodeLimiter secara sengaja:
+// user yang salah ketik kode lalu memakai /reset-password tidak boleh ikut
+// terkunci lebih cepat daripada yang dijanjikan oleh verifyCodeLimiter.
+exports.resetPasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: effectiveMax(10),
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => isRateLimitDisabled,
+  // Store terpisah dari "verify-code" supaya kuota /verify-reset-code tidak
+  // dimakan oleh percobaan di endpoint ini (dan sebaliknya).
+  store: createStore("reset-password"),
+  message: {
+    success: false,
+    message: "Terlalu banyak percobaan reset password. Coba lagi dalam 15 menit.",
+  },
+});
+
 exports.checkEmailLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: effectiveMax(30),

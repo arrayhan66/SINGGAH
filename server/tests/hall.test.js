@@ -1,6 +1,7 @@
 const request = require("supertest")
 const app = require("../server")
 const { User, Category, Project, ProjectMember } = require("../models")
+const { tokenFromCookie } = require("./helpers")
 
 describe("Hall Endpoints", () => {
   let studentToken = ""
@@ -54,7 +55,7 @@ describe("Hall Endpoints", () => {
       email: "studenthall@example.com",
       password: "Password123!",
     })
-    studentToken = studentLogin.body.data.token
+    studentToken = tokenFromCookie(studentLogin)
 
     // Create two projects: published & pending
     const published = await request(app)

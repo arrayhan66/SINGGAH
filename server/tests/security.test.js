@@ -350,8 +350,82 @@ describe("Informasi yang tidak boleh bocor", () => {
 
   test("root path tidak membocorkan isi server", async () => {
     const result = await http("/");
-    const body = result.body || "";
 
+    const body = result.body || "";
     expect(body).not.toMatch(/require\(|module\.exports|process\.env/);
+  });
+});
+
+describe("Rate limit pada endpoint autentikasi", () => {
+  // CELAH: /api/auth/verify-reset-code dibatasi (verifyCodeLimiter, 10/15
+  // menit) tapi /api/auth/reset-password -- yang juga membandingkan kode
+  // reset dengan plaintext -- TIDAK memakai limiter sama sekali
+  // (routes/authRoutes.js:88-93). Kode reset hanya 6 digit (1 juta
+  // kombinasi), jadi tanpa limiter ini bisa ditebak tanpa batas.
+  //
+  // Test ini sengaja tidak mengirim email sungguhan dan tidak mengubah
+  // password siapa pun: ia hanyaProve bahwa header limit-nya ada/tidak.
+
+  const authWriteEndpoints = [
+    { name: "login", path: "/api/auth/login", body: { email: "a@b.c", password: "x" } },
+    { name: "register", path: "/api/auth/register", body: { email: "a@b.c", password: "x" } },
+    { name: "forgot-password", path: "/api/auth/forgot-password", body: { email: "a@b.c" } },
+    { name: "check-email", path: "/api/auth/check-email", body: { email: "a@b.c" } },
+    { name: "verify-email", path: "/api/auth/verify-email", body: { code: "000000" } },
+    { name: "verify-reset-code", path: "/api/auth/verify-reset-code", body: { email: "a@b.c", code: "000000" } },
+    {
+      name: "reset-password",
+      path: "/api/auth/reset-password",
+      body: { email: "a@b.c", code: "000000", newPassword: "XyzTest123!" },
+    },
+  ];
+
+  test.each(authWriteEndpoints)(
+    "$name -> harus punya rate limit",
+    async ({ path, body }) => {
+      const result = await http(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      // express-rate-limit v8 selalu mengirim header ini kalau limiter aktif,
+      // apa pun hasilnya (200, 400, atau 429). Header yang hilang berarti
+      // endpoint ini bisa dipanggil tanpa batas.
+      expect({ path, policy: header(result, "ratelimit-policy") }).not.toEqual({
+        path,
+        policy: null,
+      });
+    },
+  );
+});
+
+describe("Kode reset tidak boleh bisa ditebak tanpa batas", () => {
+  // Hitungan langsung: tanpa limiter, 1 juta kombinasi bisa dicoba tanpa
+  // jeda. Rate limit harus ada DAN ditegakkan, bukan hanya ada di header.
+
+  test("reset-password menolak percobaan berulang setelah batas", async () => {
+    const attempts = [];
+    // Cukup untuk melewati batas terendah yang wajar (5-10).
+    for (let i = 0; i < 12; i += 1) {
+      // eslint-disable-next-line no-await-in-loop
+      const result = await http("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          // Email fiktif: tidak ada kode reset yang cocok, jadi tidak ada
+          // password sungguhan yang bisa berubah. Yang diuji murni limiternya.
+          email: `tidak-ada-${i}@example.invalid`,
+          code: "000000",
+          newPassword: "XyzTest123!",
+        }),
+      });
+
+      attempts.push(result.status);
+
+      if (result.status === 429) break;
+    }
+
+    expect(attempts).toContain(429);
   });
 });

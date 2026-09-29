@@ -6,7 +6,7 @@ import { setHallCategories } from "../three/rooms/museumLayout"
 import { seedCategoryColors } from "../utils/hallHelpers"
 
 export default function useHall() {
-  const [area, setArea] = useState("Hall Utama")
+  const [area, setArea] = useState("Halaman Utama")
   const [selectedProject, setSelectedProject] = useState(null)
   const [sceneReady, setSceneReady] = useState(false)
   const [hallData, setHallData] = useState({ categories: [], projects: [] })

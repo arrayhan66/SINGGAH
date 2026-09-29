@@ -22,6 +22,18 @@ const SUITES = [
     args: ["tests/live.test.js", "tests/production.test.js"],
   },
   {
+    name: "docs",
+    title: "Dokumentasi API (/api/docs) dan drift spec",
+    logins: 0,
+    args: ["tests/hostedDocs.test.js"],
+  },
+  {
+    name: "endpoints",
+    title: "Endpoint read-only yang belum pernah diuji di hosting",
+    logins: 0,
+    args: ["tests/hostedEndpoints.test.js"],
+  },
+  {
     name: "auth",
     title: "Alur auth (butuh akun)",
     logins: 1,

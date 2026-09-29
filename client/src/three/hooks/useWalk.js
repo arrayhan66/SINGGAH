@@ -130,5 +130,13 @@ export function clearHallReturn() {
   }
 }
 
+// Dipakai saat pengunjung menekan "Mulai Eksplorasi" di Beranda: kembalikan
+// pemain ke titik spawn hall (tepat di depan hologram) dan buang jejak posisi
+// sesi sebelumnya, sehingga masuk hall lagi selalu terasa seperti mulai baru.
+export function resetToHallSpawn() {
+  clearHallReturn()
+  useWalkStore.getState().reset(MUSEUM.spawn.position, MUSEUM.spawn.yaw)
+}
+
 export const EYE = EYE_HEIGHT
 

@@ -1,6 +1,7 @@
 const request = require("supertest")
 const app = require("../server")
 const { User, Notification } = require("../models")
+const { tokenFromCookie } = require("./helpers")
 
 describe("User Management Endpoints", () => {
   let adminToken = ""
@@ -28,7 +29,7 @@ describe("User Management Endpoints", () => {
       email: "adminusermgmt@example.com",
       password: "Password123!",
     })
-    adminToken = adminLogin.body.data.token
+    adminToken = tokenFromCookie(adminLogin)
 
     // Register & login Regular User (pending mahasiswa)
     await request(app)
@@ -51,7 +52,7 @@ describe("User Management Endpoints", () => {
       email: "usermgmt@example.com",
       password: "Password123!",
     })
-    userToken = userLogin.body.data.token
+    userToken = tokenFromCookie(userLogin)
 
     // Register a pending mahasiswa to be rejected
     await request(app)

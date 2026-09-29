@@ -1,6 +1,7 @@
 const request = require("supertest")
 const app = require("../server")
 const { User, Category, Project, News } = require("../models")
+const { tokenFromCookie } = require("./helpers")
 
 describe("Dashboard & Public Stats Endpoints", () => {
   let adminToken = ""
@@ -28,7 +29,7 @@ describe("Dashboard & Public Stats Endpoints", () => {
       email: "admindashboard@example.com",
       password: "Password123!",
     })
-    adminToken = adminLogin.body.data.token
+    adminToken = tokenFromCookie(adminLogin)
 
     // Register & login Regular User
     await request(app).post("/api/auth/register").send({
@@ -48,7 +49,7 @@ describe("Dashboard & Public Stats Endpoints", () => {
       email: "userdashboard@example.com",
       password: "Password123!",
     })
-    userToken = userLogin.body.data.token
+    userToken = tokenFromCookie(userLogin)
 
     // Seed data for meaningful stats
     const category = await Category.create({

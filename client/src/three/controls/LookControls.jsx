@@ -187,7 +187,7 @@ function LookControls({ bounds, onSelectProject }) {
     const room = findRoom(point.x, point.z)
     const message =
       room?.id === "hall"
-        ? "MEMPERSIAPKAN VIRTUAL HALL"
+        ? "MEMPERSIAPKAN GEDUNG VIRTUAL"
         : `MEMASUKI ${room.label.split(" — ")[0]}`
     useTransitionStore.getState().start(message)
     point.y = rh.height

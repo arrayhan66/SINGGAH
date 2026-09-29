@@ -24,6 +24,7 @@ process.env.CACHE_IN_TEST = "true"
 const request = require("supertest")
 const app = require("../server")
 const { User, Category, Project } = require("../models")
+const { tokenFromCookie } = require("./helpers")
 const cache = require("../utils/cache")
 
 // Guard: kalau cache diam-diam mati lagi, test ini lulus palsu. Pastikan
@@ -86,7 +87,7 @@ describe("Invalidasi cache saat data berubah di tengah query", () => {
       email: "admincache@example.com",
       password: "Password123!",
     })
-    adminToken = adminLogin.body.data.token
+    adminToken = tokenFromCookie(adminLogin)
 
     const studentRegister = await request(app).post("/api/auth/register").send({
       name: "Student Cache",
@@ -108,7 +109,7 @@ describe("Invalidasi cache saat data berubah di tengah query", () => {
       email: "studentcache@example.com",
       password: "Password123!",
     })
-    studentToken = studentLogin.body.data.token
+    studentToken = tokenFromCookie(studentLogin)
 
     // Dibuat lewat API supaya thumbnail & kolom wajib terisi, lalu dipublish
     // karena endpoint unggulan/slideshow hanya menerima karya berstatus

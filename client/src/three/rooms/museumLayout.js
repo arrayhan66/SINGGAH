@@ -155,7 +155,7 @@ export const rooms = [
     z: [-HALL_HALF_Z, HALL_HALF_Z],
     zFloor: [-HALL_HALF_Z, HALL_HALF_Z],
     floor: "marble",
-    label: "Hall Utama",
+    label: "Halaman Utama",
   },
 ]
 
@@ -537,7 +537,7 @@ function buildRooms() {
     z: [-HALL_HALF_Z, HALL_HALF_Z],
     zFloor: [-HALL_HALF_Z, HALL_HALF_Z],
     floor: "marble",
-    label: "Hall Utama",
+    label: "Halaman Utama",
   })
 
   for (let i = 0; i < N; i++) {

@@ -64,16 +64,24 @@ exports.register = asyncHandler(async (req, res) => {
   }
 })
 
+// Token JWT HANYA boleh keluar lewat cookie HttpOnly (setAuthCookie di atas).
+// Kalau ikut masuk body JSON, satu baris `localStorage.token = data.token` di
+// mana pun akan membatalkan seluruh proteksi XSS yang jadi alasan cookie ini
+// ada -- dan tokennya berlaku 6 jam (utils/authCookie.js:2). Frontend juga
+// tidak pernah membacanya: LoginForm.jsx:63 dan VerifyCodeForm.jsx:236 cuma
+// ambil `user`.
+const userOnly = (result) => ({ user: result.user })
+
 exports.login = asyncHandler(async (req, res) => {
   const result = await authService.login(req.body)
   setAuthCookie(res, result.token)
-  success(res, result, "Login berhasil")
+  success(res, userOnly(result), "Login berhasil")
 })
 
 exports.googleLogin = asyncHandler(async (req, res) => {
   const result = await authService.googleLogin(req.body)
   setAuthCookie(res, result.token)
-  success(res, result, "Login Google berhasil")
+  success(res, userOnly(result), "Login Google berhasil")
 })
 
 exports.logout = asyncHandler(async (req, res) => {

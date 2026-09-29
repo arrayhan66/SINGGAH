@@ -10,7 +10,7 @@ const GOLD = "#c9a35e"
 const MARBLE = "#eef3f9"
 const MARBLE_DARK = "#dfe9f4"
 
-function Centerpiece({ title = "HALL UTAMA" }) {
+function Centerpiece({ title = "HALAMAN UTAMA" }) {
   const orb = useRef()
   const ringA = useRef()
   const ringB = useRef()

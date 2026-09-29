@@ -14,6 +14,13 @@ function Hero() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
+  // Flag freshHall dipakai scene hall untuk mengembalikan pemain ke titik awal
+  // (hologram). Sengaja lewat state navigasi, bukan pustaka three, supaya
+  // bundle Beranda tetap ringan.
+  const handleStartExploration = () => {
+    navigate("/hall", { state: { freshHall: true } });
+  };
+
   return (
     <section
       id="hero"
@@ -60,7 +67,7 @@ function Hero() {
 
           <div className="hidden lg:block mt-14 w-full">
             <button
-              onClick={() => navigate("/hall")}
+              onClick={handleStartExploration}
               className="group relative w-full cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-12 py-6 2xl:px-14 2xl:py-7 font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/50"
             >
               <span className="relative flex items-center justify-between gap-4">
@@ -84,7 +91,7 @@ function Hero() {
         <div className="mt-8 flex w-full flex-col items-center gap-8 lg:hidden">
             <div className="w-full">
             <button
-              onClick={() => navigate("/hall")}
+              onClick={handleStartExploration}
               className="group relative w-full cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-6 py-4 font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/50"
             >
               <span className="relative flex items-center justify-between gap-4">

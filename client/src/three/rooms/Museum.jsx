@@ -265,7 +265,7 @@ function Museum({ hallData }) {
           )
         })}
 
-        <Centerpiece title="HALL UTAMA" />
+        <Centerpiece title="HALAMAN UTAMA" />
         {tier === "tinggi" && (
           <spotLight
             position={[0, HALL_H - 0.25, 0]}

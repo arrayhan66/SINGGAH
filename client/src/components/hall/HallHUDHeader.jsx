@@ -15,7 +15,7 @@ export default function HallHUDHeader({ area }) {
           </div>
           <div>
             <h1 className="text-sm font-bold leading-tight text-sky-300">
-              SINGGAH Virtual Hall 3D
+              GEDUNG VIRTUAL
             </h1>
             <p className="flex items-center space-x-1 text-[10px] leading-tight text-night-muted">
               <MapPin className="w-3 h-3 text-sky-400" />

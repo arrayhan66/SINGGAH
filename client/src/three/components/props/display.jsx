@@ -212,7 +212,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
               raycast={() => null}
               font="/fonts/Poppins-Medium.ttf"
             >
-              Virtual Exhibition
+              Gedung Virtual
             </Text>
 
             <mesh position={[0, 0.42, 0.01]}>
@@ -239,8 +239,8 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
             </mesh>
 
             {[
-              "Selamat datang di SINGGAH",
-              "Virtual Exhibition",
+              "Selamat datang di",
+              "Gedung Virtual SINGGAH",
               "karya Dosen & Mahasiswa.",
               "Masuki portal putih untuk",
               "menjelajahi setiap kategori.",

@@ -1,6 +1,7 @@
 const request = require("supertest")
 const app = require("../server")
 const { User, VerificationCode, PasswordReset } = require("../models")
+const { tokenFromCookie } = require("./helpers")
 
 describe("Auth Flow: Verify Email & Reset Password", () => {
   const userData = {
@@ -104,7 +105,9 @@ describe("Auth Flow: Verify Email & Reset Password", () => {
       .send({ email: userData.email, password: "NewPassword123!" })
 
     expect(res.status).toBe(200)
-    expect(res.body.data).toHaveProperty("token")
+    // Token JWT hanya keluar lewat cookie HttpOnly, tidak pernah di body JSON.
+    expect(res.body.data).not.toHaveProperty("token")
+    expect(tokenFromCookie(res)).toBeTruthy()
   })
 
   it("should reject login with the old password", async () => {

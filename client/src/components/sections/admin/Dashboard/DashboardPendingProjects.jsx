@@ -31,8 +31,26 @@ function DashboardPendingProjects() {
     }
   }, [])
 
+  const PENDING_URL = "/admin/karya?status=pending"
+
+  // Panel inteiro bisa diklik; tombol di dalamnya (Lihat Semua / Review)
+  // tetap menangani kliknya sendiri lewat stopPropagation.
+  const handlePanelClick = () => navigate(PENDING_URL)
+  const handlePanelKeyDown = (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return
+    e.preventDefault()
+    handlePanelClick()
+  }
+
   return (
-    <div className="dashboard-pending-card dashboard-panel group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl transition-all duration-300 md:p-6">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={handlePanelClick}
+      onKeyDown={handlePanelKeyDown}
+      aria-label="Buka daftar karya yang menunggu review"
+      className="dashboard-pending-card dashboard-panel group relative cursor-pointer overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-white/[0.07] md:p-6"
+    >
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/15">
@@ -44,7 +62,10 @@ function DashboardPendingProjects() {
         </div>
 
         <button
-          onClick={() => navigate("/admin/karya?status=pending")}
+          onClick={(e) => {
+            e.stopPropagation()
+            navigate(PENDING_URL)
+          }}
           className="group ml-auto hidden cursor-pointer min-[600px]:flex items-center gap-1 text-[9px] font-medium text-cyan-400 transition-all duration-200 hover:text-cyan-300 min-[500px]:text-xs"
         >
           Lihat Semua
@@ -81,7 +102,20 @@ function DashboardPendingProjects() {
           {pendingProjects.map((project) => (
             <div
               key={project.id}
-              className="dashboard-pending-item group flex flex-col gap-3 rounded-[14px] border border-white/10 bg-white/[0.04] p-3 transition-all duration-250 hover:-translate-y-[2px] hover:bg-white/[0.08] hover:border-white/20 hover:shadow-lg sm:flex-row sm:items-center"
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                e.stopPropagation()
+                navigate(`/admin/karya/detail/${project.slug || project.id}`)
+              }}
+              onKeyDown={(e) => {
+                if (e.key !== "Enter" && e.key !== " ") return
+                e.preventDefault()
+                e.stopPropagation()
+                navigate(`/admin/karya/detail/${project.slug || project.id}`)
+              }}
+              aria-label={`Lihat detail ${project.title}`}
+              className="dashboard-pending-item group flex cursor-pointer flex-col gap-3 rounded-[14px] border border-white/10 bg-white/[0.04] p-3 text-left transition-all duration-250 hover:-translate-y-[2px] hover:bg-white/[0.08] hover:border-white/20 hover:shadow-lg sm:flex-row sm:items-center"
               style={{ minHeight: 90 }}
             >
               <SmartImage
@@ -102,7 +136,10 @@ function DashboardPendingProjects() {
                   Pending
                 </span>
                 <button
-                  onClick={() => navigate(`/admin/karya/edit/${project.slug || project.id}`, { state: { from: "/admin" } })}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    navigate(`/admin/karya/edit/${project.slug || project.id}`, { state: { from: "/admin" } })
+                  }}
                   className="dashboard-review-btn group/rev flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-95"
                 >
                   <Eye size={13} strokeWidth={2.5} className="transition-transform duration-300 group-hover/rev:-translate-x-0.5 group-hover/rev:scale-110" />

@@ -1,6 +1,7 @@
 const request = require("supertest")
 const app = require("../server")
 const { User, Category, Project, ProjectMember, ProjectTechnology } = require("../models")
+const { tokenFromCookie } = require("./helpers")
 
 describe("Project Endpoints", () => {
   let adminToken = ""
@@ -38,7 +39,7 @@ describe("Project Endpoints", () => {
       email: "adminproj@example.com",
       password: "Password123!",
     })
-    adminToken = adminLogin.body.data.token
+    adminToken = tokenFromCookie(adminLogin)
 
     // Register & login Student
     await request(app).post("/api/auth/register").send({
@@ -58,7 +59,7 @@ describe("Project Endpoints", () => {
       email: "studentproj@example.com",
       password: "Password123!",
     })
-    studentToken = studentLogin.body.data.token
+    studentToken = tokenFromCookie(studentLogin)
 
     // Register & login Dosen
     await request(app).post("/api/auth/register").send({
@@ -78,7 +79,7 @@ describe("Project Endpoints", () => {
       email: "dosenproj@example.com",
       password: "Password123!",
     })
-    dosenToken = dosenLogin.body.data.token
+    dosenToken = tokenFromCookie(dosenLogin)
   })
 
   it("should allow student to create a project (status pending)", async () => {

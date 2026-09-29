@@ -1,6 +1,7 @@
 const request = require("supertest")
 const app = require("../server")
 const { User, Setting } = require("../models")
+const { tokenFromCookie } = require("./helpers")
 
 describe("Settings Endpoints", () => {
   let adminToken = ""
@@ -26,7 +27,7 @@ describe("Settings Endpoints", () => {
       email: "adminsettings@example.com",
       password: "Password123!",
     })
-    adminToken = adminLogin.body.data.token
+    adminToken = tokenFromCookie(adminLogin)
 
     // Register & login Regular User
     await request(app).post("/api/auth/register").send({
@@ -46,7 +47,7 @@ describe("Settings Endpoints", () => {
       email: "usersettings@example.com",
       password: "Password123!",
     })
-    userToken = userLogin.body.data.token
+    userToken = tokenFromCookie(userLogin)
   })
 
   it("should get settings publicly", async () => {

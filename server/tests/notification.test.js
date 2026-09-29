@@ -1,6 +1,7 @@
 const request = require("supertest")
 const app = require("../server")
 const { User, Notification, Category } = require("../models")
+const { tokenFromCookie } = require("./helpers")
 const projectService = require("../services/projectService")
 
 describe("Notification Endpoints", () => {
@@ -33,7 +34,7 @@ describe("Notification Endpoints", () => {
       email: "notifuser@example.com",
       password: "Password123!",
     })
-    userToken = userLogin.body.data.token
+    userToken = tokenFromCookie(userLogin)
 
     await request(app).post("/api/auth/register").send({
       name: "Other User",
@@ -53,7 +54,7 @@ describe("Notification Endpoints", () => {
       email: "notifother@example.com",
       password: "Password123!",
     })
-    otherUserToken = otherLogin.body.data.token
+    otherUserToken = tokenFromCookie(otherLogin)
 
     await request(app).post("/api/auth/register").send({
       name: "Admin User",
@@ -71,7 +72,7 @@ describe("Notification Endpoints", () => {
       email: "notifadmin@example.com",
       password: "Password123!",
     })
-    adminToken = adminLogin.body.data.token
+    adminToken = tokenFromCookie(adminLogin)
 
     const notification = await Notification.create({
       user_id: userId,

@@ -2,7 +2,7 @@ const request = require("supertest")
 const bcrypt = require("bcryptjs")
 const app = require("../server")
 const { User } = require("../models")
-const { PASSWORD, createUser, tokenFor, createCategory, createProject } = require("./helpers")
+const { PASSWORD, createUser, tokenFor, tokenFromCookie, createCategory, createProject } = require("./helpers")
 const { COOKIE_NAME } = require("../utils/authCookie")
 
 const NEW_PASSWORD = "Password456!"
@@ -159,7 +159,7 @@ describe("Auth: logout, profile-stats, change-password, hapus akun", () => {
         .send({ email: "orangasing@example.com", password: NEW_PASSWORD })
 
       expect(login.status).toBe(200)
-      expect(login.body.data.token).toBeTruthy()
+      expect(tokenFromCookie(login)).toBeTruthy()
     })
   })
 

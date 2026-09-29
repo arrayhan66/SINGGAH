@@ -37,8 +37,26 @@ function DashboardLatestNews() {
     }
   }, [])
 
+  const NEWS_URL = "/admin/berita"
+
+  // Panel seluruhnya bisa diklik; tombol "Lihat Semua" di dalamnya memakai
+  // stopPropagation supaya tidak memicu navigasi dua kali.
+  const handlePanelClick = () => navigate(NEWS_URL)
+  const handlePanelKeyDown = (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return
+    e.preventDefault()
+    handlePanelClick()
+  }
+
   return (
-    <div className="dashboard-news-card dashboard-panel group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl transition-all duration-300 md:p-6">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={handlePanelClick}
+      onKeyDown={handlePanelKeyDown}
+      aria-label="Buka daftar berita"
+      className="dashboard-news-card dashboard-panel group relative cursor-pointer overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-white/[0.07] md:p-6"
+    >
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/15">
@@ -50,7 +68,10 @@ function DashboardLatestNews() {
         </div>
 
         <button
-          onClick={() => navigate("/admin/berita")}
+          onClick={(e) => {
+            e.stopPropagation()
+            navigate(NEWS_URL)
+          }}
           className="group ml-auto hidden cursor-pointer min-[600px]:flex items-center gap-1 text-[9px] font-medium text-cyan-400 transition-all duration-200 hover:text-cyan-300 min-[500px]:text-xs"
         >
           Lihat Semua
@@ -86,7 +107,20 @@ function DashboardLatestNews() {
           {latestNews.map((news) => (
             <div
               key={news.id}
-              className="dashboard-news-item group flex flex-col gap-3 rounded-[14px] border border-white/10 bg-white/[0.04] p-3 transition-all duration-250 hover:-translate-y-[2px] hover:bg-white/[0.08] hover:border-white/20 hover:shadow-lg sm:flex-row sm:items-center"
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                e.stopPropagation()
+                navigate(`/admin/berita/preview/${news.slug}`)
+              }}
+              onKeyDown={(e) => {
+                if (e.key !== "Enter" && e.key !== " ") return
+                e.preventDefault()
+                e.stopPropagation()
+                navigate(`/admin/berita/preview/${news.slug}`)
+              }}
+              aria-label={`Lihat detail ${news.title}`}
+              className="dashboard-news-item group flex cursor-pointer flex-col gap-3 rounded-[14px] border border-white/10 bg-white/[0.04] p-3 text-left transition-all duration-250 hover:-translate-y-[2px] hover:bg-white/[0.08] hover:border-white/20 hover:shadow-lg sm:flex-row sm:items-center"
               style={{ minHeight: 90 }}
             >
               <SmartImage

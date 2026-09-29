@@ -37,6 +37,10 @@
   border-color: rgba(34, 211, 238, 0.35);
   box-shadow: 0 18px 36px -18px rgba(0, 0, 0, 0.55);
 }
+.admin-page .dashboard-panel:active {
+  transform: translateY(0.125rem);
+  transition-duration: 0.1s;
+}
 
 /* ---- Light mode: stat card putih + slab biru ---- */
 html.light .admin-page .dashboard-stat-card {
@@ -83,6 +87,32 @@ html.light .admin-page .dashboard-panel:hover {
 }
 html.light .admin-page .dashboard-panel:active {
   background-color: #dbeafe !important;
+  transform: translateY(0.125rem) !important;
+  transition-duration: 0.1s;
+}
+
+/* Fokus keyboard untuk stat card + panel yang sekarang bisa diklik */
+.admin-page .dashboard-stat-card:focus-visible,
+.admin-page .dashboard-panel:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 3px;
+}
+html.light .admin-page .dashboard-stat-card:focus-visible,
+html.light .admin-page .dashboard-panel:focus-visible {
+  outline-color: #2563eb;
+}
+
+/* Baris project/berita yang sekarang diklik ke halaman detail */
+.admin-page .dashboard-pending-item:focus-visible,
+.admin-page .dashboard-approved-item:focus-visible,
+.admin-page .dashboard-news-item:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 3px;
+}
+html.light .admin-page .dashboard-pending-item:focus-visible,
+html.light .admin-page .dashboard-approved-item:focus-visible,
+html.light .admin-page .dashboard-news-item:focus-visible {
+  outline-color: #2563eb;
 }
 
 /* ---- Teks & isi di dalam panel bawah (light mode) ----

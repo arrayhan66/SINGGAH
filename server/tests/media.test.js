@@ -13,6 +13,7 @@ jest.mock("../config/cloudinary", () => ({
 const request = require("supertest")
 const app = require("../server")
 const { User, MediaUsage } = require("../models")
+const { tokenFromCookie } = require("./helpers")
 const cloudinary = require("../config/cloudinary")
 
 describe("Media Endpoints", () => {
@@ -37,7 +38,7 @@ describe("Media Endpoints", () => {
       email: "mediaadmin@example.com",
       password: "Password123!",
     })
-    adminToken = adminLogin.body.data.token
+    adminToken = tokenFromCookie(adminLogin)
 
     await request(app).post("/api/auth/register").send({
       name: "Media User",
@@ -56,7 +57,7 @@ describe("Media Endpoints", () => {
       email: "mediauser@example.com",
       password: "Password123!",
     })
-    userToken = userLogin.body.data.token
+    userToken = tokenFromCookie(userLogin)
   })
 
   beforeEach(() => {

@@ -21,38 +21,27 @@
  * Jalankan: npm run test:idor
  */
 
-const fs = require("fs");
-const path = require("path");
 
 const API_URL = (
   process.env.API_URL || "https://singgah-production.up.railway.app"
 ).replace(/\/+$/, "");
+// Pembacaan kredensial dipusatkan di tests/credentials.js. Jangan pakai
+// dotenv di sini: password test mengandung "#" yang akan terpotong.
+const {
+  ACCOUNTS,
+  hasCredentials,
+  explainLoginFailure: explainLoginFailureBase,
+} = require("./credentials");
 
-const CREDENTIALS_FILE = path.join(__dirname, "..", ".env.security");
+const A_EMAIL = ACCOUNTS.user.email;
+const A_PASSWORD = ACCOUNTS.user.password;
+const B_EMAIL = ACCOUNTS.other.email;
+const B_PASSWORD = ACCOUNTS.other.password;
+const ADMIN_EMAIL = ACCOUNTS.admin.email;
+const ADMIN_PASSWORD = ACCOUNTS.admin.password;
 
-function readCredentials() {
-  if (!fs.existsSync(CREDENTIALS_FILE)) return {};
-  const values = {};
-  for (const line of fs.readFileSync(CREDENTIALS_FILE, "utf8").split("\n")) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) continue;
-    const eq = trimmed.indexOf("=");
-    if (eq === -1) continue;
-    values[trimmed.slice(0, eq).trim()] = trimmed.slice(eq + 1).trim();
-  }
-  return values;
-}
-
-const creds = readCredentials();
-const A_EMAIL = creds.TEST_USER_EMAIL;
-const A_PASSWORD = creds.TEST_USER_PASSWORD;
-const B_EMAIL = creds.TEST_OTHER_EMAIL;
-const B_PASSWORD = creds.TEST_OTHER_PASSWORD;
-const ADMIN_EMAIL = creds.TEST_ADMIN_EMAIL;
-const ADMIN_PASSWORD = creds.TEST_ADMIN_PASSWORD;
-
-const hasA = Boolean(A_EMAIL && A_PASSWORD);
-const hasB = Boolean(B_EMAIL && B_PASSWORD);
+const hasA = hasCredentials("user");
+const hasB = hasCredentials("other");
 
 // Dua akun berbeda WAJIB. Dengan satu akun, test ini hanya membuktikan
 // "user tidak bisa akses ID sendiri", yang memang tidak menarik.
@@ -95,13 +84,7 @@ const cookieHeader = (cookies) =>
 async function loginOrThrow(email, password, role) {
   const { status, cookies } = await login(email, password);
   if (status !== 200) {
-    const hint =
-      status === 429
-        ? "kena rate limit (10/15 menit per IP). Tunggu, atau jalankan file ini tanpa test:security di waktu berdekatan."
-        : status === 403
-          ? "akun belum terverifikasi email."
-          : "email atau password salah.";
-    throw new Error(`Login ${role} gagal (${status}): ${hint}`);
+    throw new Error(explainLoginFailureBase(role, status, null));
   }
   return cookieHeader(cookies);
 }

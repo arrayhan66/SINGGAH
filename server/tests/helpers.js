@@ -24,6 +24,25 @@ async function createUser(overrides = {}) {
 
 const tokenFor = (user) => generateToken(user)
 
+// Token JWT HANYA boleh keluar lewat cookie HttpOnly. Kalau ikut masuk body
+// JSON, satu baris `localStorage.token = data.token` di mana pun akan
+// membatalkan seluruh proteksi XSS yang jadi alasan cookie ini ada -- dan
+// tokennya berlaku 6 jam (utils/authCookie.js:2). Frontend juga tidak pernah
+// membacanya: LoginForm.jsx:63 dan VerifyCodeForm.jsx:236 cuma ambil `user`.
+function tokenFromCookie(res) {
+  const cookies = res?.headers?.["set-cookie"] || []
+  const authCookie = cookies.find((c) => c.startsWith("singgah_token="))
+  if (!authCookie) {
+    throw new Error(
+      "Login tidak mengembalikan cookie singgah_token. " +
+        "Kalau test ini gagal setelah authController dihentikan mengirim token " +
+        "di body, itu 뜻nya session lewat cookie benar-benar rusak, bukan cuma " +
+        "test yang perlu diperbarui."
+    )
+  }
+  return decodeURIComponent(authCookie.split(";")[0].split("=").slice(1).join("="))
+}
+
 async function createCategory(overrides = {}) {
   return await Category.create({
     name: overrides.name || "Kategori Test",
@@ -54,6 +73,7 @@ module.exports = {
   PASSWORD,
   createUser,
   tokenFor,
+  tokenFromCookie,
   createCategory,
   createProject,
 }

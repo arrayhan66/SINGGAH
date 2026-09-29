@@ -1,12 +1,12 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useFrame } from "@react-three/fiber"
-import { useNavigate, useParams } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 import GalleryLights from "../components/GalleryLights"
 import Museum from "../rooms/Museum"
 import LookControls from "../controls/LookControls"
 import WalkTargetMarker from "../components/WalkTargetMarker"
 import FloorHoverMarker from "../components/FloorHoverMarker"
-import { useWalkStore, loadHallReturn, clearHallReturn } from "../hooks/useWalk"
+import { useWalkStore, loadHallReturn, clearHallReturn, resetToHallSpawn } from "../hooks/useWalk"
 import { useHallMusicStore } from "../hooks/useHallMusic"
 import { MUSEUM, findRoom, rooms } from "../rooms/museumLayout"
 
@@ -41,6 +41,17 @@ function AreaLabel({ onArea }) {
 
 function VirtualExhibition({ onArea, onSelectProject, onReady, hallData }) {
   const { categorySlug } = useParams()
+  const location = useLocation()
+
+  // "Mulai Eksplorasi" di Beranda menandai masuk hall sebagai sesi baru.
+  // Flag-nya dibaca saat render (bukan di dalam effect) karena AreaLabel
+  // menimpa URL dengan navigate(..., { replace: true }) di frame pertama,
+  // yang ikut menghapus location.state.
+  const [freshHall] = useState(() => location.state?.freshHall === true)
+  // Sekali saja: hallData di-refetch beberapa saat setelah masuk, dan efek
+  // di bawah ikut jalan lagi saat itu — pengunjung tak boleh ditarik balik
+  // ke spawn setelah sudah mulai berjalan.
+  const freshHallRef = useRef(freshHall)
 
   // The music box beside the TV must already be glowing and playing the moment
   // the visitor is in the hall. Held to a mount-level effect so a room change
@@ -53,6 +64,14 @@ function VirtualExhibition({ onArea, onSelectProject, onReady, hallData }) {
   }, [])
 
   useEffect(() => {
+    // Mulai eksplorasi dari Beranda: selalu buka di titik awal di depan
+    // hologram, bukan melanjutkan posisi terakhir dari kunjungan sebelumnya.
+    if (freshHallRef.current) {
+      freshHallRef.current = false
+      resetToHallSpawn()
+      return
+    }
+
     // Returning from a project detail page: drop the player back exactly where
     // they were (same room, same spot) instead of the default spawn.
     const snap = loadHallReturn()

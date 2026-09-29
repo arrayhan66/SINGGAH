@@ -15,6 +15,10 @@
  *   TEST_ADMIN_EMAIL=...
  *   TEST_ADMIN_PASSWORD=...
  *
+ * Password boleh mengandung karakter "#" atau spasi -- file ini membacanya
+ * apa adanya lewat tests/credentials.js, bukan lewat dotenv yang akan
+ * memotong bagian setelah "#".
+ *
  *   npm run test:auth
  *
  * Jangan pernah meng-commit file itu, dan jangan pernah menempelkan isinya
@@ -26,9 +30,6 @@
  * yang memang dibuat untuk keperluan ini.
  */
 
-const fs = require("fs");
-const path = require("path");
-
 const API_URL = (
   process.env.API_URL || "https://singgah-production.up.railway.app"
 ).replace(/\/+$/, "");
@@ -36,30 +37,21 @@ const API_URL = (
 // Kredensial dibaca dari file, bukan dari process.env, supaya tidak ikut
 // terbawa ke mana pun saat test dijalankan lewat CI. Kalau file tidak ada,
 // suite ini di-skip sepenuhnya.
-const CREDENTIALS_FILE = path.join(__dirname, "..", ".env.security");
+// Pembacaan kredensial dipusatkan di tests/credentials.js. Jangan pakai
+// dotenv di sini: password test mengandung "#" yang akan terpotong.
+const {
+  ACCOUNTS,
+  hasCredentials,
+  explainLoginFailure: explainLoginFailureBase,
+} = require("./credentials");
 
-function readCredentials() {
-  if (!fs.existsSync(CREDENTIALS_FILE)) return {};
+const USER_EMAIL = ACCOUNTS.user.email;
+const USER_PASSWORD = ACCOUNTS.user.password;
+const ADMIN_EMAIL = ACCOUNTS.admin.email;
+const ADMIN_PASSWORD = ACCOUNTS.admin.password;
 
-  const values = {};
-  for (const line of fs.readFileSync(CREDENTIALS_FILE, "utf8").split("\n")) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) continue;
-    const eq = trimmed.indexOf("=");
-    if (eq === -1) continue;
-    values[trimmed.slice(0, eq).trim()] = trimmed.slice(eq + 1).trim();
-  }
-  return values;
-}
-
-const creds = readCredentials();
-const USER_EMAIL = creds.TEST_USER_EMAIL;
-const USER_PASSWORD = creds.TEST_USER_PASSWORD;
-const ADMIN_EMAIL = creds.TEST_ADMIN_EMAIL;
-const ADMIN_PASSWORD = creds.TEST_ADMIN_PASSWORD;
-
-const hasUser = Boolean(USER_EMAIL && USER_PASSWORD);
-const hasAdmin = Boolean(ADMIN_EMAIL && ADMIN_PASSWORD);
+const hasUser = hasCredentials("user");
+const hasAdmin = hasCredentials("admin");
 
 const describeUser = hasUser ? describe : describe.skip;
 const describeAdmin = hasAdmin ? describe : describe.skip;
@@ -92,26 +84,26 @@ async function login(email, password) {
     });
 
     const setCookies = response.headers.getSetCookie?.() || [];
-    return { status: response.status, response, cookies: setCookies };
+    let body = null;
+    try {
+      body = await response.clone().json();
+    } catch {
+      body = null;
+    }
+
+    return { status: response.status, response, cookies: setCookies, body };
   })();
 
   sessionCache.set(cacheKey, promise);
   return promise;
 }
 
-function explainLoginFailure(status, role) {
-  if (status === 429) {
-    return (
-      `Login ${role} kena rate limit (429). Batasnya 10 percobaan/15 menit per IP ` +
-      `dan kunci ini dipakai bersama test lain dari IP yang sama. Tunggu 15 menit, ` +
-      `atau jalankan file ini sendirian tanpa test:security di waktu berdekatan.`
-    );
-  }
-  return (
-    `Login ${role} gagal (status ${status}). Cek kredensial di ` +
-    `${CREDENTIALS_FILE}, dan pastikan akunnya sudah terverifikasi email ` +
-    `(akun unverified dibalas 403 oleh middlewares/authMiddleware.js:93).`
-  );
+// Label di file ini ("user biasa") dibedakan dari nama peran di
+// tests/credentials.js ("user") supaya pesan errornya tetap enak dibaca.
+const ROLE_LABEL = { user: "user biasa", admin: "admin" };
+
+function explainLoginFailure(status, role, body) {
+  return explainLoginFailureBase(ROLE_LABEL[role] || role, status, body);
 }
 
 const cookieHeader = (setCookies) =>
@@ -121,9 +113,9 @@ describeUser("Profil user yang sudah login", () => {
   let sessionCookies = "";
 
   beforeAll(async () => {
-    const { status, cookies } = await login(USER_EMAIL, USER_PASSWORD);
+    const { status, cookies, body } = await login(USER_EMAIL, USER_PASSWORD);
     if (status !== 200) {
-      throw new Error(explainLoginFailure(status, "user biasa"));
+      throw new Error(explainLoginFailure(status, "user", body));
     }
     sessionCookies = cookieHeader(cookies);
   });
@@ -252,9 +244,9 @@ describeUser("Profil user yang sudah login", () => {
 describeUser("Ganti password", () => {
   test("ganti password harus menolak payload kosong", async () => {
     // Pakai session cache, bukan login baru.
-    const { status, cookies } = await login(USER_EMAIL, USER_PASSWORD);
+    const { status, cookies, body } = await login(USER_EMAIL, USER_PASSWORD);
     if (status !== 200) {
-      throw new Error(explainLoginFailure(status, "user biasa"));
+      throw new Error(explainLoginFailure(status, "user", body));
     }
 
     const response = await fetch(`${API_URL}/api/auth/change-password`, {
@@ -272,9 +264,9 @@ describeUser("Ganti password", () => {
 
 describeUser("Upload file", () => {
   test("upload tanpa file harus ditolak, bukan crash", async () => {
-    const { status, cookies } = await login(USER_EMAIL, USER_PASSWORD);
+    const { status, cookies, body } = await login(USER_EMAIL, USER_PASSWORD);
     if (status !== 200) {
-      throw new Error(explainLoginFailure(status, "user biasa"));
+      throw new Error(explainLoginFailure(status, "user", body));
     }
 
     const response = await fetch(`${API_URL}/api/media`, {
@@ -297,9 +289,9 @@ describeAdmin("Endpoint admin", () => {
   let adminCookies = "";
 
   beforeAll(async () => {
-    const { status, cookies } = await login(ADMIN_EMAIL, ADMIN_PASSWORD);
+    const { status, cookies, body } = await login(ADMIN_EMAIL, ADMIN_PASSWORD);
     if (status !== 200) {
-      throw new Error(explainLoginFailure(status, "admin"));
+      throw new Error(explainLoginFailure(status, "admin", body));
     }
     adminCookies = cookieHeader(cookies);
   });

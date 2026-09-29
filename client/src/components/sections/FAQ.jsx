@@ -25,7 +25,7 @@ const faq = [
   {
     question: "Bagaimana cara mengikuti pameran ini?",
     answer:
-      "Gampang! Cukup daftar dan unggah karya kamu lewat halaman registrasi. Tim kami akan meninjau karyamu sebentar, lalu karya langsung tayang di Virtual Hall dan siap dilihat pengunjung dari mana saja.",
+      "Gampang! Cukup daftar dan unggah karya kamu lewat halaman registrasi. Tim kami akan meninjau karyamu sebentar, lalu karya langsung tayang di Gedung Virtual dan siap dilihat pengunjung dari mana saja.",
   },
   {
     question: "Apakah masyarakat umum bisa melihat karya yang dipamerkan?",

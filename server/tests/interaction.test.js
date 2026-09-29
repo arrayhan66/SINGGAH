@@ -1,6 +1,7 @@
 const request = require("supertest")
 const app = require("../server")
 const { User, Category, Project } = require("../models")
+const { tokenFromCookie } = require("./helpers")
 
 describe("Interaction Endpoints (Bookmark, Like, Comment, Reply)", () => {
   let adminToken = ""
@@ -37,7 +38,7 @@ describe("Interaction Endpoints (Bookmark, Like, Comment, Reply)", () => {
       email: "admininteract@example.com",
       password: "Password123!",
     })
-    adminToken = adminLogin.body.data.token
+    adminToken = tokenFromCookie(adminLogin)
 
     // Register & login Student
     await request(app).post("/api/auth/register").send({
@@ -57,7 +58,7 @@ describe("Interaction Endpoints (Bookmark, Like, Comment, Reply)", () => {
       email: "studentinteract@example.com",
       password: "Password123!",
     })
-    studentToken = studentLogin.body.data.token
+    studentToken = tokenFromCookie(studentLogin)
 
     // Register another student (not the comment owner)
     await request(app).post("/api/auth/register").send({
@@ -77,7 +78,7 @@ describe("Interaction Endpoints (Bookmark, Like, Comment, Reply)", () => {
       email: "otherstudentinteract@example.com",
       password: "Password123!",
     })
-    otherStudentToken = otherStudentLogin.body.data.token
+    otherStudentToken = tokenFromCookie(otherStudentLogin)
 
     // Create a published project directly
     const project = await Project.create({

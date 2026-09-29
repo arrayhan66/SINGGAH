@@ -1,6 +1,7 @@
 const request = require("supertest")
 const app = require("../server")
 const { User, Setting } = require("../models")
+const { tokenFromCookie } = require("./helpers")
 
 const ADMIN = {
   name: "Admin Maintenance",
@@ -57,13 +58,13 @@ describe("Maintenance Mode Middleware", () => {
     const adminLogin = await request(app)
       .post("/api/auth/login")
       .send({ email: ADMIN.email, password: ADMIN.password })
-    adminToken = adminLogin.body.data.token
+    adminToken = tokenFromCookie(adminLogin)
     adminCookie = adminLogin.headers["set-cookie"]
 
     const userLogin = await request(app)
       .post("/api/auth/login")
       .send({ email: USER.email, password: USER.password })
-    userToken = userLogin.body.data.token
+    userToken = tokenFromCookie(userLogin)
     userCookie = userLogin.headers["set-cookie"]
   })
 
@@ -114,7 +115,7 @@ describe("Maintenance Mode Middleware", () => {
       .send({ email: ADMIN.email, password: ADMIN.password })
 
     expect(res.status).toBe(200)
-    expect(res.body.data.token).toEqual(expect.any(String))
+    expect(tokenFromCookie(res)).toEqual(expect.any(String))
   })
 
   it("should refuse a non-admin login while maintenance mode is on", async () => {

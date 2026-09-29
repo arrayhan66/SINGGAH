@@ -10,6 +10,7 @@ jest.mock("../services/googleAuthService", () => ({
 }))
 const app = require("../server")
 const { User, VerificationCode, Notification } = require("../models")
+const { tokenFromCookie } = require("./helpers")
 const { resolveMx } = require("dns").promises
 const { verifyGoogleToken } = require("../services/googleAuthService")
 
@@ -174,7 +175,7 @@ describe("Auth Endpoints", () => {
       email: "applyuser@example.com",
       password: "Password123!",
     })
-    const applyToken = loginRes.body.data.token
+    const applyToken = tokenFromCookie(loginRes)
 
     const res = await request(app)
       .post("/api/auth/apply-tipe")
@@ -193,7 +194,7 @@ describe("Auth Endpoints", () => {
       email: "applyuser@example.com",
       password: "Password123!",
     })
-    const applyToken = loginRes.body.data.token
+    const applyToken = tokenFromCookie(loginRes)
 
     const res = await request(app)
       .post("/api/auth/apply-tipe")
@@ -222,7 +223,7 @@ describe("Auth Endpoints", () => {
       email: admin.email,
       password: "Password123!",
     })
-    const adminToken = adminLogin.body.data.token
+    const adminToken = tokenFromCookie(adminLogin)
 
     const rejectRes = await request(app)
       .post(`/api/users/${applyUser.id}/approve-tipe`)
@@ -243,7 +244,7 @@ describe("Auth Endpoints", () => {
       "rejection_reason",
       "Foto KTM kurang jelas",
     )
-    const applyToken = loginRes.body.data.token
+    const applyToken = tokenFromCookie(loginRes)
 
     // User updates profile with new valid NIM and photo before re-applying
     await request(app)
@@ -296,8 +297,50 @@ describe("Auth Endpoints", () => {
 
     expect(res.status).toBe(200)
     expect(res.body.success).toBe(true)
-    expect(res.body.data).toHaveProperty("token")
-    authToken = res.body.data.token
+    expect(res.body.data.user.email).toBe(testUser.email)
+    authToken = tokenFromCookie(res)
+  })
+
+  // REGRESI BUG-1 (versi offline).
+  //
+  // Suite authFlows.test.js:152 sudah menangkap hal yang sama, tapi file itu
+  // menembak Railway sungguhan dan butuh kredensial di server/.env.security --
+  // makanya ia dikecualikan dari `npm test` dan bug-nya bisa bertahan lama
+  // tanpa terlihat. Test ini versi lokalnya: SQLite in-memory, jalan selalu.
+  //
+  // Kenapa penting: cookie HttpOnly sejak awal dibuat untuk mencegah XSS
+  // membaca token. Selama body response masih membawa token, satu baris
+  // `localStorage.token = data.token` di mana pun mengembalikan seluruh
+  // kerentanan itu -- dan tokennya berlaku 6 jam (utils/authCookie.js:2).
+  it("should NOT include the JWT in the login response body", async () => {
+    const res = await request(app)
+      .post("/api/auth/login")
+      .send({
+        email: testUser.email,
+        password: testUser.password,
+      })
+
+    expect(res.status).toBe(200)
+    // Satu-satunya jalan keluar token adalah cookie HttpOnly.
+    expect(res.body.data).not.toHaveProperty("token")
+    // Deteksi kalau suatu saat ada yang menaruh token di jalur lain, misalnya
+    // data.session.token atau top-level response.token.
+    expect(JSON.stringify(res.body)).not.toMatch(/eyJ[A-Za-z0-9_-]{10,}/)
+  })
+
+  it("should set an HttpOnly session cookie on login", async () => {
+    const res = await request(app)
+      .post("/api/auth/login")
+      .send({
+        email: testUser.email,
+        password: testUser.password,
+      })
+
+    const authCookie = (res.headers["set-cookie"] || []).find((c) =>
+      c.startsWith("singgah_token=")
+    )
+    expect(authCookie).toBeDefined()
+    expect(authCookie).toMatch(/HttpOnly/i)
   })
 
   it("should get current user profile with auth token", async () => {
@@ -412,7 +455,12 @@ describe("Google Login", () => {
 
     expect(res.status).toBe(200)
     expect(res.body.success).toBe(true)
-    expect(res.body.data.token).toBeDefined()
+    expect(tokenFromCookie(res)).toBeDefined()
+    // Regresi BUG-1 untuk alur Google juga: buildAuthPayload()
+    // (services/authService.js:1020) juga pernah membawa token, dan jalur ini
+    // dilewati begitu saja kalau hanya login biasa yang diuji.
+    expect(res.body.data).not.toHaveProperty("token")
+    expect(JSON.stringify(res.body)).not.toMatch(/eyJ[A-Za-z0-9_-]{10,}/)
     expect(res.body.data.user.email).toBe("google.newuser@gmail.com")
     expect(res.body.data.user.tipe).toBe("umum")
     expect(res.body.data.user.is_verified).toBe(true)

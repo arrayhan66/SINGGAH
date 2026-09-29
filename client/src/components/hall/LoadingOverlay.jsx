@@ -99,7 +99,7 @@ function LoadingOverlay({ ready = false }) {
           isDark ? "text-night-muted" : "text-[#64748b]"
         }`}
       >
-        MEMPERSIAPKAN VIRTUAL HALL
+        MEMPERSIAPKAN GEDUNG VIRTUAL
       </div>
       <div
         className={`h-8 w-8 animate-spin rounded-full border-2 border-transparent ${

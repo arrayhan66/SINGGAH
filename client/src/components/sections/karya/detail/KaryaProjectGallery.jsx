@@ -96,7 +96,7 @@ function KaryaProjectGallery({
               className="transition-transform duration-300 group-hover:-translate-x-0.5 sm:size-3.5"
             />
           </span>
-          <span className="hidden sm:inline">{fromHall ? "Kembali ke Hall 3D" : "Kembali"}</span>
+          <span className="hidden sm:inline">{fromHall ? "Kembali ke Gedung Virtual" : "Kembali"}</span>
         </button>
       )}
 

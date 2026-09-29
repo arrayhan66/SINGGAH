@@ -209,8 +209,8 @@ export default function useManageCategories() {
       await api.put(`/categories/${cat.id}`, { is_active: target })
       notify(
         target
-          ? `${cat.name} diaktifkan dan tampil di hall`
-          : `${cat.name} dinonaktifkan dari hall`,
+          ? `${cat.name} diaktifkan dan tampil di Gedung Virtual`
+          : `${cat.name} dinonaktifkan dari Gedung Virtual`,
         "success",
       )
       await fetchCategories()

@@ -31,6 +31,7 @@ const {
   ACCOUNTS,
   hasCredentials,
   explainLoginFailure: explainLoginFailureBase,
+  waitForLoginQuota,
 } = require("./credentials");
 
 const A_EMAIL = ACCOUNTS.user.email;
@@ -63,15 +64,30 @@ async function login(email, password) {
   if (sessionCache.has(email)) return sessionCache.get(email);
 
   const promise = (async () => {
-    const response = await fetch(`${API_URL}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-    return {
-      status: response.status,
-      cookies: response.headers.getSetCookie?.() || [],
+    const attempt = async () => {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      return {
+        status: response.status,
+        cookies: response.headers.getSetCookie?.() || [],
+      };
     };
+
+    let result = await attempt();
+
+    // 429 = kuota 10 percobaan/15 menit habis, biasanya karena test:security
+    // baru saja menghabiskan seluruhnya. Limiter menolak sebelum handler jalan,
+    // jadi password yang benar pun ditolak dan kuota harus kedaluwarsa dulu.
+    if (result.status === 429) {
+      sessionCache.delete(email);
+      await waitForLoginQuota(API_URL);
+      result = await attempt();
+    }
+
+    return result;
   })();
 
   sessionCache.set(email, promise);

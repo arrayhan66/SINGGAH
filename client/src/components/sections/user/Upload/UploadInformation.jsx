@@ -150,7 +150,7 @@ function UploadInformation({ formData, updateField, showAuthorType = false }) {
             {!formData.author_tipe && (
               <p className="text-[10px] text-amber-400 2xl:text-xs">
                 Pilih tipe ini agar karya masuk kelompok mahasiswa/dosen yang
-                benar di Hall.
+                benar di Gedung Virtual.
               </p>
             )}
           </div>

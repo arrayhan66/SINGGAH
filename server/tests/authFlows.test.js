@@ -43,6 +43,7 @@ const {
   ACCOUNTS,
   hasCredentials,
   explainLoginFailure: explainLoginFailureBase,
+  waitForLoginQuota,
 } = require("./credentials");
 
 const USER_EMAIL = ACCOUNTS.user.email;
@@ -77,21 +78,39 @@ async function login(email, password) {
   if (sessionCache.has(cacheKey)) return sessionCache.get(cacheKey);
 
   const promise = (async () => {
-    const response = await fetch(`${API_URL}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    const attempt = async () => {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const setCookies = response.headers.getSetCookie?.() || [];
-    let body = null;
-    try {
-      body = await response.clone().json();
-    } catch {
-      body = null;
+      const setCookies = response.headers.getSetCookie?.() || [];
+      let body = null;
+      try {
+        body = await response.clone().json();
+      } catch {
+        body = null;
+      }
+
+      return { status: response.status, response, cookies: setCookies, body };
+    };
+
+    let result = await attempt();
+
+    // 429 berarti kuota 10 percobaan/15 menit sudah habis -- biasanya karena
+    // test:security baru saja menghabiskan seluruhnya untuk membuktikan brute
+    // force diblokir. Since the limiter menolak sebelum handler jalan, login
+    // dengan password benar pun ditolak, jadi "coba lagi" tidak membantu:
+    // kuotanya harus kedaluwarsa lebih dulu.
+    if (result.status === 429) {
+      // Jangan pakai entry cache yang berisi 429, atau seluruh suite ikut gagal.
+      sessionCache.delete(cacheKey);
+      await waitForLoginQuota(API_URL);
+      result = await attempt();
     }
 
-    return { status: response.status, response, cookies: setCookies, body };
+    return result;
   })();
 
   sessionCache.set(cacheKey, promise);

@@ -59,6 +59,53 @@ function readCredentials(file = CREDENTIALS_FILE) {
 const creds = readCredentials();
 
 /**
+ * Tunggu sampai kuota rate limit login tersedia lagi.
+ *
+ * Kenapa ini perlu: limiter login production dibatasi 10 percobaan GAGAL per 15
+ * menit per IP, dan test:security sengaja menghabiskan seluruh kuota itu untuk
+ * membuktikan brute force diblokir. Semua suite berjalan dari IP yang sama,
+ * jadi setelah test:security, suite auth dan idor tidak bisa login sama sekali.
+ *
+ * Yang penting dipahami: express-rate-limit menolak request DI SEBELUM handler
+ * jalan. Karena itu `skipSuccessfulRequests` tidak pernah sempat mengurangi
+ * kuota untuk request yang ditolak -- user yang mengetik password benar pun
+ * tetap terkunci. Jadi "coba login lagi" tidak akan menolong; kuotanya harus
+ * benar-benar kedaluwarsa.
+ *
+ * Yang dikembalikan adalah sisa detik yang perlu ditunggu, atau 0 kalau kuota
+ * sudah tersedia.
+ */
+async function waitForLoginQuota(API_URL, maxWaitSeconds = 60 * 16) {
+  const probe = await fetch(`${API_URL}/api/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: "cek-kuota@example.invalid", password: "x" }),
+  });
+
+  if (probe.status !== 429) {
+    // Pemeriksaan ini sendiri memakai 1 kuota kalau ternyata tidak terkunci,
+    // jadi kembalikan sisanya supaya pemanggil bisa langsung mencoba.
+    return 0;
+  }
+
+  const resetHeader = Number(probe.headers.get("ratelimit-reset"));
+  const waitSeconds = Number.isFinite(resetHeader)
+    ? Math.min(resetHeader + 2, maxWaitSeconds)
+    : 60;
+
+  if (waitSeconds > 5) {
+    console.warn(
+      `[login] Kuota rate limit habis dari suite sebelumnya. ` +
+        `Menunggu ${waitSeconds} detik sampai jendela 15 menit expire...`,
+    );
+    await new Promise((resolve) => setTimeout(resolve, waitSeconds * 1000));
+  }
+
+  return waitSeconds;
+}
+
+
+/**
  * Daftar akun yang perlu login, plus_password yang aman untuk ditampilkan di
  * pesan error (hanya panjang dan karakter pertama, tidak pernah isinya).
  */
@@ -137,4 +184,5 @@ module.exports = {
   ACCOUNTS,
   hasCredentials,
   explainLoginFailure,
+  waitForLoginQuota,
 };

@@ -98,7 +98,7 @@ async function assertMahasiswaSlot(categoryId, excludeId = null) {
   const used = await countMahasiswaSlots(categoryId, excludeId)
   if (used >= CATEGORY_MAHASISWA_LIMIT) {
     throw new AppError(
-      `Karya pada kategori ini sudah mencapai limit (${CATEGORY_MAHASISWA_LIMIT} karya mahasiswa) di Hall. Tidak ada slot kosong — hapus salah satu karya mahasiswa dulu agar karya baru bisa dipublikasikan.`,
+      `Karya pada kategori ini sudah mencapai limit (${CATEGORY_MAHASISWA_LIMIT} karya mahasiswa) di Gedung Virtual. Tidak ada slot kosong — hapus salah satu karya mahasiswa dulu agar karya baru bisa dipublikasikan.`,
       409,
     )
   }
@@ -131,7 +131,7 @@ async function assertDosenSlot(categoryId, excludeId = null) {
   const used = await countDosenSlots(categoryId, excludeId)
   if (used >= CATEGORY_DOSEN_LIMIT) {
     throw new AppError(
-      `Karya dosen pada kategori ini sudah mencapai limit (${CATEGORY_DOSEN_LIMIT} karya dosen) di Hall. Tidak ada slot kosong — hapus salah satu karya dosen dulu agar karya baru bisa dipublikasikan.`,
+      `Karya dosen pada kategori ini sudah mencapai limit (${CATEGORY_DOSEN_LIMIT} karya dosen) di Gedung Virtual. Tidak ada slot kosong — hapus salah satu karya dosen dulu agar karya baru bisa dipublikasikan.`,
       409,
     )
   }

@@ -175,7 +175,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
             </Text>
 
             <Text
-              position={[0, -0.7, 0.01]}
+              position={[0, -0.78, 0.01]}
               fontSize={0.14}
               color="#3B82F6"
               anchorX="center"
@@ -184,7 +184,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
               raycast={() => null}
               font="/fonts/Poppins-Medium.ttf"
             >
-              Selamat menjelajahi!
+              Selamat menjelajah!
             </Text>
           </>
         ) : (

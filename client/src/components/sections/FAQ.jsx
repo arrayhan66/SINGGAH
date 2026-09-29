@@ -11,31 +11,28 @@ const faq = [
         <span className="font-semibold text-cyan-300">
           Sistem Informasi Galeri Gagasan dan Hasil Karya
         </span>{" "}
-        — itulah arti nama SINGGAH. Sebuah galeri digital tempat civitas
-        akademika Politeknik Negeri Banjarmasin, Jurusan Teknik Elektro,
-        memamerkan karya terbaiknya di bidang teknologi: mulai dari website,
-        mobile app, IoT, sampai artificial intelligence. Tidak ada yang perlu
-        diunduh atau diinstal — cukup buka halamannya, lalu jelajahi gedung
-        virtual ini dengan berjalan menyusuri ruang pameran karya, menyimak
-        penjelasan tiap karya, dan berpindah kategori lewat portal — seperti
-        jalan-jalan di pameran sungguhan.
+        SINGGAH adalah singkatan dari nama itu. Tempat civitas Teknik Elektro
+        Poliban memamerkan karyanya, mulai dari website, mobile app, IoT,
+        artificial intelligence, data science, cyber security, UI/UX design,
+        sampai game development. Nggak perlu unduh aplikasi apa pun, cukup
+        dibuka lewat browser.
       </>
     ),
   },
   {
     question: "Bagaimana cara mengikuti pameran ini?",
     answer:
-      "Gampang! Daftar lewat halaman registrasi, lalu unggah karyamu di sini. Kalau kamu mahasiswa, karyamu ditinjau admin dulu sebelum tayang di ruang pameran karya. Kalau kamu dosen, karyamu langsung tayang tanpa perlu ditinjau.",
+      "Daftar dulu di halaman registrasi, lalu unggah karyamu di sini. Kalau kamu mahasiswa, karyamu ditinjau admin dulu sebelum tayang. Kalau kamu dosen, karyamu langsung tayang tanpa perlu ditinjau.",
   },
   {
-    question: "Apa itu gedung virtual SINGGAH?",
+    question: "Apa itu Gedung Virtual SINGGAH?",
     answer:
-      "Gedung virtual adalah ruang 3D tempat seluruh karya civitas Teknik Elektro dipamerkan. Di dalamnya tersedia halaman utama dan ruang pameran karya untuk setiap kategori. Pengunjung dapat berjalan bebas, berpindah kategori lewat portal, serta naik ke lantai 2 untuk melihat karya dosen.",
+      "Gedung Virtual adalah bangunan 3D tempat karya-karya itu dipamerkan. Di dalamnya ada Halaman Utama, lalu Ruang pameran Karya untuk tiap kategori. Pengunjung bisa jalan-jalan, pindah kategori lewat portal, dan naik ke lantai 2 untuk lihat karya dosen.",
   },
   {
     question: "Apakah karya yang dipamerkan bisa diunduh?",
     answer:
-      "Tergantung pemiliknya. Beberapa karya menyediakan source code atau dokumentasi lengkap untuk diunduh, sementara yang lain hanya menampilkan demo atau preview saja.",
+      "Tergantung pemilik karyanya. Ada yang menyediakan source code atau dokumentasi lengkap, ada yang cuma menampilkan demo saja.",
   },
 ];
 

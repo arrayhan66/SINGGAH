@@ -10,7 +10,7 @@ const lightVignette =
 function UploadHero({
   headingLabel = "Upload",
   headingAccent = "Karya",
-  subtitle = "Bagikan karya terbaikmu dan jadilah bagian dari galeri SINGGAH. Karya akan melalui proses tinjauan admin dahulu sebelum hadir di Hall.",
+  subtitle = "Bagikan karya terbaikmu dan jadilah bagian dari galeri SINGGAH. Karya akan melalui proses tinjauan admin dahulu sebelum hadir di Gedung Virtual.",
   ptClass = "pt-[calc(var(--navbar-h)+24px)] sm:pt-[calc(var(--navbar-h)+32px)]",
 }) {
   const { theme } = useTheme()

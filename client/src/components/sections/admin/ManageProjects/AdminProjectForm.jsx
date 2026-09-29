@@ -43,8 +43,8 @@ const statusConfig = {
 }
 
 const statusDescription = {
-  pending: "Karya ini menunggu persetujuan untuk tampil di Hall.",
-  published: "Karya ini sudah disetujui dan tampil di Hall.",
+  pending: "Karya ini menunggu persetujuan untuk tampil di Gedung Virtual.",
+  published: "Karya ini sudah disetujui dan tampil di Gedung Virtual.",
   rejected: "Karya ini ditolak. Kamu bisa setujui kembali setelah revisi.",
 }
 

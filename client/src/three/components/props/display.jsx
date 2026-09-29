@@ -145,7 +145,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
               raycast={() => null}
               font="/fonts/Poppins-Medium.ttf"
             >
-              Cara Menjelajah Hall
+              Cara Menjelajahi Halaman
             </Text>
 
             <mesh position={[0, 0.42, 0.01]}>
@@ -184,7 +184,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
               raycast={() => null}
               font="/fonts/Poppins-Medium.ttf"
             >
-              Selamat menjelajah!
+              Selamat menjelajahi!
             </Text>
           </>
         ) : (

@@ -184,7 +184,7 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
                 title={
                   busy
                     ? "Menyimpan perubahan…"
-                    : "Karya Unggulan (podium hall 3D)"
+                    : "Karya Unggulan (podium Gedung Virtual)"
                 }
                 aria-label="Atur karya unggulan"
               >

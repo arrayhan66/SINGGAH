@@ -81,7 +81,7 @@ function About() {
 
               <p className="mt-6 text-justify text-base leading-relaxed text-slate-300 lg:mt-8 lg:text-lg 2xl:mt-10 2xl:text-2xl 2xl:leading-loose 3xl:mt-12 3xl:text-3xl 3xl:leading-loose 4xl:mt-14 4xl:text-4xl 4xl:leading-loose">
                 {settings.siteDescription ||
-                  "PamerIT merupakan platform digital yang menampilkan berbagai karya terbaik mahasiswa di bidang teknologi informasi. Pengunjung dapat mengeksplorasi karya secara interaktif layaknya memasuki sebuah exhibition hall virtual."}
+                  "SINGGAH merupakan galeri digital yang menampilkan karya civitas akademik Teknik Elektro Poliban, mulai dari karya mahasiswa hingga karya dosen. Pengunjung dapat mengeksplorasi karya secara interaktif dengan berjalan menyusuri Gedung Virtual."}
               </p>
             </div>
 

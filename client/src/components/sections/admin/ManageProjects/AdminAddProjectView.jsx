@@ -156,7 +156,7 @@ function AdminAddProjectView() {
       <div className="user-page">
         <UploadHero
           headingLabel="Tambah"
-          subtitle="Tambahkan karya ke SINGGAH. Pilih tipe penulis (mahasiswa/dosen) agar karya langsung masuk kelompok yang tepat di Hall."
+          subtitle="Tambahkan karya ke SINGGAH. Pilih tipe penulis (mahasiswa/dosen) agar karya langsung masuk kelompok yang tepat di Gedung Virtual."
           ptClass="pt-6 sm:pt-8 2xl:pt-10"
         />
 

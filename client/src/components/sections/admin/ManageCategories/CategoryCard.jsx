@@ -81,7 +81,7 @@ export default function CategoryCard({ cat, onEdit, onDelete, onToggleActive, to
         <div className="ml-auto flex shrink-0 flex-wrap items-center justify-end gap-2">
           <label
             className={`${toggleClass} ${toggling ? "opacity-70" : ""} ${isLocked ? "cursor-not-allowed" : ""}`}
-            title={isLocked ? MIN_ACTIVE_TOOLTIP : cat.is_active ? "Klik untuk menonaktifkan dari hall" : "Klik untuk menampilkan di hall"}
+            title={isLocked ? MIN_ACTIVE_TOOLTIP : cat.is_active ? "Klik untuk menonaktifkan dari Gedung Virtual" : "Klik untuk menampilkan di Gedung Virtual"}
           >
             <input
               type="checkbox"

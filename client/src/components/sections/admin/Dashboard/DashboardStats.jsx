@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { FolderOpen, Newspaper, Users, Clock, ArrowRight } from "lucide-react"
+import { FolderOpen, Newspaper, Users, Clock } from "lucide-react"
 import api from "../../../../services/api"
 import { buildSparklinePath } from "../../../../utils/reportsHelpers"
 
@@ -25,7 +24,6 @@ function Sparkline({ d, stroke, gradId }) {
 }
 
 function DashboardStats() {
-  const navigate = useNavigate()
   const [stats, setStats] = useState({
     totalProject: 0,
     pendingProject: 0,
@@ -65,10 +63,10 @@ function DashboardStats() {
   }, [])
 
   const statItems = [
-    { label: "Total Karya", value: stats.totalProject, icon: FolderOpen, to: "/admin/karya" },
-    { label: "Total Berita", value: stats.totalNews, icon: Newspaper, to: "/admin/berita" },
-    { label: "Total User", value: stats.totalUser, icon: Users, to: "/admin/pengguna" },
-    { label: "Menunggu Review", value: stats.pendingProject, icon: Clock, to: "/admin/karya?status=pending" },
+    { label: "Total Karya", value: stats.totalProject, icon: FolderOpen },
+    { label: "Total Berita", value: stats.totalNews, icon: Newspaper },
+    { label: "Total User", value: stats.totalUser, icon: Users },
+    { label: "Menunggu Review", value: stats.pendingProject, icon: Clock },
   ]
 
   const series = (key) => {
@@ -97,12 +95,9 @@ function DashboardStats() {
           const key = stat.label
           const d = buildSparklinePath(series(SERIES_KEYS[key]), 72, 28, 3)
           return (
-            <button
+            <div
               key={key}
-              type="button"
-              onClick={() => navigate(stat.to)}
-              aria-label={`${stat.label} — buka halaman terkait`}
-              className="dashboard-stat-card group relative block w-full cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-5 text-left backdrop-blur-xl transition-all duration-300 hover:bg-white/[0.09] hover:border-white/20 md:p-6"
+              className="dashboard-stat-card relative block w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-5 text-left backdrop-blur-xl md:p-6"
             >
               <div className={`absolute left-0 top-0 h-full w-[3px] bg-gradient-to-b ${ACCENT_GRADIENT} rounded-l-2xl`} />
               {loading ? (
@@ -119,7 +114,7 @@ function DashboardStats() {
               ) : (
               <div className="flex items-start justify-between gap-2 pl-4 min-w-0">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="stat-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 shadow-lg shadow-cyan-500/20 transition-transform duration-300 group-hover:scale-110">
+                  <div className="stat-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 shadow-lg shadow-cyan-500/20">
                     <Icon className="h-5 w-5 text-white" />
                   </div>
                   <div>
@@ -129,21 +124,16 @@ function DashboardStats() {
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0">
-                  <div className="origin-right transition-all duration-300 group-hover:-translate-y-0.5 group-hover:scale-110">
+                  <div>
                     <Sparkline d={d} stroke={LINE_THEME.stroke} gradId={LINE_THEME.gradId} />
                   </div>
-                  <div className="flex items-center justify-end gap-1.5">
-                    <span className="flex h-4 w-0 shrink-0 items-center justify-center overflow-hidden rounded-full border border-cyan-400/40 bg-cyan-400/10 text-cyan-300 opacity-0 transition-all duration-300 group-hover:w-4 group-hover:opacity-100">
-                      <ArrowRight size={10} strokeWidth={3} />
-                    </span>
-                    <p className="stat-label truncate text-[10px] text-slate-400 text-right leading-tight md:text-[11px]">
-                      {stat.label}
-                    </p>
-                  </div>
+                  <p className="stat-label truncate text-[10px] text-slate-400 text-right leading-tight md:text-[11px]">
+                    {stat.label}
+                  </p>
                 </div>
               </div>
               )}
-            </button>
+            </div>
           )
         })}
       </div>

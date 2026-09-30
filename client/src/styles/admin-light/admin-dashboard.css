@@ -12,22 +12,6 @@
     0 7px 0 #02111f,
     0 14px 28px -12px rgba(0, 0, 0, 0.55);
 }
-.admin-page .dashboard-stat-card:hover {
-  transform: translateY(-0.25rem);
-  border-color: rgba(34, 211, 238, 0.4);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 8px 0 #02111f,
-    0 18px 34px -16px rgba(0, 0, 0, 0.55);
-}
-.admin-page .dashboard-stat-card:active {
-  transform: translateY(0);
-  transition-duration: 0.1s;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 3px 0 #02111f,
-    0 8px 16px -10px rgba(0, 0, 0, 0.55);
-}
 
 /* ---- Dark mode: panel bawah FLAT (tanpa slab 3D) ---- */
 .admin-page .dashboard-panel {
@@ -54,24 +38,6 @@ html.light .admin-page .dashboard-stat-card {
     0 12px 26px -10px rgba(30, 64, 175, 0.35),
     0 22px 44px -18px rgba(37, 99, 235, 0.28) !important;
 }
-html.light .admin-page .dashboard-stat-card:hover {
-  transform: translateY(-0.25rem) !important;
-  border-color: #9ec7fa !important;
-  background-color: #ffffff !important;
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.95),
-    0 8px 0 #5b96ee,
-    0 14px 26px -12px rgba(30, 64, 175, 0.4),
-    0 20px 40px -20px rgba(37, 99, 235, 0.32) !important;
-}
-html.light .admin-page .dashboard-stat-card:active {
-  transform: translateY(0) !important;
-  transition-duration: 0.1s;
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.9),
-    0 3px 0 #7fb1f5,
-    0 8px 16px -10px rgba(30, 64, 175, 0.35) !important;
-}
 
 /* ---- Light mode: panel bawah FLAT pastel biru ---- */
 html.light .admin-page .dashboard-panel {
@@ -91,13 +57,11 @@ html.light .admin-page .dashboard-panel:active {
   transition-duration: 0.1s;
 }
 
-/* Fokus keyboard untuk stat card + panel yang sekarang bisa diklik */
-.admin-page .dashboard-stat-card:focus-visible,
+/* Fokus keyboard untuk panel yang bisa diklik */
 .admin-page .dashboard-panel:focus-visible {
   outline: 2px solid #22d3ee;
   outline-offset: 3px;
 }
-html.light .admin-page .dashboard-stat-card:focus-visible,
 html.light .admin-page .dashboard-panel:focus-visible {
   outline-color: #2563eb;
 }
@@ -373,12 +337,6 @@ html.light .admin-page .dashboard-stat-card .stat-value {
    putih; saat hover berubah biru agar sisi kanan ikut responsif */
 html.light .admin-page .dashboard-stat-card .stat-label {
   color: #475569;
-}
-html.light .admin-page .dashboard-stat-card:hover .stat-label {
-  color: #2563eb;
-}
-.admin-page .dashboard-stat-card:hover .stat-label {
-  color: #67e8f9;
 }
 
 /* Sparkline: garis cyan muda di permukaan putih kurang terbaca ->

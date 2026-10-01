@@ -4,6 +4,7 @@ import { UserSearch, BadgeCheck, FolderKanban, ShieldCheck, ShieldX, Hourglass, 
 import { useUsers } from "../../../../context/UserContext"
 import AdminUserDeleteModal from "./AdminUserDeleteModal"
 import AdminUserTipeModal from "./AdminUserTipeModal"
+import UserDeletedModal from "../../../ui/UserDeletedModal"
 import ShowMoreButton from "../../../ui/ShowMoreButton"
 import UserAvatar from "../../../ui/UserAvatar"
 import { AdminUsersSkeleton } from "../../../ui/PageSkeletons"
@@ -28,7 +29,7 @@ function AdminUserList({ search, statusFilter }) {
   const { userList, loading, deleteUser, approveTipe, rejectTipe } = useUsers()
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
-  const [deleteSuccess, setDeleteSuccess] = useState(false)
+  const [deletedName, setDeletedName] = useState("")
   const [tipeTarget, setTipeTarget] = useState(null)
   const [tipeDecision, setTipeDecision] = useState(null)
   const [approving, setApproving] = useState(false)
@@ -72,18 +73,18 @@ function AdminUserList({ search, statusFilter }) {
     setDeleteLoading(true)
     try {
       await deleteUser(deleteTarget.id)
-      setDeleteLoading(false)
-      setDeleteSuccess(true)
-    } catch {
-      setDeleteLoading(false)
+      setDeletedName(deleteTarget.name)
       setDeleteTarget(null)
+    } catch {
+      setDeleteTarget(null)
+    } finally {
+      setDeleteLoading(false)
     }
   }
 
   function handleCancelDelete() {
     setDeleteTarget(null)
     setDeleteLoading(false)
-    setDeleteSuccess(false)
   }
 
   function handleApproveClick(user) {
@@ -321,7 +322,12 @@ function AdminUserList({ search, statusFilter }) {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         loading={deleteLoading}
-        success={deleteSuccess}
+      />
+
+      <UserDeletedModal
+        isOpen={Boolean(deletedName)}
+        userName={deletedName}
+        onClose={() => setDeletedName("")}
       />
 
       <AdminUserTipeModal

@@ -5,6 +5,7 @@ import { useUsers } from "../../../../context/UserContext"
 import AdminHeroBackground from "../../../ui/AdminHeroBackground"
 import AdminUserProfileCard from "../../../../components/sections/admin/ManageUsers/AdminUserProfileCard"
 import AdminUserDeleteModal from "../../../../components/sections/admin/ManageUsers/AdminUserDeleteModal"
+import UserDeletedModal from "../../../ui/UserDeletedModal"
 import { AdminUserDetailSkeleton } from "../../../ui/PageSkeletons"
 
 function AdminUserDetail() {
@@ -13,14 +14,14 @@ function AdminUserDetail() {
   const { getUserByUsername, fetchUserByUsername, deleteUser } = useUsers()
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
-  const [deleteSuccess, setDeleteSuccess] = useState(false)
+  const [deletedName, setDeletedName] = useState("")
   const [loading, setLoading] = useState(Boolean(slug) && !getUserByUsername(slug))
 
   const user = getUserByUsername(slug)
 
   useEffect(() => {
     let cancelled = false
-    if (!slug || user || deleteSuccess) return
+    if (!slug || user || deletedName) return
 
     setLoading(true)
     fetchUserByUsername(slug).finally(() => {
@@ -31,7 +32,7 @@ function AdminUserDetail() {
       cancelled = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug, user, deleteSuccess])
+  }, [slug, user, deletedName])
 
   function handleEdit(target) {
     navigate(`/admin/pengguna/edit/${target.username}`)
@@ -46,26 +47,25 @@ function AdminUserDetail() {
     setDeleteLoading(true)
     try {
       await deleteUser(deleteTarget.id)
-      setDeleteLoading(false)
-      setDeleteSuccess(true)
-      setTimeout(() => navigate("/admin/pengguna"), 1200)
-    } catch {
-      setDeleteLoading(false)
+      setDeletedName(deleteTarget.name)
       setDeleteTarget(null)
+    } catch {
+      setDeleteTarget(null)
+    } finally {
+      setDeleteLoading(false)
     }
   }
 
   function handleCancelDelete() {
     setDeleteTarget(null)
     setDeleteLoading(false)
-    setDeleteSuccess(false)
   }
 
   if (loading) {
     return <AdminUserDetailSkeleton />
   }
 
-  if (!user && !deleteSuccess) {
+  if (!user && !deletedName) {
     return (
       <div className="px-6 py-10 md:px-10 text-center text-slate-400">
         User tidak ditemukan.
@@ -119,7 +119,13 @@ function AdminUserDetail() {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         loading={deleteLoading}
-        success={deleteSuccess}
+      />
+
+      <UserDeletedModal
+        isOpen={Boolean(deletedName)}
+        userName={deletedName}
+        redirectPath="/admin/pengguna"
+        onClose={() => setDeletedName("")}
       />
     </>
   )

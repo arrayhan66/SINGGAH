@@ -2,7 +2,6 @@ import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import {
   X,
-  ExternalLink,
   ArrowRight,
   MessageCircle,
   Check,
@@ -29,8 +28,6 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
   const isLight = theme === "light"
   const isLoggedIn = Boolean(user)
   const categorySlug = project.Category?.slug || project.category
-
-  const links = Array.isArray(project.links) ? project.links : []
 
   const [activeImage, setActiveImage] = useState(0)
   const [isLiked, setIsLiked] = useState(Boolean(project.isLiked))
@@ -169,18 +166,6 @@ function ProjectDetailModal({ project, categoryTitle, onClose }) {
           {/* Footer aksi — di HP tombol full-width (mudah disentuh), di layar
               besar rapat ke kanan */}
           <div className="flex flex-col gap-3 border-t border-white/10 px-4 pb-4 pt-4 sm:flex-row sm:items-center sm:justify-end sm:px-8 sm:pb-8 sm:pt-6 lg:px-10">
-            {links[0]?.url && (
-              <a
-                href={links[0].url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white sm:w-auto sm:py-2.5"
-              >
-                <span>Kunjungi Demo</span>
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            )}
-
             <button
               onClick={openDetail}
               className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-400 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-sky-500/20 transition-all hover:from-sky-500 hover:to-cyan-300 sm:w-auto sm:py-2.5"

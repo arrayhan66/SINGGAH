@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Laporan Hasil Pengujian Otomatis — SINGGAH</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Tahoma, Arial, sans-serif; margin: 0; color: #1f2937; background: #f3f4f6; padding: 24px; }
+  .wrap { max-width: 960px; margin: 0 auto; }
+  header { background: linear-gradient(135deg, #1d4ed8, #3b82f6); color: #fff; border-radius: 14px; padding: 28px 32px; }
+  header h1 { margin: 0 0 6px; font-size: 26px; }
+  header p { margin: 0; opacity: .92; }
+  .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; font-size: 13px; }
+  .meta span { background: rgba(255,255,255,.18); padding: 5px 12px; border-radius: 999px; }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 20px 0; }
+  .card { background: #fff; border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .card .v { font-size: 30px; font-weight: 700; }
+  .card .l { font-size: 13px; color: #6b7280; margin-top: 2px; }
+  .card.green .v { color: #16a34a; } .card.red .v { color: #dc2626; } .card.blue .v { color: #2563eb; } .card.gray .v { color: #374151; }
+  .bar { background: #e5e7eb; border-radius: 999px; height: 12px; overflow: hidden; margin-bottom: 24px; }
+  .bar > div { height: 100%; background: #16a34a; }
+  h2 { margin: 28px 0 12px; font-size: 20px; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.08); font-size: 13px; }
+  th, td { padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+  th { background: #f8fafc; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: #475569; }
+  tr:last-child td { border-bottom: none; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .badge.ok { background: #dcfce7; color: #15803d; }
+  .badge.bad { background: #fee2e2; color: #b91c1c; }
+  .badge.skip { background: #fef3c7; color: #b45309; }
+  .suite { background: #fff; border-radius: 12px; padding: 20px 22px; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 16px; }
+  .suite-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .suite-head h3 { margin: 0; font-size: 16px; }
+  .suite-meta { margin: 8px 0 14px; font-size: 13px; color: #4b5563; }
+  .fail { margin-top: 6px; }
+  .fail details { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 6px 10px; }
+  .fail summary { cursor: pointer; font-size: 12px; font-weight: 600; color: #b91c1c; }
+  .fail p { margin: 6px 0 0; font-size: 12px; color: #7f1d1d; white-space: pre-wrap; }
+  .note { font-size: 12px; color: #6b7280; margin: 6px 0 0; }
+  footer { margin: 24px 0 8px; text-align: center; font-size: 12px; color: #9ca3af; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .wrap { max-width: 100%; }
+    .suite, table, .card { box-shadow: none; break-inside: avoid; }
+  }
+  @media (max-width: 640px) {
+    .cards { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Laporan Hasil Pengujian Otomatis</h1>
+      <p>SINGGAH — Platform Pameran Karya Digital dengan Gedung Virtual 3D</p>
+      <div class="meta">
+        <span>Backend: Railway</span>
+        <span>Frontend: Vercel</span>
+        <span>Runner: Node.js + Jest</span>
+        <span>Dibuat: Selasa, 13 Oktober 2026 pukul 13.35</span>
+      </div>
+    </header>
+
+    <div class="cards">
+      <div class="card blue"><div class="v">202</div><div class="l">Total Kasus Uji</div></div>
+      <div class="card green"><div class="v">194</div><div class="l">Lolos</div></div>
+      <div class="card red"><div class="v">8</div><div class="l">Gagal</div></div>
+      <div class="card gray"><div class="v">260.6 s</div><div class="l">Total Waktu</div></div>
+    </div>
+
+    <div class="bar"><div style="width:96%"></div></div>
+
+    <h2>1. Ringkasan per Suite</h2>
+    <table>
+      <thead>
+        <tr><th>No</th><th>Suite Pengujian</th><th>File</th><th class="num">Kasus</th><th class="num">Lolos</th><th class="num">Gagal</th><th class="num">Waktu</th><th>Hasil</th></tr>
+      </thead>
+      <tbody><tr>
+      <td>1</td>
+      <td>Smoke test Railway + Vercel</td>
+      <td>tests/live.test.js, tests/production.test.js</td>
+      <td class="num">52</td>
+      <td class="num">52</td>
+      <td class="num">0</td>
+      <td class="num">10.9 s</td>
+      <td><span class="badge ok">Lolos</span></td>
+    </tr><tr>
+      <td>2</td>
+      <td>Dokumentasi API (/api/docs) dan drift spec</td>
+      <td>tests/hostedDocs.test.js</td>
+      <td class="num">19</td>
+      <td class="num">19</td>
+      <td class="num">0</td>
+      <td class="num">4.4 s</td>
+      <td><span class="badge ok">Lolos</span></td>
+    </tr><tr>
+      <td>3</td>
+      <td>Endpoint read-only yang belum pernah diuji di hosting</td>
+      <td>tests/hostedEndpoints.test.js</td>
+      <td class="num">58</td>
+      <td class="num">58</td>
+      <td class="num">0</td>
+      <td class="num">8.0 s</td>
+      <td><span class="badge ok">Lolos</span></td>
+    </tr><tr>
+      <td>4</td>
+      <td>Alur auth (butuh akun)</td>
+      <td>tests/authFlows.test.js</td>
+      <td class="num">15</td>
+      <td class="num">7</td>
+      <td class="num">8</td>
+      <td class="num">221.4 s</td>
+      <td><span class="badge bad">Gagal</span></td>
+    </tr><tr>
+      <td>5</td>
+      <td>IDOR lintas dua akun</td>
+      <td>tests/idor.test.js</td>
+      <td class="num">15</td>
+      <td class="num">15</td>
+      <td class="num">0</td>
+      <td class="num">3.1 s</td>
+      <td><span class="badge ok">Lolos</span></td>
+    </tr><tr>
+      <td>6</td>
+      <td>Keamanan (brute force, boros kuota)</td>
+      <td>tests/security.test.js</td>
+      <td class="num">43</td>
+      <td class="num">43</td>
+      <td class="num">0</td>
+      <td class="num">12.7 s</td>
+      <td><span class="badge ok">Lolos</span></td>
+    </tr></tbody>
+    </table>
+    <p class="note">Hasil juga disimpan untuk pembuatan ulang laporan tanpa menjalankan ulang test.</p>
+
+    
+    <h2>2. Rincian Hasil Pengujian</h2>
+    
+    <section class="suite">
+      <div class="suite-head">
+        <h3>1. Smoke test Railway + Vercel</h3>
+        <span class="badge ok">Lolos</span>
+      </div>
+      <p class="suite-meta">
+        Kasus: <b>52</b> · Lolos: <b>52</b> ·
+        Gagal: <b>0</b> · Pending: <b>0</b> ·
+        Waktu: <b>10.9 s</b>
+      </p>
+      <table>
+        <thead>
+          <tr><th>No</th><th>Status</th><th>Kasus Uji</th><th>File</th><th>Durasi</th></tr>
+        </thead>
+        <tbody><tr>
+        <td class="num">1</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Categories -&gt; tidak boleh 500</td>
+        <td>live.test.js</td>
+        <td class="num">299 ms</td>
+      </tr><tr>
+        <td class="num">2</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>News -&gt; tidak boleh 500</td>
+        <td>live.test.js</td>
+        <td class="num">186 ms</td>
+      </tr><tr>
+        <td class="num">3</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Settings -&gt; tidak boleh 500</td>
+        <td>live.test.js</td>
+        <td class="num">124 ms</td>
+      </tr><tr>
+        <td class="num">4</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Projects -&gt; tidak boleh 500</td>
+        <td>live.test.js</td>
+        <td class="num">417 ms</td>
+      </tr><tr>
+        <td class="num">5</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Stats -&gt; tidak boleh 500</td>
+        <td>live.test.js</td>
+        <td class="num">140 ms</td>
+      </tr><tr>
+        <td class="num">6</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Hall -&gt; tidak boleh 500</td>
+        <td>live.test.js</td>
+        <td class="num">105 ms</td>
+      </tr><tr>
+        <td class="num">7</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Notifications -&gt; tidak boleh 500</td>
+        <td>live.test.js</td>
+        <td class="num">103 ms</td>
+      </tr><tr>
+        <td class="num">8</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Dashboard -&gt; tidak boleh 500</td>
+        <td>live.test.js</td>
+        <td class="num">142 ms</td>
+      </tr><tr>
+        <td class="num">9</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Users -&gt; tidak boleh 500</td>
+        <td>live.test.js</td>
+        <td class="num">113 ms</td>
+      </tr><tr>
+        <td class="num">10</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Categories -&gt; harus respons dalam batas wajar</td>
+        <td>live.test.js</td>
+        <td class="num">109 ms</td>
+      </tr><tr>
+        <td class="num">11</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>News -&gt; harus respons dalam batas wajar</td>
+        <td>live.test.js</td>
+        <td class="num">144 ms</td>
+      </tr><tr>
+        <td class="num">12</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Settings -&gt; harus respons dalam batas wajar</td>
+        <td>live.test.js</td>
+        <td class="num">133 ms</td>
+      </tr><tr>
+        <td class="num">13</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Projects -&gt; harus respons dalam batas wajar</td>
+        <td>live.test.js</td>
+        <td class="num">138 ms</td>
+      </tr><tr>
+        <td class="num">14</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Stats -&gt; harus respons dalam batas wajar</td>
+        <td>live.test.js</td>
+        <td class="num">112 ms</td>
+      </tr><tr>
+        <td class="num">15</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Hall -&gt; harus respons dalam batas wajar</td>
+        <td>live.test.js</td>
+        <td class="num">111 ms</td>
+      </tr><tr>
+        <td class="num">16</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Notifications -&gt; harus respons dalam batas wajar</td>
+        <td>live.test.js</td>
+        <td class="num">96 ms</td>
+      </tr><tr>
+        <td class="num">17</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Dashboard -&gt; harus respons dalam batas wajar</td>
+        <td>live.test.js</td>
+        <td class="num">107 ms</td>
+      </tr><tr>
+        <td class="num">18</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Users -&gt; harus respons dalam batas wajar</td>
+        <td>live.test.js</td>
+        <td class="num">103 ms</td>
+      </tr><tr>
+        <td class="num">19</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Railway health harus 200 dan database ok</td>
+        <td>live.test.js</td>
+        <td class="num">108 ms</td>
+      </tr><tr>
+        <td class="num">20</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>health tidak boleh membocorkan kredensial</td>
+        <td>live.test.js</td>
+        <td class="num">127 ms</td>
+      </tr><tr>
+        <td class="num">21</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>endpoint daftar harus membungkus data (bukan objek kosong)</td>
+        <td>live.test.js</td>
+        <td class="num">125 ms</td>
+      </tr><tr>
+        <td class="num">22</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>payload tidak boleh string kosong atau null</td>
+        <td>live.test.js</td>
+        <td class="num">97 ms</td>
+      </tr><tr>
+        <td class="num">23</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>error 404 harus berbentuk JSON, bukan halaman HTML</td>
+        <td>live.test.js</td>
+        <td class="num">194 ms</td>
+      </tr><tr>
+        <td class="num">24</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>limit wajar harus diterima</td>
+        <td>live.test.js</td>
+        <td class="num">264 ms</td>
+      </tr><tr>
+        <td class="num">25</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>limit tidak valid tidak boleh 500</td>
+        <td>live.test.js</td>
+        <td class="num">363 ms</td>
+      </tr><tr>
+        <td class="num">26</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>page di luar range tidak boleh 500</td>
+        <td>live.test.js</td>
+        <td class="num">49 ms</td>
+      </tr><tr>
+        <td class="num">27</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>method yang tidak didukung harus menolak, bukan 500</td>
+        <td>live.test.js</td>
+        <td class="num">40 ms</td>
+      </tr><tr>
+        <td class="num">28</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>body JSON rusak harus 400, bukan 500</td>
+        <td>live.test.js</td>
+        <td class="num">49 ms</td>
+      </tr><tr>
+        <td class="num">29</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>body sebesar 3MB harus ditolak dengan rapi (limit 2mb)</td>
+        <td>live.test.js</td>
+        <td class="num">3.9 s</td>
+      </tr><tr>
+        <td class="num">30</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>redirect tidak bolehMENTS berayap</td>
+        <td>live.test.js</td>
+        <td class="num">43 ms</td>
+      </tr><tr>
+        <td class="num">31</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>origin frontend sendiri diizinkan</td>
+        <td>live.test.js</td>
+        <td class="num">62 ms</td>
+      </tr><tr>
+        <td class="num">32</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>origin asing tidak diizinkan</td>
+        <td>live.test.js</td>
+        <td class="num">42 ms</td>
+      </tr><tr>
+        <td class="num">33</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>login tidak boleh mengembalikan token di body (harus cookie)</td>
+        <td>live.test.js</td>
+        <td class="num">63 ms</td>
+      </tr><tr>
+        <td class="num">34</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>token kedaluwarsa tidak boleh mendapat akses</td>
+        <td>live.test.js</td>
+        <td class="num">42 ms</td>
+      </tr><tr>
+        <td class="num">35</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>alg:none tidak boleh diterima</td>
+        <td>live.test.js</td>
+        <td class="num">43 ms</td>
+      </tr><tr>
+        <td class="num">36</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>role di token tidak boleh memberi akses admin</td>
+        <td>live.test.js</td>
+        <td class="num">35 ms</td>
+      </tr><tr>
+        <td class="num">37</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>halaman utama harus 200</td>
+        <td>live.test.js</td>
+        <td class="num">157 ms</td>
+      </tr><tr>
+        <td class="num">38</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>frontend harus menyajikan HTML, bukan JSON</td>
+        <td>live.test.js</td>
+        <td class="num">155 ms</td>
+      </tr><tr>
+        <td class="num">39</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>API host yang dipakai frontend harus hidup</td>
+        <td>live.test.js</td>
+        <td class="num">37 ms</td>
+      </tr><tr>
+        <td class="num">40</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>path /api di Vercel tidak dipakai frontend</td>
+        <td>live.test.js</td>
+        <td class="num">73 ms</td>
+      </tr><tr>
+        <td class="num">41</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>frontend tidak mengekspos X-Powered-By</td>
+        <td>live.test.js</td>
+        <td class="num">77 ms</td>
+      </tr><tr>
+        <td class="num">42</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Categories → tidak boleh 500</td>
+        <td>production.test.js</td>
+        <td class="num">71 ms</td>
+      </tr><tr>
+        <td class="num">43</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>News → tidak boleh 500</td>
+        <td>production.test.js</td>
+        <td class="num">81 ms</td>
+      </tr><tr>
+        <td class="num">44</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Settings → tidak boleh 500</td>
+        <td>production.test.js</td>
+        <td class="num">42 ms</td>
+      </tr><tr>
+        <td class="num">45</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Projects → tidak boleh 500</td>
+        <td>production.test.js</td>
+        <td class="num">42 ms</td>
+      </tr><tr>
+        <td class="num">46</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Stats → tidak boleh 500</td>
+        <td>production.test.js</td>
+        <td class="num">33 ms</td>
+      </tr><tr>
+        <td class="num">47</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Hall → tidak boleh 500</td>
+        <td>production.test.js</td>
+        <td class="num">53 ms</td>
+      </tr><tr>
+        <td class="num">48</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Notifications → tidak boleh 500</td>
+        <td>production.test.js</td>
+        <td class="num">44 ms</td>
+      </tr><tr>
+        <td class="num">49</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Dashboard → tidak boleh 500</td>
+        <td>production.test.js</td>
+        <td class="num">43 ms</td>
+      </tr><tr>
+        <td class="num">50</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Users → tidak boleh 500</td>
+        <td>production.test.js</td>
+        <td class="num">47 ms</td>
+      </tr><tr>
+        <td class="num">51</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>halaman utama harus 200</td>
+        <td>production.test.js</td>
+        <td class="num">62 ms</td>
+      </tr><tr>
+        <td class="num">52</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>proxy /api lewat Vercel harus menjangkau backend</td>
+        <td>production.test.js</td>
+        <td class="num">57 ms</td>
+      </tr></tbody>
+      </table>
+    </section>
+    <section class="suite">
+      <div class="suite-head">
+        <h3>2. Dokumentasi API (/api/docs) dan drift spec</h3>
+        <span class="badge ok">Lolos</span>
+      </div>
+      <p class="suite-meta">
+        Kasus: <b>19</b> · Lolos: <b>19</b> ·
+        Gagal: <b>0</b> · Pending: <b>0</b> ·
+        Waktu: <b>4.4 s</b>
+      </p>
+      <table>
+        <thead>
+          <tr><th>No</th><th>Status</th><th>Kasus Uji</th><th>File</th><th>Durasi</th></tr>
+        </thead>
+        <tbody><tr>
+        <td class="num">1</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>halaman utama docs harus 200 dan menyajikan HTML</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">148 ms</td>
+      </tr><tr>
+        <td class="num">2</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>tanpa garis miring di akhir juga harus dilayani</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">204 ms</td>
+      </tr><tr>
+        <td class="num">3</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>dokumentasi tidak boleh butuh login</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">63 ms</td>
+      </tr><tr>
+        <td class="num">4</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>aset statis docs harus termuat semua</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">500 ms</td>
+      </tr><tr>
+        <td class="num">5</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>spec harus bisa dibaca dan di-parse</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">162 ms</td>
+      </tr><tr>
+        <td class="num">6</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>spec harus punya versi OpenAPI dan info yang benar</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">1 ms</td>
+      </tr><tr>
+        <td class="num">7</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>spec harus menunjuk ke base URL yang benar</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">0 ms</td>
+      </tr><tr>
+        <td class="num">8</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>spec harus punya endpoint yang berarti</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">0 ms</td>
+      </tr><tr>
+        <td class="num">9</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>spec tidak boleh membocorkan kredensial</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">146 ms</td>
+      </tr><tr>
+        <td class="num">10</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>semua endpoint GET yang didokumentasikan harus ada di server</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">1.8 s</td>
+      </tr><tr>
+        <td class="num">11</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>endpoint yang tidak ada di spec harus tetap 404</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">52 ms</td>
+      </tr><tr>
+        <td class="num">12</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/users -&gt; 401 tanpa token</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">37 ms</td>
+      </tr><tr>
+        <td class="num">13</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/dashboard -&gt; 401 tanpa token</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">55 ms</td>
+      </tr><tr>
+        <td class="num">14</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/notifications -&gt; 401 tanpa token</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">78 ms</td>
+      </tr><tr>
+        <td class="num">15</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/activity-logs -&gt; 401 tanpa token</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">44 ms</td>
+      </tr><tr>
+        <td class="num">16</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/reports -&gt; 401 tanpa token</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">52 ms</td>
+      </tr><tr>
+        <td class="num">17</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/projects/pending -&gt; 401 tanpa token</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">42 ms</td>
+      </tr><tr>
+        <td class="num">18</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/projects/my-bookmarks -&gt; 401 tanpa token</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">52 ms</td>
+      </tr><tr>
+        <td class="num">19</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/auth/me boleh anonim tapi tidak boleh error</td>
+        <td>hostedDocs.test.js</td>
+        <td class="num">50 ms</td>
+      </tr></tbody>
+      </table>
+    </section>
+    <section class="suite">
+      <div class="suite-head">
+        <h3>3. Endpoint read-only yang belum pernah diuji di hosting</h3>
+        <span class="badge ok">Lolos</span>
+      </div>
+      <p class="suite-meta">
+        Kasus: <b>58</b> · Lolos: <b>58</b> ·
+        Gagal: <b>0</b> · Pending: <b>0</b> ·
+        Waktu: <b>8.0 s</b>
+      </p>
+      <table>
+        <thead>
+          <tr><th>No</th><th>Status</th><th>Kasus Uji</th><th>File</th><th>Durasi</th></tr>
+        </thead>
+        <tbody><tr>
+        <td class="num">1</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>slug yang ada harus mengembalikan artikel</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">408 ms</td>
+      </tr><tr>
+        <td class="num">2</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>slug yang tidak ada harus 404 dengan pesan yang jelas</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">116 ms</td>
+      </tr><tr>
+        <td class="num">3</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>slug dengan karakter aneh tidak boleh 500</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">581 ms</td>
+      </tr><tr>
+        <td class="num">4</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>slug kosong tidak boleh 500</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">43 ms</td>
+      </tr><tr>
+        <td class="num">5</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>id yang ada harus mengembalikan kategori</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">189 ms</td>
+      </tr><tr>
+        <td class="num">6</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>id yang tidak ada harus 404 'Kategori tidak ditemukan'</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">63 ms</td>
+      </tr><tr>
+        <td class="num">7</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>id bukan angka harus ditolak dengan rapi</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">335 ms</td>
+      </tr><tr>
+        <td class="num">8</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>id yang ada harus mengembalikan project</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">195 ms</td>
+      </tr><tr>
+        <td class="num">9</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>id yang tidak ada harus 404 dengan pesan 'Project tidak ditemukan'</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">62 ms</td>
+      </tr><tr>
+        <td class="num">10</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>id sangat besar tidak boleh overflow jadi 500</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">82 ms</td>
+      </tr><tr>
+        <td class="num">11</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>revision endpoint harus tetap 404</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">65 ms</td>
+      </tr><tr>
+        <td class="num">12</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>daftar user -&gt; menolak tanpa token</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">52 ms</td>
+      </tr><tr>
+        <td class="num">13</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>detail user -&gt; menolak tanpa token</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">149 ms</td>
+      </tr><tr>
+        <td class="num">14</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>project milik saya -&gt; menolak tanpa token</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">43 ms</td>
+      </tr><tr>
+        <td class="num">15</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>bookmark saya -&gt; menolak tanpa token</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">40 ms</td>
+      </tr><tr>
+        <td class="num">16</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>notifikasi -&gt; menolak tanpa token</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">37 ms</td>
+      </tr><tr>
+        <td class="num">17</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>dashboard -&gt; menolak tanpa token</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">41 ms</td>
+      </tr><tr>
+        <td class="num">18</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>log aktivitas -&gt; menolak tanpa token</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">55 ms</td>
+      </tr><tr>
+        <td class="num">19</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>laporan -&gt; menolak tanpa token</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">84 ms</td>
+      </tr><tr>
+        <td class="num">20</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>statistik profil -&gt; menolak tanpa token</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">57 ms</td>
+      </tr><tr>
+        <td class="num">21</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>daftar media -&gt; menolak tanpa token</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">63 ms</td>
+      </tr><tr>
+        <td class="num">22</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>detail user milik orang lain juga harus menolak</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">129 ms</td>
+      </tr><tr>
+        <td class="num">23</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>token ngawur tidak boleh menambah data di response</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">40 ms</td>
+      </tr><tr>
+        <td class="num">24</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/stats/visit -&gt; 404</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">43 ms</td>
+      </tr><tr>
+        <td class="num">25</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/media/usage -&gt; 404</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">48 ms</td>
+      </tr><tr>
+        <td class="num">26</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/auth/check-email -&gt; 404</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">68 ms</td>
+      </tr><tr>
+        <td class="num">27</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/news/..%2f..%2f..%2f..%2fetc%2fpasswd -&gt; tidak boleh bocor file</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">55 ms</td>
+      </tr><tr>
+        <td class="num">28</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/projects/..%2f..%2f..%2f..%2fetc%2fpasswd -&gt; tidak boleh bocor file</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">60 ms</td>
+      </tr><tr>
+        <td class="num">29</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/projects/%2e%2e%2f%2e%2e%2f.env -&gt; tidak boleh bocor file</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">78 ms</td>
+      </tr><tr>
+        <td class="num">30</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/media/..%2f..%2f..%2f.env -&gt; tidak boleh bocor file</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">55 ms</td>
+      </tr><tr>
+        <td class="num">31</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/users/..%2f..%2fserver.js -&gt; tidak boleh bocor file</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">59 ms</td>
+      </tr><tr>
+        <td class="num">32</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/news/..%2f..%2f..%2f..%2fproc%2fself%2fenviron -&gt; tidak boleh bocor file</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">194 ms</td>
+      </tr><tr>
+        <td class="num">33</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>path traversal tidak boleh membuat server error</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">313 ms</td>
+      </tr><tr>
+        <td class="num">34</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>limit=abc -&gt; tidak boleh 500</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">196 ms</td>
+      </tr><tr>
+        <td class="num">35</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>limit=-1 -&gt; tidak boleh 500</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">146 ms</td>
+      </tr><tr>
+        <td class="num">36</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>limit=0 -&gt; tidak boleh 500</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">149 ms</td>
+      </tr><tr>
+        <td class="num">37</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>limit=1e10 -&gt; tidak boleh 500</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">133 ms</td>
+      </tr><tr>
+        <td class="num">38</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>limit=999999999999 -&gt; tidak boleh 500</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">218 ms</td>
+      </tr><tr>
+        <td class="num">39</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>limit= -&gt; tidak boleh 500</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">196 ms</td>
+      </tr><tr>
+        <td class="num">40</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>limit=%20 -&gt; tidak boleh 500</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">181 ms</td>
+      </tr><tr>
+        <td class="num">41</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>limit valid harus dipatuhi</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">104 ms</td>
+      </tr><tr>
+        <td class="num">42</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>page di luar range harus mengembalikan kosong, bukan error</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">87 ms</td>
+      </tr><tr>
+        <td class="num">43</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>sort dan filter tidak dikenal tidak boleh 500</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">590 ms</td>
+      </tr><tr>
+        <td class="num">44</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>sort yang valid harus mengembalikan hasil</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">147 ms</td>
+      </tr><tr>
+        <td class="num">45</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/projects -&gt; success:true dan punya data</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">61 ms</td>
+      </tr><tr>
+        <td class="num">46</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/news -&gt; success:true dan punya data</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">58 ms</td>
+      </tr><tr>
+        <td class="num">47</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/categories -&gt; success:true dan punya data</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">39 ms</td>
+      </tr><tr>
+        <td class="num">48</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/stats -&gt; success:true dan punya data</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">44 ms</td>
+      </tr><tr>
+        <td class="num">49</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/hall -&gt; success:true dan punya data</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">58 ms</td>
+      </tr><tr>
+        <td class="num">50</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/settings -&gt; success:true dan punya data</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">53 ms</td>
+      </tr><tr>
+        <td class="num">51</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>endpoint ber-pagination harus punya bentuk yang sama</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">96 ms</td>
+      </tr><tr>
+        <td class="num">52</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>response error harus selalu punya success:false</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">220 ms</td>
+      </tr><tr>
+        <td class="num">53</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>content-type response error harus JSON</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">52 ms</td>
+      </tr><tr>
+        <td class="num">54</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/stats harus replying cepat dan konsisten</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">68 ms</td>
+      </tr><tr>
+        <td class="num">55</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/stats harus punya field yang dipakai frontend</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">50 ms</td>
+      </tr><tr>
+        <td class="num">56</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/hall harus punya kategori dan karya</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">69 ms</td>
+      </tr><tr>
+        <td class="num">57</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/settings harus mengembalikan konfigurasi publik</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">74 ms</td>
+      </tr><tr>
+        <td class="num">58</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>landing page tidak boleh membocorkan kredensial lewat settings</td>
+        <td>hostedEndpoints.test.js</td>
+        <td class="num">59 ms</td>
+      </tr></tbody>
+      </table>
+    </section>
+    <section class="suite">
+      <div class="suite-head">
+        <h3>4. Alur auth (butuh akun)</h3>
+        <span class="badge bad">Gagal</span>
+      </div>
+      <p class="suite-meta">
+        Kasus: <b>15</b> · Lolos: <b>7</b> ·
+        Gagal: <b>8</b> · Pending: <b>0</b> ·
+        Waktu: <b>221.4 s</b>
+      </p>
+      <table>
+        <thead>
+          <tr><th>No</th><th>Status</th><th>Kasus Uji</th><th>File</th><th>Durasi</th></tr>
+        </thead>
+        <tbody><tr>
+        <td class="num">1</td>
+        <td><span class="badge bad">Gagal</span></td>
+        <td>login mengembalikan cookie HttpOnly + Secure</td>
+        <td>authFlows.test.js</td>
+        <td class="num">1 ms</td>
+      </tr><tr>
+        <td class="num">2</td>
+        <td><span class="badge bad">Gagal</span></td>
+        <td>TIDAK menyertakan token di body response</td>
+        <td>authFlows.test.js</td>
+        <td class="num">0 ms</td>
+      </tr><tr>
+        <td class="num">3</td>
+        <td><span class="badge bad">Gagal</span></td>
+        <td>/api/auth/me mengembalikan data user</td>
+        <td>authFlows.test.js</td>
+        <td class="num">0 ms</td>
+      </tr><tr>
+        <td class="num">4</td>
+        <td><span class="badge bad">Gagal</span></td>
+        <td>response profil tidak boleh membocorkan password hash</td>
+        <td>authFlows.test.js</td>
+        <td class="num">0 ms</td>
+      </tr><tr>
+        <td class="num">5</td>
+        <td><span class="badge bad">Gagal</span></td>
+        <td>cookie session tidak boleh bekerja di origin lain</td>
+        <td>authFlows.test.js</td>
+        <td class="num">0 ms</td>
+      </tr><tr>
+        <td class="num">6</td>
+        <td><span class="badge bad">Gagal</span></td>
+        <td>user biasa tidak boleh menyentuh endpoint admin</td>
+        <td>authFlows.test.js</td>
+        <td class="num">1 ms</td>
+      </tr><tr>
+        <td class="num">7</td>
+        <td><span class="badge bad">Gagal</span></td>
+        <td>user biasa tidak boleh moderasi karya orang lain</td>
+        <td>authFlows.test.js</td>
+        <td class="num">0 ms</td>
+      </tr><tr>
+        <td class="num">8</td>
+        <td><span class="badge bad">Gagal</span></td>
+        <td>update profil tidak boleh bisa men escalate role</td>
+        <td>authFlows.test.js</td>
+        <td class="num">1 ms</td>
+      </tr><tr>
+        <td class="num">9</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>ganti password harus menolak payload kosong</td>
+        <td>authFlows.test.js</td>
+        <td class="num">509 ms</td>
+      </tr><tr>
+        <td class="num">10</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>upload tanpa file harus ditolak, bukan crash</td>
+        <td>authFlows.test.js</td>
+        <td class="num">43 ms</td>
+      </tr><tr>
+        <td class="num">11</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>upload tanpa token harus ditolak</td>
+        <td>authFlows.test.js</td>
+        <td class="num">42 ms</td>
+      </tr><tr>
+        <td class="num">12</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>admin boleh melihat daftar user</td>
+        <td>authFlows.test.js</td>
+        <td class="num">117 ms</td>
+      </tr><tr>
+        <td class="num">13</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>admin boleh membuka dashboard</td>
+        <td>authFlows.test.js</td>
+        <td class="num">115 ms</td>
+      </tr><tr>
+        <td class="num">14</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>daftar user tidak boleh membocorkan hash password</td>
+        <td>authFlows.test.js</td>
+        <td class="num">71 ms</td>
+      </tr><tr>
+        <td class="num">15</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>activity log tidak boleh mengekspos email massal tanpa filter</td>
+        <td>authFlows.test.js</td>
+        <td class="num">65 ms</td>
+      </tr></tbody>
+      </table>
+    </section>
+    <section class="suite">
+      <div class="suite-head">
+        <h3>5. IDOR lintas dua akun</h3>
+        <span class="badge ok">Lolos</span>
+      </div>
+      <p class="suite-meta">
+        Kasus: <b>15</b> · Lolos: <b>15</b> ·
+        Gagal: <b>0</b> · Pending: <b>0</b> ·
+        Waktu: <b>3.1 s</b>
+      </p>
+      <table>
+        <thead>
+          <tr><th>No</th><th>Status</th><th>Kasus Uji</th><th>File</th><th>Durasi</th></tr>
+        </thead>
+        <tbody><tr>
+        <td class="num">1</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>kedua akun harus punya ID berbeda</td>
+        <td>idor.test.js</td>
+        <td class="num">4 ms</td>
+      </tr><tr>
+        <td class="num">2</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/auth/me hanya mengembalikan data pemilik sendiri</td>
+        <td>idor.test.js</td>
+        <td class="num">54 ms</td>
+      </tr><tr>
+        <td class="num">3</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>user A tidak boleh membaca profil user B lewat /api/users/:id</td>
+        <td>idor.test.js</td>
+        <td class="num">41 ms</td>
+      </tr><tr>
+        <td class="num">4</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>user A tidak boleh mengubah user B lewat PUT /api/users/:id</td>
+        <td>idor.test.js</td>
+        <td class="num">41 ms</td>
+      </tr><tr>
+        <td class="num">5</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>user A tidak boleh menghapus user B</td>
+        <td>idor.test.js</td>
+        <td class="num">33 ms</td>
+      </tr><tr>
+        <td class="num">6</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>user A tidak boleh menyetujui tipe user B</td>
+        <td>idor.test.js</td>
+        <td class="num">60 ms</td>
+      </tr><tr>
+        <td class="num">7</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>mencoba IDOR tidak boleh mengubah data user B</td>
+        <td>idor.test.js</td>
+        <td class="num">51 ms</td>
+      </tr><tr>
+        <td class="num">8</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>user A tidak bisa menandai notifikasi milik user B sebagai dibaca</td>
+        <td>idor.test.js</td>
+        <td class="num">66 ms</td>
+      </tr><tr>
+        <td class="num">9</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>user A tidak bisa menghapus notifikasi milik user B</td>
+        <td>idor.test.js</td>
+        <td class="num">66 ms</td>
+      </tr><tr>
+        <td class="num">10</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>bulk delete tidak boleh mencampur ID milik user lain</td>
+        <td>idor.test.js</td>
+        <td class="num">68 ms</td>
+      </tr><tr>
+        <td class="num">11</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>notifikasi user B masih utuh setelah semua percobaan</td>
+        <td>idor.test.js</td>
+        <td class="num">79 ms</td>
+      </tr><tr>
+        <td class="num">12</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>update profil tidak boleh menaikkan role jadi admin</td>
+        <td>idor.test.js</td>
+        <td class="num">204 ms</td>
+      </tr><tr>
+        <td class="num">13</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>user tidak boleh mengubah ID user lain lewat body</td>
+        <td>idor.test.js</td>
+        <td class="num">106 ms</td>
+      </tr><tr>
+        <td class="num">14</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>admin boleh membaca user lain (kontrol positif)</td>
+        <td>idor.test.js</td>
+        <td class="num">81 ms</td>
+      </tr><tr>
+        <td class="num">15</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>user biasa ditolak di endpoint yang sama</td>
+        <td>idor.test.js</td>
+        <td class="num">55 ms</td>
+      </tr></tbody>
+      </table>
+    </section>
+    <section class="suite">
+      <div class="suite-head">
+        <h3>6. Keamanan (brute force, boros kuota)</h3>
+        <span class="badge ok">Lolos</span>
+      </div>
+      <p class="suite-meta">
+        Kasus: <b>43</b> · Lolos: <b>43</b> ·
+        Gagal: <b>0</b> · Pending: <b>0</b> ·
+        Waktu: <b>12.7 s</b>
+      </p>
+      <table>
+        <thead>
+          <tr><th>No</th><th>Status</th><th>Kasus Uji</th><th>File</th><th>Durasi</th></tr>
+        </thead>
+        <tbody><tr>
+        <td class="num">1</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Dashboard -&gt; ditolak tanpa token</td>
+        <td>security.test.js</td>
+        <td class="num">1.1 s</td>
+      </tr><tr>
+        <td class="num">2</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Users -&gt; ditolak tanpa token</td>
+        <td>security.test.js</td>
+        <td class="num">776 ms</td>
+      </tr><tr>
+        <td class="num">3</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Notifications -&gt; ditolak tanpa token</td>
+        <td>security.test.js</td>
+        <td class="num">335 ms</td>
+      </tr><tr>
+        <td class="num">4</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Reports -&gt; ditolak tanpa token</td>
+        <td>security.test.js</td>
+        <td class="num">447 ms</td>
+      </tr><tr>
+        <td class="num">5</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>ActivityLogs -&gt; ditolak tanpa token</td>
+        <td>security.test.js</td>
+        <td class="num">310 ms</td>
+      </tr><tr>
+        <td class="num">6</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>Project pending -&gt; ditolak tanpa token</td>
+        <td>security.test.js</td>
+        <td class="num">468 ms</td>
+      </tr><tr>
+        <td class="num">7</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>token ngawur harus 401, bukan 500</td>
+        <td>security.test.js</td>
+        <td class="num">62 ms</td>
+      </tr><tr>
+        <td class="num">8</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>origin frontend sendiri -&gt; CORS diizinkan</td>
+        <td>security.test.js</td>
+        <td class="num">127 ms</td>
+      </tr><tr>
+        <td class="num">9</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>origin asing -&gt; TIDAK boleh dapat allow-origin</td>
+        <td>security.test.js</td>
+        <td class="num">91 ms</td>
+      </tr><tr>
+        <td class="num">10</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>origin asing pada request tulis (POST) -&gt; tetap ditolak</td>
+        <td>security.test.js</td>
+        <td class="num">72 ms</td>
+      </tr><tr>
+        <td class="num">11</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>preflight OPTIONS dari origin asing tidak boleh mengizinkan</td>
+        <td>security.test.js</td>
+        <td class="num">67 ms</td>
+      </tr><tr>
+        <td class="num">12</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>12x login gagal -&gt; harus kena 429</td>
+        <td>security.test.js</td>
+        <td class="num">3.7 s</td>
+      </tr><tr>
+        <td class="num">13</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>OR 1=1 di path -&gt; tidak boleh 500</td>
+        <td>security.test.js</td>
+        <td class="num">105 ms</td>
+      </tr><tr>
+        <td class="num">14</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>quote di path -&gt; tidak boleh 500</td>
+        <td>security.test.js</td>
+        <td class="num">63 ms</td>
+      </tr><tr>
+        <td class="num">15</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>UNION SELECT -&gt; tidak boleh 500</td>
+        <td>security.test.js</td>
+        <td class="num">61 ms</td>
+      </tr><tr>
+        <td class="num">16</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>limit non-numerik -&gt; tidak boleh 500</td>
+        <td>security.test.js</td>
+        <td class="num">167 ms</td>
+      </tr><tr>
+        <td class="num">17</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>stacked query -&gt; tidak boleh 500</td>
+        <td>security.test.js</td>
+        <td class="num">96 ms</td>
+      </tr><tr>
+        <td class="num">18</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>sleep-based blind -&gt; tidak boleh 500</td>
+        <td>security.test.js</td>
+        <td class="num">88 ms</td>
+      </tr><tr>
+        <td class="num">19</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>payload tidak boleh membocorkan pesan error database</td>
+        <td>security.test.js</td>
+        <td class="num">58 ms</td>
+      </tr><tr>
+        <td class="num">20</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>query string SQLi tidak boleh mengembalikan data lebih banyak</td>
+        <td>security.test.js</td>
+        <td class="num">163 ms</td>
+      </tr><tr>
+        <td class="num">21</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/projects/..%2f..%2f..%2f..%2fetc%2fpasswd -&gt; tidak boleh membocorkan file</td>
+        <td>security.test.js</td>
+        <td class="num">68 ms</td>
+      </tr><tr>
+        <td class="num">22</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/news/../../../../etc/passwd -&gt; tidak boleh membocorkan file</td>
+        <td>security.test.js</td>
+        <td class="num">41 ms</td>
+      </tr><tr>
+        <td class="num">23</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/uploads/../../../../etc/passwd -&gt; tidak boleh membocorkan file</td>
+        <td>security.test.js</td>
+        <td class="num">33 ms</td>
+      </tr><tr>
+        <td class="num">24</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/static/../../../server/.env -&gt; tidak boleh membocorkan file</td>
+        <td>security.test.js</td>
+        <td class="num">45 ms</td>
+      </tr><tr>
+        <td class="num">25</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/projects/%2e%2e%2f%2e%2e%2f%2e%2e%2f.env -&gt; tidak boleh membocorkan file</td>
+        <td>security.test.js</td>
+        <td class="num">55 ms</td>
+      </tr><tr>
+        <td class="num">26</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>HSTS aktif -&gt; mencegah downgrade ke HTTP</td>
+        <td>security.test.js</td>
+        <td class="num">100 ms</td>
+      </tr><tr>
+        <td class="num">27</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>X-Content-Type-Options nosniff -&gt; cegah MIME sniffing</td>
+        <td>security.test.js</td>
+        <td class="num">50 ms</td>
+      </tr><tr>
+        <td class="num">28</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>X-Frame-Options -&gt; cegah clickjacking</td>
+        <td>security.test.js</td>
+        <td class="num">49 ms</td>
+      </tr><tr>
+        <td class="num">29</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>CSP ada dan berbasis default-src</td>
+        <td>security.test.js</td>
+        <td class="num">48 ms</td>
+      </tr><tr>
+        <td class="num">30</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>server tidak membocorkan versi teknologi</td>
+        <td>security.test.js</td>
+        <td class="num">49 ms</td>
+      </tr><tr>
+        <td class="num">31</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>halaman utama harus 200</td>
+        <td>security.test.js</td>
+        <td class="num">220 ms</td>
+      </tr><tr>
+        <td class="num">32</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>frontend tidak boleh mengekspos X-Powered-By</td>
+        <td>security.test.js</td>
+        <td class="num">168 ms</td>
+      </tr><tr>
+        <td class="num">33</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>/api/health tidak menyebut host database</td>
+        <td>security.test.js</td>
+        <td class="num">57 ms</td>
+      </tr><tr>
+        <td class="num">34</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>response error tidak membocorkan stack trace</td>
+        <td>security.test.js</td>
+        <td class="num">72 ms</td>
+      </tr><tr>
+        <td class="num">35</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>root path tidak membocorkan isi server</td>
+        <td>security.test.js</td>
+        <td class="num">46 ms</td>
+      </tr><tr>
+        <td class="num">36</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>login -&gt; harus punya rate limit</td>
+        <td>security.test.js</td>
+        <td class="num">48 ms</td>
+      </tr><tr>
+        <td class="num">37</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>register -&gt; harus punya rate limit</td>
+        <td>security.test.js</td>
+        <td class="num">38 ms</td>
+      </tr><tr>
+        <td class="num">38</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>forgot-password -&gt; harus punya rate limit</td>
+        <td>security.test.js</td>
+        <td class="num">39 ms</td>
+      </tr><tr>
+        <td class="num">39</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>check-email -&gt; harus punya rate limit</td>
+        <td>security.test.js</td>
+        <td class="num">121 ms</td>
+      </tr><tr>
+        <td class="num">40</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>verify-email -&gt; harus punya rate limit</td>
+        <td>security.test.js</td>
+        <td class="num">40 ms</td>
+      </tr><tr>
+        <td class="num">41</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>verify-reset-code -&gt; harus punya rate limit</td>
+        <td>security.test.js</td>
+        <td class="num">43 ms</td>
+      </tr><tr>
+        <td class="num">42</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>reset-password -&gt; harus punya rate limit</td>
+        <td>security.test.js</td>
+        <td class="num">59 ms</td>
+      </tr><tr>
+        <td class="num">43</td>
+        <td><span class="badge ok">Lolos</span></td>
+        <td>reset-password menolak percobaan berulang setelah batas</td>
+        <td>security.test.js</td>
+        <td class="num">1.9 s</td>
+      </tr></tbody>
+      </table>
+    </section>
+    
+
+    <footer>Dihasilkan oleh tests/generateTestReport.js · Selasa, 13 Oktober 2026 pukul 13.35</footer>
+  </div>
+</body>
+</html>

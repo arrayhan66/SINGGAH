@@ -1,0 +1,1314 @@
+{
+  "generatedAt": "2026-10-13T06:35:17.381Z",
+  "suites": [
+    {
+      "name": "live",
+      "title": "Smoke test Railway + Vercel",
+      "logins": 0,
+      "args": [
+        "tests/live.test.js",
+        "tests/production.test.js"
+      ],
+      "ok": true,
+      "wallMs": 10950,
+      "numTotalTests": 52,
+      "numPassedTests": 52,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "tests": [
+        {
+          "title": "Categories -> tidak boleh 500",
+          "status": "passed",
+          "duration": 299,
+          "failure": ""
+        },
+        {
+          "title": "News -> tidak boleh 500",
+          "status": "passed",
+          "duration": 186,
+          "failure": ""
+        },
+        {
+          "title": "Settings -> tidak boleh 500",
+          "status": "passed",
+          "duration": 124,
+          "failure": ""
+        },
+        {
+          "title": "Projects -> tidak boleh 500",
+          "status": "passed",
+          "duration": 417,
+          "failure": ""
+        },
+        {
+          "title": "Stats -> tidak boleh 500",
+          "status": "passed",
+          "duration": 140,
+          "failure": ""
+        },
+        {
+          "title": "Hall -> tidak boleh 500",
+          "status": "passed",
+          "duration": 105,
+          "failure": ""
+        },
+        {
+          "title": "Notifications -> tidak boleh 500",
+          "status": "passed",
+          "duration": 103,
+          "failure": ""
+        },
+        {
+          "title": "Dashboard -> tidak boleh 500",
+          "status": "passed",
+          "duration": 142,
+          "failure": ""
+        },
+        {
+          "title": "Users -> tidak boleh 500",
+          "status": "passed",
+          "duration": 113,
+          "failure": ""
+        },
+        {
+          "title": "Categories -> harus respons dalam batas wajar",
+          "status": "passed",
+          "duration": 109,
+          "failure": ""
+        },
+        {
+          "title": "News -> harus respons dalam batas wajar",
+          "status": "passed",
+          "duration": 144,
+          "failure": ""
+        },
+        {
+          "title": "Settings -> harus respons dalam batas wajar",
+          "status": "passed",
+          "duration": 133,
+          "failure": ""
+        },
+        {
+          "title": "Projects -> harus respons dalam batas wajar",
+          "status": "passed",
+          "duration": 138,
+          "failure": ""
+        },
+        {
+          "title": "Stats -> harus respons dalam batas wajar",
+          "status": "passed",
+          "duration": 112,
+          "failure": ""
+        },
+        {
+          "title": "Hall -> harus respons dalam batas wajar",
+          "status": "passed",
+          "duration": 111,
+          "failure": ""
+        },
+        {
+          "title": "Notifications -> harus respons dalam batas wajar",
+          "status": "passed",
+          "duration": 96,
+          "failure": ""
+        },
+        {
+          "title": "Dashboard -> harus respons dalam batas wajar",
+          "status": "passed",
+          "duration": 107,
+          "failure": ""
+        },
+        {
+          "title": "Users -> harus respons dalam batas wajar",
+          "status": "passed",
+          "duration": 103,
+          "failure": ""
+        },
+        {
+          "title": "Railway health harus 200 dan database ok",
+          "status": "passed",
+          "duration": 108,
+          "failure": ""
+        },
+        {
+          "title": "health tidak boleh membocorkan kredensial",
+          "status": "passed",
+          "duration": 127,
+          "failure": ""
+        },
+        {
+          "title": "endpoint daftar harus membungkus data (bukan objek kosong)",
+          "status": "passed",
+          "duration": 125,
+          "failure": ""
+        },
+        {
+          "title": "payload tidak boleh string kosong atau null",
+          "status": "passed",
+          "duration": 97,
+          "failure": ""
+        },
+        {
+          "title": "error 404 harus berbentuk JSON, bukan halaman HTML",
+          "status": "passed",
+          "duration": 194,
+          "failure": ""
+        },
+        {
+          "title": "limit wajar harus diterima",
+          "status": "passed",
+          "duration": 264,
+          "failure": ""
+        },
+        {
+          "title": "limit tidak valid tidak boleh 500",
+          "status": "passed",
+          "duration": 363,
+          "failure": ""
+        },
+        {
+          "title": "page di luar range tidak boleh 500",
+          "status": "passed",
+          "duration": 49,
+          "failure": ""
+        },
+        {
+          "title": "method yang tidak didukung harus menolak, bukan 500",
+          "status": "passed",
+          "duration": 40,
+          "failure": ""
+        },
+        {
+          "title": "body JSON rusak harus 400, bukan 500",
+          "status": "passed",
+          "duration": 49,
+          "failure": ""
+        },
+        {
+          "title": "body sebesar 3MB harus ditolak dengan rapi (limit 2mb)",
+          "status": "passed",
+          "duration": 3944,
+          "failure": ""
+        },
+        {
+          "title": "redirect tidak bolehMENTS berayap",
+          "status": "passed",
+          "duration": 43,
+          "failure": ""
+        },
+        {
+          "title": "origin frontend sendiri diizinkan",
+          "status": "passed",
+          "duration": 62,
+          "failure": ""
+        },
+        {
+          "title": "origin asing tidak diizinkan",
+          "status": "passed",
+          "duration": 42,
+          "failure": ""
+        },
+        {
+          "title": "login tidak boleh mengembalikan token di body (harus cookie)",
+          "status": "passed",
+          "duration": 63,
+          "failure": ""
+        },
+        {
+          "title": "token kedaluwarsa tidak boleh mendapat akses",
+          "status": "passed",
+          "duration": 42,
+          "failure": ""
+        },
+        {
+          "title": "alg:none tidak boleh diterima",
+          "status": "passed",
+          "duration": 43,
+          "failure": ""
+        },
+        {
+          "title": "role di token tidak boleh memberi akses admin",
+          "status": "passed",
+          "duration": 35,
+          "failure": ""
+        },
+        {
+          "title": "halaman utama harus 200",
+          "status": "passed",
+          "duration": 157,
+          "failure": ""
+        },
+        {
+          "title": "frontend harus menyajikan HTML, bukan JSON",
+          "status": "passed",
+          "duration": 155,
+          "failure": ""
+        },
+        {
+          "title": "API host yang dipakai frontend harus hidup",
+          "status": "passed",
+          "duration": 37,
+          "failure": ""
+        },
+        {
+          "title": "path /api di Vercel tidak dipakai frontend",
+          "status": "passed",
+          "duration": 73,
+          "failure": ""
+        },
+        {
+          "title": "frontend tidak mengekspos X-Powered-By",
+          "status": "passed",
+          "duration": 77,
+          "failure": ""
+        },
+        {
+          "title": "Categories → tidak boleh 500",
+          "status": "passed",
+          "duration": 71,
+          "failure": ""
+        },
+        {
+          "title": "News → tidak boleh 500",
+          "status": "passed",
+          "duration": 81,
+          "failure": ""
+        },
+        {
+          "title": "Settings → tidak boleh 500",
+          "status": "passed",
+          "duration": 42,
+          "failure": ""
+        },
+        {
+          "title": "Projects → tidak boleh 500",
+          "status": "passed",
+          "duration": 42,
+          "failure": ""
+        },
+        {
+          "title": "Stats → tidak boleh 500",
+          "status": "passed",
+          "duration": 33,
+          "failure": ""
+        },
+        {
+          "title": "Hall → tidak boleh 500",
+          "status": "passed",
+          "duration": 53,
+          "failure": ""
+        },
+        {
+          "title": "Notifications → tidak boleh 500",
+          "status": "passed",
+          "duration": 44,
+          "failure": ""
+        },
+        {
+          "title": "Dashboard → tidak boleh 500",
+          "status": "passed",
+          "duration": 43,
+          "failure": ""
+        },
+        {
+          "title": "Users → tidak boleh 500",
+          "status": "passed",
+          "duration": 47,
+          "failure": ""
+        },
+        {
+          "title": "halaman utama harus 200",
+          "status": "passed",
+          "duration": 62,
+          "failure": ""
+        },
+        {
+          "title": "proxy /api lewat Vercel harus menjangkau backend",
+          "status": "passed",
+          "duration": 57,
+          "failure": ""
+        }
+      ]
+    },
+    {
+      "name": "docs",
+      "title": "Dokumentasi API (/api/docs) dan drift spec",
+      "logins": 0,
+      "args": [
+        "tests/hostedDocs.test.js"
+      ],
+      "ok": true,
+      "wallMs": 4420,
+      "numTotalTests": 19,
+      "numPassedTests": 19,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "tests": [
+        {
+          "title": "halaman utama docs harus 200 dan menyajikan HTML",
+          "status": "passed",
+          "duration": 148,
+          "failure": ""
+        },
+        {
+          "title": "tanpa garis miring di akhir juga harus dilayani",
+          "status": "passed",
+          "duration": 204,
+          "failure": ""
+        },
+        {
+          "title": "dokumentasi tidak boleh butuh login",
+          "status": "passed",
+          "duration": 63,
+          "failure": ""
+        },
+        {
+          "title": "aset statis docs harus termuat semua",
+          "status": "passed",
+          "duration": 500,
+          "failure": ""
+        },
+        {
+          "title": "spec harus bisa dibaca dan di-parse",
+          "status": "passed",
+          "duration": 162,
+          "failure": ""
+        },
+        {
+          "title": "spec harus punya versi OpenAPI dan info yang benar",
+          "status": "passed",
+          "duration": 1,
+          "failure": ""
+        },
+        {
+          "title": "spec harus menunjuk ke base URL yang benar",
+          "status": "passed",
+          "duration": 0,
+          "failure": ""
+        },
+        {
+          "title": "spec harus punya endpoint yang berarti",
+          "status": "passed",
+          "duration": 0,
+          "failure": ""
+        },
+        {
+          "title": "spec tidak boleh membocorkan kredensial",
+          "status": "passed",
+          "duration": 146,
+          "failure": ""
+        },
+        {
+          "title": "semua endpoint GET yang didokumentasikan harus ada di server",
+          "status": "passed",
+          "duration": 1800,
+          "failure": ""
+        },
+        {
+          "title": "endpoint yang tidak ada di spec harus tetap 404",
+          "status": "passed",
+          "duration": 52,
+          "failure": ""
+        },
+        {
+          "title": "/api/users -> 401 tanpa token",
+          "status": "passed",
+          "duration": 37,
+          "failure": ""
+        },
+        {
+          "title": "/api/dashboard -> 401 tanpa token",
+          "status": "passed",
+          "duration": 55,
+          "failure": ""
+        },
+        {
+          "title": "/api/notifications -> 401 tanpa token",
+          "status": "passed",
+          "duration": 78,
+          "failure": ""
+        },
+        {
+          "title": "/api/activity-logs -> 401 tanpa token",
+          "status": "passed",
+          "duration": 44,
+          "failure": ""
+        },
+        {
+          "title": "/api/reports -> 401 tanpa token",
+          "status": "passed",
+          "duration": 52,
+          "failure": ""
+        },
+        {
+          "title": "/api/projects/pending -> 401 tanpa token",
+          "status": "passed",
+          "duration": 42,
+          "failure": ""
+        },
+        {
+          "title": "/api/projects/my-bookmarks -> 401 tanpa token",
+          "status": "passed",
+          "duration": 52,
+          "failure": ""
+        },
+        {
+          "title": "/api/auth/me boleh anonim tapi tidak boleh error",
+          "status": "passed",
+          "duration": 50,
+          "failure": ""
+        }
+      ]
+    },
+    {
+      "name": "endpoints",
+      "title": "Endpoint read-only yang belum pernah diuji di hosting",
+      "logins": 0,
+      "args": [
+        "tests/hostedEndpoints.test.js"
+      ],
+      "ok": true,
+      "wallMs": 7960,
+      "numTotalTests": 58,
+      "numPassedTests": 58,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "tests": [
+        {
+          "title": "slug yang ada harus mengembalikan artikel",
+          "status": "passed",
+          "duration": 408,
+          "failure": ""
+        },
+        {
+          "title": "slug yang tidak ada harus 404 dengan pesan yang jelas",
+          "status": "passed",
+          "duration": 116,
+          "failure": ""
+        },
+        {
+          "title": "slug dengan karakter aneh tidak boleh 500",
+          "status": "passed",
+          "duration": 581,
+          "failure": ""
+        },
+        {
+          "title": "slug kosong tidak boleh 500",
+          "status": "passed",
+          "duration": 43,
+          "failure": ""
+        },
+        {
+          "title": "id yang ada harus mengembalikan kategori",
+          "status": "passed",
+          "duration": 189,
+          "failure": ""
+        },
+        {
+          "title": "id yang tidak ada harus 404 'Kategori tidak ditemukan'",
+          "status": "passed",
+          "duration": 63,
+          "failure": ""
+        },
+        {
+          "title": "id bukan angka harus ditolak dengan rapi",
+          "status": "passed",
+          "duration": 335,
+          "failure": ""
+        },
+        {
+          "title": "id yang ada harus mengembalikan project",
+          "status": "passed",
+          "duration": 195,
+          "failure": ""
+        },
+        {
+          "title": "id yang tidak ada harus 404 dengan pesan 'Project tidak ditemukan'",
+          "status": "passed",
+          "duration": 62,
+          "failure": ""
+        },
+        {
+          "title": "id sangat besar tidak boleh overflow jadi 500",
+          "status": "passed",
+          "duration": 82,
+          "failure": ""
+        },
+        {
+          "title": "revision endpoint harus tetap 404",
+          "status": "passed",
+          "duration": 65,
+          "failure": ""
+        },
+        {
+          "title": "daftar user -> menolak tanpa token",
+          "status": "passed",
+          "duration": 52,
+          "failure": ""
+        },
+        {
+          "title": "detail user -> menolak tanpa token",
+          "status": "passed",
+          "duration": 149,
+          "failure": ""
+        },
+        {
+          "title": "project milik saya -> menolak tanpa token",
+          "status": "passed",
+          "duration": 43,
+          "failure": ""
+        },
+        {
+          "title": "bookmark saya -> menolak tanpa token",
+          "status": "passed",
+          "duration": 40,
+          "failure": ""
+        },
+        {
+          "title": "notifikasi -> menolak tanpa token",
+          "status": "passed",
+          "duration": 37,
+          "failure": ""
+        },
+        {
+          "title": "dashboard -> menolak tanpa token",
+          "status": "passed",
+          "duration": 41,
+          "failure": ""
+        },
+        {
+          "title": "log aktivitas -> menolak tanpa token",
+          "status": "passed",
+          "duration": 55,
+          "failure": ""
+        },
+        {
+          "title": "laporan -> menolak tanpa token",
+          "status": "passed",
+          "duration": 84,
+          "failure": ""
+        },
+        {
+          "title": "statistik profil -> menolak tanpa token",
+          "status": "passed",
+          "duration": 57,
+          "failure": ""
+        },
+        {
+          "title": "daftar media -> menolak tanpa token",
+          "status": "passed",
+          "duration": 63,
+          "failure": ""
+        },
+        {
+          "title": "detail user milik orang lain juga harus menolak",
+          "status": "passed",
+          "duration": 129,
+          "failure": ""
+        },
+        {
+          "title": "token ngawur tidak boleh menambah data di response",
+          "status": "passed",
+          "duration": 40,
+          "failure": ""
+        },
+        {
+          "title": "/api/stats/visit -> 404",
+          "status": "passed",
+          "duration": 43,
+          "failure": ""
+        },
+        {
+          "title": "/api/media/usage -> 404",
+          "status": "passed",
+          "duration": 48,
+          "failure": ""
+        },
+        {
+          "title": "/api/auth/check-email -> 404",
+          "status": "passed",
+          "duration": 68,
+          "failure": ""
+        },
+        {
+          "title": "/api/news/..%2f..%2f..%2f..%2fetc%2fpasswd -> tidak boleh bocor file",
+          "status": "passed",
+          "duration": 55,
+          "failure": ""
+        },
+        {
+          "title": "/api/projects/..%2f..%2f..%2f..%2fetc%2fpasswd -> tidak boleh bocor file",
+          "status": "passed",
+          "duration": 60,
+          "failure": ""
+        },
+        {
+          "title": "/api/projects/%2e%2e%2f%2e%2e%2f.env -> tidak boleh bocor file",
+          "status": "passed",
+          "duration": 78,
+          "failure": ""
+        },
+        {
+          "title": "/api/media/..%2f..%2f..%2f.env -> tidak boleh bocor file",
+          "status": "passed",
+          "duration": 55,
+          "failure": ""
+        },
+        {
+          "title": "/api/users/..%2f..%2fserver.js -> tidak boleh bocor file",
+          "status": "passed",
+          "duration": 59,
+          "failure": ""
+        },
+        {
+          "title": "/api/news/..%2f..%2f..%2f..%2fproc%2fself%2fenviron -> tidak boleh bocor file",
+          "status": "passed",
+          "duration": 194,
+          "failure": ""
+        },
+        {
+          "title": "path traversal tidak boleh membuat server error",
+          "status": "passed",
+          "duration": 313,
+          "failure": ""
+        },
+        {
+          "title": "limit=abc -> tidak boleh 500",
+          "status": "passed",
+          "duration": 196,
+          "failure": ""
+        },
+        {
+          "title": "limit=-1 -> tidak boleh 500",
+          "status": "passed",
+          "duration": 146,
+          "failure": ""
+        },
+        {
+          "title": "limit=0 -> tidak boleh 500",
+          "status": "passed",
+          "duration": 149,
+          "failure": ""
+        },
+        {
+          "title": "limit=1e10 -> tidak boleh 500",
+          "status": "passed",
+          "duration": 133,
+          "failure": ""
+        },
+        {
+          "title": "limit=999999999999 -> tidak boleh 500",
+          "status": "passed",
+          "duration": 218,
+          "failure": ""
+        },
+        {
+          "title": "limit= -> tidak boleh 500",
+          "status": "passed",
+          "duration": 196,
+          "failure": ""
+        },
+        {
+          "title": "limit=%20 -> tidak boleh 500",
+          "status": "passed",
+          "duration": 181,
+          "failure": ""
+        },
+        {
+          "title": "limit valid harus dipatuhi",
+          "status": "passed",
+          "duration": 104,
+          "failure": ""
+        },
+        {
+          "title": "page di luar range harus mengembalikan kosong, bukan error",
+          "status": "passed",
+          "duration": 87,
+          "failure": ""
+        },
+        {
+          "title": "sort dan filter tidak dikenal tidak boleh 500",
+          "status": "passed",
+          "duration": 590,
+          "failure": ""
+        },
+        {
+          "title": "sort yang valid harus mengembalikan hasil",
+          "status": "passed",
+          "duration": 147,
+          "failure": ""
+        },
+        {
+          "title": "/api/projects -> success:true dan punya data",
+          "status": "passed",
+          "duration": 61,
+          "failure": ""
+        },
+        {
+          "title": "/api/news -> success:true dan punya data",
+          "status": "passed",
+          "duration": 58,
+          "failure": ""
+        },
+        {
+          "title": "/api/categories -> success:true dan punya data",
+          "status": "passed",
+          "duration": 39,
+          "failure": ""
+        },
+        {
+          "title": "/api/stats -> success:true dan punya data",
+          "status": "passed",
+          "duration": 44,
+          "failure": ""
+        },
+        {
+          "title": "/api/hall -> success:true dan punya data",
+          "status": "passed",
+          "duration": 58,
+          "failure": ""
+        },
+        {
+          "title": "/api/settings -> success:true dan punya data",
+          "status": "passed",
+          "duration": 53,
+          "failure": ""
+        },
+        {
+          "title": "endpoint ber-pagination harus punya bentuk yang sama",
+          "status": "passed",
+          "duration": 96,
+          "failure": ""
+        },
+        {
+          "title": "response error harus selalu punya success:false",
+          "status": "passed",
+          "duration": 220,
+          "failure": ""
+        },
+        {
+          "title": "content-type response error harus JSON",
+          "status": "passed",
+          "duration": 52,
+          "failure": ""
+        },
+        {
+          "title": "/api/stats harus replying cepat dan konsisten",
+          "status": "passed",
+          "duration": 68,
+          "failure": ""
+        },
+        {
+          "title": "/api/stats harus punya field yang dipakai frontend",
+          "status": "passed",
+          "duration": 50,
+          "failure": ""
+        },
+        {
+          "title": "/api/hall harus punya kategori dan karya",
+          "status": "passed",
+          "duration": 69,
+          "failure": ""
+        },
+        {
+          "title": "/api/settings harus mengembalikan konfigurasi publik",
+          "status": "passed",
+          "duration": 74,
+          "failure": ""
+        },
+        {
+          "title": "landing page tidak boleh membocorkan kredensial lewat settings",
+          "status": "passed",
+          "duration": 59,
+          "failure": ""
+        }
+      ]
+    },
+    {
+      "name": "auth",
+      "title": "Alur auth (butuh akun)",
+      "logins": 1,
+      "args": [
+        "tests/authFlows.test.js"
+      ],
+      "ok": false,
+      "wallMs": 221428,
+      "numTotalTests": 15,
+      "numPassedTests": 7,
+      "numFailedTests": 8,
+      "numPendingTests": 0,
+      "tests": [
+        {
+          "title": "login mengembalikan cookie HttpOnly + Secure",
+          "status": "failed",
+          "duration": 1,
+          "failure": "Error: thrown: \"Exceeded timeout of 60000 ms for a hook.\nAdd a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout.\"\n    at beforeAll (C:\\Users\\admin\\SINGGAH\\server\\tests\\authFlows.test.js:134:3)\n    at _dispatchDescribe (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\jestAdapterInit.js:608:26)\n    at describe (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\jestAdapterInit.js:576:44)\n    at Object.describeUser (C:\\Users\\admin\\SINGGAH\\server\\tests\\authFlows.test.js:131:1)\n    at ModuleExecutor.exec (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:2078:26)\n    at CjsLoader.loadModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:323:36)\n    at CjsLoader.requireModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:289:12)\n    at Runtime.requireModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:3657:27)\n    at jestAdapter (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\runner.js:96:13)\n    at runTestInternal (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runner\\build\\index.js:276:16)\n    at runTest (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runner\\build\\index.js:344:7)"
+        },
+        {
+          "title": "TIDAK menyertakan token di body response",
+          "status": "failed",
+          "duration": 0,
+          "failure": "Error: thrown: \"Exceeded timeout of 60000 ms for a hook.\nAdd a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout.\"\n    at beforeAll (C:\\Users\\admin\\SINGGAH\\server\\tests\\authFlows.test.js:134:3)\n    at _dispatchDescribe (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\jestAdapterInit.js:608:26)\n    at describe (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\jestAdapterInit.js:576:44)\n    at Object.describeUser (C:\\Users\\admin\\SINGGAH\\server\\tests\\authFlows.test.js:131:1)\n    at ModuleExecutor.exec (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:2078:26)\n    at CjsLoader.loadModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:323:36)\n    at CjsLoader.requireModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:289:12)\n    at Runtime.requireModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:3657:27)\n    at jestAdapter (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\runner.js:96:13)\n    at runTestInternal (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runner\\build\\index.js:276:16)\n    at runTest (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runner\\build\\index.js:344:7)"
+        },
+        {
+          "title": "/api/auth/me mengembalikan data user",
+          "status": "failed",
+          "duration": 0,
+          "failure": "Error: thrown: \"Exceeded timeout of 60000 ms for a hook.\nAdd a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout.\"\n    at beforeAll (C:\\Users\\admin\\SINGGAH\\server\\tests\\authFlows.test.js:134:3)\n    at _dispatchDescribe (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\jestAdapterInit.js:608:26)\n    at describe (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\jestAdapterInit.js:576:44)\n    at Object.describeUser (C:\\Users\\admin\\SINGGAH\\server\\tests\\authFlows.test.js:131:1)\n    at ModuleExecutor.exec (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:2078:26)\n    at CjsLoader.loadModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:323:36)\n    at CjsLoader.requireModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:289:12)\n    at Runtime.requireModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:3657:27)\n    at jestAdapter (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\runner.js:96:13)\n    at runTestInternal (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runner\\build\\index.js:276:16)\n    at runTest (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runner\\build\\index.js:344:7)"
+        },
+        {
+          "title": "response profil tidak boleh membocorkan password hash",
+          "status": "failed",
+          "duration": 0,
+          "failure": "Error: thrown: \"Exceeded timeout of 60000 ms for a hook.\nAdd a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout.\"\n    at beforeAll (C:\\Users\\admin\\SINGGAH\\server\\tests\\authFlows.test.js:134:3)\n    at _dispatchDescribe (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\jestAdapterInit.js:608:26)\n    at describe (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\jestAdapterInit.js:576:44)\n    at Object.describeUser (C:\\Users\\admin\\SINGGAH\\server\\tests\\authFlows.test.js:131:1)\n    at ModuleExecutor.exec (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:2078:26)\n    at CjsLoader.loadModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:323:36)\n    at CjsLoader.requireModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:289:12)\n    at Runtime.requireModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:3657:27)\n    at jestAdapter (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\runner.js:96:13)\n    at runTestInternal (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runner\\build\\index.js:276:16)\n    at runTest (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runner\\build\\index.js:344:7)"
+        },
+        {
+          "title": "cookie session tidak boleh bekerja di origin lain",
+          "status": "failed",
+          "duration": 0,
+          "failure": "Error: thrown: \"Exceeded timeout of 60000 ms for a hook.\nAdd a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout.\"\n    at beforeAll (C:\\Users\\admin\\SINGGAH\\server\\tests\\authFlows.test.js:134:3)\n    at _dispatchDescribe (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\jestAdapterInit.js:608:26)\n    at describe (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\jestAdapterInit.js:576:44)\n    at Object.describeUser (C:\\Users\\admin\\SINGGAH\\server\\tests\\authFlows.test.js:131:1)\n    at ModuleExecutor.exec (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:2078:26)\n    at CjsLoader.loadModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:323:36)\n    at CjsLoader.requireModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:289:12)\n    at Runtime.requireModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:3657:27)\n    at jestAdapter (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\runner.js:96:13)\n    at runTestInternal (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runner\\build\\index.js:276:16)\n    at runTest (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runner\\build\\index.js:344:7)"
+        },
+        {
+          "title": "user biasa tidak boleh menyentuh endpoint admin",
+          "status": "failed",
+          "duration": 1,
+          "failure": "Error: thrown: \"Exceeded timeout of 60000 ms for a hook.\nAdd a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout.\"\n    at beforeAll (C:\\Users\\admin\\SINGGAH\\server\\tests\\authFlows.test.js:134:3)\n    at _dispatchDescribe (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\jestAdapterInit.js:608:26)\n    at describe (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\jestAdapterInit.js:576:44)\n    at Object.describeUser (C:\\Users\\admin\\SINGGAH\\server\\tests\\authFlows.test.js:131:1)\n    at ModuleExecutor.exec (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:2078:26)\n    at CjsLoader.loadModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:323:36)\n    at CjsLoader.requireModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:289:12)\n    at Runtime.requireModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:3657:27)\n    at jestAdapter (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\runner.js:96:13)\n    at runTestInternal (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runner\\build\\index.js:276:16)\n    at runTest (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runner\\build\\index.js:344:7)"
+        },
+        {
+          "title": "user biasa tidak boleh moderasi karya orang lain",
+          "status": "failed",
+          "duration": 0,
+          "failure": "Error: thrown: \"Exceeded timeout of 60000 ms for a hook.\nAdd a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout.\"\n    at beforeAll (C:\\Users\\admin\\SINGGAH\\server\\tests\\authFlows.test.js:134:3)\n    at _dispatchDescribe (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\jestAdapterInit.js:608:26)\n    at describe (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\jestAdapterInit.js:576:44)\n    at Object.describeUser (C:\\Users\\admin\\SINGGAH\\server\\tests\\authFlows.test.js:131:1)\n    at ModuleExecutor.exec (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:2078:26)\n    at CjsLoader.loadModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:323:36)\n    at CjsLoader.requireModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:289:12)\n    at Runtime.requireModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:3657:27)\n    at jestAdapter (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\runner.js:96:13)\n    at runTestInternal (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runner\\build\\index.js:276:16)\n    at runTest (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runner\\build\\index.js:344:7)"
+        },
+        {
+          "title": "update profil tidak boleh bisa men escalate role",
+          "status": "failed",
+          "duration": 1,
+          "failure": "Error: thrown: \"Exceeded timeout of 60000 ms for a hook.\nAdd a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout.\"\n    at beforeAll (C:\\Users\\admin\\SINGGAH\\server\\tests\\authFlows.test.js:134:3)\n    at _dispatchDescribe (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\jestAdapterInit.js:608:26)\n    at describe (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\jestAdapterInit.js:576:44)\n    at Object.describeUser (C:\\Users\\admin\\SINGGAH\\server\\tests\\authFlows.test.js:131:1)\n    at ModuleExecutor.exec (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:2078:26)\n    at CjsLoader.loadModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:323:36)\n    at CjsLoader.requireModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:289:12)\n    at Runtime.requireModule (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runtime\\build\\index.js:3657:27)\n    at jestAdapter (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-circus\\build\\runner.js:96:13)\n    at runTestInternal (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runner\\build\\index.js:276:16)\n    at runTest (C:\\Users\\admin\\SINGGAH\\server\\node_modules\\jest-runner\\build\\index.js:344:7)"
+        },
+        {
+          "title": "ganti password harus menolak payload kosong",
+          "status": "passed",
+          "duration": 509,
+          "failure": ""
+        },
+        {
+          "title": "upload tanpa file harus ditolak, bukan crash",
+          "status": "passed",
+          "duration": 43,
+          "failure": ""
+        },
+        {
+          "title": "upload tanpa token harus ditolak",
+          "status": "passed",
+          "duration": 42,
+          "failure": ""
+        },
+        {
+          "title": "admin boleh melihat daftar user",
+          "status": "passed",
+          "duration": 117,
+          "failure": ""
+        },
+        {
+          "title": "admin boleh membuka dashboard",
+          "status": "passed",
+          "duration": 115,
+          "failure": ""
+        },
+        {
+          "title": "daftar user tidak boleh membocorkan hash password",
+          "status": "passed",
+          "duration": 71,
+          "failure": ""
+        },
+        {
+          "title": "activity log tidak boleh mengekspos email massal tanpa filter",
+          "status": "passed",
+          "duration": 65,
+          "failure": ""
+        }
+      ]
+    },
+    {
+      "name": "idor",
+      "title": "IDOR lintas dua akun",
+      "logins": 2,
+      "args": [
+        "tests/idor.test.js"
+      ],
+      "ok": true,
+      "wallMs": 3113,
+      "numTotalTests": 15,
+      "numPassedTests": 15,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "tests": [
+        {
+          "title": "kedua akun harus punya ID berbeda",
+          "status": "passed",
+          "duration": 4,
+          "failure": ""
+        },
+        {
+          "title": "/api/auth/me hanya mengembalikan data pemilik sendiri",
+          "status": "passed",
+          "duration": 54,
+          "failure": ""
+        },
+        {
+          "title": "user A tidak boleh membaca profil user B lewat /api/users/:id",
+          "status": "passed",
+          "duration": 41,
+          "failure": ""
+        },
+        {
+          "title": "user A tidak boleh mengubah user B lewat PUT /api/users/:id",
+          "status": "passed",
+          "duration": 41,
+          "failure": ""
+        },
+        {
+          "title": "user A tidak boleh menghapus user B",
+          "status": "passed",
+          "duration": 33,
+          "failure": ""
+        },
+        {
+          "title": "user A tidak boleh menyetujui tipe user B",
+          "status": "passed",
+          "duration": 60,
+          "failure": ""
+        },
+        {
+          "title": "mencoba IDOR tidak boleh mengubah data user B",
+          "status": "passed",
+          "duration": 51,
+          "failure": ""
+        },
+        {
+          "title": "user A tidak bisa menandai notifikasi milik user B sebagai dibaca",
+          "status": "passed",
+          "duration": 66,
+          "failure": ""
+        },
+        {
+          "title": "user A tidak bisa menghapus notifikasi milik user B",
+          "status": "passed",
+          "duration": 66,
+          "failure": ""
+        },
+        {
+          "title": "bulk delete tidak boleh mencampur ID milik user lain",
+          "status": "passed",
+          "duration": 68,
+          "failure": ""
+        },
+        {
+          "title": "notifikasi user B masih utuh setelah semua percobaan",
+          "status": "passed",
+          "duration": 79,
+          "failure": ""
+        },
+        {
+          "title": "update profil tidak boleh menaikkan role jadi admin",
+          "status": "passed",
+          "duration": 204,
+          "failure": ""
+        },
+        {
+          "title": "user tidak boleh mengubah ID user lain lewat body",
+          "status": "passed",
+          "duration": 106,
+          "failure": ""
+        },
+        {
+          "title": "admin boleh membaca user lain (kontrol positif)",
+          "status": "passed",
+          "duration": 81,
+          "failure": ""
+        },
+        {
+          "title": "user biasa ditolak di endpoint yang sama",
+          "status": "passed",
+          "duration": 55,
+          "failure": ""
+        }
+      ]
+    },
+    {
+      "name": "security",
+      "title": "Keamanan (brute force, boros kuota)",
+      "logins": 12,
+      "args": [
+        "tests/security.test.js"
+      ],
+      "ok": true,
+      "wallMs": 12719,
+      "numTotalTests": 43,
+      "numPassedTests": 43,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "tests": [
+        {
+          "title": "Dashboard -> ditolak tanpa token",
+          "status": "passed",
+          "duration": 1057,
+          "failure": ""
+        },
+        {
+          "title": "Users -> ditolak tanpa token",
+          "status": "passed",
+          "duration": 776,
+          "failure": ""
+        },
+        {
+          "title": "Notifications -> ditolak tanpa token",
+          "status": "passed",
+          "duration": 335,
+          "failure": ""
+        },
+        {
+          "title": "Reports -> ditolak tanpa token",
+          "status": "passed",
+          "duration": 447,
+          "failure": ""
+        },
+        {
+          "title": "ActivityLogs -> ditolak tanpa token",
+          "status": "passed",
+          "duration": 310,
+          "failure": ""
+        },
+        {
+          "title": "Project pending -> ditolak tanpa token",
+          "status": "passed",
+          "duration": 468,
+          "failure": ""
+        },
+        {
+          "title": "token ngawur harus 401, bukan 500",
+          "status": "passed",
+          "duration": 62,
+          "failure": ""
+        },
+        {
+          "title": "origin frontend sendiri -> CORS diizinkan",
+          "status": "passed",
+          "duration": 127,
+          "failure": ""
+        },
+        {
+          "title": "origin asing -> TIDAK boleh dapat allow-origin",
+          "status": "passed",
+          "duration": 91,
+          "failure": ""
+        },
+        {
+          "title": "origin asing pada request tulis (POST) -> tetap ditolak",
+          "status": "passed",
+          "duration": 72,
+          "failure": ""
+        },
+        {
+          "title": "preflight OPTIONS dari origin asing tidak boleh mengizinkan",
+          "status": "passed",
+          "duration": 67,
+          "failure": ""
+        },
+        {
+          "title": "12x login gagal -> harus kena 429",
+          "status": "passed",
+          "duration": 3660,
+          "failure": ""
+        },
+        {
+          "title": "OR 1=1 di path -> tidak boleh 500",
+          "status": "passed",
+          "duration": 105,
+          "failure": ""
+        },
+        {
+          "title": "quote di path -> tidak boleh 500",
+          "status": "passed",
+          "duration": 63,
+          "failure": ""
+        },
+        {
+          "title": "UNION SELECT -> tidak boleh 500",
+          "status": "passed",
+          "duration": 61,
+          "failure": ""
+        },
+        {
+          "title": "limit non-numerik -> tidak boleh 500",
+          "status": "passed",
+          "duration": 167,
+          "failure": ""
+        },
+        {
+          "title": "stacked query -> tidak boleh 500",
+          "status": "passed",
+          "duration": 96,
+          "failure": ""
+        },
+        {
+          "title": "sleep-based blind -> tidak boleh 500",
+          "status": "passed",
+          "duration": 88,
+          "failure": ""
+        },
+        {
+          "title": "payload tidak boleh membocorkan pesan error database",
+          "status": "passed",
+          "duration": 58,
+          "failure": ""
+        },
+        {
+          "title": "query string SQLi tidak boleh mengembalikan data lebih banyak",
+          "status": "passed",
+          "duration": 163,
+          "failure": ""
+        },
+        {
+          "title": "/api/projects/..%2f..%2f..%2f..%2fetc%2fpasswd -> tidak boleh membocorkan file",
+          "status": "passed",
+          "duration": 68,
+          "failure": ""
+        },
+        {
+          "title": "/api/news/../../../../etc/passwd -> tidak boleh membocorkan file",
+          "status": "passed",
+          "duration": 41,
+          "failure": ""
+        },
+        {
+          "title": "/uploads/../../../../etc/passwd -> tidak boleh membocorkan file",
+          "status": "passed",
+          "duration": 33,
+          "failure": ""
+        },
+        {
+          "title": "/static/../../../server/.env -> tidak boleh membocorkan file",
+          "status": "passed",
+          "duration": 45,
+          "failure": ""
+        },
+        {
+          "title": "/api/projects/%2e%2e%2f%2e%2e%2f%2e%2e%2f.env -> tidak boleh membocorkan file",
+          "status": "passed",
+          "duration": 55,
+          "failure": ""
+        },
+        {
+          "title": "HSTS aktif -> mencegah downgrade ke HTTP",
+          "status": "passed",
+          "duration": 100,
+          "failure": ""
+        },
+        {
+          "title": "X-Content-Type-Options nosniff -> cegah MIME sniffing",
+          "status": "passed",
+          "duration": 50,
+          "failure": ""
+        },
+        {
+          "title": "X-Frame-Options -> cegah clickjacking",
+          "status": "passed",
+          "duration": 49,
+          "failure": ""
+        },
+        {
+          "title": "CSP ada dan berbasis default-src",
+          "status": "passed",
+          "duration": 48,
+          "failure": ""
+        },
+        {
+          "title": "server tidak membocorkan versi teknologi",
+          "status": "passed",
+          "duration": 49,
+          "failure": ""
+        },
+        {
+          "title": "halaman utama harus 200",
+          "status": "passed",
+          "duration": 220,
+          "failure": ""
+        },
+        {
+          "title": "frontend tidak boleh mengekspos X-Powered-By",
+          "status": "passed",
+          "duration": 168,
+          "failure": ""
+        },
+        {
+          "title": "/api/health tidak menyebut host database",
+          "status": "passed",
+          "duration": 57,
+          "failure": ""
+        },
+        {
+          "title": "response error tidak membocorkan stack trace",
+          "status": "passed",
+          "duration": 72,
+          "failure": ""
+        },
+        {
+          "title": "root path tidak membocorkan isi server",
+          "status": "passed",
+          "duration": 46,
+          "failure": ""
+        },
+        {
+          "title": "login -> harus punya rate limit",
+          "status": "passed",
+          "duration": 48,
+          "failure": ""
+        },
+        {
+          "title": "register -> harus punya rate limit",
+          "status": "passed",
+          "duration": 38,
+          "failure": ""
+        },
+        {
+          "title": "forgot-password -> harus punya rate limit",
+          "status": "passed",
+          "duration": 39,
+          "failure": ""
+        },
+        {
+          "title": "check-email -> harus punya rate limit",
+          "status": "passed",
+          "duration": 121,
+          "failure": ""
+        },
+        {
+          "title": "verify-email -> harus punya rate limit",
+          "status": "passed",
+          "duration": 40,
+          "failure": ""
+        },
+        {
+          "title": "verify-reset-code -> harus punya rate limit",
+          "status": "passed",
+          "duration": 43,
+          "failure": ""
+        },
+        {
+          "title": "reset-password -> harus punya rate limit",
+          "status": "passed",
+          "duration": 59,
+          "failure": ""
+        },
+        {
+          "title": "reset-password menolak percobaan berulang setelah batas",
+          "status": "passed",
+          "duration": 1938,
+          "failure": ""
+        }
+      ]
+    }
+  ]
+}

@@ -7,6 +7,8 @@ const {
   summarize,
   clearCaches,
   CACHE_PREFIXES,
+  DEFAULT_PORT,
+  DEFAULT_HTTPS_PORT,
   fmt,
   ms,
 } = require("./helpers");
@@ -22,7 +24,8 @@ const arg = (name, fallback) => {
 };
 const flag = (name) => process.argv.includes(`--${name}`);
 
-const PORT = Number(arg("port", 5000));
+const USE_HTTPS = flag("https");
+const PORT = Number(arg("port", USE_HTTPS ? DEFAULT_HTTPS_PORT : DEFAULT_PORT));
 const HOST = arg("host", "127.0.0.1");
 const QUICK = flag("quick");
 const USERS = Number(arg("users", 1000));
@@ -134,13 +137,17 @@ async function cooldown(ms = 5000) {
 }
 
 (async () => {
-  const request = createRequester({ host: HOST, port: PORT });
+  const request = createRequester({
+    host: HOST,
+    port: PORT,
+    https: USE_HTTPS,
+  });
 
   console.log("");
   console.log("=".repeat(72));
   console.log("UJI BEBAN SINGGAH");
   console.log("=".repeat(72));
-  console.log(`  target       : http://${HOST}:${PORT}`);
+  console.log(`  target       : ${USE_HTTPS ? "https" : "http"}://${HOST}:${PORT}`);
   console.log(`  pengguna     : ${fmt(USERS)}`);
   console.log(`  durasi beban : ${(DURATION / 1000).toFixed(0)} detik`);
   console.log(
@@ -235,6 +242,7 @@ async function cooldown(ms = 5000) {
             path: ep.path,
             connections: USERS,
             durationSec: Math.round(DURATION / 1000),
+            https: USE_HTTPS,
           })
         : await sustained(request, ep.path, USERS, DURATION);
       record("sustained", `${ep.name} (${ep.path})`, outcome, {

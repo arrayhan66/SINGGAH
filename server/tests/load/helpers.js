@@ -6,16 +6,18 @@
  */
 
 const http = require("http");
+const https = require("https");
 
 const DEFAULT_PORT = 5000;
 const DEFAULT_HOST = "127.0.0.1";
+const DEFAULT_HTTPS_PORT = 443;
 
 // PENTING: jangan naikkan maxSockets di sini.
 // Diuji: maxSockets 20000 membuat burst 1000 gagal dengan ECONNRESET/ECONNREFUSED
 // (agent membuat soket lebih cepat dari yang bisa dicerna OS), sedangkan 2000
 // memberi 1000/1000 tanpa error berulang. Jangan diubah tanpa diukur ulang.
-function makeAgent(maxSockets = 2000) {
-  return new http.Agent({ keepAlive: true, maxSockets });
+function makeAgent(AgentClass, maxSockets = 2000) {
+  return new AgentClass({ keepAlive: true, maxSockets });
 }
 
 // Error koneksi yang terjadi karena ada socket keep-alive yang ditutup server
@@ -27,15 +29,17 @@ const CONNECTION_RACE = new Set(["ECONNRESET", "ECONNREFUSED", "EPIPE"]);
 function createRequester({
   host = DEFAULT_HOST,
   port = DEFAULT_PORT,
+  https: useHttps = false,
   timeout = 30000,
   retries = 1,
 } = {}) {
-  const agent = makeAgent();
+  const transport = useHttps ? https : http;
+  const agent = makeAgent(transport.Agent);
 
   const once = (path) =>
     new Promise((resolve) => {
       const startedAt = process.hrtime.bigint();
-      const req = http.get({ host, port, path, agent, timeout }, (res) => {
+      const req = transport.get({ host, port, path, agent, timeout }, (res) => {
         let bytes = 0;
         res.on("data", (chunk) => (bytes += chunk.length));
         res.on("end", () =>
@@ -200,6 +204,7 @@ const ms = (n) => `${fmt(n)} ms`;
 module.exports = {
   DEFAULT_PORT,
   DEFAULT_HOST,
+  DEFAULT_HTTPS_PORT,
   CACHE_PREFIXES,
   createRequester,
   percentile,

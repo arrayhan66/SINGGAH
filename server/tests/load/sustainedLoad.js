@@ -25,9 +25,10 @@ function sustainedViaAutocannon({
   path,
   connections,
   durationSec,
+  https: useHttps = false,
 }) {
   return new Promise((resolve, reject) => {
-    const url = `http://${host}:${port}${path}`;
+    const url = `${useHttps ? "https" : "http"}://${host}:${port}${path}`;
     execFile(
       process.execPath,
       [

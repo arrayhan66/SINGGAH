@@ -16,6 +16,7 @@
     "test:auth": "jest --runInBand tests/authFlows.test.js",
     "test:idor": "jest --runInBand tests/idor.test.js",
     "test:hosted": "node tests/runHosted.js",
+    "test:report": "node tests/generateTestReport.js",
     "seed:hall": "node scripts/seedHall.js",
     "lowercase:usernames": "node scripts/lowercaseUsernames.js",
     "sync:db": "node scripts/syncDb.js",

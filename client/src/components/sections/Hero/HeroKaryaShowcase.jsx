@@ -13,68 +13,6 @@ import { useTheme } from "../../../context/ThemeContext";
 import SmartImage from "../../ui/SmartImage";
 import { SLIDESHOW_MAX_ITEMS } from "../../../constants/slideshow";
 
-// Data cadangan bila API belum tersedia / output kosong. Struktur ini
-// sengaja dibuat semirip mungkin dengan response API /projects agar mudah
-// diganti data manual tanpa menyentuh logika komponen.
-const FALLBACK_PROJECTS = [
-  {
-    id: "fb-plts",
-    title: "Sistem Monitoring PLTS Berbasis IoT",
-    slug: "plts-iot",
-    description:
-      "Pantau produksi dan konsumsi daya PLTS secara real-time lewat sensor IoT dan dashboard berbasis web.",
-    category: "PLTS IoT",
-    categorySlug: "iot",
-    thumbnail: "https://placehold.co/800x600/06283d/22d3ee?text=PLTS+IoT",
-    year: 2025,
-    author: "Tim Elektro",
-    status: "published",
-    updatedAt: "2025-03-14T08:00:00.000Z",
-  },
-  {
-    id: "fb-robot",
-    title: "Robot Line Follower Otomatis",
-    slug: "robot-line-follower",
-    description:
-      "Robot penjejak garis dengan kontrol PID untuk akurasi dan kecepatan melintasi lintasan.",
-    category: "Robotika",
-    categorySlug: "robotika",
-    thumbnail: "https://placehold.co/800x600/0f2232/7dd3fc?text=Robotika",
-    year: 2025,
-    author: "Tim Robotika",
-    status: "published",
-    updatedAt: "2025-09-01T08:00:00.000Z",
-  },
-  {
-    id: "fb-electro",
-    title: "Modul Rangkaian Dasar Elektronika",
-    slug: "rangkaian-elektronik",
-    description:
-      "Modul praktikum papan rangkaian dengan proteksi arus dan indikator digital.",
-    category: "Rangkaian Elektronik",
-    categorySlug: "rangkaian-elektronik",
-    thumbnail: "https://placehold.co/800x600/1e1b4b/818cf8?text=Rangkaian",
-    year: 2024,
-    author: "Tim Elektronika",
-    status: "published",
-    updatedAt: "2024-11-20T08:00:00.000Z",
-  },
-  {
-    id: "fb-appweb",
-    title: "Aplikasi & Web Layanan Kampus",
-    slug: "aplikasi-web",
-    description:
-      "Aplikasi mobile dan website layanan akademik yang saling terintegrasi.",
-    category: "Aplikasi & Web",
-    categorySlug: "website",
-    thumbnail: "https://placehold.co/800x600/082f49/38bdf8?text=Aplikasi+%26+Web",
-    year: 2026,
-    author: "Tim Pengembangan",
-    status: "published",
-    updatedAt: "2026-02-18T08:00:00.000Z",
-  },
-];
-
 // Jumlah maksimal karya yang dimuat dari API. Diambil lebih banyak dari
 // tampilan agar kartu kategori di bawah mencakup semua kategori yang ada.
 const FETCH_LIMIT = 50;
@@ -143,29 +81,21 @@ function HeroKaryaShowcase({ variant }) {
     let cancelled = false;
     const fetchSlides = async () => {
       try {
-        let res = await api.get("/projects", {
+        // Hanya karya yang secara eksplisit ditandai "Slideshow Beranda" oleh
+        // admin. Jangan fallback ke karya published lain: kalau tidak ada yang
+        // aktif, hero harus kosong (bukan menampilkan karya yang tidak dipilih).
+        const res = await api.get("/projects", {
           params: { status: "published", limit: FETCH_LIMIT, slideshow: "true" },
         });
-        let items = res.data.data.items || res.data.data || [];
-        let normalized = items
+        const items = res.data.data.items || res.data.data || [];
+        const normalized = items
           .map(normalizeProject)
-          .filter((p) => p.title && p.slug);
-        // Kalau admin belum menandai karya slideshow, fallback ke daftar
-        // publikasi terbaru (perilaku lama).
-        if (normalized.length === 0) {
-          res = await api.get("/projects", {
-            params: { status: "published", limit: FETCH_LIMIT },
-          });
-          items = res.data.data.items || res.data.data || [];
-          normalized = items
-            .map(normalizeProject)
-            .filter((p) => p.title && p.slug);
-        }
+          .filter((p) => p.isShownInSlideshow && p.title && p.slug);
         if (cancelled) return;
-        setProjects(normalized.length ? normalized : FALLBACK_PROJECTS);
+        setProjects(normalized);
       } catch {
         if (cancelled) return;
-        setProjects(FALLBACK_PROJECTS);
+        setProjects([]);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -176,24 +106,11 @@ function HeroKaryaShowcase({ variant }) {
     };
   }, []);
 
-  // Daftar slide carousel: utamakan karya yang ditandai "Slideshow Beranda"
-  // oleh admin. Kalau belum ada penanda sama sekali, fallback ke daftar lama
-  // (maks 6, tiap kategori tampil minimal satu kali).
-  const slides = useMemo(() => {
-    const flagged = projects.filter((p) => p.isShownInSlideshow);
-    if (flagged.length > 0) return flagged.slice(0, MAX_SLIDES);
-
-    const byCat = new Map();
-    for (const p of projects) {
-      const key = p.categorySlug || "karya";
-      if (!byCat.has(key)) byCat.set(key, []);
-      byCat.get(key).push(p);
-    }
-    const ordered = [];
-    for (const arr of byCat.values()) if (arr[0]) ordered.push(arr[0]);
-    for (const arr of byCat.values()) ordered.push(...arr.slice(1));
-    return ordered.slice(0, MAX_SLIDES);
-  }, [projects]);
+  // Slide carousel hanya berisi karya yang ditandai "Slideshow Beranda".
+  const slides = useMemo(
+    () => projects.filter((p) => p.isShownInSlideshow).slice(0, MAX_SLIDES),
+    [projects]
+  );
 
   const count = slides.length;
   const preview = count ? slides[active] : null;
@@ -321,10 +238,22 @@ function HeroKaryaShowcase({ variant }) {
         <div className="relative z-0">
                   {/* LAYER 1 — MAIN CARD, centered di depan. */}
         <div className="group/img relative z-10 transition-transform duration-700 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.02]">
-          {loading || !preview ? (
+          {loading ? (
             <div className="showcase-card relative overflow-hidden rounded-2xl" style={CARD_HEIGHT_STYLE}>
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="h-6 w-24 animate-pulse rounded-md bg-white/10" />
+              </div>
+            </div>
+          ) : !preview ? (
+            <div className={`showcase-card relative overflow-hidden rounded-2xl ${isLight ? "bg-blue-50" : "bg-[#041d38]"}`} style={CARD_HEIGHT_STYLE}>
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
+                <Layers size={28} className={isLight ? "text-blue-400" : "text-cyan-400"} />
+                <p className={`text-sm font-semibold ${isLight ? "text-blue-700" : "text-cyan-200"}`}>
+                  Belum ada karya unggulan
+                </p>
+                <p className={`text-xs ${isLight ? "text-blue-500" : "text-slate-400"}`}>
+                  Admin belum memilih karya untuk slideshow beranda.
+                </p>
               </div>
             </div>
           ) : (
@@ -413,6 +342,8 @@ function HeroKaryaShowcase({ variant }) {
         )}
 
         {/* NAVIGASI — dua tombol bulat simetris di tepi kanan-kiri MAIN CARD. */}
+        {count > 0 && (
+          <>
         <button
           type="button"
           onClick={prev}
@@ -429,6 +360,8 @@ function HeroKaryaShowcase({ variant }) {
         >
           <ArrowRight size={15} className="lg:h-4 lg:w-4" />
         </button>
+          </>
+        )}
       </div>
 
       {/* PAGINATION — jarak seimbang: nggak mepet ke kartu, nggak jauh dari CTA. */}

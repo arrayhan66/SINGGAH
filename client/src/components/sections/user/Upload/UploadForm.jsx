@@ -181,8 +181,9 @@ function UploadForm() {
       sessionStorage.removeItem(DRAFT_FIELDS_KEY)
       await clearUploadDraft()
 
-      // Status sebenarnya datang dari server: mahasiswa pending, dosen langsung
-      // tayang. Popup ikut menyesuaikan supaya tidak berbohong ke pengguna.
+      // Status sebenarnya datang dari server: mahasiswa pending, dosen/admin
+      // langsung tayang. Popup ikut menyesuaikan supaya tidak berbohong ke
+      // pengguna.
       setSubmittedStatus(created?.status || null)
       setSuccessOpen(true)
     } catch (err) {

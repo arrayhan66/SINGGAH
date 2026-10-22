@@ -90,9 +90,19 @@ function UploadInformation({ formData, updateField, showAuthorType = false }) {
             type="text"
             value={formData.title}
             onChange={(e) => updateField("title", e.target.value)}
+            maxLength={90}
             placeholder="Cth: Sistem Monitoring Suhu"
             className="w-full rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1.5 min-[280px]:px-4 min-[280px]:py-2.5 text-xs min-[280px]:text-sm text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:bg-white focus:outline-none 2xl:text-base 2xl:px-5 2xl:py-3 3xl:text-lg 3xl:px-6 3xl:py-3.5 4xl:text-xl 4xl:px-7 4xl:py-4"
           />
+          <span
+            className={`self-end text-[9px] min-[280px]:text-[11px] font-medium ${
+              (formData.title?.length ?? 0) >= 90
+                ? "text-red-400"
+                : "text-slate-400"
+            }`}
+          >
+            {(formData.title?.length ?? 0)}/90
+          </span>
         </div>
 
         {/* Kategori */}

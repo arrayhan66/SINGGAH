@@ -48,10 +48,13 @@ function Hero() {
             </span>
           </div>
 
-          <h1 className="mt-4 text-3xl min-[350px]:text-4xl md:text-5xl lg:text-6xl 2xl:text-7xl font-black leading-tight text-white">
-            SINGGAH
+          <h1
+            className="mt-4 text-3xl min-[350px]:text-4xl md:text-5xl lg:text-6xl 2xl:text-7xl font-black leading-tight text-white whitespace-nowrap"
+            style={{ fontFamily: "'Montserrat', sans-serif" }}
+          >
+            Singgah
             <br />
-            SEJENAK <span className="text-cyan-300">DISINI</span>
+            Sejenak <span className="text-cyan-300">Disini</span>
           </h1>
 
           <div className="mt-5 flex flex-col md:flex-row items-center lg:items-start gap-3">

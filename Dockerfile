@@ -31,7 +31,9 @@ COPY server/ ./
 # Jangan ikut tertimpa saat container start; env mutation via compose/env vars.
 EXPOSE 5000
 
+# Render/Railway menentukan PORT sendiri (bukan 5000), jadi healthcheck
+# harus membaca PORT dari environment, bukan hardcode.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD node -e "fetch('http://localhost:5000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+  CMD node -e "const p=process.env.PORT||5000;fetch('http://localhost:'+p+'/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
 CMD ["node", "server.js"]

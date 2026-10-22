@@ -135,7 +135,7 @@ function ResetPasswordForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-4 text-slate-600 transition-colors hover:text-cyan-600"
+                className="absolute right-2.5 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg text-slate-600 transition-colors hover:text-cyan-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/60 min-[350px]:right-3 sm:right-3.5"
               >
                 {showPassword ? (
                   <EyeOff className="h-[18px] w-[18px] min-[350px]:h-5 min-[350px]:w-5 sm:h-6 sm:w-6" />
@@ -168,7 +168,7 @@ function ResetPasswordForm() {
               <button
                 type="button"
                 onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-4 text-slate-600 transition-colors hover:text-cyan-600"
+                className="absolute right-2.5 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg text-slate-600 transition-colors hover:text-cyan-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/60 min-[350px]:right-3 sm:right-3.5"
               >
                 {showConfirm ? (
                   <EyeOff className="h-[18px] w-[18px] min-[350px]:h-5 min-[350px]:w-5 sm:h-6 sm:w-6" />

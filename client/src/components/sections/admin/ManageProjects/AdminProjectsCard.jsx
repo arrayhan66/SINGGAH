@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import { createPortal } from "react-dom"
-import { Clock, CheckCircle2, XCircle, Eye, Heart, Calendar, Tag, Globe, Pencil, Trash2, Star, Crown, Lock, Plus, MonitorPlay, Loader2 } from "lucide-react"
+import { Clock, CheckCircle2, XCircle, Eye, Heart, Calendar, Tag, Globe, Pencil, Trash2, Star, Crown, Lock, Plus, MonitorPlay, Loader2, GraduationCap } from "lucide-react"
 import { imageUrl, buildSrcSet } from "../../../../utils/imageUrl"
 import toast from "../../../../utils/toast"
 import SmartImage from "../../../ui/SmartImage"
@@ -61,8 +61,18 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
   // Slot unggulan bersifat per PORTAL (kategori) DAN PER TIPE PENULIS:
   // okupasi dihitung dari karya dengan tipe yang sama (mahasiswa/dosen)
   // dalam kategori yang sama, sehingga tiap portal bisa punya 2 unggulan
-  // mahasiswa + 2 unggulan dosen (maks 4).
-  const authorType = String(project.author_tipe || project.User?.tipe) === "dosen" ? "dosen" : "mahasiswa"
+  // mahasiswa + 2 unggulan dosen (maks 4). Aturan tipe harus sama dengan
+  // server (resolveAuthorType): author_tipe eksplisit menang; jika kosong,
+  // akun "dosen" maupun "umum" (admin) dianggap dosen.
+  const declaredTipe = project.author_tipe
+  const ownerTipe = project.User?.tipe
+  const authorType = declaredTipe
+    ? declaredTipe === "dosen"
+      ? "dosen"
+      : "mahasiswa"
+    : ownerTipe === "dosen" || ownerTipe === "umum"
+      ? "dosen"
+      : "mahasiswa"
   const scopeKey = `${String(project.category_id ?? project.Category?.id ?? "")}::${authorType}`
   const scopedFeatured = featuredBySlot?.[scopeKey] || {}
 
@@ -564,9 +574,20 @@ function AdminProjectsCard({ project, onViewDetail, onQuickApprove, onQuickRejec
             textClass="text-[11px]"
             className="shrink-0"
           />
-          <p className="truncate text-sm font-semibold text-white">
-            {project.User?.name || ""}
-          </p>
+          <div className="flex min-w-0 flex-col">
+            <p className="truncate text-sm font-semibold text-white">
+              {project.User?.name || ""}
+            </p>
+            <span
+              className={`author-badge author-badge-${authorType} mt-0.5 inline-flex items-center gap-1 self-start text-[10px] font-medium ${
+                authorType === "dosen" ? "text-blue-300" : "text-emerald-300"
+              }`}
+              title={`Karya ${authorType}`}
+            >
+              <GraduationCap size={11} strokeWidth={2.2} />
+              Karya {authorType === "dosen" ? "Dosen" : "Mahasiswa"}
+            </span>
+          </div>
         </div>
 
         <h3 className="mt-3 text-sm font-semibold text-white leading-snug line-clamp-2">

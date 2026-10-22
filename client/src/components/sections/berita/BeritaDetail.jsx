@@ -12,6 +12,7 @@ import {
   Send,
   BookOpen,
   Megaphone,
+  ExternalLink,
 } from "lucide-react"
 import { useBerita } from "../../../context/BeritaContext"
 import { useTheme } from "../../../context/ThemeContext"
@@ -20,13 +21,45 @@ import { imageUrl } from "../../../utils/imageUrl"
 import { processContentHtml } from "../../../utils/processContentHtml"
 import SmartImage from "../../ui/SmartImage"
 
-function parseSeeAlsoItems(htmlStr) {
-  if (!htmlStr) return []
+function parseSeeAlsoItems(htmlStr) {  if (!htmlStr) return []
   try {
     return JSON.parse(htmlStr)
   } catch {
     return []
   }
+}
+
+// Pisahkan HTML artikel menjadi potongan konten biasa dan blok kustom
+// (Baca Juga / Iklan). Tidak memakai regex karena blok kustom punya div
+// bersarang: regex non-greedy berhenti di </div> pertama dan sisa markup
+// (termasuk foto setelahnya) bisa rusak/hilang.
+function splitContentBlocks(html) {
+  if (!html) return []
+  const doc = new DOMParser().parseFromString(
+    `<div id="__news_root">${html}</div>`,
+    "text/html"
+  )
+  const root = doc.getElementById("__news_root")
+  if (!root) return [{ html }]
+
+  const parts = []
+  let buffer = ""
+
+  for (const node of Array.from(root.childNodes)) {
+    const type = node.nodeType === 1 ? node.getAttribute("data-type") : null
+    if (type === "see-also" || type === "ad-block") {
+      if (buffer.trim()) parts.push({ html: buffer })
+      buffer = ""
+      const attrs = {}
+      for (const attr of node.attributes) attrs[attr.name] = attr.value
+      parts.push({ type, attrs })
+    } else {
+      buffer += node.outerHTML ?? node.textContent ?? ""
+    }
+  }
+
+  if (buffer.trim()) parts.push({ html: buffer })
+  return parts
 }
 
 function SeeAlsoBlock({ htmlAttributes }) {
@@ -51,30 +84,58 @@ function SeeAlsoBlock({ htmlAttributes }) {
               href={item.url || "#"}
               target={item.url ? "_blank" : undefined}
               rel={item.url ? "noopener noreferrer" : undefined}
-              className={`flex items-start gap-3 px-5 py-3.5 transition-colors ${
-                item.url ? (isDark ? "hover:bg-white/5 cursor-pointer" : "hover:bg-amber-50/80 cursor-pointer") : ""
+              className={`group relative flex items-start gap-3 px-5 py-3.5 transition-all duration-300 ${
+                item.url
+                  ? isDark
+                    ? "hover:bg-blue-500/10 hover:shadow-[inset_0_0_30px_rgba(59,130,246,0.12)] cursor-pointer"
+                    : "hover:bg-blue-50 hover:shadow-[inset_0_0_30px_rgba(37,99,235,0.08)] cursor-pointer"
+                  : ""
               }`}
             >
+              {item.url && (
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-y-0 left-0 w-1 origin-top scale-y-0 bg-gradient-to-b from-cyan-400 to-blue-500 transition-transform duration-300 group-hover:scale-y-100"
+                />
+              )}
               {item.image ? (
-                <div className={`h-16 w-24 shrink-0 overflow-hidden rounded-lg ${isDark ? "bg-slate-800" : "bg-amber-100"}`}>
+                <div className={`h-16 w-24 shrink-0 overflow-hidden rounded-lg transition-all duration-300 ${isDark ? "bg-slate-800" : "bg-amber-100"} ${item.url ? "group-hover:ring-2 group-hover:ring-cyan-400/70" : ""}`}>
                   <SmartImage
                     src={item.image}
                     alt={item.title}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                 </div>
               ) : (
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${isDark ? "bg-slate-800 text-amber-400" : "bg-amber-100 text-amber-500"}`}>
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold transition-all duration-300 ${isDark ? "bg-slate-800 text-amber-400" : "bg-amber-100 text-amber-500"} ${
+                  item.url
+                    ? isDark
+                      ? "group-hover:bg-blue-500/20 group-hover:text-cyan-300"
+                      : "group-hover:bg-blue-100 group-hover:text-blue-700"
+                    : ""
+                }`}>
                   {index + 1}
                 </div>
               )}
               <div className="min-w-0 flex-1 py-0.5">
-                <p className={`text-sm font-bold leading-snug line-clamp-2 ${isDark ? "text-slate-200" : "text-slate-800"} ${item.url ? "group-hover:text-amber-400" : ""}`}>
+                <p className={`text-sm font-bold leading-snug line-clamp-2 transition-colors duration-300 ${
+                  item.url
+                    ? isDark
+                      ? "text-blue-400 group-hover:text-cyan-300 group-hover:underline group-hover:decoration-cyan-400/70 group-hover:underline-offset-2"
+                      : "text-blue-600 group-hover:text-blue-700 group-hover:underline group-hover:decoration-blue-400 group-hover:underline-offset-2"
+                    : isDark
+                      ? "text-slate-200"
+                      : "text-slate-800"
+                }`}>
                   {item.title}
                 </p>
                 {item.url && (
-                  <p className={`mt-1 text-[11px] truncate ${isDark ? "text-cyan-400" : "text-cyan-600"}`}>
-                    {item.url}
+                  <p className={`mt-1 flex items-center gap-1 text-[11px] ${isDark ? "text-blue-400/80" : "text-blue-600/80"}`}>
+                    <span className="truncate">{item.url}</span>
+                    <ExternalLink
+                      size={11}
+                      className="shrink-0 -translate-x-1 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+                    />
                   </p>
                 )}
               </div>
@@ -127,6 +188,48 @@ function AdBlockRender({ htmlAttributes }) {
   )
 }
 
+function NewsGallery({ item }) {
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
+
+  let gallery = item.gallery
+  if (typeof gallery === "string") {
+    try {
+      gallery = JSON.parse(gallery)
+    } catch {
+      gallery = []
+    }
+  }
+
+  const html = typeof item.contentHTML === "string" ? item.contentHTML : ""
+  const photos = (Array.isArray(gallery) ? gallery : []).filter(
+    (photo) => photo?.url && !html.includes(photo.url)
+  )
+
+  if (photos.length === 0) return null
+
+  return (
+    <div className="mt-8 space-y-6">
+      {photos.map((photo, index) => (
+        <figure key={`${photo.url}-${index}`} className="my-2 min-[350px]:my-4 sm:my-5 rounded-none overflow-hidden">
+          <div className={`w-full max-h-[500px] overflow-hidden ${isDark ? "bg-slate-800" : "bg-slate-100"}`}>
+            <SmartImage
+              src={imageUrl(photo.url)}
+              alt={photo.caption || item.title || ""}
+              className="block h-auto w-full max-w-full"
+            />
+          </div>
+          {photo.caption && (
+            <figcaption className={`relative mt-2 border-l-[4px] border-cyan-400 pl-4 sm:pl-5 py-2.5 bg-gradient-to-r from-cyan-500/10 to-transparent text-sm sm:text-base italic leading-relaxed rounded-r-lg ${isDark ? "text-white" : "text-slate-800"}`}>
+              {photo.caption}
+            </figcaption>
+          )}
+        </figure>
+      ))}
+    </div>
+  )
+}
+
 function NewsContent({ item }) {
   const { theme } = useTheme()
   const isDark = theme === "dark"
@@ -141,56 +244,42 @@ function NewsContent({ item }) {
       item.contentHTML.includes('data-type="ad-block"'))
 
   if (hasCustomBlocks) {
-    const parts = item.contentHTML.split(
-      /(<div[^>]*data-type="(?:see-also|ad-block)"[^>]*>[\s\S]*?<\/div>)/g
-    )
+    const parts = splitContentBlocks(item.contentHTML)
 
     return (
       <>
         {parts.map((part, index) => {
-          if (part.includes('data-type="see-also"')) {
-            const parser = new DOMParser()
-            const doc = parser.parseFromString(part, "text/html")
-            const el = doc.body.firstChild
-            if (!el) return null
-            const attrs = {}
-            for (const attr of el.attributes) {
-              attrs[attr.name] = attr.value
-            }
-            return <SeeAlsoBlock key={index} htmlAttributes={attrs} />
+          if (part.type === "see-also") {
+            return <SeeAlsoBlock key={index} htmlAttributes={part.attrs} />
           }
-          if (part.includes('data-type="ad-block"')) {
-            const parser = new DOMParser()
-            const doc = parser.parseFromString(part, "text/html")
-            const el = doc.body.firstChild
-            if (!el) return null
-            const attrs = {}
-            for (const attr of el.attributes) {
-              attrs[attr.name] = attr.value
-            }
-            return <AdBlockRender key={index} htmlAttributes={attrs} />
+          if (part.type === "ad-block") {
+            return <AdBlockRender key={index} htmlAttributes={part.attrs} />
           }
-          if (part.trim()) {
+          if (part.html && part.html.trim()) {
             return (
               <div
                 key={index}
-                className={`prose prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-img:rounded-none prose-img:mx-auto prose-p:leading-relaxed prose-p:my-4 prose-img:my-0 prose-figure:my-0 ${isDark ? "prose-invert prose-slate" : "prose-slate"}`}
-                dangerouslySetInnerHTML={{ __html: processContentHtml(part) }}
+                className={`prose prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-img:rounded-none prose-img:mx-auto prose-p:leading-relaxed prose-p:my-4 prose-img:my-0 prose-figure:my-0 prose-a:underline prose-a:underline-offset-2 ${isDark ? "prose-invert prose-slate prose-a:text-blue-400 hover:prose-a:text-blue-300" : "prose-slate prose-a:text-blue-600 hover:prose-a:text-blue-700"}`}
+                dangerouslySetInnerHTML={{ __html: processContentHtml(part.html) }}
               />
             )
           }
           return null
         })}
+        <NewsGallery item={item} />
       </>
     )
   }
 
   if (hasHTML) {
     return (
-      <div
-        className={`prose prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-img:rounded-none prose-img:mx-auto prose-p:leading-relaxed prose-p:my-4 prose-img:my-0 prose-figure:my-0 ${isDark ? "prose-invert prose-slate" : "prose-slate"}`}
-        dangerouslySetInnerHTML={{ __html: processContentHtml(item.contentHTML) }}
-      />
+      <>
+        <div
+          className={`prose prose-sm sm:prose-base max-w-none prose-headings:font-bold prose-img:rounded-none prose-img:mx-auto prose-p:leading-relaxed prose-p:my-4 prose-img:my-0 prose-figure:my-0 prose-a:underline prose-a:underline-offset-2 ${isDark ? "prose-invert prose-slate prose-a:text-blue-400 hover:prose-a:text-blue-300" : "prose-slate prose-a:text-blue-600 hover:prose-a:text-blue-700"}`}
+          dangerouslySetInnerHTML={{ __html: processContentHtml(item.contentHTML) }}
+        />
+        <NewsGallery item={item} />
+      </>
     )
   }
 

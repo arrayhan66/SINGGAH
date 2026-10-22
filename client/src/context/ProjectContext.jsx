@@ -39,8 +39,8 @@ export function ProjectProvider({ children }) {
   }, [fetchProjects, authLoading, isAuthed])
 
   // Kembalikan karya yang tersimpan supaya pemanggil bisa membaca status
-  // akhirnya (pending untuk mahasiswa, published untuk dosen) dan menampilkan
-  // popup yang sesuai, bukan asumsi "langsung tayang".
+  // akhirnya (pending untuk mahasiswa, published untuk dosen/admin) dan
+  // menampilkan popup yang sesuai, bukan asumsi "langsung tayang".
   const addProject = useCallback(async (formData) => {
     try {
       const res = await api.post("/projects", formData)

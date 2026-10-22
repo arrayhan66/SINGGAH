@@ -3,6 +3,7 @@
 
 @custom-variant light (&:where(html.light, html.light *));
 
+
 @font-face {
   font-family: "Poppins";
   font-style: normal;
@@ -91,6 +92,34 @@ html.no-scroll,
 html.no-scroll body {
   overflow: hidden;
   overscroll-behavior: none;
+}
+
+/* =========================================================
+   Fokus keyboard (aksesibilitas)
+   - Hanya muncul saat navigasi pakai keyboard (:focus-visible),
+     tidak saat klik/tap, supaya tampilan normal tidak berubah.
+   - Memakai outline (bukan box-shadow) agar otomatis mengikuti
+     border-radius tiap elemen.
+   - Warna mengikuti tema: cyan di gelap, biru di terang.
+   ========================================================= */
+:where(a, button, input, textarea, select, summary, [role="button"], [tabindex]):focus {
+  outline: none;
+}
+
+:where(a, button, input, textarea, select, summary, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid var(--color-brand-blue, #497eae);
+  outline-offset: 2px;
+}
+
+/* Input/textarea: hindari outline ganda, cukup pakai ring tipis
+   karena form fields sudah punya gaya border sendiri. */
+:where(input, textarea, select):focus-visible {
+  outline: 2px solid rgba(73, 126, 174, 0.55);
+  outline-offset: 1px;
+}
+
+html:not(.light) :where(a, button, input, textarea, select, summary, [role="button"], [tabindex]):focus-visible {
+  outline-color: rgba(34, 211, 238, 0.65);
 }
 
 @keyframes modal-in {

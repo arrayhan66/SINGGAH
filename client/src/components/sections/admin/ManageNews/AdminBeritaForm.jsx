@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, useLocation } from "react-router-dom"
 import { ArrowLeft } from "lucide-react"
 import { useBerita } from "../../../../context/BeritaContext"
 import AdminHeroBackground from "../../../ui/AdminHeroBackground"
@@ -57,9 +57,30 @@ function contentArrayToHTML(content) {
   return `<p>${content}</p>`
 }
 
+function previewToFormData(data) {
+  return {
+    title: data.title || "",
+    winner: data.winner || "",
+    date: data.date || "",
+    source: data.source || "",
+    desc: data.desc || "",
+    image: data.image || data.headline_image || null,
+    tags: data.tags || [],
+    contentText: data.contentHTML || contentArrayToHTML(data.content),
+    gallery: (data.gallery || []).map((g) => ({
+      file: null,
+      url: g.url || "",
+      caption: g.caption || "",
+    })),
+    slug: data.slug || "",
+    status: data.status || "draft",
+  }
+}
+
 function AdminBeritaForm() {
   const { slug } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const { getBeritaBySlug, addBerita, updateBerita, setTempPreviewData, tempPreviewData, loading, fetchBeritaDetail } = useBerita()
 
   const isEditMode = Boolean(slug)
@@ -68,7 +89,20 @@ function AdminBeritaForm() {
   const [saving, setSaving] = useState(false)
   const [pendingRedirect, setPendingRedirect] = useState(false)
 
+  // Saat admin kembali dari halaman pratinjau, data form dikirim lewat state
+  // navigasi. Ini membuat isi editor tidak hilang walau tempPreviewData di
+  // context sudah dibersihkan (mis. oleh efek form saat berpindah halaman).
+  const restoredFromPreview = location.state?.previewData || null
+
   useEffect(() => {
+    const restored = restoredFromPreview || tempPreviewData
+
+    if (restored) {
+      setFormData(previewToFormData(restored))
+      if (tempPreviewData) setTempPreviewData(null)
+      return undefined
+    }
+
     if (isEditMode) {
       if (loading) return undefined
 
@@ -81,24 +115,7 @@ function AdminBeritaForm() {
       fetchBeritaDetail(slug)
         .then((existing) => {
           if (cancelled || !existing) return
-          setFormData({
-            title: existing.title || "",
-            winner: existing.winner || "",
-            date: existing.date || "",
-            source: existing.source || "",
-            desc: existing.desc || "",
-            image: existing.headline_image || existing.image || null,
-            tags: existing.tags || [],
-            contentText:
-              existing.contentHTML || contentArrayToHTML(existing.content),
-            gallery: (existing.gallery || []).map((g) => ({
-              file: null,
-              url: g.url || "",
-              caption: g.caption || "",
-            })),
-            slug: existing.slug || "",
-            status: existing.status || "draft",
-          })
+          setFormData(previewToFormData(existing))
         })
         .catch((err) => {
           console.error("Failed to load berita for editing:", err)
@@ -109,31 +126,10 @@ function AdminBeritaForm() {
       }
     }
 
-    if (tempPreviewData) {
-      setFormData({
-        title: tempPreviewData.title || "",
-        winner: tempPreviewData.winner || "",
-        date: tempPreviewData.date || "",
-        source: tempPreviewData.source || "",
-        desc: tempPreviewData.desc || "",
-        image: tempPreviewData.image || null,
-        tags: tempPreviewData.tags || [],
-        contentText: tempPreviewData.contentHTML || contentArrayToHTML(tempPreviewData.content),
-        gallery: (tempPreviewData.gallery || []).map((g) => ({
-          file: null,
-          url: g.url || "",
-          caption: g.caption || "",
-        })),
-        slug: tempPreviewData.slug || "",
-        status: tempPreviewData.status || "draft",
-      })
-      setTempPreviewData(null)
-    } else {
-      setFormData(emptyForm)
-    }
+    setFormData(emptyForm)
     return undefined
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug, loading, isEditMode, tempPreviewData, fetchBeritaDetail])
+  }, [slug, loading, isEditMode, tempPreviewData, restoredFromPreview, fetchBeritaDetail])
 
   function showNotification(message, type) {
     setNotification({ message, type })
@@ -224,10 +220,13 @@ function AdminBeritaForm() {
       gallery: (formData.gallery || []).filter((g) => g.url),
     }
     setTempPreviewData(data)
+    // Sertakan juga lewat state navigasi agar halaman pratinjau tetap dapat
+    // data meskipun context dibersihkan oleh efek form.
+    const options = { state: { previewData: data } }
     if (isEditMode) {
-      navigate(`/admin/berita/preview/temp?from=edit&slug=${slug}`)
+      navigate(`/admin/berita/preview/temp?from=edit&slug=${slug}`, options)
     } else {
-      navigate("/admin/berita/preview/temp")
+      navigate("/admin/berita/preview/temp", options)
     }
   }
 

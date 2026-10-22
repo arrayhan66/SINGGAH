@@ -19,6 +19,9 @@ tools/
 # Build
 client/dist/
 
+# Laporan coverage test (hasil generate lokal, jangan ikut commit)
+server/coverage/
+
 # OS
 .DS_Store
 Thumbs.db

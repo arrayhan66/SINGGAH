@@ -191,6 +191,50 @@ html:not(.light) .ProseMirror hr {
 
 html:not(.light) .ProseMirror a {
   color: #22d3ee;
+  border-radius: 0.3rem;
+  padding: 0.05rem 0.2rem;
+  margin: 0 -0.2rem;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(34, 211, 238, 0.5);
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    text-decoration-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+html:not(.light) .ProseMirror a:hover {
+  color: #67e8f9;
+  background-color: rgba(34, 211, 238, 0.16);
+  text-decoration-color: #22d3ee;
+  text-decoration-thickness: 2px;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.16);
+}
+
+html.light .ProseMirror a {
+  color: #2563eb;
+  border-radius: 0.3rem;
+  padding: 0.05rem 0.2rem;
+  margin: 0 -0.2rem;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(37, 99, 235, 0.45);
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    text-decoration-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+html.light .ProseMirror a:hover {
+  color: #1e40af;
+  background-color: rgba(37, 99, 235, 0.12);
+  text-decoration-color: #1d4ed8;
+  text-decoration-thickness: 2px;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.14);
 }
 
 html:not(.light) .ProseMirror figcaption {

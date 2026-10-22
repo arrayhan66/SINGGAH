@@ -11,10 +11,17 @@ import DeleteConfirmModal from "../../../ui/DeleteConfirmModal"
 import ProjectDeletedModal from "../../../ui/ProjectDeletedModal"
 import toast from "../../../../utils/toast"
 
-// Tipe penulis efektif sebuah karya untuk cakupan slot unggulan:
-// author_tipe (diatur admin) menang; jika kosong ikuti tipe akun pembuat.
-const authorType = (p) =>
-  String(p.author_tipe || p.User?.tipe) === "dosen" ? "dosen" : "mahasiswa"
+// Tipe penulis efektif sebuah karya untuk cakupan slot unggulan.
+// Aturannya sejalan dengan server (resolveAuthorType): author_tipe eksplisit
+// menang; jika kosong, akun "dosen" maupun "umum" (admin) dianggap "dosen";
+// sisanya mahasiswa.
+const authorType = (p) => {
+  const declared = p.author_tipe
+  if (declared) return declared === "dosen" ? "dosen" : "mahasiswa"
+  const ownerTipe = p.User?.tipe
+  if (ownerTipe === "dosen" || ownerTipe === "umum") return "dosen"
+  return "mahasiswa"
+}
 const featuredScopeKey = (p) =>
   `${String(p.category_id ?? p.Category?.id ?? "")}::${authorType(p)}`
 

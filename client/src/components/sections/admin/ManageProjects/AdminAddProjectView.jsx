@@ -205,11 +205,7 @@ function AdminAddProjectView() {
               onSubmit={handleSubmit}
               submitting={submitting}
               apiError={error}
-              submitLabel={
-                formData.author_tipe === "mahasiswa"
-                  ? "Ajukan untuk Ditinjau"
-                  : "Publikasikan"
-              }
+              submitLabel="Publikasikan"
               requireAuthorType
             />
           </div>

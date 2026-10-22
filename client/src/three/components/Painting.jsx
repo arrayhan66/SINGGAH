@@ -25,10 +25,10 @@ const GEO_MAT = new THREE.PlaneGeometry(W - 0.02, H - 0.02)
 const GEO_GLOW = new THREE.PlaneGeometry(W + 0.56, H + 0.56)
 const GEO_LIGHT_BOX = new THREE.BoxGeometry(FRAME_W + 0.06, 0.08, 0.22)
 const GEO_LIGHT_PLANE = new THREE.PlaneGeometry(W + 0.2, 0.55)
-const GEO_PLAQUE = new THREE.PlaneGeometry(FRAME_W - 0.04, 0.72)
+const GEO_PLAQUE = new THREE.PlaneGeometry(FRAME_W - 0.04, 0.92)
 // Thin steel rim behind the plaque (regular works only): understated elegance,
 // clearly less ornate than the featured work's navy-gold plaque.
-const GEO_PLAQUE_RIM = new THREE.PlaneGeometry(FRAME_W - 0.01, 0.76)
+const GEO_PLAQUE_RIM = new THREE.PlaneGeometry(FRAME_W - 0.01, 0.96)
 const GEO_WIRE = new THREE.CylinderGeometry(0.008, 0.008, 1, 6)
 
 const BAR_Y = FRAME_H / 2 - BAR_T / 2
@@ -467,12 +467,12 @@ function Painting({
       {/* Plaque (info board). Karya unggulan: papan navy-gold ornamen. Karya biasa:
         papan gelap lebih kaya + rim baja tipis, tanpa garis di atas/bawah judul. */}
       {!goldPlaque && (
-        <mesh geometry={GEO_PLAQUE_RIM} material={PLAQUE_RIM_MAT} position={[0, -H / 2 - 0.58, 0.04]} />
+        <mesh geometry={GEO_PLAQUE_RIM} material={PLAQUE_RIM_MAT} position={[0, -H / 2 - 0.48, 0.04]} />
       )}
       <mesh
         geometry={GEO_PLAQUE}
         material={goldPlaque ? PLAQUE_GOLD_MAT : PLAQUE_DARK_MAT}
-        position={[0, -H / 2 - 0.58, 0.045]}
+        position={[0, -H / 2 - 0.48, 0.045]}
       />
 
       {/* Judul: selalu center — textAlign="center" membuat tiap baris (juga saat
@@ -482,13 +482,13 @@ function Painting({
           0.14, jadi tidak pernah nempel judul. */}
       <Text
         onSync={handleTitleSync}
-        position={[0, -H / 2 - (goldPlaque ? 0.48 : 0.46), 0.08]}
+        position={[0, -H / 2 - (goldPlaque ? 0.48 : 0.54) + 0.095, 0.08]}
         fontSize={0.115}
         color={goldPlaque ? "#f2d492" : "#f8fafc"}
         anchorX="center"
         anchorY="middle"
         textAlign="center"
-        maxWidth={FRAME_W - 0.12}
+        maxWidth={FRAME_W - 0.24}
         lineHeight={1.15}
         letterSpacing={goldPlaque ? 0.02 : 0.012}
         raycast={() => null}
@@ -497,13 +497,13 @@ function Painting({
         {title}
       </Text>
       <Text
-        position={[0, -H / 2 - (goldPlaque ? 0.48 : 0.46) - titleH / 2 - 0.14, 0.08]}
+        position={[0, -H / 2 - (goldPlaque ? 0.48 : 0.54) - 0.05 - titleH / 2, 0.08]}
         fontSize={0.09}
         color={goldPlaque ? "#cdb072" : accent}
         anchorX="center"
         anchorY="middle"
         textAlign="center"
-        maxWidth={FRAME_W - 0.12}
+        maxWidth={FRAME_W - 0.24}
         letterSpacing={goldPlaque ? 0.015 : 0.008}
         raycast={() => null}
         font="/fonts/Poppins-Medium.ttf"

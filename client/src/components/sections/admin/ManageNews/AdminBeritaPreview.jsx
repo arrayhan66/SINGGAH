@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react"
-import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom"
+import { useParams, useNavigate, Link, useSearchParams, useLocation } from "react-router-dom"
 import {
   ArrowLeft,
   Calendar,
@@ -11,10 +11,12 @@ import { useTheme } from "../../../../context/ThemeContext"
 import { imageUrl } from "../../../../utils/imageUrl"
 import SmartImage from "../../../ui/SmartImage"
 import { NewsContent } from "../../berita/BeritaDetail"
+import "../../../../styles/detail-light/article-links.css"
 
 function AdminBeritaPreview() {
   const { slug } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const [searchParams] = useSearchParams()
   const { beritaList, tempPreviewData, fetchBeritaDetail } = useBerita()
   const { theme } = useTheme()
@@ -59,12 +61,16 @@ function AdminBeritaPreview() {
   }, [slug, isTempPreview, fetchBeritaDetail])
 
   const listItem = isTempPreview ? null : beritaList.find((b) => b.slug === slug)
-  const item = isTempPreview ? tempPreviewData : detail || listItem
+  const navigationPreview = isTempPreview ? location.state?.previewData : null
+  const item = isTempPreview ? navigationPreview || tempPreviewData : detail || listItem
   const relatedNews = isTempPreview ? [] : beritaList.filter((b) => b.slug !== slug).slice(0, 3)
 
   const backTarget = isTempPreview
     ? (fromEditor && editSlug ? `/admin/berita/edit/${editSlug}` : "/admin/berita/tambah")
     : "/admin/berita"
+  // Bawa kembali data editor saat kembali dari pratinjau sementara, supaya
+  // isian yang belum disimpan tidak hilang.
+  const backState = isTempPreview && item ? { previewData: item } : undefined
 
   const headlineSrc = useMemo(() => {
     if (!item?.image) return null
@@ -121,6 +127,7 @@ function AdminBeritaPreview() {
             <div className="flex flex-wrap items-center justify-between gap-3 pb-0">
               <Link
                 to={backTarget}
+                state={backState}
                 className="group inline-flex items-center gap-1.5 min-[350px]:gap-2 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-xs min-[350px]:text-sm transition-all duration-300 shadow-sm cursor-pointer border border-white/10 bg-white/5 text-slate-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300"
               >
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 shrink-0">

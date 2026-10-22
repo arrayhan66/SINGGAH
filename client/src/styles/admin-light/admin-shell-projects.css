@@ -376,6 +376,16 @@ html.light .admin-page .status-pill-rejected {
   color: #b91c1c;
 }
 
+/* ===== TAG TIPE PENULIS (DOSEN / MAHASISWA) DI BAWAH NAMA =====
+   Teks kecil dengan ikon, tanpa pill/border supaya terasa natural
+   dan tidak "penuh tag". Warna dibedakan per tema. */
+html.light .admin-page .author-badge-dosen {
+  color: #2563eb;
+}
+html.light .admin-page .author-badge-mahasiswa {
+  color: #059669;
+}
+
 /* ===== HEADER GRUP KATEGORI di Kelola Karya =====
    Garis pemisah dibuat lebih kelihatan (light: biru abu jelas;
    dark: sedikit lebih terang dari border-white/10) + ikon grup

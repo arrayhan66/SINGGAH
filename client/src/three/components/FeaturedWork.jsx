@@ -229,7 +229,7 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
       </group>
 
       {/* ==== Info plaque on the podium face ==== */}
-      <group position={[0, 0.82, 0.55]}>
+      <group position={[0, 0.95, 0.55]}>
         {/* Gold outer frame */}
         <mesh>
           <boxGeometry args={[plaqueW + 0.12, plaqueH + 0.12, 0.045]} />
@@ -298,9 +298,9 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
           anchorY="middle"
           fillOpacity={0.9}
           raycast={() => null}
-          font="/fonts/Poppins-SemiBold.ttf"
+          font="/fonts/Montserrat-Bold.ttf"
         >
-          KARYA UNGGULAN
+          Karya Unggulan
         </Text>
         {/* Title with soft gold glow outline */}
         <Text
@@ -316,9 +316,9 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
           anchorX="center"
           anchorY="middle"
           raycast={() => null}
-          font="/fonts/Poppins-SemiBold.ttf"
+          font="/fonts/Montserrat-Bold.ttf"
         >
-          KARYA UNGGULAN
+          Karya Unggulan
         </Text>
       </group>
 

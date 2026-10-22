@@ -1,9 +1,27 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Clock, ArrowRight, Eye, Inbox } from "lucide-react"
+import { Clock, ArrowRight, Eye, Inbox, Globe, XCircle } from "lucide-react"
 import api from "../../../../services/api"
 import { imageUrl } from "../../../../utils/imageUrl"
 import SmartImage from "../../../ui/SmartImage"
+
+const statusConfig = {
+  pending: {
+    label: "Pending",
+    icon: Clock,
+    className: "border-amber-400/30 bg-amber-500/10 text-amber-400",
+  },
+  published: {
+    label: "Dipublikasikan",
+    icon: Globe,
+    className: "border-cyan-400/30 bg-cyan-500/10 text-cyan-400",
+  },
+  rejected: {
+    label: "Ditolak",
+    icon: XCircle,
+    className: "border-red-400/30 bg-red-500/10 text-red-400",
+  },
+}
 
 function DashboardPendingProjects() {
   const navigate = useNavigate()
@@ -17,7 +35,8 @@ function DashboardPendingProjects() {
       .get("/dashboard")
       .then((res) => {
         const items = res.data?.data?.pendingProjects || []
-        if (isMounted) setPendingProjects(items.slice(0, 4))
+        const onlyPending = items.filter((p) => p.status === "pending")
+        if (isMounted) setPendingProjects(onlyPending.slice(0, 4))
       })
       .catch((err) => {
         console.error("Failed to fetch pending projects:", err)
@@ -132,9 +151,19 @@ function DashboardPendingProjects() {
                 </p>
               </div>
               <div className="flex items-center gap-2 self-start sm:self-center">
-                <span className="shrink-0 rounded-md border border-amber-400/30 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-400">
-                  Pending
-                </span>
+                {(() => {
+                  const status =
+                    statusConfig[project.status] || statusConfig.pending
+                  const StatusIcon = status.icon
+                  return (
+                    <span
+                      className={`flex shrink-0 items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium ${status.className}`}
+                    >
+                      <StatusIcon size={11} strokeWidth={2.5} />
+                      {status.label}
+                    </span>
+                  )
+                })()}
                 <button
                   onClick={(e) => {
                     e.stopPropagation()

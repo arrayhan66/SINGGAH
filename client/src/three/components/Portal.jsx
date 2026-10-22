@@ -68,9 +68,9 @@ function ExitIcon() {
         outlineWidth={0.01}
         outlineColor="#b91c1c"
         raycast={() => null}
-        font="/fonts/Poppins-SemiBold.ttf"
+        font="/fonts/Montserrat-Regular.ttf"
       >
-        KELUAR
+        Keluar
       </Text>
     </group>
   )
@@ -99,9 +99,9 @@ function ExitSign({ width }) {
         anchorY="middle"
         maxWidth={width + 0.1}
         raycast={() => null}
-        font="/fonts/Poppins-SemiBold.ttf"
+        font="/fonts/Montserrat-Bold.ttf"
       >
-        EXIT
+        Exit
       </Text>
     </>
   )
@@ -214,9 +214,9 @@ function Portal({ position, rotationY, width, title, action }) {
             anchorY="middle"
             letterSpacing={0.08}
             raycast={() => null}
-            font="/fonts/Poppins-SemiBold.ttf"
+            font="/fonts/Montserrat-Bold.ttf"
           >
-            SINGGAH DISINI
+            Singgah Disini
           </Text>
         </>
       ) : (

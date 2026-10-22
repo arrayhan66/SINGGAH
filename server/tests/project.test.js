@@ -199,6 +199,63 @@ describe("Project Endpoints", () => {
     })
   })
 
+  describe("Karya unggulan diunggah admin (tanpa author_tipe)", () => {
+    // Admin mengunggah memakai akun bertipe "umum". Tanpa penanda author_tipe,
+    // karya itu masuk scope "dosen" (sesuai tampilan kartu admin). Regresi:
+    // dulu tersimpan null sehingga scope kartu (dosen) beda dengan scope server
+    // (mahasiswa) → menu slot di kartu selalu tampak kosong.
+    const createAdminPublished = async (title, authorTipe) => {
+      const req = request(app)
+        .post("/api/projects")
+        .set("Authorization", `Bearer ${adminToken}`)
+        .attach("thumbnail", Buffer.from("fake-image-bytes"), "thumbnail.jpg")
+        .field("title", title)
+        .field("description", "Karya admin untuk uji slot unggulan")
+        .field("category_id", categoryId)
+        .field("year", 2026)
+        .field("abstract", "Abstract text here...")
+        .field("technologies", JSON.stringify(["Node.js"]))
+        .field("members", JSON.stringify([{ name: "John Doe", role: "Developer" }]))
+      if (authorTipe) req.field("author_tipe", authorTipe)
+      const res = await req
+      return res.body.data
+    }
+
+    const setFeatured = async (id, slot) =>
+      request(app)
+        .patch(`/api/projects/${id}/featured`)
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send({ slot })
+
+    let adm1, adm2
+    beforeAll(async () => {
+      adm1 = await createAdminPublished(`AdminKarya1 ${Date.now()}`)
+      adm2 = await createAdminPublished(`AdminKarya2 ${Date.now()}`)
+      expect(adm1.status).toBe("published")
+    })
+
+    it("menyimpan author_tipe = dosen saat admin mengunggah tanpa pilihan tipe", () => {
+      expect(adm1.author_tipe).toBe("dosen")
+    })
+
+    it("dua karya admin dapat mengisi slot 1 & 2 tanpa saling mengunci", async () => {
+      const r1 = await setFeatured(adm1.id, 1)
+      expect(r1.status).toBe(200)
+      const r2 = await setFeatured(adm2.id, 2)
+      expect(r2.status).toBe(200)
+    })
+
+    it("slot 1 sudah terisi sehingga karya admin lain tidak boleh menimpanya", async () => {
+      const res = await setFeatured(adm2.id, 1)
+      expect(res.status).toBe(409)
+    })
+
+    it("membersihkan slot unggulan admin", async () => {
+      await setFeatured(adm1.id, null)
+      await setFeatured(adm2.id, null)
+    })
+  })
+
   describe("Slideshow beranda", () => {
     let publishedId = null
 

@@ -81,7 +81,7 @@ async function countMahasiswaSlots(categoryId, excludeId = null) {
           WHERE p.category_id = :categoryId
             AND p.status = 'published'
             ${excludeId !== null ? "AND p.id != :excludeId" : ""}
-            AND COALESCE(p.author_tipe, u.tipe) != 'dosen'`,
+            AND COALESCE(p.author_tipe, u.tipe) != 'dosen' AND u.tipe != 'umum'`,
         {
           replacements: {
             categoryId,
@@ -114,7 +114,7 @@ async function countDosenSlots(categoryId, excludeId = null) {
           WHERE p.category_id = :categoryId
             AND p.status = 'published'
             ${excludeId !== null ? "AND p.id != :excludeId" : ""}
-            AND COALESCE(p.author_tipe, u.tipe) = 'dosen'`,
+            AND (COALESCE(p.author_tipe, u.tipe) = 'dosen' OR (p.author_tipe IS NULL AND u.tipe = 'umum'))`,
         {
           replacements: {
             categoryId,
@@ -187,8 +187,20 @@ const USER_INCLUDE = {
 // Tipe penulis efektif sebuah karya: field author_tipe (yang diatur admin)
 // menang; jika kosong, ikuti tipe akun pembuat. Konsisten dengan pengelompokan
 // hall (COALESCE(author_tipe, user.tipe)) di mana non-dosen = mahasiswa.
-const resolveAuthorType = (project) =>
-  (project.author_tipe || project.User?.tipe) === "dosen" ? "dosen" : "mahasiswa"
+//
+// Karya yang ditambahkan ADMIN memakai akun admin bertipe "umum". Tanpa
+// penanda author_tipe, karya itu akan ikut tergolong "mahasiswa" dan
+// bertabrakan dengan slot unggulan mahasiswa — padahal di UI kartu admin
+// karya tanpa penanda ditampilkan sebagai unggulan "dosen". Supaya scope slot
+// konsisten, karya dari admin yang tanpa author_tipe dianggap "dosen".
+const resolveAuthorType = (project) => {
+  const declared = project.author_tipe
+  if (declared) return declared === "dosen" ? "dosen" : "mahasiswa"
+  const ownerTipe = project.User?.tipe
+  if (ownerTipe === "dosen") return "dosen"
+  if (ownerTipe === "umum") return "dosen"
+  return "mahasiswa"
+}
 
 const IMAGES_INCLUDE = {
   model: ProjectImage,
@@ -549,8 +561,7 @@ exports.updateProjectStatus = async (id, status, reason = "") => {
   // Publikasi ke Hall dibatasi per kategori: lantai 1 hanya sampai 48 karya
   // mahasiswa, lantai 2 hanya sampai 48 karya dosen.
   if (status === "published") {
-    const authorTipe = project.author_tipe || project.User?.tipe
-    if (authorTipe === "dosen") {
+    if (resolveAuthorType(project) === "dosen") {
       await assertDosenSlot(project.category_id, project.id)
     } else {
       await assertMahasiswaSlot(project.category_id, project.id)
@@ -839,8 +850,14 @@ exports.createProject = async (data, user, imageUrls = [], documentUrls = []) =>
   const declaredAuthorTipe = ["mahasiswa", "dosen"].includes(data.author_tipe)
     ? data.author_tipe
     : null
+  // Karya tanpa pilihan eksplisit dari admin dianggap "dosen" (lihat
+  // resolveAuthorType), supaya scope slot unggulan & hall konsisten.
   const authorTipe =
-    user.role === "admin" && declaredAuthorTipe ? declaredAuthorTipe : user.tipe
+    user.role === "admin"
+      ? declaredAuthorTipe || "dosen"
+      : user.tipe === "dosen"
+        ? "dosen"
+        : "mahasiswa"
 
   // Karya dosen & karya lain ditampilkan di Hall dengan kapasitas 48 per
   // kategori. Kalau sudah penuh, karya baru ditolak dengan pemberitahuan.
@@ -853,9 +870,12 @@ exports.createProject = async (data, user, imageUrls = [], documentUrls = []) =>
   // Parse & validasi relasi SEBELUM menulis ke database
   const relations = parseRelationFields(data)
 
-  // Tentukan status berdasarkan tipe user / author tipe
+  // Karya unggahan admin langsung tayang tanpa review. Karya mahasiswa masuk
+  // antrean pending; karya dosen juga langsung tayang.
   const projectStatus =
-    authorTipe === "mahasiswa" ? "pending" : "published"
+    user.role === "admin" || authorTipe !== "mahasiswa"
+      ? "published"
+      : "pending"
 
   const project = await sequelize.transaction(async (t) => {
     const created = await Project.create(
@@ -868,7 +888,7 @@ exports.createProject = async (data, user, imageUrls = [], documentUrls = []) =>
         category_id,
         status: projectStatus,
         user_id: user.id,
-        author_tipe: user.role === "admin" ? declaredAuthorTipe : null,
+        author_tipe: user.role === "admin" ? authorTipe : null,
       },
       { transaction: t },
     )

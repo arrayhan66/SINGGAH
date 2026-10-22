@@ -13,8 +13,11 @@ exports.uploadImage = async (fileOrBuffer, folder = "uploads", options = {}) => 
       secure_url: `https://res.cloudinary.com/test/image/upload/v123456/${safeFolder}/test.${format}`,
       public_id: `${safeFolder}/test`,
       format,
-      bytes:
-        fileOrBuffer && fileOrBuffer.buffer ? fileOrBuffer.buffer.length : 0,
+      bytes: Buffer.isBuffer(fileOrBuffer)
+        ? fileOrBuffer.length
+        : fileOrBuffer && fileOrBuffer.buffer
+          ? fileOrBuffer.buffer.length
+          : 0,
       created_at: new Date().toISOString(),
       resource_type: options.resource_type || "image",
       width: null,
@@ -22,25 +25,40 @@ exports.uploadImage = async (fileOrBuffer, folder = "uploads", options = {}) => 
     })
   }
 
-  const raw =
-    fileOrBuffer && fileOrBuffer.buffer ? fileOrBuffer.buffer : fileOrBuffer
+  // Multer file object -> ambil .buffer; Buffer langsung dipakai apa adanya.
+  // PENTING: cek Buffer lebih dulu, karena Buffer juga punya properti `.buffer`
+  // (ArrayBuffer internal) yang bisa keliru dianggap file object.
+  const raw = Buffer.isBuffer(fileOrBuffer)
+    ? fileOrBuffer
+    : fileOrBuffer && fileOrBuffer.buffer
+      ? fileOrBuffer.buffer
+      : fileOrBuffer
 
   // Multer versi terbaru (Node 20+) bisa memberi ArrayBuffer, bukan Buffer.
   const buffer = Buffer.isBuffer(raw) ? raw : Buffer.from(raw)
 
+  const uploadOptions = { folder, ...options }
+
+  // use_filename WAJIB disertai filename yang valid, kalau tidak Cloudinary
+  // menolak dengan "filename ... is not a valid boolean".
+  if (uploadOptions.use_filename) {
+    const originalName =
+      fileOrBuffer && fileOrBuffer.originalname
+        ? fileOrBuffer.originalname
+        : options.filename
+    if (originalName) {
+      uploadOptions.filename = String(originalName)
+    } else {
+      delete uploadOptions.use_filename
+    }
+  }
+
   return new Promise((resolve, reject) => {
     cloudinary.uploader
-      .upload_stream(
-        {
-          folder,
-          use_filename: true,
-          ...options,
-        },
-        (error, result) => {
-          if (error) return reject(error)
-          resolve(result)
-        },
-      )
+      .upload_stream(uploadOptions, (error, result) => {
+        if (error) return reject(error)
+        resolve(result)
+      })
       .end(buffer)
   })
 }

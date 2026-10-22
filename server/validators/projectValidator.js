@@ -4,7 +4,9 @@ exports.createProjectValidator = [
   body("title")
     .trim()
     .notEmpty()
-    .withMessage("Judul wajib diisi"),
+    .withMessage("Judul wajib diisi")
+    .isLength({ max: 90 })
+    .withMessage("Judul maksimal 90 karakter"),
 
   body("slug")
     .optional({ values: "falsy" })
@@ -36,7 +38,13 @@ exports.createProjectValidator = [
 ]
 
 exports.updateProjectValidator = [
-  body("title").optional().trim().notEmpty().withMessage("Judul tidak boleh kosong"),
+  body("title")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("Judul tidak boleh kosong")
+    .isLength({ max: 90 })
+    .withMessage("Judul maksimal 90 karakter"),
 
   body("slug")
     .optional()

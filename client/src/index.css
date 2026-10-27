@@ -605,12 +605,50 @@ html:not(.light) :where(a, button, input, textarea, select, summary, [role="butt
   border-color: rgba(34, 211, 238, 0.3);
 }
 
+/* Hero critters */
+@keyframes hero-lizard-breathe {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes hero-frog-sit {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-1px);
+  }
+}
+
+.hero-creature {
+  position: absolute;
+  bottom: 2px;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+}
+
+.hero-lizard {
+  left: 0;
+}
+
+.hero-frog {
+  right: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .notification-bell.has-unread .notification-bell-icon {
     animation: none;
   }
   .notification-bell:hover .notification-bell-icon {
     transform: none;
+  }
+  .hero-creature {
+    animation: none;
   }
 }
 
@@ -1202,51 +1240,69 @@ html.light .hero-karya-showcase .badge-accent {
 }
 
 
-/* Hero showcase — animasi pergantian slide & layer belakang.
-   Slide masuk dari kanan (maju) atau kiri (mundur/wrap balik), memberat
-   dan sedikit zoom — selaras dengan gerakan lapisan belakang (back-sway)
-   yang menyusul dengan lembut. */
-@keyframes karta-slide-in-right {
-  from {
-    transform: translateX(4.5%) scale(0.985);
+/* Hero showcase — tilted peek carousel */
+.hero-karya-showcase .peek-frame {
+  position: relative;
+  width: 82%;
+}
+.hero-karya-showcase .peek-stage {
+  position: relative;
+  z-index: 0;
+  perspective: 1400px;
+}
+.hero-karya-showcase .peek-card {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+.hero-karya-showcase .peek-card[data-pos="0"] {
+  transform: none;
+  opacity: 1;
+  z-index: 40;
+  pointer-events: auto;
+}
+.hero-karya-showcase .peek-card[data-pos="1"] {
+  transform: translateX(17%) rotate(5deg) rotateY(-10deg) scale(0.9);
+  opacity: 0.85;
+  z-index: 30;
+}
+.hero-karya-showcase .peek-card[data-pos="2"] {
+  transform: translateX(28%) rotate(8deg) rotateY(-16deg) scale(0.8);
+  opacity: 0.5;
+  z-index: 20;
+}
+.hero-karya-showcase .peek-card[data-pos="prev"] {
+  transform: translate(-3%, -7%) rotate(-6deg) scale(0.9);
+  opacity: 0;
+  z-index: 41;
+}
+.hero-karya-showcase .peek-card[data-pos="hidden"] {
+  transform: translateX(30%) scale(0.75);
+  opacity: 0;
+  z-index: 0;
+}
+
+@media (max-width: 768px) {
+  .hero-karya-showcase .peek-frame {
+    width: 100%;
+  }
+  .hero-karya-showcase .peek-card:not([data-pos="0"]) {
+    transform: none;
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-karya-showcase .peek-card {
+    transition: opacity 0.3s;
+  }
+  .hero-karya-showcase .peek-card:not([data-pos="0"]) {
+    transform: none;
     opacity: 0;
   }
-  to {
-    transform: translateX(0) scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes karta-slide-in-left {
-  from {
-    transform: translateX(-4.5%) scale(0.985);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0) scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes karta-back-sway {
-  from {
-    transform: translateX(-16px);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@utility animate-karta-slide-in-right {
-  animation: karta-slide-in-right 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@utility animate-karta-slide-in-left {
-  animation: karta-slide-in-left 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@utility animate-karta-back-sway {
-  animation: karta-back-sway 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Blob glow — dekorasi ambient di belakang kartu showcase.

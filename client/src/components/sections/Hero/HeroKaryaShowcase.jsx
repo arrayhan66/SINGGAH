@@ -12,12 +12,11 @@ import { imageUrl, buildSrcSet } from "../../../utils/imageUrl";
 import { useTheme } from "../../../context/ThemeContext";
 import SmartImage from "../../ui/SmartImage";
 import { SLIDESHOW_MAX_ITEMS } from "../../../constants/slideshow";
+import HeroCat from "./HeroCat";
 
-// Jumlah maksimal karya yang dimuat dari API. Diambil lebih banyak dari
-// tampilan agar kartu kategori di bawah mencakup semua kategori yang ada.
+// Jumlah maksimal karya yang dimuat dari API.
 const FETCH_LIMIT = 50;
-// Jumlah maksimal slide yang ditampilkan di carousel hero — dijaga sedikit
-// agar deretan titik penunjuk tetap ringkas (sama dengan kuota admin).
+// Jumlah maksimal slide yang ditampilkan di carousel hero.
 const MAX_SLIDES = SLIDESHOW_MAX_ITEMS;
 
 function normalizeProject(p) {
@@ -40,7 +39,7 @@ function normalizeProject(p) {
   };
 }
 
-// Format tanggal update terakhir ke Bahasa Indonesia (mis. "14 Mar 2025").
+// Format tanggal update terakhir ke Bahasa Indonesia.
 function formatDate(v) {
   if (!v) return "—";
   const d = new Date(v);
@@ -52,7 +51,7 @@ function formatDate(v) {
   });
 }
 
-// Label status karya untuk badge "Status" — sesuai API /projects.
+// Label status karya untuk badge "Status".
 const STATUS_MAP = {
   published: "Aktif",
   active: "Aktif",
@@ -60,16 +59,22 @@ const STATUS_MAP = {
   archived: "Arsip",
 };
 
-// Tinggi kartu dibuat 56.25% dari lebar lewat padding-top (bukan aspect-ratio)
-// agar rasio landscape 16:9 terjamin di semua browser / kompositor.
+// Tinggi kartu dibuat 56.25% dari lebar lewat padding-top
 const CARD_HEIGHT_STYLE = { paddingTop: "56.25%", height: "0px" };
+
+const getPos = (i, active, count) => {
+  if (count === 0) return "hidden";
+  const off = (((i - active) % count) + count) % count;
+  if (off === 0) return "0";
+  if (off === 1) return "1";
+  if (off === 2 && count >= 3) return "2";
+  if (off === count - 1 && count >= 4) return "prev";
+  return "hidden";
+};
 
 function HeroKaryaShowcase({ variant }) {
   const navigate = useNavigate();
   const { theme } = useTheme();
-  // Light mode di-render pada halaman yang sama (hanya class html.light),
-  // jadi tema dibaca dari context. Prop variant opsional untuk komponen
-  // yang di-mount di luar ThemeProvider.
   const isLight = (variant || theme) === "light";
 
   const [projects, setProjects] = useState([]);
@@ -81,9 +86,6 @@ function HeroKaryaShowcase({ variant }) {
     let cancelled = false;
     const fetchSlides = async () => {
       try {
-        // Hanya karya yang secara eksplisit ditandai "Slideshow Beranda" oleh
-        // admin. Jangan fallback ke karya published lain: kalau tidak ada yang
-        // aktif, hero harus kosong (bukan menampilkan karya yang tidak dipilih).
         const res = await api.get("/projects", {
           params: { status: "published", limit: FETCH_LIMIT, slideshow: "true" },
         });
@@ -93,6 +95,7 @@ function HeroKaryaShowcase({ variant }) {
           .filter((p) => p.isShownInSlideshow && p.title && p.slug);
         if (cancelled) return;
         setProjects(normalized);
+        setActive(0);
       } catch {
         if (cancelled) return;
         setProjects([]);
@@ -106,7 +109,6 @@ function HeroKaryaShowcase({ variant }) {
     };
   }, []);
 
-  // Slide carousel hanya berisi karya yang ditandai "Slideshow Beranda".
   const slides = useMemo(
     () => projects.filter((p) => p.isShownInSlideshow).slice(0, MAX_SLIDES),
     [projects]
@@ -120,27 +122,18 @@ function HeroKaryaShowcase({ variant }) {
     activeRef.current = active;
   }, [active]);
 
-  // Arah masuk slide: maju/autoplay => dari kanan; mundur atau wrap-balik
-  // (ujung kanan -> kiri) => dari kiri.
-  const [slideDir, setSlideDir] = useState(1);
   const goTo = useCallback(
     (i) => {
-      const cur = activeRef.current;
-      const next = ((i % count) + count) % count;
-      if (next === cur) return;
-      const delta = ((next - cur) % count + count) % count;
-      // Masuk dari kiri saat mundur, ataupun putaran maju yang "balik ke kiri"
-      // (ujung kanan -> awal).
-      setSlideDir(next < cur || delta === count - 1 ? -1 : 1);
-      setActive(next);
+      if (count <= 1) return;
+      const nextIdx = ((i % count) + count) % count;
+      if (nextIdx === activeRef.current) return;
+      setActive(nextIdx);
     },
     [count]
   );
   const next = useCallback(() => goTo(activeRef.current + 1), [goTo]);
   const prev = useCallback(() => goTo(activeRef.current - 1), [goTo]);
 
-  // Autoplay santai: setiap slide tampil PENUH ±3 detik dulu (interval 4s
-  // dikurangi 0.6s animasi masuk), baru berpindah. Berhenti saat hover.
   useEffect(() => {
     if (paused || count < 2) return;
     const t = setInterval(() => goTo(activeRef.current + 1), 4000);
@@ -152,11 +145,6 @@ function HeroKaryaShowcase({ variant }) {
     navigate(`/karya/${preview.categorySlug}/${preview.slug || preview.id}`);
   };
 
-  // Tiga badge hologram mengambang — data & nilai selalu sinkron dengan slide
-  // aktif. Posisi: kategori (kiri-atas), status (kanan-atas), update
-  // (kanan-bawah). Kiri-bawah TIDAK dipakai karena sudah ada judul karya di
-  // dalam kartu. `anim` = fasa animasi naik-turun; `delay` = tunda mulai agar
-  // gerakannya berirama (parallax), bukan serempak.
   const badges = preview
     ? [
         { key: "cat", icon: Layers, label: "Kategori", value: preview.category, pos: "tl", anim: "a", delay: "0s" },
@@ -181,22 +169,10 @@ function HeroKaryaShowcase({ variant }) {
       ]
     : [];
 
-  // Posisi badge dikelola via CSS plain (bukan class Tailwind) agar mudah
-  // diresponsif: di desktop/tablet badge melayang DI LUAR sudut kartu, di
-  // mobile (≤640px) badge MASUK KE DALAM thumbnail (menghindari korup).
-  // `anim` juga memakai class CSS plain .karta-float-* — selalu dihasilkan,
-  // tidak bergantung scanner Tailwind, jadi animasi PASTI berjalan.
-
-  // Peta gaya per theme (dark/light) — GAYA ASLI TIAP TEMA, bukan salinan.
-  // LIGHT: kaca putih + teks/aksen biru tua (theme light), tetap kontras
-  // terhadap halaman terang. DARK: kaca navy + cyan. Gaya badge hologram
-  // diatur penuh di CSS agar konsisten.
   const cls = {
     blobA: isLight ? "bg-gradient-to-br from-blue-400/30 to-cyan-300/20" : "bg-gradient-to-br from-cyan-500/50 to-blue-600/40",
     blobB: isLight ? "bg-gradient-to-tr from-sky-300/30 to-blue-400/20" : "bg-gradient-to-tr from-blue-600/40 to-cyan-500/30",
     skeleton: isLight ? "bg-blue-100/60" : "bg-slate-800/40",
-    // Overlay bottom sengaja pekat (navy solid di dasar) agar JUDUL PUTIH
-    // murni terbaca di atas thumbnail terang — bukan abu-abu.
     imgOverlay: isLight
       ? "bg-gradient-to-t from-[#01101f] via-[#0a2b52]/65 to-transparent"
       : "bg-gradient-to-t from-[#010c1c] via-[#08243f]/45 to-transparent",
@@ -207,12 +183,6 @@ function HeroKaryaShowcase({ variant }) {
     nav: isLight
       ? "border-blue-400/50 bg-gradient-to-br from-white via-blue-50 to-blue-100 text-blue-600 shadow-[0_8px_22px_-8px_rgba(37,99,235,0.5),0_0_14px_rgba(56,189,248,0.25)] ring-1 ring-blue-200/60 hover:scale-110 hover:border-blue-500 hover:from-blue-50 hover:via-blue-100 hover:to-blue-200 hover:text-blue-700 hover:shadow-[0_10px_26px_-8px_rgba(37,99,235,0.65),0_0_18px_rgba(56,189,248,0.35)] hover:ring-blue-300/70"
       : "border-cyan-300/40 bg-[#041d38]/75 text-cyan-300 shadow-[0_6px_20px_-6px_rgba(2,12,32,0.8),0_0_12px_rgba(34,211,238,0.4)] hover:border-cyan-300/70 hover:text-cyan-200",
-    dotActive: "bg-blue-600",
-    // Light: titik non-aktif putih lembut (tidak putih pekat) + border tipis
-    // supaya tetap kelihatan di atas latar paper (#f3f5f8). Dark: tetap abu.
-    dotIdle: isLight
-      ? "bg-white/80 border border-slate-500"
-      : "bg-[#6B7280]",
   };
 
   return (
@@ -221,7 +191,6 @@ function HeroKaryaShowcase({ variant }) {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Ambient glow nebula — murni dekoratif, di belakang tumpukan kartu. */}
       <div
         aria-hidden="true"
         className={`pointer-events-none absolute -top-14 right-0 z-0 h-56 w-56 animate-karta-pulse rounded-full blur-[90px] opacity-60 md:h-72 md:w-72 ${cls.blobA}`}
@@ -232,156 +201,130 @@ function HeroKaryaShowcase({ variant }) {
       />
 
       <div className="relative z-20">
-        {/* Ruang 3D HANYA untuk tumpukan kartu (rear + main). Badge hologram
-            & tombol navigasi dibiarkan FLAT (di luar perspektif) agar teks
-            kecil di dalamnya tidak dilukis ulang oleh rasterizer 3D → tajam/HD. */}
-        <div className="relative z-0">
-                  {/* LAYER 1 — MAIN CARD, centered di depan. */}
-        <div className="group/img relative z-10 transition-transform duration-700 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.02]">
-          {loading ? (
-            <div className="showcase-card relative overflow-hidden rounded-2xl" style={CARD_HEIGHT_STYLE}>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="h-6 w-24 animate-pulse rounded-md bg-white/10" />
-              </div>
-            </div>
-          ) : !preview ? (
-            <div className={`showcase-card relative overflow-hidden rounded-2xl ${isLight ? "bg-blue-50" : "bg-[#041d38]"}`} style={CARD_HEIGHT_STYLE}>
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
-                <Layers size={28} className={isLight ? "text-blue-400" : "text-cyan-400"} />
-                <p className={`text-sm font-semibold ${isLight ? "text-blue-700" : "text-cyan-200"}`}>
-                  Belum ada karya unggulan
-                </p>
-                <p className={`text-xs ${isLight ? "text-blue-500" : "text-slate-400"}`}>
-                  Admin belum memilih karya untuk slideshow beranda.
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div
-              key={`${active}-${slideDir}`}
-              className={slideDir > 0 ? "animate-karta-slide-in-right" : "animate-karta-slide-in-left"}
-            >
+        <div className="peek-frame">
+          {!loading && count > 0 && <HeroCat />}
+          <div className="peek-stage">
+            {loading ? (
               <div className="showcase-card relative overflow-hidden rounded-2xl" style={CARD_HEIGHT_STYLE}>
-                <SmartImage
-                  src={imageUrl(preview.thumbnail)}
-                  srcSet={buildSrcSet(preview.thumbnail)}
-                  sizes="(min-width: 768px) 640px, 92vw"
-                  alt={preview.title}
-                  eager
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover/img:scale-105"
-                />
-                {/* Overlay gradasi gelap agar teks selalu terbaca. */}
-                <div className={`pointer-events-none absolute inset-0 ${cls.imgOverlay}`} />
-                {/* Refleksi kaca tipis — kilau diagonal. */}
-                <div aria-hidden="true" className="showcase-glass pointer-events-none absolute inset-0" />
-                {/* Klik seluruh kartu → detail. */}
-                <button
-                  type="button"
-                  onClick={openDetail}
-                  aria-label={`Buka detail ${preview.title}`}
-                  className="absolute inset-0 z-10 cursor-pointer"
-                />
-                {/* Judul — area aman di kiri-bawah, tidak bertabrakan badge. */}
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 pb-3 pl-3 pr-32 sm:pb-4 sm:pl-5 sm:pr-36 lg:pb-5 lg:pl-6 lg:pr-40">
-                  <span
-                    className={`karta-eyebrow text-[9px] font-black uppercase tracking-[0.22em] lg:text-[10px] ${cls.eyebrow}`}
-                    style={{ color: "#67e8f9" }}
-                  >
-                    Karya Unggulan
-                  </span>
-<h3
-                    className={`mt-1 text-base font-extrabold leading-snug sm:text-xl lg:text-2xl ${cls.title}`}
-                    style={{ color: "#ffffff" }}
-                  >
-                    {preview.title}
-                  </h3>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="h-6 w-24 animate-pulse rounded-md bg-white/10" />
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-        </div>
-        {/* End ruang perspektif 3D kartu — badge & navigasi FLAT setelah ini. */}
-
-        {/* TIGA BADGE HOLOGRAM — melayang di sudut kiri-atas, kanan-atas &
-            kanan-bawah kartu utama (DI LUAR tepi kartu). Kiri-bawah kosong
-            karena diisi judul karya di dalam kartu. Lapis: aura + kaca
-            angular + ikon + teks, semua beranimasi NAIT-TURUN terus. */}
-        {preview && !loading && (
-          <div className="pointer-events-none absolute inset-0 z-30">
-            {badges.map((b) => {
-              const Icon = b.icon;
-              return (
-                <div
-                      key={b.key}
-                      className={`karta-bpos karta-bpos-${b.pos}`}
+            ) : count === 0 ? (
+              <div className={`showcase-card relative overflow-hidden rounded-2xl ${isLight ? "bg-blue-50" : "bg-[#041d38]"}`} style={CARD_HEIGHT_STYLE}>
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
+                  <Layers size={28} className={isLight ? "text-blue-400" : "text-cyan-400"} />
+                  <p className={`text-sm font-semibold ${isLight ? "text-blue-700" : "text-cyan-200"}`}>
+                    Belum ada karya unggulan
+                  </p>
+                  <p className={`text-xs ${isLight ? "text-blue-500" : "text-slate-400"}`}>
+                    Admin belum memilih karya untuk slideshow beranda.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div aria-hidden="true" style={CARD_HEIGHT_STYLE} />
+                {slides.map((slide, idx) => {
+                  const pos = getPos(idx, active, count);
+                  const isActiveCard = pos === "0";
+                  return (
+                    <div
+                      key={slide.id}
+                      className="peek-card"
+                      data-pos={pos}
+                      aria-hidden={pos !== "0"}
                     >
-                      {/* Lapis animasi melayang naik-turun (class CSS plain,
-                          bukan Tailwind — PASTI berjalan), fasa berbeda tiap
-                          badge via delay inline. */}
-                      <div
-                        className={`karta-float karta-float-${b.anim}`}
-                        style={{ animationDelay: b.delay }}
-                      >
-                    <span aria-hidden="true" className="badge-aura" />
-                    <div className="badge-shell">
-                      <span className="badge-ico">
-                        <Icon size={17} strokeWidth={2.3} />
-                      </span>
-                      <span className="badge-txt">
-                        <b className="badge-value">{b.value}</b>
-                        <em className="badge-label">{b.label}</em>
-                      </span>
-                      <span aria-hidden="true" className="badge-accent" />
+                      <div className="showcase-card relative h-full w-full overflow-hidden rounded-2xl">
+                        <SmartImage
+                          src={imageUrl(slide.thumbnail)}
+                          srcSet={buildSrcSet(slide.thumbnail)}
+                          sizes="(min-width: 768px) 640px, 92vw"
+                          alt={slide.title}
+                          eager={idx === 0}
+                          className="absolute inset-0 h-full w-full object-cover"
+                        />
+                        <div className={`pointer-events-none absolute inset-0 ${cls.imgOverlay}`} />
+                        <div aria-hidden="true" className="showcase-glass pointer-events-none absolute inset-0" />
+                        {isActiveCard && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={openDetail}
+                              aria-label={`Buka detail ${slide.title}`}
+                              className="absolute inset-0 z-10 cursor-pointer"
+                            />
+                            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 pb-3 pl-3 pr-32 sm:pb-4 sm:pl-5 sm:pr-36 lg:pb-5 lg:pl-6 lg:pr-40">
+                              <span
+                                className={`karta-eyebrow text-[9px] font-black uppercase tracking-[0.22em] lg:text-[10px] ${cls.eyebrow}`}
+                                style={{ color: "#67e8f9" }}
+                              >
+                                Karya Unggulan
+                              </span>
+                              <h3
+                                className={`mt-1 text-base font-extrabold leading-snug sm:text-xl lg:text-2xl ${cls.title}`}
+                                style={{ color: "#ffffff" }}
+                              >
+                                {slide.title}
+                              </h3>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </>
+            )}
+          </div>
+
+          {preview && !loading && count > 0 && (
+            <div className="pointer-events-none absolute inset-0 z-30">
+              {badges.map((b) => {
+                const Icon = b.icon;
+                return (
+                  <div key={b.key} className={`karta-bpos karta-bpos-${b.pos}`}>
+                    <div className={`karta-float karta-float-${b.anim}`} style={{ animationDelay: b.delay }}>
+                      <span aria-hidden="true" className="badge-aura" />
+                      <div className="badge-shell">
+                        <span className="badge-ico">
+                          <Icon size={17} strokeWidth={2.3} />
+                        </span>
+                        <span className="badge-txt">
+                          <b className="badge-value">{b.value}</b>
+                          <em className="badge-label">{b.label}</em>
+                        </span>
+                        <span aria-hidden="true" className="badge-accent" />
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                );
+              })}
+            </div>
+          )}
 
-        {/* NAVIGASI — dua tombol bulat simetris di tepi kanan-kiri MAIN CARD. */}
-        {count > 0 && (
-          <>
-        <button
-          type="button"
-          onClick={prev}
-          aria-label="Karya sebelumnya"
-          className={`absolute -left-2 top-1/2 z-40 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border backdrop-blur-md transition-all duration-300 hover:scale-110 active:scale-95 sm:-left-3 sm:h-9 sm:w-9 md:-left-4 md:h-10 md:w-10 ${cls.nav}`}
-        >
-          <ArrowLeft size={15} className="lg:h-4 lg:w-4" />
-        </button>
-        <button
-          type="button"
-          onClick={next}
-          aria-label="Karya berikutnya"
-          className={`absolute -right-2 top-1/2 z-40 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border backdrop-blur-md transition-all duration-300 hover:scale-110 active:scale-95 sm:-right-3 sm:h-9 sm:w-9 md:-right-4 md:h-10 md:w-10 ${cls.nav}`}
-        >
-          <ArrowRight size={15} className="lg:h-4 lg:w-4" />
-        </button>
-          </>
-        )}
-      </div>
-
-      {/* PAGINATION — jarak seimbang: nggak mepet ke kartu, nggak jauh dari CTA. */}
-      {count > 1 && (
-        <div className="mt-4 flex items-center justify-center sm:mt-8">
-          <div className="flex items-center gap-2 sm:gap-2.5">
-            {slides.map((p, i) => (
+          {count > 0 && (
+            <>
               <button
-                key={p.id}
                 type="button"
-                onClick={() => goTo(i)}
-                aria-label={`Karya ${i + 1}`}
-                className={`h-2 cursor-pointer rounded-full transition-all duration-300 sm:h-2.5 ${
-                  i === active ? `w-6 sm:w-7 ${cls.dotActive}` : `w-2 sm:w-2.5 ${cls.dotIdle}`
-                }`}
-              />
-            ))}
-          </div>
+                onClick={prev}
+                aria-label="Karya sebelumnya"
+                className={`absolute -left-2 top-1/2 z-40 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border backdrop-blur-md transition-all duration-300 hover:scale-110 active:scale-95 sm:-left-3 sm:h-9 sm:w-9 md:-left-4 md:h-10 md:w-10 ${cls.nav}`}
+              >
+                <ArrowLeft size={15} className="lg:h-4 lg:w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={next}
+                aria-label="Karya berikutnya"
+                className={`absolute -right-2 top-1/2 z-40 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border backdrop-blur-md transition-all duration-300 hover:scale-110 active:scale-95 sm:-right-3 sm:h-9 sm:w-9 md:-right-4 md:h-10 md:w-10 ${cls.nav}`}
+              >
+                <ArrowRight size={15} className="lg:h-4 lg:w-4" />
+              </button>
+            </>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

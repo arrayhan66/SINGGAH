@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import {
   User,
   LogOut,
@@ -10,7 +10,7 @@ import {
   Info,
   Newspaper,
 } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import logo from "../../assets/icons/logo.webp";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationContext";
@@ -23,8 +23,16 @@ import NotificationDetailModal from "../ui/NotificationDetailModal";
 import ThemeToggle from "../ui/ThemeToggle";
 import UserAvatar from "../ui/UserAvatar";
 import SmartImage from "../ui/SmartImage";
-import { itemBar, itemSubtitle, itemAccent, itemActive, itemHover, itemHoverBox } from "./menuConstants";
+import {
+  itemBar,
+  itemSubtitle,
+  itemAccent,
+  itemActive,
+  itemHover,
+  itemHoverBox,
+} from "./menuConstants";
 import { prefetchRouteFromLink } from "../../utils/routePrefetch";
+import { applyNavbarFont } from "../../utils/navbarFont";
 
 function NavbarUser() {
   const { user, logout } = useAuth();
@@ -105,10 +113,10 @@ function NavbarUser() {
         : "bg-slate-400/10 text-slate-400 ring-1 ring-slate-400/20";
 
   const navLinkClass = ({ isActive }) =>
-    `relative whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 xl:px-5 ${
+    `relative z-10 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300 xl:px-5 ${
       isActive
-        ? "bg-cyan-400/10 text-cyan-300 shadow-[0_0_18px_rgba(34,211,238,.15)]"
-        : "text-slate-300 hover:bg-white/5 hover:text-cyan-300 hover:-translate-y-0.5"
+        ? "text-cyan-300"
+        : "text-slate-300 hover:bg-white/5 hover:text-cyan-300"
     }`;
 
   const closeMenu = () => setIsOpen(false);
@@ -143,9 +151,44 @@ function NavbarUser() {
     logout();
   };
 
+  const location = useLocation();
+  const desktopNavRef = useRef(null);
+  const hasMeasured = useRef(false);
+  const [pill, setPill] = useState({
+    left: 0,
+    width: 0,
+    visible: false,
+    animate: false,
+  });
+
+  useLayoutEffect(() => {
+    const nav = desktopNavRef.current;
+    if (!nav) return;
+
+    const measure = () => {
+      const active = nav.querySelector('a[aria-current="page"]');
+      if (!active) {
+        setPill((p) => ({ ...p, visible: false }));
+        return;
+      }
+      setPill({
+        left: active.offsetLeft,
+        width: active.offsetWidth,
+        visible: true,
+        animate: hasMeasured.current, // pengukuran pertama tanpa animasi
+      });
+      hasMeasured.current = true;
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(nav);
+    return () => ro.disconnect();
+  }, [location.pathname, tipe]);
+
   useEffect(() => {
     function handleClickOutside(event) {
-      if (detailNotif || showLogoutConfirm || confirmDeleteAll) return
+      if (detailNotif || showLogoutConfirm || confirmDeleteAll) return;
       if (navRef.current && !navRef.current.contains(event.target)) {
         setIsOpen(false);
       }
@@ -166,7 +209,15 @@ function NavbarUser() {
       document.addEventListener("mousedown", handleClickOutside);
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen, isProfileOpen, isNotifOpen, closeNotif, detailNotif, showLogoutConfirm, confirmDeleteAll]);
+  }, [
+    isOpen,
+    isProfileOpen,
+    isNotifOpen,
+    closeNotif,
+    detailNotif,
+    showLogoutConfirm,
+    confirmDeleteAll,
+  ]);
 
   useEffect(() => {
     if (!isNotifOpen) return;
@@ -236,6 +287,10 @@ function NavbarUser() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    applyNavbarFont();
+  }, []);
+
   const notifProps = {
     unreadCount,
     notifications,
@@ -280,13 +335,32 @@ function NavbarUser() {
               className="h-full w-full object-contain"
             />
           </div>
-          <h1 className="text-sm font-bold text-white min-[350px]:text-base sm:text-lg">
-            SINGGAH
+          <h1
+            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            className="text-sm font-bold text-white min-[350px]:text-base sm:text-lg"
+          >
+            Singgah
           </h1>
         </NavLink>
 
         {/* Menu - Desktop */}
-        <nav className="hidden flex-1 items-center justify-center font-medium pl-4 min-[1100px]:flex min-[1100px]:pl-2 xl:pl-0 min-[1100px]:gap-3 xl:gap-8 2xl:gap-16">
+        <nav
+          ref={desktopNavRef}
+          style={{ fontFamily: "var(--snav-font, inherit)" }}
+          className="relative hidden flex-1 items-center justify-center font-medium pl-4 min-[1100px]:flex min-[1100px]:pl-2 xl:pl-0 min-[1100px]:gap-3 xl:gap-8 2xl:gap-16"
+        >
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 left-0 rounded-full bg-cyan-400/10 shadow-[0_0_18px_rgba(34,211,238,.15)] motion-reduce:transition-none"
+            style={{
+              width: pill.width,
+              transform: `translateX(${pill.left}px)`,
+              opacity: pill.visible ? 1 : 0,
+              transition: pill.animate
+                ? "transform 380ms cubic-bezier(.34,1.2,.5,1), width 380ms cubic-bezier(.4,0,.2,1), opacity 200ms"
+                : "none",
+            }}
+          />
           {menuItems.map((item) => (
             <NavLink
               key={item.to}
@@ -384,6 +458,7 @@ function NavbarUser() {
 
             {/* Dropdown */}
             <div
+              style={{ fontFamily: "var(--snav-font, inherit)" }}
               className={`absolute right-0 top-full mt-3 w-64 overflow-hidden rounded-2xl border border-white/10 bg-brand-dark/95 shadow-xl backdrop-blur-xl transition-all duration-200 ${
                 isProfileOpen
                   ? "translate-y-0 opacity-100"
@@ -411,8 +486,9 @@ function NavbarUser() {
                         "mobile-menu-item group relative flex items-center gap-3.5 rounded-2xl border px-3 py-2.5 transition-[background-color,border-color,color] duration-150 " +
                         (isActive
                           ? itemActive[item.label] || itemActive.Beranda
-                          : "border-transparent " + (itemHoverBox[item.label] || itemHoverBox.Beranda))
-                        }
+                          : "border-transparent " +
+                            (itemHoverBox[item.label] || itemHoverBox.Beranda))
+                      }
                     >
                       <span
                         className={`pointer-events-none absolute inset-y-1.5 left-0 w-[3px] rounded-full bg-gradient-to-b opacity-0 transition-opacity duration-200 group-hover:opacity-100 ${
@@ -421,13 +497,16 @@ function NavbarUser() {
                       />
                       <span
                         className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ring-1 ring-inset ${
-                          itemAccent[item.label] || "from-cyan-400/20 to-blue-500/10 text-cyan-400 ring-cyan-400/25"
+                          itemAccent[item.label] ||
+                          "from-cyan-400/20 to-blue-500/10 text-cyan-400 ring-cyan-400/25"
                         }`}
                       >
                         <ItemIcon size={17} strokeWidth={2} />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className={`block text-sm font-medium leading-tight text-slate-200 transition-colors ${itemHover[item.label] || "group-hover:text-cyan-300"}`}>
+                        <span
+                          className={`block text-sm font-medium leading-tight text-slate-200 transition-colors ${itemHover[item.label] || "group-hover:text-cyan-300"}`}
+                        >
                           {item.label}
                         </span>
                         <span className="mt-0.5 block truncate text-[11px] text-slate-500">
@@ -498,7 +577,10 @@ function NavbarUser() {
         profileMenuItems={profileMenuItems}
         onClose={closeMenu}
         onPrefetch={prefetchRouteFromLink}
-        onLogout={() => { closeMenu(); setShowLogoutConfirm(true); }}
+        onLogout={() => {
+          closeMenu();
+          setShowLogoutConfirm(true);
+        }}
       />
 
       <NotificationPanel

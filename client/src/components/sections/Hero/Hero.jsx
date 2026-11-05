@@ -1,18 +1,11 @@
-import { ArrowRight } from "lucide-react";
-import DustBackground from "../../ui/DustBackground";
-import { useTheme } from "../../../context/ThemeContext";
-import GlowBackground from "../../ui/GlowBackground";
-import PCBBackground from "../../ui/PCBBackground";
-import logoPoliban from "../../../assets/icons/Logo_Poliban.png";
 import { useNavigate } from "react-router-dom";
-import SmartImage from "../../ui/SmartImage";
+import heroRaysLight from "../../../assets/images/hero/hero-rays-light.webp";
+import bandLight from "../../../assets/images/hero/hero-band-light.webp";
 import HeroStats from "./HeroStats";
 import HeroKaryaShowcase from "./HeroKaryaShowcase";
 
 function Hero() {
   const navigate = useNavigate();
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
 
   // Flag freshHall dipakai scene hall untuk mengembalikan pemain ke titik awal
   // (hologram). Sengaja lewat state navigasi, bukan pustaka three, supaya
@@ -22,109 +15,103 @@ function Hero() {
   };
 
   return (
-    <section
-      id="hero"
-      className="relative lg:min-h-[100dvh] overflow-hidden bg-brand-dark"
-    >
-      <GlowBackground />
-      <PCBBackground />
-      {/* Partikel melayang: biru langit di dark mode, biru primer
-          di light mode biar elegan di atas bg putih */}
-      <DustBackground color={isDark ? "#7dd3fc" : "#2563eb"} />
-
-      {/* Class lg:items-start dihapus, jadi items-center berlaku untuk desktop juga biar sejajar */}
-      <div className="relative z-10 mx-auto flex lg:min-h-screen max-w-[1700px] w-full flex-col items-center px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+20px)] lg:pt-[calc(var(--navbar-h)+32px)] pb-6 lg:pb-12">
-        <div className="flex w-full min-w-0 flex-none lg:flex-1 flex-col lg:flex-row lg:flex-wrap items-center lg:justify-between">
-        <div className="flex w-full flex-col items-center text-center md:max-w-2xl md:mx-auto lg:max-w-xl 2xl:max-w-2xl lg:mx-0 lg:items-start lg:text-left lg:w-auto lg:flex-1 lg:min-w-0">
-          <div className="inline-flex items-center gap-2 min-[350px]:gap-3 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 min-[350px]:px-4 py-2 backdrop-blur-md">
-            <SmartImage
-              src={logoPoliban}
-              alt="Logo Poliban"
-              eager
-              className="h-4 w-4 min-[350px]:h-5 min-[350px]:w-5 md:h-6 md:w-6 2xl:h-8 2xl:w-8 object-contain"
-            />
-            <span className="text-[10px] min-[350px]:text-xs md:text-sm 2xl:text-lg font-medium text-cyan-300">
-              Politeknik Negeri Banjarmasin
-            </span>
-          </div>
-
-          <h1
-            className="mt-4 text-3xl min-[350px]:text-4xl md:text-5xl lg:text-6xl 2xl:text-7xl font-black leading-tight text-white whitespace-nowrap"
-            style={{ fontFamily: "'Montserrat', sans-serif" }}
-          >
-            Singgah
-            <br />
-            Sejenak <span className="text-cyan-300">Disini</span>
-          </h1>
-
-          <div className="mt-5 flex flex-col md:flex-row items-center lg:items-start gap-3">
-            <div className="hidden lg:block mt-2 h-13 w-[3px] shrink-0 rounded-full bg-gradient-to-b from-cyan-400 to-blue-600" />
-            <p className="text-xs min-[350px]:text-sm md:text-base lg:text-lg 2xl:text-xl leading-relaxed text-slate-300 max-w-md md:max-w-xl 2xl:max-w-2xl">
-              Sebuah Karya Ciptaan Civitas Akademika{" "}
-              <span className="font-semibold text-cyan-300">
-                #ElektroPoliban
-              </span>{" "}
-              tertarik untuk kolaborasi riset?
-            </p>
-          </div>
-
-          <div className="hidden lg:block mt-14 w-full">
-            <button
-              onClick={handleStartExploration}
-              className="group relative w-full cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-12 py-6 2xl:px-14 2xl:py-7 font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/50"
+    <section id="hero" className="relative overflow-hidden">
+      {/* Blok atas: latar bersih + sinar, berakhir sebelum pita */}
+      <div className="hero-top relative">
+        {/* Blok atas: konten teks + tombol dalam wadah ber-padding */}
+        <div className="relative mx-auto flex w-full max-w-[1700px] flex-col px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 pt-[calc(var(--navbar-h)+16px)] sm:pt-[calc(var(--navbar-h)+20px)] lg:pt-[calc(var(--navbar-h)+32px)] pb-8 sm:pb-10">
+          <div className="hero-rays-block relative w-full">
+            {/* Sinar radial di belakang judul dan tombol */}
+            <div
+              aria-hidden="true"
+              className="hero-rays pointer-events-none absolute z-0"
             >
-              <span className="relative flex items-center justify-between gap-4">
-                <span className="text-lg tracking-wide">Mulai Eksplorasi</span>
-                <ArrowRight
-                  size={22}
-                  className="transition-transform duration-300 group-hover:translate-x-2"
-                />
-              </span>
-            </button>
+              <img
+                src={heroRaysLight}
+                alt=""
+                aria-hidden="true"
+                className="hero-rays-img pointer-events-none absolute inset-0 h-full w-full object-cover object-[center_bottom]"
+              />
+            </div>
+            {/* Konten hero: judul, paragraf, tombol */}
+            <div className="relative z-[1] flex w-full flex-col items-center text-center">
+              <h1
+                className="mt-0 leading-tight text-white"
+                style={{
+                  fontFamily: "'Unbounded', sans-serif",
+                  fontSize: "clamp(1.75rem, 5vw, 3.25rem)",
+                  fontWeight: 900,
+                }}
+              >
+                Dari Lab Elektro,
+                <br />
+                Jadi <span className="text-cyan-300">Karya Nyata</span>
+              </h1>
+
+              <div className="mt-3 flex flex-col items-center gap-3">
+                <p className="text-xs min-[350px]:text-sm md:text-base lg:text-lg 2xl:text-xl leading-relaxed text-slate-300 max-w-xl md:max-w-2xl lg:max-w-4xl 2xl:max-w-5xl">
+                  Ini ruang pameran karya Teknik Elektro Politeknik Negeri Banjarmasin.
+                  Isinya proyek mahasiswa dan dosen, dari yang berawal sebagai tugas kuliah
+                  sampai yang sudah dipakai di lapangan.
+                </p>
+              </div>
+
+              <div className="relative z-[60] mt-4 flex w-full flex-wrap items-center justify-center gap-3 sm:mt-6 max-sm:gap-[10px]">
+                <button
+                  onClick={handleStartExploration}
+                  className="inline-flex items-center justify-center h-12 px-6 rounded-[10px] border font-[inherit] text-[15px] lg:text-base normal-case tracking-normal whitespace-nowrap min-w-0 w-full sm:w-auto cursor-pointer transition-[background-color,border-color,box-shadow,transform] duration-150 active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-current border-[#22d3ee] bg-[#22d3ee] text-[color:#04142b] shadow-[0_6px_14px_-6px_rgba(34,211,238,0.45)] hover:border-[#06b6d4] hover:bg-[#06b6d4] hover:shadow-[0_4px_10px_-6px_rgba(34,211,238,0.45)] light:border-[#2563eb] light:bg-[#2563eb] light:text-[color:#ffffff] light:shadow-[0_6px_14px_-6px_rgba(37,99,235,0.55)] light:hover:border-[#1d4ed8] light:hover:bg-[#1d4ed8] light:hover:shadow-[0_4px_10px_-6px_rgba(37,99,235,0.55)] min-[2560px]:h-14 min-[2560px]:px-7"
+                >
+                  <span className="leading-none">Lihat Karya</span>
+                </button>
+
+                <a
+                  href="#panduan"
+                  className="inline-flex items-center justify-center h-12 px-6 rounded-[10px] border font-[inherit] text-[15px] lg:text-base normal-case tracking-normal whitespace-nowrap min-w-0 w-full sm:w-auto cursor-pointer transition-[background-color,border-color,box-shadow,transform] duration-150 active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-current border-white/[0.18] bg-white/[0.06] text-[color:#e2e8f0] hover:border-white/[0.3] hover:bg-white/[0.1] light:border-[#d5dbe3] light:bg-[#f1f5f9] light:text-[color:#0f172a] light:shadow-[0_1px_2px_rgba(15,23,42,0.06)] light:hover:border-[#bcc5d1] light:hover:bg-[#e8edf3] min-[2560px]:h-14 min-[2560px]:px-7"
+                >
+                  <span className="leading-none">Baca Panduan</span>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Karya Terbaru Showcase (menggantikan area model 3D di sisi kanan) */}
-        <div className="mt-8 flex w-full lg:w-[40%] xl:w-[43%] items-center justify-center shrink-0">
-          <div className="w-full max-w-md md:max-w-xl lg:max-w-full">
+      {/* bandZone: pita biru bergambar, carousel + HeroStats, selebar layar */}
+      <div className="bandZone hero-band relative w-full">
+        <div className="hero-band-showcase relative w-full overflow-hidden">
+          <div className="relative z-10 w-full overflow-hidden">
             <HeroKaryaShowcase />
           </div>
+
+          {/* Lapisan gambar pita biru di belakang carousel */}
+          <div
+            aria-hidden="true"
+            className="hero-band-bg pointer-events-none"
+            style={{ backgroundImage: `url(${bandLight})` }}
+          />
         </div>
 
-        <div className="mt-8 flex w-full flex-col items-center gap-8 lg:hidden">
-            <div className="w-full">
-            <button
-              onClick={handleStartExploration}
-              className="group relative w-full cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] px-6 py-4 font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-500 hover:bg-[position:100%_0] hover:shadow-cyan-400/50"
-            >
-              <span className="relative flex items-center justify-between gap-4">
-                <span className="text-base tracking-wide">
-                  Mulai Eksplorasi
-                </span>
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition-transform duration-300 group-hover:translate-x-1">
-                  <ArrowRight size={18} />
-                </span>
-              </span>
-            </button>
-          </div>
+        {/* HeroStats dalam wadah ber-padding */}
+        <div className="relative z-10 mx-auto flex w-full max-w-[1700px] flex-col items-center justify-center px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16 mt-10 lg:mt-14 pb-6 lg:pb-12">
+          {/* Kalimat pengantar section stats */}
+          <p
+            className="mb-10 text-center whitespace-nowrap max-[479px]:whitespace-normal"
+            style={{
+              fontFamily: "'Poppins', sans-serif",
+              fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)",
+              fontWeight: 400,
+              lineHeight: 1.5,
+              color: "#0F172A",
+            }}
+          >
+            Sedikit angka biar kelihatan{" "}
+            <span style={{ color: "#1D6FF2", fontWeight: 500 }}>
+              seberapa ramai ruang pameran ini.
+            </span>
+          </p>
+          <HeroStats />
         </div>
-
-        {/* tutup wrapper konten atas (kolom teks + showcase + CTA) */}
       </div>
-
-      {/* Unified 4-stats row full-width, langsung di bawah showcase */}
-      <div className="w-full mt-10 lg:mt-14 mb-0 lg:mb-5 flex justify-center">
-        <HeroStats />
-      </div>
-      </div>
-
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(circle at center, transparent 0%, rgba(4,29,56,0.3) 55%, rgba(4,29,56,1) 100%)",
-        }}
-      />
     </section>
   );
 }

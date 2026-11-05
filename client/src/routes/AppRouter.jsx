@@ -13,6 +13,11 @@ const Home = lazy(() => import("../pages/Home/Home"))
 const News = lazy(() => import("../pages/News/News"))
 const NewsDetail = lazy(() => import("../pages/News/NewsDetail"))
 const About = lazy(() => import("../pages/About/About"))
+const Kebanggaan = lazy(() => import("../pages/Kebanggaan/Kebanggaan"))
+const Faq = lazy(() => import("../pages/Faq/Faq"))
+const Dosen = lazy(() => import("../pages/Dosen/DaftarDosen"))
+const Visitasi = lazy(() => import("../pages/Visitasi/Visitasi"))
+const TurVirtual = lazy(() => import("../pages/Akademik/TurVirtual"))
 const NotFound = lazy(() => import("../pages/NotFound/NotFound"))
 const Karya = lazy(() => import("../pages/Karya/Karya"))
 const KaryaDetail = lazy(() => import("../pages/Karya/KaryaDetail"))
@@ -89,6 +94,12 @@ function AppRouter() {
           element={<KaryaProjectDetail />}
         />
         <Route path="/about" element={<About />} />
+        <Route path="/kebanggaan" element={<Kebanggaan />} />
+        <Route path="/faq" element={<Faq />} />
+        <Route path="/dosen" element={<Dosen />} />
+        <Route path="/visitasi" element={<Visitasi />} />
+        <Route path="/akademik/tur-virtual" element={<TurVirtual />} />
+        <Route path="/akademik/dosen" element={<Dosen />} />
         <Route
           path="/hall"
           element={

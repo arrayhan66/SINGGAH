@@ -1,0 +1,243 @@
+.site-nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 0;
+  color: #cbd5e1;
+  font-family: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.site-nav-link::after {
+  content: "";
+  position: absolute;
+  right: 1px;
+  bottom: 3px;
+  left: 1px;
+  height: 1.5px;
+  border-radius: 70% 30% 60% 40%;
+  background: currentColor;
+  opacity: 0;
+  transform: rotate(-0.6deg) scaleX(0.75);
+  transform-origin: left center;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+.site-nav-link:hover,
+.site-nav-link.is-active {
+  color: #67e8f9;
+}
+
+.site-nav-link:hover {
+  transform: translateY(-1px) rotate(-0.3deg);
+}
+
+.site-nav-link:hover::after,
+.site-nav-link.is-active::after {
+  opacity: 0.8;
+  transform: rotate(-0.6deg) scaleX(1);
+}
+
+.site-nav-link.is-active::after {
+  opacity: 1;
+}
+
+.site-nav-link:focus-visible {
+  outline: 1px dashed #67e8f9;
+  outline-offset: 4px;
+}
+
+html.light .site-nav-link {
+  color: #475569;
+}
+
+html.light .site-nav-link:hover,
+html.light .site-nav-link.is-active {
+  color: #1d4ed8;
+}
+
+html.light .site-nav-link:focus-visible {
+  outline-color: #1d4ed8;
+}
+
+.ak-nav-dropdown .ak-nav-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 0;
+  border: 0;
+  background: transparent;
+  color: #cbd5e1;
+  font-family: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+html.light .ak-nav-dropdown .ak-nav-trigger {
+  color: #475569;
+}
+
+.site-login-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 7px 15px;
+  border: 1px solid rgba(103, 232, 249, 0.55);
+  border-radius: 7px 10px 8px 9px;
+  background: rgba(8, 47, 73, 0.34);
+  box-shadow: none;
+  color: #d9f9ff;
+  font-family: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.site-login-button:hover {
+  border-color: #67e8f9;
+  background: rgba(34, 211, 238, 0.1);
+  color: #ecfeff;
+  transform: translateY(-1px) rotate(-0.3deg);
+}
+
+.site-login-button:active {
+  transform: translateY(0);
+}
+
+.site-login-button:focus-visible {
+  outline: 1px dashed #67e8f9;
+  outline-offset: 3px;
+}
+
+html.light .site-login-button {
+  border-color: rgba(29, 78, 216, 0.45);
+  background: rgba(29, 78, 216, 0.04);
+  color: #1d4ed8;
+}
+
+html.light .site-login-button:hover {
+  border-color: #1d4ed8;
+  background: rgba(29, 78, 216, 0.08);
+  color: #1e40af;
+}
+
+html.light .site-login-button:focus-visible {
+  outline-color: #1d4ed8;
+}
+
+@media (min-width: 640px) {
+  .site-login-button {
+    padding: 8px 18px;
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 768px) {
+  .site-login-button {
+    padding: 9px 20px;
+    font-size: 13px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .site-login-button {
+    padding: 10px 22px;
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 2000px) {
+  .site-login-button {
+    padding: 12px 26px;
+    font-size: 16px;
+  }
+}
+
+.ak-nav-dropdown {
+  margin-left: 0.25rem;
+}
+
+.ak-nav-dropdown .ak-nav-trigger > span {
+  position: relative;
+}
+
+.ak-nav-dropdown .ak-nav-trigger > span::after {
+  content: "";
+  position: absolute;
+  right: 1px;
+  bottom: -3px;
+  left: 1px;
+  height: 1.5px;
+  border-radius: 70% 30% 60% 40%;
+  background: currentColor;
+  opacity: 0;
+  transform: rotate(-0.6deg) scaleX(0.75);
+  transform-origin: left center;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.ak-nav-dropdown .ak-nav-trigger:hover,
+.ak-nav-dropdown .ak-nav-trigger.is-active {
+  color: #67e8f9;
+}
+
+html.light .ak-nav-dropdown .ak-nav-trigger:hover,
+html.light .ak-nav-dropdown .ak-nav-trigger.is-active {
+  color: #1d4ed8;
+}
+
+.ak-nav-dropdown .ak-nav-trigger:hover {
+  transform: translateY(-1px) rotate(-0.3deg);
+}
+
+.ak-nav-dropdown .ak-nav-trigger:hover > span::after,
+.ak-nav-dropdown .ak-nav-trigger.is-active > span::after {
+  opacity: 0.8;
+  transform: rotate(-0.6deg) scaleX(1);
+}
+
+.ak-nav-dropdown .ak-nav-trigger.is-active > span::after {
+  opacity: 1;
+}
+
+.ak-nav-dropdown .ak-nav-trigger__chevron {
+  opacity: 0.6;
+  transition: opacity 0.18s ease, transform 0.22s ease;
+}
+
+.ak-nav-dropdown .ak-nav-trigger:hover .ak-nav-trigger__chevron,
+.ak-nav-dropdown .ak-nav-trigger.is-active .ak-nav-trigger__chevron {
+  opacity: 0.9;
+}
+
+.ak-nav-dropdown .ak-nav-trigger__chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.ak-nav-dropdown .ak-nav-trigger:focus-visible {
+  outline: 1px dashed #67e8f9;
+  outline-offset: 4px;
+}
+
+html.light .ak-nav-dropdown .ak-nav-trigger:focus-visible {
+  outline-color: #1d4ed8;
+}

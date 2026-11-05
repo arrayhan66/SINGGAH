@@ -133,6 +133,22 @@ html:not(.light) :where(a, button, input, textarea, select, summary, [role="butt
   }
 }
 
+@keyframes gallery-dust {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(6px, -14px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-dust {
+    animation: none !important;
+  }
+}
+
 @keyframes skeleton-shimmer {
   0% {
     background-position: -200% 0;
@@ -944,6 +960,98 @@ html.light .emoji-pop-preview-text {
      angular + aura neon + ikon bercahaya + label uppercase).
    - Z-axis: background → main card → badge → arrow.
    ============================================================ */
+/* ============================================================
+   HERO — LATAR BERSIH + PITA BIRU BERGAMBAR (light)
+   Struktur: section (latar bersih, sinar di blok atas)
+             > .hero-top (judul + tombol)
+             > .hero-band (carousel + stats, gambar pita).
+   Dekorasi statis: hanya gambar, tanpa blur/glow/animasi.
+   ============================================================ */
+#hero {
+  --hero-base-bg: #041d38;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--hero-base-bg);
+}
+html.light #hero {
+  --hero-base-bg: #f6f9fe;
+}
+
+/* Sinar radial di belakang judul dan tombol — garis tipis individu dari titik fokus bawah-tengah */
+.hero-rays {
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  width: max(2000px, 150vw);
+  height: 24vh;
+  transform: translateX(-50%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Pita biru: gambar penuh, mulai 90px di atas puncak kartu */
+.hero-band {
+  --card-w: min(44vw, 2000px);
+  --card-h: calc(var(--card-w) * 0.625);
+  --hero-band-offset: -10px;
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  margin: 0;
+}
+
+.hero-band-bg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: calc(0px - var(--hero-band-offset));
+  z-index: 0;
+  background-position: center top;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+/* Satu sumber lebar kartu: carousel mewarisi --card-w dari bandZone */
+.hero-band .hero-karya-showcase > div {
+  --card-w: inherit !important;
+}
+
+/* Bayangan tipis kartu saat bertumpu di pita (khusus light) */
+html.light .hero-band .hero-karya-showcase [data-card-offset] {
+  box-shadow: 0 10px 30px -12px rgba(8, 30, 80, 0.35) !important;
+}
+
+@media (max-width: 1023px) {
+  .hero-band {
+    --card-w: 60vw;
+  }
+}
+@media (max-width: 639px) {
+  .hero-band {
+    --card-w: 78vw;
+    --hero-band-offset: -10px;
+  }
+  /* Total gap tetap 32px: 24px luar + 8px dalam, titik temu -24px = 32px di bawah tombol. */
+  .hero-top > div {
+    padding-bottom: 24px;
+  }
+  .hero-rays-block {
+    padding-bottom: 8px;
+  }
+  .hero-rays {
+    bottom: -6px;
+    width: max(1800px, 240vw);
+    height: 22vh;
+  }
+}
+@media (min-width: 2560px) {
+  .hero-band {
+    --hero-band-offset: -1rem;
+  }
+}
+
 /* ============================================================
    SHOWCASE — THEME TOKENS (CSS custom properties).
    Dark defaults : :root scope under .hero-karya-showcase.

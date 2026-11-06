@@ -31,7 +31,6 @@ const LINE_MAT = new THREE.MeshBasicMaterial({
   transparent: true,
   opacity: 0.4,
   depthWrite: false,
-  renderOrder: 100,
 })
 const BEAM_MAT = new THREE.MeshBasicMaterial({
   color: "#38bdf8",
@@ -41,7 +40,6 @@ const BEAM_MAT = new THREE.MeshBasicMaterial({
   side: THREE.DoubleSide,
   depthWrite: false,
   toneMapped: false,
-  renderOrder: 100,
 })
 const RING_MAT = new THREE.MeshBasicMaterial({
   color: "#a5d8ff",
@@ -53,7 +51,6 @@ const RING_MAT = new THREE.MeshBasicMaterial({
   polygonOffsetFactor: -2,
   polygonOffsetUnits: -2,
   toneMapped: false,
-  renderOrder: 100,
 })
 const CORE_MAT = new THREE.MeshBasicMaterial({
   color: "#e0f2fe",
@@ -64,7 +61,6 @@ const CORE_MAT = new THREE.MeshBasicMaterial({
   polygonOffsetFactor: -2,
   polygonOffsetUnits: -2,
   toneMapped: false,
-  renderOrder: 100,
 })
 
 // Temp per-frame (module scope) — tidak satu pun alokasi Vector saat berjalan.
@@ -118,7 +114,7 @@ function MarkerInner() {
 
   return (
     <group raycast={() => null}>
-      <mesh ref={lineRef} geometry={LINE_GEO} material={LINE_MAT} raycast={() => null} />
+      <mesh ref={lineRef} geometry={LINE_GEO} material={LINE_MAT} renderOrder={100} raycast={() => null} />
       <group ref={markerRef} raycast={() => null}>
         {/* Titik pusat + cincin + pilar cahaya pendek di titik tujuan */}
         <mesh
@@ -126,6 +122,7 @@ function MarkerInner() {
           rotation={[-Math.PI / 2, 0, 0]}
           position={[0, 0.02, 0]}
           material={CORE_MAT}
+          renderOrder={100}
           raycast={() => null}
         />
         <mesh
@@ -133,6 +130,7 @@ function MarkerInner() {
           rotation={[-Math.PI / 2, 0, 0]}
           position={[0, 0.055, 0]}
           material={RING_MAT}
+          renderOrder={100}
           raycast={() => null}
         />
         <mesh
@@ -140,6 +138,7 @@ function MarkerInner() {
           scale={[1, BEAM_H, 1]}
           position={[0, BEAM_H / 2, 0]}
           material={BEAM_MAT}
+          renderOrder={100}
           raycast={() => null}
         />
       </group>

@@ -27,7 +27,6 @@ const RING_HOVER_MAT = new THREE.MeshBasicMaterial({
   polygonOffset: true,
   polygonOffsetFactor: -2,
   polygonOffsetUnits: -2,
-  renderOrder: 100,
   toneMapped: false,
 })
 
@@ -40,7 +39,6 @@ const CORE_HOVER_MAT = new THREE.MeshBasicMaterial({
   polygonOffset: true,
   polygonOffsetFactor: -2,
   polygonOffsetUnits: -2,
-  renderOrder: 100,
   toneMapped: false,
 })
 
@@ -74,12 +72,14 @@ function FloorHoverMarker() {
           geometry={RING_HOVER_GEO}
           material={RING_HOVER_MAT}
           rotation={[-Math.PI / 2, 0, 0]}
+          renderOrder={100}
           raycast={() => null}
         />
         <mesh
           geometry={CORE_HOVER_GEO}
           material={CORE_HOVER_MAT}
           rotation={[-Math.PI / 2, 0, 0]}
+          renderOrder={100}
           raycast={() => null}
         />
       </group>

@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Loader2, MousePointer2, Sparkles } from "lucide-react";
 import api from "../../services/api";
-import { cloudinarySrc } from "../../utils/imageUrl";
+import { cloudinarySrc, isBrokenImage } from "../../utils/imageUrl";
 
 const YAW_MIN = -62;
 const YAW_MAX = 62;
@@ -237,7 +237,6 @@ export default function PlanetaryOrbitGallery() {
     } else {
       media.addListener(listener);
     }
-    setIsCompact(media.matches);
     return () => {
       if (media.removeEventListener) {
         media.removeEventListener("change", listener);
@@ -269,7 +268,10 @@ export default function PlanetaryOrbitGallery() {
         const data = res.data?.data?.items || res.data?.data || [];
         const normalized = (Array.isArray(data) ? data : [])
           .map(normalizeProject)
-          .filter((project) => project.id && project.image);
+          .filter(
+            (project) =>
+              project.id && project.image && !isBrokenImage(project.image)
+          );
 
         const valid = await Promise.all(
           normalized.map((project) =>

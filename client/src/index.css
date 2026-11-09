@@ -969,24 +969,20 @@ html.light .emoji-pop-preview-text {
    ============================================================ */
 #hero {
   --hero-base-bg: #041d38;
+  /* Aksen CTA hero: cyan di dark, biru di light (sama dengan tombol utama). */
+  --hero-accent: var(--color-cyan-400);
+  /* Teks deskripsi hero: terang di dark, lebih gelap di light. */
+  --hero-desc: var(--color-slate-300);
+  /* Token bingkai senada navbar, dipakai juga oleh kartu karya hero. */
+  --snav-bd: rgba(148, 163, 184, 0.35);
   position: relative;
   overflow: hidden;
   background-color: var(--hero-base-bg);
 }
 html.light #hero {
   --hero-base-bg: #f6f9fe;
-}
-
-/* Sinar radial di belakang judul dan tombol — garis tipis individu dari titik fokus bawah-tengah */
-.hero-rays {
-  position: absolute;
-  left: 50%;
-  bottom: -10px;
-  width: max(2000px, 150vw);
-  height: 24vh;
-  transform: translateX(-50%);
-  z-index: 0;
-  pointer-events: none;
+  --hero-accent: var(--color-blue-600);
+  --hero-desc: var(--color-slate-700);
 }
 
 /* Pita biru: gambar penuh, mulai 90px di atas puncak kartu */
@@ -1010,17 +1006,13 @@ html.light #hero {
   background-position: center top;
   background-size: 100% 100%;
   background-repeat: no-repeat;
+  opacity: 0.5;
   pointer-events: none;
 }
 
 /* Satu sumber lebar kartu: carousel mewarisi --card-w dari bandZone */
 .hero-band .hero-karya-showcase > div {
   --card-w: inherit !important;
-}
-
-/* Bayangan tipis kartu saat bertumpu di pita (khusus light) */
-html.light .hero-band .hero-karya-showcase [data-card-offset] {
-  box-shadow: 0 10px 30px -12px rgba(8, 30, 80, 0.35) !important;
 }
 
 @media (max-width: 1023px) {
@@ -1033,17 +1025,8 @@ html.light .hero-band .hero-karya-showcase [data-card-offset] {
     --card-w: 78vw;
     --hero-band-offset: -10px;
   }
-  /* Total gap tetap 32px: 24px luar + 8px dalam, titik temu -24px = 32px di bawah tombol. */
-  .hero-top > div {
-    padding-bottom: 24px;
-  }
   .hero-rays-block {
     padding-bottom: 8px;
-  }
-  .hero-rays {
-    bottom: -6px;
-    width: max(1800px, 240vw);
-    height: 22vh;
   }
 }
 @media (min-width: 2560px) {

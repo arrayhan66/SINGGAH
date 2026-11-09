@@ -9,7 +9,6 @@
 import { useNavigate } from "react-router-dom";
 import api from "../../../services/api";
 import { imageUrl, buildSrcSet } from "../../../utils/imageUrl";
-import { useTheme } from "../../../context/ThemeContext";
 import SmartImage from "../../ui/SmartImage";
 import { SLIDESHOW_MAX_ITEMS } from "../../../constants/slideshow";
 import HeroCat from "./HeroCat";
@@ -40,10 +39,8 @@ function cardWidthVw(width) {
   return "50vw";
 }
 
-function HeroKaryaShowcase({ variant }) {
+function HeroKaryaShowcase() {
   const navigate = useNavigate();
-  const { theme } = useTheme();
-  const isLight = (variant || theme) === "light";
 
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -87,19 +84,11 @@ function HeroKaryaShowcase({ variant }) {
 
   const renderSlides = useMemo(() => {
     if (count === 0) return [];
-    if (count >= 6) {
-      return slides.map((s, i) => ({
-        key: String(s.id),
-        slide: s,
-        origIndex: i,
-      }));
-    }
-    const out = [];
-    for (let i = 0; i < count; i++) {
-      out.push({ key: `${slides[i].id}-a`, slide: slides[i], origIndex: i });
-      out.push({ key: `${slides[i].id}-b`, slide: slides[i], origIndex: i });
-    }
-    return out;
+    return slides.map((s, i) => ({
+      key: String(s.id),
+      slide: s,
+      origIndex: i,
+    }));
   }, [slides, count]);
   const renderCount = renderSlides.length;
 
@@ -208,8 +197,8 @@ function HeroKaryaShowcase({ variant }) {
     if (els.length === 0) return;
 
     const restore = reducedMotion
-      ? "transform 300ms ease, opacity 300ms ease"
-      : "transform 700ms cubic-bezier(.22,1,.36,1), opacity 400ms ease";
+      ? "none"
+      : "transform 300ms ease, opacity 300ms ease";
 
     els.forEach((el) => {
       el.style.transition = "none";
@@ -387,11 +376,8 @@ function HeroKaryaShowcase({ variant }) {
     marginLeft: `calc(var(--card-w) / -2)`,
     width: `min(var(--card-w), 2400px)`,
     aspectRatio: "16 / 10",
-    borderRadius: "14px",
-    border: `1px solid var(--color-border, ${
-      isLight ? "rgba(15,23,42,0.12)" : "rgba(148,163,184,0.18)"
-    })`,
-    boxShadow: "0 2px 8px -2px rgba(0,0,0,.25)",
+    borderRadius: "16px",
+    border: "1px solid var(--snav-bd)",
     overflow: "hidden",
     transformOrigin: "center center",
     backfaceVisibility: "hidden",
@@ -461,8 +447,8 @@ function HeroKaryaShowcase({ variant }) {
                 ry = 0;
                 rz = 0;
               } else if (side) {
-                s = 0.93;
-                op = 1;
+                s = 0.96;
+                op = 0.55;
                 z = 4;
                 pe = "auto";
                 ry = off * -rotateYDeg;
@@ -483,13 +469,10 @@ function HeroKaryaShowcase({ variant }) {
               }
 
               let trans;
-              if (dragging) {
+              if (dragging || reducedMotion) {
                 trans = "none";
-              } else if (reducedMotion) {
-                trans = "transform 300ms ease, opacity 300ms ease";
               } else {
-                trans =
-                  "transform 700ms cubic-bezier(.22,1,.36,1), opacity 400ms ease";
+                trans = "transform 300ms ease, opacity 300ms ease";
               }
 
               const style = {

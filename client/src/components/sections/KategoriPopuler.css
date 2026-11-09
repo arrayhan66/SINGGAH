@@ -1,0 +1,26 @@
+.kp{--kp-focus:var(--color-cyan-400);padding:96px 0}
+html.light .kp{--kp-focus:var(--color-blue-600)}
+.kp-wrap{--kp-gutter:20px;max-width:1700px;margin:0 auto}
+.kp-head{display:grid;grid-template-columns:1fr 1fr;column-gap:32px;align-items:start;padding:0 var(--kp-gutter);margin-bottom:48px}
+.kp-title{margin:0;font-size:32px;line-height:1.2;font-weight:500;letter-spacing:-.01em;color:var(--color-white)}
+html.light .kp-title{color:var(--color-slate-900)}
+.kp-desc{margin:6px 0 0;max-width:440px;font-size:14px;line-height:1.6;color:var(--color-slate-300)}
+html.light .kp-desc{color:var(--color-slate-600)}
+.kp-track{display:flex;gap:20px;padding:0 var(--kp-gutter);overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:var(--kp-gutter);scrollbar-width:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.kp-track::-webkit-scrollbar{display:none}
+.kp-track.is-drag{scroll-snap-type:none;cursor:grabbing}
+.kp-card{position:relative;display:block;flex:0 0 317px;aspect-ratio:317/428;overflow:hidden;border-radius:8px;background:var(--color-slate-800);scroll-snap-align:start;text-decoration:none;color:var(--color-white);-webkit-user-drag:none}
+.kp-img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;filter:brightness(.62);transition:transform .3s ease}
+.kp-card:hover .kp-img{transform:scale(1.03)}
+.kp-text{position:absolute;left:16px;top:16px;display:flex;flex-direction:column;gap:6px;max-width:60%}
+.kp-name{font-size:16px;line-height:1.3;font-weight:600;color:var(--color-white)}
+.kp-sub{font-size:13px;line-height:1.45;color:var(--color-white);opacity:.85}
+.kp-arrow{position:absolute;right:16px;bottom:16px;color:var(--color-white)}
+.kp-card:focus-visible{outline:2px solid var(--kp-focus);outline-offset:3px}
+@media (min-width:768px){.kp-wrap{--kp-gutter:32px}}
+@media (min-width:1024px){.kp-wrap{--kp-gutter:40px}}
+@media (min-width:1280px){.kp-wrap{--kp-gutter:48px}}
+@media (min-width:1536px){.kp-wrap{--kp-gutter:64px}}
+@media (max-width:1023px){.kp-card{flex-basis:280px}}
+@media (max-width:767px){.kp{padding:64px 0}.kp-head{grid-template-columns:1fr;row-gap:12px;margin-bottom:32px}.kp-title{font-size:24px}.kp-desc{margin:0}.kp-track{gap:16px}.kp-card{flex-basis:min(78vw,320px)}}
+@media (prefers-reduced-motion:reduce){.kp-img{transition:none}}

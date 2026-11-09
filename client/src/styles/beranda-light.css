@@ -193,8 +193,7 @@ html.light .beranda-page #hero h1.text-white {
   color: #404040;
 }
 
-/* "DISINI" + "Sering Diajukan": teks gradient biru -> sky */
-html.light .beranda-page #hero h1 span.text-cyan-300,
+/* "Sering Diajukan": teks gradient biru -> sky */
 html.light .beranda-page #faq h2 span.text-cyan-300 {
   background-image: linear-gradient(90deg, #2563eb, #0ea5e9);
   -webkit-background-clip: text;

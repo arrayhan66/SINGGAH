@@ -1,0 +1,164 @@
+@startuml 02-autentikasi
+'==============================================================
+' Aktor 2: AUTENTIKASI & AKUN
+'
+' Mahasiswa, Dosen, dan Admin tidak dimunculkan sebagai aktor
+' terpisah karena perilaku autentikasinya identik: seluruhnya
+' memakai use case yang sama.
+'
+' Prefix A dipakai untuk modul ini. Prefix V dipakai modul Visitor
+' pada 01-visitor.puml, sehingga tidak boleh dipakai di sini.
+'
+' Catatan: seluruh blok bertanda ' adalah komentar PlantUML dan tidak
+' muncul di diagram. Jangan menaruh tanda ' di baris relasi karena
+' teksnya akan tercetak sebagai label panah.
+'==============================================================
+
+title Use Case - Autentikasi & Manajemen Akun
+
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #EFF6FF
+  BorderColor #1D4ED8
+  ArrowColor #1D4ED8
+}
+skinparam actor {
+  BorderColor #1D4ED8
+  BackgroundColor #DBEAFE
+}
+
+actor "Pengunjung" as Visitor
+actor "Akun Terdaftar" as User
+
+rectangle "SINGGAH" <<system>> {
+
+  package "Pendaftaran" {
+    usecase "A1. Daftar Akun Baru" as A1
+    usecase "A2. Isi Form Pendaftaran" as A2
+    usecase "A3. Verifikasi Kode Email (OTP)" as A3
+    usecase "A4. Kirim Ulang OTP" as A4
+  }
+
+  package "Masuk" {
+    usecase "A5. Login Email & Password" as A5
+    usecase "A6. Verifikasi Kecocokan Data" as A6
+    usecase "A7. Logout" as A7
+    usecase "A8. Tampilkan Beranda" as A8
+    usecase "A9. Kembali ke Halaman Asal" as A9
+  }
+
+  package "Ubah Password" {
+    usecase "A10. Lupa Password" as A10
+    usecase "A11. Verifikasi Kode Reset" as A11
+    usecase "A12. Atur Ulang Password" as A12
+  }
+
+  package "Pengaturan Akun" {
+    usecase "A13. Ganti Password" as A13
+    usecase "A14. Hapus Akun" as A14
+  }
+}
+
+' --- Relasi Aktor ---
+'
+' Pengunjung melakukan pendaftaran, login, dan pemulihan password.
+'   /register, /login, dan /forgot-password dibungkus GuestRoute
+'   (AppRouter.jsx:112-114) sehingga hanya dapat diakses ketika belum
+'   login. Bila sudah login, pengguna diarahkan ke beranda atau ke
+'   panel admin (GuestRoute.jsx:8-11).
+Visitor --> A1
+Visitor --> A5
+Visitor --> A10
+
+' Akun Terdaftar dapat keluar dan mengelola akunnya.
+'   /profile dibungkus ProtectedRoute (AppRouter.jsx:166-171).
+'   Tombol logout berada di NavbarUser.jsx:137-143
+'   Hapus akun berada di ProfileDangerZone.jsx
+User --> A7
+User --> A13
+User --> A14
+
+' --- Relasi <<include>> ---
+' include = komponen struktural; use case induk tidak lengkap tanpanya.
+'
+' Bukti pada kode sumber:
+'   A1  -> A2    RegisterForm.jsx:239-244   multipart avatar dan identitas
+'   A2  -> A3    RegisterForm.jsx:244      form lengkap, wajib kirim OTP
+'   A5  -> A6    LoginForm.jsx:62          email dan password dicocokkan di
+'                                          server; hasil berupa error 401
+'                                          atau data user
+'   A13 -> A6    ProfileAction.jsx:88      ganti password juga compares
+'                                          password lama dengan hash di
+'                                          tabel User, sehingga boleh memakai
+'                                          use case yang sama dengan A5
+'   A10 -> A11   ForgotPasswordForm.jsx:42 wajib verifikasi kode reset
+'   A11 -> A12   AppRouter.jsx:127         kode sah baru bisa membuka
+'                                          halaman /reset-password
+A1 ..> A2 : <<include>>
+A2 ..> A3 : <<include>>
+A5 ..> A6 : <<include>>
+A13 ..> A6 : <<include>>
+A10 ..> A11 : <<include>>
+A11 ..> A12 : <<include>>
+
+' --- Relasi <<extend>> ---
+' extend = perilaku tambahan yang tidak selalu terjadi.
+'
+' Kirim ulang OTP muncul hanya ketika kode tidak berlaku lagi.
+'   VerifyCodeForm.jsx:335   POST /auth/resend-verification
+'
+' Tampilkan beranda hanya terjadi pada dua dari tiga kemungkinan
+' halaman tujuan setelah login berhasil.
+'   LoginForm.jsx:68-74
+'     - role admin   -> /admin        beranda admin
+'     - ada from     -> halaman asal   bukan beranda
+'     - selain itu   -> /             beranda pengguna
+'
+' Kembali ke halaman asal adalah cabang ketiga yang menghasilkan
+' halaman non-beranda. Nilai from diisi pada:
+'   AuthContext.jsx:23                 halaman yang sedang dibuka saat
+'                                      sesi kedaluwarsa
+'   KaryaProjectCard.jsx:78,96         /karya/[slug]
+'   KaryaProjectDetailSection.jsx:115  /karya/[slug]
+'   ProjectDetailModal.jsx:71,88       /hall/[kategori]/[proyek]
+A4 ..> A3 : <<extend>>
+A8 ..> A5 : <<extend>>
+A9 ..> A5 : <<extend>>
+
+' --- Catatan ---
+'
+' A6 dipakai oleh dua alur yang memang sama-sama compares password
+'   terhadap hash di tabel User, sehingga cukup satu use case:
+'   - A5  Login        authService.login:157      bcrypt.compare
+'   - A13 Ganti pass   ProfileAction.jsx:88       oldPassword
+'   Sebaliknya A11 Verifikasi Kode Reset memakai mechanisms berbeda,
+'   yaitu authService.verifyResetCode:697 yang compares kode berupa
+'   string biasa terhadap PasswordReset.code. Karena itu A11 tidak
+'   boleh memakai A6.
+'
+' A8 dan V1 pada 01-visitor.puml menunjuk halaman yang sama.
+'   A8 dipakai untuk menjelaskan halaman tujuan setelah login, sedangkan
+'   V1 dipakai untuk menjelaskan Halaman Utama beserta include Statistik
+'   Publiknya. Keduanya tidak digabung agar tiap diagram tetap ringkas.
+'
+' Kegagalan login
+'   Tidak ada relasi pada diagram untuk kasus ini. Bila email atau password
+'   salah, server membalas 401, dan LoginForm.jsx:76-90 hanya menampilkan
+'   pesan error tanpa berpindah halaman. Karena itu Beranda maupun Kembali
+'   ke Halaman Asal sama-sama tidak dijalankan.
+'
+' Deteksi Sesi Login (GET /auth/me)
+'   Dijalankan sekali secara otomatis saat aplikasi dimuat
+'   (AuthContext.jsx:40) untuk memastikan apakah ada sesi aktif. Hasilnya
+'   dipakai untuk membuka atau menutup gerbang rute (ProtectedRoute.jsx)
+'   dan memilih tampilan admin atau pengguna. Bukan bagian dari alur
+'   login, verifikasi OTP, maupun logout, sehingga tidak dimodelkan
+'   sebagai use case terpisah.
+'
+' Hapus Akun
+'   Tersedia juga untuk Admin, namun tidak ada proteksi admin terakhir:
+'   admin dapat menghapus akunnya sendiri.
+
+@enduml

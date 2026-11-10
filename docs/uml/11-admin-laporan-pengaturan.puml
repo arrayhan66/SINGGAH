@@ -1,0 +1,158 @@
+@startuml 11-admin-laporan-pengaturan
+'==============================================================
+' Aktor 6: ADMIN - LAPORAN & PENGATURAN SISTEM
+'
+' Sumber: client/src/components/sections/admin/Reports/*
+'         client/src/components/sections/admin/Settings/*
+'         client/src/components/MaintenanceGate.jsx
+'==============================================================
+
+title Use Case - Admin: Laporan & Pengaturan Sistem
+
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #E0F2FE
+  BorderColor #0369A1
+  ArrowColor #0369A1
+}
+skinparam actor {
+  BorderColor #0369A1
+  BackgroundColor #BAE6FD
+}
+
+actor "Admin" as Adm
+actor "Pengunjung" as Vis
+actor "Pengguna Terdaftar" as User
+
+rectangle "SINGGAH" <<system>> {
+
+  package "Laporan" {
+    usecase "AR1. Lihat Statistik Tahunan" as AR1
+    usecase "AR2. Pilih Tahun Laporan" as AR2
+    usecase "AR3. Lihat Ringkasan Kinerja" as AR3
+    usecase "AR4. Lihat Grafik Pertumbuhan" as AR4
+    usecase "AR5. Bandingkan dengan Bulan Sebelumnya" as AR5
+  }
+
+  package "Pengaturan - Umum" {
+    usecase "AS1. Ubah Identitas Situs" as AS1
+    usecase "AS2. Aktifkan Mode Maintenance" as AS2
+    usecase "AS3. Buka/Tutup Pendaftaran" as AS3
+  }
+
+  package "Pengaturan - Kontak" {
+    usecase "AS4. Ubah Email Kontak" as AS4
+    usecase "AS5. Ubah Nomor Telepon" as AS5
+    usecase "AS6. Ubah Alamat" as AS6
+  }
+
+  package "Pengaturan - Sosial" {
+    usecase "AS7. Ubah Akun Media Sosial" as AS7
+  }
+
+  package "Pengaturan - Keamanan" {
+    usecase "AS8. Aktifkan Verifikasi Email" as AS8
+    usecase "AS9. Atur Batas Ukuran Unggahan" as AS9
+  }
+
+  package "Penyimpanan" {
+    usecase "AS10. Simpan Pengaturan" as AS10
+  }
+
+  package "Dampak Pengaturan" {
+    usecase "AS11. Tampilkan Halaman Maintenance" as AS11
+    usecase "AS12. Batasi Akses Pengunjung" as AS12
+    usecase "AS13. Terapkan Batas Ukuran" as AS13
+  }
+}
+
+' --- Relasi Aktor ---
+Adm --> AR1
+Adm --> AR2
+Adm --> AR3
+Adm --> AR4
+Adm --> AR5
+Adm --> AS1
+Adm --> AS2
+Adm --> AS3
+Adm --> AS4
+Adm --> AS5
+Adm --> AS6
+Adm --> AS7
+Adm --> AS8
+Adm --> AS9
+Adm --> AS10
+
+Vis --> AS11
+Vis --> AS12
+User --> AS13
+
+' --- Relasi <<include>> ---
+AS1 ..> AS10 : <<include>>
+AS2 ..> AS10 : <<include>>
+AS3 ..> AS10 : <<include>>
+AS4 ..> AS10 : <<include>>
+AS5 ..> AS10 : <<include>>
+AS6 ..> AS10 : <<include>>
+AS7 ..> AS10 : <<include>>
+AS8 ..> AS10 : <<include>>
+AS9 ..> AS10 : <<include>>
+AR1 ..> AR3 : <<include>>
+AR1 ..> AR4 : <<include>>
+
+' --- Relasi <<extend>> ---
+AS11 ..> AS2 : <<extend>>
+AS12 ..> AS2 : <<extend>>
+AS12 ..> AS3 : <<extend>>
+AS13 ..> AS9 : <<extend>>
+AR5 ..> AR3 : <<extend>>
+
+note right of AR1
+  Laporan hanya dapat dibaca.
+  Tidak tersedia fitur ekspor data.
+end note
+
+note bottom of AR2
+  Pilihan tahun terbatas antara
+  tahun berjalan dan 4 tahun
+  ke belakang.
+end note
+
+note bottom of AR3
+  Ringkasan menampilkan:
+  rata-rata karya per bulan,
+  rata-rata pengunjung per bulan,
+  pengguna aktif, dan karya baru
+  pada bulan berjalan.
+end note
+
+note bottom of AR4
+  Grafik batang menampilkan
+  pertumbuhan jumlah karya dan
+  jumlah pengunjung setiap bulan.
+end note
+
+note bottom of AS2
+  Saat mode maintenance aktif,
+  halaman publik diganti menjadi
+  halaman maintenance.
+  Admin tetap memiliki akses penuh.
+  Halaman masuk dan pendaftaran
+  tetap dapat diakses.
+end note
+
+note bottom of AS3
+  Menutup pendaftaran berarti
+  pengunjung tidak dapat membuat
+  akun baru.
+end note
+
+note bottom of AS9
+  Batas ukuran berkas berlaku untuk
+  unggahan karya dan media.
+  Nilai bawaan: 10 MB.
+end note
+
+@enduml

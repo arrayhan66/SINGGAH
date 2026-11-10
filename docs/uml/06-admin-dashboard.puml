@@ -1,0 +1,95 @@
+@startuml 06-admin-dashboard
+'==============================================================
+' Aktor 6: ADMIN - DASHBOARD & PENGUMUMAN
+'
+' Sumber: client/src/components/sections/admin/Dashboard/*
+'==============================================================
+
+title Use Case - Admin: Dashboard & Pengumuman
+
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #E0F2FE
+  BorderColor #0369A1
+  ArrowColor #0369A1
+}
+skinparam actor {
+  BorderColor #0369A1
+  BackgroundColor #BAE6FD
+}
+
+actor "Admin" as Adm
+
+rectangle "SINGGAH" <<system>> {
+
+  package "Dashboard" {
+    usecase "AD1. Lihat Ringkasan Platform" as AD1
+    usecase "AD2. Lihat Karya Menunggu Review" as AD2
+    usecase "AD3. Lihat Karya yang Disetujui" as AD3
+    usecase "AD4. Lihat Berita Terbaru" as AD4
+    usecase "AD5. Lihat Aktivitas Terbaru" as AD5
+    usecase "AD6. Akses Cepat Modul" as AD6
+  }
+
+  package "Pengumuman" {
+    usecase "AD7. Susun Pengumuman" as AD7
+    usecase "AD8. Kirim Pengumuman ke Pengguna" as AD8
+  }
+}
+
+' --- Relasi Aktor ---
+Adm --> AD1
+Adm --> AD2
+Adm --> AD3
+Adm --> AD4
+Adm --> AD5
+Adm --> AD6
+Adm --> AD7
+
+' --- Relasi <<include>> ---
+AD7 ..> AD8 : <<include>>
+AD2 ..> AD1 : <<extend>>
+
+' --- Relasi <<extend>> ---
+AD8 ..> AD7 : <<extend>>
+
+note right of AD1
+  Empat metrik utama:
+  total karya, karya menunggu review,
+  total berita, total pengguna.
+end note
+
+note right of AD2
+  Menampilkan 4 karya pending
+  paling lama dalam antrean.
+end note
+
+note right of AD5
+  5 aktivitas terakhir dari 22 jenis aksi:
+  pembuatan, persetujuan, penolakan,
+  penghapusan, komentar, login,
+  registrasi, perubahan pengaturan.
+end note
+
+note bottom of AD6
+  Pintasan ke seluruh modul admin:
+  karya, berita, kategori, media,
+  pengguna, laporan, pengaturan.
+end note
+
+note bottom of AD7
+  Pengumuman disusun dengan judul,
+  pesan, dan target penerima.
+  Batas karakter: judul 120, pesan 500.
+end note
+
+note bottom of AD8
+  Target: Semua / Mahasiswa / Dosen /
+  Umum. Admin bukan target pengumuman.
+  Jumlah penerima dilaporkan setelah
+  pengiriman berhasil.
+end note
+
+@enduml

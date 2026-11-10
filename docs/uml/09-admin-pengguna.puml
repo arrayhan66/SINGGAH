@@ -1,0 +1,121 @@
+@startuml 09-admin-pengguna
+'==============================================================
+' Aktor 6: ADMIN - MANAJEMEN PENGGUNA & VERIFIKASI
+'
+' Sumber: client/src/components/sections/admin/ManageUsers/*
+'         server/routes/userRoutes.js
+'==============================================================
+
+title Use Case - Admin: Manajemen Pengguna
+
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #E0F2FE
+  BorderColor #0369A1
+  ArrowColor #0369A1
+}
+skinparam actor {
+  BorderColor #0369A1
+  BackgroundColor #BAE6FD
+}
+
+actor "Admin" as Adm
+
+rectangle "SINGGAH" <<system>> {
+
+  package "Navigasi" {
+    usecase "AU1. Lihat Daftar Pengguna" as AU1
+    usecase "AU2. Cari Pengguna" as AU2
+    usecase "AU3. Filter Pengguna" as AU3
+    usecase "AU4. Lihat Detail Pengguna" as AU4
+  }
+
+  package "Akun" {
+    usecase "AU5. Tambah Pengguna Baru" as AU5
+    usecase "AU6. Edit Data Pengguna" as AU6
+    usecase "AU7. Ubah Peran" as AU7
+    usecase "AU8. Ubah Status Aktif" as AU8
+    usecase "AU9. Hapus Pengguna" as AU9
+  }
+
+  package "Verifikasi Tipe" {
+    usecase "AU10. Tinjau Pengajuan Tipe" as AU10
+    usecase "AU11. Setujui Tipe Akun" as AU11
+    usecase "AU12. Tolak Tipe Akun" as AU12
+  }
+}
+
+' --- Relasi Aktor ---
+Adm --> AU1
+Adm --> AU2
+Adm --> AU3
+Adm --> AU4
+Adm --> AU5
+Adm --> AU6
+Adm --> AU7
+Adm --> AU8
+Adm --> AU9
+Adm --> AU10
+
+' --- Relasi <<include>> ---
+AU1 ..> AU2 : <<include>>
+AU1 ..> AU3 : <<include>>
+AU4 ..> AU1 : <<include>>
+AU5 ..> AU7 : <<include>>
+AU6 ..> AU7 : <<include>>
+AU10 ..> AU4 : <<include>>
+
+' --- Relasi <<extend>> ---
+AU11 ..> AU10 : <<extend>>
+AU12 ..> AU10 : <<extend>>
+AU7 ..> AU6 : <<extend>>
+AU8 ..> AU6 : <<extend>>
+
+note right of AU3
+  Filter status: Semua / Aktif /
+  Nonaktif.
+end note
+
+note right of AU7
+  Peran yang dapat ditetapkan:
+  Pengguna atau Admin.
+end note
+
+note bottom of AU5
+  Admin dapat membuat akun secara
+  langsung tanpa melalui proses
+  pendaftaran dan verifikasi.
+  Field: nama, username, email, peran,
+  tipe, NIM/NIP, avatar, foto identitas,
+  dan password awal.
+end note
+
+note bottom of AU9
+  Menghapus pengguna beserta karya,
+  komentar, dan dokumen miliknya.
+  Tindakan ini tidak dapat dibatalkan.
+end note
+
+note bottom of AU10
+  Pengajuan berasal dari pengguna
+  dengan tipe "umum" yang ingin
+  naik menjadi mahasiswa atau dosen
+  dengan melampirkan foto identitas.
+end note
+
+note bottom of AU11
+  Persetujuan tidak memerlukan alasan.
+  Akun langsung berpindah tipe dan
+  memperoleh hak akses tambahan.
+end note
+
+note bottom of AU12
+  Penolakan wajib disertai alasan dari
+  daftar pilihan yang telah ditentukan.
+  Alasan dikirim sebagai notifikasi
+  kepada pemohon.
+end note
+
+@enduml

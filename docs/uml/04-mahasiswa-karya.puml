@@ -1,0 +1,146 @@
+@startuml 04-mahasiswa-karya
+'==============================================================
+' Aktor 4: MAHASISWA - KELOLA KARYA
+'
+' Sumber: client/src/pages/user/Upload/*
+'         client/src/pages/user/MyKarya/*
+'         client/src/pages/user/EditKarya/*
+'==============================================================
+
+title Use Case - Mahasiswa: Kelola Karya
+
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #EDE9FE
+  BorderColor #6D28D9
+  ArrowColor #6D28D9
+}
+skinparam actor {
+  BorderColor #6D28D9
+  BackgroundColor #DDD6FE
+}
+
+actor "Mahasiswa" as Mhs
+actor "Admin" as Adm
+
+rectangle "SINGGAH" <<system>> {
+
+  package "Pengajuan Karya" {
+    usecase "M1. Buat Karya Baru" as M1
+    usecase "M2. Unggah Thumbnail" as M2
+    usecase "M3. Isi Informasi Karya" as M3
+    usecase "M4. Tambahkan Teknologi" as M4
+    usecase "M5. Tambahkan Anggota Tim" as M5
+    usecase "M6. Unggah Galeri" as M6
+    usecase "M7. Unggah Dokumen" as M7
+    usecase "M8. Tambah Tautan & Video" as M8
+    usecase "M9. Simpan Draft Sementara" as M9
+    usecase "M10. Kirim Karya untuk Review" as M10
+  }
+
+  package "Pengelolaan Karya" {
+    usecase "M11. Lihat Daftar Karya Saya" as M11
+    usecase "M12. Edit Karya" as M12
+    usecase "M13. Ajukan Revisi" as M13
+    usecase "M14. Batalkan Pengajuan Revisi" as M14
+    usecase "M15. Hapus Karya" as M15
+  }
+
+  package "Status" {
+    usecase "M16. Lihat Status Karya" as M16
+  }
+}
+
+' --- Relasi Aktor ---
+Mhs --> M1
+Mhs --> M9
+Mhs --> M11
+Mhs --> M12
+Mhs --> M13
+Mhs --> M14
+Mhs --> M15
+Mhs --> M16
+
+' --- Relasi <<include>> ---
+M1 ..> M2 : <<include>>
+M1 ..> M3 : <<include>>
+M1 ..> M4 : <<include>>
+M1 ..> M5 : <<include>>
+M1 ..> M6 : <<include>>
+M1 ..> M7 : <<include>>
+M1 ..> M8 : <<include>>
+M1 ..> M9 : <<include>>
+M1 ..> M10 : <<include>>
+M11 ..> M16 : <<include>>
+M13 ..> M9 : <<include>>
+
+' --- Relasi <<extend>> ---
+M3 ..> M9 : <<extend>>
+
+' --- Relasi ke Admin ---
+note bottom of M10
+  Student membuat pengajuan.
+  Use case ini meletakkan karya pada
+  antrean review admin.
+end note
+
+note right of M1
+  Form karya terdiri atas 7 tahap:
+  1. Thumbnail
+  2. Informasi
+  3. Teknologi
+  4. Galeri
+  5. Dokumen
+  6. Pratinjau
+  7. Kirim
+end note
+
+note bottom of M2
+  Thumbnail wajib untuk setiap karya.
+  File dikompresi otomatis sebelum
+  diunggah.
+end note
+
+note bottom of M6
+  Maksimal 10 file galeri.
+  Maksimal 10 dokumen.
+  Ukuran mengikuti batas admin
+  (default 10 MB).
+end note
+
+note bottom of M9
+  Data disimpan otomatis di browser
+  agar tidak hilang saat tab ditutup.
+  Tidak dikirim ke server.
+end note
+
+note bottom of M10
+  Karya mahasiswa berstatus "pending"
+  dan tidak tampil di halaman publik
+  maupun Hall 3D sampai disetujui admin.
+end note
+
+note bottom of M13
+  Revisi hanya dapat diajukan untuk karya
+  yang sudah berstatus "published".
+  Edit tidak langsung mengubah karya
+  yang sudah tayang, melainkan disimpan
+  sebagai pengajuan dan menunggu
+  review admin.
+end note
+
+note bottom of M14
+  Hanya bisa membatalkan pengajuan
+  yang belum diproses admin.
+end note
+
+note bottom of M11
+  Filter status:
+  Semua / Menunggu Review /
+  Disetujui / Ditolak.
+  Filter kategori dan pencarian teks.
+end note
+
+@enduml

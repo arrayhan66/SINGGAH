@@ -1,0 +1,151 @@
+@startuml 07-admin-karya
+'==============================================================
+' Aktor 6: ADMIN - MODERASI & PUBLIKASI KARYA
+'
+' Sumber: client/src/components/sections/admin/ManageProjects/*
+'         server/services/projectService.js:535-745
+'==============================================================
+
+title Use Case - Admin: Moderasi & Publikasi Karya
+
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #E0F2FE
+  BorderColor #0369A1
+  ArrowColor #0369A1
+}
+skinparam actor {
+  BorderColor #0369A1
+  BackgroundColor #BAE6FD
+}
+
+actor "Admin" as Adm
+
+rectangle "SINGGAH" <<system>> {
+
+  package "Navigasi" {
+    usecase "AK1. Lihat Daftar Karya" as AK1
+    usecase "AK2. Filter & Cari Karya" as AK2
+    usecase "AK3. Lihat Detail Karya" as AK3
+  }
+
+  package "Moderasi" {
+    usecase "AK4. Setujui Karya" as AK4
+    usecase "AK5. Tolak Karya" as AK5
+    usecase "AK6. Hapus Karya" as AK6
+  }
+
+  package "Publikasi" {
+    usecase "AK7. Tandai Karya Unggulan" as AK7
+    usecase "AK8. Atur Slideshow Beranda" as AK8
+  }
+
+  package "Pengelolaan" {
+    usecase "AK9. Tambah Karya" as AK9
+    usecase "AK10. Edit Karya" as AK10
+    usecase "AK11. Kelola Media Karya" as AK11
+    usecase "AK12. Kelola Anggota & Tautan" as AK12
+  }
+
+  package "Antrean Revisi" {
+    usecase "AK13. Lihat Antrean Revisi" as AK13
+    usecase "AK14. Setujui Revisi" as AK14
+    usecase "AK15. Tolak Revisi" as AK15
+  }
+}
+
+' --- Relasi Aktor ---
+Adm --> AK1
+Adm --> AK2
+Adm --> AK3
+Adm --> AK4
+Adm --> AK5
+Adm --> AK6
+Adm --> AK7
+Adm --> AK8
+Adm --> AK9
+Adm --> AK10
+Adm --> AK11
+Adm --> AK12
+Adm --> AK13
+
+' --- Relasi <<include>> ---
+AK1 ..> AK2 : <<include>>
+AK3 ..> AK2 : <<include>>
+AK9 ..> AK11 : <<include>>
+AK10 ..> AK11 : <<include>>
+AK9 ..> AK12 : <<include>>
+AK10 ..> AK12 : <<include>>
+AK13 ..> AK3 : <<include>>
+
+' --- Relasi <<extend>> ---
+AK5 ..> AK4 : <<extend>>
+AK14 ..> AK4 : <<extend>>
+AK15 ..> AK5 : <<extend>>
+AK8 ..> AK7 : <<extend>>
+
+note right of AK4
+  Karya berstatus "pending" disetujui
+  menjadi "published".
+  Catatan approval bersifat opsional.
+end note
+
+note bottom of AK4
+  PUBLIKASI DIBATASI KAPASITAS HALL
+  Setiap kategori punya batas:
+    - 48 karya mahasiswa (lantai 1)
+    - 48 karya dosen     (lantai 2)
+  Bila sudah penuh, karya baru tidak
+  bisa dipublikasikan sampai ada karya
+  yang dihapus dari kategori tersebut.
+end note
+
+note bottom of AK5
+  Alasan penolakan memakai daftar
+  pilihan yang sudah ditentukan
+  admin dan masih dapat disesuaikan.
+end note
+
+note bottom of AK7
+  Setiap kategori memiliki 2 slot
+  karya unggulan untuk mahasiswa dan
+  2 slot untuk dosen.
+  Maksimal 4 karya unggulan per kategori.
+end note
+
+note bottom of AK8
+  Hanya karya yang sudah "published"
+  dan ditandai unggulan yang dapat
+  dimasukkan slideshow beranda.
+  Maksimal 6 karya untuk seluruh situs.
+end note
+
+note bottom of AK6
+  Menghapus karya otomatis melepaskannya
+  dari slot unggulan dan slideshow,
+  serta membebaskan kapasitas hall.
+end note
+
+note right of AK9
+  Admin membuat karya atas nama penulis
+  tertentu dan dapat menentukan tipe
+  penulis secara langsung (mahasiswa
+  atau dosen), sehingga menentukan
+  penempatan karya di hall.
+end note
+
+note bottom of AK13
+  Antrean revisi menampilkan
+  perbandingan field karya sebelum
+  dan sesudah diubah.
+end note
+
+note bottom of AK14
+  Revisi yang disetujui akan langsung
+  memperbarui karya asal.
+  Penolakan revisi memerlukan alasan.
+end note
+
+@enduml

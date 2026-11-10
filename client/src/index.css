@@ -971,6 +971,8 @@ html.light .emoji-pop-preview-text {
   --hero-base-bg: #041d38;
   /* Aksen CTA hero: cyan di dark, biru di light (sama dengan tombol utama). */
   --hero-accent: var(--color-cyan-400);
+  /* Redup kartu samping carousel (satu angka untuk disetel). */
+  --hero-side-dim: 0.7;
   /* Teks deskripsi hero: terang di dark, lebih gelap di light. */
   --hero-desc: var(--color-slate-300);
   /* Token bingkai senada navbar, dipakai juga oleh kartu karya hero. */
@@ -983,6 +985,7 @@ html.light #hero {
   --hero-base-bg: #f6f9fe;
   --hero-accent: var(--color-blue-600);
   --hero-desc: var(--color-slate-700);
+  --hero-side-dim: 0.75;
 }
 
 /* Pita biru: gambar penuh, mulai 90px di atas puncak kartu */
@@ -998,15 +1001,18 @@ html.light #hero {
 
 .hero-band-bg {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: calc(0px - var(--hero-band-offset));
+  top: calc(var(--card-w) * 0.1875);
+  left: calc(50% - var(--card-w) * 0.68);
+  width: calc(var(--card-w) * 1.36);
+  height: calc(var(--card-w) * 0.3875);
   z-index: 0;
-  background-position: center top;
-  background-size: 100% 100%;
+  background: none;
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.5;
+  opacity: 1;
+  filter: none;
+  box-shadow: none;
   pointer-events: none;
 }
 
@@ -1027,6 +1033,12 @@ html.light #hero {
   }
   .hero-rays-block {
     padding-bottom: 8px;
+  }
+}
+@media (max-width: 768px) {
+  .hero-band-bg {
+    left: calc(50% - var(--card-w) * 0.56);
+    width: calc(var(--card-w) * 1.12);
   }
 }
 @media (min-width: 2560px) {

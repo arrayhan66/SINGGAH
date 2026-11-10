@@ -7,8 +7,14 @@ import "./KategoriPopuler.css";
 
 const CLICK_THRESHOLD_PX = 8;
 
+const visitFormatter = new Intl.NumberFormat("id-ID");
+
+function formatVisits(value) {
+  return visitFormatter.format(Math.max(0, Number(value) || 0));
+}
+
 const HEADING_LIKES = "Kategori yang paling banyak disukai";
-const HEADING_VIEWS = "Kategori yang paling sering dilihat";
+const HEADING_VIEWS = "Kategori yang paling banyak dikunjungi";
 const HEADING_COUNT = "Kategori dengan karya terbanyak";
 
 function coverOf(project) {
@@ -34,9 +40,9 @@ function buildCategoryData(projects) {
     projects.some((project) => typeof project?.[field] === "number");
 
   let metric = "count";
-  if (hasNumberField("likesCount")) metric = "likes";
+  if (hasNumberField("viewsCount")) metric = "views";
+  else if (hasNumberField("likesCount")) metric = "likes";
   else if (hasNumberField("bookmarksCount")) metric = "bookmarks";
-  else if (hasNumberField("viewsCount")) metric = "views";
 
   const valueOf = (project) => {
     if (metric === "likes") return Number(project?.likesCount) || 0;
@@ -104,6 +110,7 @@ function buildCategoryData(projects) {
       desc: group.description,
       img: cover,
       score,
+      visits: metric === "views" ? score : 0,
     });
   }
 
@@ -297,6 +304,11 @@ export default function KategoriPopuler() {
                       <span className="kp-sub">{category.desc}</span>
                     ) : null}
                   </span>
+                  {category.visits > 0 ? (
+                    <span className="kp-visits">
+                      {formatVisits(category.visits)} kunjungan
+                    </span>
+                  ) : null}
                   <ArrowRight
                     className="kp-arrow"
                     size={16}

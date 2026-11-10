@@ -198,7 +198,7 @@ function HeroKaryaShowcase() {
 
     const restore = reducedMotion
       ? "none"
-      : "transform 300ms ease, opacity 300ms ease";
+      : "transform 300ms ease, filter 300ms ease";
 
     els.forEach((el) => {
       el.style.transition = "none";
@@ -272,9 +272,18 @@ function HeroKaryaShowcase() {
     const stage = carouselRef.current;
     if (!stage) return;
     const rect = stage.getBoundingClientRect();
+    const halfW = (pillRef.current?.offsetWidth || 0) / 2;
+    const halfH = (pillRef.current?.offsetHeight || 0) / 2;
+    const pad = 8;
     pillTarget.current = {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: Math.min(
+        Math.max(e.clientX - rect.left, halfW + pad),
+        rect.width - halfW - pad
+      ),
+      y: Math.min(
+        Math.max(e.clientY - rect.top, halfH + pad),
+        rect.height - halfH - pad
+      ),
     };
     if (!pillRaf.current) pillRaf.current = requestAnimationFrame(stepPill);
     const el =
@@ -376,8 +385,10 @@ function HeroKaryaShowcase() {
     marginLeft: `calc(var(--card-w) / -2)`,
     width: `min(var(--card-w), 2400px)`,
     aspectRatio: "16 / 10",
-    borderRadius: "16px",
+    borderRadius: "12px",
     border: "1px solid var(--snav-bd)",
+    boxShadow:
+      "0 10px 28px -6px color-mix(in srgb, var(--hero-accent) 30%, transparent)",
     overflow: "hidden",
     transformOrigin: "center center",
     backfaceVisibility: "hidden",
@@ -448,7 +459,7 @@ function HeroKaryaShowcase() {
                 rz = 0;
               } else if (side) {
                 s = 0.96;
-                op = 0.55;
+                op = 1;
                 z = 4;
                 pe = "auto";
                 ry = off * -rotateYDeg;
@@ -472,16 +483,17 @@ function HeroKaryaShowcase() {
               if (dragging || reducedMotion) {
                 trans = "none";
               } else {
-                trans = "transform 300ms ease, opacity 300ms ease";
+                trans = "transform 300ms ease, filter 300ms ease";
               }
 
               const style = {
                 ...cardBaseStyle,
                 cursor: isActiveCard ? "pointer" : side ? "none" : "default",
                 transition: trans,
-                willChange: reducedMotion ? "opacity" : "transform, opacity",
+                willChange: reducedMotion ? "filter" : "transform, filter",
                 transform: `translateX(calc(${off} * var(--card-w) * ${mul} + ${dragX}px)) scale(${s}) rotateY(${ry}deg) rotateZ(${rz}deg)`,
                 opacity: op,
+                filter: side ? "brightness(var(--hero-side-dim))" : "none",
                 zIndex: z,
                 pointerEvents: pe,
               };
@@ -508,11 +520,8 @@ function HeroKaryaShowcase() {
                       isActiveCard || Math.abs(off) === 1 ? undefined : "lazy"
                     }
                     decoding="async"
-                    className="absolute inset-0 h-full w-full object-cover"
+                    className="absolute inset-0 h-full w-full object-cover object-top"
                   />
-                  {side && (
-                    <div className="absolute inset-0 bg-black/[0.28] pointer-events-none" />
-                  )}
                 </div>
               );
             })}

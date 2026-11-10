@@ -212,6 +212,8 @@ export default function PlanetaryOrbitGallery() {
   const lastPointerRef = useRef(null);
   const focusTileRef = useRef(null);
   const positionFocusRef = useRef(null);
+  const hoverTileRef = useRef(null);
+  const hoverApiRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -350,6 +352,10 @@ export default function PlanetaryOrbitGallery() {
     positionFocusRef.current = positionPillOverTile;
   }, [positionPillOverTile]);
 
+  useEffect(() => {
+    hoverApiRef.current = { showPill, hidePill };
+  }, [showPill, hidePill]);
+
   useLayoutEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
@@ -396,6 +402,26 @@ export default function PlanetaryOrbitGallery() {
       }
 
       stage.style.transform = `translateZ(${stageZRef.current}px) rotateX(${tiltRef.current}deg) rotateY(${ARef.current}deg)`;
+
+      const probe = hoveringRef.current ? lastPointerRef.current : null;
+      if (probe && !draggingRef.current) {
+        const hit = document.elementFromPoint(probe.x, probe.y);
+        const tile = hit?.closest?.("[data-title]");
+        if (tile && wrapRef.current?.contains(tile)) {
+          if (hoverTileRef.current !== tile) {
+            hoverTileRef.current = tile;
+            hoverApiRef.current?.showPill(
+              tile.dataset.title || "",
+              probe.x,
+              probe.y
+            );
+          }
+        } else {
+          hoverTileRef.current = null;
+          hoveringRef.current = false;
+          hoverApiRef.current?.hidePill();
+        }
+      }
 
       if (focusWithinRef.current && focusTileRef.current && !hoveringRef.current) {
         positionFocusRef.current?.(focusTileRef.current);
@@ -498,7 +524,7 @@ export default function PlanetaryOrbitGallery() {
     const now = event.timeStamp;
     const pointerType = event.pointerType || pointerTypeRef.current;
 
-    if (!movedRef.current) {
+    if (!movedRef.current && (event.buttons & 1) === 1) {
       const dx0 = event.clientX - startRef.current.x;
       const dy0 = event.clientY - startRef.current.y;
 
@@ -540,12 +566,26 @@ export default function PlanetaryOrbitGallery() {
         -CONFIG.VEL_MAX,
         CONFIG.VEL_MAX
       );
-    } else if (
-      (pointerType === "mouse" || pointerType === "pen") &&
-      hoveringRef.current
-    ) {
+    } else if (pointerType === "mouse" || pointerType === "pen") {
       lastPointerRef.current = { x: event.clientX, y: event.clientY };
-      positionPill(event.clientX, event.clientY);
+      const hit = document.elementFromPoint(event.clientX, event.clientY);
+      const tile = hit?.closest?.("[data-title]");
+      if (tile && wrapRef.current?.contains(tile)) {
+        const changed = hoverTileRef.current !== tile || !hoveringRef.current;
+        hoverTileRef.current = tile;
+        hoveringRef.current = true;
+        if (changed) {
+          showPill(tile.dataset.title || "", event.clientX, event.clientY);
+        } else {
+          positionPill(event.clientX, event.clientY);
+        }
+      } else {
+        hoverTileRef.current = null;
+        if (hoveringRef.current) {
+          hoveringRef.current = false;
+          hidePill();
+        }
+      }
     }
 
     lastRef.current = { x: event.clientX, y: event.clientY, t: now };
@@ -574,13 +614,13 @@ export default function PlanetaryOrbitGallery() {
   };
 
   const handlePointerOver = (event) => {
-    if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
     if (draggingRef.current) return;
 
     const tile = event.target.closest?.("[data-title]");
     if (!tile || !wrapRef.current?.contains(tile)) return;
 
     hoveringRef.current = true;
+    hoverTileRef.current = tile;
     lastPointerRef.current = { x: event.clientX, y: event.clientY };
     showPill(tile.dataset.title || "", event.clientX, event.clientY);
   };
@@ -593,6 +633,7 @@ export default function PlanetaryOrbitGallery() {
     if (related instanceof Node && tile.contains(related)) return;
 
     hoveringRef.current = false;
+    hoverTileRef.current = null;
     hidePill();
   };
 

@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import bandLight from "../../../assets/images/hero/hero-band-light.webp";
 import HeroStats from "./HeroStats";
 import HeroKaryaShowcase from "./HeroKaryaShowcase";
 import HeroRays from "./HeroRays";
+import bandLight from "../../../assets/images/hero/hero-band-light.webp";
 
 function Hero() {
   const navigate = useNavigate();
@@ -53,14 +53,14 @@ function Hero() {
               <div className="relative z-[60] mt-5 flex w-full flex-wrap items-center justify-center gap-3 md:mt-8 max-sm:gap-[10px]">
                 <button
                   onClick={handleStartExploration}
-                  className="inline-flex items-center justify-center h-12 px-6 rounded-[10px] border font-[inherit] text-[15px] lg:text-base normal-case tracking-normal whitespace-nowrap min-w-0 w-full sm:w-auto cursor-pointer transition-[background-color,border-color,box-shadow,transform] duration-150 active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-current border-[#22d3ee] bg-[#22d3ee] text-[color:#04142b] shadow-[0_6px_14px_-6px_rgba(34,211,238,0.45)] hover:border-[#06b6d4] hover:bg-[#06b6d4] hover:shadow-[0_4px_10px_-6px_rgba(34,211,238,0.45)] light:border-[#2563eb] light:bg-[#2563eb] light:text-[color:#ffffff] light:shadow-[0_6px_14px_-6px_rgba(37,99,235,0.55)] light:hover:border-[#1d4ed8] light:hover:bg-[#1d4ed8] light:hover:shadow-[0_4px_10px_-6px_rgba(37,99,235,0.55)] min-[2560px]:h-14 min-[2560px]:px-7"
+                  className="inline-flex items-center justify-center h-12 px-6 rounded-[10px] border font-[inherit] text-[15px] lg:text-base normal-case tracking-normal whitespace-nowrap min-w-0 w-full sm:w-auto cursor-pointer transition-[background-color,border-color,box-shadow] duration-[420ms] ease-[cubic-bezier(0.16,1,0.3,1)] active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-current border-[#22d3ee] bg-[#22d3ee] text-[color:#04142b] shadow-[0_6px_14px_-6px_rgba(34,211,238,0.45)] hover:border-[#06b6d4] hover:bg-[#06b6d4] hover:shadow-[0_4px_10px_-6px_rgba(34,211,238,0.45)] light:border-[#2563eb] light:bg-[#2563eb] light:text-[color:#ffffff] light:shadow-[0_6px_14px_-6px_rgba(37,99,235,0.55)] light:hover:border-[#1d4ed8] light:hover:bg-[#1d4ed8] light:hover:shadow-[0_4px_10px_-6px_rgba(37,99,235,0.55)] min-[2560px]:h-14 min-[2560px]:px-7"
                 >
                   <span className="leading-none">Mulai Eksplorasi</span>
                 </button>
 
                 <a
                   href="#panduan"
-                  className="inline-flex items-center justify-center h-12 px-6 rounded-[10px] border font-[inherit] text-[15px] lg:text-base normal-case tracking-normal whitespace-nowrap min-w-0 w-full sm:w-auto cursor-pointer transition-[background-color,border-color,box-shadow,transform] duration-150 active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-current border-[#d5dbe3] bg-[#f1f5f9] text-[color:#0f172a] hover:border-[#bcc5d1] hover:bg-[#e8edf3] shadow-[0_1px_2px_rgba(15,23,42,0.06)] min-[2560px]:h-14 min-[2560px]:px-7"
+                  className="inline-flex items-center justify-center h-12 px-6 rounded-[10px] border font-[inherit] text-[15px] lg:text-base normal-case tracking-normal whitespace-nowrap min-w-0 w-full sm:w-auto cursor-pointer transition-[background-color,border-color,box-shadow] duration-[420ms] ease-[cubic-bezier(0.16,1,0.3,1)] active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-current border-[#d5dbe3] bg-[#f1f5f9] text-[color:#0f172a] hover:bg-[#e8edf3] shadow-[0_1px_2px_rgba(15,23,42,0.06)] min-[2560px]:h-14 min-[2560px]:px-7"
                 >
                   <span className="leading-none">Baca Panduan</span>
                 </a>
@@ -77,7 +77,7 @@ function Hero() {
             <HeroKaryaShowcase />
           </div>
 
-          {/* Lapisan gambar pita biru di belakang carousel */}
+          {/* Pita biru bergambar di belakang carousel */}
           <div
             aria-hidden="true"
             className="hero-band-bg pointer-events-none"
@@ -98,9 +98,9 @@ function Hero() {
               color: "#0F172A",
             }}
           >
-            Beberapa angka untuk menemani{" "}
+            Lebih dari sekadar ruang untuk{" "}
             <span style={{ color: "#1D6FF2", fontWeight: 500 }}>
-              langkah pertamamu.
+              memajang karya.
             </span>
           </p>
           <HeroStats />

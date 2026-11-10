@@ -1,0 +1,127 @@
+@startuml 03-profil
+'==============================================================
+' Aktor 3: PROFIL & VERIFIKASI TIPE AKUN
+'
+' Prefix P dipakai untuk modul ini. Prefix A dipakai modul
+' Autentikasi pada 02-autentikasi.puml dan prefix V dipakai modul
+' Visitor pada 01-visitor.puml, sehingga keduanya tidak boleh
+' dipakai di sini.
+'
+' Catatan: seluruh blok bertanda ' adalah komentar PlantUML dan tidak
+' muncul di diagram. Jangan menaruh tanda ' di baris relasi karena
+' teksnya akan tercetak sebagai label panah.
+'==============================================================
+
+title Use Case - Profil Pengguna & Verifikasi Tipe Akun
+
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #FEF3C7
+  BorderColor #B45309
+  ArrowColor #B45309
+}
+skinparam actor {
+  BorderColor #B45309
+  BackgroundColor #FEF3C7
+}
+
+actor "Pengguna Terdaftar" as User
+actor "Mahasiswa" as Mhs
+actor "Dosen" as Dsn
+actor "Admin" as Adm
+
+' Mahasiswa, Dosen, dan Admin adalah bentuk khusus dari akun
+' terdaftar, sehingga seluruh relasi Akun Terdaftar diwarisi.
+User <|-- Mhs
+User <|-- Dsn
+User <|-- Adm
+
+rectangle "SINGGAH" <<system>> {
+
+  package "Data Profil" {
+    usecase "P1. Lihat Profil" as P1
+    usecase "P2. Edit Identitas Profil" as P2
+    usecase "P3. Unggah Foto Profil" as P3
+    usecase "P4. Lihat Statistik Profil" as P4
+  }
+
+  package "Verifikasi Tipe Akun" {
+    usecase "P5. Unggah Foto Identitas" as P5
+    usecase "P6. Ajukan Verifikasi Tipe Akun" as P6
+  }
+
+  package "Kamanan Akun" {
+    usecase "P7. Ganti Password" as P7
+    usecase "P8. Hapus Akun" as P8
+  }
+}
+
+' --- Relasi Aktor ---
+' Halaman /profile dibungkus ProtectedRoute (AppRouter.jsx:166-171)
+' dan dapat diakses oleh role user maupun admin. Admin memiliki
+' halaman profil sendiri (pages/admin/Profile/Profile.jsx) yang
+' memakai komponen ProfileForm yang sama.
+User --> P1
+User --> P2
+User --> P3
+User --> P4
+User --> P5
+User --> P6
+User --> P7
+User --> P8
+
+' --- Relasi <<include>> ---
+' include = komponen struktural; use case induk tidak lengkap tanpanya.
+'
+'   P6 -> P5    ProfileVerification.jsx:73-80
+'               Pengajuan verifikasi tidak terkirim bila foto identitas
+'               belum ada, dan pesan "Foto KTM wajib diunggah" tampil.
+P6 ..> P5 : <<include>>
+
+' --- Relasi <<extend>> ---
+' extend = perilaku tambahan yang tidak selalu terjadi.
+'
+'   P3 -> P2    ProfileAction.jsx:109
+'               hasFiles bernilai false bila tidak ada avatar maupun
+'               foto identitas, sehingga profil tetap bisa disimpan
+'               tanpa unggahan gambar.
+'
+'   P4 -> P1    ProfileForm.jsx:101
+'               Statistik hanya dirender bila user.tipe bukan "umum".
+P3 ..> P2 : <<extend>>
+P4 ..> P1 : <<extend>>
+
+' --- Catatan ---
+'
+' P3 dan P5 memakai endpoint yang sama tetapi field berbeda.
+'   P3  avatar          ProfileAction.jsx:118         opsional
+'   P5  identitas_photo ProfileVerification.jsx:86    wajib untuk P6
+'
+' P6 hanya tersedia bagi akun dengan tipe "umum".
+'   ProfileVerification.jsx:36   if (user?.tipe !== "umum") return null
+'   Mahasiswa dan Dosen sudah terverifikasi sejak pendaftaran.
+'   Proses: pilih tipe baru, isi NIM atau NIP, unggah foto identitas,
+'   lalu kirim pengajuan.
+'
+' Menunggu persetujuan admin bukan use case.
+'   Tidak ada aksi pengguna yang memicu proses ini. Status pengajuan
+'   bernilai pending, approved, atau rejected, dan hasilnya dikirim
+'   otomatis sebagai notifikasi ke pemohon. Karena itu tidak
+'   dimodelkan sebagai use case terpisah.
+'
+' P7 dan P8 sama dengan A13 dan A14 pada 02-autentikasi.puml.
+'   Keduanya tetap ditulis di sini karena tombolnya berada pada
+'   halaman profil: ProfilePassword.jsx dan ProfileDangerZone.jsx.
+'   P7 memanggil PUT /auth/change-password (ProfileAction.jsx:88).
+'   P8 memanggil DELETE /auth/account dengan password akun sebagai
+'   bukti, lalu langsung logout (ProfileDangerZone.jsx:44-46).
+'
+' Notifikasi tidak termasuk modul ini.
+'   Panel notifikasi berada di navbar, bukan di halaman profil:
+'   NavbarUser.jsx, AdminNavbar.jsx, NotificationBell.jsx,
+'   NotificationPanel.jsx, dan NotificationDetailModal.jsx.
+'   Modul notifikasi dijelaskan terpisah agar tiap diagram ringkas.
+
+@enduml

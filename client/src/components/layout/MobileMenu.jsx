@@ -139,7 +139,10 @@ export default function MobileMenu({
           </div>
         </div>
 
-        <nav className="relative flex flex-col gap-2 p-3">
+        <nav
+          className="relative flex flex-col gap-2 p-3"
+          style={{ fontFamily: "var(--snav-font, inherit)" }}
+        >
           {menuItems.map((item) =>
             renderItem({ item, accentKey: item.label }),
           )}

@@ -1,0 +1,143 @@
+@startuml 08-admin-berita
+'==============================================================
+' Aktor 6: ADMIN - EDITOR BERITA
+'
+' Sumber: client/src/components/sections/admin/ManageNews/*
+'==============================================================
+
+title Use Case - Admin: pengelolaan Berita
+
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #E0F2FE
+  BorderColor #0369A1
+  ArrowColor #0369A1
+}
+skinparam actor {
+  BorderColor #0369A1
+  BackgroundColor #BAE6FD
+}
+
+actor "Admin" as Adm
+
+rectangle "SINGGAH" <<system>> {
+
+  package "Navigasi" {
+    usecase "AB1. Lihat Daftar Berita" as AB1
+    usecase "AB2. Cari & Filter Berita" as AB2
+    usecase "AB3. Pratinjau Artikel" as AB3
+  }
+
+  package "Konten" {
+    usecase "AB4. Tulis Artikel" as AB4
+    usecase "AB5. Format Teks" as AB5
+    usecase "AB6. Sisipkan Blok Ad" as AB6
+    usecase "AB7. Sisipkan Blok \"Lihat Juga\"" as AB7
+    usecase "AB8. Atur Kerapatan Baris" as AB8
+    usecase "AB9. Atur Jarak Paragraf" as AB9
+  }
+
+  package "Metadata" {
+    usecase "AB10. Tulis Judul & Ringkasan" as AB10
+    usecase "AB11. Kelola Tag" as AB11
+    usecase "AB12. Unggah Gambar Utama" as AB12
+    usecase "AB13. Tentukan Penulis & Sumber" as AB13
+  }
+
+  package "Publikasi" {
+    usecase "AB14. Simpan sebagai Draf" as AB14
+    usecase "AB15. Terbitkan Artikel" as AB15
+    usecase "AB16. Edit Artikel" as AB16
+    usecase "AB17. Hapus Artikel" as AB17
+  }
+}
+
+' --- Relasi Aktor ---
+Adm --> AB1
+Adm --> AB2
+Adm --> AB3
+Adm --> AB4
+Adm --> AB10
+Adm --> AB11
+Adm --> AB12
+Adm --> AB13
+Adm --> AB14
+Adm --> AB16
+Adm --> AB17
+
+' --- Relasi <<include>> ---
+AB1 ..> AB2 : <<include>>
+AB3 ..> AB2 : <<include>>
+AB4 ..> AB5 : <<include>>
+AB4 ..> AB6 : <<include>>
+AB4 ..> AB7 : <<include>>
+AB4 ..> AB8 : <<include>>
+AB4 ..> AB9 : <<include>>
+AB4 ..> AB10 : <<include>>
+AB14 ..> AB4 : <<include>>
+AB15 ..> AB4 : <<include>>
+AB16 ..> AB4 : <<include>>
+AB16 ..> AB3 : <<include>>
+
+' --- Relasi <<extend>> ---
+AB15 ..> AB14 : <<extend>>
+AB5 ..> AB10 : <<extend>>
+
+note right of AB1
+  Daftar berita menampilkan judul,
+  ringkasan, gambar utama, tanggal,
+  dan status publikasi.
+end note
+
+note right of AB4
+  Editor artikel mendukung:
+  - tebal, miring, garis bawah
+  - ukuran dan jenis huruf
+  - perataan teks
+  - tautan dan garis horizontal
+  - penyisipan gambar
+end note
+
+note bottom of AB6
+  Blok iklan yang dapat diisi judul,
+  isi, dan tautan. Ini merupakan
+  fitur Sponsor konten berita.
+end note
+
+note bottom of AB7
+  Blok "Lihat juga" berisi daftar
+  artikel terkait. Setiap entri
+  memiliki judul, tautan, dan gambar
+  yang dapat diurutkan ulang.
+end note
+
+note bottom of AB10
+  Wajib diisi:
+  - judul artikel
+  - isi artikel tidak boleh kosong
+end note
+
+note bottom of AB11
+  Tag bersifat unik dan tidak
+  membedakan huruf besar-kecil.
+  Ditambahkan dengan menekan Enter.
+end note
+
+note right of AB15
+  Artikel berstatus "published"
+  langsung tampil di halaman berita
+  publik. Artikel "draft" hanya
+  terlihat oleh admin.
+end note
+
+note bottom of AB16
+  Setiap kali membuka form edit,
+  admin perlu memuat ulang artikel
+  secara lengkap terlebih dahulu
+  agar isi dan gambar tidak hilang
+  saat disimpan.
+end note
+
+@enduml

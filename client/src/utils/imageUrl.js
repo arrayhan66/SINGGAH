@@ -1,7 +1,18 @@
 export const FALLBACK_IMAGE =
   "https://placehold.co/600x400/0f172a/38bdf8?text=No+Image"
 
+// Aset Cloudinary yang sudah 404 (dihapus di sisi penyimpanan). Dicek sebelum
+// <img> dipasang agar browser tidak terus meminta URL yang sudah tidak ada.
+const BROKEN_IMAGE_MARKERS = ["bgm6bk0kwdpcyep3knua"]
+
+export function isBrokenImage(url) {
+  if (!url) return false
+  const source = String(url)
+  return BROKEN_IMAGE_MARKERS.some((marker) => source.includes(marker))
+}
+
 export function imageUrl(url) {
+  if (isBrokenImage(url)) return FALLBACK_IMAGE
   return url && String(url).trim() ? url : FALLBACK_IMAGE
 }
 

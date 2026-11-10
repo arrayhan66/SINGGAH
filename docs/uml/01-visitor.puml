@@ -1,0 +1,112 @@
+@startuml 01-visitor
+'==============================================================
+' Aktor 1: PENGUNJUNG (Visitor)
+' Pengguna tanpa sesi login. Akses hanya ke konten publik.
+'
+' Sumber: client/src/routes/AppRouter.jsx:84-109
+'
+' PENTING: seluruh blok bertanda " adalah komentar PlantUML dan
+' TIDAK muncul di diagram. Jangan menaruh tanda ' di baris relasi,
+' karena teksnya akan tercetak sebagai label panah.
+'==============================================================
+
+title Use Case - Pengunjung (Visitor)
+
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #F0FDF4
+  BorderColor #15803D
+  ArrowColor #15803D
+}
+skinparam actor {
+  BorderColor #15803D
+  BackgroundColor #DCFCE7
+}
+
+actor "Pengunjung" as Visitor
+
+rectangle "SINGGAH" <<system>> {
+
+  package "Beranda" {
+    usecase "V1. Lihat Beranda" as V1
+    usecase "V2. Lihat Statistik Publik" as V2
+    usecase "V3. Baca FAQ" as V3
+  }
+
+  package "Jelajahi Karya" {
+    usecase "V4. Lihat Daftar Kategori" as V4
+    usecase "V5. Cari Kategori" as V5
+    usecase "V6. Lihat Karya per Kategori" as V6
+    usecase "V7. Cari Karya" as V7
+    usecase "V8. Lihat Detail Karya" as V8
+    usecase "V9. Jelajah Galeri Karya" as V9
+  }
+
+  package "Berita" {
+    usecase "V10. Lihat Daftar Berita" as V10
+    usecase "V11. Baca Artikel Berita" as V11
+    usecase "V12. Bagikan Artikel" as V12
+  }
+
+  package "Gedung Virtual" {
+    usecase "V13. Masuk Gedung Virtual" as V13
+    usecase "V14. Jelajah Halaman Utama" as V14
+    usecase "V15. Lihat detail Karya dalam 3D" as V15
+    usecase "V18. Jelajahi Ruang Pameran Karya" as V18
+  }
+
+  package "Informasi" {
+    usecase "V16. Lihat Halaman About" as V16
+    usecase "V17. Ganti Tema Tampilan" as V17
+  }
+}
+
+' --- Relasi Aktor ---
+' V2, V5, V7, V9, V12, V15, V18 sengaja tidak dikaitkan ke aktor karena
+' tidak memiliki entry point mandiri; semuanya hanyareachable melalui
+' use case lain.
+Visitor --> V1
+Visitor --> V3
+Visitor --> V4
+Visitor --> V6
+Visitor --> V8
+Visitor --> V10
+Visitor --> V11
+Visitor --> V13
+Visitor --> V16
+Visitor --> V17
+
+' --- Relasi <<include>> ---
+' include = komponen struktural; use case induk tidak lengkap tanpanya.
+'
+' Bukti pada kode sumber:
+'   V1  -> V2   HeroStats.jsx:123          GET /stats, 4 metrik
+'   V4  -> V5   KaryaSection.jsx:91        SearchBar tanpa kondisi
+'   V6  -> V7   KaryaProjectSection.jsx:135 SearchBar tanpa kondisi
+'   V8  -> V9   galeri selalu dirender di halaman detail karya
+'   V11 -> V12  BeritaDetail.jsx:378 header + :468 footer, tanpa kondisi
+'   V13 -> V14  scene 3D mount saat /hall dibuka
+'   V14 -> V2   display.jsx:92-93           InfoKiosk, jumlah karya + kategori
+'   V14 -> V18  ruang pameran berada di dalam area halaman utama
+'   V16 -> V2   About.jsx:45               GET /stats
+'   V18 -> V15  detail karya hanya ada di dalam ruang pameran
+V1 ..> V2 : <<include>>
+V4 ..> V5 : <<include>>
+V6 ..> V7 : <<include>>
+V8 ..> V9 : <<include>>
+V11 ..> V12 : <<include>>
+V13 ..> V14 : <<include>>
+V14 ..> V2 : <<include>>
+V14 ..> V18 : <<include>>
+V16 ..> V2 : <<include>>
+V18 ..> V15 : <<include>>
+
+' --- Relasi <<extend>> ---
+' Pengunjung tidak memiliki use case extend pada sistem ini.
+' Contoh extend yang ada di diagram lain:
+'   04-mahasiswa-karya.puml           M13 <- M12 saat karya published
+'   11-admin-laporan-pengaturan.puml  AS11 <- AS2 saat maintenance aktif
+
+@enduml

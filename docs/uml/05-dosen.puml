@@ -1,0 +1,118 @@
+@startuml 05-dosen
+'==============================================================
+' Aktor 5: DOSEN
+'
+' Berbeda dari Mahasiswa pada dua hal:
+'  - Karya berstatus "published" langsung,
+'    tanpa antrean review.
+'  - Tidak punya status "menunggu review".
+'
+' Sumber: server/services/projectService.js:860
+'         client/src/components/sections/user/MyKarya/MyKaryaFilter.jsx:13-16
+'==============================================================
+
+title Use Case - Dosen: Kelola Karya
+
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #CFFAFE
+  BorderColor #0E7490
+  ArrowColor #0E7490
+}
+skinparam actor {
+  BorderColor #0E7490
+  BackgroundColor #CFFAFE
+}
+
+actor "Dosen" as Dsn
+actor "Mahasiswa" as Mhs
+actor "Admin" as Adm
+
+rectangle "SINGGAH" <<system>> {
+
+  package "Pengajuan Karya" {
+    usecase "D1. Buat Karya Baru" as D1
+    usecase "D2. Unggah Thumbnail" as D2
+    usecase "D3. Isi Informasi Karya" as D3
+    usecase "D4. Tambahkan Teknologi" as D4
+    usecase "D5. Tambahkan Anggota Tim" as D5
+    usecase "D6. Unggah Galeri" as D6
+    usecase "D7. Unggah Dokumen" as D7
+    usecase "D8. Tambah Tautan & Video" as D8
+    usecase "D9. Kirim Karya" as D9
+  }
+
+  package "Pengelolaan Karya" {
+    usecase "D10. Lihat Daftar Karya Saya" as D10
+    usecase "D11. Edit Karya Langsung" as D11
+    usecase "D12. Hapus Karya" as D12
+  }
+
+  package "Promosi Karya" {
+    usecase "D13. Ajukan Karya sebagai Unggulan" as D13
+  }
+}
+
+' --- Relasi Aktor ---
+Dsn --> D1
+Dsn --> D9
+Dsn --> D10
+Dsn --> D11
+Dsn --> D12
+
+' --- Relasi <<include>> ---
+D1 ..> D2 : <<include>>
+D1 ..> D3 : <<include>>
+D1 ..> D4 : <<include>>
+D1 ..> D5 : <<include>>
+D1 ..> D6 : <<include>>
+D1 ..> D7 : <<include>>
+D1 ..> D8 : <<include>>
+D1 ..> D9 : <<include>>
+D10 ..> D11 : <<extend>>
+
+' --- Relasi <<extend>> ---
+D13 ..> D9 : <<extend>>
+
+note top of D9
+  Berbeda dari Mahasiswa, karya Dosen
+  langsung berstatus "published" saat
+  dikirim dan tidak menunggu review admin.
+end note
+
+note right of D10
+  Filter status untuk Dosen hanya
+  "Semua" dan "Disetujui".
+  Tidak ada status "Menunggu Review"
+  maupun "Ditolak".
+end note
+
+note bottom of D11
+  Edit karya oleh Dosen langsung
+  memperbarui karya, tanpa membuat
+  pengajuan revisi seperti Mahasiswa.
+end note
+
+note bottom of D13
+  Slot karya dosen dipisahkan dari slot
+  mahasiswa agar tidak berebut tempat.
+  Kapasitas per kategori tetap 48 karya.
+  Karya dosen ditempatkan di lantai 2
+  Hall, mahasiswa di lantai 1.
+end note
+
+note bottom of D1
+  Perbedaan Dosen dan Mahasiswa:
+
+  Aspek              Mahasiswa     Dosen
+  -----------------  -----------   -----------
+  Status awal        pending       published
+  Review admin       Ya            Tidak
+  Edit karya tayang  Jadi revisi   Langsung ubah
+  Status "ditolak"   Ada           Tidak
+  Lokasi di Hall     Lantai 1      Lantai 2
+end note
+
+@enduml

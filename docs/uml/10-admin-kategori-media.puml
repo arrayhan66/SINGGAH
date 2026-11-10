@@ -1,0 +1,138 @@
+@startuml 10-admin-kategori-media
+'==============================================================
+' Aktor 6: ADMIN - KATEGORI & PERPUSTAKAAN MEDIA
+'
+' Sumber: client/src/components/sections/admin/ManageCategories/*
+'         client/src/components/sections/admin/MediaLibrary/*
+'==============================================================
+
+title Use Case - Admin: Kategori & Media
+
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #E0F2FE
+  BorderColor #0369A1
+  ArrowColor #0369A1
+}
+skinparam actor {
+  BorderColor #0369A1
+  BackgroundColor #BAE6FD
+}
+
+actor "Admin" as Adm
+actor "Mahasiswa" as Mhs
+actor "Dosen" as Dsn
+
+rectangle "SINGGAH" <<system>> {
+
+  package "Kategori" {
+    usecase "AT1. Lihat Daftar Kategori" as AT1
+    usecase "AT2. Tambah Kategori" as AT2
+    usecase "AT3. Edit Kategori" as AT3
+    usecase "AT4. Aktifkan/Nonaktifkan Kategori" as AT4
+    usecase "AT5. Hapus Kategori" as AT5
+  }
+
+  package "Perpustakaan Media" {
+    usecase "AM1. Lihat Daftar Media" as AM1
+    usecase "AM2. Cari & Filter Media" as AM2
+    usecase "AM3. Ubah Tampilan Daftar" as AM3
+    usecase "AM4. Unggah Media" as AM4
+    usecase "AM5. Pratinjau Media" as AM5
+    usecase "AM6. Unduh Media" as AM6
+    usecase "AM7. Salin Tautan Media" as AM7
+    usecase "AM8. Hapus Media" as AM8
+    usecase "AM9. Lihat Pemakaian Media" as AM9
+  }
+}
+
+' --- Relasi Aktor ---
+Adm --> AT1
+Adm --> AT2
+Adm --> AT3
+Adm --> AT4
+Adm --> AT5
+Adm --> AM1
+Adm --> AM2
+Adm --> AM3
+Adm --> AM4
+Adm --> AM5
+Adm --> AM6
+Adm --> AM7
+Adm --> AM8
+Adm --> AM9
+
+Mhs --> AM5
+Dsn --> AM5
+
+' --- Relasi <<include>> ---
+AT1 ..> AM9 : <<include>>
+AM1 ..> AM2 : <<include>>
+AM1 ..> AM3 : <<include>>
+AM5 ..> AM9 : <<include>>
+
+' --- Relasi <<extend>> ---
+AT3 ..> AT2 : <<extend>>
+AT4 ..> AT3 : <<extend>>
+AT5 ..> AT3 : <<extend>>
+AM6 ..> AM5 : <<extend>>
+AM8 ..> AM5 : <<extend>>
+
+note right of AT1
+  Kategori dapat difilter berdasarkan
+  kondisi: semua / berisi karya /
+  belum berisi karya.
+end note
+
+note bottom of AT2
+  BATASAN JUMLAH KATEGORI
+  - Maksimal 10 kategori
+  - Minimal 1 kategori aktif
+end note
+
+note bottom of AT4
+  Kategori nonaktif disembunyikan dari
+  halaman Karya dan tidak memiliki
+  bangunan di Hall 3D.
+  Kategori aktif terakhir tidak boleh
+  dinonaktifkan karena akan membuat
+  halaman Karya kosong.
+end note
+
+note bottom of AT5
+  Penghapusan kategori tidak dapat
+  dibatalkan. Kategori yang masih
+  memiliki karya perlu ditangani
+  terlebih dahulu.
+end note
+
+note right of AM4
+  Format yang didukung:
+  - Gambar: JPG, PNG, WEBP
+  - Dokumen: PDF, DOC, DOCX,
+    PPT, PPTX, XLS, XLSX
+  - Arsip: ZIP, RAR
+end note
+
+note bottom of AM4
+  Media dapat diunggah dengan
+  memilih berkas atau dengan
+  menyeret berkas ke halaman.
+end note
+
+note bottom of AM9
+  Sistem mencatat berapa kali media
+  dilihat dan diunduh. Angka ini
+  membantu admin menentukan media
+  yang masih aktif digunakan.
+end note
+
+note bottom of AM7
+  Tautan media siap disalin untuk
+  disisipkan pada artikel berita
+  atau halaman karya.
+end note
+
+@enduml

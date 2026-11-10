@@ -1,0 +1,7 @@
+# Hasil render diagram (berkas biner, tidak ikut repositori)
+png/
+svg/
+pdf/
+
+# PlantUML jar (unduh sekali, lihat render.sh)
+plantuml.jar

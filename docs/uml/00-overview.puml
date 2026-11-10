@@ -1,0 +1,113 @@
+@startuml 00-overview
+'==============================================================
+' SINGGAH - Diagram Overview Use Case
+' Galeri karya mahasiswa & dosen (POLIBAN)
+'
+' File ini hanya menampilkan batas sistem dan posisi aktor.
+' Rincian use case per aktor ada di file 01-13.
+'==============================================================
+
+title SINGGAH - Overview Use Case System
+
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  ArrowColor #334155
+}
+skinparam actor {
+  BorderColor #334155
+  BackgroundColor #FFFFFF
+}
+
+' --- Batas Sistem ---
+rectangle "SINGGAH\nGaleri Karya Mahasiswa & Dosen" <<system>> {
+
+  package "Portal Publik" {
+    usecase "Jelajahi Karya" as UC_PUB
+    usecase "Baca Berita" as UC_NEWS_PUB
+    usecase "Jelajah Hall 3D" as UC_HALL
+  }
+
+  package "Autentikasi" {
+    usecase "Kelola Akun" as UC_AUTH
+  }
+
+  package "Pengelolaan Karya" {
+    usecase "Kelola Karya Sendiri" as UC_KARYA
+    usecase "Interaksi Karya" as UC_SOCIAL
+    usecase "Kelola Profil" as UC_PROFIL
+  }
+
+  package "Panel Admin" {
+    usecase "Moderasi & Publikasi" as UC_MOD
+    usecase "Kelola Berita" as UC_NEWS
+    usecase "Kelola Pengguna & Kategori" as UC_UK
+    usecase "Kelola Media" as UC_MEDIA
+    usecase "Lihat Laporan" as UC_REPORT
+    usecase "Atur Pengaturan" as UC_SETTING
+  }
+}
+
+' --- Aktor ---
+actor "Pengunjung\n(Visitor)" as Visitor
+actor "Pengguna Terdaftar" as User
+actor "Mahasiswa" as Mahasiswa
+actor "Dosen" as Dosen
+actor "Admin" as Admin
+actor "Server / Worker\n(Pembuat Notifikasi,\nPengirim Email)" as System
+
+' --- Generalisasi Aktor ---
+' Mahasiswa & Dosen adalah turunan "Pengguna Terdaftar"
+' karena keduanya berbeda hanya pada field `tipe`.
+User <|-- Mahasiswa
+User <|-- Dosen
+
+' --- Relasi Aktor - Use Case ---
+Visitor --> UC_PUB
+Visitor --> UC_NEWS_PUB
+Visitor --> UC_HALL
+
+Mahasiswa --> UC_KARYA
+Dosen --> UC_KARYA
+User --> UC_SOCIAL
+User --> UC_PROFIL
+User --> UC_AUTH
+Mahasiswa --> UC_AUTH
+Dosen --> UC_AUTH
+
+Admin --> UC_MOD
+Admin --> UC_NEWS
+Admin --> UC_UK
+Admin --> UC_MEDIA
+Admin --> UC_REPORT
+Admin --> UC_SETTING
+Admin --> UC_AUTH
+
+' --- Relasi Sistem ---
+System --> UC_MOD : notifikasi approval
+System --> UC_KARYA : notifikasi revisi
+System --> UC_AUTH : kirim OTP email
+
+note bottom of Visitor
+  Tidak memiliki sesi login.
+  Aksi sosial (like, bookmark, komentar)
+  dialihkan ke halaman login.
+end note
+
+note bottom of Admin
+  Akses penuh ke seluruh panel admin.
+  Bypass mode maintenance.
+  Bisa langsung menyetujui karya
+  tanpa melalui revisi.
+end note
+
+note right of User
+  Aktor dasar untuk seluruh
+  pengguna yang sudah login
+  dan terverifikasi.
+end note
+
+@enduml

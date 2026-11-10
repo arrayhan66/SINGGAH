@@ -1,0 +1,151 @@
+@startuml 12-sistem-internal
+'==============================================================
+' USE CASE SISTEM (NON-MANUAL)
+'
+' Proses yang dijalankan otomatis oleh sistem dan tidak
+' dipicu langsung oleh pengguna.
+'
+' Sumber: client/src/utils/*, client/src/services/*,
+'         server/services/notificationService.js
+'==============================================================
+
+title Use Case - Proses Internal Sistem
+
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #F1F5F9
+  BorderColor #475569
+  ArrowColor #475569
+}
+skinparam actor {
+  BorderColor #475569
+  BackgroundColor #E2E8F0
+}
+
+actor "Pengunjung" as Vis
+actor "Pengguna Terdaftar" as User
+actor "Admin" as Adm
+actor "Sistem" as Sys <<database>>
+
+rectangle "SINGGAH" <<system>> {
+
+  package "Pengolahan Media" {
+    usecase "SI1. Kompres Gambar" as SI1
+    usecase "SI2. Validasi Format & Ukuran" as SI2
+    usecase "SI3. Buat Thumbnail" as SI3
+    usecase "SI4. Simpan Berkas di Penyimpanan" as SI4
+  }
+
+  package "Konten" {
+    usecase "SI5. Buat Slug Unik" as SI5
+    usecase "SI6. Sanitasi HTML Artikel" as SI6
+    usecase "SI7. Muat Ulang Konten Artikel" as SI7
+  }
+
+  package "Penyimpanan Data Sementara" {
+    usecase "SI8. Simpan Draft Unggahan" as SI8
+    usecase "SI9. Pulihkan Draft" as SI9
+    usecase "SI10. Hapus Draft" as SI10
+  }
+
+  package "Notifikasi & Pemantauan" {
+    usecase "SI11. Kirim Notifikasi" as SI11
+    usecase "SI12. Kirim Email Verifikasi" as SI12
+    usecase "SI13. Catat Aktivitas Pengguna" as SI13
+    usecase "SI14. Hitung Kunjungan Halaman" as SI14
+  }
+
+  package "Kinerja" {
+    usecase "SI15. Sesuaikan Kualitas Grafis" as SI15
+    usecase "SI16. Muat Halaman Berikutnya" as SI16
+    usecase "SI17. Bersihkan Cache" as SI17
+  }
+}
+
+' --- Relasi Aktor ---
+User --> SI1
+User --> SI2
+User --> SI8
+User --> SI9
+Vis --> SI14
+Admin --> SI13
+Sys --> SI11
+Sys --> SI12
+
+' --- Relasi <<include>> ---
+SI2 ..> SI3 : <<include>>
+SI3 ..> SI4 : <<include>>
+SI8 ..> SI9 : <<extend>>
+SI10 ..> SI8 : <<extend>>
+SI13 ..> SI11 : <<extend>>
+
+' --- Relasi <<extend>> ---
+SI1 ..> SI2 : <<extend>>
+SI4 ..> SI3 : <<extend>>
+SI5 ..> SI6 : <<extend>>
+SI6 ..> SI7 : <<extend>>
+SI11 ..> SI14 : <<extend>>
+SI12 ..> SI11 : <<extend>>
+SI17 ..> SI7 : <<extend>>
+
+note right of SI1
+  Gambar dikompresi di sisi peramban
+  sebelum diunggah agar hemat
+  kuota dan waktu unggah.
+end note
+
+note right of SI2
+  Menolak berkas dengan format
+  atau ukuran di luar ketentuan.
+end note
+
+note bottom of SI5
+  Judul diubah menjadi format
+  tautan: huruf kecil, tanpa spasi,
+  dipisahkan tanda hubung.
+end note
+
+note bottom of SI6
+  Isi artikel disaring dari
+  skrip berbahaya sebelum
+  ditampilkan di halaman publik.
+end note
+
+note bottom of SI7
+  Daftar artikel sengaja tidak
+  memuat isi lengkap karena ukurannya
+  sangat besar. Isi lengkap diambil
+  terpisah saat artikel dibuka.
+end note
+
+note bottom of SI8
+  Data draf disimpan di peramban,
+  bukan di server, sehingga isian
+  pengguna tidak hilang saat tab
+  ditutup atau perangkat berubah.
+end note
+
+note bottom of SI11
+  Notifikasi dikirim otomatis untuk:
+  - karya disetujui atau ditolak
+  - pengajuan revisi masuk
+  - pengajuan tipe akun diproses
+  - pembaruan pengaturan situs
+end note
+
+note bottom of SI14
+  Kunjungan dicatat dengan batas
+  frekuensi agar satu pengunjung
+  tidak tercatat berulang kali dalam
+  waktu singkat.
+end note
+
+note bottom of SI15
+  Kualitas grafis hall virtual
+  menyesuaikan perangkat agar
+  tetap berjalan lancar pada
+  perangkat dengan spesifikasi rendah.
+end note
+
+@enduml

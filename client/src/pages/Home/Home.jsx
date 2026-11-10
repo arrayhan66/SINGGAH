@@ -1,6 +1,8 @@
 import MainLayout from "../../layouts/MainLayout"
 import Hero from "../../components/sections/Hero/Hero"
-import FAQ from "../../components/sections/FAQ"
+import PlanetaryOrbitGallery from "../../components/sections/PlanetaryOrbitGallery"
+import KategoriPopuler from "../../components/sections/KategoriPopuler"
+
 import "../../styles/beranda-light.css"
 
 export default function Home() {
@@ -8,7 +10,8 @@ export default function Home() {
     <div className="beranda-page">
       <MainLayout>
         <Hero />
-        <FAQ />
+        <PlanetaryOrbitGallery />
+        <KategoriPopuler />
       </MainLayout>
     </div>
   )

@@ -49,7 +49,7 @@ function InfoPanel({ position, rotationY, entries = [] }) {
         anchorX="center"
         anchorY="middle"
         raycast={() => null}
-        font="/fonts/Poppins-SemiBold.ttf"
+        font="/fonts/GeneralSans-Semibold.ttf"
       >
         RUANG KARYA
       </Text>
@@ -67,7 +67,7 @@ function InfoPanel({ position, rotationY, entries = [] }) {
             anchorY="middle"
             maxWidth={1.15}
             raycast={() => null}
-            font="/fonts/Poppins-Medium.ttf"
+            font="/fonts/GeneralSans-Medium.ttf"
           >
             {e.title}
           </Text>
@@ -78,7 +78,7 @@ function InfoPanel({ position, rotationY, entries = [] }) {
             anchorX="right"
             anchorY="middle"
             raycast={() => null}
-            font="/fonts/Poppins-Medium.ttf"
+            font="/fonts/GeneralSans-Medium.ttf"
           >
             {e.count}
           </Text>
@@ -131,7 +131,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
               anchorY="middle"
               maxWidth={1.5}
               raycast={() => null}
-              font="/fonts/Poppins-SemiBold.ttf"
+              font="/fonts/GeneralSans-Semibold.ttf"
             >
               PANDUAN
             </Text>
@@ -143,7 +143,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
               anchorY="middle"
               maxWidth={1.5}
               raycast={() => null}
-              font="/fonts/Poppins-Medium.ttf"
+              font="/fonts/GeneralSans-Medium.ttf"
             >
               Cara Menjelajahi Halaman
             </Text>
@@ -162,7 +162,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
               anchorY="top"
               maxWidth={1.5}
               raycast={() => null}
-              font="/fonts/Poppins-Medium.ttf"
+              font="/fonts/GeneralSans-Medium.ttf"
             >
               {[
                 "Drag untuk melihat-lihat",
@@ -182,7 +182,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
               anchorY="middle"
               maxWidth={1.5}
               raycast={() => null}
-              font="/fonts/Poppins-Medium.ttf"
+              font="/fonts/GeneralSans-Medium.ttf"
             >
               Selamat menjelajah!
             </Text>
@@ -198,7 +198,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
               anchorY="middle"
               maxWidth={1.5}
               raycast={() => null}
-              font="/fonts/Poppins-SemiBold.ttf"
+              font="/fonts/GeneralSans-Semibold.ttf"
             >
               SINGGAH
             </Text>
@@ -210,7 +210,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
               anchorY="middle"
               maxWidth={1.5}
               raycast={() => null}
-              font="/fonts/Poppins-Medium.ttf"
+              font="/fonts/GeneralSans-Medium.ttf"
             >
               Gedung Virtual
             </Text>
@@ -228,7 +228,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
               anchorY="middle"
               maxWidth={1.5}
               raycast={() => null}
-              font="/fonts/Poppins-Medium.ttf"
+              font="/fonts/GeneralSans-Medium.ttf"
             >
               {`${total} Karya  ·  ${catCount} Kategori`}
             </Text>
@@ -255,7 +255,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
                 anchorY="middle"
                 maxWidth={1.45}
                 raycast={() => null}
-                font="/fonts/Poppins-Medium.ttf"
+                font="/fonts/GeneralSans-Medium.ttf"
               >
                 {line}
               </Text>

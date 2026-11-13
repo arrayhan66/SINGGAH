@@ -492,7 +492,7 @@ function Painting({
         lineHeight={1.15}
         letterSpacing={goldPlaque ? 0.02 : 0.012}
         raycast={() => null}
-        font="/fonts/Poppins-SemiBold.ttf"
+        font="/fonts/GeneralSans-Semibold.ttf"
       >
         {title}
       </Text>
@@ -506,7 +506,7 @@ function Painting({
         maxWidth={FRAME_W - 0.24}
         letterSpacing={goldPlaque ? 0.015 : 0.008}
         raycast={() => null}
-        font="/fonts/Poppins-Medium.ttf"
+        font="/fonts/GeneralSans-Medium.ttf"
       >
         {authorName}
       </Text>

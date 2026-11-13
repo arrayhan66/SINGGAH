@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import { Library } from "lucide-react"
+import { useNavigate, useSearchParams } from "react-router-dom"
+import { Library, ArrowLeft } from "lucide-react"
 import DustBackground from "../../ui/DustBackground"
 import GlowBackground from "../../ui/GlowBackground"
 import PCBBackground from "../../ui/PCBBackground"
@@ -9,12 +9,10 @@ import SearchBar from "../../ui/SearchBar"
 import OutlineButton from "../../ui/OutlineButton"
 import { KaryaPageSkeleton } from "../../ui/PageSkeletons"
 import KaryaCategoryCard from "./KaryaCategoryCard"
+import KaryaProjectCard from "./KaryaProjectCard"
 import { isCategoryActive } from "../../../utils/categoryHelpers"
 import api from "../../../services/api"
 
-// Hanya dipakai kalau API-nya gagal, bukan saat daftar kategori memang kosong.
-// KalauRespons kategori kosong, halaman harus tampil empty state — bukan
-// kategori palsu yang tidak ada di database.
 const FALLBACK_CATEGORIES = [
   { name: "Website", slug: "website", description: "Situs web modern dan responsif.", color: "#3b82f6" },
   { name: "Mobile App", slug: "mobile-app", description: "Aplikasi Android & iOS.", color: "#a78bfa" },
@@ -28,23 +26,49 @@ const FALLBACK_CATEGORIES = [
 
 function KaryaSection() {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const qParam = searchParams.get("q") || ""
+  const jurusanParam = searchParams.get("jurusan") || ""
+  const tahunParam = searchParams.get("tahun") || ""
+
+  const hasFilter = Boolean(qParam || jurusanParam || tahunParam)
+
   const initialCount = 6
   const [categories, setCategories] = useState([])
+  const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    api.get("/categories")
-      .then((res) => {
-        const items = res.data.data.items || res.data.data || []
-        // Kategori nonaktif (tidak tampil di hall 3D) tidak ikut ditampilkan.
-        setCategories(items.filter(isCategoryActive))
-      })
-      .catch((err) => {
-        console.error("Failed to fetch categories, using fallback:", err)
-        setCategories(FALLBACK_CATEGORIES)
+    Promise.all([
+      api.get("/categories").catch(() => ({ data: { data: FALLBACK_CATEGORIES } })),
+      api.get("/projects?limit=100").catch(() => ({ data: { data: { items: [] } } }))
+    ])
+      .then(([catRes, projRes]) => {
+        const catItems = catRes.data.data.items || catRes.data.data || []
+        setCategories(catItems.filter(isCategoryActive))
+        const projItems = projRes.data.data.items || projRes.data.data || []
+        setProjects(projItems)
       })
       .finally(() => setLoading(false))
   }, [])
+
+  // Filter projects client-side based on searchParams
+  const filteredProjects = projects.filter((p) => {
+    if (qParam) {
+      const qLower = qParam.toLowerCase()
+      const titleMatch = p.title?.toLowerCase().includes(qLower)
+      const descMatch = p.description?.toLowerCase().includes(qLower)
+      if (!titleMatch && !descMatch) return false
+    }
+    if (jurusanParam) {
+      const catSlug = p.Category?.slug || p.category || ""
+      if (catSlug !== jurusanParam) return false
+    }
+    if (tahunParam) {
+      if (String(p.year) !== String(tahunParam)) return false
+    }
+    return true
+  })
 
   const {
     search,
@@ -57,6 +81,10 @@ function KaryaSection() {
 
   function handleCategoryClick(slug) {
     navigate(`/karya/${slug}`)
+  }
+
+  function handleClearFilter() {
+    setSearchParams({})
   }
 
   return (
@@ -73,78 +101,86 @@ function KaryaSection() {
           <KaryaPageSkeleton />
         ) : (
           <>
-            <div className="text-center">
-              <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 sm:h-16 sm:w-16 md:h-20 md:w-20 lg:h-24 lg:w-24 3xl:h-28 3xl:w-28 4xl:h-32 4xl:w-32">
-                <Library className="h-7 w-7 text-cyan-300 sm:h-8 sm:w-8 md:h-10 md:w-10 lg:h-12 lg:w-12 3xl:h-14 3xl:w-14 4xl:h-16 4xl:w-16" />
+            {hasFilter && (
+              <div className="mb-4 flex">
+                <button
+                  type="button"
+                  onClick={handleClearFilter}
+                  className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 py-[7px] pl-[15px] pr-[17px] text-xs text-slate-300 backdrop-blur-sm transition-colors duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300 cursor-pointer"
+                >
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 transition-colors duration-300 group-hover:bg-cyan-400/20">
+                    <ArrowLeft size={13} />
+                  </span>
+                  <span>Kembali ke Semua Kategori</span>
+                </button>
               </div>
-              <h2 className="mt-2 sm:mt-3 md:mt-4 lg:mt-5 2xl:mt-6 3xl:mt-7 4xl:mt-8 text-3xl font-black text-white sm:text-4xl lg:text-5xl 2xl:text-6xl 3xl:text-7xl 4xl:text-8xl">
-                Karya <span className="text-cyan-300">SinggaH</span>
+            )}
+
+            <div className="text-center">
+              <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 sm:h-16 sm:w-16 md:h-20 md:w-20 lg:h-24 lg:w-24">
+                <Library className="h-7 w-7 text-cyan-300 sm:h-8 sm:w-8 md:h-10 md:w-10 lg:h-12 lg:w-12" />
+              </div>
+              <h2 className="mt-2 sm:mt-3 md:mt-4 lg:mt-5 text-3xl font-black text-white sm:text-4xl lg:text-5xl">
+                {hasFilter ? "Hasil Pencarian Karya" : <>Karya <span className="text-cyan-300">SinggaH</span></>}
               </h2>
 
-              <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8 2xl:mt-8 2xl:max-w-4xl 2xl:text-xl 2xl:leading-9 3xl:mt-10 3xl:max-w-5xl 3xl:text-2xl 3xl:leading-10 4xl:mt-12 4xl:max-w-6xl 4xl:text-3xl 4xl:leading-11">
-                Jelajahi seluruh karya mahasiswa Teknik Elektro Politeknik Negeri
-                Banjarmasin.
+              <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
+                {hasFilter ? (
+                  <>Menemukan {filteredProjects.length} karya berdasarkan filter pencarian.</>
+                ) : (
+                  <>Jelajahi seluruh karya mahasiswa Politeknik Negeri Banjarmasin.</>
+                )}
               </p>
             </div>
 
-            <div className="mt-8 2xl:mt-12 3xl:mt-14 4xl:mt-16">
-              <SearchBar
-                value={search}
-                onChange={handleSearchChange}
-                placeholder="Cari kategori..."
-              />
-            </div>
+            {!hasFilter && (
+              <div className="mt-8 2xl:mt-12">
+                <SearchBar
+                  value={search}
+                  onChange={handleSearchChange}
+                  placeholder="Cari kategori..."
+                />
+              </div>
+            )}
 
-            <div className="mt-14 2xl:mt-20 3xl:mt-24 4xl:mt-28">
-              {visibleCategories.length > 0 ? (
-                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 2xl:gap-10 3xl:gap-12 4xl:gap-14">
-                  {visibleCategories.map((item) => (
-                    <KaryaCategoryCard
-                      key={item.slug}
-                      item={item}
-                      onClick={() => handleCategoryClick(item.slug)}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 px-4 py-12 text-center sm:px-6 sm:py-16 md:py-20 lg:py-24 3xl:py-28 4xl:py-32">
-                  <div className="mb-4 rounded-full bg-slate-800/50 p-3 ring-1 ring-slate-700/50 backdrop-blur-sm sm:mb-5 sm:p-4 3xl:p-5 4xl:p-6">
-                    <svg
-                      className="h-8 w-8 text-slate-400 sm:h-9 sm:w-9 md:h-10 md:w-10 lg:h-11 lg:w-11 3xl:h-12 3xl:w-12 4xl:h-14 4xl:w-14"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={1.5}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                      />
-                    </svg>
+            <div className="mt-14">
+              {hasFilter ? (
+                filteredProjects.length > 0 ? (
+                  <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    {filteredProjects.map((project) => (
+                      <KaryaProjectCard key={project.id} project={project} />
+                    ))}
                   </div>
-                  <h3 className="text-center text-lg font-bold text-slate-200 sm:text-xl 3xl:text-2xl 4xl:text-3xl">
-                    {search.trim()
-                      ? "Kategori tidak ditemukan"
-                      : "Belum ada kategori"}
-                  </h3>
-                  <p className="mt-2 max-w-sm text-center text-xs text-slate-400 sm:max-w-md sm:text-sm md:text-base lg:text-base 3xl:mt-3 3xl:text-lg 4xl:text-xl">
-                    {search.trim() ? (
-                      <>
-                        Maaf, kami tidak menemukan kategori yang cocok dengan kata kunci{" "}
-                        <span className="font-semibold text-slate-300">&quot;{search}&quot;</span>
-                        . Coba gunakan istilah lain.
-                      </>
-                    ) : (
-                      "Belum ada kategori karya yang dapat ditampilkan saat ini."
-                    )}
-                  </p>
-                </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 px-4 py-16 text-center">
+                    <h3 className="text-lg font-bold text-slate-200">Tidak ada karya yang cocok</h3>
+                    <p className="mt-2 text-sm text-slate-400">
+                      Coba ubah kata kunci atau filter pencarian Anda di atas.
+                    </p>
+                  </div>
+                )
+              ) : (
+                visibleCategories.length > 0 ? (
+                  <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    {visibleCategories.map((item) => (
+                      <KaryaCategoryCard
+                        key={item.slug}
+                        item={item}
+                        onClick={() => handleCategoryClick(item.slug)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/20 px-4 py-12 text-center">
+                    <h3 className="text-lg font-bold text-slate-200">Belum ada kategori</h3>
+                    <p className="mt-2 text-sm text-slate-400">Belum ada kategori karya yang dapat ditampilkan saat ini.</p>
+                  </div>
+                )
               )}
             </div>
 
-            {!showAll && filteredCategories.length > initialCount && (
-              <div className="mt-6 flex justify-center sm:mt-8 2xl:mt-12 3xl:mt-16 4xl:mt-20">
+            {!hasFilter && !showAll && filteredCategories.length > initialCount && (
+              <div className="mt-6 flex justify-center sm:mt-8">
                 <OutlineButton onClick={() => setShowAll(true)}>
                   Lihat Lebih Banyak
                 </OutlineButton>

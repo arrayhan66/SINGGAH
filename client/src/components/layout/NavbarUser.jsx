@@ -336,7 +336,7 @@ function NavbarUser() {
             />
           </div>
           <h1
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            style={{ fontFamily: "var(--font-headline)" }}
             className="text-sm font-bold text-white min-[350px]:text-base sm:text-lg"
           >
             Singgah

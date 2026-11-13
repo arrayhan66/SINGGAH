@@ -59,7 +59,7 @@
 }
 
 .gal-center-a {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-headline);
   font-weight: 400;
 }
 

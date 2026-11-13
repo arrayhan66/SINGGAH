@@ -178,7 +178,7 @@ function Centerpiece({ title = "HALAMAN UTAMA" }) {
         anchorX="center"
         anchorY="middle"
         raycast={() => null}
-        font="/fonts/Poppins-SemiBold.ttf"
+        font="/fonts/GeneralSans-Semibold.ttf"
       >
         {title}
       </Text>

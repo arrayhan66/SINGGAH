@@ -1,4 +1,5 @@
 import MainLayout from "../../layouts/MainLayout"
+import HeroPhoto from "../../components/sections/Hero/HeroPhoto"
 import Hero from "../../components/sections/Hero/Hero"
 import PlanetaryOrbitGallery from "../../components/sections/PlanetaryOrbitGallery"
 import KategoriPopuler from "../../components/sections/KategoriPopuler"
@@ -9,6 +10,7 @@ export default function Home() {
   return (
     <div className="beranda-page">
       <MainLayout>
+        <HeroPhoto />
         <Hero />
         <PlanetaryOrbitGallery />
         <KategoriPopuler />

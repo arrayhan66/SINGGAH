@@ -28,7 +28,9 @@ const FONT_SIZE_OPTIONS = [
 
 const FONT_FAMILY_OPTIONS = [
   { label: "Default", value: "" },
-  { label: "Poppins", value: "Poppins, sans-serif" },
+  { label: "General Sans", value: "'General Sans', sans-serif" },
+  { label: "Google Sans Flex", value: "'Google Sans Flex', sans-serif" },
+  { label: "Plus Jakarta Sans", value: "'Plus Jakarta Sans', sans-serif" },
   { label: "Times New Roman", value: "Georgia, 'Times New Roman', serif" },
   { label: "Arial", value: "Arial, Helvetica, sans-serif" },
   { label: "Helvetica", value: "'Helvetica Neue', Helvetica, Arial, sans-serif" },

@@ -68,7 +68,7 @@ function ExitIcon() {
         outlineWidth={0.01}
         outlineColor="#b91c1c"
         raycast={() => null}
-        font="/fonts/Montserrat-Regular.ttf"
+        font="/fonts/GeneralSans-Regular.ttf"
       >
         Keluar
       </Text>
@@ -99,7 +99,7 @@ function ExitSign({ width }) {
         anchorY="middle"
         maxWidth={width + 0.1}
         raycast={() => null}
-        font="/fonts/Montserrat-Bold.ttf"
+        font="/fonts/GeneralSans-Bold.ttf"
       >
         Exit
       </Text>
@@ -139,7 +139,7 @@ const RIFT_EXIT_MAT = new THREE.MeshStandardMaterial({
   side: THREE.DoubleSide,
 })
 
-// Poppins is wider than the previous default font, so long category names
+// General Sans is wider than the previous default font, so long category names
 // wrapped onto two lines on the nameplate. Measure the laid-out text and
 // shrink the font until the title fits the plate on a single line — short
 // names keep the full size, long ones shrink just enough.
@@ -162,7 +162,7 @@ function BoardTitle({ position, width, children }) {
       anchorX="center"
       anchorY="middle"
       raycast={() => null}
-      font="/fonts/Poppins-SemiBold.ttf"
+      font="/fonts/GeneralSans-Semibold.ttf"
       onSync={handleSync}
     >
       {children}
@@ -214,7 +214,7 @@ function Portal({ position, rotationY, width, title, action }) {
             anchorY="middle"
             letterSpacing={0.08}
             raycast={() => null}
-            font="/fonts/Montserrat-Bold.ttf"
+            font="/fonts/GeneralSans-Bold.ttf"
           >
             Singgah Disini
           </Text>

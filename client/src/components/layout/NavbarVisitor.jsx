@@ -4,37 +4,70 @@ import {
   useLayoutEffect,
   useRef,
   useState,
-} from "react"
-import { NavLink, useLocation } from "react-router-dom"
+} from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   ChevronDown,
   ChevronRight,
   ArrowRight,
-  Home,
+  Handshake,
   LayoutGrid,
   GraduationCap,
-  Newspaper,
   Info,
+  FilePlus,
   HardHat,
   Cog,
   Zap,
   Calculator,
   Briefcase,
-} from "lucide-react"
-import logo from "../../assets/icons/logo.webp"
-import { prefetchRouteFromLink } from "../../utils/routePrefetch"
-import { applyNavbarFont } from "../../utils/navbarFont"
-import SmartImage from "../ui/SmartImage"
-import imgPemenang from "../../assets/images/navbarSupports/prestasi.jpg"
-import imgTur from "../../assets/images/navbarSupports/tur virtual.jpg"
-import imgDosen from "../../assets/images/navbarSupports/daftar dosen.jpg"
-import imgVisitasi from "../../assets/images/navbarSupports/visitasi.jpg"
+} from "lucide-react";
+import logo from "../../assets/icons/logo.webp";
+import { applyNavbarFont } from "../../utils/navbarFont";
+import SmartImage from "../ui/SmartImage";
+
+const LOGO_BRAND = {
+  fontFamily: "var(--font-body)",
+  fontWeight: 500,
+  fontSize: 18,
+  letterSpacing: "-0.01em",
+  boxSm: 24,
+  boxMd: 26,
+  box2xl: 28,
+  gap: 8,
+};
+
+// Slot gambar dropdown Tentang & Kolaborasi.
+// Cara mengisi: letakkan file di src/assets/images/navbar/, tambahkan
+//   import fotoTentang from "../../assets/images/navbar/tentang.jpg";
+// lalu isi src: fotoTentang. Rasio disarankan: Tentang 4:5 (minimal 800x1000),
+// Kemitraan dan Masalah 16:10 (minimal 1000x625).
+const NAV_IMG = {
+  tentang: {
+    src: imgInformasi,
+    alt: "Kegiatan dan karya mahasiswa Poliban di Singgah",
+  },
+  kemitraan: {
+    src: imgKerjasama,
+    alt: "Kerja sama Poliban dengan perusahaan dan instansi",
+  },
+  masalah: {
+    src: imgPengajuanMasalah,
+    alt: "Mahasiswa mengerjakan persoalan nyata dari industri",
+  },
+};
+import imgInformasi from "../../assets/images/navbarSupports/informasi.jpg";
+import imgKerjasama from "../../assets/images/navbarSupports/kerjasama.jpg";
+import imgPengajuanMasalah from "../../assets/images/navbarSupports/pengajuan masalah.jpg";
+import imgPemenang from "../../assets/images/navbarSupports/prestasi.jpg";
+import imgTur from "../../assets/images/navbarSupports/tur virtual.jpg";
+import imgDosen from "../../assets/images/navbarSupports/daftar dosen.jpg";
+import imgVisitasi from "../../assets/images/navbarSupports/visitasi.jpg";
 
 const SNAV_CSS = `
 .snav-link,.snav-menu,.snav-mobile,.snav-ink,.snav-auth{--snav-c:#475569;--snav-h:#0f172a;--snav-a:#2563eb;--snav-bg:#fff;--snav-bd:rgba(148,163,184,.35);--snav-hov:rgba(37,99,235,.07);--snav-sh:rgba(15,23,42,.22);--snav-mono:ui-monospace,"JetBrains Mono","IBM Plex Mono",Consolas,Menlo,monospace}
-.snav-link.snav-link{position:relative;z-index:1;display:inline-flex;align-items:center;padding:clamp(4px,0.8vw,8px) clamp(2px,0.4vw,4px);font-family:var(--snav-font,var(--snav-mono));font-size:clamp(11px,1.2vw,15px);line-height:1.5;font-weight:700;color:var(--snav-c);text-decoration:none;cursor:pointer;border:0;background:transparent;transition:color .2s ease;white-space:nowrap}
+.snav-link.snav-link{position:relative;z-index:1;display:inline-flex;align-items:center;padding:clamp(4px,0.8vw,8px) clamp(2px,0.4vw,4px);font-family:var(--snav-font,var(--snav-mono));font-size:clamp(11px,1.2vw,15px);line-height:1.5;font-weight:500;color:var(--snav-h);text-decoration:none;cursor:pointer;border:0;background:transparent;transition:color .2s ease;white-space:nowrap}
 @media (min-width:2560px){.snav-link.snav-link{font-size:clamp(15px,1.5vw,22px);padding:clamp(8px,1vw,14px) clamp(4px,0.6vw,8px)}}
-.snav-link.snav-link:hover{color:#2563eb}
+.snav-link.snav-link:hover{color:var(--snav-a)}
 .snav-link.snav-link:focus-visible{outline:2px solid var(--snav-a);outline-offset:4px;border-radius:6px}
 .snav-ink{position:absolute;left:0;bottom:-1px;height:2px;pointer-events:none;z-index:0;opacity:0;will-change:transform,width,opacity}
 .snav-ink::before{content:"";position:absolute;left:10%;right:10%;top:0;height:10px;border-radius:50%;filter:blur(6px);pointer-events:none;z-index:0;background:color-mix(in srgb,var(--snav-a) 45%,transparent)}
@@ -44,11 +77,11 @@ html.light .snav-ink::before{background:color-mix(in srgb,var(--snav-a) 35%,tran
 .snav-dd.is-open .snav-chev{transform:rotate(180deg)}
 .snav-dd{position:static}
 .snav-dd>.snav-link::after{content:"";position:absolute;left:-10px;right:-10px;top:100%;height:44px}
-.snav-menu{position:absolute;top:calc(100% + 14px);left:0;width:min(920px,100%);font-family:var(--snav-font,var(--snav-mono));display:grid;grid-template-columns:220px minmax(0,1fr) 260px;column-gap:32px;padding:28px 28px 28px 32px;border-radius:16px;background:var(--snav-bg);border:1px solid var(--snav-bd);box-shadow:0 2px 6px -2px var(--snav-sh);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-12px);transition:opacity 1.5s cubic-bezier(.22,1,.36,1),transform 1.5s cubic-bezier(.22,1,.36,1),visibility 0s;z-index:60}
+.snav-menu{position:absolute;top:calc(100% + 14px);left:var(--panel-left,0px);width:min(840px,100%);font-family:var(--snav-font,var(--snav-mono));display:grid;grid-template-columns:220px minmax(0,1fr) 260px;column-gap:32px;padding:28px 28px 28px 32px;border-radius:16px;background:var(--snav-bg);border:1px solid var(--snav-bd);box-shadow:0 2px 6px -2px var(--snav-sh);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-12px);transition:opacity 1.5s cubic-bezier(.22,1,.36,1),transform 1.5s cubic-bezier(.22,1,.36,1),visibility 0s;z-index:60}
 .snav-dd.is-open .snav-menu{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition:opacity 1.5s cubic-bezier(.22,1,.36,1),transform 1.5s cubic-bezier(.22,1,.36,1),visibility 0s}
 .snav-menu.snav-menu--noimg{grid-template-columns:220px minmax(0,1fr)}
-.snav-menu.snav-menu--mega{display:block;left:0;right:auto;margin-left:0;margin-right:0;width:max-content;max-width:calc(100% - 64px);padding:36px 40px 38px;border-radius:20px;box-shadow:0 20px 40px -28px var(--snav-sh)}
-.snav-menu--mega,.snav-menu--mega *{font-family:"Poppins",sans-serif}
+.snav-menu.snav-menu--mega{display:block;left:var(--panel-left,0px);right:auto;margin-left:0;margin-right:0;width:max-content;max-width:calc(100% - 64px);padding:36px 40px 38px;border-radius:20px;box-shadow:0 20px 40px -28px var(--snav-sh)}
+.snav-menu--mega,.snav-menu--mega *{font-family:var(--font-body)}
 .snav-mega-scroll{max-height:calc(100dvh - var(--navbar-h) - 32px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
 .snav-mega-layout{display:grid;grid-template-columns:minmax(0,1fr) 230px;column-gap:40px;align-items:stretch}
 .snav-mega-layout.is-noimg{grid-template-columns:minmax(0,1fr)}
@@ -65,17 +98,17 @@ html.light .snav-ink::before{background:color-mix(in srgb,var(--snav-a) 35%,tran
 .snav-mega-media{display:flex;min-width:0;padding:14px;border-radius:16px;background:color-mix(in srgb,var(--snav-a) 9%,transparent)}
 .snav-mega-cimg{display:block;width:100%;height:100%;min-height:260px;object-fit:cover;object-position:left top;border:1px solid var(--snav-bd);border-radius:10px;animation:snav-img-in .25s ease}
 @media (max-width:1199px){.snav-mega-layout{grid-template-columns:minmax(0,1fr)}.snav-mega-media{display:none}.snav-mega-cols{column-gap:16px}}
-.snav-mega-mtitle{padding:10px 12px 4px 48px;font-family:"Poppins",sans-serif;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--snav-c)}
+.snav-mega-mtitle{padding:10px 12px 4px 48px;font-family:var(--font-body);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--snav-c)}
 .snav-menu::before{content:"";position:absolute;top:-8px;left:var(--caret,50%);width:14px;height:14px;background:var(--snav-bg);border-left:1px solid var(--snav-bd);border-top:1px solid var(--snav-bd);border-radius:3px 0 0 0;transform:translateX(-50%) rotate(45deg)}
 .snav-mm-side{padding-right:32px;border-right:1px solid var(--snav-bd)}
-.snav-mm-label{margin-bottom:18px;font-family:var(--snav-font,var(--snav-mono));font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--snav-c)}
-.snav-mm-item{display:block;padding:7px 0;font-family:var(--snav-font,var(--snav-mono));font-size:17px;font-weight:700;color:var(--snav-c);text-decoration:none;transition:color .15s}
+.snav-mm-label{margin-bottom:18px;font-family:var(--snav-font,var(--snav-mono));font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--snav-c)}
+.snav-mm-item{display:block;padding:8px 0;font-family:var(--snav-font,var(--snav-mono));font-size:15px;font-weight:500;color:var(--snav-c);text-decoration:none;transition:color .15s}
 .snav-mm-item.is-hover,.snav-mm-item:focus-visible{color:#2563eb;outline:none}
 .snav-mm-body{display:flex;flex-direction:column;min-width:0}
-.snav-mm-title{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-family:var(--snav-font,var(--snav-mono));font-size:17px;font-weight:700;color:var(--snav-h);text-decoration:none}
-.snav-mm-desc{margin:14px 0 0;max-width:34ch;font-size:16px;line-height:1.6;color:var(--snav-c)}
+.snav-mm-title{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-family:var(--snav-font,var(--snav-mono));font-size:16px;font-weight:600;color:var(--snav-h);text-decoration:none}
+.snav-mm-desc{margin:14px 0 0;max-width:34ch;font-size:14px;line-height:1.55;color:var(--snav-c)}
 .snav-mm-tags{display:grid;grid-template-columns:repeat(2,max-content);gap:8px 10px;margin-top:auto;padding-top:24px}
-.snav-mm-tags span{padding:6px 14px;border-radius:9999px;font-size:13px;font-weight:500;color:var(--snav-h);background:rgba(148,163,184,.16)}
+.snav-mm-tags span{height:28px;padding:6px 14px;border-radius:9999px;font-size:12px;font-weight:500;color:var(--snav-h);background:rgba(148,163,184,.16)}
 .snav-mm-img{position:relative;min-height:260px;overflow:hidden;border-radius:6px;background:var(--snav-hov)}
 .snav-mm-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.8);animation:snav-img-in .25s ease}
 @keyframes snav-img-in{from{opacity:0}to{opacity:1}}
@@ -95,34 +128,71 @@ html.light .snav-ink::before{background:color-mix(in srgb,var(--snav-a) 35%,tran
 .snav-acc{display:grid;grid-template-rows:0fr;transition:grid-template-rows 1s ease}
 .snav-acc.is-open{grid-template-rows:1fr}
 .snav-acc>div{min-height:0;overflow:hidden;padding-left:0}
-.snav-auth{display:inline-flex;align-items:center;gap:10px;margin-left:12px}.snav-mbtn{display:flex;flex:1;align-items:center;justify-content:center;height:44px;border-radius:10px;font-family:'Poppins',sans-serif;font-size:14px;font-weight:400;letter-spacing:0;text-transform:none;text-decoration:none;border:1px solid;transition:background-color .42s cubic-bezier(.16,1,.3,1),border-color .42s cubic-bezier(.16,1,.3,1),color .42s cubic-bezier(.16,1,.3,1),box-shadow .42s cubic-bezier(.16,1,.3,1);cursor:pointer}.snav-mbtn-primary{background:#2563eb;color:#fff;border-color:#2563eb}.snav-mbtn-primary:hover{background:#1d4ed8;border-color:#1d4ed8}.snav-mbtn:not(.snav-mbtn-primary){background:#f1f5f9;color:#0f172a;border-color:#d5dbe3;box-shadow:0 1px 2px rgba(15,23,42,.06)}.snav-mbtn:not(.snav-mbtn-primary):hover{background:#e8edf3}
-.snav-login.snav-login,.snav-cta.snav-cta{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 18px;border-radius:10px;font-family:'Poppins',sans-serif;font-size:14px;font-weight:400;letter-spacing:0;text-transform:none;text-decoration:none;white-space:nowrap;transition:background-color .42s cubic-bezier(.16,1,.3,1),border-color .42s cubic-bezier(.16,1,.3,1),color .42s cubic-bezier(.16,1,.3,1),box-shadow .42s cubic-bezier(.16,1,.3,1)}
-.snav-login.snav-login{color:#0f172a;background:#f1f5f9;border:1px solid #d5dbe3;box-shadow:0 1px 2px rgba(15,23,42,.06)}
-.snav-login.snav-login:hover{background:#e8edf3}
-.snav-cta.snav-cta{color:#fff;background:#2563eb;border:1px solid #2563eb}
-.snav-cta.snav-cta:hover{background:#1d4ed8;border-color:#1d4ed8}
+.snav-auth{display:inline-flex;align-items:center;gap:20px;margin-left:0}.snav-mbtn{display:flex;flex:1;align-items:center;justify-content:center;height:44px;border-radius:10px;font-family:var(--font-body);font-size:14px;font-weight:400;letter-spacing:0;text-transform:none;text-decoration:none;border:1px solid;transition:background-color .42s cubic-bezier(.16,1,.3,1),border-color .42s cubic-bezier(.16,1,.3,1),color .42s cubic-bezier(.16,1,.3,1),box-shadow .42s cubic-bezier(.16,1,.3,1);cursor:pointer}.snav-mbtn-primary{background:var(--snav-a);color:#fff;border-color:var(--snav-a)}.snav-mbtn-primary:hover{background:color-mix(in srgb,var(--snav-a) 88%,black);border-color:color-mix(in srgb,var(--snav-a) 88%,black)}.snav-mbtn:not(.snav-mbtn-primary){background:transparent;color:var(--snav-h);border-color:transparent;box-shadow:none}.snav-mbtn:not(.snav-mbtn-primary):hover{background:var(--snav-hov)}
+.snav-login.snav-login,.snav-cta.snav-cta{display:inline-flex;align-items:center;justify-content:center;height:40px;font-family:var(--font-body);font-size:14px;font-weight:500;letter-spacing:0;text-transform:none;text-decoration:none;white-space:nowrap;transition:background-color .2s ease,border-color .2s ease,color .2s ease}
+.snav-login.snav-login{padding:0;color:var(--snav-h);background:transparent;border:0;border-radius:0;box-shadow:none}
+.snav-login.snav-login:hover{color:var(--snav-a);background:transparent}
+.snav-cta.snav-cta{padding:0 16px;color:#fff;background:var(--snav-a);border:1px solid var(--snav-a);border-radius:8px;box-shadow:none}
+.snav-cta.snav-cta:hover{background:color-mix(in srgb,var(--snav-a) 88%,black);border-color:color-mix(in srgb,var(--snav-a) 88%,black)}
 .snav-cta.snav-cta:active,.snav-login.snav-login:active{transform:translateY(1px)}
 .snav-cta.snav-cta:focus-visible,.snav-login.snav-login:focus-visible{outline:2px solid currentColor;outline-offset:2px}
 @media (max-width:949px){.snav-auth{display:none}}
 @media (max-width:949px){.snav-link.snav-link{font-size:14px}}
-@media (min-width:950px) and (max-width:1023px){.snav-link.snav-link{font-size:14px}}
-@media (min-width:1024px) and (max-width:1279px){.snav-link.snav-link{font-size:15px}}
-@media (min-width:1280px) and (max-width:1535px){.snav-link.snav-link{font-size:15px}}
-@media (min-width:1536px){.snav-link.snav-link{font-size:15px}}
-@media (min-width:950px) and (max-width:1199px){.snav-login,.snav-cta{height:36px;padding:0 14px;font-size:13px}.snav-auth{gap:8px}}
-@media (min-width:1200px) and (max-width:2559px){.snav-login,.snav-cta{height:42px;padding:0 18px;font-size:14px}.snav-auth{gap:10px}}
-@media (min-width:2560px){.snav-link.snav-link{font-size:clamp(16px,1.6vw,24px);padding:clamp(10px,1.2vw,16px) clamp(6px,0.8vw,12px)}.snav-mm-item{font-size:clamp(18px,1.8vw,26px)}.snav-mlink{font-size:clamp(16px,1.6vw,22px);padding:clamp(14px,1.4vw,20px)}.snav-mlink-sub{font-size:clamp(15px,1.5vw,20px);padding:clamp(12px,1.2vw,18px) clamp(12px,1.4vw,20px) clamp(12px,1.2vw,18px) 60px}.snav-login,.snav-cta{height:48px;padding:0 24px;font-size:16px}.snav-mbtn{height:52px;font-size:16px}.snav-auth{gap:14px}}
-@media (prefers-reduced-motion:reduce){.snav-link.snav-link,.snav-ink,.snav-chev,.snav-menu,.snav-mm-img img,.snav-burger span,.snav-mobile,.snav-acc,.snav-mega-tile,.snav-mega-link,.snav-mega-cimg{transition:none!important;animation:none!important}}
+@media (min-width:950px) and (max-width:1199px){.snav-link.snav-link{font-size:15px}}
+@media (min-width:1200px) and (max-width:1599px){.snav-link.snav-link{font-size:16px}}
+@media (min-width:950px) and (max-width:1199px){.snav-login.snav-login,.snav-cta.snav-cta{height:36px;font-size:14px}.snav-cta.snav-cta{padding:0 14px}}
+@media (min-width:1200px) and (max-width:2559px){.snav-login.snav-login,.snav-cta.snav-cta{height:40px;font-size:15px}}
+@media (min-width:2560px){.snav-link.snav-link{font-size:clamp(16px,1.6vw,24px);padding:clamp(10px,1.2vw,16px) clamp(6px,0.8vw,12px)}.snav-mm-item{font-size:15px}.snav-mlink{font-size:clamp(16px,1.6vw,22px);padding:clamp(14px,1.4vw,20px)}.snav-mlink-sub{font-size:clamp(15px,1.5vw,20px);padding:clamp(12px,1.2vw,18px) clamp(12px,1.4vw,20px) clamp(12px,1.2vw,18px) 60px}.snav-login.snav-login,.snav-cta.snav-cta{height:48px;font-size:16px}.snav-cta.snav-cta{padding:0 24px}.snav-mbtn{height:52px;font-size:16px}}
+@media (min-width:1200px){.snav-login.snav-login,.snav-cta.snav-cta{height:40px;font-size:15px}}
+@media (min-width:1600px){.snav-link.snav-link{font-size:17px}}
+@media (prefers-reduced-motion:reduce){.snav-link.snav-link,.snav-login,.snav-cta,.snav-ink,.snav-chev,.snav-menu,.snav-mm-img img,.snav-burger span,.snav-mobile,.snav-acc,.snav-mega-tile,.snav-mega-link,.snav-mega-cimg{transition:none!important;animation:none!important}}
 @media (prefers-reduced-motion:reduce){.snav-mega-tile,.snav-mega-link,.snav-mega-cimg{transform:none!important}}
-`
+.snav-menu.snav-about-panel{width:700px;max-width:calc(100vw - 24px);display:grid;grid-template-columns:250px minmax(0,1fr);gap:24px;align-items:stretch;padding:20px;border-radius:16px;background:color-mix(in srgb,var(--snav-a) 4%,white);border:1px solid var(--snav-bd);box-shadow:0 12px 32px rgba(15,23,42,.10)}
+.snav-menu.snav-duo-panel{width:880px;max-width:calc(100vw - 24px);display:flex;flex-direction:column;padding:0;border-radius:16px;background:var(--snav-bg);border:1px solid var(--snav-bd);box-shadow:0 12px 32px rgba(15,23,42,.10)}
+.snav-menu.snav-about-panel::before{background:color-mix(in srgb,var(--snav-a) 4%,white)}
+.snav-about-media{min-height:240px;overflow:hidden;border-radius:12px}
+.snav-about-body{display:flex;flex-direction:column;min-width:0}
+.snav-about-label{margin-bottom:8px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--snav-a)}
+.snav-about-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--snav-bd);text-decoration:none}
+.snav-about-row:last-child{border-bottom:0}
+.snav-about-row:focus-visible{outline:2px solid var(--snav-a);outline-offset:2px;border-radius:6px}
+.snav-about-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.snav-about-title{font-size:15px;font-weight:500;line-height:1.3;color:var(--snav-h);transition:color .2s ease}
+.snav-about-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;font-weight:400;line-height:1.45;color:var(--snav-h);opacity:.68}
+.snav-about-arrow{flex:none;color:var(--snav-h);opacity:.35;transition:color .2s ease,opacity .2s ease,transform .2s ease}
+.snav-about-row:hover .snav-about-title,.snav-about-row:focus-visible .snav-about-title{color:var(--snav-a)}
+.snav-about-row:hover .snav-about-arrow,.snav-about-row:focus-visible .snav-about-arrow{color:var(--snav-a);opacity:1;transform:translateX(2px)}
+.snav-about-row.is-active .snav-about-title{color:var(--snav-a)}
+.snav-duo-shell{display:flex;flex-direction:column;overflow:hidden;border-radius:16px}
+.snav-duo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.snav-duo-cell{display:flex;flex-direction:column;padding:20px 24px 24px 24px;overflow:hidden;background:var(--snav-bg);text-decoration:none;transition:background-color .2s ease}
+.snav-duo-cell+.snav-duo-cell{border-left:1px solid var(--snav-bd)}
+.snav-duo-cell:hover{background:color-mix(in srgb,var(--snav-a) 4%,white)}
+.snav-duo-cell:focus-visible{outline:2px solid var(--snav-a);outline-offset:-2px}
+.snav-duo-title{font-size:16px;font-weight:600;line-height:1.3;color:var(--snav-h);transition:color .2s ease}
+.snav-duo-desc{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px;min-height:3em;font-size:13px;font-weight:400;line-height:1.5;color:var(--snav-h);opacity:.7}
+.snav-duo-cell:hover .snav-duo-title,.snav-duo-cell:focus-visible .snav-duo-title{color:var(--snav-a)}
+.snav-duo-media{height:190px;margin-top:16px;overflow:hidden;border-radius:12px}
+@media (max-height:760px){.snav-duo-media{height:140px}}
+.snav-duo-bar{display:flex;flex-shrink:0;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px;border-top:1px solid var(--snav-bd);background:var(--snav-bg)}
+.snav-duo-bar-left{display:flex;align-items:center;gap:12px;min-width:0}
+.snav-duo-bar-icon{display:inline-flex;flex:none;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:color-mix(in srgb,var(--snav-a) 10%,white);color:var(--snav-a)}
+.snav-duo-bar-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.snav-duo-bar-title{font-size:14px;font-weight:600;line-height:1.3;color:var(--snav-h)}
+.snav-duo-bar-sub{font-size:13px;line-height:1.4;color:var(--snav-h);opacity:.65}
+.snav-duo-bar-btn{display:inline-flex;flex:none;align-items:center;justify-content:center;height:36px;padding:0 16px;border:0;border-radius:9999px;background:var(--snav-a);color:#fff;font-size:14px;font-weight:500;text-decoration:none;transition:background-color .2s ease}
+.snav-duo-bar-btn:hover{background:color-mix(in srgb,var(--snav-a) 88%,black)}
+.snav-duo-bar-btn:focus-visible{outline:2px solid var(--snav-a);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.snav-about-title,.snav-about-arrow,.snav-duo-cell,.snav-duo-title,.snav-duo-bar-btn{transition:none!important}.snav-about-arrow{transform:none!important}}
+`;
 
-let navInkMemo = null
-let navInkMemoAt = 0
+let navInkMemo = null;
+let navInkMemoAt = 0;
 
 const karyaImgs = import.meta.glob(
   "../../assets/images/navbarSupports/karya-*.{jpg,jpeg,png,webp}",
   { eager: true, import: "default" },
-)
+);
 const karyaImgFor = (slug) => {
   const byName = (n) =>
     Object.entries(karyaImgs).find(
@@ -131,9 +201,9 @@ const karyaImgFor = (slug) => {
           .split("/")
           .pop()
           .replace(/\.[^.]+$/, "") === n,
-    )?.[1]
-  return byName("karya-" + slug) || byName("karya-menu") || null
-}
+    )?.[1];
+  return byName("karya-" + slug) || byName("karya-menu") || null;
+};
 
 const karyaIcons = {
   "teknik-sipil-dan-kebumian": HardHat,
@@ -141,212 +211,262 @@ const karyaIcons = {
   "teknik-elektro": Zap,
   akuntansi: Calculator,
   "administrasi-bisnis": Briefcase,
-}
+};
 
-const KARYA_FALLBACK_IMG = null
-const karyaPanelImg = karyaImgFor("menu") || KARYA_FALLBACK_IMG
+const KARYA_FALLBACK_IMG = null;
+const karyaPanelImg = karyaImgFor("menu") || KARYA_FALLBACK_IMG;
 
 function useNavInk(barRef, listRef, inkRef, deps) {
-  const target = useRef({ x: 0, w: 0, show: 0 })
-  const current = useRef({ x: 0, w: 0, show: 0 })
-  const vel = useRef({ x: 0, w: 0 })
-  const raf = useRef(null)
-  const last = useRef(0)
-  const first = useRef(true)
+  const target = useRef({ x: 0, w: 0, show: 0 });
+  const current = useRef({ x: 0, w: 0, show: 0 });
+  const vel = useRef({ x: 0, w: 0 });
+  const raf = useRef(null);
+  const last = useRef(0);
+  const first = useRef(true);
 
   const apply = () => {
-    const el = inkRef.current
-    if (!el) return
-    const c = current.current
-    el.style.transform = `translate3d(${c.x}px,0,0)`
-    el.style.width = `${Math.max(c.w, 0)}px`
-    el.style.opacity = Math.min(Math.max(c.show, 0), 1).toFixed(3)
-  }
+    const el = inkRef.current;
+    if (!el) return;
+    const c = current.current;
+    el.style.transform = `translate3d(${c.x}px,0,0)`;
+    el.style.width = `${Math.max(c.w, 0)}px`;
+    el.style.opacity = Math.min(Math.max(c.show, 0), 1).toFixed(3);
+  };
 
   const tick = (now) => {
     const t = target.current,
       c = current.current,
-      v = vel.current
+      v = vel.current;
     // dt dalam detik, dibatasi supaya tidak meloncat saat tab sempat di-background
-    const dt = Math.min((now - last.current) / 1000, 1 / 30)
-    last.current = now
+    const dt = Math.min((now - last.current) / 1000, 1 / 30);
+    last.current = now;
 
-    const STIFF = 190 // makin besar makin cepat
-    const DAMP = 24 // makin kecil makin membal (kritis ≈ 27.6)
-    v.x += (STIFF * (t.x - c.x) - DAMP * v.x) * dt
-    v.w += (STIFF * (t.w - c.w) - DAMP * v.w) * dt
-    c.x += v.x * dt
-    c.w += v.w * dt
-    c.show += (t.show - c.show) * (1 - Math.exp(-dt / 0.08))
+    const STIFF = 190; // makin besar makin cepat
+    const DAMP = 24; // makin kecil makin membal (kritis ≈ 27.6)
+    v.x += (STIFF * (t.x - c.x) - DAMP * v.x) * dt;
+    v.w += (STIFF * (t.w - c.w) - DAMP * v.w) * dt;
+    c.x += v.x * dt;
+    c.w += v.w * dt;
+    c.show += (t.show - c.show) * (1 - Math.exp(-dt / 0.08));
 
     const settled =
       Math.abs(t.x - c.x) < 0.1 &&
       Math.abs(t.w - c.w) < 0.1 &&
       Math.abs(v.x) < 0.5 &&
       Math.abs(v.w) < 0.5 &&
-      Math.abs(t.show - c.show) < 0.01
+      Math.abs(t.show - c.show) < 0.01;
 
     if (settled) {
-      c.x = t.x
-      c.w = t.w
-      c.show = t.show
-      v.x = 0
-      v.w = 0
-      apply()
-      raf.current = null
-      return
+      c.x = t.x;
+      c.w = t.w;
+      c.show = t.show;
+      v.x = 0;
+      v.w = 0;
+      apply();
+      raf.current = null;
+      return;
     }
-    apply()
-    raf.current = requestAnimationFrame(tick)
-  }
+    apply();
+    raf.current = requestAnimationFrame(tick);
+  };
 
   const start = () => {
-    if (raf.current != null) return
-    last.current = performance.now()
-    raf.current = requestAnimationFrame(tick)
-  }
+    if (raf.current != null) return;
+    last.current = performance.now();
+    raf.current = requestAnimationFrame(tick);
+  };
 
   const measure = useCallback(() => {
     const bar = barRef.current,
-      list = listRef.current
-    if (!bar || !list) return
+      list = listRef.current;
+    if (!bar || !list) return;
     const el = list.querySelector(
       ".snav-link.is-active, .snav-link[aria-current='page']",
-    )
-    let next
+    );
+    let next;
     if (!el || el.offsetParent === null) {
-      next = { ...target.current, show: 0 }
+      next = { ...target.current, show: 0 };
     } else {
       const b = bar.getBoundingClientRect(),
-        r = el.getBoundingClientRect()
-      const pad = 0
+        r = el.getBoundingClientRect();
+      const pad = 0;
       // tanpa Math.round: biarkan subpixel supaya tidak bergetar
       next = {
         x: r.left - b.left - bar.clientLeft - pad,
         w: r.width + pad * 2,
         show: 1,
-      }
+      };
     }
-    target.current = next
+    target.current = next;
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     if (first.current) {
-      first.current = false
-      const recent = navInkMemo && performance.now() - navInkMemoAt < 1200
-      current.current = recent ? { ...navInkMemo } : { ...next }
-      apply()
-      if (recent && !reduce) start()
+      first.current = false;
+      const recent = navInkMemo && performance.now() - navInkMemoAt < 1200;
+      current.current = recent ? { ...navInkMemo } : { ...next };
+      apply();
+      if (recent && !reduce) start();
       else if (recent) {
-        current.current = { ...next }
-        apply()
+        current.current = { ...next };
+        apply();
       }
-      return
+      return;
     }
     if (reduce) {
-      current.current = { ...next }
-      apply()
-      return
+      current.current = { ...next };
+      apply();
+      return;
     }
-    start()
-  }, [barRef, listRef, inkRef])
+    start();
+  }, [barRef, listRef, inkRef]);
 
   useLayoutEffect(
     () => () => {
-      navInkMemo = { ...current.current }
-      navInkMemoAt = performance.now()
+      navInkMemo = { ...current.current };
+      navInkMemoAt = performance.now();
     },
     [],
-  )
+  );
 
   useLayoutEffect(() => {
-    measure()
-  }, [measure, ...deps])
+    measure();
+  }, [measure, ...deps]);
   useEffect(() => {
-    const ro = new ResizeObserver(measure)
-    if (barRef.current) ro.observe(barRef.current)
-    if (listRef.current) ro.observe(listRef.current)
-    window.addEventListener("resize", measure)
+    const ro = new ResizeObserver(measure);
+    if (barRef.current) ro.observe(barRef.current);
+    if (listRef.current) ro.observe(listRef.current);
+    window.addEventListener("resize", measure);
     if (document.fonts && document.fonts.ready)
-      document.fonts.ready.then(measure)
+      document.fonts.ready.then(measure);
     return () => {
-      ro.disconnect()
-      window.removeEventListener("resize", measure)
-      if (raf.current != null) cancelAnimationFrame(raf.current)
-      raf.current = null
-    }
-  }, [measure])
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+      if (raf.current != null) cancelAnimationFrame(raf.current);
+      raf.current = null;
+    };
+  }, [measure]);
 }
 
-function NavDropdown({ label, items, groups }) {
-  const isMega = Array.isArray(groups)
-  const { pathname } = useLocation()
-  const [open, setOpen] = useState(false)
-  const [cur, setCur] = useState(0)
-  const rootRef = useRef(null)
-  const timer = useRef(null)
-  const btnRef = useRef(null)
-  const menuRef = useRef(null)
+function NavImg({ item, className, Icon }) {
+  if (!item || !item.src) {
+    const emptyStyle = Icon
+      ? {
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "color-mix(in srgb, var(--snav-a) 6%, white)",
+        }
+      : {
+          width: "100%",
+          height: "100%",
+          background: "color-mix(in srgb, var(--snav-a) 10%, white)",
+          border: "1px solid color-mix(in srgb, var(--snav-a) 20%, white)",
+        };
+    return (
+      <div className={className} aria-hidden="true" style={emptyStyle}>
+        {Icon && (
+          <Icon
+            size={40}
+            strokeWidth={1.25}
+            aria-hidden="true"
+            style={{ color: "var(--snav-a)", opacity: 0.3 }}
+          />
+        )}
+      </div>
+    );
+  }
+  return (
+    <img
+      src={item.src}
+      alt={item.alt}
+      className={className}
+      loading="lazy"
+      decoding="async"
+      draggable={false}
+      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+    />
+  );
+}
+
+function NavDropdown({ label, items, groups, variant }) {
+  const isMega = Array.isArray(groups);
+  const { pathname } = useLocation();
+  const [open, setOpen] = useState(false);
+  const [cur, setCur] = useState(0);
+  const rootRef = useRef(null);
+  const timer = useRef(null);
+  const btnRef = useRef(null);
+  const menuRef = useRef(null);
   const activeIdx = isMega
     ? -1
     : items.findIndex(
         (i) => pathname === i.to || pathname.startsWith(i.to + "/"),
-      )
+      );
   const megaIdx = isMega
     ? groups.findIndex((g) => pathname.startsWith(`/karya/${g.slug}`))
-    : -1
-  const startIdx = isMega ? megaIdx : activeIdx
-  const active = isMega ? pathname.startsWith("/karya") : activeIdx >= 0
-  const item = isMega ? null : items[cur] || items[0]
-  const hasImg = !isMega && items.some((i) => i.img)
+    : -1;
+  const startIdx = isMega ? megaIdx : activeIdx;
+  const active = isMega ? pathname.startsWith("/karya") : activeIdx >= 0;
+  const item = isMega ? null : items[cur] || items[0];
+  const hasImg = !isMega && items.some((i) => i.img);
   const openNow = () => {
-    clearTimeout(timer.current)
-    setCur(Math.max(startIdx, 0))
-    setOpen(true)
-  }
+    clearTimeout(timer.current);
+    setCur(Math.max(startIdx, 0));
+    setOpen(true);
+  };
   const closeSoon = () => {
-    clearTimeout(timer.current)
-    timer.current = setTimeout(() => setOpen(false), 140)
-  }
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setOpen(false), 140);
+  };
 
-  useEffect(() => () => clearTimeout(timer.current), [])
+  useEffect(() => () => clearTimeout(timer.current), []);
 
   useLayoutEffect(() => {
-    if (!open) return
+    if (!open) return;
     const place = () => {
       const b = btnRef.current,
-        m = menuRef.current
-      if (!b || !m || !m.offsetParent) return
-      const br = b.getBoundingClientRect()
-      const pr = m.offsetParent.getBoundingClientRect()
-      let x =
-        br.left -
-        pr.left -
-        m.offsetParent.clientLeft +
-        br.width / 2 -
-        m.offsetLeft
-      x = Math.max(24, Math.min(x, m.offsetWidth - 24))
-      m.style.setProperty("--caret", `${Math.round(x)}px`)
-    }
-    place()
-    window.addEventListener("resize", place)
-    return () => window.removeEventListener("resize", place)
-  }, [open])
+        m = menuRef.current;
+      if (!b || !m || !m.offsetParent) return;
+      const br = b.getBoundingClientRect();
+      const pr = m.offsetParent.getBoundingClientRect();
+      const originLeft = pr.left + m.offsetParent.clientLeft;
+      const barWidth = m.offsetParent.clientWidth;
+      const panelWidth = m.offsetWidth;
+      const panelLeft = Math.max(
+        0,
+        Math.min((barWidth - panelWidth) / 2, barWidth - panelWidth),
+      );
+      const center = br.left - originLeft + br.width / 2;
+      let x = center - panelLeft;
+      x = Math.max(24, Math.min(x, panelWidth - 24));
+      m.style.setProperty("--panel-left", `${Math.round(panelLeft)}px`);
+      m.style.setProperty("--caret", `${Math.round(x)}px`);
+    };
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  }, [open]);
 
   useEffect(() => {
-    if (!open) return
+    if (!open) return;
     const down = (e) => {
-      if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(false)
-    }
+      if (rootRef.current && !rootRef.current.contains(e.target))
+        setOpen(false);
+    };
     const key = (e) => {
-      if (e.key === "Escape") setOpen(false)
-    }
-    document.addEventListener("pointerdown", down)
-    document.addEventListener("keydown", key)
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("pointerdown", down);
+    document.addEventListener("keydown", key);
     return () => {
-      document.removeEventListener("pointerdown", down)
-      document.removeEventListener("keydown", key)
-    }
-  }, [open])
+      document.removeEventListener("pointerdown", down);
+      document.removeEventListener("keydown", key);
+    };
+  }, [open]);
   return (
     <div
       ref={rootRef}
@@ -361,8 +481,8 @@ function NavDropdown({ label, items, groups }) {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={(e) => {
-          setCur(Math.max(startIdx, 0))
-          setOpen((o) => (e.detail === 0 ? !o : true))
+          setCur(Math.max(startIdx, 0));
+          setOpen((o) => (e.detail === 0 ? !o : true));
         }}
       >
         {label}
@@ -371,15 +491,21 @@ function NavDropdown({ label, items, groups }) {
       {isMega ? (
         <div className="snav-menu snav-menu--mega" role="menu" ref={menuRef}>
           <div className="snav-mega-scroll">
-            <div className={`snav-mega-layout${karyaPanelImg ? "" : " is-noimg"}`}>
+            <div
+              className={`snav-mega-layout${karyaPanelImg ? "" : " is-noimg"}`}
+            >
               <div className="snav-mega-cols">
                 {groups.map((g, i) => {
-                  const Icon = karyaIcons[g.slug] || LayoutGrid
+                  const Icon = karyaIcons[g.slug] || LayoutGrid;
                   return (
                     <section key={g.slug} className="snav-mega-col">
                       <div className="snav-mega-hd">
                         <span className="snav-mega-tile">
-                          <Icon size={16} strokeWidth={1.75} aria-hidden="true" />
+                          <Icon
+                            size={16}
+                            strokeWidth={1.75}
+                            aria-hidden="true"
+                          />
                         </span>
                         {i < groups.length - 1 && (
                           <span className="snav-mega-dots" aria-hidden="true">
@@ -404,7 +530,7 @@ function NavDropdown({ label, items, groups }) {
                         ))}
                       </ul>
                     </section>
-                  )
+                  );
                 })}
               </div>
               {karyaPanelImg && (
@@ -417,6 +543,88 @@ function NavDropdown({ label, items, groups }) {
                   />
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      ) : variant === "about" ? (
+        <div className="snav-menu snav-about-panel" role="menu" ref={menuRef}>
+          <div className="snav-about-media">
+            <NavImg item={NAV_IMG.tentang} />
+          </div>
+          <div className="snav-about-body">
+            <div className="snav-about-label">TENTANG SINGGAH</div>
+            {items.map((it) => (
+              <NavLink
+                key={it.to}
+                to={it.to}
+                role="menuitem"
+                onClick={() => setOpen(false)}
+                className={({ isActive }) =>
+                  `snav-about-row${isActive ? " is-active" : ""}`
+                }
+              >
+                <span className="snav-about-text">
+                  <span className="snav-about-title">{it.label}</span>
+                  <span className="snav-about-desc">{it.desc}</span>
+                </span>
+                <ArrowRight
+                  className="snav-about-arrow"
+                  size={16}
+                  aria-hidden="true"
+                />
+              </NavLink>
+            ))}
+          </div>
+        </div>
+      ) : variant === "duo" ? (
+        <div className="snav-menu snav-duo-panel" role="menu" ref={menuRef}>
+          <div className="snav-duo-shell">
+            <div className="snav-duo-grid">
+              {items.map((it) => (
+                <NavLink
+                  key={it.to}
+                  to={it.to}
+                  role="menuitem"
+                  onClick={() => setOpen(false)}
+                  className="snav-duo-cell"
+                >
+                  <span className="snav-duo-title">{it.label}</span>
+                  <span className="snav-duo-desc">{it.desc}</span>
+                  <div className="snav-duo-media">
+                    <NavImg
+                      item={
+                        it.to === "/kemitraan"
+                          ? NAV_IMG.kemitraan
+                          : NAV_IMG.masalah
+                      }
+                      Icon={it.to === "/kemitraan" ? Handshake : FilePlus}
+                    />
+                  </div>
+                </NavLink>
+              ))}
+            </div>
+            <div className="snav-duo-bar">
+              <div className="snav-duo-bar-left">
+                <span className="snav-duo-bar-icon" aria-hidden="true">
+                  <FilePlus size={18} />
+                </span>
+                <div className="snav-duo-bar-text">
+                  <span className="snav-duo-bar-title">
+                    Siap berkolaborasi dengan Singgah?
+                  </span>
+                  <span className="snav-duo-bar-sub">
+                    Mulai dengan mengajukan masalah yang ingin dikerjakan
+                    mahasiswa.
+                  </span>
+                </div>
+              </div>
+              <NavLink
+                to="/pengajuan-masalah"
+                className="snav-duo-bar-btn"
+                onClick={() => setOpen(false)}
+              >
+                Ajukan masalah
+              </NavLink>
             </div>
           </div>
         </div>
@@ -471,23 +679,25 @@ function NavDropdown({ label, items, groups }) {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 function NavbarVisitor() {
-  const { pathname } = useLocation()
-  const [isOpen, setIsOpen] = useState(false)
-  const [accOpen, setAccOpen] = useState(false)
-  const [accKaryaOpen, setAccKaryaOpen] = useState(false)
-  const navRef = useRef(null)
-  const headerRef = useRef(null)
-  const barRef = useRef(null)
-  const listRef = useRef(null)
-  const inkRef = useRef(null)
-  useNavInk(barRef, listRef, inkRef, [pathname])
+  const { pathname } = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
+  const [accOpen, setAccOpen] = useState(false);
+  const [accKaryaOpen, setAccKaryaOpen] = useState(false);
+  const [accKolabOpen, setAccKolabOpen] = useState(false);
+  const [accTentangOpen, setAccTentangOpen] = useState(false);
+  const navRef = useRef(null);
+  const headerRef = useRef(null);
+  const barRef = useRef(null);
+  const listRef = useRef(null);
+  const inkRef = useRef(null);
+  useNavInk(barRef, listRef, inkRef, [pathname]);
   useEffect(() => {
-    applyNavbarFont()
-  }, [])
+    applyNavbarFont();
+  }, []);
   const zonaAkademikItems = [
     {
       to: "/akademik/tur-virtual",
@@ -498,7 +708,7 @@ function NavbarVisitor() {
     },
     {
       to: "/pemenang",
-      label: "Pemenang",
+      label: "Prestasi",
       desc: "Prestasi mahasiswa Poliban di berbagai lomba, lengkap dengan karya yang membawa mereka menang.",
       tags: ["Juara", "Penghargaan"],
       img: imgPemenang,
@@ -517,7 +727,36 @@ function NavbarVisitor() {
       tags: ["Jadwal", "Kunjungan"],
       img: imgVisitasi,
     },
-  ]
+  ];
+  const kolaborasiItems = [
+    {
+      to: "/kemitraan",
+      label: "Kemitraan",
+      desc: "Perusahaan dan instansi yang bekerja sama dengan Poliban lewat Singgah.",
+    },
+    {
+      to: "/pengajuan-masalah",
+      label: "Pengajuan Masalah",
+      desc: "Punya persoalan di perusahaan atau instansimu? Ajukan di sini supaya bisa dikerjakan mahasiswa Poliban.",
+    },
+  ];
+  const tentangItems = [
+    {
+      to: "/berita",
+      label: "Berita",
+      desc: "Kabar terbaru seputar karya dan kegiatan di Poliban.",
+    },
+    {
+      to: "/about",
+      label: "Informasi Singgah",
+      desc: "Mengenal Singgah: apa itu, untuk siapa, dan bagaimana cara kerjanya.",
+    },
+    {
+      to: "/faq",
+      label: "FAQ",
+      desc: "Jawaban untuk pertanyaan yang paling sering ditanyakan.",
+    },
+  ];
   const karyaItems = [
     {
       slug: "teknik-sipil-dan-kebumian",
@@ -597,133 +836,120 @@ function NavbarVisitor() {
         { slug: "bisnis-digital", label: "Bisnis Digital" },
       ],
     },
-  ]
+  ];
   const closeMenu = () => {
-    setIsOpen(false)
-    setAccOpen(false)
-    setAccKaryaOpen(false)
-  }
+    setIsOpen(false);
+    setAccOpen(false);
+    setAccKaryaOpen(false);
+    setAccKolabOpen(false);
+    setAccTentangOpen(false);
+  };
   useEffect(() => {
     function handleClickOutside(event) {
       if (navRef.current && !navRef.current.contains(event.target)) {
-        setIsOpen(false)
-        setAccOpen(false)
+        setIsOpen(false);
+        setAccOpen(false);
+        setAccKaryaOpen(false);
+        setAccKolabOpen(false);
+        setAccTentangOpen(false);
       }
     }
-    if (isOpen) document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [isOpen])
+    if (isOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
   useEffect(() => {
-    const el = headerRef.current
-    if (!el) return
+    const el = headerRef.current;
+    if (!el) return;
     const setVar = () => {
       document.documentElement.style.setProperty(
         "--navbar-h",
         `${el.offsetHeight}px`,
-      )
-    }
-    setVar()
-    const observer = new ResizeObserver(setVar)
-    observer.observe(el)
+      );
+    };
+    setVar();
+    const observer = new ResizeObserver(setVar);
+    observer.observe(el);
     return () => {
-      observer.disconnect()
-    }
-  }, [])
+      observer.disconnect();
+    };
+  }, []);
   return (
     <header
       ref={(node) => {
-        navRef.current = node
-        headerRef.current = node
+        navRef.current = node;
+        headerRef.current = node;
       }}
       className="fixed left-0 top-0 z-50 w-full px-3 min-[350px]:px-5 md:px-8 lg:px-10 xl:px-12 2xl:px-16"
     >
       <div
         ref={barRef}
-        className={`relative mx-auto mt-3 flex w-full max-w-[1700px] items-center justify-between rounded-2xl px-2.5 py-2.5 min-[350px]:mt-5 min-[350px]:px-4 min-[350px]:py-3 sm:mt-6 sm:px-6 sm:py-4 md:mt-7 md:px-8 2xl:mt-8 2xl:px-10 border border-slate-200 bg-white`}
+        className="relative mx-auto mt-3 flex h-14 w-full max-w-[1700px] items-center justify-between rounded-xl px-3 min-[350px]:mt-5 sm:mt-6 md:mt-7 md:h-16 md:px-5 min-[950px]:grid min-[950px]:grid-cols-[1fr_auto_1fr] lg:px-6 2xl:mt-8 2xl:h-[72px] border border-slate-200 bg-white"
       >
         <NavLink
           to="/"
           onClick={closeMenu}
-          className="flex items-center gap-2 min-[350px]:gap-3 sm:gap-4"
+          className="flex items-center snav-link gap-2 min-[950px]:justify-self-start"
+          style={{ paddingLeft: 0, paddingRight: 0 }}
         >
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-xl min-[350px]:h-9 min-[350px]:w-9 sm:h-10 sm:w-10 md:h-11 md:w-11 2xl:h-14 2xl:w-14">
+          <div className="flex shrink-0 items-center justify-center">
             <SmartImage
               src={logo}
               alt="Singgah Logo"
               eager
-              className="h-full w-full object-contain"
+              className="h-6 w-6 object-contain md:h-[26px] md:w-[26px] 2xl:h-7 2xl:w-7"
             />
           </div>
           <div>
-            <h1
+            <span
               style={{
-                fontFamily: "Space Grotesk, sans-serif",
-                fontWeight: "700",
+                fontFamily: LOGO_BRAND.fontFamily,
+                fontWeight: LOGO_BRAND.fontWeight,
+                fontSize: LOGO_BRAND.fontSize,
+                letterSpacing: LOGO_BRAND.letterSpacing,
+                lineHeight: 1,
+                color: "var(--snav-h)",
+                WebkitFontSmoothing: "antialiased",
               }}
-              className={`text-xs min-[350px]:text-sm sm:text-xl 2xl:text-2xl text-neutral-900`}
+              className="block"
             >
               Singgah
-            </h1>
+            </span>
           </div>
         </NavLink>
         <nav
           ref={listRef}
-          className="hidden flex-1 items-center justify-start font-medium min-[950px]:flex min-[950px]:ml-4 min-[1024px]:ml-6 min-[1280px]:ml-8 min-[950px]:gap-4 min-[1024px]:gap-6 min-[1280px]:gap-8"
+          className="hidden items-center justify-center font-medium min-[950px]:flex min-[950px]:justify-self-center min-[950px]:gap-6 min-[1200px]:gap-7"
         >
           <style>{SNAV_CSS}</style>
-          <NavLink
-            to="/"
-            end
-            onMouseEnter={() => prefetchRouteFromLink("/")}
-            className={({ isActive }) =>
-              `snav-link${isActive ? " is-active" : ""}`
-            }
-          >
-            Beranda
-          </NavLink>
           <NavDropdown label="Karya" groups={karyaItems} />
 
           <NavDropdown label="Zona Akademik" items={zonaAkademikItems} />
-          <NavLink
-            to="/berita"
-            onMouseEnter={() => prefetchRouteFromLink("/berita")}
-            className={({ isActive }) =>
-              `snav-link${isActive ? " is-active" : ""}`
-            }
-          >
-            Berita
-          </NavLink>
-          <NavLink
-            to="/about"
-            onMouseEnter={() => prefetchRouteFromLink("/about")}
-            className={({ isActive }) =>
-              `snav-link${isActive ? " is-active" : ""}`
-            }
-          >
-            Tentang
-          </NavLink>
+          <NavDropdown
+            label="Kolaborasi"
+            items={kolaborasiItems}
+            variant="duo"
+          />
+          <NavDropdown label="Tentang" items={tentangItems} variant="about" />
         </nav>
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="snav-auth min-[950px]:flex">
-            <NavLink to="/login" onClick={closeMenu} className="snav-login">
-              Masuk
-            </NavLink>
-            <NavLink to="/register" onClick={closeMenu} className="snav-cta">
-              Daftar
-            </NavLink>
-          </div>
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className={`snav-burger min-[950px]:hidden${isOpen ? " is-open" : ""}`}
-            aria-label="Toggle menu"
-            aria-expanded={isOpen}
-            style={{ color: "#1B2A4A" }}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
+        <div className="snav-auth min-[950px]:justify-self-end">
+          <NavLink to="/login" onClick={closeMenu} className="snav-login">
+            Masuk
+          </NavLink>
+          <NavLink to="/register" onClick={closeMenu} className="snav-cta">
+            Daftar
+          </NavLink>
         </div>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className={`snav-burger min-[950px]:hidden${isOpen ? " is-open" : ""}`}
+          aria-label="Toggle menu"
+          aria-expanded={isOpen}
+          style={{ color: "#1B2A4A" }}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
         <span ref={inkRef} className="snav-ink" aria-hidden="true" />
       </div>
       <div
@@ -737,17 +963,6 @@ function NavbarVisitor() {
               className="relative flex flex-col p-3"
               style={{ color: "#1f2937" }}
             >
-              <NavLink
-                to="/"
-                end
-                onClick={closeMenu}
-                className={({ isActive }) =>
-                  `snav-mlink${isActive ? " is-active" : ""}`
-                }
-              >
-                <Home size={20} strokeWidth={1.75} />
-                <span>Beranda</span>
-              </NavLink>
               <button
                 type="button"
                 className="snav-mlink flex items-center"
@@ -816,26 +1031,66 @@ function NavbarVisitor() {
                   ))}
                 </div>
               </div>
-              <NavLink
-                to="/berita"
-                onClick={closeMenu}
-                className={({ isActive }) =>
-                  `snav-mlink${isActive ? " is-active" : ""}`
-                }
+              <button
+                type="button"
+                className="snav-mlink flex items-center"
+                onClick={() => setAccKolabOpen((o) => !o)}
+                aria-expanded={accKolabOpen}
               >
-                <Newspaper size={20} strokeWidth={1.75} />
-                <span>Berita</span>
-              </NavLink>
-              <NavLink
-                to="/about"
-                onClick={closeMenu}
-                className={({ isActive }) =>
-                  `snav-mlink${isActive ? " is-active" : ""}`
-                }
+                <Handshake size={20} strokeWidth={1.75} />
+                <span className="flex-1 text-left min-w-0">Kolaborasi</span>
+                <ChevronDown
+                  className={`snav-chev${accKolabOpen ? " rotate-180" : ""}`}
+                  size={16}
+                  style={{ marginLeft: "auto" }}
+                />
+              </button>
+              <div className={`snav-acc${accKolabOpen ? " is-open" : ""}`}>
+                <div>
+                  {kolaborasiItems.map((it) => (
+                    <NavLink
+                      key={it.to}
+                      to={it.to}
+                      onClick={closeMenu}
+                      className={({ isActive }) =>
+                        `snav-mlink-sub${isActive ? " is-active" : ""}`
+                      }
+                    >
+                      {it.label}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
+              <button
+                type="button"
+                className="snav-mlink flex items-center"
+                onClick={() => setAccTentangOpen((o) => !o)}
+                aria-expanded={accTentangOpen}
               >
                 <Info size={20} strokeWidth={1.75} />
-                <span>Tentang</span>
-              </NavLink>
+                <span className="flex-1 text-left min-w-0">Tentang</span>
+                <ChevronDown
+                  className={`snav-chev${accTentangOpen ? " rotate-180" : ""}`}
+                  size={16}
+                  style={{ marginLeft: "auto" }}
+                />
+              </button>
+              <div className={`snav-acc${accTentangOpen ? " is-open" : ""}`}>
+                <div>
+                  {tentangItems.map((it) => (
+                    <NavLink
+                      key={it.to}
+                      to={it.to}
+                      onClick={closeMenu}
+                      className={({ isActive }) =>
+                        `snav-mlink-sub${isActive ? " is-active" : ""}`
+                      }
+                    >
+                      {it.label}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
               <div
                 style={{
                   height: 1,
@@ -860,7 +1115,7 @@ function NavbarVisitor() {
         </div>
       </div>
     </header>
-  )
+  );
 }
 
-export default NavbarVisitor
+export default NavbarVisitor;

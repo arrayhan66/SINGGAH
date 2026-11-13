@@ -275,7 +275,7 @@ function FloorLabel({ position, text }) {
         anchorY="middle"
         letterSpacing={0.03}
         raycast={() => null}
-        font="/fonts/Poppins-Medium.ttf"
+        font="/fonts/GeneralSans-Medium.ttf"
       >
         {text}
       </Text>
@@ -394,7 +394,7 @@ function DosenStairSign({ room, y = 3.2 }) {
         outlineWidth={0.02}
         outlineColor="#0b1220"
         raycast={() => null}
-        font="/fonts/Poppins-SemiBold.ttf"
+        font="/fonts/GeneralSans-Semibold.ttf"
       >
         KARYA DOSEN
       </Text>

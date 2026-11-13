@@ -298,7 +298,7 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
           anchorY="middle"
           fillOpacity={0.9}
           raycast={() => null}
-          font="/fonts/Montserrat-Bold.ttf"
+          font="/fonts/GeneralSans-Bold.ttf"
         >
           Karya Unggulan
         </Text>
@@ -316,7 +316,7 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
           anchorX="center"
           anchorY="middle"
           raycast={() => null}
-          font="/fonts/Montserrat-Bold.ttf"
+          font="/fonts/GeneralSans-Bold.ttf"
         >
           Karya Unggulan
         </Text>
@@ -363,7 +363,7 @@ function FeaturedWork({ position = [0, 0, 0], rotationY = 0, projects = [] }) {
         anchorX="center"
         anchorY="middle"
         raycast={() => null}
-        font="/fonts/Poppins-SemiBold.ttf"
+        font="/fonts/GeneralSans-Semibold.ttf"
       >
         KARYA UNGGULAN
       </Text>

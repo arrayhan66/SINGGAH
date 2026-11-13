@@ -17,11 +17,11 @@
   --ak-amber-soft: #f7ead5;
   --ak-shadow: rgba(27, 42, 42, 0.14);
   --ak-shadow-hard: #1e2e2c;
-  --ak-font-display: Georgia, "Times New Roman", serif;
+  --ak-font-display: var(--font-headline);
   min-height: 100vh;
   background: var(--ak-paper);
   color: var(--ak-ink);
-  font-family: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-body);
 }
 
 html:not(.light) .akademik-page {
@@ -670,7 +670,7 @@ html:not(.light) .akademik-page {
 
 .ak-viewer__info h4 {
   margin: 6px 0 4px;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-headline);
   font-size: 1.2rem;
   font-weight: 400;
   line-height: 1.15;
@@ -790,7 +790,7 @@ html:not(.light) .akademik-page {
 }
 
 .ak-viewer__help-card h3 {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-headline);
   font-size: 1.55rem;
   font-weight: 400;
 }
@@ -834,7 +834,7 @@ html:not(.light) .akademik-page {
   border: 0;
   background: transparent;
   color: #ffffff;
-  font-family: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-body);
   cursor: pointer;
 }
 
@@ -928,7 +928,7 @@ html:not(.light) .akademik-page {
   border-radius: 50%;
   background: #f4f1e9;
   color: #0f766e;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-headline);
   font-size: 12px;
   font-weight: 700;
   box-shadow: 0 2px 9px rgba(0, 0, 0, 0.45);
@@ -2888,7 +2888,7 @@ html:not(.light) .akademik-page {
 
 .ak-viewer__info-card h4 {
   margin: 6px 0 4px;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-headline);
   font-size: 1.2rem;
   font-weight: 400;
   line-height: 1.15;
@@ -3031,7 +3031,7 @@ html:not(.light) .akademik-page {
   border-radius: 50%;
   background: #f4f1e9;
   color: #0f766e;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-headline);
   font-size: 12px;
   font-weight: 700;
   box-shadow: 0 2px 9px rgba(0, 0, 0, 0.45);

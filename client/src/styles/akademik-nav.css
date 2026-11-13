@@ -7,7 +7,7 @@
   --ak-nav-accent: #67e8f9;
   --ak-nav-hover: rgba(103, 232, 249, 0.06);
   --ak-nav-shadow: rgba(14, 165, 233, 0.12);
-  font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-body);
 }
 
 html.light .ak-nav-dropdown,
@@ -114,7 +114,7 @@ html.light .ak-mnav {
   color: #e7e9f3;
   text-align: left;
   cursor: pointer;
-  font-family: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-body);
 }
 
 html.light .ak-mnav__trigger {

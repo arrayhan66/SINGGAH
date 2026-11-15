@@ -5,7 +5,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, Link, useLocation } from "react-router-dom";
 import {
   ChevronDown,
   ChevronRight,
@@ -20,6 +20,12 @@ import {
   Zap,
   Calculator,
   Briefcase,
+  Star,
+  Lightbulb,
+  BookOpen,
+  FlaskConical,
+  HandHeart,
+  Image as ImageIcon,
 } from "lucide-react";
 import logo from "../../assets/icons/logo.webp";
 import { applyNavbarFont } from "../../utils/navbarFont";
@@ -55,19 +61,117 @@ const NAV_IMG = {
     alt: "Mahasiswa mengerjakan persoalan nyata dari industri",
   },
 };
-import imgInformasi from "../../assets/images/navbarSupports/informasi.jpg";
-import imgKerjasama from "../../assets/images/navbarSupports/kerjasama.jpg";
-import imgPengajuanMasalah from "../../assets/images/navbarSupports/pengajuan masalah.jpg";
-import imgPemenang from "../../assets/images/navbarSupports/prestasi.jpg";
-import imgTur from "../../assets/images/navbarSupports/tur virtual.jpg";
-import imgDosen from "../../assets/images/navbarSupports/daftar dosen.jpg";
-import imgVisitasi from "../../assets/images/navbarSupports/visitasi.jpg";
+import imgInformasi from "../../assets/images/navbarSupports/informasi.webp";
+import imgKerjasama from "../../assets/images/navbarSupports/kerjasama.webp";
+import imgPengajuanMasalah from "../../assets/images/navbarSupports/pengajuan-masalah.webp";
+import imgPemenang from "../../assets/images/navbarSupports/prestasi.webp";
+import imgTur from "../../assets/images/navbarSupports/tur-virtual.webp";
+import imgDosen from "../../assets/images/navbarSupports/daftar-dosen.webp";
+import imgPenelitian from "../../assets/images/navbarSupports/penilitian&gif.gif";
+import imgPublikasi from "../../assets/images/navbarSupports/publikasi.webp";
+import imgKaryaUnggulan from "../../assets/images/navbarSupports/karyaunggulan.webp";
+import imgInovasi from "../../assets/images/navbarSupports/inovasi.webp";
+
+// DUMMY: pemilik akan mengganti judul; gambar sudah diisi lewat import Vite.
+const KARYA_MENU = [
+  {
+    key: "unggulan",
+    icon: Star,
+    title: "Produk Unggulan",
+    desc: "Karya yang sudah siap digunakan",
+    href: "/karya?kategori=produk-unggulan",
+    preview: {
+      label: "Produk Unggulan",
+      title: "Absensi arisan RT lewat WhatsApp",
+      tag: "Teknik Informatika",
+      src: imgKaryaUnggulan,
+      alt: "",
+    },
+  },
+  {
+    key: "inovasi",
+    icon: Lightbulb,
+    title: "Inovasi",
+    desc: "Gagasan baru yang masih dikembangkan",
+    href: "/karya?kategori=inovasi",
+    preview: {
+      label: "Inovasi",
+      title: "Sensor kualitas air kolam tambak",
+      tag: "Teknik Informatika",
+      src: imgInovasi,
+      alt: "",
+    },
+  },
+  {
+    key: "publikasi",
+    icon: BookOpen,
+    title: "Publikasi Ilmiah",
+    desc: "Tulisan yang sudah diterbitkan",
+    href: "/karya?kategori=publikasi-ilmiah",
+    preview: {
+      label: "Publikasi Ilmiah",
+      title: "Pemetaan genangan di bantaran Martapura",
+      tag: "Sistem Informasi Kota Cerdas",
+      src: imgPublikasi,
+      alt: "",
+    },
+  },
+];
+
+const NAMA_MENU_PENELITIAN = "Penelitian & PkM";
+
+const MENU_PENELITIAN = [
+  {
+    judul: "Penelitian",
+    items: [
+      {
+        label: "Kegiatan Penelitian",
+        desc: "Penelitian dosen dan mahasiswa Poliban",
+        to: "/penelitian/kegiatan",
+      },
+      {
+        label: "Buletin",
+        desc: "Kumpulan terbitan riset tiap edisi",
+        to: "/penelitian/buletin",
+      },
+    ],
+  },
+  {
+    judul: "PkM",
+    items: [
+      {
+        label: "Kegiatan PkM",
+        desc: "Pengabdian dosen ke masyarakat",
+        to: "/pkm/kegiatan",
+      },
+      {
+        label: "Diseminasi",
+        desc: "Penyebaran hasil riset ke masyarakat",
+        to: "/pkm/diseminasi",
+      },
+    ],
+  },
+];
+
+const MENU_PENGABDIAN = [
+  {
+    to: "/pengabdian",
+    label: "Pengabdian",
+    desc: "Kegiatan pengabdian masyarakat oleh dosen dan mahasiswa Poliban.",
+  },
+  {
+    to: "/diseminasi",
+    label: "Diseminasi",
+    desc: "Penyebaran hasil pengabdian dan riset supaya bisa dipakai lebih luas.",
+  },
+];
 
 const SNAV_CSS = `
 .snav-link,.snav-menu,.snav-mobile,.snav-ink,.snav-auth{--snav-c:#475569;--snav-h:#0f172a;--snav-a:#2563eb;--snav-bg:#fff;--snav-bd:rgba(148,163,184,.35);--snav-hov:rgba(37,99,235,.07);--snav-sh:rgba(15,23,42,.22);--snav-mono:ui-monospace,"JetBrains Mono","IBM Plex Mono",Consolas,Menlo,monospace}
-.snav-link.snav-link{position:relative;z-index:1;display:inline-flex;align-items:center;padding:clamp(4px,0.8vw,8px) clamp(2px,0.4vw,4px);font-family:var(--snav-font,var(--snav-mono));font-size:clamp(11px,1.2vw,15px);line-height:1.5;font-weight:500;color:var(--snav-h);text-decoration:none;cursor:pointer;border:0;background:transparent;transition:color .2s ease;white-space:nowrap}
+.snav-link.snav-link{position:relative;z-index:1;display:inline-flex;align-items:center;padding:clamp(4px,0.8vw,8px) clamp(2px,0.4vw,4px);font-family:var(--snav-font,var(--snav-mono));font-size:clamp(11px,1.2vw,15px);line-height:1.5;font-weight:500;color:#334155;text-decoration:none;cursor:pointer;border:0;background:transparent;transition:color 150ms ease;white-space:nowrap}
 @media (min-width:2560px){.snav-link.snav-link{font-size:clamp(15px,1.5vw,22px);padding:clamp(8px,1vw,14px) clamp(4px,0.6vw,8px)}}
-.snav-link.snav-link:hover{color:var(--snav-a)}
+.snav-link.snav-link:hover{color:#0f172a}
+.snav-dd.is-open>.snav-link.snav-link{color:var(--snav-a)}
 .snav-link.snav-link:focus-visible{outline:2px solid var(--snav-a);outline-offset:4px;border-radius:6px}
 .snav-ink{position:absolute;left:0;bottom:-1px;height:2px;pointer-events:none;z-index:0;opacity:0;will-change:transform,width,opacity}
 .snav-ink::before{content:"";position:absolute;left:10%;right:10%;top:0;height:10px;border-radius:50%;filter:blur(6px);pointer-events:none;z-index:0;background:color-mix(in srgb,var(--snav-a) 45%,transparent)}
@@ -75,10 +179,14 @@ const SNAV_CSS = `
 html.light .snav-ink::before{background:color-mix(in srgb,var(--snav-a) 35%,transparent)}
 .snav-chev{margin-left:5px;transition:transform .28s cubic-bezier(.22,1,.36,1)}
 .snav-dd.is-open .snav-chev{transform:rotate(180deg)}
+.snav-dd>.snav-link .snav-chev{color:#94a3b8;margin-left:4px}
+.snav-dd.is-open>.snav-link .snav-chev{color:var(--snav-a)}
 .snav-dd{position:static}
 .snav-dd>.snav-link::after{content:"";position:absolute;left:-10px;right:-10px;top:100%;height:44px}
-.snav-menu{position:absolute;top:calc(100% + 14px);left:var(--panel-left,0px);width:min(840px,100%);font-family:var(--snav-font,var(--snav-mono));display:grid;grid-template-columns:220px minmax(0,1fr) 260px;column-gap:32px;padding:28px 28px 28px 32px;border-radius:16px;background:var(--snav-bg);border:1px solid var(--snav-bd);box-shadow:0 2px 6px -2px var(--snav-sh);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-12px);transition:opacity 1.5s cubic-bezier(.22,1,.36,1),transform 1.5s cubic-bezier(.22,1,.36,1),visibility 0s;z-index:60}
-.snav-dd.is-open .snav-menu{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition:opacity 1.5s cubic-bezier(.22,1,.36,1),transform 1.5s cubic-bezier(.22,1,.36,1),visibility 0s}
+.snav-dd:not(.is-open)>.snav-link::after{pointer-events:none !important}
+.snav-menu{position:absolute;top:calc(100% + 14px);left:var(--panel-left,0px);width:min(840px,100%);font-family:var(--snav-font,var(--snav-mono));display:grid;grid-template-columns:220px minmax(0,1fr) 260px;column-gap:32px;padding:28px 28px 28px 32px;border-radius:16px;background:var(--snav-bg);border:1px solid var(--snav-bd);box-shadow:0 2px 6px -2px var(--snav-sh);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-6px);transition:opacity 70ms linear,transform 70ms linear,visibility 0s linear 70ms;z-index:60}
+.snav-dd.is-open .snav-menu{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition:opacity 160ms cubic-bezier(.22,1,.36,1) 40ms,transform 160ms cubic-bezier(.22,1,.36,1) 40ms,visibility 0s}
+nav:has(.snav-dd.is-open) .snav-dd:not(.is-open) .snav-menu{transition:none !important}
 .snav-menu.snav-menu--noimg{grid-template-columns:220px minmax(0,1fr)}
 .snav-menu.snav-menu--mega{display:block;left:var(--panel-left,0px);right:auto;margin-left:0;margin-right:0;width:max-content;max-width:calc(100% - 64px);padding:36px 40px 38px;border-radius:20px;box-shadow:0 20px 40px -28px var(--snav-sh)}
 .snav-menu--mega,.snav-menu--mega *{font-family:var(--font-body)}
@@ -100,6 +208,7 @@ html.light .snav-ink::before{background:color-mix(in srgb,var(--snav-a) 35%,tran
 @media (max-width:1199px){.snav-mega-layout{grid-template-columns:minmax(0,1fr)}.snav-mega-media{display:none}.snav-mega-cols{column-gap:16px}}
 .snav-mega-mtitle{padding:10px 12px 4px 48px;font-family:var(--font-body);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--snav-c)}
 .snav-menu::before{content:"";position:absolute;top:-8px;left:var(--caret,50%);width:14px;height:14px;background:var(--snav-bg);border-left:1px solid var(--snav-bd);border-top:1px solid var(--snav-bd);border-radius:3px 0 0 0;transform:translateX(-50%) rotate(45deg)}
+.snav-dd.is-open .snav-menu::after{content:"";position:absolute;top:-18px;left:0;right:0;height:18px;background:transparent;pointer-events:auto}
 .snav-mm-side{padding-right:32px;border-right:1px solid var(--snav-bd)}
 .snav-mm-label{margin-bottom:18px;font-family:var(--snav-font,var(--snav-mono));font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--snav-c)}
 .snav-mm-item{display:block;padding:8px 0;font-family:var(--snav-font,var(--snav-mono));font-size:15px;font-weight:500;color:var(--snav-c);text-decoration:none;transition:color .15s}
@@ -112,7 +221,31 @@ html.light .snav-ink::before{background:color-mix(in srgb,var(--snav-a) 35%,tran
 .snav-mm-img{position:relative;min-height:260px;overflow:hidden;border-radius:6px;background:var(--snav-hov)}
 .snav-mm-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.8);animation:snav-img-in .25s ease}
 @keyframes snav-img-in{from{opacity:0}to{opacity:1}}
-@media (max-width:1199px){.snav-menu{grid-template-columns:240px minmax(0,1fr)}.snav-mm-img{display:none}}
+@media (max-width:1199px){.snav-menu{grid-template-columns:240px minmax(0,1fr)}}
+.snav-menu.snav-zona{grid-template-columns:1fr;grid-template-rows:auto auto auto;row-gap:16px;padding:32px 40px;align-items:start;border:1px solid #cbd5e1}
+.snav-zona .snav-mm-div{display:none}
+.snav-zona .snav-mm-side{display:flex;flex-direction:column;min-width:0;min-height:0;padding:0;border-right:0}
+.snav-zona .snav-mm-label{margin-bottom:28px;font-size:12px;font-weight:500;letter-spacing:.06em;line-height:16px;color:#64748b;text-transform:uppercase}
+.snav-zona .snav-mm-list{display:flex;flex-direction:column;gap:4px}
+.snav-zona .snav-mm-item{display:flex;align-items:center;height:36px;padding:0;border:0;border-radius:0;background:transparent;font-size:16px;font-weight:500;color:#64748b;text-decoration:none}
+.snav-zona .snav-mm-item.is-hover,.snav-zona .snav-mm-item:hover,.snav-zona .snav-mm-item:focus-visible{color:#2563eb;outline:none}
+.snav-zona .snav-mm-body{display:flex;flex-direction:column;min-width:0;min-height:0;padding:0 32px}
+.snav-zona .snav-mm-title{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-size:16px;font-weight:500;color:#0f172a;text-decoration:none}
+.snav-zona .snav-mm-desc{margin:12px 0 0;max-width:none;font-size:15px;line-height:1.5;color:#64748b;display:block;overflow:visible}
+.snav-zona .snav-mm-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:20px}
+.snav-zona .snav-mm-tags span{height:auto;padding:6px 14px;border-radius:9999px;background:#f1f5f9;color:#334155;font-size:13px;font-weight:500}
+.snav-zona .snav-mm-img{grid-column:1;grid-row:3;display:flex;min-height:180px;max-height:240px;align-self:stretch;overflow:hidden;background:transparent;border-radius:0}
+.snav-zona .snav-mm-img img{position:static;display:block;width:100%;height:100%;object-fit:cover;object-position:center;border-radius:0}
+.snav-menu.snav-kartu-panel{display:flex;flex-direction:row;gap:12px;padding:12px;width:520px;max-width:calc(100vw - 24px);border:1px solid #cbd5e1;border-radius:14px;background:#ffffff;box-shadow:0 16px 40px -12px rgba(15,23,42,0.18),0 2px 6px rgba(15,23,42,0.05)}
+.snav-kartu-panel::before{background:#ffffff;border-left:1px solid #cbd5e1;border-top:1px solid #cbd5e1}
+.snav-kartu{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:10px;padding:8px;border-radius:10px;background:#f8fafc;text-decoration:none;outline:none;transition:background-color 120ms ease-out}
+.snav-kartu:hover,.snav-kartu:focus-visible{background:#f1f5f9}
+.snav-kartu:focus-visible{box-shadow:0 0 0 2px #cbd5e1!important}
+.snav-kartu-media{height:112px;width:100%;border-radius:6px;overflow:hidden;background:#f1f5f9;flex:none}
+.snav-kartu-media img{display:block;width:100%;height:100%;object-fit:cover}
+.snav-kartu-text{padding:0 4px 4px}
+.snav-kartu-title{display:block;font-size:15px;font-weight:500;color:#0f172a;line-height:1.3}
+.snav-kartu-desc{margin-top:2px;font-size:13px;color:#64748b;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .snav-burger{position:relative;width:40px;height:40px;border:0;background:transparent;cursor:pointer}
 .snav-burger span{position:absolute;left:10px;right:10px;height:2px;border-radius:2px;background:currentColor;transition:transform .3s cubic-bezier(.22,1,.36,1),opacity .2s}
 .snav-burger span:nth-child(1){top:14px}.snav-burger span:nth-child(2){top:19px}.snav-burger span:nth-child(3){top:24px}
@@ -130,8 +263,8 @@ html.light .snav-ink::before{background:color-mix(in srgb,var(--snav-a) 35%,tran
 .snav-acc>div{min-height:0;overflow:hidden;padding-left:0}
 .snav-auth{display:inline-flex;align-items:center;gap:20px;margin-left:0}.snav-mbtn{display:flex;flex:1;align-items:center;justify-content:center;height:44px;border-radius:10px;font-family:var(--font-body);font-size:14px;font-weight:400;letter-spacing:0;text-transform:none;text-decoration:none;border:1px solid;transition:background-color .42s cubic-bezier(.16,1,.3,1),border-color .42s cubic-bezier(.16,1,.3,1),color .42s cubic-bezier(.16,1,.3,1),box-shadow .42s cubic-bezier(.16,1,.3,1);cursor:pointer}.snav-mbtn-primary{background:var(--snav-a);color:#fff;border-color:var(--snav-a)}.snav-mbtn-primary:hover{background:color-mix(in srgb,var(--snav-a) 88%,black);border-color:color-mix(in srgb,var(--snav-a) 88%,black)}.snav-mbtn:not(.snav-mbtn-primary){background:transparent;color:var(--snav-h);border-color:transparent;box-shadow:none}.snav-mbtn:not(.snav-mbtn-primary):hover{background:var(--snav-hov)}
 .snav-login.snav-login,.snav-cta.snav-cta{display:inline-flex;align-items:center;justify-content:center;height:40px;font-family:var(--font-body);font-size:14px;font-weight:500;letter-spacing:0;text-transform:none;text-decoration:none;white-space:nowrap;transition:background-color .2s ease,border-color .2s ease,color .2s ease}
-.snav-login.snav-login{padding:0;color:var(--snav-h);background:transparent;border:0;border-radius:0;box-shadow:none}
-.snav-login.snav-login:hover{color:var(--snav-a);background:transparent}
+.snav-login.snav-login{padding:0;color:#334155;background:transparent;border:0;border-radius:0;box-shadow:none}
+.snav-login.snav-login:hover{color:#0f172a;background:transparent}
 .snav-cta.snav-cta{padding:0 16px;color:#fff;background:var(--snav-a);border:1px solid var(--snav-a);border-radius:8px;box-shadow:none}
 .snav-cta.snav-cta:hover{background:color-mix(in srgb,var(--snav-a) 88%,black);border-color:color-mix(in srgb,var(--snav-a) 88%,black)}
 .snav-cta.snav-cta:active,.snav-login.snav-login:active{transform:translateY(1px)}
@@ -139,12 +272,11 @@ html.light .snav-ink::before{background:color-mix(in srgb,var(--snav-a) 35%,tran
 @media (max-width:949px){.snav-auth{display:none}}
 @media (max-width:949px){.snav-link.snav-link{font-size:14px}}
 @media (min-width:950px) and (max-width:1199px){.snav-link.snav-link{font-size:15px}}
-@media (min-width:1200px) and (max-width:1599px){.snav-link.snav-link{font-size:16px}}
+@media (min-width:1200px){.snav-link.snav-link{font-size:15px}}
 @media (min-width:950px) and (max-width:1199px){.snav-login.snav-login,.snav-cta.snav-cta{height:36px;font-size:14px}.snav-cta.snav-cta{padding:0 14px}}
 @media (min-width:1200px) and (max-width:2559px){.snav-login.snav-login,.snav-cta.snav-cta{height:40px;font-size:15px}}
-@media (min-width:2560px){.snav-link.snav-link{font-size:clamp(16px,1.6vw,24px);padding:clamp(10px,1.2vw,16px) clamp(6px,0.8vw,12px)}.snav-mm-item{font-size:15px}.snav-mlink{font-size:clamp(16px,1.6vw,22px);padding:clamp(14px,1.4vw,20px)}.snav-mlink-sub{font-size:clamp(15px,1.5vw,20px);padding:clamp(12px,1.2vw,18px) clamp(12px,1.4vw,20px) clamp(12px,1.2vw,18px) 60px}.snav-login.snav-login,.snav-cta.snav-cta{height:48px;font-size:16px}.snav-cta.snav-cta{padding:0 24px}.snav-mbtn{height:52px;font-size:16px}}
+@media (min-width:2560px){.snav-link.snav-link{font-size:15px;padding:clamp(10px,1.2vw,16px) clamp(6px,0.8vw,12px)}.snav-mm-item{font-size:15px}.snav-mlink{font-size:clamp(16px,1.6vw,22px);padding:clamp(14px,1.4vw,20px)}.snav-mlink-sub{font-size:clamp(15px,1.5vw,20px);padding:clamp(12px,1.2vw,18px) clamp(12px,1.4vw,20px) clamp(12px,1.2vw,18px) 60px}.snav-login.snav-login,.snav-cta.snav-cta{height:48px;font-size:16px}.snav-cta.snav-cta{padding:0 24px}.snav-mbtn{height:52px;font-size:16px}}
 @media (min-width:1200px){.snav-login.snav-login,.snav-cta.snav-cta{height:40px;font-size:15px}}
-@media (min-width:1600px){.snav-link.snav-link{font-size:17px}}
 @media (prefers-reduced-motion:reduce){.snav-link.snav-link,.snav-login,.snav-cta,.snav-ink,.snav-chev,.snav-menu,.snav-mm-img img,.snav-burger span,.snav-mobile,.snav-acc,.snav-mega-tile,.snav-mega-link,.snav-mega-cimg{transition:none!important;animation:none!important}}
 @media (prefers-reduced-motion:reduce){.snav-mega-tile,.snav-mega-link,.snav-mega-cimg{transform:none!important}}
 .snav-menu.snav-about-panel{width:700px;max-width:calc(100vw - 24px);display:grid;grid-template-columns:250px minmax(0,1fr);gap:24px;align-items:stretch;padding:20px;border-radius:16px;background:color-mix(in srgb,var(--snav-a) 4%,white);border:1px solid var(--snav-bd);box-shadow:0 12px 32px rgba(15,23,42,.10)}
@@ -172,7 +304,7 @@ html.light .snav-ink::before{background:color-mix(in srgb,var(--snav-a) 35%,tran
 .snav-duo-title{font-size:16px;font-weight:600;line-height:1.3;color:var(--snav-h);transition:color .2s ease}
 .snav-duo-desc{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px;min-height:3em;font-size:13px;font-weight:400;line-height:1.5;color:var(--snav-h);opacity:.7}
 .snav-duo-cell:hover .snav-duo-title,.snav-duo-cell:focus-visible .snav-duo-title{color:var(--snav-a)}
-.snav-duo-media{height:190px;margin-top:16px;overflow:hidden;border-radius:12px}
+.snav-duo-media{height:190px;margin-top:16px;overflow:hidden}
 @media (max-height:760px){.snav-duo-media{height:140px}}
 .snav-duo-bar{display:flex;flex-shrink:0;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px;border-top:1px solid var(--snav-bd);background:var(--snav-bg)}
 .snav-duo-bar-left{display:flex;align-items:center;gap:12px;min-width:0}
@@ -184,6 +316,59 @@ html.light .snav-ink::before{background:color-mix(in srgb,var(--snav-a) 35%,tran
 .snav-duo-bar-btn:hover{background:color-mix(in srgb,var(--snav-a) 88%,black)}
 .snav-duo-bar-btn:focus-visible{outline:2px solid var(--snav-a);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){.snav-about-title,.snav-about-arrow,.snav-duo-cell,.snav-duo-title,.snav-duo-bar-btn{transition:none!important}.snav-about-arrow{transform:none!important}}
+.snav-menu.snav-preview-panel{width:700px;max-width:calc(100vw - 24px);display:grid;grid-template-columns:320px minmax(0,1fr);gap:20px;align-items:stretch;padding:16px;border-radius:14px;background:#fff;border:1px solid #cbd5e1;box-shadow:0 16px 40px -12px rgba(15,23,42,.22),0 2px 6px rgba(15,23,42,.06)}
+.snav-menu.snav-preview-panel::before{background:#fff;border-left-color:#cbd5e1;border-top-color:#cbd5e1}
+.snav-kl-list{position:relative;display:flex;flex-direction:column;gap:0;min-width:0;height:100%;align-self:stretch;border:1px solid #cbd5e1;border-radius:12px;overflow:hidden;background:#ffffff}
+.snav-pv-item{position:relative;z-index:1;display:flex;align-items:center;gap:12px;flex:1 1 0;min-height:60px;box-sizing:border-box;padding:0 18px;text-decoration:none;outline:none;border:0;border-bottom:1px solid #cbd5e1;border-radius:0;background:transparent;transition:background-color 150ms ease-out,border-color 150ms ease-out}
+.snav-pv-item:last-child{border-bottom:0}
+.snav-pv-item.is-active,.snav-pv-item:hover{background:#f8fafc!important}
+.snav-pv-item:focus-visible{outline:none!important;box-shadow:none!important}
+.snav-kl-in{display:flex;align-items:center;gap:12px;min-width:0;flex:1;transform:translateX(0);will-change:transform;transition:transform 200ms cubic-bezier(.22,1,.36,1)}
+.snav-pv-item.is-active .snav-kl-in,.snav-pv-item:hover .snav-kl-in{transform:translateX(10px)}
+.snav-kl-chev{position:absolute;right:8px;top:50%;margin-top:-7px;color:#2563eb;opacity:0;transform:translateX(6px);transition:opacity 160ms ease-out,transform 200ms cubic-bezier(.22,1,.36,1)}
+.snav-pv-item.is-active .snav-kl-chev,.snav-pv-item:hover .snav-kl-chev{opacity:1;transform:translateX(0)}
+.snav-pv-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.snav-pv-title{font-size:16px;font-weight:500;line-height:1.3;color:#0f172a!important}
+.snav-pv-desc{font-size:13.5px;font-weight:400;line-height:1.4;color:#64748b!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.snav-pv-card{position:relative;display:flex;flex-direction:column;padding:0;border-radius:0;background:#ffffff;text-decoration:none;outline:none;border:0;overflow:hidden}
+.snav-pv-card:focus-visible{outline:none!important;box-shadow:0 0 0 2px #2563eb!important}
+.snav-pv-media{position:relative;flex:1 1 auto;min-height:120px;display:grid;overflow:hidden;border:0!important;border-radius:0;background:#e2e8f0}
+.snav-pv-photo{grid-area:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden;border:0!important;will-change:opacity;opacity:0;z-index:1;pointer-events:none;transition:opacity 0s linear 220ms}
+.snav-pv-photo[data-active="true"]{opacity:1;z-index:2;pointer-events:auto;transition:opacity 220ms ease-out}
+.snav-pv-photo img{display:block;width:100%;height:100%;object-fit:cover;transition:transform 400ms cubic-bezier(.22,1,.36,1)}
+.snav-pv-card:hover .snav-pv-photo[data-active="true"] img{transform:scale(1.03)}
+.snav-pv-caps{display:grid;height:68px}
+.snav-pv-cap{grid-area:1/1;position:relative;padding:12px 16px;display:flex;flex-direction:column;min-width:0;will-change:opacity;opacity:0;transform:translateY(4px);pointer-events:none;transition:opacity 90ms ease-in,transform 90ms ease-in}
+.snav-pv-cap[data-active="true"]{opacity:1;transform:translateY(0);pointer-events:auto;transition:opacity 160ms ease-out 90ms,transform 160ms ease-out 90ms}
+.snav-pv-name{font-size:16px;font-weight:500;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#0f172a!important}
+.snav-pv-prodi{margin-top:2px;font-size:13px;line-height:1.4;color:#64748b!important}
+.snav-pv-arrow{position:absolute;top:12px;right:12px;z-index:3;pointer-events:none;color:#ffffff!important}
+.snav-pv-card:hover .snav-pv-arrow{transform:rotate(0deg)!important}
+@media (max-width:949px){.snav-menu.snav-preview-panel{grid-template-columns:minmax(0,1fr)}.snav-pv-card{display:none}}
+.snav-menu.snav-pn-panel{width:760px;max-width:calc(100vw - 32px);display:grid;grid-template-columns:minmax(0,1fr) 240px;grid-template-rows:auto;column-gap:24px;row-gap:0;padding:0;align-items:stretch;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 2px 6px -2px rgba(15,23,42,.10)}
+.snav-menu.snav-pn-panel::before{background:#fff;border-left-color:#e2e8f0;border-top-color:#e2e8f0}
+.snav-pn-main{display:flex;flex-direction:column;min-width:0;padding:20px 0 20px 20px}
+.snav-pn-tabs{display:flex;flex-direction:row;gap:20px;align-items:center;padding:0 2px 14px;margin:0;border:0;background:transparent;z-index:auto}
+.snav-pn-tab{position:static;padding:0;margin:0;background:transparent;border:0;border-radius:0;box-shadow:none;cursor:pointer;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;line-height:16px;color:#64748b!important;transition:color 120ms ease-out;outline:none!important}
+.snav-pn-tab:hover{color:#0f172a!important}
+.snav-pn-tab:active{color:#2563eb!important}
+.snav-pn-tab[aria-selected="true"]{color:#2563eb!important}
+.snav-pn-tab:focus-visible{box-shadow:0 0 0 2px #cbd5e1!important;border-radius:4px!important;outline:none!important}
+.snav-pn-body{display:grid;min-width:0;border:1px solid #94a3b8!important;border-radius:12px!important;background:#ffffff!important;overflow:hidden!important;padding:0!important;margin:0!important;z-index:auto!important}
+.snav-pn-sub{grid-area:1/1;display:flex;flex-direction:column;justify-content:center;min-width:0;opacity:0;visibility:hidden;pointer-events:none;transition:opacity 90ms ease-in,visibility 0s linear 90ms}
+.snav-pn-sub[data-active="true"]{opacity:1;visibility:visible;pointer-events:auto;transition:opacity 160ms ease-out 90ms,visibility 0s}
+.snav-pn-list{display:flex;flex-direction:column;justify-content:center}
+.snav-pn-item{display:flex;align-items:center;justify-content:space-between;gap:12px;height:68px;padding:0 18px;margin:0;border-radius:0;border:0;border-bottom:1px solid #cbd5e1;text-decoration:none;outline:none;background:transparent;transition:background-color 120ms ease-out}
+.snav-pn-item:last-child{border-bottom:0}
+.snav-pn-item:hover,.snav-pn-item:focus-visible{background-color:#f8fafc;outline:none!important;box-shadow:none!important}
+.snav-pn-texts{min-width:0;flex:1 1 auto}
+.snav-pn-title{display:block;font-size:16px;font-weight:500;line-height:1.3;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.snav-pn-desc{display:block;margin-top:2px;font-size:13.5px;font-weight:400;line-height:1.4;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.snav-pn-item-arrow{flex:none;opacity:0;transform:translateX(-6px);transition:opacity 140ms ease-out,transform 160ms cubic-bezier(.22,1,.36,1)}
+.snav-pn-item:hover .snav-pn-item-arrow,.snav-pn-item:focus-visible .snav-pn-item-arrow{opacity:1;transform:translateX(0)}
+.snav-pn-figure{display:flex;align-self:stretch;min-width:0;border:1px solid #94a3b8!important;border-radius:12px!important;overflow:hidden!important;background:#ffffff!important;margin:20px 20px 20px 0!important}
+.snav-pn-figure img{display:block;width:100%;height:100%;min-height:200px;object-fit:cover;border-radius:0!important}
+@media (max-width:949px){.snav-menu.snav-pn-panel{grid-template-columns:1fr}}
 `;
 
 let navInkMemo = null;
@@ -349,7 +534,7 @@ function useNavInk(barRef, listRef, inkRef, deps) {
   }, [measure]);
 }
 
-function NavImg({ item, className, Icon }) {
+function NavImg({ item, className, Icon, imgStyle }) {
   if (!item || !item.src) {
     const emptyStyle = Icon
       ? {
@@ -387,43 +572,124 @@ function NavImg({ item, className, Icon }) {
       loading="lazy"
       decoding="async"
       draggable={false}
-      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+      style={{ width: "100%", height: "100%", objectFit: "cover", ...imgStyle }}
     />
   );
 }
+
+let navTimer = null;
+let navCurrent = null;
+let navMenuSeq = 0;
+const navRegistry = new Map();
+
+const NAV_DEBUG = true;
+const navLog = (...a) => {
+  if (NAV_DEBUG) console.log("[nav]", performance.now().toFixed(0), ...a); // DEBUG SEMENTARA dihapus setelah bug terbukti
+};
+
+const navClear = () => {
+  if (navTimer) {
+    clearTimeout(navTimer);
+    navTimer = null;
+  }
+};
+
+const navSwitch = (id) => {
+  navLog("switch", id, "navCurrentSebelum=", navCurrent); // DEBUG SEMENTARA dihapus setelah bug terbukti
+  for (const [key, entry] of navRegistry) {
+    if (key !== id) entry.close();
+  }
+  if (id != null) {
+    const entry = navRegistry.get(id);
+    if (entry) entry.open();
+  }
+  navCurrent = id;
+  navTimer = null;
+};
+
+const navSwitchIfHovered = (id) => {
+  navTimer = null;
+  const entry = navRegistry.get(id);
+  if (!entry || !entry.el || !entry.el.matches(":hover")) {
+    navLog("switchIfHovered abort", id, "alasan=tidak-hover"); // DEBUG SEMENTARA dihapus setelah bug terbukti
+    return;
+  }
+  navSwitch(id);
+};
+
+const navCloseIfNoHover = () => {
+  navTimer = null;
+  let hovered = false;
+  for (const [, entry] of navRegistry) {
+    if (entry && entry.el && entry.el.matches(":hover")) {
+      hovered = true;
+      break;
+    }
+  }
+  if (hovered) {
+    navLog("close abort", "alasan=ada-elemen-yang-hover"); // DEBUG SEMENTARA dihapus setelah bug terbukti
+    return;
+  }
+  navSwitch(null);
+};
+
+const navEnter = (id, ev) => {
+  navClear();
+  navLog("enter", id, "navCurrent=", navCurrent); // DEBUG SEMENTARA dihapus setelah bug terbukti
+  if (ev && ev.currentTarget && !ev.currentTarget.matches(":hover")) {
+    navLog("enter abort", id, "alasan=tidak-hover"); // DEBUG SEMENTARA dihapus setelah bug terbukti
+    return;
+  }
+  if (navCurrent === null || navCurrent === id) navSwitch(id);
+  else navTimer = setTimeout(() => navSwitchIfHovered(id), 100);
+};
+
+const navLeave = (id) => {
+  if (!navRegistry.has(id)) return;
+  navClear();
+  navLog("leave", id); // DEBUG SEMENTARA dihapus setelah bug terbukti
+  navTimer = setTimeout(() => navCloseIfNoHover(), 160);
+};
 
 function NavDropdown({ label, items, groups, variant }) {
   const isMega = Array.isArray(groups);
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   const [cur, setCur] = useState(0);
+  const [karyaAktif, setKaryaAktif] = useState(0);
+  const [karyaHover, setKaryaHover] = useState(null);
+  const [penelitianAktif, setPenelitianAktif] = useState(0);
+  const [tabPenelitian, setTabPenelitian] = useState(() => 0); // lazy initializer
   const rootRef = useRef(null);
-  const timer = useRef(null);
   const btnRef = useRef(null);
   const menuRef = useRef(null);
+  const [menuId] = useState(() => ++navMenuSeq);
   const activeIdx = isMega
     ? -1
     : items.findIndex(
         (i) => pathname === i.to || pathname.startsWith(i.to + "/"),
       );
-  const megaIdx = isMega
-    ? groups.findIndex((g) => pathname.startsWith(`/karya/${g.slug}`))
-    : -1;
-  const startIdx = isMega ? megaIdx : activeIdx;
-  const active = isMega ? pathname.startsWith("/karya") : activeIdx >= 0;
+  const active =
+    isMega || variant === "preview"
+      ? pathname.startsWith("/karya")
+      : activeIdx >= 0;
   const item = isMega ? null : items[cur] || items[0];
   const hasImg = !isMega && items.some((i) => i.img);
-  const openNow = () => {
-    clearTimeout(timer.current);
-    setCur(Math.max(startIdx, 0));
-    setOpen(true);
-  };
-  const closeSoon = () => {
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => setOpen(false), 140);
-  };
+  useEffect(() => {
+    navRegistry.set(menuId, {
+      open: () => setOpen(true),
+      close: () => setOpen(false),
+      el: rootRef.current,
+    });
+    return () => {
+      navRegistry.delete(menuId);
+      if (navCurrent === menuId) navCurrent = null;
+    };
+  }, [menuId]);
 
-  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => {
+    if (!open && navCurrent === menuId) navCurrent = null;
+  }, [open, menuId]);
 
   useLayoutEffect(() => {
     if (!open) return;
@@ -436,29 +702,37 @@ function NavDropdown({ label, items, groups, variant }) {
       const originLeft = pr.left + m.offsetParent.clientLeft;
       const barWidth = m.offsetParent.clientWidth;
       const panelWidth = m.offsetWidth;
-      const panelLeft = Math.max(
-        0,
-        Math.min((barWidth - panelWidth) / 2, barWidth - panelWidth),
-      );
       const center = br.left - originLeft + br.width / 2;
+      const websiteCenter = window.innerWidth / 2;
+      let panelLeft;
+      if (variant === "preview") panelLeft = br.left - originLeft;
+      else if (variant === "about") panelLeft = br.right - originLeft - panelWidth;
+      else panelLeft = websiteCenter - originLeft - panelWidth / 2;
+      panelLeft = Math.max(0, Math.min(panelLeft, barWidth - panelWidth));
+      if (panelWidth >= barWidth) panelLeft = 0;
       let x = center - panelLeft;
-      x = Math.max(24, Math.min(x, panelWidth - 24));
+      x = Math.max(20, Math.min(x, panelWidth - 20));
       m.style.setProperty("--panel-left", `${Math.round(panelLeft)}px`);
       m.style.setProperty("--caret", `${Math.round(x)}px`);
     };
     place();
     window.addEventListener("resize", place);
     return () => window.removeEventListener("resize", place);
-  }, [open]);
+  }, [open, variant]);
 
   useEffect(() => {
     if (!open) return;
     const down = (e) => {
-      if (rootRef.current && !rootRef.current.contains(e.target))
-        setOpen(false);
+      if (rootRef.current && !rootRef.current.contains(e.target)) {
+        navClear();
+        navSwitch(null);
+      }
     };
     const key = (e) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        navClear();
+        navSwitch(null);
+      }
     };
     document.addEventListener("pointerdown", down);
     document.addEventListener("keydown", key);
@@ -466,13 +740,13 @@ function NavDropdown({ label, items, groups, variant }) {
       document.removeEventListener("pointerdown", down);
       document.removeEventListener("keydown", key);
     };
-  }, [open]);
+  }, [open, variant]);
   return (
     <div
       ref={rootRef}
       className={`snav-dd${open ? " is-open" : ""}`}
-      onMouseEnter={openNow}
-      onMouseLeave={closeSoon}
+      onMouseEnter={(e) => navEnter(menuId, e)}
+      onMouseLeave={() => navLeave(menuId)}
     >
       <button
         type="button"
@@ -481,12 +755,14 @@ function NavDropdown({ label, items, groups, variant }) {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={(e) => {
-          setCur(Math.max(startIdx, 0));
-          setOpen((o) => (e.detail === 0 ? !o : true));
+          navLog("click", menuId); // DEBUG SEMENTARA dihapus setelah bug terbukti
+          navClear();
+          if (e.detail === 0 && open) navSwitch(null);
+          else navSwitch(menuId);
         }}
       >
         {label}
-        <ChevronDown className="snav-chev" size={14} />
+        <ChevronDown className="snav-chev" size={13} />
       </button>
       {isMega ? (
         <div className="snav-menu snav-menu--mega" role="menu" ref={menuRef}>
@@ -539,12 +815,123 @@ function NavDropdown({ label, items, groups, variant }) {
                     className="snav-mega-cimg"
                     src={karyaPanelImg}
                     alt=""
+                    decoding="async"
                     loading="lazy"
                   />
                 </div>
               )}
             </div>
           </div>
+        </div>
+      ) : variant === "preview" ? (
+        <div
+          className="snav-menu snav-preview-panel"
+          role="menu"
+          ref={menuRef}
+          style={{
+            border: "1px solid #cbd5e1",
+            borderRadius: "14px",
+            boxShadow:
+              "0 16px 40px -12px rgba(15,23,42,0.22), 0 2px 6px rgba(15,23,42,0.06)",
+          }}
+        >
+          <div className="snav-kl-list" onMouseLeave={() => setKaryaHover(null)}>
+            {KARYA_MENU.map((it, i) => {
+              const aktif = i === karyaHover;
+              return (
+                <NavLink
+                  key={it.key}
+                  to={it.href}
+                  role="menuitem"
+                  onMouseEnter={() => { setKaryaAktif(i); setKaryaHover(i); }}
+                  onFocus={(e) => {
+                    navLog("focus", menuId, e.currentTarget.matches(":focus-visible")); // DEBUG SEMENTARA dihapus setelah bug terbukti
+                    setKaryaAktif(i);
+                    setKaryaHover(i);
+                  }}
+                  onClick={() => setOpen(false)}
+                  className={`snav-pv-item${aktif ? " is-active" : ""}`}
+                  style={{
+                    outline: "none",
+                    boxShadow: "none",
+                  }}
+                >
+                  <ChevronRight
+                    className="snav-kl-chev"
+                    size={14}
+                    aria-hidden="true"
+                    style={{ color: "#2563eb" }}
+                  />
+                  <span className="snav-kl-in">
+                    <span className="snav-pv-text">
+                      <span className="snav-pv-title">{it.title}</span>
+                      <span className="snav-pv-desc">{it.desc}</span>
+                    </span>
+                  </span>
+                </NavLink>
+              );
+            })}
+          </div>
+          <Link
+            to={KARYA_MENU[karyaAktif].href}
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="snav-pv-card"
+          >
+            <span className="snav-pv-media">
+              {KARYA_MENU.map((it, i) => {
+                const aktif = i === karyaAktif;
+                return (
+                  <span
+                    key={it.key}
+                    className="snav-pv-photo"
+                    data-active={aktif ? "true" : "false"}
+                    aria-hidden={!aktif}
+                  >
+                    {it.preview.src ? (
+                      <img
+                        src={it.preview.src}
+                        alt={it.preview.alt}
+                        decoding="async"
+                        loading="eager"
+                        draggable={false}
+                      />
+                    ) : (
+                      <ImageIcon size={28} color="#94a3b8" aria-hidden="true" />
+                    )}
+                  </span>
+                );
+              })}
+              <ArrowRight
+                className="snav-pv-arrow"
+                size={20}
+                strokeWidth={2}
+                aria-hidden="true"
+                style={{
+                  transform: "rotate(-45deg)",
+                  transformOrigin: "center",
+                  filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.55))",
+                  transition: "transform 260ms cubic-bezier(.22,1,.36,1)",
+                }}
+              />
+            </span>
+            <span className="snav-pv-caps">
+              {KARYA_MENU.map((it, i) => {
+                const aktif = i === karyaAktif;
+                return (
+                  <span
+                    key={it.key}
+                    className="snav-pv-cap"
+                    data-active={aktif ? "true" : "false"}
+                    aria-hidden={!aktif}
+                  >
+                    <span className="snav-pv-name">{it.preview.title}</span>
+                    <span className="snav-pv-prodi">{it.preview.tag}</span>
+                  </span>
+                );
+              })}
+            </span>
+          </Link>
         </div>
       ) : variant === "about" ? (
         <div className="snav-menu snav-about-panel" role="menu" ref={menuRef}>
@@ -598,6 +985,7 @@ function NavDropdown({ label, items, groups, variant }) {
                           : NAV_IMG.masalah
                       }
                       Icon={it.to === "/kemitraan" ? Handshake : FilePlus}
+                      imgStyle={{borderRadius:0}}
                     />
                   </div>
                 </NavLink>
@@ -628,29 +1016,166 @@ function NavDropdown({ label, items, groups, variant }) {
             </div>
           </div>
         </div>
+      ) : variant === "kolom-media" ? (
+        <div className="snav-menu snav-pn-panel" role="menu" ref={menuRef}>
+          <div
+            className="snav-pn-main"
+            style={{ gridColumn: "1", gridRow: "1" }}
+          >
+            <div className="snav-pn-tabs">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={tabPenelitian === 0 ? "true" : "false"}
+                onClick={() => {
+                  setTabPenelitian(0);
+                  setPenelitianAktif(0);
+                }}
+                className="snav-pn-tab"
+                style={{ outline: "none" }}
+              >
+                Penelitian
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={tabPenelitian === 1 ? "true" : "false"}
+                onClick={() => {
+                  setTabPenelitian(1);
+                  setPenelitianAktif(2);
+                }}
+                className="snav-pn-tab"
+                style={{ outline: "none" }}
+              >
+                PkM
+              </button>
+            </div>
+
+            <div className="snav-pn-body">
+              {MENU_PENELITIAN.map((col, ci) => {
+                const aktifTab = ci === tabPenelitian;
+                return (
+                  <div
+                    key={col.judul}
+                    className="snav-pn-sub"
+                    data-active={aktifTab ? "true" : "false"}
+                  >
+                    <div className="snav-pn-list">
+                      {col.items.map((it, ii) => {
+                        const idx = ci === 0 ? ii : ii + 2;
+                        return (
+                          <NavLink
+                            key={it.to}
+                            to={it.to}
+                            role="menuitem"
+                            onMouseEnter={() => setPenelitianAktif(idx)}
+                            onFocus={(e) => {
+                              navLog("focus", menuId, e.currentTarget.matches(":focus-visible")); // DEBUG SEMENTARA dihapus setelah bug terbukti
+                              setPenelitianAktif(idx);
+                            }}
+                            onClick={() => setOpen(false)}
+                            className="snav-pn-item"
+                            data-active-item={
+                              penelitianAktif === idx ? "true" : "false"
+                            }
+                            style={{ textDecoration: "none", outline: "none" }}
+                          >
+                            <div className="snav-pn-texts">
+                              <span className="snav-pn-title">{it.label}</span>
+                              <span className="snav-pn-desc">{it.desc}</span>
+                            </div>
+                            <ArrowRight
+                              className="snav-pn-item-arrow"
+                              size={16}
+                              strokeWidth={2}
+                              style={{ color: "#2563eb" }}
+                              aria-hidden="true"
+                            />
+                          </NavLink>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div
+            className="snav-pn-figure"
+            style={{ gridColumn: "2", gridRow: "1" }}
+            aria-hidden="true"
+          >
+            <img src={imgPenelitian} alt="" decoding="async" />
+          </div>
+        </div>
+      ) : variant === "kartu" ? (
+        <div className="snav-menu snav-kartu-panel" role="menu" ref={menuRef}>
+          {items.map((it) => (
+            <NavLink
+              key={it.to}
+              to={it.to}
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="snav-kartu"
+              style={{ outline: "none" }}
+            >
+              <div className="snav-kartu-media" aria-hidden="true">
+                {it.img && (
+                  <img src={it.img} alt="" decoding="async" loading="lazy" />
+                )}
+              </div>
+              <div className="snav-kartu-text">
+                <span className="snav-kartu-title">{it.label}</span>
+                <span className="snav-kartu-desc">{it.desc}</span>
+              </div>
+            </NavLink>
+          ))}
+        </div>
       ) : (
         <div
-          className={`snav-menu${hasImg ? "" : " snav-menu--noimg"}`}
+          className={`snav-menu${hasImg ? "" : " snav-menu--noimg"}${variant === "zona" ? " snav-zona" : ""}`}
           role="menu"
           ref={menuRef}
         >
-          <div className="snav-mm-side">
+          <div
+            className="snav-mm-side"
+            style={{ gridColumn: "1", gridRow: "1" }}
+          >
             <div className="snav-mm-label">{label}</div>
-            {items.map((it, i) => (
-              <NavLink
-                key={it.to}
-                to={it.to}
-                role="menuitem"
-                className={`snav-mm-item${i === cur ? " is-hover" : ""}`}
-                onMouseEnter={() => setCur(i)}
-                onFocus={() => setCur(i)}
-                onClick={() => setOpen(false)}
-              >
-                {it.label}
-              </NavLink>
-            ))}
+            <div className="snav-mm-list">
+              {items.map((it, i) => (
+                <NavLink
+                  key={it.to}
+                  to={it.to}
+                  role="menuitem"
+                  className={`snav-mm-item${i === cur ? " is-hover" : ""}`}
+                  onMouseEnter={() => setCur(i)}
+                  onFocus={(e) => {
+                    navLog("focus", menuId, e.currentTarget.matches(":focus-visible")); // DEBUG SEMENTARA dihapus setelah bug terbukti
+                    setCur(i);
+                  }}
+                  onClick={() => setOpen(false)}
+                >
+                  {it.label}
+                </NavLink>
+              ))}
+            </div>
           </div>
-          <div className="snav-mm-body">
+          {variant === "zona" && (
+            <div
+              className="snav-mm-div"
+              aria-hidden="true"
+              style={{ gridColumn: "2", gridRow: "1" }}
+            />
+          )}
+            <div
+              className="snav-mm-body"
+              style={{
+                gridColumn: variant === "zona" ? "1" : "2",
+                gridRow: variant === "zona" ? "2" : "1",
+              }}
+            >
             <div className="snav-mm-label">Jelajahi</div>
             <NavLink
               to={item.to}
@@ -670,9 +1195,22 @@ function NavDropdown({ label, items, groups, variant }) {
             )}
           </div>
           {hasImg && (
-            <div className="snav-mm-img" aria-hidden="true">
+            <div
+              className="snav-mm-img"
+              aria-hidden="true"
+              style={{
+                gridColumn: variant === "zona" ? "4" : "3",
+                gridRow: "1",
+              }}
+            >
               {item.img && (
-                <img key={item.to} src={item.img} alt="" loading="lazy" />
+                <img
+                  key={item.to}
+                  src={item.img}
+                  alt=""
+                  decoding="async"
+                  loading="lazy"
+                />
               )}
             </div>
           )}
@@ -689,6 +1227,8 @@ function NavbarVisitor() {
   const [accKaryaOpen, setAccKaryaOpen] = useState(false);
   const [accKolabOpen, setAccKolabOpen] = useState(false);
   const [accTentangOpen, setAccTentangOpen] = useState(false);
+  const [accPenelitianOpen, setAccPenelitianOpen] = useState(false);
+  const [accPengabdianOpen, setAccPengabdianOpen] = useState(false);
   const navRef = useRef(null);
   const headerRef = useRef(null);
   const barRef = useRef(null);
@@ -697,6 +1237,47 @@ function NavbarVisitor() {
   useNavInk(barRef, listRef, inkRef, [pathname]);
   useEffect(() => {
     applyNavbarFont();
+  }, []);
+  useEffect(() => {
+    const dropImgs = [
+      imgInformasi,
+      imgKerjasama,
+      imgPengajuanMasalah,
+      imgKaryaUnggulan,
+      imgInovasi,
+      imgPublikasi,
+      imgPenelitian,
+      imgTur,
+      imgPemenang,
+      imgDosen,
+    ];
+    const warm = () => {
+      for (const src of dropImgs) {
+        const im = new Image();
+        im.decoding = "async";
+        im.src = src;
+      }
+    };
+    let idleId = null;
+    let timeoutId = null;
+    if (
+      typeof window !== "undefined" &&
+      typeof window.requestIdleCallback === "function"
+    ) {
+      idleId = window.requestIdleCallback(warm, { timeout: 1200 });
+    } else {
+      timeoutId = setTimeout(warm, 600);
+    }
+    return () => {
+      if (
+        idleId != null &&
+        typeof window !== "undefined" &&
+        typeof window.cancelIdleCallback === "function"
+      ) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId != null) clearTimeout(timeoutId);
+    };
   }, []);
   const zonaAkademikItems = [
     {
@@ -719,13 +1300,6 @@ function NavbarVisitor() {
       desc: "Profil dosen Poliban dari semua jurusan, beserta bidang keahlian dan mata kuliah yang diampu.",
       tags: ["Profil", "Bidang keahlian"],
       img: imgDosen,
-    },
-    {
-      to: "/visitasi",
-      label: "Visitasi",
-      desc: "Jadwal dan cara mengajukan kunjungan ke Poliban untuk sekolah atau instansi.",
-      tags: ["Jadwal", "Kunjungan"],
-      img: imgVisitasi,
     },
   ];
   const kolaborasiItems = [
@@ -757,92 +1331,14 @@ function NavbarVisitor() {
       desc: "Jawaban untuk pertanyaan yang paling sering ditanyakan.",
     },
   ];
-  const karyaItems = [
-    {
-      slug: "teknik-sipil-dan-kebumian",
-      label: "Teknik Sipil dan Kebumian",
-      prodi: [
-        { slug: "teknik-sipil", label: "Teknik Sipil" },
-        { slug: "teknik-pertambangan", label: "Teknik Pertambangan" },
-        { slug: "teknik-bangunan-rawa", label: "Teknik Bangunan Rawa" },
-        {
-          slug: "teknologi-rekayasa-geomatika-dan-survei",
-          label: "Teknologi Rekayasa Geomatika dan Survei",
-        },
-        {
-          slug: "teknologi-rekayasa-konstruksi-jalan-dan-jembatan",
-          label: "Teknologi Rekayasa Konstruksi Jalan dan Jembatan", // cek ke situs resmi
-        },
-      ],
-    },
-    {
-      slug: "teknik-mesin",
-      label: "Teknik Mesin",
-      prodi: [
-        { slug: "teknik-mesin", label: "Teknik Mesin" },
-        { slug: "alat-berat", label: "Alat Berat" },
-        {
-          slug: "tata-operasi-dan-pemeliharaan-prediktif-alat-berat",
-          label: "Tata Operasi dan Pemeliharaan Prediktif Alat Berat", // cek ke situs resmi
-        },
-        {
-          slug: "teknologi-rekayasa-otomotif",
-          label: "Teknologi Rekayasa Otomotif",
-        },
-      ],
-    },
-    {
-      slug: "teknik-elektro",
-      label: "Teknik Elektro",
-      prodi: [
-        { slug: "teknik-listrik", label: "Teknik Listrik" },
-        { slug: "elektronika", label: "Elektronika" },
-        { slug: "teknik-informatika", label: "Teknik Informatika" },
-        {
-          slug: "sistem-informasi-kota-cerdas",
-          label: "Sistem Informasi Kota Cerdas",
-        },
-        {
-          slug: "teknologi-rekayasa-pembangkit-energi",
-          label: "Teknologi Rekayasa Pembangkit Energi",
-        },
-        {
-          slug: "teknologi-rekayasa-otomasi",
-          label: "Teknologi Rekayasa Otomasi",
-        },
-      ],
-    },
-    {
-      slug: "akuntansi",
-      label: "Akuntansi",
-      prodi: [
-        { slug: "akuntansi", label: "Akuntansi" },
-        {
-          slug: "sistem-informasi-akuntansi",
-          label: "Sistem Informasi Akuntansi",
-        },
-        {
-          slug: "akuntansi-lembaga-keuangan-syariah",
-          label: "Akuntansi Lembaga Keuangan Syariah",
-        },
-      ],
-    },
-    {
-      slug: "administrasi-bisnis",
-      label: "Administrasi Bisnis",
-      prodi: [
-        { slug: "administrasi-bisnis", label: "Administrasi Bisnis" },
-        { slug: "sistem-informasi", label: "Sistem Informasi" },
-        { slug: "bisnis-digital", label: "Bisnis Digital" },
-      ],
-    },
-  ];
   const closeMenu = () => {
     setIsOpen(false);
     setAccOpen(false);
     setAccKaryaOpen(false);
     setAccKolabOpen(false);
     setAccTentangOpen(false);
+    setAccPenelitianOpen(false);
+    setAccPengabdianOpen(false);
   };
   useEffect(() => {
     function handleClickOutside(event) {
@@ -852,6 +1348,8 @@ function NavbarVisitor() {
         setAccKaryaOpen(false);
         setAccKolabOpen(false);
         setAccTentangOpen(false);
+        setAccPenelitianOpen(false);
+        setAccPengabdianOpen(false);
       }
     }
     if (isOpen) document.addEventListener("mousedown", handleClickOutside);
@@ -921,9 +1419,27 @@ function NavbarVisitor() {
           className="hidden items-center justify-center font-medium min-[950px]:flex min-[950px]:justify-self-center min-[950px]:gap-6 min-[1200px]:gap-7"
         >
           <style>{SNAV_CSS}</style>
-          <NavDropdown label="Karya" groups={karyaItems} />
+          <NavDropdown
+            label="Karya"
+            items={KARYA_MENU}
+            variant="preview"
+          />
 
-          <NavDropdown label="Zona Akademik" items={zonaAkademikItems} />
+          <NavDropdown
+            label={NAMA_MENU_PENELITIAN}
+            items={MENU_PENELITIAN.flatMap((c) => c.items)}
+            variant="kolom-media"
+          />
+          <NavDropdown
+            label="Zona Akademik"
+            items={zonaAkademikItems}
+            variant="zona"
+          />
+          <NavDropdown
+            label="Pengabdian"
+            items={MENU_PENGABDIAN}
+            variant="kartu"
+          />
           <NavDropdown
             label="Kolaborasi"
             items={kolaborasiItems}
@@ -979,21 +1495,69 @@ function NavbarVisitor() {
               </button>
               <div className={`snav-acc${accKaryaOpen ? " is-open" : ""}`}>
                 <div>
-                  {karyaItems.map((group) => (
-                    <div key={group.slug}>
-                      <div className="snav-mega-mtitle" role="presentation">
-                        {group.label}
+                  {KARYA_MENU.map((it) => {
+                    const Icon = it.icon || LayoutGrid;
+                    return (
+                      <NavLink
+                        key={it.key}
+                        to={it.href}
+                        onClick={closeMenu}
+                        className={({ isActive }) =>
+                          `snav-mlink-sub${isActive ? " is-active" : ""}`
+                        }
+                      >
+                        <Icon size={16} strokeWidth={1.75} aria-hidden="true" />
+                        {it.title}
+                      </NavLink>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="snav-mlink flex items-center"
+                onClick={() => setAccPenelitianOpen((o) => !o)}
+                aria-expanded={accPenelitianOpen}
+              >
+                <FlaskConical size={20} strokeWidth={1.75} />
+                <span className="flex-1 text-left min-w-0">
+                  {NAMA_MENU_PENELITIAN}
+                </span>
+                <ChevronDown
+                  className={`snav-chev${accPenelitianOpen ? " rotate-180" : ""}`}
+                  size={16}
+                  style={{ marginLeft: "auto" }}
+                />
+              </button>
+              <div
+                className={`snav-acc${accPenelitianOpen ? " is-open" : ""}`}
+              >
+                <div>
+                  {MENU_PENELITIAN.map((col) => (
+                    <div key={col.judul}>
+                      <div
+                        style={{
+                          padding: "8px 12px 4px 48px",
+                          fontSize: 11,
+                          fontWeight: 600,
+                          letterSpacing: "0.06em",
+                          textTransform: "uppercase",
+                          color: "#64748b",
+                        }}
+                      >
+                        {col.judul}
                       </div>
-                      {group.prodi.map((p) => (
+                      {col.items.map((it) => (
                         <NavLink
-                          key={p.slug}
-                          to={`/karya/${group.slug}?prodi=${p.slug}`}
+                          key={it.to}
+                          to={it.to}
                           onClick={closeMenu}
                           className={({ isActive }) =>
                             `snav-mlink-sub${isActive ? " is-active" : ""}`
                           }
                         >
-                          {p.label}
+                          {it.label}
                         </NavLink>
                       ))}
                     </div>
@@ -1018,6 +1582,38 @@ function NavbarVisitor() {
               <div className={`snav-acc${accOpen ? " is-open" : ""}`}>
                 <div>
                   {zonaAkademikItems.map((it) => (
+                    <NavLink
+                      key={it.to}
+                      to={it.to}
+                      onClick={closeMenu}
+                      className={({ isActive }) =>
+                        `snav-mlink-sub${isActive ? " is-active" : ""}`
+                      }
+                    >
+                      {it.label}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
+              <button
+                type="button"
+                className="snav-mlink flex items-center"
+                onClick={() => setAccPengabdianOpen((o) => !o)}
+                aria-expanded={accPengabdianOpen}
+              >
+                <HandHeart size={20} strokeWidth={1.75} />
+                <span className="flex-1 text-left min-w-0">Pengabdian</span>
+                <ChevronDown
+                  className={`snav-chev${accPengabdianOpen ? " rotate-180" : ""}`}
+                  size={16}
+                  style={{ marginLeft: "auto" }}
+                />
+              </button>
+              <div
+                className={`snav-acc${accPengabdianOpen ? " is-open" : ""}`}
+              >
+                <div>
+                  {MENU_PENGABDIAN.map((it) => (
                     <NavLink
                       key={it.to}
                       to={it.to}

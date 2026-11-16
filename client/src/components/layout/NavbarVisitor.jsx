@@ -13,6 +13,10 @@ import {
   Handshake,
   LayoutGrid,
   GraduationCap,
+  Network,
+  Compass,
+  Bell,
+  CircleHelp,
   Info,
   FilePlus,
   HardHat,
@@ -26,6 +30,9 @@ import {
   FlaskConical,
   HandHeart,
   Image as ImageIcon,
+  Microscope,
+  Newspaper,
+  Megaphone,
 } from "lucide-react";
 import logo from "../../assets/icons/logo.webp";
 import { applyNavbarFont } from "../../utils/navbarFont";
@@ -71,6 +78,8 @@ import imgPenelitian from "../../assets/images/navbarSupports/penilitian&gif.gif
 import imgPublikasi from "../../assets/images/navbarSupports/publikasi.webp";
 import imgKaryaUnggulan from "../../assets/images/navbarSupports/karyaunggulan.webp";
 import imgInovasi from "../../assets/images/navbarSupports/inovasi.webp";
+import imgPengabdianMenu from "../../assets/images/navbarSupports/pengabdian.jpg";
+import imgDiseminasiMenu from "../../assets/images/navbarSupports/desiminasi.avif";
 
 // DUMMY: pemilik akan mengganti judul; gambar sudah diisi lewat import Vite.
 const KARYA_MENU = [
@@ -78,7 +87,7 @@ const KARYA_MENU = [
     key: "unggulan",
     icon: Star,
     title: "Produk Unggulan",
-    desc: "Karya yang sudah siap digunakan",
+    desc: "Karya yang sudah siap ditampilkan",
     href: "/karya?kategori=produk-unggulan",
     preview: {
       label: "Produk Unggulan",
@@ -92,7 +101,7 @@ const KARYA_MENU = [
     key: "inovasi",
     icon: Lightbulb,
     title: "Inovasi",
-    desc: "Gagasan baru yang masih dikembangkan",
+    desc: "Gagasan Baru yang dikembangkan",
     href: "/karya?kategori=inovasi",
     preview: {
       label: "Inovasi",
@@ -126,13 +135,15 @@ const MENU_PENELITIAN = [
     items: [
       {
         label: "Kegiatan Penelitian",
-        desc: "Penelitian dosen dan mahasiswa Poliban",
+        desc: "Penelitian yang sedang berjalan",
         to: "/penelitian/kegiatan",
+        ikon: Microscope,
       },
       {
         label: "Buletin",
-        desc: "Kumpulan terbitan riset tiap edisi",
+        desc: "Terbitan berkala hasil riset prodi",
         to: "/penelitian/buletin",
+        ikon: Newspaper,
       },
     ],
   },
@@ -141,13 +152,15 @@ const MENU_PENELITIAN = [
     items: [
       {
         label: "Kegiatan PkM",
-        desc: "Pengabdian dosen ke masyarakat",
+        desc: "Kegiatan prodi di tengah masyarakat",
         to: "/pkm/kegiatan",
+        ikon: HandHeart,
       },
       {
         label: "Diseminasi",
         desc: "Penyebaran hasil riset ke masyarakat",
         to: "/pkm/diseminasi",
+        ikon: Megaphone,
       },
     ],
   },
@@ -157,12 +170,14 @@ const MENU_PENGABDIAN = [
   {
     to: "/pengabdian",
     label: "Pengabdian",
-    desc: "Kegiatan pengabdian masyarakat oleh dosen dan mahasiswa Poliban.",
+    desc: "Catatan kegiatan pengabdian kepada masyarakat",
+    img: imgPengabdianMenu,
   },
   {
     to: "/diseminasi",
     label: "Diseminasi",
-    desc: "Penyebaran hasil pengabdian dan riset supaya bisa dipakai lebih luas.",
+    desc: "Penyebaran hasil pengabdian dan riset",
+    img: imgDiseminasiMenu,
   },
 ];
 
@@ -187,6 +202,8 @@ html.light .snav-ink::before{background:color-mix(in srgb,var(--snav-a) 35%,tran
 .snav-menu{position:absolute;top:calc(100% + 14px);left:var(--panel-left,0px);width:min(840px,100%);font-family:var(--snav-font,var(--snav-mono));display:grid;grid-template-columns:220px minmax(0,1fr) 260px;column-gap:32px;padding:28px 28px 28px 32px;border-radius:16px;background:var(--snav-bg);border:1px solid var(--snav-bd);box-shadow:0 2px 6px -2px var(--snav-sh);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-6px);transition:opacity 70ms linear,transform 70ms linear,visibility 0s linear 70ms;z-index:60}
 .snav-dd.is-open .snav-menu{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition:opacity 160ms cubic-bezier(.22,1,.36,1) 40ms,transform 160ms cubic-bezier(.22,1,.36,1) 40ms,visibility 0s}
 nav:has(.snav-dd.is-open) .snav-dd:not(.is-open) .snav-menu{transition:none !important}
+.snav-dd:not(.is-open)>.snav-menu,.snav-dd:not(.is-open)>.snav-menu *{pointer-events:none !important}
+.snav-dd.is-open>.snav-menu{pointer-events:auto !important}
 .snav-menu.snav-menu--noimg{grid-template-columns:220px minmax(0,1fr)}
 .snav-menu.snav-menu--mega{display:block;left:var(--panel-left,0px);right:auto;margin-left:0;margin-right:0;width:max-content;max-width:calc(100% - 64px);padding:36px 40px 38px;border-radius:20px;box-shadow:0 20px 40px -28px var(--snav-sh)}
 .snav-menu--mega,.snav-menu--mega *{font-family:var(--font-body)}
@@ -222,30 +239,40 @@ nav:has(.snav-dd.is-open) .snav-dd:not(.is-open) .snav-menu{transition:none !imp
 .snav-mm-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.8);animation:snav-img-in .25s ease}
 @keyframes snav-img-in{from{opacity:0}to{opacity:1}}
 @media (max-width:1199px){.snav-menu{grid-template-columns:240px minmax(0,1fr)}}
-.snav-menu.snav-zona{grid-template-columns:1fr;grid-template-rows:auto auto auto;row-gap:16px;padding:32px 40px;align-items:start;border:1px solid #cbd5e1}
-.snav-zona .snav-mm-div{display:none}
-.snav-zona .snav-mm-side{display:flex;flex-direction:column;min-width:0;min-height:0;padding:0;border-right:0}
-.snav-zona .snav-mm-label{margin-bottom:28px;font-size:12px;font-weight:500;letter-spacing:.06em;line-height:16px;color:#64748b;text-transform:uppercase}
+.snav-menu.snav-zona{display:grid!important;grid-template-columns:180px 1px minmax(0,1fr) 300px!important;grid-template-rows:auto!important;grid-auto-flow:row!important;align-items:stretch!important;column-gap:32px!important;row-gap:0!important;padding:32px 40px!important;border:1px solid #cbd5e1!important}
+.snav-zona .snav-mm-div{display:block!important;width:1px!important;background:#e2e8f0!important;align-self:stretch!important;grid-column:2!important;grid-row:1!important}
+.snav-zona .snav-mm-side{display:flex!important;flex-direction:column;min-width:0;padding:0!important;border-right:0!important;grid-column:1!important;grid-row:1!important}
+.snav-zona .snav-mm-label{margin-bottom:28px!important;font-size:11px!important;font-weight:600!important;letter-spacing:0.06em!important;line-height:16px!important;color:#64748b!important;text-transform:uppercase!important}
 .snav-zona .snav-mm-list{display:flex;flex-direction:column;gap:4px}
 .snav-zona .snav-mm-item{display:flex;align-items:center;height:36px;padding:0;border:0;border-radius:0;background:transparent;font-size:16px;font-weight:500;color:#64748b;text-decoration:none}
 .snav-zona .snav-mm-item.is-hover,.snav-zona .snav-mm-item:hover,.snav-zona .snav-mm-item:focus-visible{color:#2563eb;outline:none}
-.snav-zona .snav-mm-body{display:flex;flex-direction:column;min-width:0;min-height:0;padding:0 32px}
-.snav-zona .snav-mm-title{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-size:16px;font-weight:500;color:#0f172a;text-decoration:none}
-.snav-zona .snav-mm-desc{margin:12px 0 0;max-width:none;font-size:15px;line-height:1.5;color:#64748b;display:block;overflow:visible}
+.snav-zona .snav-mm-body{display:flex!important;flex-direction:column;min-width:0;padding:0!important;grid-column:3!important;grid-row:1!important}
+.snav-zona .snav-mm-title{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-size:18px!important;font-weight:600!important;color:#0f172a;text-decoration:none}
+.snav-zona .snav-mm-desc{margin:12px 0 0;font-size:14px!important;line-height:1.5;color:#64748b!important;display:block;overflow:visible}
 .snav-zona .snav-mm-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:20px}
 .snav-zona .snav-mm-tags span{height:auto;padding:6px 14px;border-radius:9999px;background:#f1f5f9;color:#334155;font-size:13px;font-weight:500}
-.snav-zona .snav-mm-img{grid-column:1;grid-row:3;display:flex;min-height:180px;max-height:240px;align-self:stretch;overflow:hidden;background:transparent;border-radius:0}
-.snav-zona .snav-mm-img img{position:static;display:block;width:100%;height:100%;object-fit:cover;object-position:center;border-radius:0}
-.snav-menu.snav-kartu-panel{display:flex;flex-direction:row;gap:12px;padding:12px;width:520px;max-width:calc(100vw - 24px);border:1px solid #cbd5e1;border-radius:14px;background:#ffffff;box-shadow:0 16px 40px -12px rgba(15,23,42,0.18),0 2px 6px rgba(15,23,42,0.05)}
+.snav-zona .snav-mm-img{grid-column:4!important;grid-row:1!important;display:block!important;width:300px!important;aspect-ratio:4/3!important;align-self:center!important;overflow:hidden!important;background:transparent!important;border-radius:0!important;border:1px solid #e2e8f0!important;min-height:0!important;max-height:none!important}
+.snav-zona .snav-mm-img img{position:static!important;display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;border-radius:0!important}
+.snav-menu.snav-zona{width:920px!important;max-width:calc(100vw - 32px)!important}
+.snav-zona .snav-mm-desc{display:block!important;overflow:visible!important;text-overflow:clip!important;max-height:none!important}
+.snav-zona .snav-mm-tags{flex-wrap:nowrap!important}
+.snav-zona .snav-mm-tags span{white-space:nowrap!important;flex:none!important}
+.snav-menu.snav-kartu-panel{display:flex;flex-direction:row;gap:16px;padding:12px;width:520px;max-width:calc(100vw - 24px);border:1px solid #cbd5e1;border-radius:14px;background:#ffffff;box-shadow:0 16px 40px -12px rgba(15,23,42,0.18),0 2px 6px rgba(15,23,42,0.05)}
 .snav-kartu-panel::before{background:#ffffff;border-left:1px solid #cbd5e1;border-top:1px solid #cbd5e1}
-.snav-kartu{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:10px;padding:8px;border-radius:10px;background:#f8fafc;text-decoration:none;outline:none;transition:background-color 120ms ease-out}
-.snav-kartu:hover,.snav-kartu:focus-visible{background:#f1f5f9}
-.snav-kartu:focus-visible{box-shadow:0 0 0 2px #cbd5e1!important}
-.snav-kartu-media{height:112px;width:100%;border-radius:6px;overflow:hidden;background:#f1f5f9;flex:none}
-.snav-kartu-media img{display:block;width:100%;height:100%;object-fit:cover}
-.snav-kartu-text{padding:0 4px 4px}
-.snav-kartu-title{display:block;font-size:15px;font-weight:500;color:#0f172a;line-height:1.3}
-.snav-kartu-desc{margin-top:2px;font-size:13px;color:#64748b;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.snav-kartu{flex:1 1 0;min-width:0;display:flex;flex-direction:column;background:#ffffff!important;border:1px solid #cbd5e1!important;border-radius:0!important;padding:0!important;overflow:hidden!important;text-decoration:none!important;outline:none;transition:background-color 140ms ease,border-color 140ms ease}
+.snav-kartu:hover,.snav-kartu:focus-visible{outline:none!important}
+.snav-kartu:hover .snav-kartu-media img,.snav-kartu:focus-visible .snav-kartu-media img{transform:scale(1.05)}
+.snav-kartu:hover .snav-kartu-title,.snav-kartu:focus-visible .snav-kartu-title{transform:translateX(4px)}
+.snav-kartu:hover .snav-kartu-desc,.snav-kartu:focus-visible .snav-kartu-desc{transform:translateX(4px)}
+.snav-kartu-panel:has(.snav-kartu:hover) .snav-kartu:not(:hover) img{opacity:.78}
+.snav-kartu-media{position:relative;width:100%;aspect-ratio:16 / 10;overflow:hidden!important;border-radius:0!important;border-bottom:1px solid #e2e8f0!important;background:#f8fafc!important}
+.snav-kartu-media img{display:block;width:100%;height:100%;object-fit:cover;border-radius:0!important;transform:scale(1);transform-origin:center;will-change:transform;transition:transform 500ms cubic-bezier(.22,1,.36,1),opacity 280ms ease}
+.snav-kartu-arrow{position:absolute;top:12px;right:12px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:0!important;background:#ffffff!important;border:1px solid #e2e8f0!important;color:#0f172a!important;overflow:hidden!important;pointer-events:none}
+.snav-kartu-arrow svg{color:#0f172a!important;transform:rotate(-45deg);transform-origin:center;will-change:transform;backface-visibility:hidden;transition:transform 380ms cubic-bezier(.22,1,.36,1)}
+.snav-kartu:hover .snav-kartu-arrow svg,.snav-kartu:focus-visible .snav-kartu-arrow svg{transform:rotate(0deg)}
+.snav-kartu-text{padding:14px 16px 20px}
+.snav-kartu-title{display:block;font-size:15px;font-weight:600;line-height:1.3;color:#0f172a!important;transform:translateX(0);transition:transform 240ms cubic-bezier(.22,1,.36,1)}
+.snav-kartu-desc{display:block;margin-top:4px;font-size:13px;font-weight:400;color:#64748b!important;line-height:1.45;white-space:normal!important;transform:translateX(0);transition:transform 240ms cubic-bezier(.22,1,.36,1),color 200ms ease}
 .snav-burger{position:relative;width:40px;height:40px;border:0;background:transparent;cursor:pointer}
 .snav-burger span{position:absolute;left:10px;right:10px;height:2px;border-radius:2px;background:currentColor;transition:transform .3s cubic-bezier(.22,1,.36,1),opacity .2s}
 .snav-burger span:nth-child(1){top:14px}.snav-burger span:nth-child(2){top:19px}.snav-burger span:nth-child(3){top:24px}
@@ -279,32 +306,40 @@ nav:has(.snav-dd.is-open) .snav-dd:not(.is-open) .snav-menu{transition:none !imp
 @media (min-width:1200px){.snav-login.snav-login,.snav-cta.snav-cta{height:40px;font-size:15px}}
 @media (prefers-reduced-motion:reduce){.snav-link.snav-link,.snav-login,.snav-cta,.snav-ink,.snav-chev,.snav-menu,.snav-mm-img img,.snav-burger span,.snav-mobile,.snav-acc,.snav-mega-tile,.snav-mega-link,.snav-mega-cimg{transition:none!important;animation:none!important}}
 @media (prefers-reduced-motion:reduce){.snav-mega-tile,.snav-mega-link,.snav-mega-cimg{transform:none!important}}
-.snav-menu.snav-about-panel{width:700px;max-width:calc(100vw - 24px);display:grid;grid-template-columns:250px minmax(0,1fr);gap:24px;align-items:stretch;padding:20px;border-radius:16px;background:color-mix(in srgb,var(--snav-a) 4%,white);border:1px solid var(--snav-bd);box-shadow:0 12px 32px rgba(15,23,42,.10)}
+.snav-menu.snav-about-panel{width:700px;max-width:calc(100vw - 24px);display:grid;grid-template-columns:250px minmax(0,1fr);gap:24px;align-items:stretch;padding:20px;border-radius:14px;background:#ffffff;border:1px solid #cbd5e1;box-shadow:0 16px 40px -12px rgba(15,23,42,.22),0 2px 6px rgba(15,23,42,.06)}
 .snav-menu.snav-duo-panel{width:880px;max-width:calc(100vw - 24px);display:flex;flex-direction:column;padding:0;border-radius:16px;background:var(--snav-bg);border:1px solid var(--snav-bd);box-shadow:0 12px 32px rgba(15,23,42,.10)}
-.snav-menu.snav-about-panel::before{background:color-mix(in srgb,var(--snav-a) 4%,white)}
-.snav-about-media{min-height:240px;overflow:hidden;border-radius:12px}
+.snav-menu.snav-about-panel::before{background:#ffffff}
+.snav-about-media{min-height:240px;overflow:hidden;border-radius:0;border:1px solid #e2e8f0}
+.snav-about-media img{display:block;width:100%;height:100%;object-fit:cover;border-radius:0;transform:scale(1);transform-origin:center;will-change:transform;transition:transform 500ms cubic-bezier(.22,1,.36,1)}
+.snav-menu.snav-about-panel:has(.snav-about-row:hover) .snav-about-media img,.snav-menu.snav-about-panel:has(.snav-about-row:focus-visible) .snav-about-media img{transform:scale(1.04)}
 .snav-about-body{display:flex;flex-direction:column;min-width:0}
-.snav-about-label{margin-bottom:8px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--snav-a)}
-.snav-about-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--snav-bd);text-decoration:none}
+.snav-about-label{margin-bottom:8px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#64748b}
+.snav-about-row{position:relative;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid #e2e8f0}
 .snav-about-row:last-child{border-bottom:0}
-.snav-about-row:focus-visible{outline:2px solid var(--snav-a);outline-offset:2px;border-radius:6px}
-.snav-about-text{display:flex;flex-direction:column;gap:2px;min-width:0}
-.snav-about-title{font-size:15px;font-weight:500;line-height:1.3;color:var(--snav-h);transition:color .2s ease}
-.snav-about-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;font-weight:400;line-height:1.45;color:var(--snav-h);opacity:.68}
-.snav-about-arrow{flex:none;color:var(--snav-h);opacity:.35;transition:color .2s ease,opacity .2s ease,transform .2s ease}
-.snav-about-row:hover .snav-about-title,.snav-about-row:focus-visible .snav-about-title{color:var(--snav-a)}
-.snav-about-row:hover .snav-about-arrow,.snav-about-row:focus-visible .snav-about-arrow{color:var(--snav-a);opacity:1;transform:translateX(2px)}
-.snav-about-row.is-active .snav-about-title{color:var(--snav-a)}
+.snav-about-text{display:flex;align-items:flex-start;gap:14px;padding-right:32px;min-width:0;transform:translateX(0);will-change:transform;transition:transform 240ms cubic-bezier(.22,1,.36,1)}
+.snav-about-row:hover .snav-about-text,.snav-about-row:focus-visible .snav-about-text{transform:translateX(4px)}
+.snav-about-icon{flex:0 0 22px;margin-top:1px;color:#334155}
+.snav-about-copy{display:flex;flex-direction:column;min-width:0;flex:1 1 auto}
+.snav-about-title{display:block;font-size:15px;font-weight:600;line-height:1.3;color:#0f172a;white-space:normal}
+.snav-about-desc{display:block;font-size:13px;font-weight:400;line-height:1.45;color:#64748b;white-space:normal}
+.snav-about-arrow{position:absolute;right:0;top:50%;margin-top:-8px;width:16px;height:16px;color:#0f172a;pointer-events:none;opacity:0;transform:translateX(-8px);will-change:transform;transition:opacity 220ms ease,transform 300ms cubic-bezier(.16,1,.3,1)}
+.snav-about-row:hover .snav-about-arrow,.snav-about-row:focus-visible .snav-about-arrow{opacity:1;transform:translateX(0)}
 .snav-duo-shell{display:flex;flex-direction:column;overflow:hidden;border-radius:16px}
 .snav-duo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
-.snav-duo-cell{display:flex;flex-direction:column;padding:20px 24px 24px 24px;overflow:hidden;background:var(--snav-bg);text-decoration:none;transition:background-color .2s ease}
+.snav-duo-cell{display:flex;flex-direction:column;padding:20px 24px 24px 24px;overflow:hidden;background:var(--snav-bg);text-decoration:none}
 .snav-duo-cell+.snav-duo-cell{border-left:1px solid var(--snav-bd)}
-.snav-duo-cell:hover{background:color-mix(in srgb,var(--snav-a) 4%,white)}
-.snav-duo-cell:focus-visible{outline:2px solid var(--snav-a);outline-offset:-2px}
-.snav-duo-title{font-size:16px;font-weight:600;line-height:1.3;color:var(--snav-h);transition:color .2s ease}
-.snav-duo-desc{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px;min-height:3em;font-size:13px;font-weight:400;line-height:1.5;color:var(--snav-h);opacity:.7}
-.snav-duo-cell:hover .snav-duo-title,.snav-duo-cell:focus-visible .snav-duo-title{color:var(--snav-a)}
-.snav-duo-media{height:190px;margin-top:16px;overflow:hidden}
+.snav-duo-cell:hover,.snav-duo-cell:focus-visible{background:var(--snav-bg)!important;outline:none!important}
+.snav-duo-title{font-size:16px;font-weight:600;line-height:1.3;color:#0f172a!important;transform:translateX(0);transition:transform 240ms cubic-bezier(.22,1,.36,1)!important;text-decoration:none!important}
+.snav-duo-desc{display:block!important;overflow:visible;margin-top:6px;min-height:3em;font-size:13px;font-weight:400;line-height:1.5;color:#64748b!important;opacity:1!important;transform:translateX(0);transition:transform 240ms cubic-bezier(.22,1,.36,1)!important}
+.snav-duo-cell:hover .snav-duo-title,.snav-duo-cell:focus-visible .snav-duo-title{color:#0f172a!important;transform:translateX(4px)!important}
+.snav-duo-cell:hover .snav-duo-desc,.snav-duo-cell:focus-visible .snav-duo-desc{color:#64748b!important;transform:translateX(4px)!important}
+.snav-duo-media{position:relative!important;height:190px;margin-top:16px;overflow:hidden!important;border-radius:0!important}
+.snav-duo-media img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;border-radius:0!important;transform:scale(1)!important;transform-origin:center!important;will-change:transform!important;transition:transform 500ms cubic-bezier(.22,1,.36,1),opacity 280ms ease!important}
+.snav-duo-cell:hover .snav-duo-media img,.snav-duo-cell:focus-visible .snav-duo-media img{transform:scale(1.05)!important}
+.snav-duo-grid:has(.snav-duo-cell:hover) .snav-duo-cell:not(:hover) .snav-duo-media img,.snav-duo-grid:has(.snav-duo-cell:focus-visible) .snav-duo-cell:not(:hover):not(:focus-visible) .snav-duo-media img{opacity:.78!important}
+.snav-duo-arrow{position:absolute!important;top:12px;right:12px;width:36px;height:36px;border-radius:0!important;background:#ffffff!important;border:1px solid #e2e8f0!important;display:flex!important;align-items:center;justify-content:center;pointer-events:none;z-index:2}
+.snav-duo-arrow-icon{color:#0f172a!important;transform:rotate(-45deg);transform-origin:center;will-change:transform;backface-visibility:hidden;transition:transform 380ms cubic-bezier(.22,1,.36,1)!important}
+.snav-duo-cell:hover .snav-duo-arrow-icon,.snav-duo-cell:focus-visible .snav-duo-arrow-icon{transform:rotate(0deg)}
 @media (max-height:760px){.snav-duo-media{height:140px}}
 .snav-duo-bar{display:flex;flex-shrink:0;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px;border-top:1px solid var(--snav-bd);background:var(--snav-bg)}
 .snav-duo-bar-left{display:flex;align-items:center;gap:12px;min-width:0}
@@ -312,10 +347,11 @@ nav:has(.snav-dd.is-open) .snav-dd:not(.is-open) .snav-menu{transition:none !imp
 .snav-duo-bar-text{display:flex;flex-direction:column;gap:2px;min-width:0}
 .snav-duo-bar-title{font-size:14px;font-weight:600;line-height:1.3;color:var(--snav-h)}
 .snav-duo-bar-sub{font-size:13px;line-height:1.4;color:var(--snav-h);opacity:.65}
-.snav-duo-bar-btn{display:inline-flex;flex:none;align-items:center;justify-content:center;height:36px;padding:0 16px;border:0;border-radius:9999px;background:var(--snav-a);color:#fff;font-size:14px;font-weight:500;text-decoration:none;transition:background-color .2s ease}
-.snav-duo-bar-btn:hover{background:color-mix(in srgb,var(--snav-a) 88%,black)}
-.snav-duo-bar-btn:focus-visible{outline:2px solid var(--snav-a);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){.snav-about-title,.snav-about-arrow,.snav-duo-cell,.snav-duo-title,.snav-duo-bar-btn{transition:none!important}.snav-about-arrow{transform:none!important}}
+.snav-duo-bar-btn{display:inline-flex;flex:none;align-items:center;justify-content:center;height:36px;padding:0 16px;border:0;border-radius:9999px;background:var(--snav-a);color:#fff;font-size:14px;font-weight:500;text-decoration:none;transition:background-color 140ms ease!important}
+.snav-duo-bar-btn:hover,.snav-duo-bar-btn:focus-visible{background:#1d4ed8!important;outline:none!important}
+.snav-duo-btn-arrow{flex:none;margin-left:-14px;opacity:0;transform:translateX(-6px);transition:opacity 140ms ease,transform 160ms cubic-bezier(.22,1,.36,1),margin-left 160ms cubic-bezier(.22,1,.36,1)!important}
+.snav-duo-bar-btn:hover .snav-duo-btn-arrow,.snav-duo-bar-btn:focus-visible .snav-duo-btn-arrow{margin-left:6px;opacity:1;transform:translateX(0)}
+@media (prefers-reduced-motion:reduce){.snav-about-title,.snav-about-arrow,.snav-duo-cell,.snav-duo-title,.snav-duo-bar-btn,.snav-duo-media img,.snav-duo-btn-arrow,.snav-duo-arrow-icon{transition:none!important}.snav-about-arrow{transform:none!important}}
 .snav-menu.snav-preview-panel{width:700px;max-width:calc(100vw - 24px);display:grid;grid-template-columns:320px minmax(0,1fr);gap:20px;align-items:stretch;padding:16px;border-radius:14px;background:#fff;border:1px solid #cbd5e1;box-shadow:0 16px 40px -12px rgba(15,23,42,.22),0 2px 6px rgba(15,23,42,.06)}
 .snav-menu.snav-preview-panel::before{background:#fff;border-left-color:#cbd5e1;border-top-color:#cbd5e1}
 .snav-kl-list{position:relative;display:flex;flex-direction:column;gap:0;min-width:0;height:100%;align-self:stretch;border:1px solid #cbd5e1;border-radius:12px;overflow:hidden;background:#ffffff}
@@ -325,9 +361,9 @@ nav:has(.snav-dd.is-open) .snav-dd:not(.is-open) .snav-menu{transition:none !imp
 .snav-pv-item:focus-visible{outline:none!important;box-shadow:none!important}
 .snav-kl-in{display:flex;align-items:center;gap:12px;min-width:0;flex:1;transform:translateX(0);will-change:transform;transition:transform 200ms cubic-bezier(.22,1,.36,1)}
 .snav-pv-item.is-active .snav-kl-in,.snav-pv-item:hover .snav-kl-in{transform:translateX(10px)}
-.snav-kl-chev{position:absolute;right:8px;top:50%;margin-top:-7px;color:#2563eb;opacity:0;transform:translateX(6px);transition:opacity 160ms ease-out,transform 200ms cubic-bezier(.22,1,.36,1)}
-.snav-pv-item.is-active .snav-kl-chev,.snav-pv-item:hover .snav-kl-chev{opacity:1;transform:translateX(0)}
-.snav-pv-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.snav-karya-arrow{position:absolute;right:16px;top:50%;margin-top:-8px;color:#0f172a;opacity:0;transform:translateX(-8px);transition:opacity 220ms ease,transform 300ms cubic-bezier(.16,1,.3,1);will-change:transform;pointer-events:none}
+.snav-pv-item.is-active .snav-karya-arrow,.snav-pv-item:hover .snav-karya-arrow,.snav-pv-item:focus-visible .snav-karya-arrow{opacity:1;transform:translateX(0)}
+.snav-pv-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;padding-right:40px}
 .snav-pv-title{font-size:16px;font-weight:500;line-height:1.3;color:#0f172a!important}
 .snav-pv-desc{font-size:13.5px;font-weight:400;line-height:1.4;color:#64748b!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .snav-pv-card{position:relative;display:flex;flex-direction:column;padding:0;border-radius:0;background:#ffffff;text-decoration:none;outline:none;border:0;overflow:hidden}
@@ -345,30 +381,39 @@ nav:has(.snav-dd.is-open) .snav-dd:not(.is-open) .snav-menu{transition:none !imp
 .snav-pv-arrow{position:absolute;top:12px;right:12px;z-index:3;pointer-events:none;color:#ffffff!important}
 .snav-pv-card:hover .snav-pv-arrow{transform:rotate(0deg)!important}
 @media (max-width:949px){.snav-menu.snav-preview-panel{grid-template-columns:minmax(0,1fr)}.snav-pv-card{display:none}}
-.snav-menu.snav-pn-panel{width:760px;max-width:calc(100vw - 32px);display:grid;grid-template-columns:minmax(0,1fr) 240px;grid-template-rows:auto;column-gap:24px;row-gap:0;padding:0;align-items:stretch;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 2px 6px -2px rgba(15,23,42,.10)}
-.snav-menu.snav-pn-panel::before{background:#fff;border-left-color:#e2e8f0;border-top-color:#e2e8f0}
-.snav-pn-main{display:flex;flex-direction:column;min-width:0;padding:20px 0 20px 20px}
-.snav-pn-tabs{display:flex;flex-direction:row;gap:20px;align-items:center;padding:0 2px 14px;margin:0;border:0;background:transparent;z-index:auto}
-.snav-pn-tab{position:static;padding:0;margin:0;background:transparent;border:0;border-radius:0;box-shadow:none;cursor:pointer;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;line-height:16px;color:#64748b!important;transition:color 120ms ease-out;outline:none!important}
-.snav-pn-tab:hover{color:#0f172a!important}
-.snav-pn-tab:active{color:#2563eb!important}
+.snav-menu.snav-pn-panel{width:760px;max-width:calc(100vw - 32px);display:grid;grid-template-columns:minmax(0,1fr) 240px;grid-template-rows:auto;column-gap:24px;row-gap:0;padding:0;align-items:stretch;background:#fff;border:1px solid #cbd5e1;border-radius:14px;box-shadow:0 16px 40px -12px rgba(15,23,42,.22),0 2px 6px rgba(15,23,42,.06)}
+.snav-menu.snav-pn-panel::before{background:#fff;border-left-color:#cbd5e1;border-top-color:#cbd5e1}
+.snav-pn-main{display:flex;flex-direction:column;min-width:0;padding:20px 24px 20px 20px}
+.snav-pn-tabs{display:flex;width:100%;gap:0;margin:0 0 8px 0;padding:0;border:0;border-bottom:1px solid #e2e8f0;background:transparent}
+.snav-pn-tab{position:relative;flex:1 1 0;min-width:0;height:40px;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none;outline:none!important;overflow:visible;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#64748b;line-height:1}
+.snav-pn-tab::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:#cbd5e1;transform:scaleX(0);transform-origin:center;transition:transform 220ms cubic-bezier(.22,1,.36,1),background-color 160ms ease}
+.snav-pn-tab-label{position:relative;z-index:1;transition:color 160ms ease}
 .snav-pn-tab[aria-selected="true"]{color:#2563eb!important}
-.snav-pn-tab:focus-visible{box-shadow:0 0 0 2px #cbd5e1!important;border-radius:4px!important;outline:none!important}
-.snav-pn-body{display:grid;min-width:0;border:1px solid #94a3b8!important;border-radius:12px!important;background:#ffffff!important;overflow:hidden!important;padding:0!important;margin:0!important;z-index:auto!important}
-.snav-pn-sub{grid-area:1/1;display:flex;flex-direction:column;justify-content:center;min-width:0;opacity:0;visibility:hidden;pointer-events:none;transition:opacity 90ms ease-in,visibility 0s linear 90ms}
-.snav-pn-sub[data-active="true"]{opacity:1;visibility:visible;pointer-events:auto;transition:opacity 160ms ease-out 90ms,visibility 0s}
-.snav-pn-list{display:flex;flex-direction:column;justify-content:center}
-.snav-pn-item{display:flex;align-items:center;justify-content:space-between;gap:12px;height:68px;padding:0 18px;margin:0;border-radius:0;border:0;border-bottom:1px solid #cbd5e1;text-decoration:none;outline:none;background:transparent;transition:background-color 120ms ease-out}
-.snav-pn-item:last-child{border-bottom:0}
-.snav-pn-item:hover,.snav-pn-item:focus-visible{background-color:#f8fafc;outline:none!important;box-shadow:none!important}
-.snav-pn-texts{min-width:0;flex:1 1 auto}
-.snav-pn-title{display:block;font-size:16px;font-weight:500;line-height:1.3;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.snav-pn-desc{display:block;margin-top:2px;font-size:13.5px;font-weight:400;line-height:1.4;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.snav-pn-item-arrow{flex:none;opacity:0;transform:translateX(-6px);transition:opacity 140ms ease-out,transform 160ms cubic-bezier(.22,1,.36,1)}
-.snav-pn-item:hover .snav-pn-item-arrow,.snav-pn-item:focus-visible .snav-pn-item-arrow{opacity:1;transform:translateX(0)}
-.snav-pn-figure{display:flex;align-self:stretch;min-width:0;border:1px solid #94a3b8!important;border-radius:12px!important;overflow:hidden!important;background:#ffffff!important;margin:20px 20px 20px 0!important}
-.snav-pn-figure img{display:block;width:100%;height:100%;min-height:200px;object-fit:cover;border-radius:0!important}
+.snav-pn-tab[aria-selected="true"] .snav-pn-tab-label{color:#2563eb!important}
+.snav-pn-tab[aria-selected="true"]::after{background:#2563eb;transform:scaleX(1)}
+.snav-pn-tab:hover:not([aria-selected="true"]),.snav-pn-tab:focus-visible:not([aria-selected="true"]){color:#0f172a}
+.snav-pn-tab:hover:not([aria-selected="true"]) .snav-pn-tab-label,.snav-pn-tab:focus-visible:not([aria-selected="true"]) .snav-pn-tab-label{color:#0f172a!important}
+.snav-pn-tab:hover:not([aria-selected="true"])::after,.snav-pn-tab:focus-visible:not([aria-selected="true"])::after{background:#cbd5e1;transform:scaleX(1)}
+.snav-pn-tab:focus-visible{outline:none!important}
+.snav-pn-body{display:grid;min-width:0;border:0!important;border-radius:0!important;background:transparent!important;overflow:visible!important;padding:0!important;margin:0!important;z-index:auto!important}
+.snav-pn-sub{grid-area:1/1;display:flex;flex-direction:column;justify-content:center;min-width:0;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(4px);transition:opacity 90ms ease-in,transform 90ms ease-in,visibility 0s linear 90ms}
+.snav-pn-sub[data-active="true"]{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0);transition:opacity 160ms ease-out 90ms,transform 160ms ease-out 90ms,visibility 0s}
+.snav-pn-list{display:flex;flex-direction:column;gap:0}
+.snav-pn-item{position:relative;display:flex;align-items:flex-start;padding:16px 0;margin:0;border:0!important;border-bottom:1px solid #e2e8f0!important;border-radius:0!important;text-decoration:none;outline:none;background:transparent!important;box-shadow:none!important}
+.snav-pn-item:last-child{border-bottom:0!important}
+.snav-pn-item:hover,.snav-pn-item:focus-visible{background:transparent!important;outline:none!important;box-shadow:none!important}
+.snav-pn-texts{display:flex;align-items:flex-start;gap:14px;min-width:0;flex:1 1 auto;padding-right:32px;transform:translateX(0);transition:transform 200ms cubic-bezier(.22,1,.36,1)}
+.snav-pn-copy{min-width:0;flex:1 1 auto}
+.snav-pn-title{display:block;font-size:15px;font-weight:600;line-height:1.3;color:#0f172a;white-space:normal;overflow:visible;text-overflow:clip}
+.snav-pn-desc{display:block;margin-top:2px;font-size:13px;font-weight:400;line-height:1.4;color:#64748b;white-space:normal;overflow:visible;text-overflow:clip}
+.snav-pn-icon{flex:0 0 22px;margin-top:1px;color:#334155;background:none;border:none;border-radius:0}
+.snav-pn-arrow{position:absolute;right:0;top:16px;color:#0f172a;opacity:0;transform:translateX(-8px);transition:opacity 220ms ease,transform 300ms cubic-bezier(.16,1,.3,1);will-change:transform;pointer-events:none}
+.snav-pn-item:hover .snav-pn-texts,.snav-pn-item:focus-visible .snav-pn-texts{transform:translateX(4px)}
+.snav-pn-item:hover .snav-pn-arrow,.snav-pn-item:focus-visible .snav-pn-arrow{opacity:1;transform:translateX(0)}
+.snav-pn-figure{display:flex;align-self:stretch;min-width:0;border:0!important;border-left:1px solid #e2e8f0!important;border-radius:0!important;overflow:hidden!important;background:#ffffff!important;margin:0!important;padding:20px 20px 20px 24px!important}
+.snav-pn-figure img{display:block;width:100%;height:100%;min-height:200px;object-fit:cover;border:1px solid #e2e8f0!important;border-radius:0!important}
 @media (max-width:949px){.snav-menu.snav-pn-panel{grid-template-columns:1fr}}
+.snav-menu img,.snav-duo-media,.snav-duo-media img{border-radius:0!important}
 `;
 
 let navInkMemo = null;
@@ -578,83 +623,11 @@ function NavImg({ item, className, Icon, imgStyle }) {
 }
 
 let navTimer = null;
-let navCurrent = null;
-let navMenuSeq = 0;
-const navRegistry = new Map();
 
-const NAV_DEBUG = true;
-const navLog = (...a) => {
-  if (NAV_DEBUG) console.log("[nav]", performance.now().toFixed(0), ...a); // DEBUG SEMENTARA dihapus setelah bug terbukti
-};
-
-const navClear = () => {
-  if (navTimer) {
-    clearTimeout(navTimer);
-    navTimer = null;
-  }
-};
-
-const navSwitch = (id) => {
-  navLog("switch", id, "navCurrentSebelum=", navCurrent); // DEBUG SEMENTARA dihapus setelah bug terbukti
-  for (const [key, entry] of navRegistry) {
-    if (key !== id) entry.close();
-  }
-  if (id != null) {
-    const entry = navRegistry.get(id);
-    if (entry) entry.open();
-  }
-  navCurrent = id;
-  navTimer = null;
-};
-
-const navSwitchIfHovered = (id) => {
-  navTimer = null;
-  const entry = navRegistry.get(id);
-  if (!entry || !entry.el || !entry.el.matches(":hover")) {
-    navLog("switchIfHovered abort", id, "alasan=tidak-hover"); // DEBUG SEMENTARA dihapus setelah bug terbukti
-    return;
-  }
-  navSwitch(id);
-};
-
-const navCloseIfNoHover = () => {
-  navTimer = null;
-  let hovered = false;
-  for (const [, entry] of navRegistry) {
-    if (entry && entry.el && entry.el.matches(":hover")) {
-      hovered = true;
-      break;
-    }
-  }
-  if (hovered) {
-    navLog("close abort", "alasan=ada-elemen-yang-hover"); // DEBUG SEMENTARA dihapus setelah bug terbukti
-    return;
-  }
-  navSwitch(null);
-};
-
-const navEnter = (id, ev) => {
-  navClear();
-  navLog("enter", id, "navCurrent=", navCurrent); // DEBUG SEMENTARA dihapus setelah bug terbukti
-  if (ev && ev.currentTarget && !ev.currentTarget.matches(":hover")) {
-    navLog("enter abort", id, "alasan=tidak-hover"); // DEBUG SEMENTARA dihapus setelah bug terbukti
-    return;
-  }
-  if (navCurrent === null || navCurrent === id) navSwitch(id);
-  else navTimer = setTimeout(() => navSwitchIfHovered(id), 100);
-};
-
-const navLeave = (id) => {
-  if (!navRegistry.has(id)) return;
-  navClear();
-  navLog("leave", id); // DEBUG SEMENTARA dihapus setelah bug terbukti
-  navTimer = setTimeout(() => navCloseIfNoHover(), 160);
-};
-
-function NavDropdown({ label, items, groups, variant }) {
+function NavDropdown({ id, label, items, groups, variant, activeMenu, onActivate }) {
   const isMega = Array.isArray(groups);
   const { pathname } = useLocation();
-  const [open, setOpen] = useState(false);
+  const open = activeMenu === id;
   const [cur, setCur] = useState(0);
   const [karyaAktif, setKaryaAktif] = useState(0);
   const [karyaHover, setKaryaHover] = useState(null);
@@ -663,7 +636,6 @@ function NavDropdown({ label, items, groups, variant }) {
   const rootRef = useRef(null);
   const btnRef = useRef(null);
   const menuRef = useRef(null);
-  const [menuId] = useState(() => ++navMenuSeq);
   const activeIdx = isMega
     ? -1
     : items.findIndex(
@@ -675,21 +647,60 @@ function NavDropdown({ label, items, groups, variant }) {
       : activeIdx >= 0;
   const item = isMega ? null : items[cur] || items[0];
   const hasImg = !isMega && items.some((i) => i.img);
-  useEffect(() => {
-    navRegistry.set(menuId, {
-      open: () => setOpen(true),
-      close: () => setOpen(false),
-      el: rootRef.current,
-    });
-    return () => {
-      navRegistry.delete(menuId);
-      if (navCurrent === menuId) navCurrent = null;
-    };
-  }, [menuId]);
 
-  useEffect(() => {
-    if (!open && navCurrent === menuId) navCurrent = null;
-  }, [open, menuId]);
+  const clearNavTimer = () => {
+    if (navTimer) {
+      clearTimeout(navTimer);
+      navTimer = null;
+    }
+  };
+
+  const handleEnter = (e) => {
+    clearNavTimer();
+    // DEBUG SEMENTARA
+    console.log('[nav]', 'enter', id, Math.round(performance.now()));
+    if (e && e.currentTarget && !e.currentTarget.matches(":hover")) return;
+    const target = rootRef.current;
+    const delay = activeMenu === null || activeMenu === id ? 100 : 120;
+    // DEBUG SEMENTARA
+    console.log('[nav]', 'jadwal-buka', id, Math.round(performance.now()));
+    navTimer = setTimeout(() => {
+      // DEBUG SEMENTARA
+      console.log('[nav]', 'timer-buka-jalan', id, Math.round(performance.now()));
+      if (!target || !target.matches(":hover")) {
+        // DEBUG SEMENTARA
+        console.log('[nav]', 'timer-buka-dibatalkan-matches', id, Math.round(performance.now()));
+        return;
+      }
+      onActivate(id);
+      navTimer = null;
+    }, delay);
+  };
+
+  const handleLeave = () => {
+    clearNavTimer();
+    // DEBUG SEMENTARA
+    console.log('[nav]', 'leave', id, Math.round(performance.now()));
+    const target = rootRef.current;
+    // DEBUG SEMENTARA
+    console.log('[nav]', 'jadwal-tutup', id, Math.round(performance.now()));
+    navTimer = setTimeout(() => {
+      // DEBUG SEMENTARA
+      console.log('[nav]', 'timer-tutup-jalan', id, Math.round(performance.now()));
+      if (target && target.matches(":hover")) return;
+      if (activeMenu === id) onActivate(null);
+      navTimer = null;
+    }, 160);
+  };
+
+  const handleFocus = (e) => {
+    // DEBUG SEMENTARA
+    console.log('[nav]', 'fokus', id, Math.round(performance.now()));
+    if (e.currentTarget.matches(":focus-visible")) {
+      clearNavTimer();
+      onActivate(id);
+    }
+  };
 
   useLayoutEffect(() => {
     if (!open) return;
@@ -724,14 +735,14 @@ function NavDropdown({ label, items, groups, variant }) {
     if (!open) return;
     const down = (e) => {
       if (rootRef.current && !rootRef.current.contains(e.target)) {
-        navClear();
-        navSwitch(null);
+        clearNavTimer();
+        onActivate(null);
       }
     };
     const key = (e) => {
       if (e.key === "Escape") {
-        navClear();
-        navSwitch(null);
+        clearNavTimer();
+        onActivate(null);
       }
     };
     document.addEventListener("pointerdown", down);
@@ -740,13 +751,13 @@ function NavDropdown({ label, items, groups, variant }) {
       document.removeEventListener("pointerdown", down);
       document.removeEventListener("keydown", key);
     };
-  }, [open, variant]);
+  }, [open, onActivate, id]);
   return (
     <div
       ref={rootRef}
       className={`snav-dd${open ? " is-open" : ""}`}
-      onMouseEnter={(e) => navEnter(menuId, e)}
-      onMouseLeave={() => navLeave(menuId)}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
     >
       <button
         type="button"
@@ -754,11 +765,11 @@ function NavDropdown({ label, items, groups, variant }) {
         className={`snav-link${active ? " is-active" : ""}`}
         aria-haspopup="menu"
         aria-expanded={open}
+        onFocus={handleFocus}
         onClick={(e) => {
-          navLog("click", menuId); // DEBUG SEMENTARA dihapus setelah bug terbukti
-          navClear();
-          if (e.detail === 0 && open) navSwitch(null);
-          else navSwitch(menuId);
+          clearNavTimer();
+          if (e.detail === 0 && open) onActivate(null);
+          else onActivate(open ? null : id);
         }}
       >
         {label}
@@ -798,7 +809,7 @@ function NavDropdown({ label, items, groups, variant }) {
                               role="menuitem"
                               className="snav-mega-link"
                               title={p.label}
-                              onClick={() => setOpen(false)}
+                              onClick={() => { clearNavTimer(); onActivate(null); }}
                             >
                               {p.label.replace(/^Teknologi\s+/, "")}
                             </NavLink>
@@ -844,23 +855,18 @@ function NavDropdown({ label, items, groups, variant }) {
                   to={it.href}
                   role="menuitem"
                   onMouseEnter={() => { setKaryaAktif(i); setKaryaHover(i); }}
-                  onFocus={(e) => {
-                    navLog("focus", menuId, e.currentTarget.matches(":focus-visible")); // DEBUG SEMENTARA dihapus setelah bug terbukti
-                    setKaryaAktif(i);
-                    setKaryaHover(i);
-                  }}
-                  onClick={() => setOpen(false)}
+                  onFocus={() => { setKaryaAktif(i); setKaryaHover(i); }}
+                  onClick={() => { clearNavTimer(); onActivate(null); }}
                   className={`snav-pv-item${aktif ? " is-active" : ""}`}
                   style={{
                     outline: "none",
                     boxShadow: "none",
                   }}
                 >
-                  <ChevronRight
-                    className="snav-kl-chev"
-                    size={14}
+                  <ArrowRight
+                    className="snav-karya-arrow"
+                    size={16}
                     aria-hidden="true"
-                    style={{ color: "#2563eb" }}
                   />
                   <span className="snav-kl-in">
                     <span className="snav-pv-text">
@@ -875,7 +881,7 @@ function NavDropdown({ label, items, groups, variant }) {
           <Link
             to={KARYA_MENU[karyaAktif].href}
             role="menuitem"
-            onClick={() => setOpen(false)}
+            onClick={() => { clearNavTimer(); onActivate(null); }}
             className="snav-pv-card"
           >
             <span className="snav-pv-media">
@@ -939,21 +945,24 @@ function NavDropdown({ label, items, groups, variant }) {
             <NavImg item={NAV_IMG.tentang} />
           </div>
           <div className="snav-about-body">
-            <div className="snav-about-label">TENTANG SINGGAH</div>
+            <div className="snav-about-label">TENTANG</div>
             {items.map((it) => (
               <NavLink
                 key={it.to}
                 to={it.to}
                 role="menuitem"
-                onClick={() => setOpen(false)}
+                onClick={() => { clearNavTimer(); onActivate(null); }}
                 className={({ isActive }) =>
                   `snav-about-row${isActive ? " is-active" : ""}`
                 }
               >
-                <span className="snav-about-text">
-                  <span className="snav-about-title">{it.label}</span>
-                  <span className="snav-about-desc">{it.desc}</span>
-                </span>
+                <div className="snav-about-text">
+                  <it.ikon size={22} strokeWidth={1.5} aria-hidden="true" className="snav-about-icon" />
+                  <div className="snav-about-copy">
+                    <div className="snav-about-title">{it.label}</div>
+                    <div className="snav-about-desc">{it.desc}</div>
+                  </div>
+                </div>
                 <ArrowRight
                   className="snav-about-arrow"
                   size={16}
@@ -972,12 +981,15 @@ function NavDropdown({ label, items, groups, variant }) {
                   key={it.to}
                   to={it.to}
                   role="menuitem"
-                  onClick={() => setOpen(false)}
+                  onClick={() => { clearNavTimer(); onActivate(null); }}
                   className="snav-duo-cell"
                 >
                   <span className="snav-duo-title">{it.label}</span>
                   <span className="snav-duo-desc">{it.desc}</span>
                   <div className="snav-duo-media">
+                    <span className="snav-duo-arrow" aria-hidden="true">
+                      <ArrowRight size={16} className="snav-duo-arrow-icon" aria-hidden="true" />
+                    </span>
                     <NavImg
                       item={
                         it.to === "/kemitraan"
@@ -1001,17 +1013,17 @@ function NavDropdown({ label, items, groups, variant }) {
                     Siap berkolaborasi dengan Singgah?
                   </span>
                   <span className="snav-duo-bar-sub">
-                    Mulai dengan mengajukan masalah yang ingin dikerjakan
-                    mahasiswa.
+                    Dari masalah di lapangan, bisa lahir proyek yang berguna.
                   </span>
                 </div>
               </div>
               <NavLink
                 to="/pengajuan-masalah"
                 className="snav-duo-bar-btn"
-                onClick={() => setOpen(false)}
+                onClick={() => { clearNavTimer(); onActivate(null); }}
               >
                 Ajukan masalah
+                <ArrowRight size={14} strokeWidth={2} aria-hidden="true" className="snav-duo-btn-arrow" />
               </NavLink>
             </div>
           </div>
@@ -1034,7 +1046,7 @@ function NavDropdown({ label, items, groups, variant }) {
                 className="snav-pn-tab"
                 style={{ outline: "none" }}
               >
-                Penelitian
+                <span className="snav-pn-tab-label">Penelitian</span>
               </button>
               <button
                 type="button"
@@ -1047,7 +1059,7 @@ function NavDropdown({ label, items, groups, variant }) {
                 className="snav-pn-tab"
                 style={{ outline: "none" }}
               >
-                PkM
+                <span className="snav-pn-tab-label">PkM</span>
               </button>
             </div>
 
@@ -1069,11 +1081,8 @@ function NavDropdown({ label, items, groups, variant }) {
                             to={it.to}
                             role="menuitem"
                             onMouseEnter={() => setPenelitianAktif(idx)}
-                            onFocus={(e) => {
-                              navLog("focus", menuId, e.currentTarget.matches(":focus-visible")); // DEBUG SEMENTARA dihapus setelah bug terbukti
-                              setPenelitianAktif(idx);
-                            }}
-                            onClick={() => setOpen(false)}
+                            onFocus={() => setPenelitianAktif(idx)}
+                            onClick={() => { clearNavTimer(); onActivate(null); }}
                             className="snav-pn-item"
                             data-active-item={
                               penelitianAktif === idx ? "true" : "false"
@@ -1081,16 +1090,19 @@ function NavDropdown({ label, items, groups, variant }) {
                             style={{ textDecoration: "none", outline: "none" }}
                           >
                             <div className="snav-pn-texts">
-                              <span className="snav-pn-title">{it.label}</span>
-                              <span className="snav-pn-desc">{it.desc}</span>
+                              {it.ikon && <it.ikon size={22} strokeWidth={1.5} aria-hidden="true" className="snav-pn-icon" />}
+                              <div className="snav-pn-copy">
+                                <span className="snav-pn-title">{it.label}</span>
+                                <span className="snav-pn-desc">{it.desc}</span>
+                              </div>
                             </div>
                             <ArrowRight
-                              className="snav-pn-item-arrow"
+                              className="snav-pn-arrow"
                               size={16}
                               strokeWidth={2}
-                              style={{ color: "#2563eb" }}
                               aria-hidden="true"
                             />
+
                           </NavLink>
                         );
                       })}
@@ -1116,7 +1128,7 @@ function NavDropdown({ label, items, groups, variant }) {
               key={it.to}
               to={it.to}
               role="menuitem"
-              onClick={() => setOpen(false)}
+              onClick={() => { clearNavTimer(); onActivate(null); }}
               className="snav-kartu"
               style={{ outline: "none" }}
             >
@@ -1124,6 +1136,9 @@ function NavDropdown({ label, items, groups, variant }) {
                 {it.img && (
                   <img src={it.img} alt="" decoding="async" loading="lazy" />
                 )}
+                <span className="snav-kartu-arrow" aria-hidden="true">
+                  <ArrowRight size={16} aria-hidden="true" />
+                </span>
               </div>
               <div className="snav-kartu-text">
                 <span className="snav-kartu-title">{it.label}</span>
@@ -1151,11 +1166,8 @@ function NavDropdown({ label, items, groups, variant }) {
                   role="menuitem"
                   className={`snav-mm-item${i === cur ? " is-hover" : ""}`}
                   onMouseEnter={() => setCur(i)}
-                  onFocus={(e) => {
-                    navLog("focus", menuId, e.currentTarget.matches(":focus-visible")); // DEBUG SEMENTARA dihapus setelah bug terbukti
-                    setCur(i);
-                  }}
-                  onClick={() => setOpen(false)}
+                  onFocus={() => setCur(i)}
+                  onClick={() => { clearNavTimer(); onActivate(null); }}
                 >
                   {it.label}
                 </NavLink>
@@ -1169,18 +1181,18 @@ function NavDropdown({ label, items, groups, variant }) {
               style={{ gridColumn: "2", gridRow: "1" }}
             />
           )}
-            <div
-              className="snav-mm-body"
-              style={{
-                gridColumn: variant === "zona" ? "1" : "2",
-                gridRow: variant === "zona" ? "2" : "1",
-              }}
-            >
-            <div className="snav-mm-label">Jelajahi</div>
+          <div
+            className="snav-mm-body"
+            style={{
+              gridColumn: variant === "zona" ? "3" : "2",
+              gridRow: "1",
+            }}
+          >
+            <div className="snav-mm-label">JELAJAHI</div>
             <NavLink
               to={item.to}
               className="snav-mm-title"
-              onClick={() => setOpen(false)}
+              onClick={() => { clearNavTimer(); onActivate(null); }}
             >
               {item.label}
               <ArrowRight size={16} aria-hidden="true" />
@@ -1225,6 +1237,8 @@ function NavbarVisitor() {
   const [isOpen, setIsOpen] = useState(false);
   const [accOpen, setAccOpen] = useState(false);
   const [accKaryaOpen, setAccKaryaOpen] = useState(false);
+  const [activeMenu, setActiveMenu] = useState(null);
+  const handleActivateMenu = (id) => setActiveMenu(id);
   const [accKolabOpen, setAccKolabOpen] = useState(false);
   const [accTentangOpen, setAccTentangOpen] = useState(false);
   const [accPenelitianOpen, setAccPenelitianOpen] = useState(false);
@@ -1283,21 +1297,21 @@ function NavbarVisitor() {
     {
       to: "/akademik/tur-virtual",
       label: "Tur Virtual",
-      desc: "Lihat-lihat laboratorium, ruang kelas, dan bengkel kampus lewat foto 360°.",
+      desc: "Keliling lab dan ruang kelas tanpa datang ke kampus",
       tags: ["Laboratorium", "Fasilitas"],
       img: imgTur,
     },
     {
       to: "/pemenang",
       label: "Prestasi",
-      desc: "Prestasi mahasiswa Poliban di berbagai lomba, lengkap dengan karya yang membawa mereka menang.",
+      desc: "Catatan kemenangan mahasiswa di berbagai lomba",
       tags: ["Juara", "Penghargaan"],
       img: imgPemenang,
     },
     {
       to: "/dosen",
       label: "Daftar Dosen",
-      desc: "Profil dosen Poliban dari semua jurusan, beserta bidang keahlian dan mata kuliah yang diampu.",
+      desc: "Dosen pengampu mata kuliah beserta bidang keahliannya",
       tags: ["Profil", "Bidang keahlian"],
       img: imgDosen,
     },
@@ -1306,29 +1320,44 @@ function NavbarVisitor() {
     {
       to: "/kemitraan",
       label: "Kemitraan",
-      desc: "Perusahaan dan instansi yang bekerja sama dengan Poliban lewat Singgah.",
+      desc: "Perusahaan dan instansi yang bekerja sama lewat Singgah",
     },
     {
       to: "/pengajuan-masalah",
       label: "Pengajuan Masalah",
-      desc: "Punya persoalan di perusahaan atau instansimu? Ajukan di sini supaya bisa dikerjakan mahasiswa Poliban.",
+      desc: "Punya persoalan di perusahaan atau instansi? Ajukan di sini",
     },
   ];
   const tentangItems = [
     {
-      to: "/berita",
-      label: "Berita",
-      desc: "Kabar terbaru seputar karya dan kegiatan di Poliban.",
+      to: "/tentang/profil",
+      label: "Profile",
+      desc: "Mengenal prodi dari dekat",
+      ikon: GraduationCap,
+    },
+    {
+      to: "/tentang/struktur-organisasi",
+      label: "Struktur Organisasi",
+      desc: "Bagan jabatan dan tugas di prodi",
+      ikon: Network,
     },
     {
       to: "/about",
       label: "Informasi Singgah",
-      desc: "Mengenal Singgah: apa itu, untuk siapa, dan bagaimana cara kerjanya.",
+      desc: "Apa itu Singgah dan untuk siapa",
+      ikon: Compass,
+    },
+    {
+      to: "/berita",
+      label: "Pengumuman",
+      desc: "Kabar dan pemberitahuan terbaru",
+      ikon: Bell,
     },
     {
       to: "/faq",
       label: "FAQ",
-      desc: "Jawaban untuk pertanyaan yang paling sering ditanyakan.",
+      desc: "Jawaban untuk pertanyaan yang sering diajukan",
+      ikon: CircleHelp,
     },
   ];
   const closeMenu = () => {
@@ -1420,32 +1449,47 @@ function NavbarVisitor() {
         >
           <style>{SNAV_CSS}</style>
           <NavDropdown
+            id="karya"
             label="Karya"
             items={KARYA_MENU}
             variant="preview"
+            activeMenu={activeMenu}
+            onActivate={handleActivateMenu}
           />
 
           <NavDropdown
+            id="penelitian"
             label={NAMA_MENU_PENELITIAN}
             items={MENU_PENELITIAN.flatMap((c) => c.items)}
             variant="kolom-media"
+            activeMenu={activeMenu}
+            onActivate={handleActivateMenu}
           />
           <NavDropdown
+            id="zona"
             label="Zona Akademik"
             items={zonaAkademikItems}
             variant="zona"
+            activeMenu={activeMenu}
+            onActivate={handleActivateMenu}
           />
           <NavDropdown
+            id="pengabdian"
             label="Pengabdian"
             items={MENU_PENGABDIAN}
             variant="kartu"
+            activeMenu={activeMenu}
+            onActivate={handleActivateMenu}
           />
           <NavDropdown
+            id="kolaborasi"
             label="Kolaborasi"
             items={kolaborasiItems}
             variant="duo"
+            activeMenu={activeMenu}
+            onActivate={handleActivateMenu}
           />
-          <NavDropdown label="Tentang" items={tentangItems} variant="about" />
+          <NavDropdown id="tentang" label="Tentang" items={tentangItems} variant="about" activeMenu={activeMenu} onActivate={handleActivateMenu} />
         </nav>
         <div className="snav-auth min-[950px]:justify-self-end">
           <NavLink to="/login" onClick={closeMenu} className="snav-login">

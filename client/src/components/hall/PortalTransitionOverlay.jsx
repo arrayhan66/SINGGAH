@@ -61,7 +61,7 @@ function PortalTransitionOverlay() {
         className={`h-8 w-8 animate-spin rounded-full border-2 border-transparent ${
           isDark
             ? "border-t-cyan-400 border-r-cyan-400/50"
-            : "border-t-[#2563eb] border-r-[#2563eb]/50"
+            : "border-t-[var(--color-accent-primary)] border-r-[var(--color-accent-primary)]/50"
         }`}
       />
       <div

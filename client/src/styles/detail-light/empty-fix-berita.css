@@ -4,7 +4,7 @@
   color: #67e8f9;
 }
 html.light .karya-detail-page div.col-span-full span.font-semibold.text-slate-300 {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 
 /* ===== CARD KARYA 3D (DARK MODE) =====

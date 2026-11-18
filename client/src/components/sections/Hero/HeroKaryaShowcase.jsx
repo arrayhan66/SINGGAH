@@ -198,7 +198,7 @@ function HeroKaryaShowcase() {
 
     const restore = reducedMotion
       ? "none"
-      : "transform 300ms ease, filter 300ms ease";
+      : "transform 300ms ease";
 
     els.forEach((el) => {
       el.style.transition = "none";
@@ -376,7 +376,6 @@ function HeroKaryaShowcase() {
   }, [paused, count, isTabVisible, dragging, reducedMotion]);
 
   const mul = isMobileNarrow ? 0.9 : 1.04;
-  const rotateYDeg = isMobileNarrow ? 8 : 14;
 
   const cardBaseStyle = {
     position: "absolute",
@@ -416,8 +415,6 @@ function HeroKaryaShowcase() {
         ref={carouselRef}
         className="relative w-full overflow-hidden"
         style={{
-          perspective: "1800px",
-          perspectiveOrigin: "center center",
           touchAction: "pan-y",
           "--card-w": cardWidth,
           minHeight: `calc(var(--card-w) * 0.625 + 80px)`,
@@ -449,51 +446,40 @@ function HeroKaryaShowcase() {
               const isActiveCard = off === 0;
               const side = off === -1 || off === 1;
 
-              let s, op, z, pe, ry, rz;
+              let s, op, z, pe;
               if (isActiveCard) {
                 s = 1;
                 op = 1;
                 z = 5;
                 pe = "auto";
-                ry = 0;
-                rz = 0;
               } else if (side) {
                 s = 0.96;
                 op = 1;
                 z = 4;
                 pe = "auto";
-                ry = off * -rotateYDeg;
-                rz = off * 1.6;
               } else {
                 s = 0.9;
                 op = 0;
                 z = 0;
                 pe = "none";
-                ry = 0;
-                rz = 0;
               }
 
               const dragX = dragging ? dragDelta : 0;
-              if (reducedMotion) {
-                ry = 0;
-                rz = 0;
-              }
 
               let trans;
               if (dragging || reducedMotion) {
                 trans = "none";
               } else {
-                trans = "transform 300ms ease, filter 300ms ease";
+                trans = "transform 300ms ease";
               }
 
               const style = {
                 ...cardBaseStyle,
                 cursor: isActiveCard ? "pointer" : side ? "none" : "default",
                 transition: trans,
-                willChange: reducedMotion ? "filter" : "transform, filter",
-                transform: `translateX(calc(${off} * var(--card-w) * ${mul} + ${dragX}px)) scale(${s}) rotateY(${ry}deg) rotateZ(${rz}deg)`,
+                willChange: "transform",
+                transform: `translateX(calc(${off} * var(--card-w) * ${mul} + ${dragX}px)) scale(${s})`,
                 opacity: op,
-                filter: side ? "brightness(var(--hero-side-dim))" : "none",
                 zIndex: z,
                 pointerEvents: pe,
               };

@@ -28,7 +28,7 @@
 }
 .admin-page .sidebar-menu-active .sidebar-menu-tile,
 .admin-page aside .sidebar-collapse-arrow {
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   background-color: transparent;
   color: #ffffff;
   box-shadow: 0 6px 18px -6px rgba(34, 211, 238, 0.5);
@@ -60,7 +60,7 @@ html.light .admin-page aside .sidebar-menu-active .sidebar-menu-subtitle {
 html.light .admin-page aside .sidebar-menu-active .sidebar-menu-tile,
 html.light .admin-page aside .sidebar-collapse-arrow {
   background-image: none;
-  background-color: #2563eb;
+  background-color: var(--color-accent-primary);
   color: #ffffff;
   box-shadow: 0 6px 18px -6px rgba(37, 99, 235, 0.45);
 }
@@ -85,7 +85,7 @@ html.light .admin-page aside .sidebar-collapse-btn {
    Berubah jadi kotak radius persis seperti tile ikon menu utama
    (h-10 w-10 rounded-xl), ikut palet aktif di tiap mode. */
 .admin-page aside .sidebar-collapse-btn.sidebar-collapsed {
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   background-color: transparent;
   border-color: transparent;
   color: #ffffff;
@@ -98,7 +98,7 @@ html.light .admin-page aside .sidebar-collapse-btn {
 }
 html.light .admin-page aside .sidebar-collapse-btn.sidebar-collapsed {
   background-image: none;
-  background-color: #2563eb;
+  background-color: var(--color-accent-primary);
   color: #ffffff;
   box-shadow: 0 6px 18px -6px rgba(37, 99, 235, 0.45);
 }
@@ -120,7 +120,7 @@ html.light .admin-page aside .sidebar-collapse-btn.sidebar-collapsed:hover {
 html.light .admin-page .card-action-btn {
   border-color: #bfdbfe;
   background-color: #ffffff;
-  color: #2563eb;
+  color: var(--color-accent-primary);
   box-shadow: 0 4px 14px -8px rgba(37, 99, 235, 0.5);
 }
 html.light .admin-page .card-action-btn:hover {
@@ -173,7 +173,7 @@ html.light .admin-page .card-star-btn.card-featured:hover {
 html.light .admin-page .card-slideshow-btn {
   border-color: #bfdbfe;
   background-color: #ffffff;
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 html.light .admin-page .card-slideshow-btn.card-featured {
   border-color: #10b981;
@@ -380,7 +380,7 @@ html.light .admin-page .status-pill-rejected {
    Teks kecil dengan ikon, tanpa pill/border supaya terasa natural
    dan tidak "penuh tag". Warna dibedakan per tema. */
 html.light .admin-page .author-badge-dosen {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 html.light .admin-page .author-badge-mahasiswa {
   color: #059669;
@@ -397,7 +397,7 @@ html.light .admin-page .category-group-divider {
   border-color: #b9c9e8;
 }
 .admin-page .category-group-icon {
-  background-image: linear-gradient(135deg, #22d3ee 0%, #2563eb 100%);
+  background-image: linear-gradient(135deg, #22d3ee 0%, var(--color-accent-primary) 100%);
   border-color: transparent;
   color: #ffffff;
   box-shadow:
@@ -409,7 +409,7 @@ html.light .admin-page .category-group-divider {
 }
 html.light .admin-page .category-group-icon {
   background-image: none;
-  background-color: #2563eb;
+  background-color: var(--color-accent-primary);
   box-shadow:
     0 6px 16px -8px rgba(37, 99, 235, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
@@ -470,7 +470,7 @@ html.light .admin-page .category-group-icon svg {
   z-index: 1;
 }
 .admin-page div.admin-empty-projects div.rounded-full.bg-slate-800\/50 {
-  background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+  background: linear-gradient(135deg, var(--color-accent-primary) 0%, #06b6d4 100%);
   box-shadow:
     0 8px 20px -8px rgba(6, 182, 212, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
@@ -543,7 +543,7 @@ html.light .admin-page div.admin-empty-projects p.text-slate-500 {
   z-index: 1;
 }
 .admin-page div.admin-empty-news div.rounded-full.bg-slate-800\/50 {
-  background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+  background: linear-gradient(135deg, var(--color-accent-primary) 0%, #06b6d4 100%);
   box-shadow:
     0 8px 20px -8px rgba(6, 182, 212, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
@@ -613,7 +613,7 @@ html.light .admin-page div.admin-empty-news p.text-slate-500 {
   z-index: 1;
 }
 .admin-page div.admin-empty-categories div.rounded-full.bg-slate-800\/50 {
-  background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+  background: linear-gradient(135deg, var(--color-accent-primary) 0%, #06b6d4 100%);
   box-shadow:
     0 8px 20px -8px rgba(6, 182, 212, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
@@ -685,7 +685,7 @@ html.light .admin-page div.admin-empty-categories p.text-slate-500 {
   z-index: 1;
 }
 .admin-page div.admin-empty-users div.rounded-xl.bg-slate-800\/50 {
-  background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+  background: linear-gradient(135deg, var(--color-accent-primary) 0%, #06b6d4 100%);
   box-shadow:
     0 8px 20px -8px rgba(6, 182, 212, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
@@ -747,7 +747,7 @@ html.light .admin-page span.border-amber-400\/25.bg-amber-400\/10.text-amber-300
    Dark: tombol putih solid. Light: dibuat biru solid primer (senada
    tombol "Tambah User") + ikon & teks putih agar lebih menonjol. */
 html.light .admin-page .user-action-detail {
-  background-color: #2563eb;
+  background-color: var(--color-accent-primary);
   border-color: #1d4ed8;
   color: #ffffff;
   box-shadow: 0 6px 16px -8px rgba(37, 99, 235, 0.5);
@@ -880,7 +880,7 @@ html.light .admin-page .user-form-upload {
 html.light .admin-page .user-form-upload:hover {
   background-color: #eff6ff;
   border-color: #60a5fa;
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 
 /* ===== FOTO PROFIL FORM USER (LIGHT) =====
@@ -893,7 +893,7 @@ html.light .admin-page .user-form-avatar .bg-gradient-to-br.font-bold.text-white
   border-color: #dbe2ec;
 }
 html.light .admin-page .user-form-camera {
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   background-color: transparent;
   box-shadow: 0 6px 16px -6px rgba(37, 99, 235, 0.5);
 }

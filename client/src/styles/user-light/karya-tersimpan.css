@@ -11,7 +11,7 @@ html.light .user-page .bg-gradient-to-br.from-cyan-400\/20.to-blue-500\/10 {
   box-shadow: none;
 }
 html.light .user-page .bg-gradient-to-br.from-cyan-400\/20.to-blue-500\/10 svg {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 html.light
   .user-page
@@ -36,7 +36,7 @@ html.light .user-page .bg-white\/10.text-slate-300 {
 
 /* ===== KARYA TERSIMPAN: JUDUL & TAG ===== */
 html.light .user-page section h2 span.text-cyan-300 {
-  background-image: linear-gradient(90deg, #2563eb, #0ea5e9);
+  background-image: linear-gradient(90deg, var(--color-accent-primary), #0ea5e9);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -46,7 +46,7 @@ html.light .user-page .hero h1 {
   color: #0f172a;
 }
 html.light .user-page .hero h1 span.text-cyan-300 {
-  background-image: linear-gradient(90deg, #2563eb, #0ea5e9);
+  background-image: linear-gradient(90deg, var(--color-accent-primary), #0ea5e9);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -63,7 +63,7 @@ html.light .user-page .hero p {
   color: #475569;
 }
 html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl span.rounded-full {
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   border-color: transparent;
   color: #ffffff;
   box-shadow: 0 4px 12px -4px rgba(37, 99, 235, 0.35);
@@ -77,8 +77,8 @@ html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl sp
 /* Samakan persis tombol bookmark halaman Karya Detail:
    gradasi cyan -> biru + ikon putih, hover terangkat + glow biru */
 html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.rounded-full.bg-brand-navy\/80.text-slate-200 {
-  background-color: #2563eb;
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-color: var(--color-accent-primary);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   border-color: rgba(255, 255, 255, 0.35);
   color: #ffffff;
 }
@@ -102,7 +102,7 @@ html.light .user-page .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl bu
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   color: #ffffff;
   transition:
     transform 0.3s cubic-bezier(0.33, 1, 0.68, 1),
@@ -189,7 +189,7 @@ html.light .user-page button.karya-loadmore-btn {
   isolation: isolate;
   overflow: hidden;
   border-color: transparent;
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   color: #ffffff;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.35),

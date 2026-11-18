@@ -16,8 +16,8 @@ html.light .karya-page #karya.bg-brand-dark {
    Tebal 2px + ikon + gradasi cyan -> biru + teks putih,
    konsisten dengan badge kategori di halaman detail. */
 html.light .karya-page .category-chip {
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
-  background-color: #2563eb;
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
+  background-color: var(--color-accent-primary);
   border-color: rgba(255, 255, 255, 0.55);
   color: #ffffff;
   box-shadow: 0 4px 14px -4px rgba(37, 99, 235, 0.45);
@@ -65,7 +65,7 @@ html.light .karya-page #karya h2.text-white {
 /* Icon box header (Library): LIGHT MODE disamakan dengan icon kotak
    kategori = gradasi cyan -> biru + ikon putih */
 html.light .karya-page #karya .rounded-2xl.border-cyan-400\/30.bg-cyan-400\/10 {
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   background-color: transparent;
   border-color: transparent;
   box-shadow: 0 10px 24px -8px rgba(37, 99, 235, 0.45);
@@ -80,7 +80,7 @@ html.light
 
 /* "SinggaH" highlight: teks gradient biru -> sky */
 html.light .karya-page #karya h2 span.text-cyan-300 {
-  background-image: linear-gradient(90deg, #2563eb, #0ea5e9);
+  background-image: linear-gradient(90deg, var(--color-accent-primary), #0ea5e9);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -182,7 +182,7 @@ html.light
   background-image: linear-gradient(
     to bottom right,
     #22d3ee,
-    #2563eb
+    var(--color-accent-primary)
   );
   color: #ffffff;
 }
@@ -196,7 +196,7 @@ html.light .karya-page button.bg-white.text-slate-900 {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   color: #ffffff;
   transition:
     transform 0.3s cubic-bezier(0.33, 1, 0.68, 1),
@@ -228,7 +228,7 @@ html.light .karya-page button.hover\:bg-slate-200:active {
 
 /* ===== SEARCH BAR ===== */
 /* Natural putih; saat fokus: border biru muda + glow biru di bawah
-   (biru aktif menu #2563eb) */
+   (biru aktif menu var(--color-accent-primary)) */
 html.light .karya-page .border-white\/60.bg-white\/90 {
   background-color: #fbfcfe;
   border-color: #e2e8f0;
@@ -253,7 +253,7 @@ html.light .karya-page button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10 {
   isolation: isolate;
   overflow: hidden;
   border-color: transparent;
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   color: #ffffff;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.35),
@@ -348,7 +348,7 @@ html.light .karya-page button.rounded-xl.border-cyan-400\/30.bg-cyan-400\/10:act
   color: #67e8f9;
 }
 html.light .karya-page div.col-span-full span.font-semibold.text-slate-300 {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 
 /* ===== SKELETON CATEGORY CARD (WIREFRAME LOADING) ===== */

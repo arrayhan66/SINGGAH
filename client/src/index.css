@@ -48,15 +48,38 @@
 }
 
 @theme {
-  --font-body: "Google Sans Flex", "Plus Jakarta Sans", -apple-system,
+  --font-body:
+    "Google Sans Flex", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
+  --font-headline:
+    "General Sans", "Google Sans Flex", "Plus Jakarta Sans", -apple-system,
     BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-headline: "General Sans", "Google Sans Flex", "Plus Jakarta Sans",
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-sans: var(--font-body);
 
   --color-brand-dark: #041d38;
   --color-brand-navy: #06294d;
   --color-brand-blue: #497eae;
+  --color-accent-primary: #055acd;
+  --color-accent-soft: color-mix(
+    in srgb,
+    var(--color-accent-primary) 7%,
+    transparent
+  );
+  --color-accent-faint: color-mix(
+    in srgb,
+    var(--color-accent-primary) 5%,
+    transparent
+  );
+  --color-accent-ring: color-mix(
+    in srgb,
+    var(--color-accent-primary) 35%,
+    transparent
+  );
+  --color-accent-shadow: color-mix(
+    in srgb,
+    var(--color-accent-primary) 8%,
+    transparent
+  );
 
   /* Tema gelap (hall / virtual tour) */
   --color-night: #0b1220;
@@ -108,11 +131,29 @@ html.no-scroll body {
      border-radius tiap elemen.
    - Warna mengikuti tema: cyan di gelap, biru di terang.
    ========================================================= */
-:where(a, button, input, textarea, select, summary, [role="button"], [tabindex]):focus {
+:where(
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  summary,
+  [role="button"],
+  [tabindex]
+):focus {
   outline: none;
 }
 
-:where(a, button, input, textarea, select, summary, [role="button"], [tabindex]):focus-visible {
+:where(
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  summary,
+  [role="button"],
+  [tabindex]
+):focus-visible {
   outline: 2px solid var(--color-brand-blue, #497eae);
   outline-offset: 2px;
 }
@@ -124,7 +165,17 @@ html.no-scroll body {
   outline-offset: 1px;
 }
 
-html:not(.light) :where(a, button, input, textarea, select, summary, [role="button"], [tabindex]):focus-visible {
+html:not(.light)
+  :where(
+    a,
+    button,
+    input,
+    textarea,
+    select,
+    summary,
+    [role="button"],
+    [tabindex]
+  ):focus-visible {
   outline-color: rgba(34, 211, 238, 0.65);
 }
 
@@ -181,7 +232,9 @@ html:not(.light) :where(a, button, input, textarea, select, summary, [role="butt
 /* SmartImage: shimmer saat memuat + fade/blur-in halus saat gambar siap */
 .smart-img {
   opacity: 0;
-  transition: opacity 0.6s ease, filter 0.6s ease;
+  transition:
+    opacity 0.6s ease,
+    filter 0.6s ease;
   will-change: opacity, filter;
 }
 .smart-img.smart-img-shimmer {
@@ -201,7 +254,9 @@ html:not(.light) :where(a, button, input, textarea, select, summary, [role="butt
 .smart-img.smart-img-ready {
   opacity: var(--smart-img-opacity, 1);
   filter: blur(0);
-  transition: opacity 0.7s ease, filter 0.7s ease;
+  transition:
+    opacity 0.7s ease,
+    filter 0.7s ease;
 }
 
 @utility animate-modal-in {
@@ -731,7 +786,11 @@ html {
 }
 .emoji-pop-head {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.02)
+  );
   padding: 0.65rem 0.75rem;
 }
 .emoji-pop-search {
@@ -753,7 +812,10 @@ html {
   font-size: 0.75rem;
   color: #f8fafc;
   outline: none;
-  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 .emoji-pop-input::placeholder {
   color: #64748b;
@@ -772,7 +834,9 @@ html {
   border-radius: 9999px;
   padding: 0.125rem;
   color: #64748b;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 .emoji-pop-clear:hover {
   background-color: rgba(255, 255, 255, 0.1);
@@ -789,7 +853,12 @@ html {
 .emoji-pop-divider {
   height: 1px;
   margin: 0.65rem 0;
-  background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.28), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(148, 163, 184, 0.28),
+    transparent
+  );
 }
 .emoji-pop-tab {
   display: flex;
@@ -801,7 +870,10 @@ html {
   border-radius: 0.5rem;
   font-size: 1rem;
   opacity: 0.55;
-  transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.15s ease;
+  transition:
+    background-color 0.2s ease,
+    opacity 0.2s ease,
+    transform 0.15s ease;
 }
 .emoji-pop-tab:hover {
   background-color: rgba(255, 255, 255, 0.06);
@@ -851,7 +923,11 @@ html {
   align-items: center;
   gap: 0.625rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.03),
+    rgba(255, 255, 255, 0.06)
+  );
   padding: 0.5rem 0.75rem;
 }
 .emoji-pop-preview-icon {
@@ -862,7 +938,11 @@ html {
   justify-content: center;
   border-radius: 0.5rem;
   font-size: 1.25rem;
-  background: linear-gradient(180deg, rgba(34, 211, 238, 0.16), rgba(37, 99, 235, 0.16));
+  background: linear-gradient(
+    180deg,
+    rgba(34, 211, 238, 0.16),
+    rgba(37, 99, 235, 0.16)
+  );
   box-shadow: inset 0 0 0 1px rgba(34, 211, 238, 0.22);
 }
 .emoji-pop-preview-text {
@@ -889,7 +969,11 @@ html.light .emoji-pop {
 }
 html.light .emoji-pop-head {
   border-bottom-color: #e5e9ef;
-  background: linear-gradient(180deg, rgba(37, 99, 235, 0.05), rgba(37, 99, 235, 0.02));
+  background: linear-gradient(
+    180deg,
+    rgba(37, 99, 235, 0.05),
+    rgba(37, 99, 235, 0.02)
+  );
 }
 html.light .emoji-pop-search {
   color: #7d8bb0;
@@ -919,7 +1003,12 @@ html.light .emoji-pop-label {
   color: #7d8bb0;
 }
 html.light .emoji-pop-divider {
-  background: linear-gradient(90deg, transparent, rgba(100, 116, 139, 0.25), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(100, 116, 139, 0.25),
+    transparent
+  );
 }
 html.light .emoji-pop-tab:hover {
   background-color: #eef2fa;
@@ -934,7 +1023,8 @@ html.light .emoji-pop-grid {
 }
 html.light .emoji-pop-cats {
   background: #f8fafc !important;
-}html.light .emoji-pop-grid::-webkit-scrollbar-thumb {
+}
+html.light .emoji-pop-grid::-webkit-scrollbar-thumb {
   background-color: rgba(100, 116, 139, 0.3);
 }
 html.light .emoji-cell {
@@ -948,10 +1038,18 @@ html.light .emoji-pop-empty {
 }
 html.light .emoji-pop-preview {
   border-top-color: #e5e9ef;
-  background: linear-gradient(180deg, rgba(37, 99, 235, 0.04), rgba(37, 99, 235, 0.08));
+  background: linear-gradient(
+    180deg,
+    rgba(37, 99, 235, 0.04),
+    rgba(37, 99, 235, 0.08)
+  );
 }
 html.light .emoji-pop-preview-icon {
-  background: linear-gradient(180deg, rgba(34, 211, 238, 0.22), rgba(37, 99, 235, 0.18));
+  background: linear-gradient(
+    180deg,
+    rgba(34, 211, 238, 0.22),
+    rgba(37, 99, 235, 0.18)
+  );
   box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.22);
 }
 html.light .emoji-pop-preview-text {
@@ -1017,23 +1115,6 @@ html.light #hero {
   margin: 0;
 }
 
-.hero-band-bg {
-  position: absolute;
-  top: calc(var(--card-w) * 0.1875);
-  left: calc(50% - var(--card-w) * 0.68);
-  width: calc(var(--card-w) * 1.36);
-  height: calc(var(--card-w) * 0.3875);
-  z-index: 0;
-  background: none;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  opacity: 1;
-  filter: none;
-  box-shadow: none;
-  pointer-events: none;
-}
-
 /* Satu sumber lebar kartu: carousel mewarisi --card-w dari bandZone */
 .hero-band .hero-karya-showcase > div {
   --card-w: inherit !important;
@@ -1051,12 +1132,6 @@ html.light #hero {
   }
   .hero-rays-block {
     padding-bottom: 8px;
-  }
-}
-@media (max-width: 768px) {
-  .hero-band-bg {
-    left: calc(50% - var(--card-w) * 0.56);
-    width: calc(var(--card-w) * 1.12);
   }
 }
 @media (min-width: 2560px) {
@@ -1080,12 +1155,20 @@ html.light #hero {
   --kc-glass-stop1: rgba(255, 255, 255, 0.12);
   --kc-glass-stop2: rgba(255, 255, 255, 0.05);
   --kc-glass-stop3: rgba(140, 170, 255, 0.07);
-  --kc-aura: radial-gradient(closest-side, rgba(34, 211, 238, 0.5), transparent 70%);
+  --kc-aura: radial-gradient(
+    closest-side,
+    rgba(34, 211, 238, 0.5),
+    transparent 70%
+  );
   --kc-badge-border: rgba(34, 211, 238, 0.55);
-  --kc-badge-bg: linear-gradient(140deg, rgba(8, 34, 62, 0.85), rgba(5, 20, 40, 0.92));
+  --kc-badge-bg: linear-gradient(
+    140deg,
+    rgba(8, 34, 62, 0.85),
+    rgba(5, 20, 40, 0.92)
+  );
   --kc-badge-inner: rgba(255, 255, 255, 0.16);
   --kc-ico-color: #e0feff;
-  --kc-ico-bg: linear-gradient(135deg, #22d3ee, #2563eb);
+  --kc-ico-bg: linear-gradient(135deg, #22d3ee, var(--color-accent-primary));
   --kc-ico-shadow: 0 0 14px rgba(34, 211, 238, 0.55);
   --kc-value-color: #f0fcff;
   --kc-label-color: #7dd3fc;
@@ -1096,19 +1179,27 @@ html.light .hero-karya-showcase {
      bg card = satu keluarga dgn body (kontras rendah), definisi dari tepi
      biru lembut di rentang opacity yg sama (0.25 ring border²), rear stack
      jelas bertumpuk, aura + drop gelap tipis. Dark mode tidak disentuh. */
-   --kc-frame-a: rgba(28, 82, 225, 0.8);
+  --kc-frame-a: rgba(28, 82, 225, 0.8);
   --kc-frame-b: rgba(28, 82, 225, 0.35);
   --kc-card-bg: linear-gradient(180deg, #f5f9fd, #e5edf7);
   --kc-card-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.19);
-  --kc-aura: radial-gradient(closest-side, rgba(59, 130, 246, 0.45), transparent 70%);
+  --kc-aura: radial-gradient(
+    closest-side,
+    rgba(59, 130, 246, 0.45),
+    transparent 70%
+  );
   --kc-badge-border: rgba(96, 165, 250, 0.35);
-  --kc-badge-bg: linear-gradient(140deg, rgba(255, 255, 255, 0.97), rgba(226, 239, 254, 0.95));
+  --kc-badge-bg: linear-gradient(
+    140deg,
+    rgba(255, 255, 255, 0.97),
+    rgba(226, 239, 254, 0.95)
+  );
   --kc-ico-color: #ffffff;
-  --kc-ico-bg: linear-gradient(135deg, #0ea5e9, #2563eb);
+  --kc-ico-bg: linear-gradient(135deg, #0ea5e9, var(--color-accent-primary));
   --kc-ico-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
   --kc-value-color: #0b2e52;
   --kc-label-color: #0369a1;
-  --kc-accent: linear-gradient(90deg, transparent, #2563eb);
+  --kc-accent: linear-gradient(90deg, transparent, var(--color-accent-primary));
 }
 
 /* Light mode: aksen garis cyan di badge ikut dilembutkan supaya tidak
@@ -1130,7 +1221,9 @@ html.light .hero-karya-showcase .badge-accent {
   border-radius: 16px;
   background: var(--kc-card-bg);
   box-shadow: var(--kc-card-shadow);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 /* Ring border asimetris — mask padding-box, ketebalan 2px solid, warna
@@ -1193,7 +1286,10 @@ html.light .hero-karya-showcase .badge-accent {
 
 /* === BADGE HOLOGRAM (floating HUD chip) — tema sama (light/dark), hanya token berubah === */
 .hero-karya-showcase .badge-aura {
-  position: absolute; inset: -8px; z-index: -1; border-radius: 50%;
+  position: absolute;
+  inset: -8px;
+  z-index: -1;
+  border-radius: 50%;
   background: var(--kc-aura);
   filter: blur(8px);
   transform: translateZ(0);
@@ -1208,7 +1304,14 @@ html.light .hero-karya-showcase .badge-accent {
   padding: 0.45rem 1.1rem 0.45rem 0.45rem;
   border: 1px solid var(--kc-badge-border);
   background: var(--kc-badge-bg);
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  clip-path: polygon(
+    0 0,
+    calc(100% - 10px) 0,
+    100% 10px,
+    100% 100%,
+    10px 100%,
+    0 calc(100% - 10px)
+  );
   /* PENTING: TIDAK memakai filter/drop-shadow di sini — filter pada panel
      berisi teks + animasi scale/rotate membuat teks dilukis ulang tiap frame
      (buram). Glow HANYA lewat badge-aura di belakang. */
@@ -1221,7 +1324,14 @@ html.light .hero-karya-showcase .badge-accent {
   inset: 1px;
   pointer-events: none;
   background: linear-gradient(135deg, var(--kc-badge-inner), transparent 45%);
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  clip-path: polygon(
+    0 0,
+    calc(100% - 10px) 0,
+    100% 10px,
+    100% 100%,
+    10px 100%,
+    0 calc(100% - 10px)
+  );
 }
 
 /* Ikon bercahaya — kotak angular kecil dengan gradien neon. */
@@ -1234,7 +1344,14 @@ html.light .hero-karya-showcase .badge-accent {
   height: 28px;
   color: var(--kc-ico-color);
   background: var(--kc-ico-bg);
-  clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 7px 100%, 0 calc(100% - 7px));
+  clip-path: polygon(
+    0 0,
+    calc(100% - 7px) 0,
+    100% 7px,
+    100% 100%,
+    7px 100%,
+    0 calc(100% - 7px)
+  );
   box-shadow: var(--kc-ico-shadow);
 }
 
@@ -1291,33 +1408,82 @@ html.light .hero-karya-showcase .badge-accent {
 }
 
 @media (max-width: 640px) {
-  .hero-karya-showcase .badge-shell { gap: 0.5rem; padding: 0.32rem 0.85rem 0.32rem 0.32rem; }
-  .hero-karya-showcase .badge-ico   { width: 22px; height: 22px; }
-  .hero-karya-showcase .badge-value { max-width: 115px; font-size: 11px; }
-  .hero-karya-showcase .badge-label { font-size: 8px; }
+  .hero-karya-showcase .badge-shell {
+    gap: 0.5rem;
+    padding: 0.32rem 0.85rem 0.32rem 0.32rem;
+  }
+  .hero-karya-showcase .badge-ico {
+    width: 22px;
+    height: 22px;
+  }
+  .hero-karya-showcase .badge-value {
+    max-width: 115px;
+    font-size: 11px;
+  }
+  .hero-karya-showcase .badge-label {
+    font-size: 8px;
+  }
 }
 
 /* ≤330px — badge ikut mengecil biar tidak kesannya "ngambang besar" di
    atas card sempit. Teks value dipotong (ellipsis), float ikut dijinakkan
    supaya tidak overhang keluar tepi card. */
 @media (max-width: 330px) {
-  .hero-karya-showcase .badge-shell { gap: 0.3rem; padding: 0.2rem 0.4rem 0.2rem 0.2rem; }
-  .hero-karya-showcase .badge-ico { width: 14px; height: 14px; }
-  .hero-karya-showcase .badge-ico svg { width: 10px; height: 10px; }
-  .hero-karya-showcase .badge-value { max-width: 70px; font-size: 9px; }
-  .hero-karya-showcase .badge-label { font-size: 6.5px; letter-spacing: 0.1em; }
-  .hero-karya-showcase .badge-accent { right: 4px; bottom: 3px; width: 9px; height: 1.5px; }
-  .hero-karya-showcase .badge-aura { inset: -4px; }
+  .hero-karya-showcase .badge-shell {
+    gap: 0.3rem;
+    padding: 0.2rem 0.4rem 0.2rem 0.2rem;
+  }
+  .hero-karya-showcase .badge-ico {
+    width: 14px;
+    height: 14px;
+  }
+  .hero-karya-showcase .badge-ico svg {
+    width: 10px;
+    height: 10px;
+  }
+  .hero-karya-showcase .badge-value {
+    max-width: 70px;
+    font-size: 9px;
+  }
+  .hero-karya-showcase .badge-label {
+    font-size: 6.5px;
+    letter-spacing: 0.1em;
+  }
+  .hero-karya-showcase .badge-accent {
+    right: 4px;
+    bottom: 3px;
+    width: 9px;
+    height: 1.5px;
+  }
+  .hero-karya-showcase .badge-aura {
+    inset: -4px;
+  }
 
   /* ≤330px card terlalu sempit — badge kanan-atas DIHAPUS agar tidak menumpuk */
-  .hero-karya-showcase .karta-bpos-tr { display: none; }
-  .hero-karya-showcase .karta-bpos-tl { left: 4px; top: 6px; }
-  .hero-karya-showcase .karta-bpos-br { right: 4px; bottom: 6px; }
+  .hero-karya-showcase .karta-bpos-tr {
+    display: none;
+  }
+  .hero-karya-showcase .karta-bpos-tl {
+    left: 4px;
+    top: 6px;
+  }
+  .hero-karya-showcase .karta-bpos-br {
+    right: 4px;
+    bottom: 6px;
+  }
 
-  .hero-karya-showcase .karta-float-a { animation-duration: 2.8s; }
-  .hero-karya-showcase .karta-float-b { animation-duration: 2.4s; }
-  .hero-karya-showcase .karta-float-c { animation-duration: 2.6s; }
-  .hero-karya-showcase .karta-float-d { animation-duration: 3.2s; }
+  .hero-karya-showcase .karta-float-a {
+    animation-duration: 2.8s;
+  }
+  .hero-karya-showcase .karta-float-b {
+    animation-duration: 2.4s;
+  }
+  .hero-karya-showcase .karta-float-c {
+    animation-duration: 2.6s;
+  }
+  .hero-karya-showcase .karta-float-d {
+    animation-duration: 3.2s;
+  }
 }
 
 /* Judul & eyebrow KARYA UNGGULAN — ukuran BERJENJANG tiap breakpoint
@@ -1332,34 +1498,64 @@ html.light .hero-karya-showcase .badge-accent {
 }
 
 @media (max-width: 900px) {
-  .hero-karya-showcase h3 { font-size: 19px; }
-  .hero-karya-showcase .karta-eyebrow { font-size: 8.5px; }
+  .hero-karya-showcase h3 {
+    font-size: 19px;
+  }
+  .hero-karya-showcase .karta-eyebrow {
+    font-size: 8.5px;
+  }
 }
 @media (max-width: 800px) {
-  .hero-karya-showcase h3 { font-size: 18px; }
-  .hero-karya-showcase .karta-eyebrow { font-size: 8px; }
+  .hero-karya-showcase h3 {
+    font-size: 18px;
+  }
+  .hero-karya-showcase .karta-eyebrow {
+    font-size: 8px;
+  }
 }
 @media (max-width: 700px) {
-  .hero-karya-showcase h3 { font-size: 17px; }
-  .hero-karya-showcase .karta-eyebrow { font-size: 8px; }
+  .hero-karya-showcase h3 {
+    font-size: 17px;
+  }
+  .hero-karya-showcase .karta-eyebrow {
+    font-size: 8px;
+  }
 }
 @media (max-width: 600px) {
-  .hero-karya-showcase h3 { font-size: 15px; }
-  .hero-karya-showcase .karta-eyebrow { font-size: 7.5px; }
+  .hero-karya-showcase h3 {
+    font-size: 15px;
+  }
+  .hero-karya-showcase .karta-eyebrow {
+    font-size: 7.5px;
+  }
 }
 @media (max-width: 500px) {
-  .hero-karya-showcase h3 { font-size: 13.5px; }
-  .hero-karya-showcase .karta-eyebrow { font-size: 7.5px; letter-spacing: 0.18em; }
+  .hero-karya-showcase h3 {
+    font-size: 13.5px;
+  }
+  .hero-karya-showcase .karta-eyebrow {
+    font-size: 7.5px;
+    letter-spacing: 0.18em;
+  }
 }
 @media (max-width: 400px) {
-  .hero-karya-showcase h3 { font-size: 12.5px; }
-  .hero-karya-showcase .karta-eyebrow { font-size: 7px; letter-spacing: 0.18em; }
+  .hero-karya-showcase h3 {
+    font-size: 12.5px;
+  }
+  .hero-karya-showcase .karta-eyebrow {
+    font-size: 7px;
+    letter-spacing: 0.18em;
+  }
 }
 @media (max-width: 300px) {
-  .hero-karya-showcase h3 { font-size: 11px; }
-  .hero-karya-showcase .karta-eyebrow { font-size: 6.5px; letter-spacing: 0.16em; }
+  .hero-karya-showcase h3 {
+    font-size: 11px;
+  }
+  .hero-karya-showcase .karta-eyebrow {
+    font-size: 6.5px;
+    letter-spacing: 0.16em;
+  }
 }
-
 
 /* Hero showcase — tilted peek carousel */
 .hero-karya-showcase .peek-frame {
@@ -1375,7 +1571,9 @@ html.light .hero-karya-showcase .badge-accent {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform, opacity;
 }
 .hero-karya-showcase .peek-card[data-pos="0"] {

@@ -55,11 +55,11 @@ html.light .beranda-page .bg-cyan-400\/10 {
   background-color: #eff6ff;
 }
 html.light .beranda-page .text-cyan-300 {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 /* Menu AKTIF navbar: pill biru solid + teks putih -> jelas terlihat */
 html.light .beranda-page header nav .bg-cyan-400\/10.text-cyan-300 {
-  background-color: #2563eb;
+  background-color: var(--color-accent-primary);
   color: #ffffff;
 }
 html.light .beranda-page header [class*="shadow-[0_0_18px"] {
@@ -74,14 +74,14 @@ html.light .beranda-page header .hover\:bg-white\/5:hover {
   background-color: #dbeafe;
 }
 html.light .beranda-page .hover\:text-cyan-300:hover {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 
 /* Tombol Login (header): gradient biru primer -> sekunder.
    Di-scope ke header supaya tombol "Mulai Eksplorasi" di #hero tetap
    pakai gradient animasi bawaan dark mode (slide saat hover). */
 html.light .beranda-page header .bg-gradient-to-r.from-blue-600.via-cyan-500.to-blue-600 {
-  background-image: linear-gradient(90deg, #2563eb, #0ea5e9, #2563eb);
+  background-image: linear-gradient(90deg, var(--color-accent-primary), #0ea5e9, var(--color-accent-primary));
 }
 html.light .beranda-page header .shadow-cyan-500\/20 {
   box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.22),
@@ -97,7 +97,7 @@ html.light .beranda-page header button span.bg-white {
   background-color: #0f172a;
 }
 html.light .beranda-page header button span.bg-cyan-300 {
-  background-color: #2563eb;
+  background-color: var(--color-accent-primary);
 }
 
 /* Panel menu mobile */
@@ -139,7 +139,7 @@ html.light
   background-color: rgba(37, 99, 235, 0.07);
 }
 
-/* Blur di bawah kaki karakter 3D: cyan -> biru primer #2563eb
+/* Blur di bawah kaki karakter 3D: cyan -> biru primer var(--color-accent-primary)
    (senada dengan warna aktif navbar/tombol di light mode).
    blur-3xl nyebarin warna jadi tipis, jadi opasitasnya dibikin tinggi */
 html.light .beranda-page #hero .bg-cyan-400\/25.blur-3xl {
@@ -152,7 +152,7 @@ html.light .beranda-page #faq > .pointer-events-none.inset-0:not(.opacity-20) ca
   filter: brightness(0.48) saturate(3) contrast(1.15);
 }
 
-/* Partikel HERO light mode: warna sudah di-set biru primer #2563eb
+/* Partikel HERO light mode: warna sudah di-set biru primer var(--color-accent-primary)
    langsung dari JS -> filter penggelap di atas tidak berlaku di sini,
    supaya partikel tampil apa adanya (elegan, tidak terlalu gelap) */
 html.light
@@ -195,7 +195,7 @@ html.light .beranda-page #hero h1.text-white {
 
 /* "Sering Diajukan": teks gradient biru -> sky */
 html.light .beranda-page #faq h2 span.text-cyan-300 {
-  background-image: linear-gradient(90deg, #2563eb, #0ea5e9);
+  background-image: linear-gradient(90deg, var(--color-accent-primary), #0ea5e9);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -214,7 +214,7 @@ html.light .beranda-page #hero .poliban-badge span {
 
 /* Garis aksen */
 html.light .beranda-page #hero .from-cyan-400.to-blue-600 {
-  background-image: linear-gradient(to bottom, #2563eb, #0ea5e9);
+  background-image: linear-gradient(to bottom, var(--color-accent-primary), #0ea5e9);
 }
 
 /* Deskripsi */
@@ -341,5 +341,5 @@ html.light .beranda-page footer .text-slate-500 {
 }
 
 html.light .beranda-page footer .hover\:text-cyan-300:hover {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }

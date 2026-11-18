@@ -1,6 +1,6 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { LayoutGrid, GraduationCap, Compass, Search, ChevronDown, Newspaper } from "lucide-react"
+import { Sprout, BookMarked, Glasses, Building2, Medal, Microscope, HandHeart, Search, ChevronDown } from "lucide-react"
 import foto1 from "../../../assets/images/hero/poliban.jpg"
 import foto2 from "../../../assets/images/hero/poliban1.jpeg"
 import foto3 from "../../../assets/images/hero/poliban2.jpeg"
@@ -55,8 +55,8 @@ function ShortcutLink({ to, label, icon: Icon }) {
       className="hero-shortcut inline-flex items-center justify-center rounded-full"
       style={{
         ...WHITE,
-        width: 36,
-        height: 36,
+        width: 32,
+        height: 32,
         textDecoration: "none",
         background: hover ? "rgba(255,255,255,0.22)" : "transparent",
         transition: "background-color 150ms ease",
@@ -64,20 +64,20 @@ function ShortcutLink({ to, label, icon: Icon }) {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      <Icon size={18} aria-hidden="true" />
+      <Icon size={20} strokeWidth={1.25} aria-hidden="true" />
     </Link>
   )
 }
 
 function TagLink({ to, icon: Icon, children }) {
-  const [hover, setHover] = useState(false)
-
   return (
     <Link
       to={to}
       className="hero-tag inline-flex items-center rounded-full"
       style={{
         ...GLASS,
+        background: "rgba(0,0,0,0.55)",
+        borderColor: "rgba(255,255,255,0.6)",
         height: 36,
         padding: "0 16px",
         gap: 8,
@@ -85,15 +85,9 @@ function TagLink({ to, icon: Icon, children }) {
         fontWeight: 500,
         textDecoration: "none",
         whiteSpace: "nowrap",
-        transition: "background-color 150ms ease, border-color 150ms ease",
-        ...(hover
-          ? { background: "rgba(0,0,0,0.55)", borderColor: "rgba(255,255,255,0.6)" }
-          : {}),
       }}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
     >
-      <Icon size={15} aria-hidden="true" />
+      <Icon size={16} strokeWidth={1.5} aria-hidden="true" />
       {children}
     </Link>
   )
@@ -205,7 +199,6 @@ export default function HeroPhoto() {
         elapsedRef.current = 0
         setCurrent((c) => {
           const next = (c + 1) % SLIDES.length
-          console.log("hero slide ->", next) // DEBUG hapus nanti
           return next
         })
       }
@@ -292,6 +285,21 @@ export default function HeroPhoto() {
             outline: 2px solid #fff;
             outline-offset: 2px;
           }
+          .hero-tag {
+            transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+          }
+          @media (hover: hover) {
+            .hero-tag:hover {
+              background: #ffffff !important;
+              border-color: #ffffff !important;
+              color: #0f172a !important;
+            }
+          }
+          .hero-tag:focus-visible {
+            background: #ffffff !important;
+            border-color: #ffffff !important;
+            color: #0f172a !important;
+          }
           .hp-seg:focus-within {
             background: #f8fafc;
             border-radius: 9999px;
@@ -305,7 +313,7 @@ export default function HeroPhoto() {
           }
           .hero-search-btn:focus-visible {
             outline: none;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.35);
+            box-shadow: 0 0 0 3px var(--color-accent-ring);
           }
           .hero-search-btn:active {
             transform: translateY(1px);
@@ -382,29 +390,41 @@ export default function HeroPhoto() {
                   textWrap: "balance",
                 }}
               >
-                Kami punya sesuatu untuk ditunjukkan
+                Galeri Karya dari Civitas Akademika Poliban
               </h1>
-              <div className="flex flex-wrap items-center gap-3" style={{ marginTop: 20 }}>
+              <div className="flex flex-wrap items-center" style={{ marginTop: 20, gap: 16 }}>
                 <p
                   style={{
                     ...WHITE,
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: 500,
                     lineHeight: 1.3,
-                    maxWidth: "8.5rem",
+                    maxWidth: 100,
+                    textWrap: "balance",
                     textAlign: "left",
+                    margin: 0,
                   }}
                 >
-                  Jelajahi dari semua jurusan
+                  Mulai dari
+                  <br />
+                  mana saja
                 </p>
                 <nav
                   aria-label="Pintasan"
-                  className="flex items-center gap-0.5"
-                  style={{ ...GLASS, borderRadius: 9999, padding: 4 }}
+                  style={{
+                    ...GLASS,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    height: 48,
+                    padding: "0 18px",
+                    gap: 8,
+                    borderRadius: 9999,
+                  }}
                 >
-                  <ShortcutLink to="/karya" label="Karya" icon={LayoutGrid} />
-                  <ShortcutLink to="/akademik/tur-virtual" label="Tur Virtual" icon={Compass} />
-                  <ShortcutLink to="/berita" label="Berita" icon={Newspaper} />
+                  <ShortcutLink to="/akademik/tur-virtual" label="Tur Virtual" icon={Glasses} />
+                  <ShortcutLink to="/pemenang" label="Prestasi" icon={Medal} />
+                  <ShortcutLink to="/penelitian/kegiatan" label="Penelitian" icon={Microscope} />
+                  <ShortcutLink to="/pkm/kegiatan" label="PkM" icon={HandHeart} />
                 </nav>
               </div>
             </div>
@@ -419,36 +439,41 @@ export default function HeroPhoto() {
               <p
                 style={{
                   ...WHITE,
-                  fontSize: 15,
+                  fontSize: 16,
+                  fontWeight: 400,
                   lineHeight: 1.55,
-                  maxWidth: 400,
+                  letterSpacing: 0,
+                  maxWidth: 440,
                   textAlign: isLg ? "right" : "left",
+                  textWrap: "balance",
+                  textShadow: "0 1px 12px rgba(0,0,0,.35)",
                 }}
               >
-                Karya-karya dari kampus Politeknik Negeri Banjarmasin yang bisa kamu lihat langsung di sini.
+                Tiap karya punya cerita kecilnya sendiri. Mau melihat karya yang luar biasa? Mungkin kamu bisa menemukannya di sini.
               </p>
               <ul
                 className="flex flex-wrap gap-2"
                 style={{
                   justifyContent: isLg ? "flex-end" : "flex-start",
+                  maxWidth: isLg ? 280 : undefined,
                   listStyle: "none",
                   margin: 0,
                   padding: 0,
                 }}
               >
                 <li>
-                  <TagLink to="/karya" icon={LayoutGrid}>
-                    Karya Mahasiswa
+                  <TagLink to="/karya?kategori=produk-unggulan" icon={Building2}>
+                    Gedung Virtual
                   </TagLink>
                 </li>
                 <li>
-                  <TagLink to="/karya" icon={GraduationCap}>
-                    Semua Jurusan
+                  <TagLink to="/karya?kategori=inovasi" icon={Sprout}>
+                    Inovasi
                   </TagLink>
                 </li>
                 <li>
-                  <TagLink to="/akademik/tur-virtual" icon={Compass}>
-                    Tur Virtual
+                  <TagLink to="/karya?kategori=publikasi-ilmiah" icon={BookMarked}>
+                    Publikasi Ilmiah
                   </TagLink>
                 </li>
               </ul>
@@ -643,7 +668,7 @@ export default function HeroPhoto() {
                             borderRadius: 10,
                             fontSize: 15,
                             fontWeight: selected ? 600 : 400,
-                            color: selected ? "#2563eb" : "#334155",
+                            color: selected ? "var(--color-accent-primary)" : "#334155",
                             background: i === activeYearIndex && !selected ? "#f1f5f9" : "transparent",
                           }}
                           onClick={() => selectYear(item.value)}
@@ -662,7 +687,7 @@ export default function HeroPhoto() {
                   height: isMd ? 56 : 52,
                   padding: "0 32px",
                   borderRadius: 9999,
-                  background: "#2563eb",
+                  background: "var(--color-accent-primary)",
                   color: "#fff",
                   fontSize: 16,
                   fontWeight: 600,

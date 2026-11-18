@@ -73,7 +73,7 @@ html.light .admin-page .reports-stat-card .stat-label {
   color: #64748b !important;
 }
 html.light .admin-page .reports-stat-card:hover .stat-label {
-  color: #2563eb !important;
+  color: var(--color-accent-primary) !important;
 }
 
 /* Trend badge light mode */
@@ -118,7 +118,7 @@ html.light .admin-page .reports-bar-card .bar-month {
   color: #94a3b8 !important;
 }
 html.light .admin-page .reports-bar-card .bar-month-active {
-  color: #2563eb !important;
+  color: var(--color-accent-primary) !important;
   font-weight: 600 !important;
 }
 

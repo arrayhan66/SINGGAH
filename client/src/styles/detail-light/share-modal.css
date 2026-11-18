@@ -58,7 +58,7 @@ html.light .karya-projectdetail-page .share-modal {
 
 /* ── Header ── */
 .karya-projectdetail-page .share-modal-badge {
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   color: #ffffff;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.35),
@@ -137,7 +137,7 @@ html.light .karya-projectdetail-page .share-preview-media {
 html.light .karya-projectdetail-page .share-preview-tag {
   background: rgba(255, 255, 255, 0.85);
   border-color: rgba(37, 99, 235, 0.25);
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 .karya-projectdetail-page .share-preview-body {
   padding: 0.9rem 1.1rem 1.1rem;
@@ -206,8 +206,8 @@ html.light .karya-projectdetail-page .share-copylink-url {
   color: #64748b;
 }
 .karya-projectdetail-page .share-copylink-btn {
-  background-color: #2563eb;
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-color: var(--color-accent-primary);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   color: #ffffff;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.35),

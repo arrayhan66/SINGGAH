@@ -11,7 +11,7 @@
     Card      : #FFFFFF + border #D6E4FB + shadow biru
     Inner box : #EFF6FF + ring #DBEAFE
     Heading   : #0F172A | Text: #64748B
-    Primary   : #2563EB | Secondary: #0EA5E9 | Soft: #EFF6FF
+    Primary   : var(--color-accent-primary) | Secondary: #0EA5E9 | Soft: #EFF6FF
 */
 
 /* ===== LOGO ===== */
@@ -61,12 +61,12 @@ html.light .bg-cyan-400\/10 {
   background-color: #eff6ff;
 }
 html.light .text-cyan-300 {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 /* Menu AKTIF: pill biru solid + teks putih -> jelas terlihat
    (desktop & mobile, elemen punya combo bg-cyan-400/10 + text-cyan-300) */
 html.light header nav .bg-cyan-400\/10.text-cyan-300 {
-  background-color: #2563eb;
+  background-color: var(--color-accent-primary);
   color: #ffffff;
 }
 html.light header [class*="shadow-[0_0_18px"] {
@@ -80,7 +80,7 @@ html.light header .hover\:bg-white\/5:hover {
   background-color: #dbeafe;
 }
 html.light .hover\:text-cyan-300:hover {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 html.light .shadow-cyan-500\/20 {
   box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.22),
@@ -90,7 +90,7 @@ html.light header button span.bg-white {
   background-color: #0f172a;
 }
 html.light header button span.bg-cyan-300 {
-  background-color: #2563eb;
+  background-color: var(--color-accent-primary);
 }
 html.light header .bg-brand-dark\/95 {
   background: linear-gradient(
@@ -118,7 +118,7 @@ html.light header nav .bg-cyan-400\/40 {
   background-color: rgba(37, 99, 235, 0.45);
 }
 html.light header nav .group:hover .group-hover\:bg-cyan-400 {
-  background-color: #2563eb;
+  background-color: var(--color-accent-primary);
 }
 /* Titik di dalam item AKTIF: pill biru solid -> titik putih agar terlihat */
 html.light header nav .bg-cyan-400\/10.text-cyan-300 .bg-cyan-400\/40,
@@ -154,7 +154,7 @@ html.light .menu-divider-line-end {
   background: linear-gradient(90deg, rgba(37, 99, 235, 0.45), transparent);
 }
 html.light .menu-section-label-text {
-  color: #2563eb;
+  color: var(--color-accent-primary);
   text-shadow: none;
 }
 /* Kartu container menu: permukaan putih + border biru lembut */
@@ -232,7 +232,7 @@ html.light .mobile-menu-item.group:hover
 }
 html.light .mobile-menu-item.group:hover
   > .min-w-0 > .mobile-menu-item-label.group-hover\:text-blue-600 {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 html.light .mobile-menu-item.group:hover
   > .min-w-0 > .mobile-menu-item-label.group-hover\:text-red-400 {
@@ -266,7 +266,7 @@ html.light .mobile-menu-item.group:hover .group-hover\:text-red-400 {
   color: #dc2626;
 }
 html.light .mobile-menu-item.group:hover .group-hover\:text-blue-600 {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 html.light .mobile-menu-item.border-cyan-400\/30 {
   border-color: #93c5fd;
@@ -326,7 +326,7 @@ html.light .mobile-menu-item .text-slate-500 {
 
 /* ===== LONCENG NOTIFIKASI ===== */
 html.light .notification-bell {
-  color: #2563eb;
+  color: var(--color-accent-primary);
   background: linear-gradient(180deg, #ffffff 0%, #f2f7fe 52%, #e6effb 100%);
   border-color: #cfe0f7;
   box-shadow:
@@ -407,7 +407,7 @@ html.light footer .text-slate-500 {
   color: #404040;
 }
 html.light footer .hover\:text-cyan-300:hover {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 
 /* ============================================================

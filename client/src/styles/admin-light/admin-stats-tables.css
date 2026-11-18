@@ -278,7 +278,7 @@ html.light .admin-page .admin-media-table-head th {
 /* ============================================================
    USER PAGE: TABEL DAFTAR USER — LIGHT MODE.
    Mengambil pola tabel list Media Library: kontainer putih +
-   header biru #2563eb (dari .admin-media-table/-head yang sudah
+   header biru var(--color-accent-primary) (dari .admin-media-table/-head yang sudah
    dipakai di markup). Bagian ini hanya memoles sel/badge/aksi
    agar rapi & terbaca di atas latar putih. Dark mode & layout
    tidak berubah.
@@ -339,7 +339,7 @@ html.light .admin-page .admin-user-table .border-white\/\[0\.06\].bg-white\/\[0\
   color: #475569;
 }
 html.light .admin-page .admin-user-table .border-white\/\[0\.06\].bg-white\/\[0\.03\].text-slate-300 .text-cyan-400 {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 
 /* Tombol aksi */

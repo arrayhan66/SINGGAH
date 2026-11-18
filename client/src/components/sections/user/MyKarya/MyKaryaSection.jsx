@@ -19,7 +19,7 @@ const INITIAL_VISIBLE_COUNT = 6
 const darkVignette =
   "radial-gradient(circle at top center, transparent 0%, rgba(4,29,56,0.2) 50%, rgba(4,29,56,0.85) 100%)"
 const lightVignette =
-  "radial-gradient(circle at top center, transparent 0%, rgba(37,99,235,0.05) 50%, rgba(30,64,120,0.16) 100%)"
+  "radial-gradient(circle at top center, transparent 0%, var(--color-accent-faint) 50%, rgba(30,64,120,0.16) 100%)"
 
 function MyKaryaSection() {
   const { user } = useAuth()

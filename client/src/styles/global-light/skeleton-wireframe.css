@@ -28,23 +28,23 @@ html.light .border-slate-700\/60 {
 /* Login/Register: "Inovasi Digital Kampus" */
 html.light .bg-gradient-to-r.from-blue-600.via-cyan-600.to-teal-500.bg-clip-text {
   background-image: none;
-  color: #2563eb;
-  -webkit-text-fill-color: #2563eb;
+  color: var(--color-accent-primary);
+  -webkit-text-fill-color: var(--color-accent-primary);
   filter: none;
 }
 /* Halaman 404: angka raksasa */
 html.light .bg-gradient-to-b.from-cyan-300.to-blue-600.bg-clip-text {
   background-image: none;
-  color: #2563eb;
-  -webkit-text-fill-color: #2563eb;
+  color: var(--color-accent-primary);
+  -webkit-text-fill-color: var(--color-accent-primary);
   filter: none;
 }
 /* Edit Karya: judul gradasi cyan-blue-purple */
 html.light
   .bg-gradient-to-r.from-cyan-300.via-blue-400.to-purple-400.bg-clip-text {
   background-image: none;
-  color: #2563eb;
-  -webkit-text-fill-color: #2563eb;
+  color: var(--color-accent-primary);
+  -webkit-text-fill-color: var(--color-accent-primary);
   filter: none;
 }
 /* Glow blur di belakang judul edit karya diredam */

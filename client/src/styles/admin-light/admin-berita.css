@@ -11,7 +11,7 @@ html.light .admin-page .admin-filter-tabs button:hover {
   background: #e9eef5;
 }
 html.light .admin-page .admin-filter-tabs button.bg-white\/10 {
-  background: #2563eb;
+  background: var(--color-accent-primary);
   color: #ffffff;
   box-shadow: 0 2px 8px -2px rgba(37, 99, 235, 0.45);
 }

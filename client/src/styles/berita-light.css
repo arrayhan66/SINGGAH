@@ -23,7 +23,7 @@ html.light .berita-page #berita > .pointer-events-none.opacity-20 {
 /* Icon box megaphone: gradasi cyan -> biru + ikon putih,
    PERSIS kotak icon header di menu karya */
 html.light .berita-page .rounded-2xl.border-cyan-400\/30.bg-cyan-400\/10 {
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   background-color: transparent;
   border-color: transparent;
   box-shadow: 0 10px 24px -8px rgba(37, 99, 235, 0.45);
@@ -42,7 +42,7 @@ html.light .berita-page h2.text-white {
 
 /* "Kegiatan" highlight: teks gradient biru -> sky */
 html.light .berita-page h2 span.text-cyan-300 {
-  background-image: linear-gradient(90deg, #2563eb, #0ea5e9);
+  background-image: linear-gradient(90deg, var(--color-accent-primary), #0ea5e9);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -111,7 +111,7 @@ html.light .berita-page .focus-within\:shadow-cyan-400\/30:focus-within {
 /* ===== CARD BERITA ===== */
 /* Badge kategori/tag: BIRU SOLID + teks & ikon PUTIH */
 html.light .berita-page .bg-brand-navy\/80 {
-  background-color: #2563eb;
+  background-color: var(--color-accent-primary);
   border-color: transparent;
 }
 html.light .berita-page .bg-brand-navy\/80.text-cyan-300 {
@@ -123,7 +123,7 @@ html.light .berita-page .border-cyan-500\/30 {
 
 /* Ikon meta (kalender/penulis): cyan muda -> biru primary */
 html.light .berita-page .text-cyan-400 {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 
 /* Judul berita: hitam keabu #404040 senada judul section
@@ -132,7 +132,7 @@ html.light .berita-page h3.text-white {
   color: #404040;
 }
 html.light .berita-page .group:hover .group-hover\:text-cyan-300 {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 
 html.light .berita-page .text-slate-300\/90 {
@@ -146,7 +146,7 @@ html.light .berita-page .border-slate-700\/40 {
 
 /* Tombol "Baca": putih di card putih -> jadikan primary blue */
 html.light .berita-page div[role="button"].bg-white.text-slate-900 {
-  background-color: #2563eb;
+  background-color: var(--color-accent-primary);
   color: #ffffff;
 }
 html.light .berita-page div[role="button"].hover\:bg-slate-200:hover {
@@ -226,7 +226,7 @@ html.light .berita-page h3.text-slate-200 {
   color: #404040;
 }
 html.light .berita-page .font-semibold.text-slate-300 {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 
 /* Figcaption foto dalam artikel */

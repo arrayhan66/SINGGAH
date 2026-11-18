@@ -4,12 +4,7 @@ import {
   LayoutGrid,
   Users,
   PenTool,
-  ShieldCheck,
-  Tags,
-  Radio,
-  UserPlus,
 } from "lucide-react";
-import Skeleton from "../../ui/Skeleton";
 import api from "../../../services/api";
 
 const COUNT_DURATION = 1000;
@@ -85,7 +80,7 @@ function Counter({ value, className = "", active = false }) {
   }, [target, reduced, active]);
 
   if (target === null) {
-    return <span className={`font-mono ${className}`}>{value}</span>;
+    return <span className={`${className}`}>{value}</span>;
   }
 
   const compact =
@@ -94,20 +89,25 @@ function Counter({ value, className = "", active = false }) {
       : null;
 
   return (
-    <span className={`font-mono tabular-nums ${className}`}>
+    <span className={`tabular-nums ${className}`}>
       {compact ?? display}
     </span>
   );
 }
 
-const badgeCls =
-  "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-bold tracking-wide";
-
-const badgeLight =
-  "light:border-emerald-200/70 light:bg-emerald-50 light:text-emerald-700";
-
-const cardCls =
-  "group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-5 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.09] light:border-slate-200/70 light:bg-white light:shadow-[0_10px_30px_-12px_rgba(2,10,26,0.35)] light:hover:bg-white";
+const GESER = ["-56px", "64px", "-24px", "80px"];
+const KIRI = [
+  [30, 120, 250],
+  [10, 90, 200],
+  [60, 180, 280],
+  [20, 100, 230],
+];
+const KANAN = [
+  [40, 200, 270],
+  [70, 150, 260],
+  [20, 110, 240],
+  [50, 170, 290],
+];
 
 function HeroStats() {
   const [stats, setStats] = useState({
@@ -116,7 +116,7 @@ function HeroStats() {
     visitorsCount: "–",
     usersCount: "–",
   });
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   useEffect(() => {
     api
@@ -139,132 +139,174 @@ function HeroStats() {
   const items = [
     {
       label: "Karya",
-      value: stats.projectsCount,
       icon: Layers,
+      value: stats.projectsCount,
       chip: "from-cyan-400 to-blue-600 text-white shadow-cyan-500/30",
       labelColor: "text-cyan-300 light:text-blue-600",
       plus: "text-cyan-300 light:text-blue-600",
       glow: "bg-cyan-400/10 group-hover:bg-cyan-400/25",
-      desc: "Karya mahasiswa & dosen Elektro Poliban yang ditampilkan di Ruang Pameran Karya.",
-      badge: (
-        <span className={`${badgeCls} border-emerald-400/30 bg-emerald-400/10 text-emerald-300 ${badgeLight}`}>
-          <ShieldCheck className="h-3 w-3" /> TERVERIFIKASI
-        </span>
-      ),
+      kiri: "Terdapat",
+      kanan: "dari civitas akademika",
     },
     {
       label: "Kategori",
-      value: stats.categoriesCount,
       icon: LayoutGrid,
+      varian: "gelap",
+      value: stats.categoriesCount,
       chip: "from-cyan-400 to-blue-600 text-white shadow-cyan-500/30",
       labelColor: "text-cyan-300 light:text-blue-600",
       plus: "text-cyan-300 light:text-blue-600",
       glow: "bg-sky-400/10 group-hover:bg-sky-400/25",
-      desc: "Kategori karya yang dihadirkan dalam Halaman Utama SINGGAH.",
-      badge: (
-        <span className={`${badgeCls} border-emerald-400/30 bg-emerald-400/10 text-emerald-300 ${badgeLight}`}>
-          <Tags className="h-3 w-3" /> TERINDEKS
-        </span>
-      ),
+      kiri: "sesuai jenisnya",
+      kanan: "Tersusun dalam",
     },
     {
       label: "Pengunjung",
-      value: stats.visitorsCount,
       icon: Users,
+      value: stats.visitorsCount,
       chip: "from-cyan-400 to-blue-600 text-white shadow-cyan-500/30",
       labelColor: "text-cyan-300 light:text-blue-600",
       plus: "text-cyan-300 light:text-blue-600",
       glow: "bg-emerald-400/10 group-hover:bg-emerald-400/25",
-      desc: "Pengunjung yang telah singgah menikmati Gedung Virtual SINGGAH.",
-      badge: (
-        <span className={`${badgeCls} border-emerald-400/30 bg-emerald-400/10 text-emerald-300 ${badgeLight}`}>
-          <Radio className="h-3 w-3" /> TERPANTAU
-        </span>
-      ),
+      kiri: "Sudah ada",
+      kanan: "yang singgah",
     },
     {
       label: "Kontributor",
-      value: stats.usersCount,
       icon: PenTool,
+      varian: "gelap",
+      value: stats.usersCount,
       chip: "from-cyan-400 to-blue-600 text-white shadow-cyan-500/30",
       labelColor: "text-cyan-300 light:text-blue-600",
       plus: "text-cyan-300 light:text-blue-600",
       glow: "bg-indigo-400/10 group-hover:bg-indigo-400/25",
-      desc: "Pengguna terdaftar yang turut berkontribusi karya di SINGGAH.",
-      badge: (
-        <span className={`${badgeCls} border-emerald-400/30 bg-emerald-400/10 text-emerald-300 ${badgeLight}`}>
-          <UserPlus className="h-3 w-3" /> BERGABUNG
-        </span>
-      ),
+      kiri: "yang menaruh karyanya",
+      kanan: "Ada juga",
     },
   ];
 
   const [gridRef, inView] = useInView();
 
   return (
-    <div
-      ref={gridRef}
-      className="grid w-full grid-cols-1 gap-3 min-[600px]:grid-cols-2 min-[1200px]:grid-cols-4 min-[1200px]:gap-5"
-    >
-      {loading
-        ? Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className={`${cardCls} pointer-events-none`}
+    <div ref={gridRef} className="stats-jaring relative w-full">
+                      <style>{`
+.stats-jaring{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%}
+.stats-baris{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%;max-width:520px}
+.stats-sambung,.stats-kipas{display:none}
+.stats-masuk{display:block;opacity:0;transform:translate3d(0,14px,0);transition:opacity 600ms cubic-bezier(0.22,1,0.36,1),transform 800ms cubic-bezier(0.22,1,0.36,1);transition-delay:var(--d,0ms)}
+.stats-masuk.is-in{opacity:1;transform:translate3d(0,0,0)}
+.stats-chip{position:relative;z-index:1;box-sizing:border-box;display:flex;align-items:center;gap:0;height:52px;padding:0 18px;border-radius:0;white-space:nowrap}
+.stats-terang{background:var(--color-accent-primary);border:1px solid var(--color-accent-primary);color:#0f172a;border-radius:0;box-shadow:none;transition:background-color 200ms ease,border-color 200ms ease}
+.stats-terang:hover,.stats-terang:focus-visible{background-color:#1d4ed8;border-color:#1d4ed8}
+.stats-terang.stats-gelap{background:#0f172a;border-color:#0f172a}
+.stats-terang.stats-gelap:hover,.stats-terang.stats-gelap:focus-visible{background-color:#1e293b;border-color:#1e293b}
+.stats-redup{background:#f1f5f9;border:1px solid #e9edf3;color:#64748b;font-size:20px;font-weight:400;border-radius:0;box-shadow:none}
+.stats-angka{font-family:var(--font-headline);font-size:20px;line-height:1;font-weight:600;color:#ffffff;font-variant-numeric:tabular-nums}
+.stats-label{font-size:20px;line-height:1;font-weight:600;letter-spacing:0;text-transform:none;margin:0 0 0 8px;color:#ffffff}
+.stats-icon{transition:transform 200ms ease}
+.stats-terang:hover .stats-icon,.stats-terang:focus-visible .stats-icon{transform:translateY(-2px)}
+@media (max-width:1199.98px){
+.stats-chip,.stats-redup{font-size:16px}
+}
+@media (min-width:1200px){
+.stats-jaring{gap:20px}
+.stats-baris{flex-direction:row;align-items:center;gap:0;width:auto;max-width:none;left:var(--geser)}
+.stats-balik{flex-direction:row-reverse}
+.stats-sambung{display:block;flex:none;width:40px;height:1px;background:#cbd5e1}
+.stats-chip::before,.stats-chip::after{content:"";display:block;position:absolute;top:50%;width:3px;height:3px;margin-top:-1.5px;border-radius:0;background:#475569;z-index:2;pointer-events:none}
+.stats-chip::before{left:-8px}
+.stats-chip::after{right:-8px}
+.stats-kipas{display:block;position:absolute;top:50%;width:100vw;height:300px;margin-top:-150px;overflow:visible;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(90deg,#000 0%,#000 12%,rgba(0,0,0,0) 34%,rgba(0,0,0,0) 66%,#000 88%,#000 100%);mask-image:linear-gradient(90deg,#000 0%,#000 12%,rgba(0,0,0,0) 34%,rgba(0,0,0,0) 66%,#000 88%,#000 100%)}
+.stats-kipas-kiri{right:calc(100% + 10px)}
+.stats-kipas-kanan{left:calc(100% + 10px)}
+}
+@media (prefers-reduced-motion: reduce){
+.stats-masuk,.stats-terang{transition:none}
+.stats-masuk{opacity:1;transform:none;transition-delay:0ms}
+}
+`}</style>
+      {items.map((c, i) => {
+        const Icon = c.icon;
+        return (
+          <div
+            key={c.label}
+            className={`stats-baris ${i % 2 === 1 ? "stats-balik" : ""}`}
+            style={{
+              "--geser": GESER[i % GESER.length],
+            }}
+          >
+            <svg
+              className="stats-kipas stats-kipas-kiri"
+              aria-hidden="true"
+              viewBox="0 0 100 300"
+              preserveAspectRatio="none"
             >
-              <div className="flex items-start justify-between">
-                <Skeleton className="h-11 w-11 rounded-xl" />
-                <Skeleton className="h-6 w-20 rounded-full" />
-              </div>
-              <div className="mt-4">
-                <Skeleton className="h-10 w-28" />
-                <Skeleton className="mt-1 h-3 w-full" />
-                <Skeleton className="mt-1 h-3 w-3/4" />
+              {KIRI[i % KIRI.length].map((y, k) => (
+                <line
+                  key={k}
+                  x1="0"
+                  y1={y}
+                  x2={k < 2 ? 100 : 118}
+                  y2="150"
+                  stroke="#cbd5e1"
+                  strokeWidth="1"
+                  vectorEffect="non-scaling-stroke"
+                />
+              ))}
+            </svg>
+            <div className={`stats-masuk ${inView ? "is-in" : ""}`} style={{ "--d": `${i * 120 + 0 * 60}ms` }}>
+              <div className="stats-chip stats-redup">
+                {c.kiri}
               </div>
             </div>
-          ))
-        : items.map((c, i) => {
-            const Icon = c.icon;
-            return (
-              <div
-                key={c.label}
-                style={{ transitionDelay: `${i * 120}ms` }}
-                className={`${cardCls} ${
-                  inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-                }`}
-              >
-                <div
-                  aria-hidden="true"
-                  className={`absolute -right-12 -top-12 h-28 w-28 rounded-full blur-2xl transition-all ${c.glow}`}
+            <span className="stats-sambung" aria-hidden="true" />
+            <div className={`stats-masuk ${inView ? "is-in" : ""}`} style={{ "--d": `${i * 120 + 1 * 60}ms` }}>
+              <div className={`stats-chip stats-terang${c.varian === "gelap" ? " stats-gelap" : ""}`}>
+                <Icon
+                  className="stats-icon"
+                  width={22}
+                  height={22}
+                  strokeWidth={1.75}
+                  style={{ color: "#ffffff", marginRight: 10 }}
                 />
-                <div className="flex items-start justify-between gap-2">
-                  <div
-                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border bg-gradient-to-br shadow-lg transition-transform duration-300 group-hover:scale-105 ${c.chip}`}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  {c.badge}
-                </div>
-                <div className="mt-4 min-w-0">
-                  <div className="flex items-end gap-2.5">
-                    <Counter
-                      value={c.value}
-                      active={inView}
-                      className="font-mono text-5xl font-extrabold tracking-tight leading-none text-white light:text-slate-900"
-                    />
-                    <span
-                      className={`mb-1 shrink-0 font-sans text-xl font-extrabold uppercase tracking-wide ${c.labelColor}`}
-                    >
-                      {c.label}
-                    </span>
-                  </div>
-                  <p className="mt-1.5 text-xs font-medium leading-relaxed text-slate-400 light:text-slate-500">
-                    {c.desc}
-                  </p>
-                </div>
+                <Counter
+                  value={c.value}
+                  active={inView}
+                  className="stats-angka tabular-nums"
+                />
+                <span className="stats-label font-sans">
+                  {c.label}
+                </span>
               </div>
-            );
-          })}
+            </div>
+            <span className="stats-sambung" aria-hidden="true" />
+            <div className={`stats-masuk ${inView ? "is-in" : ""}`} style={{ "--d": `${i * 120 + 2 * 60}ms` }}>
+              <div className="stats-chip stats-redup">
+                {c.kanan}
+              </div>
+            </div>
+            <svg
+              className="stats-kipas stats-kipas-kanan"
+              aria-hidden="true"
+              viewBox="0 0 100 300"
+              preserveAspectRatio="none"
+            >
+              {KANAN[i % KANAN.length].map((y, k) => (
+                <line
+                  key={k}
+                  x1="100"
+                  y1={y}
+                  x2={k < 2 ? 0 : -18}
+                  y2="150"
+                  stroke="#cbd5e1"
+                  strokeWidth="1"
+                  vectorEffect="non-scaling-stroke"
+                />
+              ))}
+            </svg>
+          </div>
+        );
+      })}
     </div>
   );
 }

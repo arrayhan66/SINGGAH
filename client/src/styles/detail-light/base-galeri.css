@@ -9,8 +9,8 @@
    Light: gradasi cyan -> biru + teks putih + ikon lembut, konsisten
    dengan badge kategori header. Dark: gelap pekat + border cyan terang + glow. */
 html.light .karya-detail-page .category-chip {
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
-  background-color: #2563eb;
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
+  background-color: var(--color-accent-primary);
   border-color: rgba(255, 255, 255, 0.55);
   color: #ffffff;
   box-shadow: 0 4px 14px -4px rgba(37, 99, 235, 0.45);
@@ -25,7 +25,7 @@ html:not(.light) .karya-detail-page .category-chip {
 }
 
 /* ===== MENTION @user DI KOMENTAR ===== */
-/* Light mode: accent cyan jadi #2563eb (terlalu biru/nyala utk teks
+/* Light mode: accent cyan jadi var(--color-accent-primary) (terlalu biru/nyala utk teks
    mention). Diredam ke biru kalem agar tidak menonjol/terlihat besar. */
 html.light
   .karya-projectdetail-page
@@ -209,7 +209,7 @@ html.light .karya-projectdetail-page .gallery-arrow {
 html.light .karya-projectdetail-page .gallery-arrow:hover {
   background: #ffffff;
   border-color: rgba(37, 99, 235, 0.3);
-  color: #2563eb;
+  color: var(--color-accent-primary);
   box-shadow: 0 4px 14px rgba(37, 99, 235, 0.15);
 }
 
@@ -229,7 +229,7 @@ html.light .karya-projectdetail-page .gallery-dots-bar {
   -webkit-backdrop-filter: blur(8px);
 }
 html.light .karya-projectdetail-page .gallery-dot-active {
-  background: #2563eb;
+  background: var(--color-accent-primary);
   box-shadow: 0 0 6px rgba(37, 99, 235, 0.35);
 }
 html.light .karya-projectdetail-page .gallery-dot-inactive {
@@ -242,8 +242,8 @@ html.light .karya-projectdetail-page .gallery-dot-inactive:hover {
 /* Back button — light mode */
 html.light .karya-projectdetail-page .gallery-back {
   border-color: rgba(255, 255, 255, 0.4);
-  background-color: #2563eb;
-  background-image: linear-gradient(135deg, #22d3ee 0%, #2563eb 100%);
+  background-color: var(--color-accent-primary);
+  background-image: linear-gradient(135deg, #22d3ee 0%, var(--color-accent-primary) 100%);
   color: #ffffff;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.35),

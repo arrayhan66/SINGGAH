@@ -204,7 +204,7 @@ html:not(.light) .auth-page .bg-slate-950 .from-white.to-cyan-50 img {
 }
 /* Judul "SINGGAH": LIGHT -> teks gradasi biru tua */
 html.light .auth-page .bg-slate-950 .bg-white\/90 h2 {
-  background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, var(--color-accent-primary) 0%, #1e3a8a 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -290,13 +290,13 @@ html.light .auth-page [data-role-card] [class*="text-cyan-300"] {
   color: #1d4ed8;
 }
 html.light .auth-page [data-role-card] .text-cyan-500 {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 /* Kartu AKTIF lebih menarik: gradasi biru solid + TEKS PUTIH + glow kuat
    + sedikit membesar */
 html.light .auth-page [data-role-card].border-cyan-400 {
-  border-color: #2563eb;
-  background: linear-gradient(150deg, #2563eb 0%, #1d4ed8 100%);
+  border-color: var(--color-accent-primary);
+  background: linear-gradient(150deg, var(--color-accent-primary) 0%, #1d4ed8 100%);
   color: #ffffff;
   box-shadow: 0 16px 34px -12px rgba(37, 99, 235, 0.6);
   transform: scale(1.02);
@@ -313,7 +313,7 @@ html.light .auth-page [data-role-card].border-cyan-400 [class*="text-slate-800"]
 
 /* Stepper connector -> gradasi biru tua (tema light mode dashboard) */
 html.light .auth-page [data-step-connector] {
-  background-image: linear-gradient(90deg, #2563eb, #1d4ed8);
+  background-image: linear-gradient(90deg, var(--color-accent-primary), #1d4ed8);
 }
 
 /* Tombol Selanjutnya -> SAMA PERSIS seperti tombol login "Masuk":
@@ -352,7 +352,7 @@ html.light .auth-page input[type="password"] {
 html.light .auth-page input[type="email"]:focus,
 html.light .auth-page input[type="password"]:focus {
   background-color: #ffffff;
-  border-color: #2563eb;
+  border-color: var(--color-accent-primary);
 }
 
 /* INPUT REGISTER (text: Nama Lengkap, Username, NIM) -> sama seperti
@@ -363,7 +363,7 @@ html.light .auth-page input[type="text"] {
 }
 html.light .auth-page input[type="text"]:focus {
   background-color: #ffffff;
-  border-color: #2563eb;
+  border-color: var(--color-accent-primary);
 }
 /* Teks di dalam semua input auth light -> #404040 (hitam tidak-hitam) */
 html.light .auth-page input[type="text"],
@@ -382,7 +382,7 @@ html.light .auth-page label.border-dashed.border-slate-200.bg-slate-50 {
 }
 html.light .auth-page label.border-dashed.border-slate-200.bg-slate-50:hover {
   background-color: #ffffff;
-  border-color: #2563eb;
+  border-color: var(--color-accent-primary);
   box-shadow: 0 8px 20px -10px rgba(37, 99, 235, 0.35);
 }
 html.light .auth-page label.border-dashed .text-slate-600 {
@@ -421,7 +421,7 @@ html:not(.light) .auth-page .bg-slate-950 .text-cyan-300 {
 /* DARK MODE: icon Smart Project -> warna SAMA seperti Secure Access
    (dari cyan-600 jadi blue-600) */
 html:not(.light) .auth-page .bg-slate-950 .bg-cyan-600 {
-  background-color: #2563eb;
+  background-color: var(--color-accent-primary);
 }
 /* DARK MODE: tombol KEMBALI register punya efek hover yang terlihat */
 html:not(.light) .auth-page .bg-slate-800 {

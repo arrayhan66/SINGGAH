@@ -89,7 +89,7 @@ function SeeAlsoBlock({ htmlAttributes }) {
                 item.url
                   ? isDark
                     ? "hover:bg-blue-500/10 hover:shadow-[inset_0_0_30px_rgba(59,130,246,0.12)] cursor-pointer"
-                    : "hover:bg-blue-50 hover:shadow-[inset_0_0_30px_rgba(37,99,235,0.08)] cursor-pointer"
+                    : "hover:bg-blue-50 hover:shadow-[inset_0_0_30px_var(--color-accent-shadow)] cursor-pointer"
                   : ""
               }`}
             >

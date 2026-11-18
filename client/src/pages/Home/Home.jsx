@@ -1,8 +1,8 @@
 import MainLayout from "../../layouts/MainLayout"
 import HeroPhoto from "../../components/sections/Hero/HeroPhoto"
+import MitraMarquee from "../../components/sections/Hero/MitraMarquee"
 import Hero from "../../components/sections/Hero/Hero"
 import PlanetaryOrbitGallery from "../../components/sections/PlanetaryOrbitGallery"
-import KategoriPopuler from "../../components/sections/KategoriPopuler"
 
 import "../../styles/beranda-light.css"
 
@@ -11,9 +11,9 @@ export default function Home() {
     <div className="beranda-page">
       <MainLayout>
         <HeroPhoto />
+        <MitraMarquee />
         <Hero />
         <PlanetaryOrbitGallery />
-        <KategoriPopuler />
       </MainLayout>
     </div>
   )

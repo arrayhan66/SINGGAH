@@ -62,7 +62,7 @@ html.light
   button.h-12.w-12.rounded-full.border-white\/15.bg-brand-dark\/90 {
   border-color: #bfdbfe;
   background-color: #ffffff;
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 html.light
   .admin-page
@@ -107,7 +107,7 @@ html.light .admin-page .hover\:from-cyan-500\/\[0\.12\]:hover {
 /* Tab aktif gradasi translusen -> pill biru solid teks putih */
 html.light .admin-page .from-cyan-500\/25.to-blue-500\/25 {
   background-image: none;
-  background-color: #2563eb;
+  background-color: var(--color-accent-primary);
   color: #ffffff;
 }
 html.light .admin-page .bg-cyan-500\/25 {
@@ -244,7 +244,7 @@ html.light .admin-page .bg-cyan-900\/20 .bg-slate-900\/90 {
 
 /* ===== INPUT RANGE (editor berita) ===== */
 html.light .admin-page .accent-cyan-400 {
-  accent-color: #2563eb;
+  accent-color: var(--color-accent-primary);
 }
 html.light .admin-page .bg-slate-800.rounded-lg {
   background-color: #eef3fa;

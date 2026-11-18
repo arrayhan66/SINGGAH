@@ -11,6 +11,11 @@ import { CATEGORY_COLORS } from "../../utils/hallHelpers"
 const W = PAINTING_SIZE.w
 const H = PAINTING_SIZE.h
 
+const ACCENT_PRIMARY =
+  typeof window !== "undefined"
+    ? getComputedStyle(document.documentElement).getPropertyValue("--color-accent-primary").trim() || "#2563eb"
+    : "#2563eb"
+
 const FRAME_W = W + 0.34
 const FRAME_H = H + 0.34
 const BAR_T = 0.1
@@ -142,7 +147,7 @@ const PALETTES = [
   ["#0ea5e9", "#1d4ed8", "#7dd3fc", "#0f172a"],
   ["#22d3ee", "#0891b2", "#a5f3fc", "#083344"],
   ["#6366f1", "#4338ca", "#a5b4fc", "#1e1b4b"],
-  ["#3b82f6", "#2563eb", "#93c5fd", "#1e3a8a"],
+  ["#3b82f6", ACCENT_PRIMARY, "#93c5fd", "#1e3a8a"],
   ["#38bdf8", "#0284c7", "#bae6fd", "#0c4a6e"],
   ["#818cf8", "#4f46e5", "#c7d2fe", "#312e81"],
 ]

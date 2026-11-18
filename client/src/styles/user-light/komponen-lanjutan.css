@@ -80,7 +80,7 @@ html.light .user-page button.rounded-xl.bg-white.text-slate-900 {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   color: #ffffff;
   transition:
     transform 0.3s cubic-bezier(0.33, 1, 0.68, 1),

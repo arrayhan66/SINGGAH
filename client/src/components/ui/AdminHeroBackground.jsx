@@ -11,7 +11,7 @@ const darkVignette =
    terlihat sebagai permukaan tersendiri (bukan putih polos,
    bukan navy gelap) */
 const lightVignette =
-  "radial-gradient(circle at top center, transparent 0%, rgba(37,99,235,0.05) 50%, rgba(30,64,120,0.16) 100%)"
+  "radial-gradient(circle at top center, transparent 0%, var(--color-accent-faint) 50%, rgba(30,64,120,0.16) 100%)"
 
 function AdminHeroBackground({ children, className = "", fullWidth = false }) {
   const { theme } = useTheme()

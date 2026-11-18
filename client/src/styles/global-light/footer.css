@@ -26,7 +26,7 @@ html.light footer .text-slate-500 {
   color: #404040;
 }
 html.light footer .hover\:text-cyan-300:hover {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 
 /* ============================================================
@@ -173,7 +173,7 @@ html.light .text-cyan-300\/70,
 html.light .text-cyan-300\/75,
 html.light .text-cyan-300\/80,
 html.light .text-cyan-300\/90 {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 
 /* Tombol Hapus (komentar/balasan): saat hover teks jadi MERAH

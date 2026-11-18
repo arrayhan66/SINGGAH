@@ -63,7 +63,7 @@ html.light .admin-page .dashboard-panel:active {
   outline-offset: 3px;
 }
 html.light .admin-page .dashboard-panel:focus-visible {
-  outline-color: #2563eb;
+  outline-color: var(--color-accent-primary);
 }
 
 /* Baris project/berita yang sekarang diklik ke halaman detail */
@@ -76,7 +76,7 @@ html.light .admin-page .dashboard-panel:focus-visible {
 html.light .admin-page .dashboard-pending-item:focus-visible,
 html.light .admin-page .dashboard-approved-item:focus-visible,
 html.light .admin-page .dashboard-news-item:focus-visible {
-  outline-color: #2563eb;
+  outline-color: var(--color-accent-primary);
 }
 
 /* ---- Teks & isi di dalam panel bawah (light mode) ----
@@ -298,7 +298,7 @@ html:not(.light) .admin-page .announce-field:focus {
    cyan -> biru, ikon putih, bayangan biru lembut. Dark mode
    tetap kotak kaca cyan (sudah sesuai header Karya). */
 html.light .admin-page .dashboard-hero-icon {
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   background-color: transparent;
   border-color: transparent;
   box-shadow: 0 10px 24px -8px rgba(37, 99, 235, 0.45);
@@ -310,7 +310,7 @@ html.light .admin-page .dashboard-hero-icon svg {
 /* ===== KARTU STATISTIK & QUICK ACTION (ikon) =====
    Ikon dibuat BEDA antara dark & light:
    - DARK : kotak gradasi cyan -> biru + ikon putih (gaya Karya).
-   - LIGHT: kotak biru SOLID (#2563eb) + ikon putih — beda dari
+   - LIGHT: kotak biru SOLID (var(--color-accent-primary)) + ikon putih — beda dari
      dark, dan jelas terlihat di atas kartu putih.
    Di light, global-light.css meratakan gradient jadi biru polos,
    sengaja dipakai sebagai dasar solid biru (bukan dipulihkan
@@ -318,7 +318,7 @@ html.light .admin-page .dashboard-hero-icon svg {
 html.light .admin-page .dashboard-stat-card .stat-icon,
 html.light .admin-page .dashboard-quickaction-card .quickaction-icon {
   background-image: none;
-  background-color: #2563eb;
+  background-color: var(--color-accent-primary);
   color: #ffffff;
   box-shadow: 0 6px 18px -6px rgba(37, 99, 235, 0.4);
 }
@@ -342,7 +342,7 @@ html.light .admin-page .dashboard-stat-card .stat-label {
 /* Sparkline: garis cyan muda di permukaan putih kurang terbaca ->
    dipindah ke biru primer agar jelas */
 html.light .admin-page .dashboard-stat-card .sparkline path[stroke] {
-  stroke: #2563eb;
+  stroke: var(--color-accent-primary);
 }
 
 /* Judul item di panel bawah (project pending/approved, berita):
@@ -432,7 +432,7 @@ html.light .admin-page .dashboard-quickaction-card .quickaction-label {
   color: #67e8f9;
 }
 html.light .admin-page .dashboard-quickaction-card:hover .quickaction-label {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 
 /* ===== PANAH (quick action: Project / Berita / User) =====
@@ -441,7 +441,7 @@ html.light .admin-page .dashboard-quickaction-card:hover .quickaction-label {
    + panah putih, meluncur ke kanan & "membalik" lewat easing
    overshoot supaya terasa hidup. */
 .admin-page .dashboard-quickaction-card:hover .quickaction-arrow {
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   border-color: transparent;
   color: #ffffff;
   box-shadow: 0 8px 18px -8px rgba(34, 211, 238, 0.5);
@@ -449,7 +449,7 @@ html.light .admin-page .dashboard-quickaction-card:hover .quickaction-label {
 }
 html.light .admin-page .dashboard-quickaction-card:hover .quickaction-arrow {
   background-image: none;
-  background-color: #2563eb;
+  background-color: var(--color-accent-primary);
   border-color: transparent;
   color: #ffffff;
   box-shadow: 0 8px 18px -8px rgba(37, 99, 235, 0.5);

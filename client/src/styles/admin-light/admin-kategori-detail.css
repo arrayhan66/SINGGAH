@@ -1,10 +1,10 @@
 /* ============================================================
    ICON KARTU KATEGORI (CategoryCard) — mengikuti tile menu aktif
    sidebar: dark = gradasi cyan→biru solid + glow, ikon putih;
-   light = biru solid (#2563eb) + ikon putih + shadow lembut.
+   light = biru solid (var(--color-accent-primary)) + ikon putih + shadow lembut.
    ============================================================ */
 .admin-page div.admin-category-icon {
-  background-image: linear-gradient(to bottom right, #22d3ee, #2563eb);
+  background-image: linear-gradient(to bottom right, #22d3ee, var(--color-accent-primary));
   background-color: transparent;
   border-color: transparent;
   color: #ffffff;
@@ -15,7 +15,7 @@
 }
 html.light .admin-page div.admin-category-icon {
   background-image: none;
-  background-color: #2563eb;
+  background-color: var(--color-accent-primary);
   border-color: transparent;
   color: #ffffff;
   box-shadow: 0 6px 18px -6px rgba(37, 99, 235, 0.45);

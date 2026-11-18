@@ -60,7 +60,7 @@
   border-radius: 9999px 9999px 0 0;
 }
 .user-page div.mt-8.grid.grid-cols-1.gap-4 > div:nth-child(1) .stats-accent {
-  background: linear-gradient(90deg, #22d3ee, #2563eb);
+  background: linear-gradient(90deg, #22d3ee, var(--color-accent-primary));
 }
 .user-page div.mt-8.grid.grid-cols-1.gap-4 > div:nth-child(2) .stats-accent {
   background: linear-gradient(90deg, #fbbf24, #d97706);
@@ -235,7 +235,7 @@ html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.roun
    selaras dengan tombol "Upload Karya Baru" (bukan flat putih). */
 html.light .user-page #my-karya .group.flex.h-full.flex-col.overflow-hidden.rounded-3xl button.bg-white {
   background-color: transparent !important;
-  background-image: linear-gradient(90deg, #2563eb, #0ea5e9, #2563eb) !important;
+  background-image: linear-gradient(90deg, var(--color-accent-primary), #0ea5e9, var(--color-accent-primary)) !important;
   background-size: 200% 100% !important;
   background-position: 0 0 !important;
   color: #ffffff !important;
@@ -270,7 +270,7 @@ html.light .user-page .focus-within\:shadow-cyan-400\/30:focus-within {
     0 6px 12px -6px rgba(37, 99, 235, 0.22) !important;
 }
 html.light .user-page .group:focus-within svg {
-  color: #2563eb;
+  color: var(--color-accent-primary);
 }
 html.light .user-page .group:focus-within button.bg-red-500 svg {
   color: #ffffff;

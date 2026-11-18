@@ -23,13 +23,13 @@
   left: 4px;
   width: calc(50% - 4px);
   border-radius: 9999px;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background: linear-gradient(135deg, var(--color-accent-primary), #1d4ed8);
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
   transition: transform 0.25s ease-out;
 }
 
 .auth-toggle[data-active="login"]::before {
-  background: linear-gradient(90deg, #2563eb, #53eafd, #2563eb);
+  background: linear-gradient(90deg, var(--color-accent-primary), #53eafd, var(--color-accent-primary));
   background-size: 200% 100%;
   background-position: 0 0;
   box-shadow: 0 4px 12px rgba(83, 234, 253, 0.35);
@@ -89,7 +89,7 @@
 }
 
 .auth-tab:focus-visible {
-  outline: 2px solid #2563eb;
+  outline: 2px solid var(--color-accent-primary);
   outline-offset: 2px;
 }
 
@@ -99,7 +99,7 @@ html.light .auth-toggle {
 }
 
 html.light .auth-toggle[data-active="login"]::before {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background: linear-gradient(135deg, var(--color-accent-primary), #1d4ed8);
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
 }
 

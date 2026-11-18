@@ -31,7 +31,7 @@ html:not(.light) .berita-article-card .prose a:hover {
 
 /* ---------- LIGHT MODE ---------- */
 html.light .berita-article-card .prose a {
-  color: #2563eb;
+  color: var(--color-accent-primary);
   font-weight: 600;
   padding: 0.05rem 0.2rem;
   margin: 0 -0.2rem;

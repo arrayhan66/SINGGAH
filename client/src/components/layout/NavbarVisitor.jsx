@@ -78,8 +78,6 @@ import imgPenelitian from "../../assets/images/navbarSupports/penilitian&gif.gif
 import imgPublikasi from "../../assets/images/navbarSupports/publikasi.webp";
 import imgKaryaUnggulan from "../../assets/images/navbarSupports/karyaunggulan.webp";
 import imgInovasi from "../../assets/images/navbarSupports/inovasi.webp";
-import imgPengabdianMenu from "../../assets/images/navbarSupports/pengabdian.jpg";
-import imgDiseminasiMenu from "../../assets/images/navbarSupports/desiminasi.avif";
 
 // DUMMY: pemilik akan mengganti judul; gambar sudah diisi lewat import Vite.
 const KARYA_MENU = [
@@ -166,23 +164,8 @@ const MENU_PENELITIAN = [
   },
 ];
 
-const MENU_PENGABDIAN = [
-  {
-    to: "/pengabdian",
-    label: "Pengabdian",
-    desc: "Catatan kegiatan pengabdian kepada masyarakat",
-    img: imgPengabdianMenu,
-  },
-  {
-    to: "/diseminasi",
-    label: "Diseminasi",
-    desc: "Penyebaran hasil pengabdian dan riset",
-    img: imgDiseminasiMenu,
-  },
-];
-
 const SNAV_CSS = `
-.snav-link,.snav-menu,.snav-mobile,.snav-ink,.snav-auth{--snav-c:#475569;--snav-h:#0f172a;--snav-a:#2563eb;--snav-bg:#fff;--snav-bd:rgba(148,163,184,.35);--snav-hov:rgba(37,99,235,.07);--snav-sh:rgba(15,23,42,.22);--snav-mono:ui-monospace,"JetBrains Mono","IBM Plex Mono",Consolas,Menlo,monospace}
+.snav-link,.snav-menu,.snav-mobile,.snav-ink,.snav-auth{--snav-c:#475569;--snav-h:#0f172a;--snav-a:var(--color-accent-primary);--snav-bg:#fff;--snav-bd:rgba(148,163,184,.35);--snav-hov:var(--color-accent-soft);--snav-sh:rgba(15,23,42,.22);--snav-mono:ui-monospace,"JetBrains Mono","IBM Plex Mono",Consolas,Menlo,monospace}
 .snav-link.snav-link{position:relative;z-index:1;display:inline-flex;align-items:center;padding:clamp(4px,0.8vw,8px) clamp(2px,0.4vw,4px);font-family:var(--snav-font,var(--snav-mono));font-size:clamp(11px,1.2vw,15px);line-height:1.5;font-weight:500;color:#334155;text-decoration:none;cursor:pointer;border:0;background:transparent;transition:color 150ms ease;white-space:nowrap}
 @media (min-width:2560px){.snav-link.snav-link{font-size:clamp(15px,1.5vw,22px);padding:clamp(8px,1vw,14px) clamp(4px,0.6vw,8px)}}
 .snav-link.snav-link:hover{color:#0f172a}
@@ -229,7 +212,7 @@ nav:has(.snav-dd.is-open) .snav-dd:not(.is-open) .snav-menu{transition:none !imp
 .snav-mm-side{padding-right:32px;border-right:1px solid var(--snav-bd)}
 .snav-mm-label{margin-bottom:18px;font-family:var(--snav-font,var(--snav-mono));font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--snav-c)}
 .snav-mm-item{display:block;padding:8px 0;font-family:var(--snav-font,var(--snav-mono));font-size:15px;font-weight:500;color:var(--snav-c);text-decoration:none;transition:color .15s}
-.snav-mm-item.is-hover,.snav-mm-item:focus-visible{color:#2563eb;outline:none}
+.snav-mm-item.is-hover,.snav-mm-item:focus-visible{color:var(--color-accent-primary);outline:none}
 .snav-mm-body{display:flex;flex-direction:column;min-width:0}
 .snav-mm-title{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-family:var(--snav-font,var(--snav-mono));font-size:16px;font-weight:600;color:var(--snav-h);text-decoration:none}
 .snav-mm-desc{margin:14px 0 0;max-width:34ch;font-size:14px;line-height:1.55;color:var(--snav-c)}
@@ -245,7 +228,7 @@ nav:has(.snav-dd.is-open) .snav-dd:not(.is-open) .snav-menu{transition:none !imp
 .snav-zona .snav-mm-label{margin-bottom:28px!important;font-size:11px!important;font-weight:600!important;letter-spacing:0.06em!important;line-height:16px!important;color:#64748b!important;text-transform:uppercase!important}
 .snav-zona .snav-mm-list{display:flex;flex-direction:column;gap:4px}
 .snav-zona .snav-mm-item{display:flex;align-items:center;height:36px;padding:0;border:0;border-radius:0;background:transparent;font-size:16px;font-weight:500;color:#64748b;text-decoration:none}
-.snav-zona .snav-mm-item.is-hover,.snav-zona .snav-mm-item:hover,.snav-zona .snav-mm-item:focus-visible{color:#2563eb;outline:none}
+.snav-zona .snav-mm-item.is-hover,.snav-zona .snav-mm-item:hover,.snav-zona .snav-mm-item:focus-visible{color:var(--color-accent-primary);outline:none}
 .snav-zona .snav-mm-body{display:flex!important;flex-direction:column;min-width:0;padding:0!important;grid-column:3!important;grid-row:1!important}
 .snav-zona .snav-mm-title{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-size:18px!important;font-weight:600!important;color:#0f172a;text-decoration:none}
 .snav-zona .snav-mm-desc{margin:12px 0 0;font-size:14px!important;line-height:1.5;color:#64748b!important;display:block;overflow:visible}
@@ -257,22 +240,6 @@ nav:has(.snav-dd.is-open) .snav-dd:not(.is-open) .snav-menu{transition:none !imp
 .snav-zona .snav-mm-desc{display:block!important;overflow:visible!important;text-overflow:clip!important;max-height:none!important}
 .snav-zona .snav-mm-tags{flex-wrap:nowrap!important}
 .snav-zona .snav-mm-tags span{white-space:nowrap!important;flex:none!important}
-.snav-menu.snav-kartu-panel{display:flex;flex-direction:row;gap:16px;padding:12px;width:520px;max-width:calc(100vw - 24px);border:1px solid #cbd5e1;border-radius:14px;background:#ffffff;box-shadow:0 16px 40px -12px rgba(15,23,42,0.18),0 2px 6px rgba(15,23,42,0.05)}
-.snav-kartu-panel::before{background:#ffffff;border-left:1px solid #cbd5e1;border-top:1px solid #cbd5e1}
-.snav-kartu{flex:1 1 0;min-width:0;display:flex;flex-direction:column;background:#ffffff!important;border:1px solid #cbd5e1!important;border-radius:0!important;padding:0!important;overflow:hidden!important;text-decoration:none!important;outline:none;transition:background-color 140ms ease,border-color 140ms ease}
-.snav-kartu:hover,.snav-kartu:focus-visible{outline:none!important}
-.snav-kartu:hover .snav-kartu-media img,.snav-kartu:focus-visible .snav-kartu-media img{transform:scale(1.05)}
-.snav-kartu:hover .snav-kartu-title,.snav-kartu:focus-visible .snav-kartu-title{transform:translateX(4px)}
-.snav-kartu:hover .snav-kartu-desc,.snav-kartu:focus-visible .snav-kartu-desc{transform:translateX(4px)}
-.snav-kartu-panel:has(.snav-kartu:hover) .snav-kartu:not(:hover) img{opacity:.78}
-.snav-kartu-media{position:relative;width:100%;aspect-ratio:16 / 10;overflow:hidden!important;border-radius:0!important;border-bottom:1px solid #e2e8f0!important;background:#f8fafc!important}
-.snav-kartu-media img{display:block;width:100%;height:100%;object-fit:cover;border-radius:0!important;transform:scale(1);transform-origin:center;will-change:transform;transition:transform 500ms cubic-bezier(.22,1,.36,1),opacity 280ms ease}
-.snav-kartu-arrow{position:absolute;top:12px;right:12px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:0!important;background:#ffffff!important;border:1px solid #e2e8f0!important;color:#0f172a!important;overflow:hidden!important;pointer-events:none}
-.snav-kartu-arrow svg{color:#0f172a!important;transform:rotate(-45deg);transform-origin:center;will-change:transform;backface-visibility:hidden;transition:transform 380ms cubic-bezier(.22,1,.36,1)}
-.snav-kartu:hover .snav-kartu-arrow svg,.snav-kartu:focus-visible .snav-kartu-arrow svg{transform:rotate(0deg)}
-.snav-kartu-text{padding:14px 16px 20px}
-.snav-kartu-title{display:block;font-size:15px;font-weight:600;line-height:1.3;color:#0f172a!important;transform:translateX(0);transition:transform 240ms cubic-bezier(.22,1,.36,1)}
-.snav-kartu-desc{display:block;margin-top:4px;font-size:13px;font-weight:400;color:#64748b!important;line-height:1.45;white-space:normal!important;transform:translateX(0);transition:transform 240ms cubic-bezier(.22,1,.36,1),color 200ms ease}
 .snav-burger{position:relative;width:40px;height:40px;border:0;background:transparent;cursor:pointer}
 .snav-burger span{position:absolute;left:10px;right:10px;height:2px;border-radius:2px;background:currentColor;transition:transform .3s cubic-bezier(.22,1,.36,1),opacity .2s}
 .snav-burger span:nth-child(1){top:14px}.snav-burger span:nth-child(2){top:19px}.snav-burger span:nth-child(3){top:24px}
@@ -282,8 +249,8 @@ nav:has(.snav-dd.is-open) .snav-dd:not(.is-open) .snav-menu{transition:none !imp
 .snav-mobile{position:absolute;right:0;left:auto;top:calc(100% + 12px);width:min(340px,100%);max-width:360px;max-height:calc(100dvh - var(--navbar-h) - 32px);overflow:hidden;overscroll-behavior:contain;opacity:0;visibility:hidden;pointer-events:none;transform:translateX(20px);clip-path:inset(0 0 0 100%);transform-origin:top right;transition:opacity 1s ease,transform 1s ease,clip-path 1s ease,visibility 0s;z-index:50}
 .snav-mobile.is-open{opacity:1;visibility:visible;pointer-events:auto;transform:none;clip-path:inset(-16px -16px -16px -16px);transition:opacity 1s ease,transform 1s ease,clip-path 1s ease,visibility 0s}
 .snav-mobile-inner{min-height:0;overflow:hidden}
-.snav-mlink{display:flex;align-items:center;gap:12px;padding:12px 12px;font-family:var(--snav-font,var(--snav-mono));font-size:clamp(15px,4vw,17px);font-weight:600;color:var(--snav-c);text-decoration:none;background:none;border:0;width:100%;text-align:left;cursor:pointer;border-radius:8px;min-height:48px}.snav-mlink:hover{color:#2563eb;background:var(--snav-hov)}.snav-mlink.is-active{color:var(--snav-a)}.snav-mlink-sub{display:flex;align-items:center;gap:12px;padding:10px 12px 10px 48px;font-family:var(--snav-font,var(--snav-mono));font-size:clamp(14px,3.6vw,16px);font-weight:400;color:var(--snav-c);text-decoration:none;background:none;border:0;width:100%;text-align:left;cursor:pointer;border-radius:8px;min-height:44px}.snav-mlink-sub:hover{color:#2563eb;background:var(--snav-hov)}.snav-mlink-sub.is-active{color:var(--snav-a)}
-.snav-mlink:hover{color:#2563eb}
+.snav-mlink{display:flex;align-items:center;gap:12px;padding:12px 12px;font-family:var(--snav-font,var(--snav-mono));font-size:clamp(15px,4vw,17px);font-weight:600;color:var(--snav-c);text-decoration:none;background:none;border:0;width:100%;text-align:left;cursor:pointer;border-radius:8px;min-height:48px}.snav-mlink:hover{color:var(--color-accent-primary);background:var(--snav-hov)}.snav-mlink.is-active{color:var(--snav-a)}.snav-mlink-sub{display:flex;align-items:center;gap:12px;padding:10px 12px 10px 48px;font-family:var(--snav-font,var(--snav-mono));font-size:clamp(14px,3.6vw,16px);font-weight:400;color:var(--snav-c);text-decoration:none;background:none;border:0;width:100%;text-align:left;cursor:pointer;border-radius:8px;min-height:44px}.snav-mlink-sub:hover{color:var(--color-accent-primary);background:var(--snav-hov)}.snav-mlink-sub.is-active{color:var(--snav-a)}
+.snav-mlink:hover{color:var(--color-accent-primary)}
 .snav-mlink.is-active{color:var(--snav-a)}
 .snav-acc{display:grid;grid-template-rows:0fr;transition:grid-template-rows 1s ease}
 .snav-acc.is-open{grid-template-rows:1fr}
@@ -367,7 +334,7 @@ nav:has(.snav-dd.is-open) .snav-dd:not(.is-open) .snav-menu{transition:none !imp
 .snav-pv-title{font-size:16px;font-weight:500;line-height:1.3;color:#0f172a!important}
 .snav-pv-desc{font-size:13.5px;font-weight:400;line-height:1.4;color:#64748b!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .snav-pv-card{position:relative;display:flex;flex-direction:column;padding:0;border-radius:0;background:#ffffff;text-decoration:none;outline:none;border:0;overflow:hidden}
-.snav-pv-card:focus-visible{outline:none!important;box-shadow:0 0 0 2px #2563eb!important}
+.snav-pv-card:focus-visible{outline:none!important;box-shadow:0 0 0 2px var(--color-accent-primary)!important}
 .snav-pv-media{position:relative;flex:1 1 auto;min-height:120px;display:grid;overflow:hidden;border:0!important;border-radius:0;background:#e2e8f0}
 .snav-pv-photo{grid-area:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden;border:0!important;will-change:opacity;opacity:0;z-index:1;pointer-events:none;transition:opacity 0s linear 220ms}
 .snav-pv-photo[data-active="true"]{opacity:1;z-index:2;pointer-events:auto;transition:opacity 220ms ease-out}
@@ -388,9 +355,9 @@ nav:has(.snav-dd.is-open) .snav-dd:not(.is-open) .snav-menu{transition:none !imp
 .snav-pn-tab{position:relative;flex:1 1 0;min-width:0;height:40px;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none;outline:none!important;overflow:visible;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#64748b;line-height:1}
 .snav-pn-tab::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:#cbd5e1;transform:scaleX(0);transform-origin:center;transition:transform 220ms cubic-bezier(.22,1,.36,1),background-color 160ms ease}
 .snav-pn-tab-label{position:relative;z-index:1;transition:color 160ms ease}
-.snav-pn-tab[aria-selected="true"]{color:#2563eb!important}
-.snav-pn-tab[aria-selected="true"] .snav-pn-tab-label{color:#2563eb!important}
-.snav-pn-tab[aria-selected="true"]::after{background:#2563eb;transform:scaleX(1)}
+.snav-pn-tab[aria-selected="true"]{color:var(--color-accent-primary)!important}
+.snav-pn-tab[aria-selected="true"] .snav-pn-tab-label{color:var(--color-accent-primary)!important}
+.snav-pn-tab[aria-selected="true"]::after{background:var(--color-accent-primary);transform:scaleX(1)}
 .snav-pn-tab:hover:not([aria-selected="true"]),.snav-pn-tab:focus-visible:not([aria-selected="true"]){color:#0f172a}
 .snav-pn-tab:hover:not([aria-selected="true"]) .snav-pn-tab-label,.snav-pn-tab:focus-visible:not([aria-selected="true"]) .snav-pn-tab-label{color:#0f172a!important}
 .snav-pn-tab:hover:not([aria-selected="true"])::after,.snav-pn-tab:focus-visible:not([aria-selected="true"])::after{background:#cbd5e1;transform:scaleX(1)}
@@ -658,18 +625,14 @@ function NavDropdown({ id, label, items, groups, variant, activeMenu, onActivate
   const handleEnter = (e) => {
     clearNavTimer();
     // DEBUG SEMENTARA
-    console.log('[nav]', 'enter', id, Math.round(performance.now()));
     if (e && e.currentTarget && !e.currentTarget.matches(":hover")) return;
     const target = rootRef.current;
     const delay = activeMenu === null || activeMenu === id ? 100 : 120;
     // DEBUG SEMENTARA
-    console.log('[nav]', 'jadwal-buka', id, Math.round(performance.now()));
     navTimer = setTimeout(() => {
       // DEBUG SEMENTARA
-      console.log('[nav]', 'timer-buka-jalan', id, Math.round(performance.now()));
       if (!target || !target.matches(":hover")) {
         // DEBUG SEMENTARA
-        console.log('[nav]', 'timer-buka-dibatalkan-matches', id, Math.round(performance.now()));
         return;
       }
       onActivate(id);
@@ -680,13 +643,10 @@ function NavDropdown({ id, label, items, groups, variant, activeMenu, onActivate
   const handleLeave = () => {
     clearNavTimer();
     // DEBUG SEMENTARA
-    console.log('[nav]', 'leave', id, Math.round(performance.now()));
     const target = rootRef.current;
     // DEBUG SEMENTARA
-    console.log('[nav]', 'jadwal-tutup', id, Math.round(performance.now()));
     navTimer = setTimeout(() => {
       // DEBUG SEMENTARA
-      console.log('[nav]', 'timer-tutup-jalan', id, Math.round(performance.now()));
       if (target && target.matches(":hover")) return;
       if (activeMenu === id) onActivate(null);
       navTimer = null;
@@ -695,7 +655,6 @@ function NavDropdown({ id, label, items, groups, variant, activeMenu, onActivate
 
   const handleFocus = (e) => {
     // DEBUG SEMENTARA
-    console.log('[nav]', 'fokus', id, Math.round(performance.now()));
     if (e.currentTarget.matches(":focus-visible")) {
       clearNavTimer();
       onActivate(id);
@@ -1121,32 +1080,6 @@ function NavDropdown({ id, label, items, groups, variant, activeMenu, onActivate
             <img src={imgPenelitian} alt="" decoding="async" />
           </div>
         </div>
-      ) : variant === "kartu" ? (
-        <div className="snav-menu snav-kartu-panel" role="menu" ref={menuRef}>
-          {items.map((it) => (
-            <NavLink
-              key={it.to}
-              to={it.to}
-              role="menuitem"
-              onClick={() => { clearNavTimer(); onActivate(null); }}
-              className="snav-kartu"
-              style={{ outline: "none" }}
-            >
-              <div className="snav-kartu-media" aria-hidden="true">
-                {it.img && (
-                  <img src={it.img} alt="" decoding="async" loading="lazy" />
-                )}
-                <span className="snav-kartu-arrow" aria-hidden="true">
-                  <ArrowRight size={16} aria-hidden="true" />
-                </span>
-              </div>
-              <div className="snav-kartu-text">
-                <span className="snav-kartu-title">{it.label}</span>
-                <span className="snav-kartu-desc">{it.desc}</span>
-              </div>
-            </NavLink>
-          ))}
-        </div>
       ) : (
         <div
           className={`snav-menu${hasImg ? "" : " snav-menu--noimg"}${variant === "zona" ? " snav-zona" : ""}`}
@@ -1242,7 +1175,6 @@ function NavbarVisitor() {
   const [accKolabOpen, setAccKolabOpen] = useState(false);
   const [accTentangOpen, setAccTentangOpen] = useState(false);
   const [accPenelitianOpen, setAccPenelitianOpen] = useState(false);
-  const [accPengabdianOpen, setAccPengabdianOpen] = useState(false);
   const navRef = useRef(null);
   const headerRef = useRef(null);
   const barRef = useRef(null);
@@ -1367,7 +1299,6 @@ function NavbarVisitor() {
     setAccKolabOpen(false);
     setAccTentangOpen(false);
     setAccPenelitianOpen(false);
-    setAccPengabdianOpen(false);
   };
   useEffect(() => {
     function handleClickOutside(event) {
@@ -1378,7 +1309,6 @@ function NavbarVisitor() {
         setAccKolabOpen(false);
         setAccTentangOpen(false);
         setAccPenelitianOpen(false);
-        setAccPengabdianOpen(false);
       }
     }
     if (isOpen) document.addEventListener("mousedown", handleClickOutside);
@@ -1470,14 +1400,6 @@ function NavbarVisitor() {
             label="Zona Akademik"
             items={zonaAkademikItems}
             variant="zona"
-            activeMenu={activeMenu}
-            onActivate={handleActivateMenu}
-          />
-          <NavDropdown
-            id="pengabdian"
-            label="Pengabdian"
-            items={MENU_PENGABDIAN}
-            variant="kartu"
             activeMenu={activeMenu}
             onActivate={handleActivateMenu}
           />
@@ -1626,38 +1548,6 @@ function NavbarVisitor() {
               <div className={`snav-acc${accOpen ? " is-open" : ""}`}>
                 <div>
                   {zonaAkademikItems.map((it) => (
-                    <NavLink
-                      key={it.to}
-                      to={it.to}
-                      onClick={closeMenu}
-                      className={({ isActive }) =>
-                        `snav-mlink-sub${isActive ? " is-active" : ""}`
-                      }
-                    >
-                      {it.label}
-                    </NavLink>
-                  ))}
-                </div>
-              </div>
-              <button
-                type="button"
-                className="snav-mlink flex items-center"
-                onClick={() => setAccPengabdianOpen((o) => !o)}
-                aria-expanded={accPengabdianOpen}
-              >
-                <HandHeart size={20} strokeWidth={1.75} />
-                <span className="flex-1 text-left min-w-0">Pengabdian</span>
-                <ChevronDown
-                  className={`snav-chev${accPengabdianOpen ? " rotate-180" : ""}`}
-                  size={16}
-                  style={{ marginLeft: "auto" }}
-                />
-              </button>
-              <div
-                className={`snav-acc${accPengabdianOpen ? " is-open" : ""}`}
-              >
-                <div>
-                  {MENU_PENGABDIAN.map((it) => (
                     <NavLink
                       key={it.to}
                       to={it.to}

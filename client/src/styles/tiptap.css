@@ -214,7 +214,7 @@ html:not(.light) .ProseMirror a:hover {
 }
 
 html.light .ProseMirror a {
-  color: #2563eb;
+  color: var(--color-accent-primary);
   border-radius: 0.3rem;
   padding: 0.05rem 0.2rem;
   margin: 0 -0.2rem;

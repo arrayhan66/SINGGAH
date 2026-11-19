@@ -91,11 +91,19 @@ function HeroIntro() {
             color: #ffffff;
             border: none;
             box-shadow: 0 4px 12px -4px rgba(37, 99, 235, 0.45);
+            cursor: pointer;
+            transition: background-color .2s ease, border-color .2s ease, color .2s ease;
           }
-          .hi-btn-utama:hover,
-          .hi-btn-utama:focus-visible {
-            background: #1d4ed8;
-            box-shadow: 0 6px 16px -4px rgba(29, 78, 216, 0.5);
+          .hi-btn-utama:hover {
+            background: color-mix(in srgb, var(--color-accent-primary) 88%, black);
+            border-color: color-mix(in srgb, var(--color-accent-primary) 88%, black);
+          }
+          .hi-btn.hi-btn-utama:focus-visible {
+            outline: 2px solid currentColor;
+            outline-offset: 2px;
+          }
+          .hi-btn-utama:active {
+            transform: translateY(1px);
           }
           .hi-btn-kedua {
             background: transparent;

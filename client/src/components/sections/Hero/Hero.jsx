@@ -1,8 +1,11 @@
+import { lazy, Suspense } from "react";
 import HeroStats from "./HeroStats";
 import HeroRays from "./HeroRays";
 import HeroIntro from "./HeroIntro";
 import KategoriPopuler from "../KategoriPopuler";
 import PenelitianPkmPanel from "../PenelitianPkmPanel";
+const DosenCarousel = lazy(() => import("../DosenCarousel"));
+const FaqSection = lazy(() => import("../FaqSection"));
 
 function Hero() {
   return (
@@ -69,6 +72,10 @@ function Hero() {
       </div>
 
       <PenelitianPkmPanel />
+      <Suspense fallback={null}>
+        <DosenCarousel />
+        <FaqSection />
+      </Suspense>
     </section>
   );
 }

@@ -31,7 +31,6 @@ import {
   HandHeart,
   Image as ImageIcon,
   Microscope,
-  Newspaper,
   Megaphone,
 } from "lucide-react";
 import logo from "../../assets/icons/logo.webp";
@@ -136,12 +135,6 @@ const MENU_PENELITIAN = [
         desc: "Penelitian yang sedang berjalan",
         to: "/penelitian/kegiatan",
         ikon: Microscope,
-      },
-      {
-        label: "Buletin",
-        desc: "Terbitan berkala hasil riset prodi",
-        to: "/penelitian/buletin",
-        ikon: Newspaper,
       },
     ],
   },

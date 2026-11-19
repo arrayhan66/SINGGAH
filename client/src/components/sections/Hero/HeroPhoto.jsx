@@ -309,11 +309,12 @@ export default function HeroPhoto() {
             outline: none !important;
           }
           .hero-search-btn:hover {
-            background-color: #1d4ed8 !important;
+            background: color-mix(in srgb, var(--color-accent-primary) 88%, black) !important;
+            border-color: color-mix(in srgb, var(--color-accent-primary) 88%, black);
           }
           .hero-search-btn:focus-visible {
-            outline: none;
-            box-shadow: 0 0 0 3px var(--color-accent-ring);
+            outline: 2px solid currentColor;
+            outline-offset: 2px;
           }
           .hero-search-btn:active {
             transform: translateY(1px);
@@ -695,6 +696,8 @@ export default function HeroPhoto() {
                   outline: "none",
                   WebkitAppearance: "none",
                   appearance: "none",
+                  cursor: "pointer",
+                  transition: "background-color .2s ease, border-color .2s ease, color .2s ease",
                 }}
               >
                 <Search size={16} aria-hidden="true" />

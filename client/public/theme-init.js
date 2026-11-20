@@ -1,3 +1,5 @@
 try {
   document.documentElement.classList.add("light");
-} catch {}
+} catch (error) {
+  void error;
+}

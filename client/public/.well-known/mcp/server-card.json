@@ -1,0 +1,76 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/mcp-server-card/v1.json",
+  "version": "1.0",
+  "protocolVersion": "2025-06-18",
+  "name": "id.singgah.web-tools",
+  "title": "SINGGAH Web Tools",
+  "serverInfo": {
+    "name": "id.singgah.web-tools",
+    "title": "SINGGAH Web Tools",
+    "version": "1.0.0"
+  },
+  "description": "Server card untuk alat publik SINGGAH: membaca berita, karya, kategori, dan statistik dari API publik.",
+  "endpoint": "https://api.singgah.site/api",
+  "transport": {
+    "type": "streamable-http",
+    "endpoint": "https://api.singgah.site/api"
+  },
+  "documentationUrl": "https://singgah.site/llms.txt",
+  "authentication": {
+    "required": false,
+    "schemes": []
+  },
+  "capabilities": {
+    "tools": {
+      "listChanged": false
+    },
+    "resources": {
+      "subscribe": false,
+      "listChanged": false
+    }
+  },
+  "tools": [
+    {
+      "name": "list_news",
+      "description": "Ambil daftar berita terbaru SINGGAH.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20,
+            "default": 5
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "list_projects",
+      "description": "Ambil daftar karya mahasiswa yang dipublikasikan di SINGGAH.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20,
+            "default": 5
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_site_stats",
+      "description": "Ambil statistik publik SINGGAH.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    }
+  ],
+  "resources": ["dynamic"]
+}

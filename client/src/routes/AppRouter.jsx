@@ -13,6 +13,8 @@ const Home = lazy(() => import("../pages/Home/Home"))
 const News = lazy(() => import("../pages/News/News"))
 const NewsDetail = lazy(() => import("../pages/News/NewsDetail"))
 const About = lazy(() => import("../pages/About/About"))
+const Contact = lazy(() => import("../pages/Contact/Contact"))
+const Terms = lazy(() => import("../pages/Terms/Terms"))
 const NotFound = lazy(() => import("../pages/NotFound/NotFound"))
 const Karya = lazy(() => import("../pages/Karya/Karya"))
 const KaryaDetail = lazy(() => import("../pages/Karya/KaryaDetail"))
@@ -89,6 +91,8 @@ function AppRouter() {
           element={<KaryaProjectDetail />}
         />
         <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/terms" element={<Terms />} />
         <Route
           path="/hall"
           element={

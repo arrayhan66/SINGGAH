@@ -49,6 +49,14 @@ function Footer() {
             Tentang
           </NavLink>
 
+          <NavLink to="/contact" className={`transition ${isDark ? "hover:text-cyan-300" : "hover:text-blue-600"}`}>
+            Kontak
+          </NavLink>
+
+          <NavLink to="/terms" className={`transition ${isDark ? "hover:text-cyan-300" : "hover:text-blue-600"}`}>
+            Syarat & Ketentuan
+          </NavLink>
+
           <NavLink to="/berita" className={`transition ${isDark ? "hover:text-cyan-300" : "hover:text-blue-600"}`}>
             Berita
           </NavLink>

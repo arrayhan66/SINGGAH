@@ -8,6 +8,7 @@ import App from "./App.jsx";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { NotificationProvider } from "./context/NotificationContext";
+import { registerAgentTools } from "./agentTools";
 
 const MESSAGE_PORT_NOISE = /message port closed/i;
 
@@ -58,6 +59,8 @@ window.addEventListener("error", (event) => {
     event.preventDefault();
   }
 });
+
+registerAgentTools();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

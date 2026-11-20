@@ -366,15 +366,15 @@ nav:has(.snav-dd.is-open) .snav-dd:not(.is-open) .snav-menu{transition:none !imp
 .snav-pn-sub{grid-area:1/1;display:flex;flex-direction:column;justify-content:center;min-width:0;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(4px);transition:opacity 90ms ease-in,transform 90ms ease-in,visibility 0s linear 90ms}
 .snav-pn-sub[data-active="true"]{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0);transition:opacity 160ms ease-out 90ms,transform 160ms ease-out 90ms,visibility 0s}
 .snav-pn-list{display:flex;flex-direction:column;gap:0}
-.snav-pn-item{position:relative;display:flex;align-items:flex-start;padding:16px 0;margin:0;border:0!important;border-bottom:1px solid #e2e8f0!important;border-radius:0!important;text-decoration:none;outline:none;background:transparent!important;box-shadow:none!important}
+.snav-pn-item{position:relative;display:flex;align-items:center;padding:16px 0;margin:0;border:0!important;border-bottom:1px solid #e2e8f0!important;border-radius:0!important;text-decoration:none;outline:none;background:transparent!important;box-shadow:none!important}
 .snav-pn-item:last-child{border-bottom:0!important}
 .snav-pn-item:hover,.snav-pn-item:focus-visible{background:transparent!important;outline:none!important;box-shadow:none!important}
-.snav-pn-texts{display:flex;align-items:flex-start;gap:14px;min-width:0;flex:1 1 auto;padding-right:32px;transform:translateX(0);transition:transform 200ms cubic-bezier(.22,1,.36,1)}
+.snav-pn-texts{display:flex;align-items:center;gap:12px;min-width:0;flex:1 1 auto;padding-right:0;transform:translateX(0);transition:transform 200ms cubic-bezier(.22,1,.36,1)}
 .snav-pn-copy{min-width:0;flex:1 1 auto}
 .snav-pn-title{display:block;font-size:15px;font-weight:600;line-height:1.3;color:#0f172a;white-space:normal;overflow:visible;text-overflow:clip}
 .snav-pn-desc{display:block;margin-top:2px;font-size:13px;font-weight:400;line-height:1.4;color:#64748b;white-space:normal;overflow:visible;text-overflow:clip}
-.snav-pn-icon{flex:0 0 22px;margin-top:1px;color:#334155;background:none;border:none;border-radius:0}
-.snav-pn-arrow{position:absolute;right:0;top:16px;color:#0f172a;opacity:0;transform:translateX(-8px);transition:opacity 220ms ease,transform 300ms cubic-bezier(.16,1,.3,1);will-change:transform;pointer-events:none}
+.snav-pn-icon{flex:0 0 24px;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;margin-top:0;color:#334155;background:none;border:none;border-radius:0}
+.snav-pn-arrow{position:relative;margin-left:auto;align-self:center;right:auto;top:auto;color:#0f172a;opacity:0;transform:translateX(-8px);transition:opacity 220ms ease,transform 300ms cubic-bezier(.16,1,.3,1);will-change:transform;pointer-events:none}
 .snav-pn-item:hover .snav-pn-texts,.snav-pn-item:focus-visible .snav-pn-texts{transform:translateX(4px)}
 .snav-pn-item:hover .snav-pn-arrow,.snav-pn-item:focus-visible .snav-pn-arrow{opacity:1;transform:translateX(0)}
 .snav-pn-figure{display:flex;align-self:stretch;min-width:0;border:0!important;border-left:1px solid #e2e8f0!important;border-radius:0!important;overflow:hidden!important;background:#ffffff!important;margin:0!important;padding:20px 20px 20px 24px!important}

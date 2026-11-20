@@ -78,7 +78,14 @@ const creds = readCredentials();
  * lebih lama dari itu, fungsi TIDAK tidur -- pemanggil akan mendapat 429 dan
  * pesan yang jelas, bukan "Exceeded timeout of 60000 ms".
  */
-async function waitForLoginQuota(API_URL, maxWaitSeconds = 45) {
+const DEFAULT_API_URL = "https://api.singgah.site";
+
+/**
+ * Cek apakah kuota login sedang terkunci, tanpa menunggu.
+ * Dipakai runner sebelum menjalankan suite auth/idor supaya suites itu bisa
+ * dilewati dengan jelas, bukan gagal 429 di dalam Jest.
+ */
+async function getLoginQuotaResetSeconds(API_URL = DEFAULT_API_URL) {
   const probe = await fetch(`${API_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -86,15 +93,22 @@ async function waitForLoginQuota(API_URL, maxWaitSeconds = 45) {
   });
 
   if (probe.status !== 429) {
-    // Pemeriksaan ini sendiri memakai 1 kuota kalau ternyata tidak terkunci,
-    // jadi kembalikan sisanya supaya pemanggil bisa langsung mencoba.
+    // Probe ini memakai 1 kuota kalau ternyata tidak terkunci.
     return 0;
   }
 
   const resetHeader = Number(probe.headers.get("ratelimit-reset"));
-  const waitSeconds = Number.isFinite(resetHeader)
-    ? Math.ceil(resetHeader) + 2
-    : 0;
+  return Number.isFinite(resetHeader) ? Math.ceil(resetHeader) : 0;
+}
+
+async function waitForLoginQuota(
+  API_URL = DEFAULT_API_URL,
+  maxWaitSeconds = 45,
+) {
+  const resetSeconds = await getLoginQuotaResetSeconds(API_URL);
+  if (!resetSeconds) return 0;
+
+  const waitSeconds = resetSeconds + 2;
 
   // Jangan pernah menunggu lebih lama dari batas hook Jest. Dulu fungsi ini
   // tidur sampai 16 menit di dalam beforeAll, sehingga test gagal karena
@@ -196,9 +210,11 @@ function explainLoginFailure(role, status, body) {
 
 module.exports = {
   CREDENTIALS_FILE,
+  DEFAULT_API_URL,
   readCredentials,
   ACCOUNTS,
   hasCredentials,
   explainLoginFailure,
+  getLoginQuotaResetSeconds,
   waitForLoginQuota,
 };

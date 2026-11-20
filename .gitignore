@@ -51,3 +51,4 @@ server/.env.cloudinary.bak
 # nilai env yang perlu diisi saat deploy.
 !.env.example
 !**/.env.example
+node_modules/

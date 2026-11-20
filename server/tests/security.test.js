@@ -1,5 +1,5 @@
 /**
- * Uji keamanan terhadap deployment yang SEDANG JALAN (Railway + Vercel).
+ * Uji keamanan terhadap deployment yang SEDANG JALAN (singgah.site + api.singgah.site).
  *
  * Berbeda dengan test lain di folder ini, file ini tidak memakai SQLite
  * in-memory dan tidak memakai supertest. Semua request ditembak ke URL sungguhan
@@ -7,7 +7,7 @@
  * CORS, trust proxy, rate limiter, security header, dan tidak adanya SQL injection.
  *
  * Test unit (test:unit) tidak bisa menguji semua itu. App yang di-require
- * di dalam proses test berjalan dengan NODE_ENV=test dan tanpa proxy Railway,
+ * di dalam proses test berjalan dengan NODE_ENV=test dan tanpa proxy hosting,
  * sehingga konfigurasi yang terbukti salah di sini bisa tetap terlihat aman
  * di test unit.
  *
@@ -20,16 +20,16 @@
  *
  * Jalankan:
  *   npm run test:security
- *   API_URL=https://staging.up.railway.app FRONTEND_URL=https://staging.vercel.app \
+ *   API_URL=https://api.singgah.site FRONTEND_URL=https://singgah.site \
  *     npm run test:security
  */
 
 const API_URL = (
-  process.env.API_URL || "https://singgah-production.up.railway.app"
+  process.env.API_URL || "https://api.singgah.site"
 ).replace(/\/+$/, "");
 
 const FRONTEND_URL = (
-  process.env.FRONTEND_URL || "https://singgah-flax.vercel.app"
+  process.env.FRONTEND_URL || "https://singgah.site"
 ).replace(/\/+$/, "");
 
 // Origin yang harus ditolak. CORS adalah proteksi sisi browser, jadi yang
@@ -223,14 +223,14 @@ describe("Rate limit login: brute force harus dibatasi", () => {
 
     // 401 yang lolos adalah percobaan yang BELUM kena limit. Kalau angkanya
     // jauh melebihi 10, itu bukti store per-worker, yaitu REDIS_URL belum
-    // diset di Railway sehingga batas efektif jadi 10 x jumlah worker.
+    // diset di hosting sehingga batas efektif jadi 10 x jumlah worker.
     // Warn saja, jangan gagalkan test: limiter longgar bukan berarti tidak
     // ada proteksi sama sekali.
     if (unauthorized > 10) {
       console.warn(
         `[rate limit] PERINGATAN: ${unauthorized} percobaan lolos sebelum ` +
           `diblokir, padahal batas deklaratif 10/15 menit. Store rate limit ` +
-          `per-worker (REDIS_URL belum diset di Railway), jadi batas efektif ` +
+          `per-worker (REDIS_URL belum diset di hosting), jadi batas efektif ` +
           `menjadi 10 x jumlah worker. Set REDIS_URL untuk mengetat.`,
       );
     }
@@ -300,7 +300,7 @@ describe("Path traversal: tidak boleh keluar dari direktori aplikasi", () => {
 
 describe("Security headers", () => {
   // Helmet dipasang di server.js. Kalau ada yang hilang, biasanya karena
-  // ada proxy (Vercel/nginx) yang menimpa header sebelum sampai ke user.
+  // ada proxy/CDN hosting yang menimpa header sebelum sampai ke user.
   test("HSTS aktif -> mencegah downgrade ke HTTP", async () => {
     const result = await http("/api/categories");
     expect(header(result, "strict-transport-security")).toContain("max-age");
@@ -331,7 +331,7 @@ describe("Security headers", () => {
   });
 });
 
-describe("Frontend Vercel: proxy dan aset", () => {
+describe("Frontend singgah.site: halaman dan aset", () => {
   test("halaman utama harus 200", async () => {
     const response = await fetch(FRONTEND_URL, { redirect: "manual" });
     expect(response.status).toBe(200);

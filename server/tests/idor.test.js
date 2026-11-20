@@ -1,5 +1,5 @@
 /**
- * Uji IDOR (Insecure Direct Object Reference) terhadap Railway yang dideploy.
+ * Uji IDOR (Insecure Direct Object Reference) terhadap api.singgah.site.
  *
  * IDOR adalah celah di mana user yang sudah login berhasil mengakses atau
  * mengubah data milik orang lain hanya dengan menebak/menukar ID di URL.
@@ -23,7 +23,7 @@
 
 
 const API_URL = (
-  process.env.API_URL || "https://singgah-production.up.railway.app"
+  process.env.API_URL || "https://api.singgah.site"
 ).replace(/\/+$/, "");
 // Pembacaan kredensial dipusatkan di tests/credentials.js. Jangan pakai
 // dotenv di sini: password test mengandung "#" yang akan terpotong.

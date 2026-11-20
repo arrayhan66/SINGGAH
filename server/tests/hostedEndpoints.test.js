@@ -4,8 +4,8 @@
  * Suite live.test.js, production.test.js, dan hostedDocs.test.js fokus ke
  * kesehatan umum (health, latency, CORS, JWT, spec drift). File ini menutup
  * endpoint yang sampai sekarang hanya diuji lewat supertest terhadap app
- * lokal dengan SQLite -- artinya kalau ada yang hanya rusak di Railway
- * (proxy, middleware, konfigurasi Railway, perbedaan MySQL vs SQLite),
+ * lokal dengan SQLite -- artinya kalau ada yang hanya rusak di hosting
+ * (proxy, middleware, konfigurasi api.singgah.site, perbedaan MySQL vs SQLite),
  * tidak ada yang menangkapnya.
  *
  * Semua request di sini read-only (GET). Suite yang menulis data production
@@ -14,11 +14,11 @@
  *
  * Jalankan:
  *   npm run test:endpoints
- *   API_URL=https://staging.up.railway.app npm run test:endpoints
+ *   API_URL=https://api.singgah.site npm run test:endpoints
  */
 
 const API_URL = (
-  process.env.API_URL || "https://singgah-production.up.railway.app"
+  process.env.API_URL || "https://api.singgah.site"
 ).replace(/\/+$/, "");
 
 // Tanpa token. Endpoint yang butuh auth harus menolak, bukan accidentaly 200.

@@ -1,5 +1,5 @@
 /**
- * Uji alur yang BUTUH AKUN NYATA, menembak server Railway yang dideploy.
+ * Uji alur yang BUTUH AKUN NYATA, menembak api.singgah.site yang dideploy.
  *
  * Test di folder lain cukup dengan user palsu karena area itu tidak butuh
  * sesi. Tapi profil, ganti password, upload, dan moderasi admin semuanya
@@ -31,7 +31,7 @@
  */
 
 const API_URL = (
-  process.env.API_URL || "https://singgah-production.up.railway.app"
+  process.env.API_URL || "https://api.singgah.site"
 ).replace(/\/+$/, "");
 
 // Kredensial dibaca dari file, bukan dari process.env, supaya tidak ikut

@@ -304,7 +304,7 @@ describe("Auth Endpoints", () => {
   // REGRESI BUG-1 (versi offline).
   //
   // Suite authFlows.test.js:152 sudah menangkap hal yang sama, tapi file itu
-  // menembak Railway sungguhan dan butuh kredensial di server/.env.security --
+  // menembak api.singgah.site sungguhan dan butuh kredensial di server/.env.security --
   // makanya ia dikecualikan dari `npm test` dan bug-nya bisa bertahan lama
   // tanpa terlihat. Test ini versi lokalnya: SQLite in-memory, jalan selalu.
   //

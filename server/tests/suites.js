@@ -11,7 +11,7 @@
 const SUITES = [
   {
     name: "live",
-    title: "Smoke test Railway + Vercel",
+    title: "Smoke test api.singgah.site + singgah.site",
     logins: 0,
     args: ["tests/live.test.js", "tests/production.test.js"],
   },

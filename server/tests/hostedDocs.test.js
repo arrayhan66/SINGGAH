@@ -1,5 +1,5 @@
 /**
- * Uji VKTI dokumentasi API yang di-deploy di Railway.
+ * Uji VKTI dokumentasi API yang di-deploy di api.singgah.site.
  *
  * Halaman /api/docs adalah satu-satunya "kontrak" yang dibaca orang lain
  * (frontend, integrator, developer baru) sebelum menyentuh API. Failure-nya
@@ -12,16 +12,25 @@
  *
  * Syarat: butuh internet, menyentuh server production.
  *
+ * /api/docs sengaja tidak disajikan di production, jadi suite ini hanya jalan
+ * kalau DOCS_URL diisi ke instance yang mengaktifkan dokumentasi:
+ *   DOCS_URL=https://api.contoh.site/api/docs npm run test:docs
+ * Tanpa DOCS_URL, test yang bergantung pada docs di-skip (bukan gagal).
+ *
  * Jalankan:
  *   npm run test:docs
- *   API_URL=https://staging.up.railway.app npm run test:docs
+ *   API_URL=https://api.singgah.site npm run test:docs
  */
 
 const API_URL = (
-  process.env.API_URL || "https://singgah-production.up.railway.app"
+  process.env.API_URL || "https://api.singgah.site"
 ).replace(/\/+$/, "");
 
-const DOCS_URL = `${API_URL}/api/docs`;
+const DOCS_URL = process.env.DOCS_URL
+  ? process.env.DOCS_URL.replace(/\/+$/, "")
+  : `${API_URL}/api/docs`;
+
+const describeDocs = process.env.DOCS_URL ? describe : describe.skip;
 
 /**
  * swagger-ui-init.js membungkus spec di dalam object literal JavaScript,
@@ -80,7 +89,7 @@ async function loadSpec() {
   return cachedSpec;
 }
 
-describe("Halaman /api/docs harus hidup", () => {
+describeDocs("Halaman /api/docs harus hidup", () => {
   test("halaman utama docs harus 200 dan menyajikan HTML", async () => {
     const response = await fetch(`${DOCS_URL}/`, { redirect: "follow" });
 
@@ -127,7 +136,7 @@ describe("Halaman /api/docs harus hidup", () => {
   });
 });
 
-describe("Spec OpenAPI harus benar-benar termuat", () => {
+describeDocs("Spec OpenAPI harus benar-benar termuat", () => {
   // Kegagalan paling umum di sini: loadSwagger() melempar error saat bundling
   // $ref. Server tetap start, /api/docs tetap 200, tapi Swagger UI menampilkan
   // "Failed to load API definition" tanpa satu pun endpoint.
@@ -173,7 +182,7 @@ describe("Spec OpenAPI harus benar-benar termuat", () => {
   });
 });
 
-describe("Spec harus sinkron dengan route yang benar-benar ada", () => {
+describeDocs("Spec harus sinkron dengan route yang benar-benar ada", () => {
   // openapi.yaml ditulis tangan dan $ref-nya tersebar di 10 file YAML,
   // sementara router-nya ada di 20 file terpisah. Dua-duanya bisa berubah
   // tanpa satu pun tahu. Yang paling berbahaya: route dihapus atau di-rename

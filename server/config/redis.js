@@ -4,7 +4,17 @@ const logger = require("../utils/logger")
 let client = null
 let healthy = false
 let lastHealthCheck = 0
+let nextRetryAt = 0
 const HEALTH_WINDOW = 10_000
+
+// Kalau Redis sedang flapping (log produksi pernah menunjukkan ECONNRESET,
+// ENOTFOUND, lalu ETIMEDOUT berulang), setiap cache.get bisa menghabiskan
+// beberapa detik hanya untuk menunggu klien baru "ready". Karena getNews dan
+// getProjects memanggil cache beberapa kali per request, delay ini menjalar
+// sampai request diakhiri 503 oleh proxy. Setelah gagal, beri jeda sebelum
+// mencoba lagi dan langsung pakai fallback memori selama jeda itu.
+const FAILURE_COOLDOWN = parseInt(process.env.REDIS_FAILURE_COOLDOWN_MS, 10) || 30_000
+const MAX_READY_WAIT = 1_500
 
 function isEnabled() {
   return process.env.NODE_ENV !== "test" && Boolean(process.env.REDIS_URL)
@@ -58,13 +68,16 @@ function getRedis() {
 async function isRedisReady() {
   if (!isEnabled()) return false
 
-  if (Date.now() - lastHealthCheck < HEALTH_WINDOW) return healthy
+  const now = Date.now()
+  if (now < nextRetryAt) return false
+  if (now - lastHealthCheck < HEALTH_WINDOW) return healthy
 
-  lastHealthCheck = Date.now()
+  lastHealthCheck = now
 
   const redis = getRedis()
   if (!redis) {
     healthy = false
+    nextRetryAt = Date.now() + FAILURE_COOLDOWN
     return false
   }
 
@@ -75,7 +88,7 @@ async function isRedisReady() {
     // Tunggu sampai klien benar-benar siap (polling status), bukan tidur
     // acak. Pada start pertama, klien bisa berada di fase connecting/reconnect
     // dan ping akan ditolak (enableOfflineQueue:false).
-    const deadline = Date.now() + redis.options.connectTimeout + 1000
+    const deadline = Date.now() + Math.min(redis.options.connectTimeout, MAX_READY_WAIT)
     while (redis.status !== "ready" && Date.now() < deadline) {
       await new Promise((resolve) => setTimeout(resolve, 100))
     }
@@ -91,8 +104,9 @@ async function isRedisReady() {
 
   if (!healthy) {
     // Ping yang gagal bisa meninggalkan klien dalam kondisi rusak;
-    // buang klien ini agar dibuat ulang segar pada panggilan berikutnya.
+    // buang klien ini agar dibuat ulang segar setelah masa jeda habis.
     destroyClient()
+    nextRetryAt = Date.now() + FAILURE_COOLDOWN
   }
 
   return healthy

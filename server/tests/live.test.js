@@ -1,10 +1,10 @@
 /**
- * Uji VKTI LANGSUNG ke deployment Railway + Vercel.
+ * Uji VKTI LANGSUNG ke deployment singgah.site + api.singgah.site.
  *
  * Semua request di file ini ditembak ke server sungguhan, bukan ke app yang
  * di-require di dalam proses jest. Yang diperiksa adalah apa yang dilihat
- * pengguna sungguhan: apakah endpoint hidup, apakah cepat, apakah proxy Vercel
- * benar, apakah cookie session punya flag yang benar.
+ * pengguna sungguhan: apakah endpoint hidup, apakah cepat, apakah frontend dan
+ * backend saling terhubung, apakah cookie session punya flag yang benar.
  *
  * Syarat:
  *   - Butuh internet.
@@ -13,16 +13,16 @@
  *
  * Jalankan:
  *   npm run test:prod
- *   API_URL=https://staging.up.railway.app FRONTEND_URL=https://staging.vercel.app \
+ *   API_URL=https://api.singgah.site FRONTEND_URL=https://singgah.site \
  *     npm run test:prod
  */
 
 const API_URL = (
-  process.env.API_URL || "https://singgah-production.up.railway.app"
+  process.env.API_URL || "https://api.singgah.site"
 ).replace(/\/+$/, "");
 
 const FRONTEND_URL = (
-  process.env.FRONTEND_URL || "https://singgah-flax.vercel.app"
+  process.env.FRONTEND_URL || "https://singgah.site"
 ).replace(/\/+$/, "");
 
 // Batas lenient. Tujuannya mendeteksi server yang benar-benar tidak sehat
@@ -78,9 +78,9 @@ describe("Endpoint publik harus hidup", () => {
 });
 
 describe("Health check", () => {
-  test("Railway health harus 200 dan database ok", async () => {
-    // railway.json memakai path ini sebagai healthcheck, jadi kalau rusak
-    // Railway akan menganggap service mati dan restart terus.
+  test("health api.singgah.site harus 200 dan database ok", async () => {
+    // Platform hosting memakai path ini sebagai healthcheck, jadi kalau rusak
+    // service bisa dianggap mati dan di-restart terus.
     const result = await fetchJson("/api/health");
 
     expect(result.status).toBe(200);
@@ -97,8 +97,9 @@ describe("Health check", () => {
 
 describe("Konsistensi response API", () => {
   test("endpoint daftar harus membungkus data (bukan objek kosong)", async () => {
-    // Kombinasi Railway + Vercel sering gagal diam-diam di sini: backend 200
-    // tapi body-nya bukan bentuk yang frontend/XMLHttpRequest expects.
+    // Deployment dengan domain frontend dan backend berbeda sering gagal
+    // diam-diam di sini: backend 200 tapi body-nya bukan bentuk yang
+    // frontend/XMLHttpRequest expects.
     const result = await fetchJson("/api/categories?limit=1");
 
     expect(result.status).toBe(200);
@@ -181,7 +182,7 @@ describe("Perilaku HTTP", () => {
   });
 
   test("redirect tidak bolehMENTS berayap", async () => {
-    // Kalau Railway salah konfigurasi slash, semua request bisa kena 307 dan
+    // Kalau hosting/proxy salah konfigurasi slash, request bisa kena 307 dan
     // frontend yang tidak mengikutinya akan gagal.
     const response = await fetch(`${API_URL}/api/categories`, {
       redirect: "manual",
@@ -293,7 +294,7 @@ describe("JWT: token yang sudah kedaluwarsa harus ditolak", () => {
   });
 });
 
-describe("Vercel: frontend dan proxy ke Railway", () => {
+describe("Frontend singgah.site dan backend api.singgah.site", () => {
   test("halaman utama harus 200", async () => {
     const response = await fetch(FRONTEND_URL, { redirect: "follow" });
     expect(response.status).toBe(200);
@@ -306,26 +307,22 @@ describe("Vercel: frontend dan proxy ke Railway", () => {
   });
 
   test("API host yang dipakai frontend harus hidup", async () => {
-    // Frontend yang dideploy memakai URL absolut ke Railway (lihat
-    // client/vercel.json: TIDAK ada rewrite /api, dan bundle memuat
-    // baseURL absolut). Jadi frontend tidak melewati Vercel sama sekali --
-    // request API-nya langsung ke Railway. Test ini memeriksa host itu hidup.
+    // Frontend dan backend sekarang punya domain sendiri-sendiri. Bundle
+    // frontend memanggil API_URL secara langsung, jadi host itu harus hidup
+    // dan mengembalikan JSON, bukan halaman HTML.
     const response = await fetch(`${API_URL}/api/categories`);
 
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toContain("application/json");
   });
 
-  test("path /api di Vercel tidak dipakai frontend", async () => {
-    // client/vercel.json me-rewrite SEMUA path ke /index.html, jadi
-    // singgah-flax.vercel.app/api/* membalas HTML SPA, bukan JSON.
-    // Ini bukan bug selama frontend memakai URL absolut, tapi test ini
-    // mengunci kondisi tersebut supaya tidak disalahartikan nanti.
+  test("path /api di frontend tidak dipakai sebagai proxy", async () => {
+    // singgah.site tidak meneruskan /api ke backend: request API langsung ke
+    // api.singgah.site. Kalau suatu saat frontend diubah ke mode proxy, test
+    // ini gagal supaya konfigurasi hosting diperiksa ulang.
     const response = await fetch(`${FRONTEND_URL}/api/categories`);
 
-    // Kalau suatu saat frontend diubah ke mode proxy (/api), test ini akan
-    // gagal dan memberi tahu bahwa vercel.json perlu rewrite.
-    expect(response.headers.get("content-type")).toContain("text/html");
+    expect(response.status).toBe(404);
   });
 
   test("frontend tidak mengekspos X-Powered-By", async () => {

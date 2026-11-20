@@ -18,10 +18,13 @@ const sequelize = isTest
         port: parseInt(process.env.DB_PORT) || 3306,
         dialect: "mysql",
         logging: false,
+        // TiDB Cloud Serverless membatasi ~100 koneksi per cluster. Total
+        // koneksi = pool.max x jumlah worker PM2, jadi default dijaga rendah
+        // (12 x 2 = 24) supaya tidak ada request yang menggantung di pool.
         pool: {
-          max: parseInt(process.env.DB_POOL_MAX) || 10,
+          max: parseInt(process.env.DB_POOL_MAX) || 12,
           min: parseInt(process.env.DB_POOL_MIN) || 2,
-          acquire: parseInt(process.env.DB_POOL_ACQUIRE) || 30000,
+          acquire: parseInt(process.env.DB_POOL_ACQUIRE) || 10000,
           idle: parseInt(process.env.DB_POOL_IDLE) || 10000,
         },
         dialectOptions: {

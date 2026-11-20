@@ -339,8 +339,8 @@ const html = `<!DOCTYPE html>
       <h1>Laporan Hasil Pengujian Otomatis</h1>
       <p>SINGGAH — Platform Pameran Karya Digital dengan Gedung Virtual 3D</p>
       <div class="meta">
-        <span>Backend: Railway</span>
-        <span>Frontend: Vercel</span>
+        <span>Backend: api.singgah.site</span>
+        <span>Frontend: singgah.site</span>
         <span>Runner: Node.js + Jest</span>
         <span>Dibuat: ${esc(now)}</span>
       </div>

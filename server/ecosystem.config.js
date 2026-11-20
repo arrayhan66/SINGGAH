@@ -8,7 +8,9 @@ module.exports = {
 
       exec_mode: "cluster",
 
-      instances: parseInt(process.env.PM2_INSTANCES, 10) || 3,
+      // 2 worker x DB_POOL_MAX 12 = 24 koneksi, jauh di bawah batas TiDB
+      // Serverless (~100). Worker berlebih justru memicu DB_POOL habis.
+      instances: parseInt(process.env.PM2_INSTANCES, 10) || 2,
 
       min_uptime: "20s",
       max_restarts: 10,

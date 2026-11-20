@@ -1,13 +1,13 @@
-// Target default adalah Railway production. Override lewat env untuk menguji
-// deployment lain tanpa mengubah kode:
-//   API_URL=https://host.railway.app FRONTEND_URL=https://site.vercel.app \
+// Target default adalah api.singgah.site production. Override lewat env untuk
+// menguji deployment lain tanpa mengubah kode:
+//   API_URL=https://api.contoh.site FRONTEND_URL=https://contoh.site \
 //     npx jest tests/production.test.js
 const BASE_URL = (
-  process.env.API_URL || "https://singgah-production.up.railway.app"
+  process.env.API_URL || "https://api.singgah.site"
 ).replace(/\/+$/, "");
 
 const FRONTEND_URL = (
-  process.env.FRONTEND_URL || "https://singgah-flax.vercel.app"
+  process.env.FRONTEND_URL || "https://singgah.site"
 ).replace(/\/+$/, "");
 
 async function request(path) {
@@ -57,18 +57,18 @@ describe("Production API Smoke Test", () => {
 // menguji frontend + backend sungguhan. Kosongkan lewat FRONTEND_URL= kalau
 // sengaja mau menonaktifkan bagian ini:
 //   FRONTEND_URL= npx jest tests/production.test.js
-// Menguji via domain Vercel sekaligus membuktikan rewrite /api -> Railway
-// bekerja, bukan cuma Origin Railway-nya.
-describe("Production Frontend (Vercel)", () => {
+// Frontend dan backend sekarang memakai domain berbeda, jadi keduanya dicek
+// langsung: singgah.site untuk halaman, api.singgah.site untuk data.
+describe("Production Frontend (singgah.site)", () => {
   test("halaman utama harus 200", async () => {
     const response = await fetch(FRONTEND_URL, { redirect: "follow" });
     expect(response.status).toBe(200);
   });
 
-  test("proxy /api lewat Vercel harus menjangkau backend", async () => {
-    const response = await fetch(
-      `${FRONTEND_URL.replace(/\/+$/, "")}/api/categories`,
-    );
-    expect(response.status).toBeLessThan(500);
+  test("backend yang dipakai frontend harus hidup", async () => {
+    const response = await fetch(`${BASE_URL}/api/categories`);
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toContain("application/json");
   });
 });

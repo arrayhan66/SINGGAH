@@ -56,14 +56,14 @@ const PORT = process.env.PORT || 5000;
 // Jumlah proxy tepercaya di depan Express. WAJIB benar, karena semua limit
 // berbasis IP (rate limiter, log akses) membaca req.ip dari sini.
 //
-// Rantai di produksi:  browser -> Vercel (rewrite /api) -> nginx -> Node
-//   jadi ada 2 proxy tepercaya sebelum Node, bukan 1.
-// Kalau nilainya kurang, req.ip akan menjadi IP Vercel/nginx, sehingga SEMUA
-// pengguna terlihat satu IP dan rate limiter bisa salah throttle semuanya.
-// Kalau kelebihan, IP asli bisa dipalsukan client danumanng circumvent limit.
+// Rantai di produksi (Hostinger): browser -> hcdn -> Node.
+//   Jadi ada 1 proxy tepercaya sebelum Node.
+// Kalau nilainya kurang, req.ip menjadi IP proxy sehingga SEMUA pengguna
+// terlihat satu IP dan rate limiter bisa salah throttle semuanya.
+// Kalau kelebihan, IP asli bisa dipalsukan client dan circumvent limit.
 //
-//   TRUST_PROXY=1  akses langsung (nginx -> Node, tanpa Vercel)
-//   TRUST_PROXY=2  produksi lewat Vercel  <- nilai yang dipakai di VPS
+//   TRUST_PROXY=1  Hostinger hcdn / nginx -> Node  (default, dipakai sekarang)
+//   TRUST_PROXY=2  hanya jika ada proxy tambahan (mis. Vercel) di depannya
 const TRUST_PROXY = Number(process.env.TRUST_PROXY ?? 1);
 app.set("trust proxy", TRUST_PROXY);
 
@@ -224,71 +224,107 @@ app.get("/", (req, res) => {
   });
 });
 
-const startServer = async () => {
+const registerFallbackHandlers = () => {
+  // 404 Handler — taruh di sini, SETELAH semua route termasuk docs
+  app.use((req, res) => {
+    res.status(404).json({
+      success: false,
+      message: "Endpoint tidak ditemukan",
+    });
+  });
+
+  // HARUS PALING BAWAH
+  app.use(errorMiddleware);
+};
+
+const initialize = async () => {
   try {
     await sequelize.authenticate();
     logger.info("Database connected");
+  } catch (err) {
+    // Jangan hentikan startup hanya karena DB belum siap saat PM2 restart.
+    // Kalau proses tidak pernah listen, hcdn langsung mengembalikan 503
+    // (connection refused) dan aplikasi baru sembuh setelah restart manual.
+    // Dengan tetap listen, /api/health menjawab 503 berisi JSON yang jelas.
+    logger.error(`Database gagal dihubungi saat startup: ${err.message}`);
+  }
 
-    // Redis itu opsional secara fungsional (semua ada fallback ke memori),
-    // tapi JAUH lebih lambat dan tidak konsisten antar worker PM2. Di cluster
-    // mode, cache memori tiap worker terpisah sehingga cache hit rate anjlok
-    // di ~1/jumlahWorker dan rate limiter jadi longgar N kali lipat.
-    // Kalau Redis mati, pastikan itu terlihat di log, bukan diam-diam.
-    if (process.env.REDIS_URL) {
-      if (await isRedisReady()) {
-        logger.info("Redis ready");
-      } else {
-        logger.warn(
-          "Redis TIDAK bisa dihubungi meskipun REDIS_URL diset — memakai cache " +
-            "memori per worker. Jangan jalankan >1 worker PM2 dalam kondisi ini: " +
-            "rate limiter jadi longgar N kali dan cache tidak dibagi antar worker.",
-        );
-      }
+  // Redis itu opsional secara fungsional (semua ada fallback ke memori),
+  // tapi JAUH lebih lambat dan tidak konsisten antar worker PM2. Di cluster
+  // mode, cache memori tiap worker terpisah sehingga cache hit rate anjlok
+  // di ~1/jumlahWorker dan rate limiter jadi longgar N kali lipat.
+  // Kalau Redis mati, pastikan itu terlihat di log, bukan diam-diam.
+  if (process.env.REDIS_URL) {
+    if (await isRedisReady()) {
+      logger.info("Redis ready");
     } else {
       logger.warn(
-        "REDIS_URL belum diset — memakai cache memori per worker. " +
-          "Single worker saja yang aman untuk rate limit.",
+        "Redis TIDAK bisa dihubungi meskipun REDIS_URL diset — memakai cache " +
+          "memori per worker. Jangan jalankan >1 worker PM2 dalam kondisi ini: " +
+          "rate limiter jadi longgar N kali dan cache tidak dibagi antar worker.",
       );
     }
+  } else {
+    logger.warn(
+      "REDIS_URL belum diset — memakai cache memori per worker. " +
+        "Single worker saja yang aman untuk rate limit.",
+    );
+  }
 
-    // Buat tabel yang belum ada (tanpa mengubah tabel lama)
-    if (process.env.NODE_ENV !== "test") {
-      await ensureGoogleIdColumn();
-      await ensureSlideshowColumn();
-      await sequelize.sync();
-    }
+  // Buat tabel yang belum ada (tanpa mengubah tabel lama)
+  if (process.env.NODE_ENV !== "test") {
+    await ensureGoogleIdColumn();
+    await ensureSlideshowColumn();
+    await sequelize.sync();
+  }
 
-    const swaggerDocument = await loadSwagger();
+  const swaggerDocument = await loadSwagger();
 
-    // Dokumentasi API hanya untuk non-production (hindari bocor skema endpoint).
-    app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  // Dokumentasi API hanya untuk non-production (hindari bocor skema endpoint).
+  app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+};
 
-    // 404 Handler — taruh di sini, SETELAH semua route termasuk docs
-    app.use((req, res) => {
-      res.status(404).json({
-        success: false,
-        message: "Endpoint tidak ditemukan",
-      });
-    });
+const startServer = async () => {
+  // Backlog default Node cuma 511. Saat 1000 orang membuka beranda di
+  // detik yang sama, sisanya dapat ECONNREFUSED padahal server sehat
+  // (terukur: 2.685 koneksi ditolak saat uji beranda x1.000).
+  // Backlog HARUS lewat app.listen — kalau memakai
+  // http.createServer(app).listen(), jalur cluster PM2 terlewat sehingga
+  // tiap worker merebut port dan gagal EADDRINUSE.
+  const backlog = parseInt(process.env.SERVER_BACKLOG, 10) || 8192;
 
-    // HARUS PALING BAWAH
-    app.use(errorMiddleware);
+  // Listen dulu, baru inisialisasi DB/Redis. Semua route API sudah terdaftar
+  // di atas, jadi health check langsung bisa dijawab walau DB sedang lambat.
+  const server = app.listen(PORT, backlog, () => {
+    logger.info(`Server running on port ${PORT} (backlog ${backlog})`);
+  });
 
-    if (process.env.NODE_ENV !== "test") {
-      // Backlog default Node cuma 511. Saat 1000 orang membuka beranda di
-      // detik yang sama, sisanya dapat ECONNREFUSED padahal server sehat
-      // (terukur: 2.685 koneksi ditolak saat uji beranda x1.000).
-      // Backlog HARUS lewat app.listen — kalau memakai
-      // http.createServer(app).listen(), jalur cluster PM2 terlewat sehingga
-      // tiap worker merebut port dan gagal EADDRINUSE.
-      const backlog = parseInt(process.env.SERVER_BACKLOG, 10) || 8192;
+  // Batas durasi request. Default Node 5 menit; terlalu lama untuk proxy hosting
+  // sehingga query yang nyangkut berubah jadi 503 setelah 394 detik.
+  const requestTimeout = parseInt(process.env.REQUEST_TIMEOUT_MS, 10) || 120_000;
+  server.requestTimeout = requestTimeout;
+  server.headersTimeout = requestTimeout + 5_000;
+  server.keepAliveTimeout = 5_000;
 
-      app.listen(PORT, backlog, () => {
-        logger.info(`Server running on port ${PORT} (backlog ${backlog})`);
-      });
-    }
+  // Inisialisasi diberi batas waktu supaya handler 404/error tetap terpasang
+  // walaupun sequelize.sync() atau loadSwagger() sedang mogok.
+  const initTimeoutMs = parseInt(process.env.INIT_TIMEOUT_MS, 10) || 30_000;
+  let initTimer;
+  try {
+    await Promise.race([
+      initialize(),
+      new Promise((resolve) => {
+        initTimer = setTimeout(() => {
+          logger.warn(`Inisialisasi melebihi ${initTimeoutMs} ms, dilanjutkan`);
+          resolve();
+        }, initTimeoutMs);
+      }),
+    ]);
   } catch (err) {
-    logger.error("Server failed to start:", err);
+    logger.error("Inisialisasi gagal:", err);
+  } finally {
+    clearTimeout(initTimer);
+    registerFallbackHandlers();
   }
 };
 
@@ -298,24 +334,12 @@ if (process.env.NODE_ENV !== "test") {
     startServer();
   } else {
     // Mode serverless (misalnya Vercel): app diekspor TANPA listen.
-    app.use((req, res) => {
-      res.status(404).json({
-        success: false,
-        message: "Endpoint tidak ditemukan",
-      });
-    });
-    app.use(errorMiddleware);
+    registerFallbackHandlers();
   }
 } else {
   // Saat test, skip loadSwagger (swagger-parser lambat) supaya startup
   // cepat & deterministik; docs API tidak dipakai di test.
-  app.use((req, res) => {
-    res.status(404).json({
-      success: false,
-      message: "Endpoint tidak ditemukan",
-    });
-  });
-  app.use(errorMiddleware);
+  registerFallbackHandlers();
 }
 
 module.exports = app;

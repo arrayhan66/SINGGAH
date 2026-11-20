@@ -31,6 +31,8 @@
     "leva": "^0.10.1",
     "lucide-react": "^1.22.0",
     "marzipano": "^0.10.2",
+    "page-flip": "^2.0.7",
+    "pdfjs-dist": "^6.5.438",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-intersection-observer": "^10.0.3",

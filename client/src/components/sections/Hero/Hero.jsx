@@ -4,6 +4,7 @@ import HeroRays from "./HeroRays";
 import HeroIntro from "./HeroIntro";
 import KategoriPopuler from "../KategoriPopuler";
 import PenelitianPkmPanel from "../PenelitianPkmPanel";
+import Bulletin from "../../Bulletin";
 const DosenCarousel = lazy(() => import("../DosenCarousel"));
 const FaqSection = lazy(() => import("../FaqSection"));
 
@@ -72,6 +73,7 @@ function Hero() {
       </div>
 
       <PenelitianPkmPanel />
+      <Bulletin />
       <Suspense fallback={null}>
         <DosenCarousel />
         <FaqSection />

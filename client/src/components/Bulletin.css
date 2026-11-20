@@ -1,0 +1,126 @@
+.bl {
+  margin-top: -32px;
+  padding: 0 0 96px;
+}
+@media (max-width: 767px) {
+  .bl {
+    margin-top: -20px;
+  }
+}
+.bl-wrap {
+  width: 100%;
+  max-width: 1700px;
+  margin-right: auto;
+  margin-left: auto;
+}
+.bl-header {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: end;
+  align-items: last baseline;
+  justify-content: start;
+  column-gap: 64px;
+  row-gap: 12px;
+  margin-bottom: 40px;
+}
+@media (max-width: 1023px) {
+  .bl-header {
+    grid-template-columns: 1fr;
+    justify-content: stretch;
+  }
+}
+.bl-heading {
+  min-width: 0;
+}
+.bl-title {
+  margin: 0;
+  max-width: 900px;
+  font-family: var(--font-headline);
+  font-size: clamp(36px, 4.4vw, 56px);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+  white-space: nowrap;
+}
+@media (max-width: 767px) {
+  .bl-title {
+    white-space: normal;
+    max-width: 620px;
+  }
+}
+.bl-title-line {
+  display: block;
+  color: #0f172a;
+}
+.bl-title-accent {
+  color: var(--color-accent-primary);
+}
+.bl-desc {
+  margin: 0;
+  width: fit-content;
+  max-width: 100%;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-slate-500);
+  justify-self: end;
+  text-align: left;
+}
+@media (max-width: 1023px) {
+  .bl-desc {
+    justify-self: start;
+    max-width: 560px;
+  }
+}
+.bl-btn {
+  height: 48px;
+  padding: 0 24px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-slate-900, #0f172a);
+  background: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  text-decoration: none;
+  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease, box-shadow 300ms ease;
+}
+.bl-btn--primary {
+  background: var(--color-accent-primary);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 12px -4px rgba(37, 99, 235, 0.45);
+  cursor: pointer;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease;
+}
+.bl-btn--primary:hover {
+  background: color-mix(in srgb, var(--color-accent-primary) 88%, black);
+  border-color: color-mix(in srgb, var(--color-accent-primary) 88%, black);
+}
+.bl-btn.bl-btn--primary:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+.bl-btn--primary:active {
+  transform: translateY(1px);
+}
+.bl-btn--ghost {
+  background: transparent;
+  border: 1px solid var(--color-slate-300, #cbd5e1);
+  color: var(--color-slate-900, #0f172a);
+}
+.bl-btn--ghost:hover,
+.bl-btn--ghost:focus-visible {
+  background: var(--color-slate-200, #e2e8f0);
+  border-color: var(--color-slate-400, #94a3b8);
+  color: var(--color-slate-900, #0f172a);
+}
+.bl-btn:focus-visible {
+  outline: 2px solid var(--color-slate-900, #0f172a);
+  outline-offset: 3px;
+}

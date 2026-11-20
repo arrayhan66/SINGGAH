@@ -313,9 +313,14 @@ exports.viewLimiter = rateLimit({
   },
 });
 
+// App.jsx memanggil endpoint ini sekali setiap halaman dibuka. Di kampus,
+// ratusan mahasiswa bisa berbagi satu IP publik (NAT), jadi batas 10/menit
+// menghasilkan ratusan 429 setiap pagi (terukur: 352 4xx pada 08:00).
+// Endpoint ini sudah idempoten per IP per hari (recordVisit + unique index),
+// jadi batasnya dinaikkan; bot tetap tertahan oleh batas dan unique constraint.
 exports.visitLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: effectiveMax(10),
+  max: effectiveMax(120),
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => isRateLimitDisabled,

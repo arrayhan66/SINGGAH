@@ -224,6 +224,31 @@ app.get("/", (req, res) => {
   });
 });
 
+let swaggerRouter = null;
+
+if (process.env.NODE_ENV !== "test") {
+  loadSwagger()
+    .then((doc) => {
+      const router = express.Router();
+      router.use(swaggerUi.serve);
+      router.get("/", swaggerUi.setup(doc));
+      swaggerRouter = router;
+    })
+    .catch((err) => {
+      logger.error("Gagal memuat spec Swagger:", err);
+    });
+
+  app.use("/api/docs", (req, res, next) => {
+    if (!swaggerRouter) {
+      return res.status(503).json({
+        success: false,
+        message: "Dokumentasi sedang dimuat, silakan coba lagi.",
+      });
+    }
+    return swaggerRouter(req, res, next);
+  });
+}
+
 const registerFallbackHandlers = () => {
   // 404 Handler — taruh di sini, SETELAH semua route termasuk docs
   app.use((req, res) => {
@@ -277,11 +302,6 @@ const initialize = async () => {
     await ensureSlideshowColumn();
     await sequelize.sync();
   }
-
-  const swaggerDocument = await loadSwagger();
-
-  // Dokumentasi API hanya untuk non-production (hindari bocor skema endpoint).
-  app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 };
 
 const startServer = async () => {

@@ -8,9 +8,10 @@ module.exports = {
 
       exec_mode: "cluster",
 
-      // 2 worker x DB_POOL_MAX 12 = 24 koneksi, jauh di bawah batas TiDB
-      // Serverless (~100). Worker berlebih justru memicu DB_POOL habis.
-      instances: parseInt(process.env.PM2_INSTANCES, 10) || 2,
+      // Default 1 worker. Tiap worker bisa memakai hingga max_memory_restart;
+      // 3 worker x 600M mudah kena OOM di paket hosting kecil, lalu PM2 restart
+      // berulang dan hcdn mengembalikan 503. Naikkan hanya kalau RAM memadai.
+      instances: parseInt(process.env.PM2_INSTANCES, 10) || 1,
 
       min_uptime: "20s",
       max_restarts: 10,

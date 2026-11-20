@@ -1,8 +1,7 @@
 /**
  * Daftar suite yang menyentuh hosting sungguhan.
  *
- * Dipakai bersama oleh tests/runHosted.js (runner ke terminal) dan
- * tests/generateTestReport.js (runner -> laporan HTML).
+ * Dipakai oleh tests/runHosted.js (runner ke terminal).
  *
  * URUTAN suite disengaja: yang boros kuota login (security) ditaruh paling
  * akhir supaya suite yang butuh login sah (auth, idor) kebagian kuota dulu.

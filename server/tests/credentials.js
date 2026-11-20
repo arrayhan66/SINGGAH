@@ -73,9 +73,12 @@ const creds = readCredentials();
  * benar-benar kedaluwarsa.
  *
  * Yang dikembalikan adalah sisa detik yang perlu ditunggu, atau 0 kalau kuota
- * sudah tersedia.
+ * sudah tersedia. Tunggu dibatasi maksimal `maxWaitSeconds` (default 45 detik,
+ * di bawah timeout default Jest 60 detik untuk hook/test). Kalau reset-butuh
+ * lebih lama dari itu, fungsi TIDAK tidur -- pemanggil akan mendapat 429 dan
+ * pesan yang jelas, bukan "Exceeded timeout of 60000 ms".
  */
-async function waitForLoginQuota(API_URL, maxWaitSeconds = 60 * 16) {
+async function waitForLoginQuota(API_URL, maxWaitSeconds = 45) {
   const probe = await fetch(`${API_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -90,8 +93,21 @@ async function waitForLoginQuota(API_URL, maxWaitSeconds = 60 * 16) {
 
   const resetHeader = Number(probe.headers.get("ratelimit-reset"));
   const waitSeconds = Number.isFinite(resetHeader)
-    ? Math.min(resetHeader + 2, maxWaitSeconds)
-    : 60;
+    ? Math.ceil(resetHeader) + 2
+    : 0;
+
+  // Jangan pernah menunggu lebih lama dari batas hook Jest. Dulu fungsi ini
+  // tidur sampai 16 menit di dalam beforeAll, sehingga test gagal karena
+  // timeout 60 detik dan timer yang masih hidup bikin Jest tidak exit.
+  if (waitSeconds > maxWaitSeconds) {
+    console.warn(
+      `[login] Kuota rate limit masih habis (reset ~${waitSeconds} detik). ` +
+        `Tidak menunggu di dalam test agar tidak kena timeout Jest. ` +
+        `Tunggu ${Math.ceil(waitSeconds / 60)} menit lalu ulangi, dan jangan ` +
+        `jalankan suite security tepat sebelum auth/idor.`,
+    );
+    return waitSeconds;
+  }
 
   if (waitSeconds > 5) {
     console.warn(

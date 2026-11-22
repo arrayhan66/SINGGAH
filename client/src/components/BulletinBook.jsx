@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { PageFlip } from "page-flip";
 import * as pdfjsLib from "pdfjs-dist";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
-import pdfUrl from "../assets/pdf-files/bulletin2646.pdf?url";
+import pdfUrl from "../assets/pdf-files/bulletin-terbaru.pdf?url";
 import "./BulletinBook.css";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
@@ -65,6 +65,7 @@ export default function BulletinBook() {
   const [zoom, setZoom] = useState(1);
   const [isFs, setIsFs] = useState(false);
   const [edge, setEdge] = useState("start");
+  const [curPage, setCurPage] = useState(1);
 
   useEffect(() => {
     let dead = false;
@@ -233,10 +234,12 @@ export default function BulletinBook() {
           })();
           const last = pdf.numPages - 1;
           setEdge(idx <= 0 ? "start" : idx >= last ? "end" : "mid");
+          document.querySelectorAll(".bk-host").forEach(function(h){ h.style.setProperty("--bk-prog", String(last > 0 ? Math.min(1, Math.max(0, idx / last)) : 0)); });
         };
         syncEdgeRef.current = syncEdge;
         pf.on("flip", (e) => {
           setPageInput(String(e.data + 1));
+          setCurPage(e.data + 1);
           want(e.data);
           syncEdge();
         });
@@ -317,122 +320,146 @@ export default function BulletinBook() {
     if (e.key === "ArrowLeft") apiRef.current.prev();
   };
 
+  const atStart = edge === "start";
+  const atEnd = edge === "end";
+  const chip =
+    status !== "ready"
+      ? ""
+      : atStart
+        ? "Sampul depan"
+        : atEnd
+          ? "Sampul belakang"
+          : `Halaman ${curPage}–${Math.min(curPage + 1, total)} dari ${total}`;
+
   return (
     <div ref={rootRef} className={`bk${isFs ? " is-fs" : ""}`}>
-      <div
-        ref={stageRef}
-        className="bk-stage"
-        style={{ "--bk-zoom": zoom }}
-        tabIndex={0}
-        onKeyDown={onKey}
-        aria-label="Buku buletin interaktif"
-      >
-        <div ref={hostRef} className="bk-host" data-edge={edge} />
-        {status === "loading" && (
-          <div className="bk-overlay" role="status">
-            Memuat buletin…
-          </div>
-        )}
-        {status === "error" && (
-          <div className="bk-error" role="alert">
-            <strong>Buletin belum dapat dimuat</strong>
-            <p>{IS_DEV ? errorMsg : "Silakan unduh PDF-nya langsung."}</p>
+      <div className="bk-player">
+        <div className="bk-top">
+          <span className="bk-title">Buletin terbaru</span>
+          {chip && <span className="bk-chip">{chip}</span>}
+        </div>
+
+        <div
+          ref={stageRef}
+          className="bk-stage"
+          style={{ "--bk-zoom": zoom }}
+          tabIndex={0}
+          onKeyDown={onKey}
+          aria-label="Buku buletin interaktif"
+        >
+          <div ref={hostRef} className="bk-host" data-edge={edge} />
+          {status === "ready" && (
+            <>
+              <button
+                type="button"
+                className="bk-nav bk-nav-prev"
+                aria-label="Halaman sebelumnya"
+                disabled={atStart}
+                onClick={() => apiRef.current && apiRef.current.prev()}
+              >
+                <Icon>
+                  <path d="M15 18l-6-6 6-6" />
+                </Icon>
+              </button>
+              <button
+                type="button"
+                className="bk-nav bk-nav-next"
+                aria-label="Halaman berikutnya"
+                disabled={atEnd}
+                onClick={() => apiRef.current && apiRef.current.next()}
+              >
+                <Icon>
+                  <path d="M9 18l-6-6-6-6" />
+                </Icon>
+              </button>
+            </>
+          )}
+          {status === "loading" && (
+            <div className="bk-overlay" role="status">
+              Memuat buletin…
+            </div>
+          )}
+          {status === "error" && (
+            <div className="bk-error" role="alert">
+              <strong>Buletin belum dapat dimuat</strong>
+              <p>{IS_DEV ? errorMsg : "Silakan unduh PDF-nya langsung."}</p>
+              <a className="bk-btn" href={pdfUrl} download>
+                Unduh E-Book
+              </a>
+            </div>
+          )}
+        </div>
+
+        {status !== "error" && (
+          <div className="bk-controls">
+            {status === "ready" && (
+              <div className="bk-toolbar" role="toolbar" aria-label="Kontrol buku">
+                <div className="bk-zoomgroup">
+                  <button
+                    type="button"
+                    className="bk-tbtn"
+                    aria-label="Perkecil"
+                    disabled={zoom <= ZOOM_MIN}
+                    onClick={() => setZoom((z) => Math.max(ZOOM_MIN, z - ZOOM_STEP))}
+                  >
+                    <Icon>
+                      <circle cx="11" cy="11" r="7" />
+                      <path d="M21 21l-4.3-4.3M8 11h6" />
+                    </Icon>
+                  </button>
+                  <span className="bk-zoomlabel">{Math.round(zoom * 100)}%</span>
+                  <button
+                    type="button"
+                    className="bk-tbtn"
+                    aria-label="Perbesar"
+                    disabled={zoom >= ZOOM_MAX}
+                    onClick={() => setZoom((z) => Math.min(ZOOM_MAX, z + ZOOM_STEP))}
+                  >
+                    <Icon>
+                      <circle cx="11" cy="11" r="7" />
+                      <path d="M21 21l-4.3-4.3M11 8v6M8 11h6" />
+                    </Icon>
+                  </button>
+                  <span className="bk-sep" />
+                </div>
+
+                <div className="bk-pager">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    aria-label="Nomor halaman"
+                    value={pageInput}
+                    onChange={(e) => setPageInput(e.target.value.replace(/\D/g, ""))}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") goTo();
+                    }}
+                  />
+                  <span>/ {total}</span>
+                </div>
+
+                <span className="bk-sep" />
+                <button
+                  type="button"
+                  className="bk-tbtn"
+                  aria-label={isFs ? "Keluar layar penuh" : "Layar penuh"}
+                  onClick={toggleFs}
+                >
+                  <Icon>
+                    {isFs ? (
+                      <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" />
+                    ) : (
+                      <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+                    )}
+                  </Icon>
+                </button>
+              </div>
+            )}
             <a className="bk-btn" href={pdfUrl} download>
-              Unduh PDF
+              Unduh E-Book
             </a>
           </div>
         )}
       </div>
-
-      {status === "ready" && (
-        <div className="bk-toolbar" role="toolbar" aria-label="Kontrol buku">
-          <div className="bk-zoomgroup">
-            <button
-              type="button"
-              className="bk-tbtn"
-              aria-label="Perkecil"
-              disabled={zoom <= ZOOM_MIN}
-              onClick={() => setZoom((z) => Math.max(ZOOM_MIN, z - ZOOM_STEP))}
-            >
-              <Icon>
-                <circle cx="11" cy="11" r="7" />
-                <path d="M21 21l-4.3-4.3M8 11h6" />
-              </Icon>
-            </button>
-            <span className="bk-zoomlabel">{Math.round(zoom * 100)}%</span>
-            <button
-              type="button"
-              className="bk-tbtn"
-              aria-label="Perbesar"
-              disabled={zoom >= ZOOM_MAX}
-              onClick={() => setZoom((z) => Math.min(ZOOM_MAX, z + ZOOM_STEP))}
-            >
-              <Icon>
-                <circle cx="11" cy="11" r="7" />
-                <path d="M21 21l-4.3-4.3M11 8v6M8 11h6" />
-              </Icon>
-            </button>
-            <span className="bk-sep" />
-          </div>
-
-          <button
-            type="button"
-            className="bk-tbtn"
-            aria-label="Halaman sebelumnya"
-            onClick={() => apiRef.current && apiRef.current.prev()}
-          >
-            <Icon>
-              <path d="M15 18l-6-6 6-6" />
-            </Icon>
-          </button>
-          <div className="bk-pager">
-            <input
-              type="text"
-              inputMode="numeric"
-              aria-label="Nomor halaman"
-              value={pageInput}
-              onChange={(e) => setPageInput(e.target.value.replace(/\D/g, ""))}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") goTo();
-              }}
-            />
-            <span>/ {total}</span>
-          </div>
-          <button
-            type="button"
-            className="bk-tbtn"
-            aria-label="Halaman berikutnya"
-            onClick={() => apiRef.current && apiRef.current.next()}
-          >
-            <Icon>
-              <path d="M9 18l6-6-6-6" />
-            </Icon>
-          </button>
-
-          <span className="bk-sep" />
-          <button
-            type="button"
-            className="bk-tbtn"
-            aria-label={isFs ? "Keluar layar penuh" : "Layar penuh"}
-            onClick={toggleFs}
-          >
-            <Icon>
-              {isFs ? (
-                <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" />
-              ) : (
-                <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
-              )}
-            </Icon>
-          </button>
-        </div>
-      )}
-
-      {status !== "error" && (
-        <a className="bk-btn" href={pdfUrl} download>
-          Unduh PDF
-        </a>
-      )}
-
     </div>
   );
 }

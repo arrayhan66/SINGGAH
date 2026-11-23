@@ -14,7 +14,7 @@ export const itemSubtitle = {
   Beranda: "Layar utama",
   Karya: "Jelajahi karya",
   "Upload Karya": "Bagikan karyamu",
-  Tentang: "Tentang SINGGAH",
+  Tentang: "Tentang Singgah",
   Berita: "Kabar terbaru",
   "Profil Saya": "Akun & pengaturan",
   "Karya Tersimpan": "Karya favoritmu",

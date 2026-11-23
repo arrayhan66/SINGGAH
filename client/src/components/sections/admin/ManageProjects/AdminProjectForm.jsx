@@ -188,7 +188,7 @@ function AdminProjectForm() {
     <div className="user-page">
       <EditKaryaHero
         backPath={fromPath}
-        subtitle="Perbarui informasi dan tinjau status karya mahasiswa di SINGGAH."
+        subtitle="Perbarui informasi dan tinjau status karya mahasiswa di Singgah."
         ptClass="pt-6 sm:pt-8 2xl:pt-10"
       />
 

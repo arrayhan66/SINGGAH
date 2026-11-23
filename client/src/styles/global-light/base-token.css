@@ -136,7 +136,7 @@ html.light .text-slate-500 {
 
 /* ===== JUDUL & HEADING -> HITAM ===== */
 /* Semua heading yang tadinya putih jadi hitam keabu #404040
-   (persis tulisan "SINGGAH"), berlaku global termasuk admin */
+   (persis tulisan "Singgah"), berlaku global termasuk admin */
 html.light h1.text-white,
 html.light h2.text-white,
 html.light h3.text-white,

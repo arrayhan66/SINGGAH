@@ -49,7 +49,7 @@ export default function SettingsHero({
               Pengaturan <span className="text-cyan-300">Website</span>
             </h1>
             <p className="mt-1 max-w-xl text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400">
-              Kelola konfigurasi, identitas visual, dan sistem platform SINGGAH
+              Kelola konfigurasi, identitas visual, dan sistem platform Singgah
             </p>
           </div>
         </div>

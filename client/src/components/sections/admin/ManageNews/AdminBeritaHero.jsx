@@ -29,7 +29,7 @@ function AdminBeritaHero({ search, onSearchChange, statusFilter, onStatusChange 
               Kelola <span className="text-cyan-300">Berita</span>
             </h1>
             <p className="mt-1 text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400 max-w-xl">
-              Tambah, ubah, atau hapus berita dan pencapaian SINGGAH.
+              Tambah, ubah, atau hapus berita dan pencapaian Singgah.
             </p>
           </div>
         </div>

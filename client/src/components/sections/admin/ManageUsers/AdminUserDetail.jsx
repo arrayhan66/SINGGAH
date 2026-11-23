@@ -97,7 +97,7 @@ function AdminUserDetail() {
                 Detail <span className="text-slate-100">User</span>
               </h1>
               <p className="mt-1 max-w-xl text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400">
-                Detail informasi akun pengguna SINGGAH.
+                Detail informasi akun pengguna Singgah.
               </p>
             </div>
           </div>

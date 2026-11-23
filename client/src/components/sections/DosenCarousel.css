@@ -40,3 +40,9 @@
 .dc-card:focus-within { outline: 2px solid currentColor; outline-offset: -4px; }
 @media (max-width: 767px) { .dc-card { flex: 0 0 78vw; } .dc-num { font-size: 32px; } .dc-arrows { display: none; } }
 @media (prefers-reduced-motion: reduce) { .dc-card, .dc-card::after, .dc-go, .dc-go svg { transition: none; } }
+/* BL-DOSENDESC-START */
+.dc-accent { display: inline !important; }
+.dsn-head-desc { margin: 0 -28px 7px auto !important; max-width: none !important; flex: 0 1 auto !important; white-space: nowrap !important; text-align: right !important; align-self: flex-end !important; font-size: 15px !important; line-height: 1.7 !important; font-weight: 400 !important; color: #64748b !important; }
+@media (max-width: 1100px) { .dsn-head-desc { white-space: normal !important; max-width: 420px !important; } }
+@media (max-width: 900px) { .dsn-head-desc { margin: 0 !important; text-align: left !important; max-width: none !important; white-space: normal !important; } }
+/* BL-DOSENDESC-END */

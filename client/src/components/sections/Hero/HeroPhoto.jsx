@@ -111,6 +111,7 @@ export default function HeroPhoto() {
     () => typeof document !== "undefined" && document.hidden
   )
   const [inView, setInView] = useState(true)
+  const [heroEntered, setHeroEntered] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(
     () =>
       typeof window !== "undefined" &&
@@ -184,6 +185,10 @@ export default function HeroPhoto() {
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
+
+  useEffect(() => {
+    if (inView) setHeroEntered(true)
+  }, [inView])
 
   const paused = tabHidden || !inView
 
@@ -330,6 +335,17 @@ export default function HeroPhoto() {
           .hero-year-option:hover {
             background-color: #f1f5f9 !important;
           }
+          /* HEROIN-START */
+          html .hero-enter { opacity: 0; translate: 0 10px; }
+          html .hero-enter.is-in { animation: hero-in-up 0.6s ease-out both; animation-delay: var(--hero-delay, 0ms); }
+          html .hero-enter-fade { opacity: 0; translate: 0 10px; }
+          html .hero-enter-fade.is-in { animation: hero-enter-rise 0.6s ease-out both; animation-delay: var(--hero-delay, 0ms); }
+          @keyframes hero-in-up { from { opacity: 0; translate: 0 10px; } to { opacity: 1; translate: 0 0; } }
+          @keyframes hero-enter-rise { from { opacity: 0; translate: 0 10px; } to { opacity: 1; translate: 0 0; } }
+          @media (prefers-reduced-motion: reduce) {
+            html .hero-enter, html .hero-enter-fade { opacity: 1 !important; translate: none !important; animation: none !important; }
+          }
+          /* HEROIN-END */
         `}
       </style>
       <div className="mx-auto w-full max-w-[1700px]">
@@ -384,6 +400,7 @@ export default function HeroPhoto() {
             <div className="flex flex-col items-start">
               <h1
                 id={`${uid}-judul`}
+                className={`hero-enter${heroEntered ? " is-in" : ""}`}
                 style={{
                   ...WHITE,
                   fontSize: "clamp(40px, 4.6vw, 72px)",
@@ -393,7 +410,7 @@ export default function HeroPhoto() {
               >
                 Galeri Karya dari Civitas Akademika Poliban
               </h1>
-              <div className="flex flex-wrap items-center" style={{ marginTop: 20, gap: 16 }}>
+              <div className={`hero-enter flex flex-wrap items-center${heroEntered ? " is-in" : ""}`} style={{ marginTop: 20, gap: 16, "--hero-delay": "0ms" }}>
                 <p
                   style={{
                     ...WHITE,
@@ -438,6 +455,7 @@ export default function HeroPhoto() {
               }}
             >
               <p
+                className={`hero-enter${heroEntered ? " is-in" : ""}`}
                 style={{
                   ...WHITE,
                   fontSize: 16,
@@ -448,18 +466,20 @@ export default function HeroPhoto() {
                   textAlign: isLg ? "right" : "left",
                   textWrap: "balance",
                   textShadow: "0 1px 12px rgba(0,0,0,.35)",
+                  "--hero-delay": "0ms",
                 }}
               >
                 Tiap karya punya cerita kecilnya sendiri. Mau melihat karya yang luar biasa? Mungkin kamu bisa menemukannya di sini.
               </p>
               <ul
-                className="flex flex-wrap gap-2"
+                className={`hero-enter flex flex-wrap gap-2${heroEntered ? " is-in" : ""}`}
                 style={{
                   justifyContent: isLg ? "flex-end" : "flex-start",
                   maxWidth: isLg ? 280 : undefined,
                   listStyle: "none",
                   margin: 0,
                   padding: 0,
+                  "--hero-delay": "0ms",
                 }}
               >
                 <li>
@@ -482,11 +502,12 @@ export default function HeroPhoto() {
           </div>
 
           <div
-            className="absolute z-[2]"
+            className={`hero-enter-fade absolute z-[2]${heroEntered ? " is-in" : ""}`}
             style={{
               left: "50%",
               bottom: half + 16,
               transform: "translateX(-50%)",
+              "--hero-delay": "0ms",
               display: "flex",
               alignItems: "center",
               gap: 6,
@@ -558,7 +579,7 @@ export default function HeroPhoto() {
             role="search"
             aria-label="Cari karya mahasiswa"
             onSubmit={onSubmit}
-            className="hero-search-form absolute bottom-0 left-1/2 z-[3] flex flex-col md:flex-row md:items-center"
+            className={`hero-enter-fade hero-search-form absolute bottom-0 left-1/2 z-[3] flex flex-col md:flex-row md:items-center${heroEntered ? " is-in" : ""}`}
             style={{
               height: isMd ? 72 : "auto",
               width: isMd ? "min(100% - 32px, 880px)" : "min(100% - 24px, 520px)",
@@ -568,6 +589,7 @@ export default function HeroPhoto() {
               boxShadow: "0 12px 32px -8px rgba(15,23,42,0.18)",
               padding: isMd ? "8px 8px 8px 28px" : 8,
               transform: "translate(-50%, 50%)",
+              "--hero-delay": "0ms",
             }}
           >
             <div className="hp-seg flex h-[60px] flex-1 flex-col justify-center px-4 md:h-full md:px-3">

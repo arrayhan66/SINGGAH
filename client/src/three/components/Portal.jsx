@@ -194,7 +194,7 @@ function Portal({ position, rotationY, width, title, action }) {
         <boxGeometry args={[frameW, FRAME_T, DEPTH]} />
       </mesh>
 
-      {/* ==== Tengah portal: logo SINGGAH (masuk) / icon EXIT merah (keluar) ==== */}
+      {/* ==== Tengah portal: logo Singgah (masuk) / icon EXIT merah (keluar) ==== */}
       {title ? (
         <>
           {/* Logo plate textures decode asynchronously — wrap them so the

@@ -62,7 +62,7 @@ function AdminHero() {
               <span className="text-cyan-300">{name}</span>
             </h1>
 <p className="mt-1 text-sm text-slate-400 max-w-xl">
-              Kelola karya, berita, dan aktivitas SINGGAH
+              Kelola karya, berita, dan aktivitas Singgah
             </p>
           </div>
         </div>

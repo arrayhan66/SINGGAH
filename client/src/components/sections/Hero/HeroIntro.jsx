@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Compass, LayoutGrid } from "lucide-react";
 import karyaMahasiswa from "../../../assets/images/hero/karyaMahasiswa.jpg";
@@ -61,8 +61,30 @@ function HeroIntro() {
     navigate("/hall", { state: { freshHall: true } });
   };
 
+  const sectionRef = useRef(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return undefined;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setInView(true);
+            io.disconnect();
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -10% 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       aria-labelledby={id}
       className="px-3 pb-2 pt-6 min-[350px]:px-5 md:px-8 lg:px-10 lg:pb-2 lg:pt-[40px] xl:px-12 2xl:px-16"
     >
@@ -187,14 +209,34 @@ function HeroIntro() {
               transform: none !important;
             }
           }
+          /* PRODIN-START */
+          html .hi-prodin {
+            opacity: 0;
+            translate: 0 32px;
+            transition: opacity 350ms cubic-bezier(0.22, 1, 0.36, 1), translate 500ms cubic-bezier(0.22, 1, 0.36, 1);
+            transition-delay: var(--prodin-d, 0ms);
+            will-change: opacity, translate;
+          }
+          html .hi-prodin.is-in {
+            opacity: 1;
+            translate: 0 0;
+          }
+          @media (prefers-reduced-motion: reduce) {
+            html .hi-prodin {
+              opacity: 1 !important;
+              translate: 0 0 !important;
+              transition: none !important;
+            }
+          }
+          /* PRODIN-END */
         `}
       </style>
       <div className="mx-auto w-full max-w-[1700px]">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_0.8fr_1.1fr] lg:items-start lg:gap-8">
           <div>
             <span
-              className="inline-flex items-center"
-              style={{
+              className={`hi-prodin inline-flex items-center${inView ? " is-in" : ""}`}
+              style={{ "--prodin-d": "0ms",
                 backgroundColor: "#f1f5f9",
                 border: "1px solid #e2e8f0",
                 borderRadius: "999px",
@@ -209,8 +251,8 @@ function HeroIntro() {
 
             <h2
               id={id}
-              className="mt-5 font-headline"
-              style={{
+              className={`hi-prodin mt-5 font-headline${inView ? " is-in" : ""}`}
+              style={{ "--prodin-d": "0ms",
                 fontSize: "clamp(32px, 3.6vw, 56px)",
                 fontWeight: 500,
                 lineHeight: 1.1,
@@ -224,8 +266,8 @@ function HeroIntro() {
             </h2>
 
             <p
-              className="mt-5"
-              style={{
+              className={`hi-prodin mt-5${inView ? " is-in" : ""}`}
+              style={{ "--prodin-d": "0ms",
                 fontSize: "17px",
                 fontWeight: 400,
                 lineHeight: 1.6,
@@ -239,7 +281,7 @@ function HeroIntro() {
               tahun.
             </p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-3">
+            <div className={`hi-prodin mt-8 flex flex-wrap items-center gap-3${inView ? " is-in" : ""}`} style={{ "--prodin-d": "0ms" }}>
               <button
                 type="button"
                 onClick={handleStartExploration}
@@ -256,8 +298,8 @@ function HeroIntro() {
 
            <Link
              to="/karya"
-             className="group relative block overflow-hidden rounded-[28px] bg-slate-900 focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-blue-600 hi-card"
-             style={{
+             className={`hi-prodin group relative block overflow-hidden rounded-[28px] bg-slate-900 focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-blue-600 hi-card${inView ? " is-in" : ""}`}
+             style={{ "--prodin-d": "0ms",
                aspectRatio: "3 / 4",
                minHeight: "380px",
                boxShadow: "0 24px 48px -24px rgba(15,23,42,0.35)",
@@ -316,8 +358,8 @@ function HeroIntro() {
            <div>
              <Link
                to="/akademik/tur-virtual"
-               className="group relative block overflow-hidden rounded-[28px] bg-slate-900 focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-blue-600 hi-card"
-               style={{
+               className={`hi-prodin group relative block overflow-hidden rounded-[28px] bg-slate-900 focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-blue-600 hi-card${inView ? " is-in" : ""}`}
+               style={{ "--prodin-d": "0ms",
                  aspectRatio: "16 / 10",
                  boxShadow: "0 24px 48px -24px rgba(15,23,42,0.35)",
                }}
@@ -373,8 +415,8 @@ function HeroIntro() {
              </Link>
 
              <p
-                className="mt-5 max-w-[560px] text-[15px]"
-                style={{ lineHeight: 1.65, color: "#64748b" }}
+                className={`hi-prodin mt-5 max-w-[560px] text-[15px]${inView ? " is-in" : ""}`}
+                style={{ "--prodin-d": "0ms", lineHeight: 1.65, color: "#64748b" }}
               >
                 Bawa suasana kampus ke layar Anda, jelajahi tiap ruangan lewat tur virtual kapan saja dan dari mana saja, tanpa harus datang langsung
              </p>

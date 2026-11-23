@@ -25,9 +25,9 @@ function AdminFooter() {
         <div className="flex flex-col items-center gap-4 md:flex-row md:justify-between">
           <NavLink to="/admin" className="flex shrink-0 items-center gap-2">
             <div className={`h-9 w-9 overflow-hidden rounded-lg ${isDark ? "" : "bg-white ring-1 ring-[#d7e2f2]"}`}>
-              <SmartImage src={logo} alt="SINGGAH Logo" eager className="h-full w-full object-contain" />
+              <SmartImage src={logo} alt="Singgah Logo" eager className="h-full w-full object-contain" />
             </div>
-            <span className={`text-sm font-bold ${isDark ? "text-white" : "text-[#1b2a4a]"}`}>SINGGAH</span>
+            <span className={`text-sm font-bold ${isDark ? "text-white" : "text-[#1b2a4a]"}`}>Singgah</span>
           </NavLink>
 
           <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
@@ -54,7 +54,7 @@ function AdminFooter() {
 
         {/* COPYRIGHT */}
         <div className={`mt-5 border-t pt-4 text-center text-xs ${isDark ? "border-white/10 text-slate-500" : "border-[#d6e4fb] text-[#64748b]"}`}>
-          Copyright © 2026 SINGGAH — Dibuat ElektroPoliban
+          Copyright © 2026 Singgah — Dibuat ElektroPoliban
         </div>
       </div>
     </footer>

@@ -101,9 +101,9 @@ function AdminNavbar() {
         {/* LOGO */}
         <NavLink to="/admin" className="flex items-center gap-1.5 min-[260px]:gap-1 shrink-0">
           <div className="flex h-6 min-[320px]:h-7 min-[360px]:h-8 5xl:h-10 6xl:h-12 w-6 min-[320px]:w-7 min-[360px]:w-8 5xl:w-10 6xl:w-12 items-center justify-center overflow-hidden rounded-md min-[320px]:rounded-lg">
-            <SmartImage src={logo} alt="SINGGAH Logo" eager className="h-full w-full object-contain" />
+            <SmartImage src={logo} alt="Singgah Logo" eager className="h-full w-full object-contain" />
           </div>
-          <span className="text-sm min-[360px]:text-base 5xl:text-xl 6xl:text-2xl font-bold text-white">SINGGAH</span>
+          <span className="text-sm min-[360px]:text-base 5xl:text-xl 6xl:text-2xl font-bold text-white">Singgah</span>
         </NavLink>
 
         {/* RIGHT */}

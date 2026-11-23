@@ -11,7 +11,7 @@ export default function HallHUDHeader({ area }) {
       <div className="pointer-events-auto flex flex-col items-start gap-2">
         <div className="flex items-center space-x-3 rounded-2xl border border-night-border bg-black/50 px-4 py-2.5 backdrop-blur-md shadow-xl">
           <div className="h-9 w-9 overflow-hidden rounded-xl bg-gradient-to-tr from-blue-700 to-sky-400 flex items-center justify-center shadow-lg shadow-blue-900/40">
-            <SmartImage src={logo} alt="SINGGAH Logo" eager className="h-full w-full object-contain" />
+            <SmartImage src={logo} alt="Singgah Logo" eager className="h-full w-full object-contain" />
           </div>
           <div>
             <h1 className="text-sm font-bold leading-tight text-sky-300">

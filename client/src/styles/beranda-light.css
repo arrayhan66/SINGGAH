@@ -202,7 +202,7 @@ html.light .beranda-page #faq h2 span.text-cyan-300 {
 }
 
 /* Angka statistik hero (Proyek/Kategori/Pengunjung): hitam keabu
-   PERSIS tulisan "SINGGAH SEJENAK" */
+   PERSIS tulisan "Singgah SEJENAK" */
 html.light .beranda-page #hero h2.text-cyan-300 {
   color: #404040;
 }
@@ -247,7 +247,7 @@ html.light .beranda-page .hover\:border-cyan-400\/40:hover {
   border-color: #93c5fd;
 }
 
-/* Stat card mobile: angka ikut hitam keabu "SINGGAH SEJENAK" */
+/* Stat card mobile: angka ikut hitam keabu "Singgah SEJENAK" */
 html.light .beranda-page #hero p.font-bold.text-white {
   color: #404040;
 }

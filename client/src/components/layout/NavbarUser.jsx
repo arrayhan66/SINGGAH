@@ -330,7 +330,7 @@ function NavbarUser() {
           <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-xl min-[350px]:h-9 min-[350px]:w-9 sm:h-10 sm:w-10 md:h-11 md:w-11">
             <SmartImage
               src={logo}
-              alt="SINGGAH Logo"
+              alt="Singgah Logo"
               eager
               className="h-full w-full object-contain"
             />

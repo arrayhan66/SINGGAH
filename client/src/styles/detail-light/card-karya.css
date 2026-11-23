@@ -85,7 +85,7 @@ html.light .karya-detail-page button.rounded-full.bg-brand-navy\/80 svg.text-cya
 }
 
 /* Nama project di card: hitam lembut #404040 persis judul
-   "SINGGAH SEJENAK" & nama kategori di menu Karya.
+   "Singgah SEJENAK" & nama kategori di menu Karya.
    Ditaruh setelah rule h3.text-white .detail-page agar menang. */
 html.light .karya-detail-page h3.text-white {
   background-image: none;

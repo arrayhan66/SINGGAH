@@ -3,6 +3,8 @@ import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
 import SmartImage from "../ui/SmartImage";
 import logo from "../../assets/icons/logo.webp";
+import footerBg from "../../assets/images/bg-cover/Poliban-Depan-malam.jpg";
+import "./Footer.css";
 
 function Footer() {
   const { theme } = useTheme();
@@ -11,53 +13,73 @@ function Footer() {
   const tipe = user?.tipe || "umum";
 
   return (
-    <footer className={`mt-auto w-full ${isDark ? "border-t border-white/10 bg-night-deep" : "border-t border-neutral-400 bg-white shadow-sm"}`}>
-      <div className="w-full flex flex-col items-center justify-between gap-5 px-6 py-6 sm:px-8 md:px-12 lg:flex-row lg:py-8 2xl:px-16 3xl:px-20">
-        {/* LOGO */}
-        <NavLink to="/" className="flex items-center gap-2.5 sm:gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:h-10 sm:w-10 md:h-11 md:w-11 2xl:h-14 2xl:w-14">
-            <SmartImage
-              src={logo}
-              alt="SINGGAH Logo"
-              eager
-              className="h-10 w-10 object-contain sm:h-12 sm:w-12 2xl:h-16 2xl:w-16"
-            />
-          </div>
-
-          <h2 className={`text-base font-bold sm:text-lg md:text-xl 2xl:text-2xl ${isDark ? "text-white" : "text-neutral-900"}`}>
-            SINGGAH
-          </h2>
-        </NavLink>
-
-        {/* MENU */}
-        <div className={`flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs sm:text-sm md:text-base lg:gap-x-10 2xl:text-lg ${isDark ? "text-slate-300" : "text-[#6B7280]"}`}>
-          <NavLink to="/" className={`transition ${isDark ? "hover:text-cyan-300" : "hover:text-blue-600"}`}>
-            Beranda
+    <footer className={`sf ${isDark ? "sf-dark bg-night-deep" : "sf-light bg-white"}`}>
+      <div className="sf-card" style={{ backgroundImage: `url(${footerBg})` }}>
+        <div className="sf-brand">
+          <NavLink to="/" className="sf-logo">
+            <SmartImage src={logo} alt="Singgah Logo" eager className="sf-logo-img" />
+            <span className="sf-name">Singgah</span>
           </NavLink>
-
-          <NavLink to="/karya" className={`transition ${isDark ? "hover:text-cyan-300" : "hover:text-blue-600"}`}>
-            Karya
-          </NavLink>
-
-          {tipe !== "umum" && (
-            <NavLink to="/upload" className={`transition ${isDark ? "hover:text-cyan-300" : "hover:text-blue-600"}`}>
-              Upload Karya
-            </NavLink>
-          )}
-
-          <NavLink to="/about" className={`transition ${isDark ? "hover:text-cyan-300" : "hover:text-blue-600"}`}>
-            Tentang
-          </NavLink>
-
-          <NavLink to="/berita" className={`transition ${isDark ? "hover:text-cyan-300" : "hover:text-blue-600"}`}>
-            Berita
-          </NavLink>
+          <p className="sf-desc">
+            Singgah mengumpulkan karya dan riset program studi dalam satu galeri, supaya mahasiswa, dosen, dan mitra bisa menemukan apa yang mereka cari.
+          </p>
         </div>
 
-        {/* COPYRIGHT */}
-        <p className={`text-center text-[10px] sm:text-xs md:text-sm 2xl:text-base ${isDark ? "text-slate-500" : "text-[#6B7280]"}`}>
-          Copyright © 2026 SINGGAH — Dibuat ElektroPoliban
-        </p>
+        <nav className="sf-cols" aria-label="Footer">
+          <div className="sf-col">
+            <div className="sf-col-title">Karya</div>
+            <ul className="sf-col-list">
+              <li><NavLink className="sf-link" to="/karya?kategori=produk-unggulan">Produk Unggulan</NavLink></li>
+              <li><NavLink className="sf-link" to="/karya?kategori=inovasi">Inovasi</NavLink></li>
+              <li><NavLink className="sf-link" to="/karya?kategori=publikasi-ilmiah">Publikasi Ilmiah</NavLink></li>
+              {tipe !== "umum" && (
+                <li><NavLink className="sf-link" to="/upload">Upload Karya</NavLink></li>
+              )}
+            </ul>
+          </div>
+          <div className="sf-col">
+            <div className="sf-col-title">Penelitian &amp; PkM</div>
+            <ul className="sf-col-list">
+              <li><NavLink className="sf-link" to="/penelitian/kegiatan">Kegiatan Penelitian</NavLink></li>
+              <li><NavLink className="sf-link" to="/penelitian/buletin">Buletin</NavLink></li>
+              <li><NavLink className="sf-link" to="/pkm/kegiatan">Kegiatan PkM</NavLink></li>
+              <li><NavLink className="sf-link" to="/pkm/diseminasi">Diseminasi</NavLink></li>
+            </ul>
+          </div>
+          <div className="sf-col">
+            <div className="sf-col-title">Zona Akademik</div>
+            <ul className="sf-col-list">
+              <li><NavLink className="sf-link" to="/akademik/tur-virtual">Tur Virtual</NavLink></li>
+              <li><NavLink className="sf-link" to="/pemenang">Prestasi</NavLink></li>
+              <li><NavLink className="sf-link" to="/dosen">Daftar Dosen</NavLink></li>
+            </ul>
+          </div>
+          <div className="sf-col">
+            <div className="sf-col-title">Kolaborasi</div>
+            <ul className="sf-col-list">
+              <li><NavLink className="sf-link" to="/kemitraan">Kemitraan</NavLink></li>
+              <li><NavLink className="sf-link" to="/pengajuan-masalah">Pengajuan Masalah</NavLink></li>
+            </ul>
+          </div>
+          <div className="sf-col">
+            <div className="sf-col-title">Tentang</div>
+            <ul className="sf-col-list">
+              <li><NavLink className="sf-link" to="/tentang/profil">Profile</NavLink></li>
+              <li><NavLink className="sf-link" to="/tentang/struktur-organisasi">Struktur Organisasi</NavLink></li>
+              <li><NavLink className="sf-link" to="/about">Informasi Singgah</NavLink></li>
+              <li><NavLink className="sf-link" to="/berita">Pengumuman</NavLink></li>
+              <li><NavLink className="sf-link" to="/faq">FAQ</NavLink></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+
+      <div className="sf-bottom">
+        <p className="sf-copy">Copyright © 2026 Singgah — Dibuat ElektroPoliban</p>
+        <nav className="sf-legal" aria-label="Legal">
+          <a href="#" onClick={(e) => e.preventDefault()}>Privacy Policy</a>
+          <a href="#" onClick={(e) => e.preventDefault()}>Terms of Service</a>
+        </nav>
       </div>
     </footer>
   );

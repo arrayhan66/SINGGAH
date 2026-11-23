@@ -185,7 +185,7 @@ export default function BulletinBook() {
         await Promise.all([probe(workerUrl), probe(pdfUrl)]);
         if (dead) return;
 
-        task = pdfjsLib.getDocument({ url: pdfUrl });
+        task = pdfjsLib.getDocument({ url: pdfUrl, verbosity: pdfjsLib.VerbosityLevel.ERRORS });
         pdf = await task.promise;
         if (dead) return;
 

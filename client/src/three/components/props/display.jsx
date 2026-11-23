@@ -200,7 +200,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
               raycast={() => null}
               font="/fonts/GeneralSans-Semibold.ttf"
             >
-              SINGGAH
+              Singgah
             </Text>
             <Text
               position={[0, 0.58, 0.01]}
@@ -240,7 +240,7 @@ function InfoKiosk({ position, rotationY, stats, categories = [], variant = "inf
 
             {[
               "Selamat datang di",
-              "Gedung Virtual SINGGAH",
+              "Gedung Virtual Singgah",
               "karya Dosen & Mahasiswa.",
               "Masuki portal putih untuk",
               "menjelajahi setiap kategori.",

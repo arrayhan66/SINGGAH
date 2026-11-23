@@ -5,28 +5,34 @@ import api from "../../services/api";
 import { cloudinarySrc, isBrokenImage } from "../../utils/imageUrl";
 import "./PlanetaryOrbitGallery.css";
 
+const CARD_W = { DESKTOP: 300, MOBILE: 190 };
+const CARD_H = {
+  DESKTOP: (CARD_W.DESKTOP * 9) / 16,
+  MOBILE: (CARD_W.MOBILE * 9) / 16,
+};
+const ROW_STEP_DESKTOP = 276; // tiga baris mengisi CONTAINER_H 860
 const CONFIG = {
   DESKTOP: {
-    TILE_W: 220, // lebar tile (px) desktop
-    TILE_H: 140, // tinggi tile (px) desktop
+    TILE_W: CARD_W.DESKTOP, // lebar tile (px) desktop
+    TILE_H: CARD_H.DESKTOP, // tinggi tile (px) desktop
     GAP: 56, // jarak antar tile pada keliling silinder (px)
     ROWS: 3, // jumlah baris tile
     COLS_MIN: 14, // minimal kolom pada silinder
-    ROW_STEP: 212, // jarak vertikal antar baris (px)
-    CONTAINER_H: 700, // tinggi wadah galeri (px)
+    ROW_STEP: ROW_STEP_DESKTOP, // jarak vertikal antar baris (px)
+    CONTAINER_H: 860, // tinggi wadah galeri (px)
   },
   MOBILE: {
-    TILE_W: 150, // lebar tile (px) mobile
-    TILE_H: 96, // tinggi tile (px) mobile
-    GAP: 40, // jarak antar tile pada keliling silinder (px)
+    TILE_W: CARD_W.MOBILE, // lebar tile (px) mobile
+    TILE_H: CARD_H.MOBILE, // tinggi tile (px) mobile
+    GAP: 56, // jarak antar tile pada keliling silinder (px)
     ROWS: 3, // jumlah baris tile
     COLS_MIN: 12, // minimal kolom pada silinder
-    ROW_STEP: 150, // jarak vertikal antar baris (px)
+    ROW_STEP: CARD_H.MOBILE + 64, // jarak vertikal antar baris (px)
     CONTAINER_H: 520, // tinggi wadah galeri (px)
   },
   CAM_BACK: 0.3, // kamera mundur 30% radius dari pusat silinder
   PERSP_FACTOR: 1.0, // skala tile di tengah layar
-  ROW_ANGLE_OFFSET: [0, 0.5, 0.25], // offset sudut per baris (x 360/COLS)
+  ROW_ANGLE_OFFSET: [0, 0, 0], // offset sudut per baris (x 360/COLS)
   DRAG_DEG_PER_PX: 0.1, // derajat rotasi per px drag
   TILT_PER_PX: 0.015, // derajat tilt per px drag vertikal
   TILT_MAX: 4, // batas tilt maksimum (derajat)
@@ -152,12 +158,7 @@ function buildTiles(projects, geo) {
       if (isPrimary) seen.add(project.id);
 
       const theta = i * angleStep + CONFIG.ROW_ANGLE_OFFSET[r] * angleStep;
-      const s = 0.92 + ((i * 7 + r * 13) % 5) * 0.03;
-      const jitterY = ((i * 11 + r * 5) % 7 - 3) * 3;
-      const rowY = (r - 1) * ROW_STEP + jitterY;
-      const rz = ((i * 3 + r * 7) % 5 - 2) * 1.2;
-      const W = TILE_W * [0.92, 1, 1.1][(i * 3 + r * 2) % 3];
-      const H = TILE_H * [0.86, 1, 1.08][(i * 5 + r) % 3];
+      const rowY = (r - (ROWS - 1) / 2) * ROW_STEP;
       const slotIndex = r * COLS + i;
 
       result.push({
@@ -166,10 +167,10 @@ function buildTiles(projects, geo) {
         isPrimary,
         theta,
         slotIndex,
-        width: W,
-        height: H,
+        width: TILE_W,
+        height: TILE_H,
         loading: slotIndex < 12 ? "eager" : "lazy",
-        transform: `rotateY(${theta}deg) translateZ(${-R}px) translateY(${rowY}px) rotateZ(${rz}deg) scale(${s})`,
+        transform: `rotateY(${theta}deg) translateZ(${-R}px) translateY(${rowY}px)`,
       });
     }
   }
@@ -776,8 +777,8 @@ export default function PlanetaryOrbitGallery() {
         <div className="gal-vignette" aria-hidden="true" />
 
         <p className="gal-center" aria-hidden="true">
-          <span className="gal-center-a">Dibuat oleh</span>
-          <span className="gal-center-b">Civitas Poliban</span>
+          <span className="gal-center-a">Satu Galeri</span>
+          <span className="gal-center-b">Banyak Karya</span>
         </p>
 
         <div

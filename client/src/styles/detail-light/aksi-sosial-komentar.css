@@ -17,7 +17,7 @@ html.light .berita-detail-page .shadow-cyan-900\/20 {
 }
 
 /* ===== JUDUL PROJECT DETAIL ===== */
-/* Judul project: hitam keabu #404040 PERSIS tulisan "SINGGAH"
+/* Judul project: hitam keabu #404040 PERSIS tulisan "Singgah"
    (nama brand di header). Ditaruh setelah rule generik
    .detail-page h1.text-white agar menang. */
 html.light .karya-projectdetail-page h1.text-white {
@@ -234,14 +234,14 @@ html.light
 }
 
 /* ===== JUDUL "KOMENTAR" ===== */
-/* Hitam keabu #404040 PERSIS tulisan "SINGGAH" */
+/* Hitam keabu #404040 PERSIS tulisan "Singgah" */
 html.light .karya-projectdetail-page h3.text-lg.font-bold.text-white {
   background-image: none;
   color: #404040;
 }
 
 /* ===== JUDUL SECTION: TIM PENGEMBANG & TEKNOLOGI ===== */
-/* Hitam keabu #404040 PERSIS tulisan "SINGGAH" */
+/* Hitam keabu #404040 PERSIS tulisan "Singgah" */
 html.light
   .karya-projectdetail-page
   h3.uppercase.tracking-wider.text-white {

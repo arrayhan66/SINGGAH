@@ -1,8 +1,9 @@
+import faqFoto from "../../assets/images/bg-cover/faq-background.jpg";
 // DUMMY: ganti dengan isi asli sebelum rilis.
-export const FAQ_IMAGE = null; // isi dengan import gambar dari src/assets, mis. import foto dari "../../assets/faq.jpg"
+export const FAQ_IMAGE = faqFoto;
 export const FAQ_CTA = {
   judul: "Butuh bantuan lain?",
-  teks: "Tanyakan langsung ke admin prodi atau lihat panduan lengkap di halaman bantuan.",
+  teks: "Tanyakan langsung ke admin prodi atau lihat panduan lengkap di Informasi Singgah.",
   tautan: "Hubungi admin prodi",
   href: "#",
 };
@@ -10,15 +11,15 @@ export const FAQ_CTA = {
 export const FAQ_ITEMS = [
   {
     id: "f1",
-    tanya: "Apa itu Buletin Riset dan siapa yang menerbitkannya?",
+    tanya: "Apa itu Singgah?",
     jawab:
-      "Buletin Riset adalah media terbitan prodi yang memuat kabar riset, penelitian, dan pengabdian kepada masyarakat. Edisi terbaru dapat dibaca langsung di halaman ini.",
+      "Singgah adalah situs program studi yang mengumpulkan buletin riset, profil dosen dan peneliti, karya, dan tur kampus virtual di satu tempat.",
   },
   {
     id: "f2",
-    tanya: "Seberapa sering buletin diterbitkan?",
+    tanya: "Apa saja yang bisa saya temukan di Singgah?",
     jawab:
-      "Buletin terbit setiap tiga bulan. Edisi baru akan muncul di bagian Buletin setelah proses penyuntingan selesai.",
+      "Kamu bisa membaca buletin terbaru seperti membuka buku, mengenal dosen dan peneliti berdasarkan bidang keahlian, melihat galeri karya, dan berkeliling kampus lewat tur virtual.",
   },
   {
     id: "f3",

@@ -86,7 +86,7 @@ html.light .berita-page #berita h2.text-white {
   }
 }
 
-/* Deskripsi hero: tanpa batas max-w supaya "SINGGAH" tidak turun baris
+/* Deskripsi hero: tanpa batas max-w supaya "Singgah" tidak turun baris
    di layar lebar (di mobile tetap wrap natural oleh lebar kontainer) */
 html.light .berita-page #berita p.max-w-2xl {
   max-width: 100%;

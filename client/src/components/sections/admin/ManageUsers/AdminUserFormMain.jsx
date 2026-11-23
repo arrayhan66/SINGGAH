@@ -69,7 +69,7 @@ function AdminUserFormMain({ formData, updateField, onPublish, isEditMode, savin
         <p className="mt-1 text-xs text-slate-400">
           {isAdmin
             ? `Role Administrator tidak memakai tipe pengguna. Tipe asli "${preservedTipe}" akan aktif kembali saat role diubah ke User Biasa.`
-            : "Kategori pengguna di SINGGAH."}
+            : "Kategori pengguna di Singgah."}
         </p>
 
         <div className="mt-5 grid grid-cols-1 gap-2 sm:gap-3 md:grid-cols-3">

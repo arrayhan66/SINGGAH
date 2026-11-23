@@ -162,7 +162,7 @@ html.light .auth-page .bg-slate-950 .bg-blue-50\/70 {
 }
 /* Judul DAN teks di bawah judul kartu fitur (Smart Project /
    Secure Access / Manajemen terstruktur / Autentikasi civitas)
-   -> #404040 (sama seperti tulisan SINGGAH); menimpa warna putih
+   -> #404040 (sama seperti tulisan Singgah); menimpa warna putih
    dari rule footer light */
 html.light .auth-page .bg-slate-950 .bg-cyan-50\/70 .text-slate-500,
 html.light .auth-page .bg-slate-950 .bg-blue-50\/70 .text-slate-500,
@@ -172,7 +172,7 @@ html.light .auth-page .bg-slate-950 .bg-blue-50\/70 .text-slate-800 {
   text-shadow: none;
 }
 /* Semua teks gelap di kartu konten kiri -> #404040 (hitam "Selamat
-   Datang": hitam tapi tidak terlalu hitam): judul SINGGAH, Gerbang
+   Datang": hitam tapi tidak terlalu hitam): judul Singgah, Gerbang
    Menuju, deskripsi, dll. */
 html.light .auth-page .bg-slate-950 .bg-white\/90 .text-slate-900,
 html.light .auth-page .bg-slate-950 .bg-white\/90 .text-slate-800,
@@ -180,7 +180,7 @@ html.light .auth-page .bg-slate-950 .bg-white\/90 .text-slate-600 {
   color: #404040;
 }
 
-/* ===== LOGO SINGGAH (kotak logo + judul) lebih menarik, 2 mode ===== */
+/* ===== LOGO Singgah (kotak logo + judul) lebih menarik, 2 mode ===== */
 /* LIGHT: kapsul kaca biru premium + ring + glow, ikon dikasih bayangan */
 html.light .auth-page .bg-slate-950 .from-white.to-cyan-50 {
   background: linear-gradient(145deg, #ffffff 0%, #e9f2ff 100%);
@@ -202,14 +202,14 @@ html:not(.light) .auth-page .bg-slate-950 .from-white.to-cyan-50 {
 html:not(.light) .auth-page .bg-slate-950 .from-white.to-cyan-50 img {
   filter: drop-shadow(0 3px 4px rgba(3, 123, 144, 0.35));
 }
-/* Judul "SINGGAH": LIGHT -> teks gradasi biru tua */
+/* Judul "Singgah": LIGHT -> teks gradasi biru tua */
 html.light .auth-page .bg-slate-950 .bg-white\/90 h2 {
   background: linear-gradient(135deg, var(--color-accent-primary) 0%, #1e3a8a 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
-/* Judul "SINGGAH": DARK -> hitam tidak-terlalu-hitam #404040 polos */
+/* Judul "Singgah": DARK -> hitam tidak-terlalu-hitam #404040 polos */
 html:not(.light) .auth-page .bg-slate-950 .bg-white\/90 h2 {
   color: #404040;
 }

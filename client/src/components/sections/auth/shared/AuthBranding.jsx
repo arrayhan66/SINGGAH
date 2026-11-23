@@ -58,14 +58,14 @@ function AuthBranding({ backTo = "/" }) {
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-100 bg-gradient-to-br from-white to-cyan-50 p-2 shadow-xl shadow-cyan-200/40">
               <SmartImage
                 src={logo}
-                alt="Logo SINGGAH"
+                alt="Logo Singgah"
                 eager
                 className="h-9 w-9 object-contain"
               />
             </div>
             <div>
               <h2 className="text-2xl font-black tracking-tight text-slate-900">
-                SINGGAH
+                Singgah
               </h2>
             </div>
           </div>

@@ -178,7 +178,7 @@ function AdminBeritaPreview() {
                   </div>
                   <div>
                     <p className={`font-bold text-[11px] min-[350px]:text-xs sm:text-sm leading-tight min-[350px]:leading-normal ${isDark ? "text-slate-200" : "text-slate-800"}`}>
-                      {item.winner || item.source || "Tim Redaksi SINGGAH"}
+                      {item.winner || item.source || "Tim Redaksi Singgah"}
                     </p>
                     <p className={`text-[9px] min-[350px]:text-[11px] font-medium leading-tight min-[350px]:leading-normal ${isDark ? "text-cyan-400" : "text-cyan-600"}`}>
                       Divisi Publikasi & Media Akademik
@@ -220,7 +220,7 @@ function AdminBeritaPreview() {
               <div className="absolute bottom-3 min-[350px]:bottom-4 left-3 min-[350px]:left-4 right-3 min-[350px]:right-4 sm:left-6 sm:right-6 flex justify-end">
                 <span className="inline-flex items-center gap-1.5 text-[9px] min-[350px]:text-[11px] sm:text-xs text-white/95 bg-gradient-to-r from-black/60 to-black/40 backdrop-blur-lg px-3 min-[350px]:px-4 py-1.5 min-[350px]:py-2 rounded-full border border-white/15 font-semibold tracking-wide shadow-lg shadow-black/20">
                   <Newspaper size={11} className="min-[350px]:w-3 min-[350px]:h-3 shrink-0 opacity-80" />
-                  Dokumentasi Resmi SINGGAH
+                  Dokumentasi Resmi Singgah
                 </span>
               </div>
             </div>

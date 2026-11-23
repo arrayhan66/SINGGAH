@@ -10,7 +10,7 @@ const lightVignette =
 
 function EditKaryaHero({
   backPath = "/my-karya",
-  subtitle = "Perbarui informasi karya yang sudah kamu upload ke SINGGAH.",
+  subtitle = "Perbarui informasi karya yang sudah kamu upload ke Singgah.",
   ptClass = "pt-[calc(var(--navbar-h)+24px)] sm:pt-[calc(var(--navbar-h)+28px)]",
 }) {
   const navigate = useNavigate()

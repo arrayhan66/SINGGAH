@@ -12,7 +12,7 @@ function MyKaryaHero() {
       </h2>
 
       <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8 2xl:mt-8 2xl:max-w-4xl 2xl:text-xl 2xl:leading-9 3xl:mt-10 3xl:max-w-5xl 3xl:text-2xl 3xl:leading-10 4xl:mt-12 4xl:max-w-6xl 4xl:text-3xl 4xl:leading-11">
-        Kelola semua karya yang sudah kamu upload ke SINGGAH.
+        Kelola semua karya yang sudah kamu upload ke Singgah.
       </p>
     </div>
   )

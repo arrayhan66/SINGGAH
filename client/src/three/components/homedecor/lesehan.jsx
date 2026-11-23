@@ -67,7 +67,7 @@ function LesehanTable({
         <ringGeometry args={[radius - 0.1, radius - 0.06, 48]} />
         <meshStandardMaterial color={BRASS} metalness={0.85} roughness={0.3} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-4} />
       </mesh>
-      {/* SINGGAH logo in the centre */}
+      {/* Singgah logo in the centre */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, topH + 0.055, 0]}>
         <planeGeometry args={[radius * 0.5, radius * 0.5]} />
         <meshStandardMaterial

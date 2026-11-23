@@ -162,3 +162,197 @@
     max-width: 520px;
   }
 }
+/* BL-FAQFOTO-START */
+.faq-media { overflow: hidden !important; }
+.faq-media img { display: block !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
+/* BL-FAQFOTO-END */
+/* BL-FAQ2-START */
+.faq-list { border-top: 0 !important; display: flex !important; flex-direction: column !important; gap: 8px !important; }
+.faq-list > li { border-bottom: 0 !important; background: rgba(15,23,42,0.04) !important; border-radius: 14px !important; overflow: hidden !important; transition: background-color 320ms cubic-bezier(.4,0,.2,1) !important; }
+.faq-list > li.is-open { background: rgba(15,23,42,0.06) !important; }
+.faq-btn { min-height: 52px !important; padding: 0 20px !important; font-size: 14px !important; font-weight: 500 !important; color: var(--color-navy-ink) !important; align-items: center !important; gap: 16px !important; }
+.faq-btn:hover { color: var(--color-navy-ink) !important; }
+.faq-arrow { width: 16px !important; height: 16px !important; flex: none !important; color: #64748b !important; transition: transform 300ms cubic-bezier(.4,0,.2,1) !important; transform: rotate(0deg) !important; }
+.faq-btn[aria-expanded="true"] .faq-arrow { transform: rotate(180deg) !important; }
+.faq-panel { display: grid !important; grid-template-rows: 0fr !important; transition: grid-template-rows 320ms cubic-bezier(.4,0,.2,1) !important; }
+.faq-list > li.is-open .faq-panel { grid-template-rows: 1fr !important; }
+.faq-panel-inner { overflow: hidden !important; min-height: 0 !important; }
+.faq-answer { margin: 0 !important; padding: 0 20px 18px !important; font-size: 13.5px !important; line-height: 1.65 !important; color: #64748b !important; opacity: 0 !important; transition: opacity 220ms cubic-bezier(.4,0,.2,1) 0ms !important; }
+.faq-list > li.is-open .faq-answer { opacity: 1 !important; transition-delay: 80ms !important; }
+.faq-media { position: relative !important; border-radius: 20px !important; overflow: hidden !important; aspect-ratio: auto !important; height: 100% !important; min-height: 0 !important; background: var(--color-slate-100, var(--color-paper-border)) !important; }
+.faq-media img { display: block !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
+.faq-media-overlay { position: absolute !important; inset: 0 !important; background: linear-gradient(to top, rgba(0,0,0,0.62), rgba(0,0,0,0) 55%) !important; pointer-events: none !important; }
+.faq-media-content { position: absolute !important; left: 0 !important; right: 0 !important; bottom: 0 !important; padding: 22px !important; display: flex !important; align-items: flex-end !important; justify-content: space-between !important; gap: 16px !important; }
+.faq-media-copy { min-width: 0 !important; }
+.faq-media-title { margin: 0 !important; font-size: 18px !important; font-weight: 700 !important; line-height: 1.2 !important; color: #fff !important; }
+.faq-media-text { margin: 8px 0 0 !important; font-size: 13.5px !important; line-height: 1.5 !important; color: rgba(255,255,255,0.92) !important; max-width: 260px !important; }
+.faq-media-btn { flex: none !important; width: 40px !important; height: 40px !important; border-radius: 999px !important; background: #fff !important; color: #0f172a !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; text-decoration: none !important; transition: transform .2s ease, background-color .2s ease !important; }
+.faq-media-btn:hover { transform: translateY(-1px) !important; background: #f8fafc !important; }
+.faq-media-btn:focus-visible { outline: 2px solid #fff !important; outline-offset: 2px !important; }
+@media (min-width: 1024px) {
+  .faq-grid { align-items: stretch !important; }
+  .faq-side { display: flex !important; flex-direction: column !important; }
+  .faq-media { flex: 1 1 auto !important; }
+}
+@media (max-width: 1023px) {
+  .faq-media { aspect-ratio: 4 / 3 !important; height: auto !important; max-width: 520px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .faq-list > li, .faq-arrow, .faq-panel, .faq-answer, .faq-media-btn { transition: none !important; }
+}
+/* BL-FAQ2-END */
+/* BL-FAQ3-START */
+/* B: Tag FAQ disalin dari .dc-tag (DosenCarousel.css:5) */
+.faq-tag { width: fit-content !important; justify-self: start !important; align-self: flex-start !important; display: inline-flex !important; max-width: max-content !important; background-color: #f1f5f9 !important; border: 1px solid #e2e8f0 !important; border-radius: 999px !important; font-size: 13px !important; font-weight: 500 !important; color: #334155 !important; padding: 4px 12px !important; margin-bottom: 16px !important; letter-spacing: normal !important; text-transform: none !important; }
+/* B: Judul FAQ tipografi disalin dari .dc-title (DosenCarousel.css:6) */
+.faq-title { margin: 0 0 32px !important; max-width: 760px !important; font-family: var(--font-headline) !important; font-size: clamp(30px, 3.6vw, 52px) !important; font-weight: 500 !important; line-height: 1.06 !important; letter-spacing: -0.02em !important; color: var(--color-navy-ink) !important; }
+
+/* C: penyebab zoom/berubah ukuran - BL-FAQ2 set .faq-media aspect-ratio:auto;height:100%;flex:1 1 auto dan .faq-grid align-items:stretch (FaqSection.css:182,192-196) sehingga tinggi kartu mengikuti daftar saat item dibuka. Netralkan agar tinggi tetap. */
+@media (min-width: 1024px) {
+  .faq-grid { align-items: start !important; }
+  .faq-side { display: block !important; }
+  .faq-media { flex: none !important; aspect-ratio: 4 / 3 !important; height: auto !important; align-self: start !important; }
+}
+.faq-media { aspect-ratio: 4 / 3 !important; height: auto !important; align-self: start !important; overflow: hidden !important; position: relative !important; border-radius: 20px !important; transform: none !important; box-shadow: none !important; transition: box-shadow 500ms cubic-bezier(0.22, 1, 0.36, 1), transform 500ms cubic-bezier(0.22, 1, 0.36, 1) !important; -webkit-tap-highlight-color: transparent !important; }
+.faq-media img { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; object-fit: cover !important; transform: none !important; transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1) !important; will-change: transform !important; }
+/* netralkan zoom pada non-hover states */
+.faq-media:focus img, .faq-media:focus-within img, .faq-media:active img, .faq-media.is-open img { transform: none !important; }
+.faq-media:focus, .faq-media:focus-within, .faq-media:active, .faq-media.is-open { transform: none !important; }
+
+/* D: hover disalin dari hi-card Produk Unggulan (HeroIntro.jsx:123-175) */
+.faq-media:hover { box-shadow: 0 24px 48px -24px rgba(15,23,42,0.35) !important; }
+.faq-media:hover img { transform: scale(1.04) !important; }
+.faq-media-overlay { opacity: 1 !important; transition: opacity 500ms cubic-bezier(0.22, 1, 0.36, 1) !important; }
+.faq-media::after { content: "" !important; position: absolute !important; inset: 0 !important; background: linear-gradient(to top, rgba(15,23,42,0.25) 0%, transparent 60%) !important; opacity: 0 !important; transition: opacity 500ms cubic-bezier(0.22, 1, 0.36, 1) !important; pointer-events: none !important; z-index: 2 !important; }
+.faq-media:hover::after { opacity: 1 !important; }
+.faq-media-content { z-index: 3 !important; }
+.faq-media-btn { transition: background-color 400ms cubic-bezier(0.22, 1, 0.36, 1), transform 400ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 400ms cubic-bezier(0.22, 1, 0.36, 1) !important; will-change: transform !important; }
+.faq-media-btn svg { color: #0f172a !important; transform: rotate(-45deg) !important; transition: color 400ms cubic-bezier(0.22, 1, 0.36, 1), transform 500ms cubic-bezier(0.22, 1, 0.36, 1) !important; }
+.faq-media:hover .faq-media-btn, .faq-media-btn:hover, .faq-media-btn:focus-visible { background-color: #0f172a !important; transform: translateY(-2px) !important; box-shadow: 0 8px 18px -6px rgba(15,23,42,0.5) !important; }
+.faq-media:hover .faq-media-btn svg, .faq-media-btn:hover svg, .faq-media-btn:focus-visible svg { color: #ffffff !important; transform: rotate(0deg) !important; }
+
+@media (max-width: 1023px) {
+  .faq-media { aspect-ratio: 4 / 3 !important; height: auto !important; max-width: 520px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .faq-media, .faq-media img, .faq-media::after, .faq-media-overlay, .faq-media-btn, .faq-media-btn svg { transition: none !important; transform: none !important; }
+}
+/* BL-FAQ3-END */
+/* BL-FAQ4-START */
+/* A: hanya Singgah biru; "diajukan tentang" ikut warna judul */
+.faq-title .faq-accent { display: inline !important; color: var(--color-accent-primary) !important; }
+
+/* D: susunan 2 baris x 2 kolom di desktop, salin grid-template-columns asli FaqSection.css:18 */
+@media (min-width: 1024px) {
+  .faq-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr) !important; column-gap: clamp(24px, 2vw, 40px) !important; row-gap: clamp(24px, 2vw, 36px) !important; align-items: start !important; }
+  .faq-side, .faq-main { display: contents !important; }
+  .faq-tag { grid-column: 1 !important; grid-row: 1 !important; margin-bottom: 0 !important; align-self: end !important; }
+  .faq-title { grid-column: 2 !important; grid-row: 1 !important; margin: 0 !important; align-self: end !important; }
+  .faq-media { grid-column: 1 !important; grid-row: 2 !important; align-self: start !important; }
+  .faq-list { grid-column: 2 !important; grid-row: 2 !important; align-self: start !important; }
+}
+
+/* D: kartu foto - atas sejajar item pertama, aspect-ratio 3/2, tinggi tetap */
+.faq-media { aspect-ratio: 3 / 2 !important; height: auto !important; align-self: start !important; }
+@media (max-width: 1023px) {
+  .faq-media { aspect-ratio: 4 / 3 !important; height: auto !important; max-width: 520px !important; }
+}
+
+/* C: label kartu lebih besar */
+.faq-media-content { padding: clamp(22px, 1.6vw, 28px) !important; }
+.faq-media-title { font-size: clamp(20px, 1.25vw, 22px) !important; font-weight: 700 !important; }
+.faq-media-text { font-size: clamp(14.5px, .88vw, 15.5px) !important; line-height: 1.5 !important; max-width: 340px !important; }
+
+/* B: tombol panah bulat - tiru hi-card-arrow (HeroIntro.jsx:156-175,306) warna/ukuran/bayangan; panah tidak pudar */
+.faq-media-btn { width: clamp(42px, 2.6vw, 48px) !important; height: clamp(42px, 2.6vw, 48px) !important; background: #ffffff !important; color: #0f172a !important; opacity: 1 !important; box-shadow: none !important; }
+.faq-media-btn .faq-media-btn-icon, .faq-media-btn svg { width: 16px !important; height: 16px !important; color: #0f172a !important; opacity: 1 !important; transform: rotate(0deg) !important; transition: transform 300ms cubic-bezier(.4,0,.2,1), color 400ms cubic-bezier(0.22, 1, 0.36, 1) !important; }
+.faq-media:hover .faq-media-btn, .faq-media-btn:hover, .faq-media-btn:focus-visible { background-color: #0f172a !important; transform: translateY(-2px) !important; box-shadow: 0 8px 18px -6px rgba(15,23,42,0.5) !important; opacity: 1 !important; }
+.faq-media:hover .faq-media-btn .faq-media-btn-icon, .faq-media:hover .faq-media-btn svg, .faq-media-btn:hover .faq-media-btn-icon, .faq-media-btn:hover svg, .faq-media-btn:focus-visible .faq-media-btn-icon, .faq-media-btn:focus-visible svg { color: #ffffff !important; opacity: 1 !important; transform: rotate(45deg) !important; }
+
+/* D: item FAQ balance */
+.faq-list { gap: clamp(8px, .55vw, 10px) !important; }
+.faq-list > li { border-radius: clamp(14px, .9vw, 16px) !important; }
+.faq-btn { min-height: clamp(54px, 3.4vw, 66px) !important; padding-inline: clamp(20px, 1.5vw, 28px) !important; font-size: clamp(15px, 1.05vw, 18px) !important; font-weight: 400 !important; letter-spacing: 0 !important; line-height: 1.4 !important; }
+.faq-arrow { width: 1.1em !important; height: 1.1em !important; }
+.faq-answer { font-size: clamp(14px, .9vw, 16px) !important; line-height: 1.65 !important; padding-bottom: 20px !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-media-btn .faq-media-btn-icon, .faq-media-btn svg { transition: none !important; }
+}
+/* BL-FAQ4-END */
+/* BL-FAQ5-START */
+/* Nilai tetap dari CSS asli contoh - menimpa clamp/vw BL-FAQ4 */
+.faq-list { border-top: 0 !important; margin: 0 !important; padding: 0 !important; list-style: none !important; gap: 8px !important; display: flex !important; flex-direction: column !important; }
+.faq-list > li { background: rgba(24,24,27,0.04) !important; border: 0 !important; box-shadow: none !important; border-radius: 14px !important; overflow: hidden !important; }
+.faq-list > li.is-open { background: rgba(24,24,27,0.06) !important; }
+.faq-btn { padding: 18px 22px !important; gap: 16px !important; min-height: 0 !important; align-items: center !important; justify-content: space-between !important; font-family: var(--font-body) !important; font-size: 0.95rem !important; font-weight: 500 !important; letter-spacing: -0.01em !important; line-height: 1.5 !important; color: rgb(24,24,27) !important; text-align: left !important; }
+.faq-arrow, .faq-arrow svg { width: 15px !important; height: 15px !important; color: #71717a !important; }
+.faq-panel .faq-answer, .faq-answer { padding: 0 22px 20px !important; font-size: 0.875rem !important; line-height: 1.65 !important; color: #71717a !important; font-family: var(--font-body) !important; }
+@media (max-width: 640px) { .faq-btn { padding: 16px 18px !important; font-size: 0.9rem !important; } }
+/* BL-FAQ5-END */
+/* BL-FAQ11-START */
+html .faq .faq-list.faq-list { display: flex !important; flex-direction: column !important; gap: 10px !important; row-gap: 10px !important; }
+html .faq .faq-list.faq-list > li { margin: 0 !important; padding: 0 !important; min-height: 0 !important; height: auto !important; border: 1px solid #dbe2ea !important; border-radius: 10px !important; background: transparent !important; box-shadow: none !important; transition: background-color 200ms ease, border-color 200ms ease !important; }
+html .faq .faq-list.faq-list > li:hover { background: rgba(255,255,255,0.7) !important; border-color: #cbd5e1 !important; }
+html .faq .faq-list.faq-list > li.is-open { background: #ffffff !important; border-color: #cbd5e1 !important; box-shadow: none !important; }
+html .faq .faq-list.faq-list .faq-btn { display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 16px !important; width: 100% !important; margin: 0 !important; padding: 18px 22px !important; min-height: 0 !important; height: auto !important; line-height: 1.4 !important; font-family: var(--font-body) !important; font-size: 15px !important; font-weight: 500 !important; letter-spacing: -0.01em !important; color: #0f172a !important; text-align: left !important; background: transparent !important; border: 0 !important; }
+html .faq .faq-list.faq-list > li.is-open .faq-btn { color: #0f172a !important; font-weight: 500 !important; }
+html .faq .faq-list.faq-list .faq-arrow { flex: none !important; width: 14px !important; height: 14px !important; color: #64748b !important; }
+html .faq .faq-list.faq-list > li.is-open .faq-arrow { color: #475569 !important; }
+html .faq .faq-list.faq-list .faq-panel-inner { padding: 0 !important; margin: 0 !important; border: 0 !important; min-height: 0 !important; overflow: hidden !important; }
+html .faq .faq-list.faq-list .faq-answer { margin: 0 !important; padding: 0 22px 18px 22px !important; font-family: var(--font-body) !important; font-size: 14.5px !important; font-weight: 400 !important; line-height: 1.7 !important; color: #475569 !important; }
+/* BL-FAQ11-END */
+/* BL-FAQ12-START */
+/* hover/terbuka: satu keluarga dengan #f6f9fe, sedikit berbeda */
+html .faq .faq-list.faq-list > li:hover { background: rgba(226,232,240,0.25) !important; border-color: #cbd5e1 !important; box-shadow: none !important; }
+html .faq .faq-list.faq-list > li.is-open { background: rgba(226,232,240,0.35) !important; border-color: #cbd5e1 !important; box-shadow: none !important; }
+html .faq .faq-list.faq-list > li.is-open:hover { background: rgba(226,232,240,0.35) !important; }
+/* pil hiasan */
+html .faq .faq-tagrow { display: flex !important; align-items: center !important; flex-wrap: wrap !important; gap: 8px !important; }
+html .faq .faq-chips { display: flex !important; flex-wrap: wrap !important; gap: 8px !important; margin: 0 !important; padding: 0 !important; }
+html .faq .faq-chip { display: inline-flex !important; align-items: center !important; padding: 6px 14px !important; border: 1px solid #cbd5e1 !important; border-radius: 999px !important; background: transparent !important; color: #1b2a4a !important; font-family: var(--font-body) !important; font-size: 13px !important; font-weight: 500 !important; line-height: 1.2 !important; white-space: nowrap !important; pointer-events: none !important; user-select: none !important; cursor: default !important; }
+html .faq .faq-chip.is-on { background: #1b2a4a !important; border-color: #1b2a4a !important; color: #ffffff !important; }
+/* pindahkan penempatan grid .faq-tag -> .faq-tagrow (asal BL-FAQ4:249) */
+@media (min-width: 1024px) {
+  html .faq .faq-tagrow { grid-column: 1 !important; grid-row: 1 !important; margin-bottom: 0 !important; align-self: end !important; }
+}
+html .faq .faq-tagrow .faq-tag { grid-column: auto !important; grid-row: auto !important; margin: 0 !important; justify-self: auto !important; align-self: auto !important; }
+/* BL-FAQ12-END */
+/* BL-FAQ13-START */
+/* pil ke kanan, rata tepi kanan kartu foto (kolom grid sama), turun 8px */
+html .faq .faq-tagrow { display: flex !important; align-items: center !important; justify-content: space-between !important; flex-wrap: nowrap !important; gap: 12px !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; justify-self: stretch !important; }
+html .faq .faq-chips { margin-left: auto !important; justify-content: flex-end !important; flex-wrap: nowrap !important; transform: translateY(8px) !important; }
+@media (max-width: 640px) {
+  html .faq .faq-tagrow { flex-wrap: wrap !important; }
+  html .faq .faq-chips { margin-left: 0 !important; transform: none !important; }
+}
+/* BL-FAQ13-END */
+/* CHIPFINAL-START */
+html .faq .faq-chips .faq-chip.faq-chip { display: inline-flex !important; align-items: center !important; justify-content: center !important; height: 36px !important; padding: 0 16px !important; border-radius: 10px !important; border: 1px solid #cbd5e1 !important; background: transparent !important; color: #1b2a4a !important; font-family: var(--font-body) !important; font-size: 13px !important; font-weight: 500 !important; cursor: pointer !important; transition: border-color 200ms, background-color 200ms !important; }
+html .faq .faq-chips .faq-chip.faq-chip:hover { background: rgba(226,232,240,.55) !important; border-color: #94a3b8 !important; }
+html .faq .faq-chips .faq-chip.faq-chip:focus-visible { outline: 2px solid #055acd !important; outline-offset: 2px !important; }
+/* kompensasi agar tinggi baris .faq-tagrow tetap seperti sebelumnya */
+html .faq .faq-chips.faq-chips { margin-top: calc(-1 * 6px / 2) !important; margin-bottom: calc(-1 * 6px / 2) !important; }
+/* CHIPFINAL-END */
+/* CHIPFIX-START */
+html .faq .faq-tagrow.faq-tagrow, html .faq .faq-chips.faq-chips { pointer-events: auto !important; }
+html .faq .faq-chips.faq-chips { position: relative !important; z-index: 3 !important; }
+html .faq .faq-chips .faq-chip.faq-chip { pointer-events: auto !important; cursor: pointer !important; user-select: none !important; }
+html .faq .faq-chips .faq-chip.faq-chip:active { background: rgba(226,232,240,.85) !important; border-color: #94a3b8 !important; }
+@media (min-width: 901px) {
+  html .faq .faq-tag.faq-tag { transform: translateY(-72px) !important; }
+}
+/* CHIPFIX-END */
+/* LISTFINAL-START */
+html .faq .faq-list.faq-list > li { background: #eef1f5 !important; border-color: transparent !important; border-radius: 10px !important; transform: none !important; transition: background-color 220ms, border-color 220ms, border-radius 220ms, transform 240ms cubic-bezier(.22,1,.36,1) !important; }
+html .faq .faq-list.faq-list > li:hover { background: #e7ebf1 !important; transform: translateX(4px) !important; }
+html .faq .faq-list.faq-list > li.is-open { background: #e7ebf1 !important; transform: translateX(0) !important; }
+html .faq .faq-list.faq-list .faq-arrow { color: #64748b !important; }
+/* LISTFINAL-END */
+/* CHIPFINAL2-START */
+html .faq .faq-chips .faq-chip.faq-chip { border: 0 !important; background: #222839 !important; color: #e2e8f0 !important; border-radius: 10px !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.08) !important; height: 36px !important; padding: 0 16px !important; font-size: 13px !important; font-weight: 500 !important; transition: background-color 200ms, color 200ms, box-shadow 200ms !important; }
+html .faq .faq-chips .faq-chip.faq-chip:hover { background: #2d354d !important; color: #fff !important; border: 0 !important; }
+html .faq .faq-chips .faq-chip.faq-chip:active { background: #1b2030 !important; color: #fff !important; border: 0 !important; }
+html .faq .faq-chips .faq-chip.faq-chip:focus-visible { outline: 2px solid #055acd !important; outline-offset: 2px !important; }
+/* CHIPFINAL2-END */
+html .faq .faq-list.faq-list > li:has(.faq-btn:focus-visible) { border-color: #055acd !important; }

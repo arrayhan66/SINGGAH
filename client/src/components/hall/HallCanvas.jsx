@@ -7,9 +7,6 @@ import { DPR_FOR, useLiteMode, isMobile } from "../../three/hooks/useQuality"
 import { attachWebGLContextGuard } from "../../three/utils/webglGuard"
 
 // Turunkan pixel-ratio render secara adaptif saat FPS ambles (HP panas).
-// Faktor dari PerformanceMonitor memangkas beban fill-rate tanpa menyentuh
-// asset 3D. Floor dipatok tinggi (0.92) agar hasil tetap tajam/HD — turun
-// hanya sedikit kalau device benar-benar kepayahan, tidak sampai buram.
 function AutoDpr() {
   const gl = useThree((s) => s.gl)
   const setDpr = useThree((s) => s.setDpr)

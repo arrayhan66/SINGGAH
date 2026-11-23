@@ -56,7 +56,7 @@ export default function Bulletin() {
   <iframe
     className="bl-hey-frame"
     src={BL_HEYZINE}
-    title="Buletin SINGGAH"
+    title="Buletin Singgah"
     allowFullScreen
     allow="clipboard-write"
     loading="lazy"

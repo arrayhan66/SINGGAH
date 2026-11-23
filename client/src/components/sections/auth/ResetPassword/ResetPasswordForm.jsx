@@ -82,13 +82,13 @@ function ResetPasswordForm() {
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-100/30 bg-white/10 p-3 shadow-md backdrop-blur-md sm:h-16 sm:w-16 sm:p-3.5">
               <SmartImage
                 src={logo}
-                alt="Logo SINGGAH"
+                alt="Logo Singgah"
                 eager
                 className="h-full w-full object-contain"
               />
             </div>
             <span className="text-xl font-black tracking-wider text-white sm:text-2xl">
-              SINGGAH
+              Singgah
             </span>
           </div>
 

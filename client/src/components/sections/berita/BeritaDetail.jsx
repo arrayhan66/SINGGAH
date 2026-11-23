@@ -442,7 +442,7 @@ function BeritaDetail() {
   const relatedNews = beritaList.filter((b) => b.slug !== slug).slice(0, 3);
 
   const currentUrl = window.location.href;
-  const shareTitle = encodeURIComponent(item?.title || "Berita SINGGAH");
+  const shareTitle = encodeURIComponent(item?.title || "Berita Singgah");
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(currentUrl);
@@ -551,7 +551,7 @@ function BeritaDetail() {
                     <p
                       className={`font-bold text-[11px] min-[350px]:text-xs sm:text-sm leading-tight min-[350px]:leading-normal ${isDark ? "text-slate-200" : "text-slate-800"}`}
                     >
-                      {item.winner || item.source || "Tim Redaksi SINGGAH"}
+                      {item.winner || item.source || "Tim Redaksi Singgah"}
                     </p>
                     <p
                       className={`text-[9px] min-[350px]:text-[11px] font-medium leading-tight min-[350px]:leading-normal ${isDark ? "text-cyan-400" : "text-cyan-600"}`}
@@ -591,7 +591,7 @@ function BeritaDetail() {
                   size={11}
                   className="min-[350px]:w-3 min-[350px]:h-3 shrink-0 opacity-80"
                 />
-                Dokumentasi Resmi SINGGAH
+                Dokumentasi Resmi Singgah
               </span>
             </div>
           </div>

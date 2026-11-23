@@ -12,7 +12,7 @@ export default function MaintenanceSection() {
         </div>
 
         <h1 className="mt-8 text-2xl font-bold tracking-tight text-white md:text-4xl">
-          SINGGAH Sedang Maintenance
+          Singgah Sedang Maintenance
         </h1>
 
         <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-slate-400 md:text-base">

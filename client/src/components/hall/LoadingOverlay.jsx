@@ -92,7 +92,7 @@ function LoadingOverlay({ ready = false }) {
           isDark ? "text-sky-300" : "text-[#1e3a8a]"
         }`}
       >
-        SINGGAH
+        Singgah
       </div>
       <div
         className={`text-xs md:text-sm tracking-[0.3em] ${

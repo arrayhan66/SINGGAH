@@ -31,8 +31,8 @@ export default function UserFormHero({ isEditMode, onBack }) {
             </h1>
             <p className="mt-1 max-w-xl text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400">
               {isEditMode
-                ? "Perbarui informasi akun pengguna SINGGAH."
-                : "Lengkapi data untuk membuat akun pengguna baru di SINGGAH."}
+                ? "Perbarui informasi akun pengguna Singgah."
+                : "Lengkapi data untuk membuat akun pengguna baru di Singgah."}
             </p>
           </div>
         </div>

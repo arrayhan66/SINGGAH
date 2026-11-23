@@ -55,7 +55,7 @@ function ProfileHero({ isAdmin = false }) {
       </div>
 
       <p className="mt-3 max-w-xl text-xs min-[350px]:text-sm md:text-base lg:text-lg lg:mt-4 2xl:text-xl 2xl:mt-5 text-slate-300">
-        Kelola informasi akun dan keamanan profil kamu di SINGGAH.
+        Kelola informasi akun dan keamanan profil kamu di Singgah.
       </p>
     </>
   )

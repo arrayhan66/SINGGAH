@@ -91,8 +91,9 @@ export default function DosenCarousel() {
         <header className="dc-header">
           <div className="dc-heading">
             <span className="dc-tag">Dosen &amp; Peneliti</span>
-            <h2 id="dc-title" className="dc-title">Kenali dosen<span className="dc-accent">dan peneliti</span></h2>
+            <h2 id="dc-title" className="dc-title">Kenali dosen<br />dan <span className="dc-accent">peneliti</span></h2>
           </div>
+          <p className="dsn-head-desc">Setiap bidang punya orang-orang di baliknya, geser dan kenali satu per satu.</p>
           <div className="dc-arrows">
             <button type="button" aria-label="Sebelumnya" onClick={() => geser(-1)} disabled={edges.prev}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg></button>
             <button type="button" aria-label="Berikutnya" onClick={() => geser(1)} disabled={edges.next}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6" /></svg></button>

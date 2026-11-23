@@ -5,13 +5,13 @@ import PCBBackground from "../ui/PCBBackground";
 
 const faq = [
   {
-    question: <>Apa itu SINGGAH?</>,
+    question: <>Apa itu Singgah?</>,
     answer: (
       <>
         <span className="font-semibold text-cyan-300">
           Sistem Informasi Galeri Gagasan dan Hasil Karya
         </span>{" "}
-        SINGGAH adalah singkatan dari nama itu. Tempat civitas Teknik Elektro
+        Singgah adalah singkatan dari nama itu. Tempat civitas Teknik Elektro
         Poliban memamerkan karyanya, mulai dari website, mobile app, IoT,
         artificial intelligence, data science, cyber security, UI/UX design,
         sampai game development. Nggak perlu unduh aplikasi apa pun, cukup
@@ -25,7 +25,7 @@ const faq = [
       "Daftar dulu di halaman registrasi, lalu unggah karyamu di sini. Kalau kamu mahasiswa, karyamu ditinjau admin dulu sebelum tayang. Kalau kamu dosen, karyamu langsung tayang tanpa perlu ditinjau.",
   },
   {
-    question: "Apa itu Gedung Virtual SINGGAH?",
+    question: "Apa itu Gedung Virtual Singgah?",
     answer:
       "Gedung Virtual adalah bangunan 3D tempat karya-karya itu dipamerkan. Di dalamnya ada Halaman Utama, lalu Ruang pameran Karya untuk tiap kategori. Pengunjung bisa jalan-jalan, pindah kategori lewat portal, dan naik ke lantai 2 untuk lihat karya dosen.",
   },

@@ -28,7 +28,7 @@ function buildLinkHotspot(scene, onSelect) {
   button.innerHTML = `
     <span class="ak-hotspot__pulse" aria-hidden="true"></span>
     <span class="ak-hotspot__arrow" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M5 12h14" />
         <path d="m13 6 6 6-6 6" />
       </svg>

@@ -43,6 +43,7 @@ function Strip() {
   const bandRef = useRef(null)
   const trackRef = useRef(null)
   const setRef = useRef(null)
+  const berhenti = useRef(false)
 
   useEffect(() => {
     const band = bandRef.current
@@ -56,6 +57,8 @@ function Strip() {
     let lebarSet = 0
     let tampil = !document.hidden
     let dalamLayar = true
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
+    let reduced = motionQuery.matches
 
     const ukur = () => {
       lebarSet = satu.getBoundingClientRect().width
@@ -65,7 +68,7 @@ function Strip() {
       if (last === 0) last = t
       const dt = Math.min((t - last) / 1000, 0.1)
       last = t
-      if (lebarSet > 0) {
+      if (!berhenti.current && lebarSet > 0) {
         x -= KECEPATAN * dt
         if (x <= -lebarSet) x += lebarSet
         track.style.transform = "translate3d(" + x + "px,0,0)"
@@ -83,7 +86,7 @@ function Strip() {
       raf = 0
     }
     const sinkron = () => {
-      if (tampil && dalamLayar) mulai()
+      if (!reduced && tampil && dalamLayar) mulai()
       else henti()
     }
 
@@ -107,19 +110,29 @@ function Strip() {
       sinkron()
     }
     document.addEventListener("visibilitychange", onVisibility)
+    const onMotionChange = (event) => {
+      reduced = event.matches
+      if (reduced) {
+        x = 0
+        track.style.transform = "translate3d(0px,0,0)"
+      }
+      sinkron()
+    }
+    motionQuery.addEventListener("change", onMotionChange)
 
     return () => {
       henti()
       ro.disconnect()
       io.disconnect()
       document.removeEventListener("visibilitychange", onVisibility)
+      motionQuery.removeEventListener("change", onMotionChange)
     }
   }, [])
 
   return (
     <section aria-label="Mitra" className="w-full" style={{ marginTop: 16, marginBottom: 0 }}>
       <style>{CSS}</style>
-      <div ref={bandRef} className="mitra-band">
+      <div ref={bandRef} className="mitra-band" onPointerEnter={() => { berhenti.current = true }} onPointerLeave={() => { berhenti.current = false }}>
         <div ref={trackRef} className="mitra-track">
           <div ref={setRef} className="mitra-set">
             {SATU_SET.map((m) => (

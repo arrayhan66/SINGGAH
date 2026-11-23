@@ -253,12 +253,12 @@ html.light .admin-page aside .sidebar-menu-item.border-cyan-400\/30 .sidebar-men
   color: #1d4ed8;
 }
 
-/* ===== TOMBOL "CIUTKAN" LIGHT: teks pakai tone gelap khas SINGGAH ===== */
+/* ===== TOMBOL "CIUTKAN" LIGHT: teks pakai tone gelap khas Singgah ===== */
 html.light .admin-page aside button span.text-\[12px\] {
   color: #404040;
 }
 
-/* ===== TOMBOL "CIUTKAN" LIGHT: teks pakai tone gelap khas SINGGAH ===== */
+/* ===== TOMBOL "CIUTKAN" LIGHT: teks pakai tone gelap khas Singgah ===== */
 html.light .admin-page aside button span.text-\[12px\] {
   color: #404040;
 }
@@ -327,8 +327,8 @@ html.light .admin-page .dashboard-quickaction-card .quickaction-icon svg {
   color: #ffffff;
 }
 
-/* Nilai statistik: hitam lembut SINGGAH #404040 (bukan #0f172a
-   yang terlalu pekat), senada judul "SINGGAH" di beranda */
+/* Nilai statistik: hitam lembut Singgah #404040 (bukan #0f172a
+   yang terlalu pekat), senada judul "Singgah" di beranda */
 html.light .admin-page .dashboard-stat-card .stat-value {
   color: #404040;
 }
@@ -346,7 +346,7 @@ html.light .admin-page .dashboard-stat-card .sparkline path[stroke] {
 }
 
 /* Judul item di panel bawah (project pending/approved, berita):
-   teks putih dark -> jadi hitam lembut SINGGAH #404040 di light,
+   teks putih dark -> jadi hitam lembut Singgah #404040 di light,
    bukan #0f172a yang terlalu pekat */
 html.light .admin-page .dashboard-pending-item p.text-white,
 html.light .admin-page .dashboard-approved-item p.text-white,
@@ -422,7 +422,7 @@ html.light .admin-page .dashboard-quickaction-card:active {
   background-color: #dbeafe !important;
 }
 
-/* Label quick action: hitam lembut SINGGAH #404040 di light mode
+/* Label quick action: hitam lembut Singgah #404040 di light mode
    (menggantikan #0f172a dari .text-white), berubah biru saat hover
    di light / cyan di dark agar konsisten dengan aksen dashboard */
 html.light .admin-page .dashboard-quickaction-card .quickaction-label {

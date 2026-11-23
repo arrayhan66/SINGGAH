@@ -151,7 +151,7 @@ function AdminUserHero({ search, onSearchChange, statusFilter, onStatusChange })
                 Kelola <span className="text-cyan-300">User</span>
               </h1>
               <p className="mt-1 text-[clamp(0.8125rem,0.75rem+0.5vw,0.875rem)] text-slate-400 max-w-xl">
-                Tambah, edit, hapus, dan kelola seluruh pengguna SINGGAH.
+                Tambah, edit, hapus, dan kelola seluruh pengguna Singgah.
               </p>
             </div>
           </div>

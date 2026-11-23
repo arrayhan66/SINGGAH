@@ -16,7 +16,7 @@ html.light .detail-page .text-cyan-300 {
 
 /* ===== HEADER HALAMAN ===== */
 /* Judul nama kategori: NORMAL seperti dark mode (tanpa efek 3D),
-   warna hitam keabu #404040 PERSIS tulisan "SINGGAH SEJENAK" di beranda */
+   warna hitam keabu #404040 PERSIS tulisan "Singgah SEJENAK" di beranda */
 html.light .karya-detail-page #karya-detail h2.text-white {
   letter-spacing: -0.02em;
   background-image: none;
